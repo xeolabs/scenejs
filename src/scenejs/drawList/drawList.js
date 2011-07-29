@@ -1982,16 +1982,20 @@ var SceneJS_DrawList = new (function() {
 
     this._pickFrame = function(sceneId, canvasX, canvasY, options) {
         //if (!this._states.pickBufferActive) {
-        this._createPickBuffer();
-        this._bindPickBuffer();
-        this._states.nodeRenderer.init({ picking: true });
-        this._renderBin(this._states, true);
-        this._states.pickBufferActive = true;
-        this._states.nodeRenderer.cleanup();
+        var states = this._sceneStates[sceneId] ;
+        if (!states) {
+            throw "No drawList found for scene '" + sceneId + "'";
+        }
+        this._createPickBuffer(states);
+        this._bindPickBuffer(states);
+        states.nodeRenderer.init({ picking: true });
+        this._renderBin(states, true);
+        states.pickBufferActive = true;
+        states.nodeRenderer.cleanup();
         //}
-        var pickIndex = this._readPickBuffer(canvasX, canvasY);
+        var pickIndex = this._readPickBuffer(states, canvasX, canvasY);
         var wasPicked = false;
-        var pickListeners = this._states.nodeRenderer.pickListeners[pickIndex];
+        var pickListeners = states.nodeRenderer.pickListeners[pickIndex];
         if (pickListeners) {
             var listeners = pickListeners.listeners;
             for (var i = listeners.length - 1; i >= 0; i--) {
@@ -1999,20 +2003,16 @@ var SceneJS_DrawList = new (function() {
                 listeners[i]({ canvasX: canvasX, canvasY: canvasY }, options);
             }
         }
-        this._unbindPickBuffer();
+        this._unbindPickBuffer(states);
         return wasPicked;
     };
 
-    function deactivatePick() {
-
-    }
-
-    this._createPickBuffer = function() {
-        var canvas = this._states.canvas;
+    this._createPickBuffer = function(states) {
+        var canvas = states.canvas;
         var gl = canvas.context;
         var width = canvas.canvas.width;
         var height = canvas.canvas.height;
-        var pickBuf = this._states.pickBuf;
+        var pickBuf = states.pickBuf;
         if (pickBuf) { // Currently have a pick buffer
             if (pickBuf.width == width && pickBuf.height) { // Canvas size unchanged, buffer still good
                 return;
@@ -2024,7 +2024,7 @@ var SceneJS_DrawList = new (function() {
             }
         }
 
-        pickBuf = this._states.pickBuf = {
+        pickBuf = states.pickBuf = {
             frameBuf : gl.createFramebuffer(),
             renderBuf : gl.createRenderbuffer(),
             texture : gl.createTexture(),
@@ -2079,18 +2079,18 @@ var SceneJS_DrawList = new (function() {
         }
     };
 
-    this._bindPickBuffer = function() {
-        var context = this._states.canvas.context;
-        context.bindFramebuffer(context.FRAMEBUFFER, this._states.pickBuf.frameBuf);
+    this._bindPickBuffer = function(states) {
+        var context = states.canvas.context;
+        context.bindFramebuffer(context.FRAMEBUFFER, states.pickBuf.frameBuf);
         context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
         context.disable(context.BLEND);
     };
 
     /** Reads pick buffer pixel at given coordinates, returns index of associated listener else (-1)
      */
-    this._readPickBuffer = function(pickX, pickY) {
-        var canvas = this._states.canvas.canvas;
-        var context = this._states.canvas.context;
+    this._readPickBuffer = function(states, pickX, pickY) {
+        var canvas = states.canvas.canvas;
+        var context = states.canvas.context;
 
         var x = pickX;
         var y = canvas.height - pickY;
@@ -2101,8 +2101,8 @@ var SceneJS_DrawList = new (function() {
         return (pickedNodeIndex >= 1) ? pickedNodeIndex - 1 : -1;
     };
 
-    this._unbindPickBuffer = function() {
-        var context = this._states.canvas.context;
+    this._unbindPickBuffer = function(states) {
+        var context = states.canvas.context;
         context.bindFramebuffer(context.FRAMEBUFFER, null);
     };
 })();
