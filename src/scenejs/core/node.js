@@ -8,7 +8,6 @@ SceneJS._Node = function(cfg, scene) {
     this.attr = {};
     this.attr.type = "node";
     this.attr.sid = null;
-    this.attr.flags = null;     // Fast to detect that we have no flags and then bypass processing them
     this.attr.data = {};
 
     if (cfg) {
@@ -16,7 +15,6 @@ SceneJS._Node = function(cfg, scene) {
         this.attr.type = cfg.type || "node";
         this.attr.layer = cfg.layer;
         this.attr.data = cfg.data;
-        this.attr.flags = cfg.flags;
         this.attr.enabled = cfg.enabled === false ? false : true;
         this.attr.sid = cfg.sid;
         this.attr.info = cfg.info;
@@ -55,6 +53,7 @@ SceneJS._Node = function(cfg, scene) {
 
     if (cfg) {
         this._createCore(cfg.coreId || cfg.resource);
+        this.setTags(cfg.tags || {});
         if (this._init) {
             this._init(cfg);
         }
@@ -109,6 +108,13 @@ SceneJS._Node.prototype.getCoreId = function() {
  * Backwards compatibility
  */
 SceneJS._Node.prototype.getResource = SceneJS._Node.prototype.getCoreId;
+
+
+SceneJS._Node.prototype._tags = {};
+
+SceneJS._Node.prototype.setTags = function(tags) {
+
+};
 
 /**
  * Dumps anything that was memoized on this node to reduce recompilation work
@@ -176,17 +182,7 @@ SceneJS._Node.prototype._compileNodes = function() { // Selected children - usef
             childId = child.attr.id;
 
             if (SceneJS_compileModule.preVisitNode(child)) {
-
-                //  if (child.flags) {
-                SceneJS_flagsModule.preVisitNode(child);
-                // }
-
                 child._compileWithEvents.call(child);
-
-                //if (child.flags) {
-                SceneJS_flagsModule.postVisitNode(child);
-                // }
-
             }
             SceneJS_compileModule.postVisitNode(child);
         }
@@ -260,37 +256,6 @@ SceneJS._Node.prototype.getId = SceneJS._Node.prototype.getID;
  */
 SceneJS._Node.prototype.getType = function() {
     return this.attr.type;
-};
-
-/**
- Sets the flags.
- @param {{String:Boolean}} flags Map of flag booleans
- @since Version 0.8
- */
-SceneJS._Node.prototype.setFlags = function(flags) {
-    this.attr.flags = SceneJS._shallowClone(flags);    // TODO: set flags map null when empty - helps avoid unneeded push/pop on render
-};
-
-/**
- Applies flag values where they are currently undefined or null on node
- @param {{String:Boolean}} flags Map of flag booleans
- @since Version 0.8
- */
-SceneJS._Node.prototype.addFlags = function(flags) {
-    if (this.attr.flags) {
-        SceneJS._apply(flags, this.attr.flags);    // TODO: set flags map null when empty - helps avoid unneeded push/pop on render
-    } else {
-        this.attr.flags = SceneJS._shallowClone(flags);
-    }
-};
-
-/**
- Returns the flags
- @param {{String:Boolean}} Map of flag booleans
- @since Version 0.8
- */
-SceneJS._Node.prototype.getFlags = function() {
-    return SceneJS._shallowClone(this.attr.flags || {});  // Flags map is null when none exist
 };
 
 /**
@@ -672,26 +637,6 @@ SceneJS._Node.prototype.addListener = function(eventName, fn, options) {
     this.numListeners++;
     this._resetCompilationMemos();  // Need re-render - potentially more state changes
     return this;
-};
-
-
-/**
- * Specifies whether or not this node and its subtree will be rendered when next visited during traversal
- * @param {Boolean} enabled Will only be rendered when true
- * @deprecated - Use setFlags instead
- */
-SceneJS._Node.prototype.setEnabled = function(enabled) {
-    throw SceneJS_errorModule.fatalError("node 'enabled' attribute no longer supported - use 'enabled' property on 'flags' attribute instead");
-};
-
-/**
- * Returns whether or not this node and its subtree will be rendered when next visited during traversal, as earlier
- * specified with {@link Node#setEnabled}.
- * @return {boolean} Whether or not this subtree is rendered
- * @deprecated - Use getFlags instead
- */
-SceneJS._Node.prototype.getEnabled = function() {
-    throw SceneJS_errorModule.fatalError("node 'enabled' attribute no longer supported - use 'enabled' property on 'flags' attribute instead");
 };
 
 /**

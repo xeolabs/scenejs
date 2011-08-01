@@ -183,7 +183,8 @@ var SceneJS_DrawList = new (function() {
     var nextProgramId = 0;
 
     this.COMPILE_SCENE = 0;     // When we set a state update, rebuilding entire scene from scratch
-    this.COMPILE_NODES = 1;   //
+    this.COMPILE_BRANCH = 1;   //
+    this.COMPILE_NODES = 2;   //
 
     this.compileMode = null; // DOCS: http://scenejs.wikispaces.com/Scene+Graph+Compilation
 
@@ -296,6 +297,7 @@ var SceneJS_DrawList = new (function() {
      * Prepares renderer for new scene graph compilation pass
      */
     this.bindScene = function(params, options) {
+
         options = options || {};
 
         /* Activate states for scene
@@ -306,11 +308,10 @@ var SceneJS_DrawList = new (function() {
 
         this._stateHash = null;
 
-        if (options.compileMode == SceneJS_DrawList.COMPILE_SCENE) {        // Rebuild display list for entire scene
+        if (options.compileMode == SceneJS_DrawList.COMPILE_SCENE               // Rebuild from whole scene
+                || options.compileMode == SceneJS_DrawList.COMPILE_BRANCH) {    // Rebuild from branch(es)
 
-            /* Going to rebuild the state graph as we recompile
-             * the entire scene graph. We'll set the state soup to
-             * defaults, prepare to rebuild the node bins and shaders
+            /* Default state soup
              */
 
             clipState = this._DEFAULT_CLIP_STATE;
@@ -331,18 +332,21 @@ var SceneJS_DrawList = new (function() {
             renderListenersState = this._DEFAULT_RENDER_LISTENERS_STATE;
             shaderState = this._DEFAULT_SHADER_STATE;
 
-            this._states.lenBin = 0;
-
-            nextStateId = 0;                 // Ready to ID new states
-
-            //  nextProgramId = 0;           // Ready to ID new programs
-
-            this._nodeMap = this._states.nodeMap = {};
-            this._stateMap = this._states.stateMap = {};
-
             this._forceBinSort(true);             // Sort display list with orders re-built from layer orders
 
-        } else if (options.compileMode == SceneJS_DrawList.COMPILE_NODES) {   // Rebuild display list for subtree
+            if (options.compileMode == SceneJS_DrawList.COMPILE_SCENE) {
+                this._states.lenBin = 0;
+
+                nextStateId = 0;                                // All new states
+                //  nextProgramId = 0;                              // All new programs
+
+                this._nodeMap = this._states.nodeMap = {};
+                this._stateMap = this._states.stateMap = {};
+            }
+        }
+
+
+        if (options.compileMode == SceneJS_DrawList.COMPILE_NODES) {   // Rebuild display list for subtree
 
             /* Going to overwrite selected state graph nodes
              * as we partially recompile portions of the scene graph.
@@ -433,7 +437,7 @@ var SceneJS_DrawList = new (function() {
         }
         clipState = this._getState(this._CLIPS, id);
         clips = clips || [];
-        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (true && this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
             if (clips.length > 0) {
                 var hash = [];
                 for (var i = 0; i < clips.length; i++) {
@@ -457,7 +461,7 @@ var SceneJS_DrawList = new (function() {
         }
         colortransState = this._getState(this._COLORTRANS, id, true);
         colortransState.core = core;
-        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (true && this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
             colortransState.hash = core ? "t" : "f";
             this._stateHash = null;
         }
@@ -470,11 +474,6 @@ var SceneJS_DrawList = new (function() {
         }
         flagsState = this._getState(this._FLAGS, id);
         flags = flags || this._DEFAULT_FLAGS_STATE.flags;
-        //                if (!flagsState.flags
-        //                        || (flagsState.flags.enabled != flags.enabled)
-        //                        || (flagsState.flags.transparent != flags.transparent)) {
-        //                    this._states.lenEnabledBin = 0;
-        //                }
         flagsState.flags = flags || this._DEFAULT_FLAGS_STATE.flags;
         this._states.lenEnabledBin = 0;
     };
@@ -487,7 +486,7 @@ var SceneJS_DrawList = new (function() {
         }
         fogState = this._getState(this._FOG, id);
         fogState.fog = fog;
-        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (true && this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
             fogState.hash = fog ? fog.mode : "";
             this._stateHash = null;
         }
@@ -510,7 +509,7 @@ var SceneJS_DrawList = new (function() {
         }
         lightState = this._getState(this._LIGHTS, id);
         lights = lights || [];
-        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (true && this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
             var hash = [];
             for (var i = 0; i < lights.length; i++) {
                 var light = lights[i];
@@ -544,7 +543,7 @@ var SceneJS_DrawList = new (function() {
             return;
         }
         morphState = this._getState(this._MORPH, id);
-        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (true && this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
             if (morph) {
                 var target0 = morph.targets[0];  // All targets have same arrays
                 morphState.hash = ([
@@ -578,7 +577,7 @@ var SceneJS_DrawList = new (function() {
             return;
         }
         texState = this._getState(this._TEXTURE, id);
-        if (this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
+        if (true && this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
             var hashStr;
             if (core && core.layers.length > 0) {
                 var layers = core.layers;
@@ -732,7 +731,7 @@ var SceneJS_DrawList = new (function() {
                 this._releaseState(node.pickListenersState);
                 node.pickListenersState = pickListenersState;
                 pickListenersState._nodeCount++;
-            }         
+            }
             if (node.flagsState._stateId != flagsState._stateId) {
                 this._releaseState(node.flagsState);
                 node.flagsState = flagsState;
@@ -833,6 +832,87 @@ var SceneJS_DrawList = new (function() {
         node[stateName] = soupState;
         soupState._nodeCount++;
         return soupState;
+    };
+
+
+    this.setGeometryNEW = function(id, geo) {
+
+        /* Pull in dirty states from other modules
+         */
+        this.marshallStates();
+
+        var node = this._states.nodeMap[id]; // Node and geoState share same ID
+
+        var rebuildProgram;
+
+        if (!node || this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Create node
+
+            rebuildProgram = true;
+
+            geoState = this._getState(this._GEO, id);
+            geoState.geo = geo;
+            geoState.hash = ([                           // Safe to build geometry hash here - geometry is immutable
+                geo.normalBuf ? "t" : "f",
+                geo.uvBuf ? "t" : "f",
+                geo.uvBuf2 ? "t" : "f",
+                geo.colorBuf ? "t" : "f"]).join("");
+
+            node = {
+                id: id,
+                sortId: 0,  // Lazy-create later
+                geoState: geoState
+            };
+
+            this._states.nodeMap[id] = node;
+
+            this._states.bin[this._states.lenBin++] = node;
+
+            /* Make the display list node findable by its geometry scene node
+             */
+            var geoNodesMap = this._states.geoNodesMap[id];
+            if (!geoNodesMap) {
+                geoNodesMap = this._states.geoNodesMap[id] = [];
+            }
+            geoNodesMap.push(node);
+        }
+
+        if (rebuildProgram) {
+
+            if (!this._stateHash) {
+                this._stateHash = this._getSceneHash();
+            }
+
+            /* Create or replace program
+             */
+            if (node.program) {
+                this._releaseProgram(node.program);
+            }
+            node.program = this._getProgram(this._stateHash);    // Touches for LRU cache
+            node.stateHash = this._stateHash;
+        }
+
+        /* Rebuild node states
+         */
+        this._attachState(node, "flagsState", flagsState);
+        this._attachState(node, "rendererState", rendererState);
+        this._attachState(node, "lightState", lightState);
+        this._attachState(node, "colortransState", colortransState);
+        this._attachState(node, "materialState", materialState);
+        this._attachState(node, "fogState", fogState);
+        this._attachState(node, "modelXFormState", modelXFormState);
+        this._attachState(node, "viewXFormState", viewXFormState);
+        this._attachState(node, "projXFormState", projXFormState);
+        this._attachState(node, "texState", texState);
+        this._attachState(node, "pickColorState", pickColorState);
+        this._attachState(node, "imageBufState", imageBufState);
+        this._attachState(node, "clipState", clipState);
+        this._attachState(node, "morphState", morphState);
+        this._attachState(node, "pickListenersState", pickListenersState);
+        this._attachState(node, "renderListenersState", renderListenersState);
+        this._attachState(node, "shaderState", shaderState);
+
+        node.layerName = SceneJS_layerModule.getLayer();
+
     };
 
     /**
@@ -969,7 +1049,7 @@ var SceneJS_DrawList = new (function() {
          * with Human dental implant animation
          *--------------------------------------------*/
 
-        var drawListFilter = true;
+        var drawListFilter = false;
         if (drawListFilter && lenEnabledBin > 0) {
             for (var i = 0; i < lenEnabledBin; i++) {
                 node = enabledBin[i];
@@ -1091,9 +1171,9 @@ var SceneJS_DrawList = new (function() {
 
     this._releaseProgram = function(program) {
         if (--program.refCount <= 0) {
-            program.render.destroy();
-            program.pick.destroy();
-            this._programs[program.stateHash] = null;
+//            program.render.destroy();
+//            program.pick.destroy();
+//            this._programs[program.stateHash] = null;
         }
     };
 

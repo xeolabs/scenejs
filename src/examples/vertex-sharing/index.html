@@ -14,7 +14,7 @@
 
         </div>
         <div id="header-inner">
-            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Multi-Materials Demo
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Sharing Vertex Arrays among Multiple Meshes
             </h1>
             <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
                     src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
@@ -40,28 +40,10 @@
 
             <p>This enables each sub-Geometery to have a different material/texture, and even to be of a different primitive type.</p>
 
-            <pre><code>new SceneJS.Geometry({
-   positions: [...],
-   uv: [...]
-},
 
-    new SceneJS.BoundingBox({ ... extents of first set of faces.... },
-        new SceneJS.Material({ baseColor: { r: 1 } },
-            new SceneJS.Geometry({
-                indices: [...],
-                primitive: "triangles"
-            }))),
-
-    new SceneJS.BoundingBox({ ... extents of second set of faces.... },
-        new SceneJS.Material({ baseColor: { g: 1 } },
-            new SceneJS.Geometry({
-                indices: [...],
-                primitive: "triangles"
-            })))
-);</code></pre>
            <br/>
             <ul>
-                <li><a target="_other" href="multi-materials.js">Scene source code</a></li>
+                <li><a target="_other" href="vertex-sharing.js">Scene source code</a></li>
                 <li><a target="_other" href="http://scenejs.wikispaces.com/SceneJS.Geometry">Wiki page on
                     SceneJS.Geometry</a></li>
             </ul>
@@ -74,6 +56,6 @@
     </div>
 
 </div>
-<script type="text/javascript" src="multi-materials.js"></script>
+<script type="text/javascript" src="vertex-sharing.js"></script>
 </body>
 </html>

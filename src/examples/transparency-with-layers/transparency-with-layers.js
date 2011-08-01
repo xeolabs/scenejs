@@ -119,69 +119,75 @@ SceneJS.createScene({
                                          *----------------------------------------------------------------------------*/
 
                                         {
-                                            type: "material",
-                                            baseColor:      { r: 1.0, g: 0.0, b: 0.0 },
-                                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
-                                            specular:       0.3,
-                                            shine:          6.0,
-                                            alpha:          0.2,
-
+                                            type: "flags",
+                                            
                                             flags: {
                                                 transparent: true,
                                                 backfaces: false    // Hide backfaces
                                             },
 
-                                            // Default layer at order 0
-
                                             nodes: [
                                                 {
-                                                    type:"scale",
-                                                    x: 6,
-                                                    y: 6,
-                                                    z: 6,
+                                                    type: "material",
+                                                    baseColor:      { r: 1.0, g: 0.0, b: 0.0 },
+                                                    specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                                                    specular:       0.3,
+                                                    shine:          6.0,
+                                                    alpha:          0.2,
+
+                                                    // Default layer at order 0
 
                                                     nodes: [
                                                         {
-                                                            type: "cube"
-                                                        }
+                                                            type:"scale",
+                                                            x: 6,
+                                                            y: 6,
+                                                            z: 6,
 
+                                                            nodes: [
+                                                                {
+                                                                    type: "cube"
+                                                                }
+
+                                                            ]
+                                                        }
                                                     ]
-                                                }
-                                            ]
-                                        },
+                                                },
 
-                                        /*------------------------------------------------------------------------------
-                                         * Outer transparent green cube in "outer-layer"
-                                         *----------------------------------------------------------------------------*/
+                                                /*------------------------------------------------------------------------------
+                                                 * Outer transparent green cube in "outer-layer"
+                                                 *----------------------------------------------------------------------------*/
 
-                                        {
-                                            type: "material",
-                                            baseColor:      { r: 0.0, g: 1.0, b: 0.0 },
-                                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
-                                            specular:       0.3,
-                                            shine:          6.0,
-                                            alpha:          0.2,
-
-                                            flags: {
-                                                transparent: true,
-                                                backfaces: false    // Hide backfaces
-                                            },
-
-
-                                            layer: "outer-layer",
-
-                                            nodes: [
                                                 {
-                                                    type:"scale",
-                                                    x: 9,
-                                                    y: 9,
-                                                    z: 9,
+                                                    type: "material",
+                                                    baseColor:      { r: 0.0, g: 1.0, b: 0.0 },
+                                                    specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                                                    specular:       0.3,
+                                                    shine:          6.0,
+                                                    alpha:          0.2,
+
+                                                    flags: {
+                                                        transparent: true,
+                                                        backfaces: false    // Hide backfaces
+                                                    },
+
+
+                                                    layer: "outer-layer",
 
                                                     nodes: [
                                                         {
-                                                            type: "cube"
-                                                        }
+                                                            type:"scale",
+                                                            x: 9,
+                                                            y: 9,
+                                                            z: 9,
 
+                                                            nodes: [
+                                                                {
+                                                                    type: "cube"
+                                                                }
+
+                                                            ]
+                                                        }
                                                     ]
                                                 }
                                             ]

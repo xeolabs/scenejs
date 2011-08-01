@@ -69,9 +69,6 @@ SceneJS.createScene({
                                                             y: 2,
                                                             z: 2,
 
-                                                            flags: {
-                                                                enabled: true
-                                                            },
                                                             layer: "surface-layer",
 
                                                             nodes: [
@@ -164,77 +161,83 @@ SceneJS.createScene({
                                                         },
 
                                                         {
-                                                            type: "scale",
-                                                            x: 2.05,
-                                                            y: 2.05,
-                                                            z: 2.05,
+                                                            type: "flags",
+
+                                                            layer: "cloud-layer",
 
                                                             flags: {
                                                                 transparent: true,
-                                                                enabled: true,
                                                                 specular:false,
                                                                 blendFunc: {
                                                                     sfactor: "srcAlpha",
                                                                     dfactor: "one"
-                                                                }
+                                                                },
+                                                                backfaces: true  // TODO: Sphere backfaces seem to be reversed if this is needed
                                                             },
-
-                                                            layer: "cloud-layer",
-
+                                                            
                                                             nodes: [
-
-                                                                /*------------------------------------------------------------------
-                                                                 *
-                                                                 *----------------------------------------------------------------*/
-
                                                                 {
-                                                                    type: "texture",
-                                                                    layers: [
-
-                                                                        /*---------------------------------------------------------
-                                                                         *  Alpha map
-                                                                         *
-                                                                         *--------------------------------------------------------*/
-
-                                                                        {
-                                                                            uri: "images/earthclouds.jpg",
-                                                                            applyTo:"alpha",
-                                                                            blendMode: "multiply",
-                                                                            flipY: false
-                                                                        }
-
-                                                                    ],
-
-                                                                    /*---------------------------------------------------------
-                                                                     * Sphere with some material
-                                                                     *--------------------------------------------------------*/
+                                                                    type: "scale",
+                                                                    x: 2.05,
+                                                                    y: 2.05,
+                                                                    z: 2.05,
 
                                                                     nodes: [
+
+                                                                        /*------------------------------------------------------------------
+                                                                         *
+                                                                         *----------------------------------------------------------------*/
+
                                                                         {
-                                                                            type: "node",
-                                                                            z: 1,
-                                                                            angle : 195,
+                                                                            type: "texture",
+                                                                            layers: [
+
+                                                                                /*---------------------------------------------------------
+                                                                                 *  Alpha map
+                                                                                 *
+                                                                                 *--------------------------------------------------------*/
+
+                                                                                {
+                                                                                    uri: "images/earthclouds.jpg",
+                                                                                    applyTo:"alpha",
+                                                                                    blendMode: "multiply",
+                                                                                    flipY: false
+                                                                                }
+
+                                                                            ],
+
+                                                                            /*---------------------------------------------------------
+                                                                             * Sphere with some material
+                                                                             *--------------------------------------------------------*/
+
                                                                             nodes: [
                                                                                 {
-                                                                                    type: "rotate",
-                                                                                    y: 1,
-                                                                                    id: "clouds-rotate",
+                                                                                    type: "node",
+                                                                                    z: 1,
+                                                                                    angle : 195,
                                                                                     nodes: [
                                                                                         {
-                                                                                            type: "material",
-                                                                                            specular: 0,
-                                                                                            shine:0.0001,
-                                                                                            emit: 0.0,
-                                                                                            alpha: 1,
-                                                                                            baseColor: {
-                                                                                                r: 1, g: 1, b: 1
-                                                                                            },
+                                                                                            type: "rotate",
+                                                                                            y: 1,
+                                                                                            id: "clouds-rotate",
                                                                                             nodes: [
                                                                                                 {
-                                                                                                    type: "sphere"
+                                                                                                    type: "material",
+                                                                                                    specular: 0,
+                                                                                                    shine:0.0001,
+                                                                                                    emit: 0.0,
+                                                                                                    alpha: 1.0,
+                                                                                                    baseColor: {
+                                                                                                        r: 1, g: 1, b: 1
+                                                                                                    },
+                                                                                                    nodes: [
+                                                                                                        {
+                                                                                                            type: "sphere"
+                                                                                                        }
+                                                                                                    ]
+
                                                                                                 }
                                                                                             ]
-
                                                                                         }
                                                                                     ]
                                                                                 }

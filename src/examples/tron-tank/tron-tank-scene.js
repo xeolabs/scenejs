@@ -85,150 +85,155 @@ SceneJS.createScene({
                         /* Canyon walls, a bunch of cubes
                          */
                         {
-                            type:"material",
-                            baseColor:      { r: 0.3, g: 0.3, b: 0.3 },
-                            specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
-                            specular:       10.9,
-                            shine:          20.0,
-                            alpha: 0.5,
+                            type: "flags",
                             flags: {
                                 transparent: true
                             },
-
                             nodes: [
-
                                 {
-                                    type: "translate",
-                                    x: -75,
-                                    y: 0,
-                                    z: 0,
+                                    type:"material",
+                                    baseColor:      { r: 0.3, g: 0.3, b: 0.3 },
+                                    specularColor:  { r: 0.0, g: 0.0, b: 0.0 },
+                                    specular:       10.9,
+                                    shine:          20.0,
+                                    alpha: 0.5,
 
                                     nodes: [
 
                                         {
-                                            type: "rotate",
-                                            y: 1,
-                                            angle: 6,
+                                            type: "translate",
+                                            x: -75,
+                                            y: 0,
+                                            z: 0,
+
                                             nodes: [
+
                                                 {
-                                                    type: "cube",
-                                                    xSize: 50,
-                                                    ySize: 30,
-                                                    zSize: 50
+                                                    type: "rotate",
+                                                    y: 1,
+                                                    angle: 6,
+                                                    nodes: [
+                                                        {
+                                                            type: "cube",
+                                                            xSize: 50,
+                                                            ySize: 30,
+                                                            zSize: 50
+                                                        }
+                                                    ]
                                                 }
                                             ]
-                                        }
-                                    ]
-                                },
-                                {
-                                    type: "translate",
-                                    x: 80,
-                                    y: 0,
-                                    z: 0,
-
-                                    nodes: [
+                                        },
                                         {
-                                            type: "rotate",
-                                            y: 1,
-                                            angle: 0,
+                                            type: "translate",
+                                            x: 80,
+                                            y: 0,
+                                            z: 0,
 
                                             nodes: [
                                                 {
-                                                    type: "cube",
-                                                    xSize: 50,
-                                                    ySize: 30,
-                                                    zSize: 50
+                                                    type: "rotate",
+                                                    y: 1,
+                                                    angle: 0,
+
+                                                    nodes: [
+                                                        {
+                                                            type: "cube",
+                                                            xSize: 50,
+                                                            ySize: 30,
+                                                            zSize: 50
+                                                        }
+                                                    ]
                                                 }
                                             ]
-                                        }
-                                    ]
-                                },
-                                {
-                                    type: "translate",
-                                    x: -80,
-                                    y: 0,
-                                    z: 80,
-
-                                    nodes: [
+                                        },
                                         {
-                                            type : "rotate",
-                                            y: 1,
-                                            angle: -12 ,
+                                            type: "translate",
+                                            x: -80,
+                                            y: 0,
+                                            z: 80,
+
                                             nodes: [
                                                 {
-                                                    type: "cube",
-                                                    xSize: 50,
-                                                    ySize: 30,
-                                                    zSize: 50
+                                                    type : "rotate",
+                                                    y: 1,
+                                                    angle: -12 ,
+                                                    nodes: [
+                                                        {
+                                                            type: "cube",
+                                                            xSize: 50,
+                                                            ySize: 30,
+                                                            zSize: 50
+                                                        }
+                                                    ]
                                                 }
                                             ]
-                                        }
-                                    ]
-                                },
-                                {
-                                    type: "rotate",
-                                    x: 80,
-                                    y: 0,
-                                    z: 40,
-
-                                    node:[
+                                        },
                                         {
                                             type: "rotate",
-                                            y: 1,
-                                            angle: -12,
-                                            nodes: [
+                                            x: 80,
+                                            y: 0,
+                                            z: 40,
+
+                                            node:[
                                                 {
-                                                    type: "cube",
-                                                    xSize: 50,
-                                                    ySize: 30,
-                                                    zSize: 50
+                                                    type: "rotate",
+                                                    y: 1,
+                                                    angle: -12,
+                                                    nodes: [
+                                                        {
+                                                            type: "cube",
+                                                            xSize: 50,
+                                                            ySize: 30,
+                                                            zSize: 50
+                                                        }
+                                                    ]
                                                 }
                                             ]
-                                        }
-                                    ]
-                                },
-                                {
-                                    type: "translate",
-                                    x: 120,
-                                    y: 0,
-                                    z: 140,
-
-                                    nodes: [
+                                        },
                                         {
-                                            type: "rotate",
-                                            y: 1,
-                                            angle: -12 ,
+                                            type: "translate",
+                                            x: 120,
+                                            y: 0,
+                                            z: 140,
 
                                             nodes: [
                                                 {
-                                                    type: "cube",
-                                                    xSize: 50,
-                                                    ySize: 30,
-                                                    zSize: 50
+                                                    type: "rotate",
+                                                    y: 1,
+                                                    angle: -12 ,
+
+                                                    nodes: [
+                                                        {
+                                                            type: "cube",
+                                                            xSize: 50,
+                                                            ySize: 30,
+                                                            zSize: 50
+                                                        }
+                                                    ]
                                                 }
                                             ]
-                                        }
-                                    ]
-                                },
+                                        },
 
-                                {
-                                    type: "translate",
-                                    x: -60,
-                                    y: 0,
-                                    z: 160,
-
-                                    nodes: [
                                         {
-                                            type: "rotate",
-                                            y: 1,
-                                            angle: -12,
+                                            type: "translate",
+                                            x: -60,
+                                            y: 0,
+                                            z: 160,
 
                                             nodes: [
                                                 {
-                                                    type: "cube",
-                                                    xSize: 50,
-                                                    ySize: 30,
-                                                    zSize: 50
+                                                    type: "rotate",
+                                                    y: 1,
+                                                    angle: -12,
+
+                                                    nodes: [
+                                                        {
+                                                            type: "cube",
+                                                            xSize: 50,
+                                                            ySize: 30,
+                                                            zSize: 50
+                                                        }
+                                                    ]
                                                 }
                                             ]
                                         }
@@ -342,7 +347,7 @@ SceneJS.scene("theScene").start({
             return;
         }
         needUpdate = false;
-        
+
         pitch += pitchInc;
 
         if (pitch < 1) {

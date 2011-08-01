@@ -10,9 +10,9 @@ var SceneJS_compileModule = new (function() {
 
     this._debugCfg = null;
 
-    /* Compile disabled by default
+    /* Compile enabled by default
      */
-    this._enableCompiler = false;
+    this._enableCompiler = true;
 
     /** Tracks compilation states for each scene
      */

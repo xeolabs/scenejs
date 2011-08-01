@@ -334,8 +334,8 @@
         var self = this;
         if (cfg.idleFunc) {    // Wrap idleFunc to call on selector as scope
             var idleFunc = cfg.idleFunc;
-            cfg.idleFunc = function() {
-                idleFunc.call(self);
+            cfg.idleFunc = function(params) {
+                idleFunc.call(self, params);
             };
         }
         if (cfg.sleepFunc) {    // Wrap idleFunc to call on selector as scope

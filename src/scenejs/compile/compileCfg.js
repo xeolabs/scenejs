@@ -330,25 +330,8 @@ var SceneJS_compileCfg = new (function() {
         "flags": {
             "set" : {
                 attr: {
-                    "flags": {
-                        attr: {
-                            transparent: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            enabled: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            picking: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            colortrans: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            clipping: {
-                                level: this.COMPILE_BRANCH
-                            }
-                        },
-                        level: this.COMPILE_SCENE
+                    "flags": {                       
+                        level: this.REDRAW
                     }
                 }
             },

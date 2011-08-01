@@ -4,7 +4,6 @@
  * is that they never trigger the generation of new GLSL shaders - flags are designed
  * to switch things on/of with minimal overhead.
  *
- * @private
  */
 var SceneJS_flagsModule = new (function() {
 
@@ -12,44 +11,6 @@ var SceneJS_flagsModule = new (function() {
     var flagStack = [];
     var stackLen = 0;
     var dirty;
-
-    /* These flags are inherited, where not overidden, by all flags in a scene, in order to support
-     * flag reading on randomly-accessed nodes. For example, this allows the renderer to check if
-     * "picking" is set for some random node, without having to know if the flag is set on higher nodes.  
-     */
-    var DEFAULT_FLAGS = {
-        fog: true,              // Fog enabled
-        colortrans : true,      // Effect of colortrans enabled
-        picking : true,         // Picking enabled
-        clipping : true,        // User-defined clipping enabled
-        enabled : true,         // Node not culled from traversal
-        transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
-        backfaces: true,        // Show backfaces
-        frontface: "ccw"        // Default vertex winding for front face
-    };
-
-    /** Creates flag set by inheriting flags off top of stack where not overridden
-     */
-    function createFlags(flags) {
-        var newFlags = {};
-        var topFlags = (stackLen > 0) ? flagStack[stackLen - 1] : DEFAULT_FLAGS;
-        var flag;
-        var name;
-        for (name in flags) {
-            if (flags.hasOwnProperty(name)) {
-                newFlags[name] = flags[name];
-            }
-        }
-        for (name in topFlags) {
-            if (topFlags.hasOwnProperty(name)) {
-                flag = newFlags[name];
-                if (flag == null || flag == undefined) {
-                    newFlags[name] = topFlags[name];
-                }
-            }
-        }
-        return newFlags;
-    }
 
     /**
      * Maps renderer node properties to WebGL context enums
@@ -76,14 +37,9 @@ var SceneJS_flagsModule = new (function() {
         return value;
     };
 
-    /* Make fresh flag stack for new render pass, containing default flags
-     * to enable/disable various things for subgraph
-     */
-    var self = this;
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
             function() {
-                self.flags = DEFAULT_FLAGS;
                 stackLen = 0;
                 dirty = true;
             });
@@ -96,33 +52,12 @@ var SceneJS_flagsModule = new (function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_DrawList.setFlags(idStack[stackLen - 1], flagStack[stackLen - 1]);
-                    } else { // Full compile supplies it's own default states
+                    } else {
                         SceneJS_DrawList.setFlags();
                     }
                     dirty = false;
                 }
             });
-
-    this.preVisitNode = function(node) {
-        var attr = node.attr;
-        var flags = attr.flags;
-        if (flags) {
-            flags = createFlags(flags);  // TODO: very inefficient
-        } else {
-            flags = (stackLen > 0) ? flagStack[stackLen - 1] : DEFAULT_FLAGS;
-        }
-        idStack[stackLen] = attr.id;
-        flagStack[stackLen] = flags;
-        stackLen++;
-        dirty = true;
-    };
-
-    this.postVisitNode = function(node) {
-        if (stackLen > 0 && idStack[stackLen - 1] === node.attr.id) {
-            stackLen--;
-            dirty = true;
-        }
-    };
 
     var Flags = SceneJS.createNodeType("flags");
 
@@ -150,55 +85,8 @@ var SceneJS_flagsModule = new (function() {
     };
 
     Flags.prototype._compile = function() {
-        var flags = this.core.flags;
-
-        flags = createFlags(flags);  // TODO: very inefficient
-
         idStack[stackLen] = this.attr.id;
-        flagStack[stackLen] = flags;
-        stackLen++;
-        dirty = true;
-
-        this._compileNodes();
-
-        stackLen--;
-        dirty = true;
-    };
-
-
-
-    var Mask = SceneJS.createNodeType("mask");
-
-    Mask.prototype._init = function(params) {
-        if (this.core._nodeCount == 1) { // This node defines a core
-            if (!params.mask) {
-                throw SceneJS_errorModule.fatalError(
-                        SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "mask node 'mask' attribute missing ");
-            }
-            this.setMask(params.mask);
-        }
-    };
-
-    Mask.prototype.setMask = function(mask) {
-        this.core.mask = SceneJS._shallowClone(mask);
-    };
-
-    Mask.prototype.addMask = function(mask) {
-        SceneJS._apply(mask, this.core.mask);
-    };
-
-    Mask.prototype.getMask = function() {
-        return SceneJS._shallowClone(this.core.mask);
-    };
-
-    Mask.prototype._compile = function() {
-        var mask = this.core.mask;
-
-        mask = createFlags(mask);  // TODO: very inefficient
-
-        idStack[stackLen] = this.attr.id;
-        flagStack[stackLen] = mask;
+        flagStack[stackLen] = this.core.flags;
         stackLen++;
         dirty = true;
 
@@ -208,9 +96,3 @@ var SceneJS_flagsModule = new (function() {
         dirty = true;
     };
 })();
-
-
-
-
-
-
