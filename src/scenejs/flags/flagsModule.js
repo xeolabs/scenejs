@@ -68,12 +68,13 @@ var SceneJS_flagsModule = new (function() {
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
                         "flags node 'flags' attribute missing ");
             }
+            this.core.flags = {};
             this.setFlags(params.flags);
         }
     };
 
     Flags.prototype.setFlags = function(flags) {
-        this.core.flags = SceneJS._shallowClone(flags);
+        SceneJS._apply(flags, this.core.flags, true); // Node's flags object is shared with drawlist node   
     };
 
     Flags.prototype.addFlags = function(flags) {

@@ -35,60 +35,9 @@ var SceneJS_compileCfg = new (function() {
         /* Configs for base node type overrides configs for subtypes
          */
         "node": {
-            "set" : {
-                attr: {
-                    "flags": {
-                        attr: {
-                            transparent: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            enabled: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            picking: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            colortrans: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            clipping: {
-                                level: this.COMPILE_BRANCH
-                            }
-                        },
-                        level: this.COMPILE_SCENE
-                    }
-                }
-            },
-
+           
             "add" : {
                 attr: {
-
-                    /* "add" op is used to overwrite flags
-                     */
-                    "flags": {
-
-                        attr: {
-
-                            transparent: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            enabled: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            picking: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            colortrans: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            clipping: {
-                                level: this.COMPILE_BRANCH
-                            }
-                        },
-
-                        level: this.COMPILE_SCENE
-                    },
-
                     "node": {
                         level: this.COMPILE_SCENE
                     },
@@ -326,11 +275,11 @@ var SceneJS_compileCfg = new (function() {
                 }
             }
         },
-        
+
         "flags": {
             "set" : {
                 attr: {
-                    "flags": {                       
+                    "flags": {
                         level: this.REDRAW
                     }
                 }
@@ -345,21 +294,7 @@ var SceneJS_compileCfg = new (function() {
 
                         attr: {
 
-                            transparent: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            enabled: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            picking: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            colortrans: {
-                                level: this.COMPILE_BRANCH
-                            },
-                            clipping: {
-                                level: this.COMPILE_BRANCH
-                            }
+                             level: this.REDRAW
                         }
                     }
                 }

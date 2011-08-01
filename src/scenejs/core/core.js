@@ -332,18 +332,25 @@ var SceneJS = {
         return o2;
     },
 
-    /** Add properties of o to o2, overwriting them on o2 if already there
+    /** Add properties of o to o2, overwriting them on o2 if already there.
+     * The optional clear flag causes properties on o2 to be cleared first
      */
-    _apply : function(o, o2) {
-        for (var name in o) {
+    _apply : function(o, o2, clear) {
+        var name;
+        if (clear) {
+            for (name in o2) {
+                if (o2.hasOwnProperty(name)) {
+                    delete o2[name];
+                }
+            }
+        }
+        for (name in o) {
             if (o.hasOwnProperty(name)) {
                 o2[name] = o[name];
             }
         }
         return o2;
     },
-
-
 
     /** Lazy-bound state resources published by "suppliers"
      */
