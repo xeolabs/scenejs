@@ -1,15 +1,17 @@
 # SceneJS Version 2
 
-SceneJS is a lean and fast scene graph framework for WebGL, designed to be a browser interface for model and data
-visualisation systems.
+SceneJS is a WebGL-based 3D engine for applications such as engineering and data visualisation where the
+priority requirement is high frame rates for large numbers of individually pickable and articulated objects.
 
-Essentially, SceneJS is an optimised draw list of WebGL calls with a simple scene graph layered on top. As updates are
-made to the scene graph, SceneJS dynamically rebuilds the affected portions of the draw list, while taking care of
-various things like shader generation, state minimisation, depth ordering for transparency and so on.
+To efficiently support these core requirements, SceneJS omits features such as animation, physics and
+visibility culling. However, since the result is a lean kernel through which it's very efficient to update
+the states of objects, it's then practical to integrate your choice of third-party toolkits for these tasks,
+such as TweenJS, JSBullet and jsBVH.
 
-The SceneJS V2 API deliberately leaves out things like animation, physics and visibility culling, opting instead to
-provide a lean kernel that takes care of fast rendering (and picking). This way, SceneJS is able to concentrate on
- doing that efficiently, leaving you to bolt on your own application-level code to do the rest.
+Under the hood, SceneJS is essentially an state-optimised draw list of WebGL calls with a simple scene
+graph layered on top. As updates are made to the scene graph, SceneJS dynamically rebuilds the affected
+portions of the draw list, while taking care of such things as shader generation, state minimisation and
+depth ordering for transparency.
 
 For an example of what can be done with SceneJS, take a look at http://biodigitalhuman.com
 
