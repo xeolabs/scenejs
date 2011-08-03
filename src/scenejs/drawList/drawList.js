@@ -835,86 +835,6 @@ var SceneJS_DrawList = new (function() {
     };
 
 
-    this.setGeometryNEW = function(id, geo) {
-
-        /* Pull in dirty states from other modules
-         */
-        this.marshallStates();
-
-        var node = this._states.nodeMap[id]; // Node and geoState share same ID
-
-        var rebuildProgram;
-
-        if (!node || this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Create node
-
-            rebuildProgram = true;
-
-            geoState = this._getState(this._GEO, id);
-            geoState.geo = geo;
-            geoState.hash = ([                           // Safe to build geometry hash here - geometry is immutable
-                geo.normalBuf ? "t" : "f",
-                geo.uvBuf ? "t" : "f",
-                geo.uvBuf2 ? "t" : "f",
-                geo.colorBuf ? "t" : "f"]).join("");
-
-            node = {
-                id: id,
-                sortId: 0,  // Lazy-create later
-                geoState: geoState
-            };
-
-            this._states.nodeMap[id] = node;
-
-            this._states.bin[this._states.lenBin++] = node;
-
-            /* Make the display list node findable by its geometry scene node
-             */
-            var geoNodesMap = this._states.geoNodesMap[id];
-            if (!geoNodesMap) {
-                geoNodesMap = this._states.geoNodesMap[id] = [];
-            }
-            geoNodesMap.push(node);
-        }
-
-        if (rebuildProgram) {
-
-            if (!this._stateHash) {
-                this._stateHash = this._getSceneHash();
-            }
-
-            /* Create or replace program
-             */
-            if (node.program) {
-                this._releaseProgram(node.program);
-            }
-            node.program = this._getProgram(this._stateHash);    // Touches for LRU cache
-            node.stateHash = this._stateHash;
-        }
-
-        /* Rebuild node states
-         */
-        this._attachState(node, "flagsState", flagsState);
-        this._attachState(node, "rendererState", rendererState);
-        this._attachState(node, "lightState", lightState);
-        this._attachState(node, "colortransState", colortransState);
-        this._attachState(node, "materialState", materialState);
-        this._attachState(node, "fogState", fogState);
-        this._attachState(node, "modelXFormState", modelXFormState);
-        this._attachState(node, "viewXFormState", viewXFormState);
-        this._attachState(node, "projXFormState", projXFormState);
-        this._attachState(node, "texState", texState);
-        this._attachState(node, "pickColorState", pickColorState);
-        this._attachState(node, "imageBufState", imageBufState);
-        this._attachState(node, "clipState", clipState);
-        this._attachState(node, "morphState", morphState);
-        this._attachState(node, "pickListenersState", pickListenersState);
-        this._attachState(node, "renderListenersState", renderListenersState);
-        this._attachState(node, "shaderState", shaderState);
-
-        node.layerName = SceneJS_layerModule.getLayer();
-
-    };
-
     /**
      * Removes a geometry, which deletes the associated display list node. Linked states then get their reference
      * counts decremented. States whose reference count becomes zero are deleted.
@@ -1011,6 +931,12 @@ var SceneJS_DrawList = new (function() {
         if (!this._states) {
             throw  SceneJS_errorModule.fatalError("No scene bound");
         }
+
+        if (this._states.pickBufferBound) {
+            this._unbindPickBuffer(this._states);
+            this._states.pickBufferBound = false;
+        }
+
         params = params || {};
         if (this._states.needSort) {
             this._preSortBins();
@@ -1036,7 +962,7 @@ var SceneJS_DrawList = new (function() {
 
     this._renderBin = function(states, picking) {
 
-        var context = this._states.canvas.context;
+        var context = states.canvas.context;
 
         var enabledBin = states.enabledBin;
         var lenEnabledBin = states.lenEnabledBin;
@@ -1171,9 +1097,9 @@ var SceneJS_DrawList = new (function() {
 
     this._releaseProgram = function(program) {
         if (--program.refCount <= 0) {
-//            program.render.destroy();
-//            program.pick.destroy();
-//            this._programs[program.stateHash] = null;
+            //            program.render.destroy();
+            //            program.pick.destroy();
+            //            this._programs[program.stateHash] = null;
         }
     };
 
@@ -1870,7 +1796,7 @@ var SceneJS_DrawList = new (function() {
 
                 /* Texture matrix
                  */
-                if (layer.matrixAsArray) {
+                if (layer.matrix) {
                     src.push("textureCoord=(SCENEJS_uLayer" + i + "Matrix * texturePos).xy;");
                 } else {
                     src.push("textureCoord=texturePos.xy;");
@@ -2053,26 +1979,31 @@ var SceneJS_DrawList = new (function() {
             SceneJS_loggingModule.info(src);
         }
         return src;
-    }
-
-    this.pick = function(params, options) {
-        this._states = this._sceneStates[params.sceneId];
-        return this._pickFrame(params.sceneId, params.canvasX, params.canvasY, options);
     };
 
-    this._pickFrame = function(sceneId, canvasX, canvasY, options) {
-        //if (!this._states.pickBufferActive) {
-        var states = this._sceneStates[sceneId] ;
+    this.pick = function(params, options) {
+        var states = this._sceneStates[params.sceneId];
         if (!states) {
-            throw "No drawList found for scene '" + sceneId + "'";
+            throw "No drawList found for scene '" + params.sceneId + "'";
         }
-        this._createPickBuffer(states);
-        this._bindPickBuffer(states);
-        states.nodeRenderer.init({ picking: true });
-        this._renderBin(states, true);
-        states.pickBufferActive = true;
-        states.nodeRenderer.cleanup();
-        //}
+        return this._pickFrame(states, params.canvasX, params.canvasY, options);
+    };
+
+    this._pickFrame = function(states, canvasX, canvasY, options) {
+
+        // If need to rebuild pick buffer
+        //      or bind existing buffer
+        //      then render for pick
+
+        if (this._createPickBuffer(states) || !states.pickBufferBound) {
+            this._bindPickBuffer(states);
+            states.nodeRenderer.init({ picking: true });
+            this._renderBin(states, true);
+            states.nodeRenderer.cleanup();
+        } 
+
+        states.pickBufferBound = true;
+
         var pickIndex = this._readPickBuffer(states, canvasX, canvasY);
         var wasPicked = false;
         var pickListeners = states.nodeRenderer.pickListeners[pickIndex];
@@ -2083,7 +2014,8 @@ var SceneJS_DrawList = new (function() {
                 listeners[i]({ canvasX: canvasX, canvasY: canvasY }, options);
             }
         }
-        this._unbindPickBuffer(states);
+
+        //   this._unbindPickBuffer(states);
         return wasPicked;
     };
 
@@ -2095,7 +2027,7 @@ var SceneJS_DrawList = new (function() {
         var pickBuf = states.pickBuf;
         if (pickBuf) { // Currently have a pick buffer
             if (pickBuf.width == width && pickBuf.height) { // Canvas size unchanged, buffer still good
-                return;
+                return false;
             } else { // Buffer needs reallocation for new canvas size
 
                 gl.deleteTexture(pickBuf.texture);
@@ -2157,6 +2089,7 @@ var SceneJS_DrawList = new (function() {
             default:
                 throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: " + status);
         }
+        return true;
     };
 
     this._bindPickBuffer = function(states) {
@@ -2184,5 +2117,6 @@ var SceneJS_DrawList = new (function() {
     this._unbindPickBuffer = function(states) {
         var context = states.canvas.context;
         context.bindFramebuffer(context.FRAMEBUFFER, null);
+        states.pickBufferBound = false;
     };
 })();
