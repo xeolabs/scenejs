@@ -402,19 +402,11 @@ new (function() {
     };
 
     SceneJS_geometry.prototype._compile = function() {
-        this._preCompile();
-        this._compileNodes();
-        this._postCompile();
-    };
-
-    SceneJS_geometry.prototype._preCompile = function() {
-        if (!this.core._loading) {
+         if (!this.core._loading) {
             pushGeometry(this.attr.id, this.core);
         }
-    };
-
-    SceneJS_geometry.prototype._postCompile = function() {
-        if (!this.core._loading) {
+        this._compileNodes();
+          if (!this.core._loading) {
             popGeometry();
         }
     };

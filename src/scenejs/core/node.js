@@ -182,7 +182,7 @@ SceneJS._Node.prototype._compileNodes = function() { // Selected children - usef
             childId = child.attr.id;
 
             if (SceneJS_compileModule.preVisitNode(child)) {
-                child._compileWithEvents.call(child);
+                child._compileWithEvents();
             }
             SceneJS_compileModule.postVisitNode(child);
         }
@@ -223,15 +223,6 @@ SceneJS._Node.prototype._compileWithEvents = function() {
     }
     if (this.attr.layer) {
         SceneJS_layerModule.popLayer();
-    }
-};
-
-
-/** @private */
-SceneJS._Node.prototype._compileNodeAtIndex = function(index) {
-    if (index >= 0 && index < this.children.length) {
-        var child = this.children[index];
-        child._compileWithEvents.call(child);
     }
 };
 

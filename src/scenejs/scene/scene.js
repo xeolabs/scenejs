@@ -257,9 +257,7 @@ new (function() {
             window[fnName] = function() {
                 if (self._running && !self._paused) { // idleFunc may have stopped render loop
                     if (cfg.idleFunc) {
-                        cfg.idleFunc({
-                            fps: getFPS()
-                        });
+                        cfg.idleFunc();
                     }
                     var compileFlags = SceneJS_compileModule.beginSceneCompile(self.attr.id);
                     if (compileFlags.level != SceneJS_compileModule.COMPILE_NOTHING) {          // level could be REDRAW
@@ -273,6 +271,13 @@ new (function() {
                         SceneJS_layerModule.setActiveLayers(self._layers);   // TODO: needed for display list redraw when scene node not compiled - need to tidy up placementof this
 
                         SceneJS_DrawList.renderFrame({ profileFunc: cfg.profileFunc });
+
+                        if (cfg.frameFunc) {
+                            cfg.frameFunc({
+                                fps: getFPS()
+                            });
+                        }
+
                         requestAnimFrame(window[fnName]);
                     } else {
                         if (!sleeping && cfg.sleepFunc) {

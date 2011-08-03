@@ -332,13 +332,22 @@
         }
         cfg = cfg || {};
         var self = this;
-        if (cfg.idleFunc) {    // Wrap idleFunc to call on selector as scope
+
+        // Wrap callbacks to call on selector as scope
+
+        if (cfg.idleFunc) {
             var idleFunc = cfg.idleFunc;
             cfg.idleFunc = function(params) {
                 idleFunc.call(self, params);
             };
         }
-        if (cfg.sleepFunc) {    // Wrap idleFunc to call on selector as scope
+        if (cfg.frameFunc) {
+            var frameFunc = cfg.frameFunc;
+            cfg.frameFunc = function() {
+                frameFunc.call(self);
+            };
+        }
+        if (cfg.sleepFunc) {
             var sleepFunc = cfg.sleepFunc;
             cfg.sleepFunc = function() {
                 sleepFunc.call(self);
