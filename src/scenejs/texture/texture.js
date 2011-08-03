@@ -2,7 +2,7 @@
  * A scene node that defines one or more layers of texture to apply to geometries within its subgraph
  * that have UV coordinates.
  */
-new (function() {
+var SceneJS_textureModule = new (function() {
 
     var idStack = [];
     var textureStack = [];
@@ -182,7 +182,7 @@ new (function() {
                     blendFactor: (layerParam.blendFactor != undefined && layerParam.blendFactor != null) ? layerParam.blendFactor : 1.0,
                     translate: { x:0, y: 0},
                     scale: { x: 1, y: 1 },
-                    rotate: 0.0
+                    rotate: { z: 0.0 }
                 };
 
                 this.core.layers.push(layer);
@@ -271,14 +271,22 @@ new (function() {
             t = SceneJS_math_scalingMat4v([ scale.x || 1, scale.y || 1, 1]);
             matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
         }
-        if (cfg.rotate != undefined && cfg.rotate != null) {
+        if (cfg.rotate) {
             var rotate = cfg.rotate;
-            layer.rotate = rotate;
-            t = SceneJS_math_rotationMat4v(rotate * 0.0174532925, [0,0,1]);
+            if (rotate.z != undefined) {
+                layer.rotate.z = rotate.z || 0;
+            }
+            t = SceneJS_math_rotationMat4v(rotate.z * 0.0174532925, [0,0,1]);
             matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
         }
         if (matrix) {
             layer.matrix = matrix;
+            if (!layer.matrixAsArray) {
+                layer.matrixAsArray = new Float32Array(layer.matrix);
+            } else {
+                layer.matrixAsArray.set(layer.matrix);
+            }
+
             layer.matrixAsArray = new Float32Array(layer.matrix); // TODO - reinsert into array
         }
     };

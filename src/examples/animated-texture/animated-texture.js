@@ -113,7 +113,9 @@ SceneJS.createScene({
 
                                             /* Texture rotation angle in degrees
                                              */
-                                            rotate: 0.0,
+                                            rotate: {
+                                                z: 0.0
+                                            },
 
                                             /* Texture translation offset
                                              */
@@ -223,7 +225,9 @@ scene.start({
                     x: texScale,
                     y: texScale
                 },
-                rotate: texAngle,
+                rotate: {
+                    z: texAngle
+                },
 
                 // http://scenejs.wikispaces.com/texture#Texture%20Layers-Layer%20Blend%20Factor
 
