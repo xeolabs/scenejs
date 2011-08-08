@@ -3,6 +3,27 @@
 SceneJS is a WebGL-based 3D engine geared for engineering and data visualisation, where the
 priority requirement is high frame rates for thousands of individually pickable and articulated objects.
 
+## Key Features:
+
+ * JSON API
+ * fast
+ * automatic shader generation
+ * GPU state change minimisation
+ * sharable OpenSG-style node cores
+ * geometry morphing
+ * text
+ * texture animation
+ * render-to-texture
+ * color, specular, glow, transparency and bump mapping
+ * arbitrarily-aligned clipping planes
+ * multi-layered textures
+ * texture atlas support
+ * render-order layers, useful for correct transparency
+ * debugging modes
+ * messaging system
+ * IoC container
+ * and more..
+
 ## Leaner and Meaner
 
 To efficiently support these core requirements, SceneJS omits features such as animation, physics and
@@ -90,28 +111,6 @@ different view of a model in each scene, then to animate parts of the model we c
 
 
 For an example of what can be done with SceneJS, take a look at http://biodigitalhuman.com
-
-Some key features:
-
- * JSON API
- * fast
- * automatic shader generation
- * GPU state change minimisation
- * sharable OpenSG-style node cores
- * geometry morphing
- * text
- * texture animation
- * render-to-texture
- * color, specular, glow, transparency and bump mapping
- * arbitrarily-aligned clipping planes
- * multi-layered textures
- * texture atlas support
- * render-order layers, useful for correct transparency
- * debugging modes
- * messaging system
- * IoC container
- * and more..
-
 
 # Building
 
