@@ -60,7 +60,7 @@ SceneJS._Node = function(cfg, scene) {
     }
 };
 
-SceneJS._Node.prototype.constructor = Node;
+SceneJS._Node.prototype.constructor = SceneJS._Node;
 
 SceneJS._Node.prototype._cores = {};
 
