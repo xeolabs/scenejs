@@ -101,6 +101,7 @@ var SceneJS_NodeRenderer = function(cfg) {
     this.init = function(params) {
         params = params || {};
         this._picking = params.picking;
+        this._zPicking = params.zPick;
         this._program = null;
         this._lastRendererState = null;
         this._lastImageBufState = null;
@@ -135,7 +136,7 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         /* Only pick nodes that are enabled for picking
          */
-        if (this._picking && nodeFlagsState.flags.picking === false) {
+        if ((this._picking || this._zPicking) && nodeFlagsState.flags.picking === false) {
             return;
         }
 
@@ -149,7 +150,15 @@ var SceneJS_NodeRenderer = function(cfg) {
             //                    this._program.unbind();
             //                }
 
-            this._program = this._picking ? node.program.pick : node.program.render;
+            if (this._picking) {
+                this._program = node.program.pick;
+
+            } else if (this._zPicking) {
+                this._program = node.program.zPick;
+
+            } else {
+                this._program = node.program.render;
+            }
 
             if (this.profile) {
                 this._program.setProfile(this.profile);
@@ -404,7 +413,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._lastClipStateId = node.clipState._stateId;
         }
 
-        if (!this._picking) {
+        if (!this._picking && !this._zPicking) {
 
             /*----------------------------------------------------------------------------------------------------------
              * fog
@@ -558,7 +567,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             }
         }
 
-        if (!this._picking) {    // TODO: do we ever want matrices during a pick pass?
+        if (!this._picking && !this._zPicking) {    // TODO: do we ever want matrices during a pick pass?
 
             /*----------------------------------------------------------------------------------------------------------
              * Render listeners

@@ -932,9 +932,9 @@ var SceneJS_DrawList = new (function() {
             throw  SceneJS_errorModule.fatalError("No scene bound");
         }
 
-        if (this._states.pickBufferBound) {
-            this._unbindPickBuffer(this._states);
-            this._states.pickBufferBound = false;
+        var pickBuf = this._states.pickBuf;
+        if (pickBuf && pickBuf.bound) {
+            pickBuf.unbind();
         }
 
         params = params || {};
@@ -952,7 +952,7 @@ var SceneJS_DrawList = new (function() {
         var doProfile = params.profileFunc ? true : false;
         var nodeRenderer = this._states.nodeRenderer;
         nodeRenderer.init({ doProfile: doProfile });
-        this._renderBin(this._states, false); //Not picking
+        this._renderBin(this._states, false, false); //Not picking
         nodeRenderer.cleanup();
         this._states = null;
         if (doProfile) {
@@ -960,7 +960,7 @@ var SceneJS_DrawList = new (function() {
         }
     };
 
-    this._renderBin = function(states, picking) {
+    this._renderBin = function(states, picking, zPick) {
 
         var context = states.canvas.context;
 
@@ -1060,9 +1060,139 @@ var SceneJS_DrawList = new (function() {
         }
     };
 
-    //-----------------------------------------------------------------------------------------------------------------
-    //  Shader generation
-    //-----------------------------------------------------------------------------------------------------------------
+
+    /*===================================================================================================================
+     *
+     * PICK
+     *
+     *==================================================================================================================*/
+
+    this.pick = function(params, options) {
+        var states = this._sceneStates[params.sceneId];
+        if (!states) {
+            throw "No drawList found for scene '" + params.sceneId + "'";
+        }
+
+        options = options || {};
+
+        var canvasX = params.canvasX;
+        var canvasY = params.canvasY;
+
+        var pickBuf = states.pickBuf;
+        if (!pickBuf) {
+            pickBuf = states.pickBuf = new SceneJS_PickBuffer({ canvas: states.canvas });
+        }
+
+        pickBuf.bind();
+
+        states.nodeRenderer.init({ picking: true });
+        this._renderBin(states, true);
+        states.nodeRenderer.cleanup();
+
+        var pix = pickBuf.read(canvasX, canvasY);
+        var pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
+        var pickIndex = (pickedNodeIndex >= 1) ? pickedNodeIndex - 1 : -1;
+
+        var wasPicked = false;
+        var pickListeners = states.nodeRenderer.pickListeners[pickIndex];
+        if (pickListeners) {
+            var listeners = pickListeners.listeners;
+
+            var canvasZ = (options.zPick) ? this._zPick(states, canvasX, canvasY, pickListeners._stateId) : undefined;
+
+            for (var i = listeners.length - 1; i >= 0; i--) {
+                wasPicked = true;
+                listeners[i]({
+                    canvasX: canvasX,
+                    canvasY: canvasY,
+                    canvasZ: canvasZ
+                }, options);
+            }
+
+        }
+
+        return wasPicked;
+    };
+
+    this._zPick = function(states, canvasX, canvasY, pickListenersStateId) {
+
+        states.pickBuf.unbind();
+
+        var zPickBuf = states.zPickBuf;
+        if (!zPickBuf) {
+            zPickBuf = states.zPickBuf = new SceneJS_PickBuffer({ canvas: states.canvas });
+        }
+
+        zPickBuf.bind();
+
+        var nodeRenderer = states.nodeRenderer;
+        nodeRenderer.init({ zPick: true });
+
+        /* Do Z-intersect pass on render bin
+         */
+        var bin = states.bin;
+        var node;
+        var viewMat;
+        var projMat;
+        for (var i = 0, len = bin.length; i < len; i++) {
+            node = bin[i];
+            if (node.pickListenersState._stateId == pickListenersStateId) {
+                nodeRenderer.renderNode(node);
+                viewMat = node.viewXFormState.mat;
+                projMat = node.projXFormState.mat;
+            }
+        }
+
+
+
+        nodeRenderer.cleanup();
+
+        var pix = zPickBuf.read(canvasX, canvasY);
+        var nz = pix[2];
+
+         var canvas = states.canvas.canvas;
+
+        var nx = -((2.0 * (canvasX / canvas.width)) - 1.0) / projMat[0];
+        var ny = -((-2.0 * (canvasY / canvas.height)) + 1.0) / projMat[5];
+        var inViewMat = SceneJS_math_inverseMat4(viewMat, SceneJS_math_mat4());
+
+        var worldPos = SceneJS_math_transformPoint3(inViewMat, [nx, ny, nz]);
+
+        alert(JSON.stringify(worldPos));
+        //alert(JSON.stringify(projMat));
+
+        zPickBuf.unbind();
+
+        return worldPos[2];
+    };
+
+//    ayPick.prototype.execute = function(params, completed) {
+//        var inViewMat, nx, ny, projMat, rayDirection, rayOrigin, viewMat;
+//        viewMat = SceneJS.withNode(this._cfg.lookAtNode).get("matrix");
+//        projMat = SceneJS.withNode(this._cfg.cameraNode).get("matrix");
+//        nx = -((2.0 * (params.x / this._cfg.canvasWidth)) - 1.0) / projMat[0];
+//        ny = -((-2.0 * (params.y / this._cfg.canvasHeight)) + 1.0) / projMat[5];
+//        inViewMat = this._inverseMat4(viewMat);
+//        rayOrigin = [0, 0, 0, 1];
+//        rayDirection = [nx, ny, 1, 0];
+//        rayOrigin = this._mulMat4v4(inViewMat, rayOrigin);
+//        rayDirection = this._mulMat4v4(inViewMat, rayDirection);
+//        this._result = {
+//            rayOrigin: rayOrigin,
+//            rayDirection: rayDirection
+//        };
+//        if (completed) {
+//            completed(this);
+//        }
+//        return this;
+//    };
+
+
+    /*===================================================================================================================
+     *
+     * SHADERS
+     *
+     *==================================================================================================================*/
 
     this._getSceneHash = function() {
         return ([                           // Same hash for both render and pick shaders
@@ -1085,8 +1215,10 @@ var SceneJS_DrawList = new (function() {
             }
             program = this._programs[stateHash] = {
                 id: nextProgramId++,
+
                 render: this._createShader(this._composeRenderingVertexShader(), this._composeRenderingFragmentShader()),
                 pick: this._createShader(this._composePickingVertexShader(), this._composePickingFragmentShader()),
+           //     zPick: this._createShader(this._composeZIntersectVertexShader(), this._composeZIntersectFragmentShader()),
                 stateHash: stateHash,
                 refCount: 0
             };
@@ -1264,7 +1396,7 @@ var SceneJS_DrawList = new (function() {
 
 
         /*-----------------------------------------------------------------------------------
-         * Custom GLSL - situated here to use SceneJS-managed variables
+         * Custom GLSL
          *----------------------------------------------------------------------------------*/
 
         if (customFragmentShader.code) {
@@ -1297,6 +1429,184 @@ var SceneJS_DrawList = new (function() {
         src.push("    gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
         src.push("}");
         // }
+
+        if (debugCfg.logScripts == true) {
+            SceneJS_loggingModule.info(src);
+        }
+        return src;
+    };
+
+
+    /*===================================================================================================================
+     *
+     * Z-intersect shaders
+     *
+     *==================================================================================================================*/
+
+    this._composeZIntersectVertexShader = function() {
+
+        var customShaders = shaderState.shader.shaders || {};
+
+        var customVertexShader = customShaders.vertex || {};
+        var vertexHooks = customVertexShader.hooks || {};
+
+        var customFragmentShader = customShaders.fragment || {};
+        var fragmentHooks = customFragmentShader.hooks || {};
+
+        var clipping = clipState.clips.length > 0;
+        var morphing = morphState.morph && true;
+
+        var src = [
+            "#ifdef GL_ES",
+            "   precision highp float;",
+            "#endif",
+            "attribute vec3 SCENEJS_aVertex;",
+            "uniform mat4 SCENEJS_uMMatrix;",
+            "uniform mat4 SCENEJS_uVMatrix;",
+            "uniform mat4 SCENEJS_uPMatrix;"];
+
+        if (clipping || fragmentHooks.worldPosClip) {
+            src.push("varying vec4 SCENEJS_vWorldVertex;");
+        }
+
+        //  if (fragmentHooks.viewPosClip) {
+        src.push("varying vec4 SCENEJS_vViewVertex;\n");
+        //   }
+
+        src.push("varying vec4 SCENEJS_vProjVertex;\n");
+
+        if (customVertexShader.code) {
+            src.push("\n" + customVertexShader.code + "\n");
+        }
+
+        if (morphing) {
+            src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
+            if (morphState.morph.targets[0].vertexBuf) {      // target2 has these arrays also
+                src.push("attribute vec3 SCENEJS_aMorphVertex;");
+            }
+        }
+
+        src.push("void main(void) {");
+        src.push("   vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
+
+        if (vertexHooks.modelPos) {
+            src.push("tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
+        }
+
+        if (morphing) {
+            if (morphState.morph.targets[0].vertexBuf) {
+                src.push("  vec4 vMorphVertex = vec4(SCENEJS_aMorphVertex, 1.0); ");
+
+                if (vertexHooks.modelPos) {
+                    src.push("vMorphVertex=" + vertexHooks.modelPos + "(vMorphVertex);");
+                }
+
+                src.push("  tmpVertex = vec4(mix(tmpVertex.xyz, vMorphVertex.xyz, SCENEJS_uMorphFactor), 1.0); ");
+            }
+        }
+
+        src.push("  tmpVertex = SCENEJS_uMMatrix * tmpVertex; ");
+
+        if (vertexHooks.worldPos) {
+            src.push("tmpVertex=" + vertexHooks.worldPos + "(tmpVertex);");
+        }
+
+        if (clipping || fragmentHooks.worldPosClip) {
+            src.push("  SCENEJS_vWorldVertex = tmpVertex; ");
+        }
+
+        src.push("  tmpVertex = SCENEJS_uVMatrix * tmpVertex; ");
+
+        if (vertexHooks.viewPos) {
+            src.push("tmpVertex=" + vertexHooks.viewPos + "(tmpVertex);");
+        }
+
+        //if (fragmentHooks.viewPosClip) {
+        src.push("  SCENEJS_vViewVertex = tmpVertex;");
+        //  }
+
+        src.push("  SCENEJS_vProjVertex = SCENEJS_uPMatrix * tmpVertex;");
+
+        src.push("  gl_Position = SCENEJS_vProjVertex;");
+        src.push("}");
+
+        if (debugCfg.logScripts == true) {
+            SceneJS_loggingModule.info(src);
+        }
+        return src;
+    };
+
+    this._composeZIntersectFragmentShader = function() {
+
+        var customShaders = shaderState.shader.shaders || {};
+        var customFragmentShader = customShaders.fragment || {};
+        var fragmentHooks = customFragmentShader.hooks || {};
+
+        var clipping = clipState && clipState.clips.length > 0;
+
+        var src = [
+            "#ifdef GL_ES",
+            "   precision highp float;",
+            "#endif"];
+
+        if (clipping || fragmentHooks.worldPosClip) {
+            src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
+        }
+
+        //  if (fragmentHooks.viewPosClip) {
+        src.push("varying vec4 SCENEJS_vViewVertex;");              // View-space vertex
+        //}
+
+        src.push("varying vec4 SCENEJS_vProjVertex;\n");
+
+        /*-----------------------------------------------------------------------------------
+         * Variables - Clipping
+         *----------------------------------------------------------------------------------*/
+
+        if (clipping) {
+            for (var i = 0; i < clipState.clips.length; i++) {
+                src.push("uniform float SCENEJS_uClipMode" + i + ";");
+                src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
+            }
+        }
+
+        /*-----------------------------------------------------------------------------------
+         * Custom GLSL
+         *----------------------------------------------------------------------------------*/
+
+        if (customFragmentShader.code) {
+            src.push("\n" + customFragmentShader.code + "\n");
+        }
+
+        src.push("void main(void) {");
+
+        if (fragmentHooks.worldPosClip) {
+            src.push("if (" + fragmentHooks.worldPosClip + "(SCENEJS_vWorldVertex) == false) { discard; };");
+        }
+        if (fragmentHooks.viewPosClip) {
+            src.push("if (!" + fragmentHooks.viewPosClip + "(SCENEJS_vViewVertex) == false) { discard; };");
+        }
+
+        if (clipping) {
+            src.push("  float   dist;");
+            for (var i = 0; i < clipState.clips.length; i++) {
+                src.push("    if (SCENEJS_uClipMode" + i + " != 0.0) {");
+                src.push("        dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w;");
+                src.push("        if (SCENEJS_uClipMode" + i + " == 1.0) {");
+                src.push("            if (dist < 0.0) { discard; }");
+                src.push("        }");
+                src.push("        if (SCENEJS_uClipMode" + i + " == 2.0) {");
+                src.push("            if (dist > 0.0) { discard; }");
+                src.push("        }");
+                src.push("    }");
+            }
+        }
+
+
+        //src.push("    gl_FragColor = vec4(1.0, 1.0, (800.0-SCENEJS_vProjVertex.z)/300.0, 1.0); ");
+        src.push("    gl_FragColor = vec4(SCENEJS_vWorldVertex.x, SCENEJS_vWorldVertex.y, SCENEJS_vWorldVertex.z, 1.0); ");
+
+        src.push("}");
 
         if (debugCfg.logScripts == true) {
             SceneJS_loggingModule.info(src);
@@ -1979,144 +2289,5 @@ var SceneJS_DrawList = new (function() {
             SceneJS_loggingModule.info(src);
         }
         return src;
-    };
-
-    this.pick = function(params, options) {
-        var states = this._sceneStates[params.sceneId];
-        if (!states) {
-            throw "No drawList found for scene '" + params.sceneId + "'";
-        }
-        return this._pickFrame(states, params.canvasX, params.canvasY, options);
-    };
-
-    this._pickFrame = function(states, canvasX, canvasY, options) {
-
-        // If need to rebuild pick buffer
-        //      or bind existing buffer
-        //      then render for pick
-
-        if (this._createPickBuffer(states) || !states.pickBufferBound) {
-            this._bindPickBuffer(states);
-            states.nodeRenderer.init({ picking: true });
-            this._renderBin(states, true);
-            states.nodeRenderer.cleanup();
-        } 
-
-        states.pickBufferBound = true;
-
-        var pickIndex = this._readPickBuffer(states, canvasX, canvasY);
-        var wasPicked = false;
-        var pickListeners = states.nodeRenderer.pickListeners[pickIndex];
-        if (pickListeners) {
-            var listeners = pickListeners.listeners;
-            for (var i = listeners.length - 1; i >= 0; i--) {
-                wasPicked = true;
-                listeners[i]({ canvasX: canvasX, canvasY: canvasY }, options);
-            }
-        }
-
-        //   this._unbindPickBuffer(states);
-        return wasPicked;
-    };
-
-    this._createPickBuffer = function(states) {
-        var canvas = states.canvas;
-        var gl = canvas.context;
-        var width = canvas.canvas.width;
-        var height = canvas.canvas.height;
-        var pickBuf = states.pickBuf;
-        if (pickBuf) { // Currently have a pick buffer
-            if (pickBuf.width == width && pickBuf.height) { // Canvas size unchanged, buffer still good
-                return false;
-            } else { // Buffer needs reallocation for new canvas size
-
-                gl.deleteTexture(pickBuf.texture);
-                gl.deleteFramebuffer(pickBuf.frameBuf);
-                gl.deleteRenderbuffer(pickBuf.renderBuf);
-            }
-        }
-
-        pickBuf = states.pickBuf = {
-            frameBuf : gl.createFramebuffer(),
-            renderBuf : gl.createRenderbuffer(),
-            texture : gl.createTexture(),
-            width: width,
-            height: height
-        };
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
-
-        gl.bindTexture(gl.TEXTURE_2D, pickBuf.texture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-        try {
-            // Do it the way the spec requires
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, null);
-        } catch (exception) {
-            // Workaround for what appears to be a Minefield bug.
-            var textureStorage = new WebGLUnsignedByteArray(width * height * 3);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, textureStorage);
-        }
-        gl.bindRenderbuffer(gl.RENDERBUFFER, pickBuf.renderBuf);
-        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickBuf.texture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickBuf.renderBuf);
-        gl.bindTexture(gl.TEXTURE_2D, null);
-        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-        /* Verify framebuffer is OK
-         */
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
-        if (!gl.isFramebuffer(pickBuf.frameBuf)) {
-            throw  SceneJS_errorModule.fatalError("Invalid framebuffer");
-        }
-        var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-        switch (status) {
-            case gl.FRAMEBUFFER_COMPLETE:
-                break;
-            case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
-            case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
-            case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-                throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
-            case gl.FRAMEBUFFER_UNSUPPORTED:
-                throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED");
-            default:
-                throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: " + status);
-        }
-        return true;
-    };
-
-    this._bindPickBuffer = function(states) {
-        var context = states.canvas.context;
-        context.bindFramebuffer(context.FRAMEBUFFER, states.pickBuf.frameBuf);
-        context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
-        context.disable(context.BLEND);
-    };
-
-    /** Reads pick buffer pixel at given coordinates, returns index of associated listener else (-1)
-     */
-    this._readPickBuffer = function(states, pickX, pickY) {
-        var canvas = states.canvas.canvas;
-        var context = states.canvas.context;
-
-        var x = pickX;
-        var y = canvas.height - pickY;
-        var pix = new Uint8Array(4);
-        context.readPixels(x, y, 1, 1, context.RGBA, context.UNSIGNED_BYTE, pix);
-
-        var pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
-        return (pickedNodeIndex >= 1) ? pickedNodeIndex - 1 : -1;
-    };
-
-    this._unbindPickBuffer = function(states) {
-        var context = states.canvas.context;
-        context.bindFramebuffer(context.FRAMEBUFFER, null);
-        states.pickBufferBound = false;
     };
 })();
