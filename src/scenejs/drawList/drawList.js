@@ -932,10 +932,7 @@ var SceneJS_DrawList = new (function() {
             throw  SceneJS_errorModule.fatalError("No scene bound");
         }
 
-        var pickBuf = this._states.pickBuf;
-        if (pickBuf && pickBuf.bound) {
-            pickBuf.unbind();
-        }
+        this._states.pickBufDirty = true; // Pick buff will now need rendering on next pick
 
         params = params || {};
         if (this._states.needSort) {
@@ -1081,14 +1078,21 @@ var SceneJS_DrawList = new (function() {
         var pickBuf = states.pickBuf;
         if (!pickBuf) {
             pickBuf = states.pickBuf = new SceneJS_PickBuffer({ canvas: states.canvas });
+            states.pickBufDirty = true;
         }
 
         pickBuf.bind();
 
-        states.nodeRenderer.init({ picking: true });
-        this._renderBin(states, true);
-        states.nodeRenderer.cleanup();
+        if (states.pickBufDirty) {
 
+            pickBuf.clear();
+
+            states.nodeRenderer.init({ picking: true });
+            this._renderBin(states, true);
+            states.nodeRenderer.cleanup();
+
+            states.pickBufDirty = false;
+        }
         var pix = pickBuf.read(canvasX, canvasY);
         var pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
         var pickIndex = (pickedNodeIndex >= 1) ? pickedNodeIndex - 1 : -1;
@@ -1110,6 +1114,8 @@ var SceneJS_DrawList = new (function() {
             }
 
         }
+
+        pickBuf.unbind();
 
         return wasPicked;
     };
@@ -1144,13 +1150,12 @@ var SceneJS_DrawList = new (function() {
         }
 
 
-
         nodeRenderer.cleanup();
 
         var pix = zPickBuf.read(canvasX, canvasY);
         var nz = pix[2];
 
-         var canvas = states.canvas.canvas;
+        var canvas = states.canvas.canvas;
 
         var nx = -((2.0 * (canvasX / canvas.width)) - 1.0) / projMat[0];
         var ny = -((-2.0 * (canvasY / canvas.height)) + 1.0) / projMat[5];
@@ -1166,26 +1171,26 @@ var SceneJS_DrawList = new (function() {
         return worldPos[2];
     };
 
-//    ayPick.prototype.execute = function(params, completed) {
-//        var inViewMat, nx, ny, projMat, rayDirection, rayOrigin, viewMat;
-//        viewMat = SceneJS.withNode(this._cfg.lookAtNode).get("matrix");
-//        projMat = SceneJS.withNode(this._cfg.cameraNode).get("matrix");
-//        nx = -((2.0 * (params.x / this._cfg.canvasWidth)) - 1.0) / projMat[0];
-//        ny = -((-2.0 * (params.y / this._cfg.canvasHeight)) + 1.0) / projMat[5];
-//        inViewMat = this._inverseMat4(viewMat);
-//        rayOrigin = [0, 0, 0, 1];
-//        rayDirection = [nx, ny, 1, 0];
-//        rayOrigin = this._mulMat4v4(inViewMat, rayOrigin);
-//        rayDirection = this._mulMat4v4(inViewMat, rayDirection);
-//        this._result = {
-//            rayOrigin: rayOrigin,
-//            rayDirection: rayDirection
-//        };
-//        if (completed) {
-//            completed(this);
-//        }
-//        return this;
-//    };
+    //    ayPick.prototype.execute = function(params, completed) {
+    //        var inViewMat, nx, ny, projMat, rayDirection, rayOrigin, viewMat;
+    //        viewMat = SceneJS.withNode(this._cfg.lookAtNode).get("matrix");
+    //        projMat = SceneJS.withNode(this._cfg.cameraNode).get("matrix");
+    //        nx = -((2.0 * (params.x / this._cfg.canvasWidth)) - 1.0) / projMat[0];
+    //        ny = -((-2.0 * (params.y / this._cfg.canvasHeight)) + 1.0) / projMat[5];
+    //        inViewMat = this._inverseMat4(viewMat);
+    //        rayOrigin = [0, 0, 0, 1];
+    //        rayDirection = [nx, ny, 1, 0];
+    //        rayOrigin = this._mulMat4v4(inViewMat, rayOrigin);
+    //        rayDirection = this._mulMat4v4(inViewMat, rayDirection);
+    //        this._result = {
+    //            rayOrigin: rayOrigin,
+    //            rayDirection: rayDirection
+    //        };
+    //        if (completed) {
+    //            completed(this);
+    //        }
+    //        return this;
+    //    };
 
 
     /*===================================================================================================================
@@ -1218,7 +1223,7 @@ var SceneJS_DrawList = new (function() {
 
                 render: this._createShader(this._composeRenderingVertexShader(), this._composeRenderingFragmentShader()),
                 pick: this._createShader(this._composePickingVertexShader(), this._composePickingFragmentShader()),
-           //     zPick: this._createShader(this._composeZIntersectVertexShader(), this._composeZIntersectFragmentShader()),
+                //     zPick: this._createShader(this._composeZIntersectVertexShader(), this._composeZIntersectFragmentShader()),
                 stateHash: stateHash,
                 refCount: 0
             };

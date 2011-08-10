@@ -136,11 +136,11 @@
     <!-- Create compressed javascript lib -->
 
     <target name="package"
-            depends="package-lib, package-lib-utils, package-lib-plugins, package-index, package-examples">
+            depends="package-lib,  package-index, package-examples">
     </target>
 
     <target name="package-lib"
-            depends="assemble-libs, package-lib-utils, package-lib-plugins">
+            depends="assemble-libs">
 
 
         <!-- Compress JS file list -->
@@ -198,19 +198,6 @@
         </copy>
     </target>
 
-    <target name="package-lib-utils" depends="create-dist-directories">
-        <copy todir="${EXTRACTED_DIST_DIR}/lib/utils">
-            <fileset dir="${basedir}/src/utils"/>
-        </copy>
-    </target>
-
-    <target name="package-lib-plugins" depends="create-dist-directories">
-        <copy todir="${EXTRACTED_DIST_DIR}/lib/plugins">
-            <fileset dir="${basedir}/src/plugins"/>
-        </copy>
-    </target>
-
-
     <target name="clean-dist-directory" if="CLEAN_DIST">
         <mkdir dir="${DIST_CONTAINER_DIR}"></mkdir>
         <delete includeemptydirs="true">
@@ -223,9 +210,7 @@
         <antcall target="clean-dist-directory"/>
         <mkdir dir="${EXTRACTED_DIST_DIR}"/>
         <mkdir dir="${EXTRACTED_DIST_DIR}/lib"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/lib/utils"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/lib/plugins"/>
-        <mkdir dir="${EXTRACTED_DIST_DIR}/examples"/>
+         <mkdir dir="${EXTRACTED_DIST_DIR}/examples"/>
     </target>
 
 </project>

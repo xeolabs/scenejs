@@ -80,23 +80,26 @@ var SceneJS_PickBuffer = function(cfg) {
     };
 
     this.bind = function() {
-
         this._touch();
-
         if (this.bound) {
             return;
         }
-
         gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        gl.disable(gl.BLEND);
-
         this.bound = true;
     };
 
+    this.clear = function() {
+        if (!this.bound) {
+            throw "Pick buffer not bound";
+        }
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.disable(gl.BLEND);
+    };
+
+
     /** Reads pick buffer pixel at given coordinates, returns index of associated object else (-1)
      */
-      this.read = function(pickX, pickY) {
+    this.read = function(pickX, pickY) {
         var x = pickX;
         var y = canvas.canvas.height - pickY;
         var pix = new Uint8Array(4);
