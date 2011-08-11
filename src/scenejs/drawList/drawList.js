@@ -1001,8 +1001,12 @@ var SceneJS_DrawList = new (function() {
              * Layer order is preserved independently within opaque and transparent bins.
              * At each node that is marked destroyed, we'll just slice it out of the bin array instead.
              */
-            for (var i = 0, len = bin.length; i < len; i++) {
+            for (var i = 0, len = states.lenBin; i < len; i++) {
                 node = bin[i];
+
+//                if (!node) { // HACK
+//                    continue;
+//                }
 
                 if (node.destroyed) {
                     if (i < len) {
@@ -1041,7 +1045,9 @@ var SceneJS_DrawList = new (function() {
                 }
             }
             if (countDestroyed > 0) {
-                bin.length -= countDestroyed;
+                bin.length -= countDestroyed;  // TODO: tidy this up
+                states.lenBin = bin.length;
+                len = bin.length;
             }
         }
 

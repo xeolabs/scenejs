@@ -53,10 +53,10 @@ var SceneJS_compileCfg = new (function() {
             "remove" : {
                 attr: {
                     "node" : {
-                        level: this.REDRAW
+                        level: this.COMPILE_SCENE
                     },
                     "nodes" : {
-                        level: this.REDRAW
+                        level: this.COMPILE_SCENE
                     }
                 },
                 level: this.COMPILE_SCENE
