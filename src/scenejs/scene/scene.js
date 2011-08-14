@@ -161,8 +161,7 @@ new (function() {
         this._destroyed = false;
         this.scene = this;
         this.nodeMap = new SceneJS_Map(); // Can auto-generate IDs when not supplied
-        this._layers = params.layers || {};
-
+        
         this.canvas = findCanvas(params.canvasId, params.contextAttr); // canvasId can be null
 
         var sceneId = this.attr.id;
@@ -201,23 +200,6 @@ new (function() {
         }
         var context = this.canvas.context;
         return context.getParameter(context.DEPTH_BITS)
-    };
-
-    /**
-     Sets which layers are included in the each render of the scene, along with their priorities (default priority is 0)
-     */
-    Scene.prototype.setLayers = function(layers) {
-        if (this._destroyed) {
-            throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
-        }
-        this._layers = layers || {};
-    };
-
-    /**
-     Gets which layers are included in the each render of this scene, along with their priorities (default priority is 0)
-     */
-    Scene.prototype.getLayers = function() {
-        return this._layers;
     };
 
     window.requestAnimFrame = (function() {
@@ -268,7 +250,6 @@ new (function() {
                         self._compileWithEvents();
                         sleeping = false;
                         SceneJS_compileModule.finishSceneCompile();
-                        SceneJS_layerModule.setActiveLayers(self._layers);   // TODO: needed for display list redraw when scene node not compiled - need to tidy up placementof this
 
                         SceneJS_DrawList.renderFrame({ profileFunc: cfg.profileFunc });
 
@@ -354,7 +335,6 @@ new (function() {
         SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_COMPILING, { sceneId: sceneId, nodeId: sceneId, canvas : scene.canvas });
 
         if (SceneJS_compileModule.preVisitNode(this)) {
-            SceneJS_layerModule.setActiveLayers(this._layers);  // Activate selected layers - all layers active when undefined
             this._compileNodes();
         }
         SceneJS_compileModule.postVisitNode(this);

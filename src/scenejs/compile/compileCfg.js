@@ -35,7 +35,7 @@ var SceneJS_compileCfg = new (function() {
         /* Configs for base node type overrides configs for subtypes
          */
         "node": {
-           
+
             "add" : {
                 attr: {
                     "node": {
@@ -122,13 +122,6 @@ var SceneJS_compileCfg = new (function() {
             },
             "start" : {
                 level: this.COMPILE_SCENE
-            },
-            "set" : {
-                attr: {
-                    "layers": {
-                        level: this.RESORT
-                    }
-                }
             }
         },
 
@@ -294,8 +287,21 @@ var SceneJS_compileCfg = new (function() {
 
                         attr: {
 
-                             level: this.REDRAW
+                            level: this.REDRAW
                         }
+                    }
+                }
+            }
+        },
+
+        "layer": {
+            "set" : {
+                attr: {
+                    "priority": {
+                        level: this.RESORT
+                    },
+                    "enabled": {
+                        level: this.REDRAW
                     }
                 }
             }

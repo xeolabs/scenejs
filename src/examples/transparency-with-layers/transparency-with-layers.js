@@ -80,37 +80,47 @@ SceneJS.createScene({
                                     nodes: [
 
                                         /*------------------------------------------------------------------------------
-                                         * Inner opaque blue cube in "inner-layer"
+                                         *
+                                         * LAYER -1 - blended first
+                                         *
+                                         * Inner opaque blue cube
                                          *----------------------------------------------------------------------------*/
-
                                         {
-                                            type: "material",
-                                            baseColor:      { r: 0.0, g: 0.0, b: 1.0 },
-                                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
-                                            specular:       0.3,
-                                            shine:          6.0,
-
-                                            layer: "inner-layer",
+                                            type: "layer",
+                                            priority: -1,
 
                                             nodes: [
                                                 {
-                                                    type:"scale",
-                                                    x: 3,
-                                                    y: 3,
-                                                    z: 3,
+                                                    type: "material",
+                                                    baseColor:      { r: 0.0, g: 0.0, b: 1.0 },
+                                                    specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                                                    specular:       0.3,
+                                                    shine:          6.0,
 
                                                     nodes: [
                                                         {
-                                                            type: "cube"
-                                                        }
+                                                            type:"scale",
+                                                            x: 3,
+                                                            y: 3,
+                                                            z: 3,
 
+                                                            nodes: [
+                                                                {
+                                                                    type: "cube"
+                                                                }
+
+                                                            ]
+                                                        }
                                                     ]
                                                 }
                                             ]
                                         },
 
                                         /*------------------------------------------------------------------------------
-                                         * Transparent red cube in default layer, sandwiched between inner and outer cubes.
+                                         *
+                                         * LAYER 0 (default) - blended next
+                                         *
+                                         * Middle transparent red cube
                                          *
                                          * See how we cull backfaces because we can't control the order in which faces
                                          * render. We don't want front faces rendering before back faces, which would
@@ -120,7 +130,7 @@ SceneJS.createScene({
 
                                         {
                                             type: "flags",
-                                            
+
                                             flags: {
                                                 transparent: true,
                                                 backfaces: false    // Hide backfaces
@@ -134,8 +144,6 @@ SceneJS.createScene({
                                                     specular:       0.3,
                                                     shine:          6.0,
                                                     alpha:          0.2,
-
-                                                    // Default layer at order 0
 
                                                     nodes: [
                                                         {
@@ -155,37 +163,40 @@ SceneJS.createScene({
                                                 },
 
                                                 /*------------------------------------------------------------------------------
-                                                 * Outer transparent green cube in "outer-layer"
+                                                 *
+                                                 * LAYER 1 - blended last
+                                                 *
+                                                 * Outer transparent green cube
                                                  *----------------------------------------------------------------------------*/
 
                                                 {
-                                                    type: "material",
-                                                    baseColor:      { r: 0.0, g: 1.0, b: 0.0 },
-                                                    specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
-                                                    specular:       0.3,
-                                                    shine:          6.0,
-                                                    alpha:          0.2,
-
-                                                    flags: {
-                                                        transparent: true,
-                                                        backfaces: false    // Hide backfaces
-                                                    },
-
-
-                                                    layer: "outer-layer",
+                                                    type: "layer",
+                                                    priority: 1,
 
                                                     nodes: [
+
                                                         {
-                                                            type:"scale",
-                                                            x: 9,
-                                                            y: 9,
-                                                            z: 9,
+                                                            type: "material",
+                                                            baseColor:      { r: 0.0, g: 1.0, b: 0.0 },
+                                                            specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                                                            specular:       0.3,
+                                                            shine:          6.0,
+                                                            alpha:          0.2,
 
                                                             nodes: [
                                                                 {
-                                                                    type: "cube"
-                                                                }
+                                                                    type:"scale",
+                                                                    x: 9,
+                                                                    y: 9,
+                                                                    z: 9,
 
+                                                                    nodes: [
+                                                                        {
+                                                                            type: "cube"
+                                                                        }
+
+                                                                    ]
+                                                                }
                                                             ]
                                                         }
                                                     ]
@@ -201,7 +212,6 @@ SceneJS.createScene({
             ]
         }
     ]
-
 });
 
 /*-------------------------------------------------------------------------------------------
@@ -211,10 +221,10 @@ SceneJS.createScene({
  * in the order neccessary for a correct transparency effect.
  *-------------------------------------------------------------------------------------------*/
 
-SceneJS.scene("theScene").set("layers", {
-    "inner-layer": -1, // Higher priority than default layer's 0 priority
-    "outer-layer":  1  // Lower priority than default layer's 0 priority
-});
+//SceneJS.scene("theScene").set("layers", {
+//    "inner-layer": -1, // Higher priority than default layer's 0 priority
+//    "outer-layer":  1  // Lower priority than default layer's 0 priority
+//});
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff

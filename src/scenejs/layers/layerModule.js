@@ -1,135 +1,69 @@
-/**
- * Backend that tracks the current node render priority as a scene is traversed. Each node that has a "priority"
- * attribute pushes and pops its priority value before and after the node is rendered. Then, when a geometry is
- * being ordered within GL state sorting, the priority for that geometry can be be obtained from here in order
- * to set its explicit render order.
- *
- * On an architectural note, see how we isolate this kind of state tracking into a singleton module instead of monkey
- * patching it onto node objects - a more obvious design with less surprises.
- *
- * @private
- */
 var SceneJS_layerModule = new (function() {
 
     this.DEFAULT_LAYER_NAME = "___default";
 
-    var enabledLayers;
-    var layerMap;
-    var layerOrder;
-
     var layerStack = [];
+    var idStack = [];
     var stackLen = 0;
 
-    var self = this;
+    var dirty = true;
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,
             function() {
-                self.setActiveLayers(null);
                 stackLen = 0;
             });
 
-    this.setActiveLayers = function(layers) {
-        enabledLayers = {};
-        layerMap = {};
-        layerOrder = [
-            {
-                name: this.DEFAULT_LAYER_NAME, // Default layer - implicitly enabled
-                priority: 0
-            }
-        ];
-        if (layers) {
-            if (SceneJS._isArray(layers)) {
-
-                /* Array of layer names - no sorting
-                 */
-                for (var i = 0, len = layers.length; i < len; i++) {
-                    appendLayer(layers[i], 0);
-                }
-            } else {
-
-                /* Map of layer names - do sorting
-                 */
-                var priority;
-                for (var layerName in layers) {
-                    if (layers.hasOwnProperty(layerName)) {
-                        priority = layers[layerName];
-                        insertLayer(layerName, priority);
+    SceneJS_eventModule.addListener(
+            SceneJS_eventModule.SCENE_RENDERING,
+            function() {
+                if (dirty) {
+                    if (stackLen > 0) {
+                        SceneJS_DrawList.setLayer(idStack[stackLen - 1], layerStack[stackLen - 1]);
+                    } else {
+                        SceneJS_DrawList.setLayer();
                     }
+                    dirty = false;
                 }
-            }
+            });
+
+    var Layer = SceneJS.createNodeType("layer");
+
+    Layer.prototype._init = function(params) {
+        if (this.core._nodeCount == 1) { // This node defines the resource
+            this.core.priority = params.priority || 0;
+            this.core.enabled = params.enabled !== false; 
+            this.setLayer(params.layer);
         }
     };
 
-    /* Append layer for when sorting not done
-     */
-    function appendLayer(layerName, priority) {
-        enabledLayers[layerName] = true;
-        var newLayer = {
-            name: layerName,
-            priority: priority
-        };
-        layerMap[layerName] = newLayer;
-        layerOrder.push(newLayer);
-    }
-
-    /* Insert layer for when sorting is done
-     */
-    function insertLayer(layerName, priority) {
-        enabledLayers[layerName] = true;
-        var newLayer = {
-            name: layerName,
-            priority: priority
-        };
-        layerMap[layerName] = newLayer;
-        var layer;
-        for (var i = layerOrder.length - 1; i >= 0; i--) {
-            layer = layerOrder[i];
-            if (layer.priority > priority) {
-                layerOrder.splice(i, 0, newLayer);
-                return;
-            }
-        }
-        /* Insert at front
-         */
-        layerOrder.push(newLayer);
-    }
-
-    /**
-     * Get the priority of an enabled layer.
-     * Returns null if layer undefined or disabled.
-     */
-    this.getLayerPriority = function(layerName) {
-        if (!enabledLayers[layerName]) {
-            return null;
-        }
-        return layerMap[layerName].priority;
+    Layer.prototype.setPriority = function(priority) {
+        this.core.priority = priority;
     };
 
-    this.getOrderedLayerNames = function() {
-        return layerOrder;
+    Layer.prototype.getPriority = function() {
+        return this.core.priority;
     };
 
-    this.getEnabledLayers = function() {
-        return enabledLayers;
+    Layer.prototype.setEnabled = function(enabled) {
+        this.core.enabled = enabled;
     };
 
-    this.layerEnabled = function(layer) {
-        return (layerOrder.length == 0)  // All layers are enabled by default
-                || (enabledLayers[layer] === true);
+    Layer.prototype.getEnabled = function() {
+        return this.core.enabled;
     };
 
-    this.pushLayer = function(layer) {
-        layerStack[stackLen++] = layer;
-    };
+    Layer.prototype._compile = function() {
+        layerStack[stackLen] = this.core;
+        idStack[stackLen] = this.attr.id;
+        stackLen++;
 
-    this.getLayer = function() {
-        return stackLen == 0 ? undefined : layerStack[stackLen - 1];
-    };
+        dirty = true;
 
-    this.popLayer = function() {
+        this._compileNodes();
+
         stackLen--;
+        dirty = true;
     };
-
 })();
 

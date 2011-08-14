@@ -27,20 +27,21 @@ var SceneJS_DrawList = new (function() {
     this._CLIPS = 1;
     this._COLORTRANS = 2;
     this._FLAGS = 3;
-    this._FOG = 4;
-    this._IMAGEBUF = 5;
-    this._LIGHTS = 6;
-    this._MATERIAL = 7;
-    this._MORPH = 8;
-    this._PICKCOLOR = 9;
-    this._TEXTURE = 10;
-    this._RENDERER = 11;
-    this._MODEL_TRANSFORM = 12;
-    this._PROJ_TRANSFORM = 13;
-    this._VIEW_TRANSFORM = 14;
-    this._PICK_LISTENERS = 15;
-    this._RENDER_LISTENERS = 16;
-    this._SHADER = 17;
+    this._LAYER = 4;
+    this._FOG = 5;
+    this._IMAGEBUF = 6;
+    this._LIGHTS = 7;
+    this._MATERIAL = 8;
+    this._MORPH = 9;
+    this._PICKCOLOR = 10;
+    this._TEXTURE = 11;
+    this._RENDERER = 12;
+    this._MODEL_TRANSFORM = 13;
+    this._PROJ_TRANSFORM = 14;
+    this._VIEW_TRANSFORM = 15;
+    this._PICK_LISTENERS = 16;
+    this._RENDER_LISTENERS = 17;
+    this._SHADER = 18;
 
     /*----------------------------------------------------------------------
      * Default state values
@@ -87,6 +88,13 @@ var SceneJS_DrawList = new (function() {
             transparent: false,     // Node transparent - works in conjunction with matarial alpha properties
             backfaces: true,        // Show backfaces
             frontface: "ccw"        // Default vertex winding for front face
+        }
+    });
+
+    this._DEFAULT_LAYER_STATE = createState({
+        core: {
+            priority : 0,
+            enabled: true
         }
     });
 
@@ -193,6 +201,7 @@ var SceneJS_DrawList = new (function() {
     /* Currently exported states
      */
     var flagsState;
+    var layerState;
     var rendererState;
     var lightState;
     var colortransState;
@@ -317,6 +326,7 @@ var SceneJS_DrawList = new (function() {
             clipState = this._DEFAULT_CLIP_STATE;
             colortransState = this._DEFAULT_COLORTRANS_STATE;
             flagsState = this._DEFAULT_FLAGS_STATE;
+            layerState = this._DEFAULT_LAYER_STATE;
             fogState = this._DEFAULT_FOG_STATE;
             imageBufState = this._DEFAULT_IMAGEBUF_STATE;
             lightState = this._DEFAULT_LIGHTS_STATE;
@@ -475,6 +485,16 @@ var SceneJS_DrawList = new (function() {
         flagsState = this._getState(this._FLAGS, id);
         flags = flags || this._DEFAULT_FLAGS_STATE.flags;
         flagsState.flags = flags || this._DEFAULT_FLAGS_STATE.flags;
+        this._states.lenEnabledBin = 0;
+    };
+
+    this.setLayer = function(id, core) {
+        if (arguments.length == 0) {
+            layerState = this._DEFAULT_LAYER_STATE;
+            return;
+        }
+        layerState = this._getState(this._LAYER, id);
+        layerState.core = core;
         this._states.lenEnabledBin = 0;
     };
 
@@ -763,6 +783,7 @@ var SceneJS_DrawList = new (function() {
 
         geoState._nodeCount++;
         flagsState._nodeCount++;
+        layerState._nodeCount++;
         rendererState._nodeCount++;
         lightState._nodeCount++;
         colortransState._nodeCount++;
@@ -790,6 +811,7 @@ var SceneJS_DrawList = new (function() {
             program : program,
 
             geoState:               geoState,
+            layerState:             layerState,
             flagsState:             flagsState,
             rendererState:          rendererState,
             lightState:             lightState,
@@ -806,9 +828,7 @@ var SceneJS_DrawList = new (function() {
             morphState :            morphState,
             pickListenersState:     pickListenersState,
             renderListenersState:   renderListenersState,
-            shaderState:            shaderState,
-
-            layerName:SceneJS_layerModule.getLayer()
+            shaderState:            shaderState
         };
 
         this._states.nodeMap[id] = node;
@@ -854,6 +874,7 @@ var SceneJS_DrawList = new (function() {
             this._releaseProgram(node.program);
             this._releaseState(node.geoState);
             this._releaseState(node.flagsState);
+            this._releaseState(node.layerState);
             this._releaseState(node.rendererState);
             this._releaseState(node.lightState);
             this._releaseState(node.colortransState);
@@ -862,7 +883,7 @@ var SceneJS_DrawList = new (function() {
             this._releaseState(node.modelXFormState);
             this._releaseState(node.viewXFormState);
             this._releaseState(node.projXFormState);
-            this._releaseState(node.texState)
+            this._releaseState(node.texState);
             this._releaseState(node.pickColorState);
             this._releaseState(node.imageBufState);
             this._releaseState(node.clipState);
@@ -886,12 +907,7 @@ var SceneJS_DrawList = new (function() {
             var layerPriority;
             for (var i = 0, len = bin.length; i < len; i++) {
                 node = bin[i];
-                if (node.layerName) {
-                    layerPriority = SceneJS_layerModule.getLayerPriority(node.layerName) || 0;
-                    node.sortId = (layerPriority * 100000) + node.program.id;
-                } else {
-                    node.sortId = node.program.id;
-                }
+                node.sortId = (node.layerState.core.priority * 100000) + node.program.id;
             }
             this._states.needSortIds = false;
         }
@@ -972,7 +988,7 @@ var SceneJS_DrawList = new (function() {
          * with Human dental implant animation
          *--------------------------------------------*/
 
-        var drawListFilter = false;
+        var drawListFilter = true;
         if (drawListFilter && lenEnabledBin > 0) {
             for (var i = 0; i < lenEnabledBin; i++) {
                 node = enabledBin[i];
@@ -991,7 +1007,6 @@ var SceneJS_DrawList = new (function() {
 
             var bin = states.bin;
 
-            var enabledLayers = SceneJS_layerModule.getEnabledLayers();
             var node;
             var countDestroyed = 0;
             var flags;
@@ -1003,10 +1018,6 @@ var SceneJS_DrawList = new (function() {
              */
             for (var i = 0, len = states.lenBin; i < len; i++) {
                 node = bin[i];
-
-//                if (!node) { // HACK
-//                    continue;
-//                }
 
                 if (node.destroyed) {
                     if (i < len) {
@@ -1026,19 +1037,19 @@ var SceneJS_DrawList = new (function() {
                     continue;
                 }
 
-                if (node.layerName && !enabledLayers[node.layerName]) {     // Skip disabled layers
+                if (!node.layerState.core.enabled) {                        // Skip disabled layers
                     continue;
                 }
 
-                if (_picking && flags.picking === false) {                   // When picking, skip unpickable node
+                if (_picking && flags.picking === false) {                  // When picking, skip unpickable node
                     continue;
                 }
 
-                if (!_picking && flags.transparent === true) {               // Buffer transparent node when not picking
+                if (!_picking && flags.transparent === true) {              // Buffer transparent node when not picking
                     _transparentBin[nTransparent++] = node;
 
                 } else {
-                    nodeRenderer.renderNode(node);                   // Render node if opaque or in picking mode
+                    nodeRenderer.renderNode(node);                          // Render node if opaque or in picking mode
                     if (drawListFilter) {
                         enabledBin[states.lenEnabledBin++] = node;
                     }
