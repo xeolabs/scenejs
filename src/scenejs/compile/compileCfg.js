@@ -53,10 +53,10 @@ var SceneJS_compileCfg = new (function() {
             "remove" : {
                 attr: {
                     "node" : {
-                        level: this.COMPILE_SCENE
+                        level: this.RESORT
                     },
                     "nodes" : {
-                        level: this.COMPILE_SCENE
+                        level: this.RESORT
                     }
                 },
                 level: this.COMPILE_SCENE
@@ -301,7 +301,7 @@ var SceneJS_compileCfg = new (function() {
                         level: this.RESORT
                     },
                     "enabled": {
-                        level: this.REDRAW
+                        level: this.RESORT
                     }
                 }
             }

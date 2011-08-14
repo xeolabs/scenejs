@@ -33,7 +33,6 @@ var SceneJS_layerModule = new (function() {
         if (this.core._nodeCount == 1) { // This node defines the resource
             this.core.priority = params.priority || 0;
             this.core.enabled = params.enabled !== false; 
-            this.setLayer(params.layer);
         }
     };
 

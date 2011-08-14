@@ -13,7 +13,6 @@ SceneJS._Node = function(cfg, scene) {
     if (cfg) {
         this.attr.id = cfg.id;
         this.attr.type = cfg.type || "node";
-        this.attr.layer = cfg.layer;
         this.attr.data = cfg.data;
         this.attr.enabled = cfg.enabled === false ? false : true;
         this.attr.sid = cfg.sid;
@@ -202,9 +201,6 @@ SceneJS._Node.prototype._compileNodes = function() { // Selected children - usef
  * Wraps _compile to fire built-in events either side of rendering.
  * @private */
 SceneJS._Node.prototype._compileWithEvents = function() {
-    if (this.attr.layer) {
-        SceneJS_layerModule.pushLayer(this.attr.layer);
-    }
 
     /* As scene is traversed, SceneJS_loadStatusModule will track the counts
      * of nodes that are still initialising
@@ -221,9 +217,7 @@ SceneJS._Node.prototype._compileWithEvents = function() {
     if (this.listeners["loading-status"]) { // Report diff of loading stats that occurred while rending this tree
         this._fireEvent("loading-status", SceneJS_loadStatusModule.diffStatus(loadStatusSnapshot));
     }
-    if (this.attr.layer) {
-        SceneJS_layerModule.popLayer();
-    }
+
 };
 
 /**
@@ -264,24 +258,6 @@ SceneJS._Node.prototype.getData = function() {
 SceneJS._Node.prototype.setData = function(data) {
     this.attr.data = data;
     return this;
-};
-
-/**
- * Assigns this node to a layer, in order to control the order in which the geometries within it are rendered.
- * http://scenejs.wikispaces.com/Layers
- * @param {string} layer The layer name
- */
-SceneJS._Node.prototype.setLayer = function(layer) {
-    this.attr.layer = layer;
-};
-
-/**
- * Returns the name of the layer this node is assigned to.
- * http://scenejs.wikispaces.com/Layers
- * @return {string} layer The layer name
- */
-SceneJS._Node.prototype.getLayer = function() {
-    return this.attr.layer;
 };
 
 /**
