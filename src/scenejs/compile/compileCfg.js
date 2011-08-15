@@ -273,7 +273,7 @@ var SceneJS_compileCfg = new (function() {
             "set" : {
                 attr: {
                     "flags": {
-                        level: this.REDRAW
+                        level: this.RESORT
                     }
                 }
             },
@@ -287,7 +287,7 @@ var SceneJS_compileCfg = new (function() {
 
                         attr: {
 
-                            level: this.REDRAW
+                            level: this.RESORT
                         }
                     }
                 }
