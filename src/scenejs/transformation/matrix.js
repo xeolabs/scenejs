@@ -40,7 +40,7 @@
                     "Matrix elements should number 16");
         }
         if (!this.core.mat) {
-            this.core.mat = SceneJS_math_identityMat4();
+            this.core.mat = elements;
         } else {
             for (var i = 0; i < 16; i++) {
                 this.core.mat[i] = elements[i];
