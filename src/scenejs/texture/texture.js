@@ -144,7 +144,7 @@ var SceneJS_textureModule = new (function() {
                 if (!layerParam.uri && !layerParam.imageBuf && !layerParam.image && !layerParam.canvasId) {
                     throw SceneJS_errorModule.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "Texture.layers[" + i + "] has no uri, imageBuf or canvasId specified");
+                            "texture layer " + i + "  has no uri, imageBuf or canvasId specified");
                 }
                 if (layerParam.applyFrom) {
                     if (layerParam.applyFrom != "uv" &&
@@ -153,7 +153,7 @@ var SceneJS_textureModule = new (function() {
                         layerParam.applyFrom != "geometry") {
                         throw SceneJS_errorModule.fatalError(
                                 SceneJS.errors.NODE_CONFIG_EXPECTED,
-                                "Texture.layers[" + i + "].applyFrom value is unsupported - " +
+                                "texture layer " + i + "  applyFrom value is unsupported - " +
                                 "should be either 'uv', 'uv2', 'normal' or 'geometry'");
                     }
                 }
@@ -166,11 +166,18 @@ var SceneJS_textureModule = new (function() {
                         layerParam.applyTo != "normals") {
                         throw SceneJS_errorModule.fatalError(
                                 SceneJS.errors.NODE_CONFIG_EXPECTED,
-                                "Texture.layers[" + i + "].applyTo value is unsupported - " +
+                                "texture layer " + i + " applyTo value is unsupported - " +
                                 "should be either 'baseColor', 'specular' or 'normals'");
                     }
                 }
-
+                if (layerParam.blendMode) {
+                    if (layerParam.blendMode != "add" || layerParam.blendMode != "multiply") {
+                        throw SceneJS_errorModule.fatalError(
+                                SceneJS.errors.NODE_CONFIG_EXPECTED,
+                                "texture layer " + i + " blendMode value is unsupported - " +
+                                "should be either 'add' or 'multiply'");
+                    }
+                }
                 var layer = {
                     image : null,                       // Initialised when state == IMAGE_LOADED
                     creationParams: layerParam,         // Create texture using this
@@ -190,7 +197,7 @@ var SceneJS_textureModule = new (function() {
                 this._setLayerTransform(layerParam, layer);
 
                 if (layer.creationParams.imageBuf) {
-                    layer.texture = SceneJS._compilationStates.getState("imagebuf", this.scene.attr.id, layer.creationParams.imageBuf);
+                    layer.texture = SceneJS._compilationStates.getState("imageBuf", this.scene.attr.id, layer.creationParams.imageBuf);
                 } else {
                     var self = this;
                     layer.texture = createTexture(
@@ -211,12 +218,12 @@ var SceneJS_textureModule = new (function() {
         if (cfg.index == undefined || cfg.index == null) {
             throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "Invalid Texture#setLayerConfig argument: index null or undefined");
+                    "Invalid texture set layer argument: index null or undefined");
         }
         if (cfg.index < 0 || cfg.index >= this.core.layers.length) {
             throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "Invalid Texture#setLayer argument: index out of range (" + this.core.layers.length + " layers defined)");
+                    "Invalid texture set layer argument: index out of range (" + this.core.layers.length + " layers defined)");
         }
         this._setLayer(parseInt(cfg.index), cfg);
     };
@@ -230,7 +237,7 @@ var SceneJS_textureModule = new (function() {
                     if (indexNum < 0 || indexNum >= this.core.layers.length) {
                         throw SceneJS_errorModule.fatalError(
                                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                                "Invalid Texture#setLayer argument: index out of range (" + this.core.layers.length + " layers defined)");
+                                "Invalid texture set layer argument: index out of range (" + this.core.layers.length + " layers defined)");
                     }
                     this._setLayer(indexNum, layers[index] || {});
                 }
