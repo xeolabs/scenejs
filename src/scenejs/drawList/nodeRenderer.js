@@ -8,6 +8,8 @@ var SceneJS_NodeRenderer = function(cfg) {
 
     this.pickListeners = [];
 
+    this.pickNames = [];
+
     /** Facade to support node state queries while node rendering
      */
 
@@ -104,7 +106,7 @@ var SceneJS_NodeRenderer = function(cfg) {
         this._zPicking = params.zPick;
         this._program = null;
         this._lastRendererState = null;
-        this._lastImageBufState = null;
+        this._lastImagebufState = null;
         this._lastRenderListenersState = null;
         this._pickIndex = 0;
         this.profile = params.doProfile ? {
@@ -187,7 +189,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._lastModelXFormStateId = -1;
             this._lastProjXFormStateId = -1;
             this._lastPickStateId = -1;
-            this._lastImageBufStateId = -1;
+            this._lastImagebufStateId = -1;
             this._lastFogStateId = -1;
             this._lastPickListenersStateId = -1;
             this._lastRenderListenersStateId = -1;
@@ -199,18 +201,18 @@ var SceneJS_NodeRenderer = function(cfg) {
 
 
         /*----------------------------------------------------------------------------------------------------------
-         * imagebuf
+         * imageBuf
          *--------------------------------------------------------------------------------------------------------*/
 
-        if (! this._lastImageBufState || node.imageBufState._stateId != this._lastImageBufState._stateId) {
-            if (this._lastImageBufState && this._lastImageBufState.imageBuf) {
-                gl.finish(); // Force imagebuf to complete
-                this._lastImageBufState.imageBuf.unbind();
+        if (! this._lastImagebufState || node.imageBufState._stateId != this._lastImagebufState._stateId) {
+            if (this._lastImagebufState && this._lastImagebufState.imageBuf) {
+                gl.finish(); // Force imageBuf to complete
+                this._lastImagebufState.imageBuf.unbind();
             }
             if (node.imageBufState.imageBuf) {
                 node.imageBufState.imageBuf.bind();
             }
-            this._lastImageBufState = node.imageBufState;
+            this._lastImagebufState = node.imageBufState;
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -362,7 +364,6 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         if (node.viewXFormState._stateId != this._lastViewXFormStateId) {
             program.setUniform("SCENEJS_uVMatrix", node.viewXFormState.mat);
-            //  program.setUniform("SCENEJS_uVNMatrix", node.viewXFormState.normalMat);
             program.setUniform("SCENEJS_uEye", node.viewXFormState.lookAt.eye);
             this._lastViewXFormStateId = node.viewXFormState._stateId;
         }
@@ -555,15 +556,26 @@ var SceneJS_NodeRenderer = function(cfg) {
          *--------------------------------------------------------------------------------------------------------*/
 
         if (this._picking) {
-            if (! this._lastPickListenersState || node.pickListenersState._stateId != this._lastPickListenersState._stateId) {
-                if (node.pickListenersState.listeners.length > 0) {
-                    this.pickListeners[this._pickIndex++] = node.pickListenersState;
+//            if (! this._lastPickListenersState || node.pickListenersState._stateId != this._lastPickListenersState._stateId) {
+//                if (node.pickListenersState.listeners.length > 0) {
+//                    this.pickListeners[this._pickIndex++] = node.pickListenersState;
+//                    var b = this._pickIndex >> 16 & 0xFF;
+//                    var g = this._pickIndex >> 8 & 0xFF;
+//                    var r = this._pickIndex & 0xFF;
+//                    program.setUniform("SCENEJS_uPickColor", [r / 255,g / 255,b / 255]);
+//                }
+//                this._lastPickListenersState = node.pickListenersState;
+//            }
+
+            if (! this._lastNameState || node.nameState._stateId != this._lastNameState._stateId) {
+                if (node.nameState.name) {
+                    this.pickNames[this._pickIndex++] = node.nameState.name;
                     var b = this._pickIndex >> 16 & 0xFF;
                     var g = this._pickIndex >> 8 & 0xFF;
                     var r = this._pickIndex & 0xFF;
                     program.setUniform("SCENEJS_uPickColor", [r / 255,g / 255,b / 255]);
                 }
-                this._lastPickListenersState = node.pickListenersState;
+                this._lastNameState = node.nameState;
             }
         }
 
@@ -708,9 +720,9 @@ var SceneJS_NodeRenderer = function(cfg) {
         //                this._lastRendererState.props.restoreProps(canvas.context);
         //            }
 
-        if (this._lastImageBufState && this._lastImageBufState.imageBuf) {
-            this._lastImageBufState.imageBuf.unbind();
-            this._lastImageBufState = null;
+        if (this._lastImagebufState && this._lastImagebufState.imageBuf) {
+            this._lastImagebufState.imageBuf.unbind();
+            this._lastImagebufState = null;
         }
 
         if (this._program) {

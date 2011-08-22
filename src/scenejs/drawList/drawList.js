@@ -40,8 +40,10 @@ var SceneJS_DrawList = new (function() {
     this._PROJ_TRANSFORM = 14;
     this._VIEW_TRANSFORM = 15;
     this._PICK_LISTENERS = 16;
-    this._RENDER_LISTENERS = 17;
-    this._SHADER = 18;
+    this._NAME = 17;
+    this._TAG = 18;
+    this._RENDER_LISTENERS = 19;
+    this._SHADER = 20;
 
     /*----------------------------------------------------------------------
      * Default state values
@@ -138,6 +140,14 @@ var SceneJS_DrawList = new (function() {
         listeners : []
     });
 
+    this._DEFAULT_NAME_STATE = createState({
+        core : null
+    });
+
+    this._DEFAULT_TAG_STATE = createState({
+        core : null
+    });
+
     this._DEFAULT_TEXTURE_STATE = createState({
         hash: ""
     });
@@ -217,6 +227,8 @@ var SceneJS_DrawList = new (function() {
     var clipState;
     var morphState;
     var pickListenersState;
+    var nameState;
+    var tagState;
     var renderListenersState;
     var shaderState;
 
@@ -339,6 +351,8 @@ var SceneJS_DrawList = new (function() {
             projXFormState = this._DEFAULT_PROJ_TRANSFORM_STATE;
             viewXFormState = this._DEFAULT_VIEW_TRANSFORM_STATE;
             pickListenersState = this._DEFAULT_PICK_LISTENERS_STATE;
+            nameState = this._DEFAULT_NAME_STATE;
+            tagState = this._DEFAULT_TAG_STATE;
             renderListenersState = this._DEFAULT_RENDER_LISTENERS_STATE;
             shaderState = this._DEFAULT_SHADER_STATE;
 
@@ -579,16 +593,16 @@ var SceneJS_DrawList = new (function() {
         morphState.morph = morph;
     };
 
-    this.setPickColor = function(id, pickColor) {
-        if (arguments.length == 0) {
-            pickColorState = this._DEFAULT_PICK_COLOR_STATE;
-            this._stateHash = null;
-            return;
-        }
-        pickColorState = this._getState(this._PICKCOLOR, id);
-        pickColorState.pickColor = pickColor;
-        this._stateHash = null;
-    };
+    //    this.setPickColor = function(id, pickColor) {
+    //        if (arguments.length == 0) {
+    //            pickColorState = this._DEFAULT_PICK_COLOR_STATE;
+    //            this._stateHash = null;
+    //            return;
+    //        }
+    //        pickColorState = this._getState(this._PICKCOLOR, id);
+    //        pickColorState.pickColor = pickColor;
+    //        this._stateHash = null;
+    //    };
 
     this.setTexture = function(id, core) {
         if (arguments.length == 0) {
@@ -672,6 +686,25 @@ var SceneJS_DrawList = new (function() {
         pickListenersState = this._getState(this._PICK_LISTENERS, id);
         pickListenersState.listeners = listeners || [];
     };
+
+    this.setName = function(id, name) {
+        if (arguments.length == 0) {
+            nameState = this._DEFAULT_NAME_STATE;
+            return;
+        }
+        nameState = this._getState(this._NAME, id);
+        nameState.name = name;             // Can be null
+    };
+
+    this.setTag = function(id, core) {
+        if (arguments.length == 0) {
+            tagState = this._DEFAULT_TAG_STATE;
+            return;
+        }
+        tagState = this._getState(this._TAG, id);
+        tagState.core = core;             // Can be null
+    };
+
 
     this.setRenderListeners = function(id, listeners) {
         if (arguments.length == 0) {
@@ -798,6 +831,8 @@ var SceneJS_DrawList = new (function() {
         clipState._nodeCount++;
         morphState._nodeCount++;
         pickListenersState._nodeCount++;
+        nameState._nodeCount++;
+        tagState._nodeCount++;
         renderListenersState._nodeCount++;
         shaderState._nodeCount++;
 
@@ -827,6 +862,8 @@ var SceneJS_DrawList = new (function() {
             clipState :             clipState,
             morphState :            morphState,
             pickListenersState:     pickListenersState,
+            nameState:              nameState,
+            tagState:              tagState,
             renderListenersState:   renderListenersState,
             shaderState:            shaderState
         };
@@ -889,6 +926,8 @@ var SceneJS_DrawList = new (function() {
             this._releaseState(node.clipState);
             this._releaseState(node.morphState);
             this._releaseState(node.pickListenersState);
+            this._releaseState(node.nameState);
+            this._releaseState(node.tagState);
             this._releaseState(node.renderListenersState);
             this._releaseState(node.shaderState);
         }
@@ -965,7 +1004,7 @@ var SceneJS_DrawList = new (function() {
         var doProfile = params.profileFunc ? true : false;
         var nodeRenderer = this._states.nodeRenderer;
         nodeRenderer.init({ doProfile: doProfile });
-        this._renderBin(this._states, false, false); //Not picking
+        this._renderBin(this._states, false, params.tagSelector); //Not picking
         nodeRenderer.cleanup();
         this._states = null;
         if (doProfile) {
@@ -973,7 +1012,7 @@ var SceneJS_DrawList = new (function() {
         }
     };
 
-    this._renderBin = function(states, picking, zPick) {
+    this._renderBin = function(states, picking, tagSelector) {
 
         var context = states.canvas.context;
 
@@ -983,12 +1022,7 @@ var SceneJS_DrawList = new (function() {
         var nTransparent = 0;
         var _transparentBin = transparentBin;
 
-        /*---------------------------------------------
-         * TODO: get this working - makes objects vanish
-         * with Human dental implant animation
-         *--------------------------------------------*/
-
-        var drawListFilter = true;
+        var drawListFilter = false;  // TODO: breaks picking of transparent objects in BDS Human
         if (drawListFilter && lenEnabledBin > 0) {
             for (var i = 0; i < lenEnabledBin; i++) {
                 node = enabledBin[i];
@@ -1010,7 +1044,17 @@ var SceneJS_DrawList = new (function() {
             var node;
             var countDestroyed = 0;
             var flags;
+            var tagCore;
             var _picking = picking;
+
+            /* Tag matching
+             */
+            var tagMask;
+            var tagRegex;
+            if (tagSelector) {
+                tagMask = tagSelector.mask;
+                tagRegex = tagSelector.regex;
+            }
 
             /* Render opaque nodes while buffering transparent nodes.
              * Layer order is preserved independently within opaque and transparent bins.
@@ -1035,6 +1079,21 @@ var SceneJS_DrawList = new (function() {
 
                 if (flags.enabled === false) {                              // Skip disabled node
                     continue;
+                }
+
+                /* Skip unmatched tags
+                 */
+                if (tagMask) {
+                    tagCore = node.tagState.core;
+                    if (tagCore) {
+                        if (tagCore.mask != tagMask) { // Scene tag mask was updated since last render
+                            tagCore.mask = tagMask;
+                            tagCore.matches = tagRegex.test(tagCore.tag);
+                        }
+                        if (!tagCore.matches) {
+                            continue;
+                        }
+                    }
                 }
 
                 if (!node.layerState.core.enabled) {                        // Skip disabled layers
@@ -1114,27 +1173,27 @@ var SceneJS_DrawList = new (function() {
         var pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
         var pickIndex = (pickedNodeIndex >= 1) ? pickedNodeIndex - 1 : -1;
 
-        var wasPicked = false;
-        var pickListeners = states.nodeRenderer.pickListeners[pickIndex];
-        if (pickListeners) {
-            var listeners = pickListeners.listeners;
-
-            var canvasZ = (options.zPick) ? this._zPick(states, canvasX, canvasY, pickListeners._stateId) : undefined;
-
-            for (var i = listeners.length - 1; i >= 0; i--) {
-                wasPicked = true;
-                listeners[i]({
-                    canvasX: canvasX,
-                    canvasY: canvasY,
-                    canvasZ: canvasZ
-                }, options);
-            }
-
-        }
+        //        var wasPicked = false;
+        //        var pickListeners = states.nodeRenderer.pickListeners[pickIndex];
+        //        if (pickListeners) {
+        //            var listeners = pickListeners.listeners;
+        //
+        //            var canvasZ = (options.zPick) ? this._zPick(states, canvasX, canvasY, pickListeners._stateId) : undefined;
+        //
+        //            for (var i = listeners.length - 1; i >= 0; i--) {
+        //                wasPicked = true;
+        //                listeners[i]({
+        //                    canvasX: canvasX,
+        //                    canvasY: canvasY,
+        //                    canvasZ: canvasZ
+        //                }, options);
+        //            }
+        //
+        //        }
 
         pickBuf.unbind();
 
-        return wasPicked;
+        return states.nodeRenderer.pickNames[pickIndex];
     };
 
     this._zPick = function(states, canvasX, canvasY, pickListenersStateId) {
@@ -1700,8 +1759,7 @@ var SceneJS_DrawList = new (function() {
             src.push("uniform vec3 SCENEJS_uEye;");             // World-space eye position
 
             src.push("attribute vec3 SCENEJS_aNormal;");        // Normal vectors
-            src.push("uniform   mat4 SCENEJS_uMNMatrix;");      // Model normal matrix
-            src.push("uniform   mat4 SCENEJS_uVNMatrix;");      // View normal matrix
+            src.push("uniform   mat4 SCENEJS_uMNMatrix;");      // Model normal matrix         
 
             src.push("varying   vec3 SCENEJS_vNormal;");        // Output world-space vertex normal vector
             src.push("varying   vec3 SCENEJS_vEyeVec;");        // Output world-space eye vector

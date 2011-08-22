@@ -160,7 +160,7 @@ new (function() {
 
     }
 
-    SceneJS._compilationStates.setSupplier("imagebuf", {
+    SceneJS._compilationStates.setSupplier("imageBuf", {
         get: function(sceneId, id) {
             var bufs = sceneBufs[sceneId];
             return {

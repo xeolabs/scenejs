@@ -79,7 +79,7 @@ var SceneJS_compileModule = new (function() {
             SceneJS_eventModule.INIT,
             function() {
                 self._debugCfg = SceneJS_debugModule.getConfigs("compilation");
-                self._enableCompiler = !!self._debugCfg.enabled;
+            //    self._enableCompiler = !!self._debugCfg.enabled;
             });
 
     SceneJS_eventModule.addListener(

@@ -70,6 +70,8 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/flags/flagsModule.js"/>
+        
+        <fileset dir="${SRC_DIR}" includes="scenejs/tag/tagModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/load-status/loadStatusModule.js"/>
 
@@ -111,10 +113,11 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometry.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickingModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/name/nameModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/layer/layerModule.js"/>
 
-        <fileset dir="${SRC_DIR}" includes="scenejs/imagebuf/imageBuf.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/imageBuf/imageBuf.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/shader/shader.js"/>
 

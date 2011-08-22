@@ -37,7 +37,7 @@ SceneJS.createScene({
                     },
 
                     nodes: [
-                       {
+                        {
                             type: "light",
                             mode:                   "dir",
                             color:                  { r: 1.0, g: 1.0, b: 1.0 },
@@ -82,7 +82,7 @@ SceneJS.createScene({
 
                                                             nodes: [
                                                                 {
-                                                                    type: "node",
+                                                                    type: "name",
                                                                     id: "left-blue-sphere",
 
                                                                     nodes: [
@@ -92,7 +92,7 @@ SceneJS.createScene({
                                                                     ]
                                                                 },
                                                                 {
-                                                                    type: "node",
+                                                                    type: "name",
                                                                     id: "right-blue-sphere",
 
                                                                     nodes: [
@@ -136,8 +136,9 @@ SceneJS.createScene({
 
                                                             nodes: [
                                                                 {
-                                                                    type: "node",
+                                                                    type: "name",
                                                                     id: "left-green-sphere",
+
                                                                     nodes: [
                                                                         {
                                                                             type: "translate",
@@ -151,7 +152,7 @@ SceneJS.createScene({
                                                                     ]
                                                                 },
                                                                 {
-                                                                    type: "node",
+                                                                    type: "name",
                                                                     id: "right-green-sphere",
 
                                                                     nodes: [
@@ -188,7 +189,7 @@ SceneJS.createScene({
 
                                                                             nodes: [
                                                                                 {
-                                                                                    type: "node",
+                                                                                    type: "name",
                                                                                     id: "red-group-sphere",
 
                                                                                     nodes: [
@@ -228,42 +229,6 @@ SceneJS.createScene({
 
 var scene = SceneJS.scene("theScene");
 
-/* We can observe when nothing is picked with a "notpicked"
- * listener attached to the scene node:
-  */
-scene.bind("notpicked",
-        function(event) {
-            alert("Nothing picked");
-        });
-
-/* We'll listen for picking on each of the teapots:
- */
-
-scene.findNode("right-blue-sphere").bind("picked",
-        function(event) {
-            alert("Picked: 'right-blue-sphere'");
-        });
-
-scene.findNode("left-blue-sphere").bind("picked",
-        function(event) {
-            alert("Picked: 'left-blue-sphere'");
-        });
-
-scene.findNode("red-group-sphere").bind("picked",
-        function(event) {
-            alert("Picked: 'red-group-sphere'");
-        });
-
-scene.findNode("right-green-sphere").bind("picked",
-        function(event) {
-            alert("Picked: 'right-green-sphere'");
-        });
-
-scene.findNode("left-green-sphere").bind("picked",
-        function(event) {
-            alert("Picked: 'left-green-sphere'");
-        });
-
 scene.start();
 
 var canvas = document.getElementById("theCanvas");
@@ -276,7 +241,14 @@ var canvas = document.getElementById("theCanvas");
  */
 function mouseDown(event) {
     var coords = clickCoordsWithinElement(event);
-    scene.pick(coords.x, coords.y);
+
+    var pickRecord = scene.pick(coords.x, coords.y);
+
+    if (pickRecord) {
+        alert("Picked 'name' node with id '" + pickRecord.nodeId + "' at canvasX=" + pickRecord.canvasX + ", canvasY=" + pickRecord.canvasY);
+    } else {
+        alert("Nothing picked");
+    }
 }
 
 canvas.addEventListener('mousedown', mouseDown, false);

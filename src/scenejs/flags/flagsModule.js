@@ -5,37 +5,12 @@
  * to switch things on/of with minimal overhead.
  *
  */
-var SceneJS_flagsModule = new (function() {
+(function() {
 
     var idStack = [];
     var flagStack = [];
     var stackLen = 0;
     var dirty;
-
-    /**
-     * Maps renderer node properties to WebGL context enums
-     * @private
-     */
-    var glEnum = function(context, name) {
-        if (!name) {
-            throw SceneJS_errorModule.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "Null SceneJS.renderer node config: \"" + name + "\"");
-        }
-        var result = SceneJS_webgl_enumMap[name];
-        if (!result) {
-            throw SceneJS_errorModule.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "Unrecognised SceneJS.renderer node config value: \"" + name + "\"");
-        }
-        var value = context[result];
-        if (!value) {
-            throw SceneJS_errorModule.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
-        }
-        return value;
-    };
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_COMPILING,

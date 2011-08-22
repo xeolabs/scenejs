@@ -122,6 +122,13 @@ var SceneJS_compileCfg = new (function() {
             },
             "start" : {
                 level: this.COMPILE_SCENE
+            },
+            set: {
+                attr: {
+                    "tagMask": {
+                        level: this.REDRAW
+                    }
+                }
             }
         },
 

@@ -161,7 +161,11 @@ new (function() {
         this._destroyed = false;
         this.scene = this;
         this.nodeMap = new SceneJS_Map(); // Can auto-generate IDs when not supplied
-        
+
+        if (params.tagMask) {
+            this.setTagMask(params.tagMask);
+        }
+
         this.canvas = findCanvas(params.canvasId, params.contextAttr); // canvasId can be null
 
         var sceneId = this.attr.id;
@@ -213,6 +217,22 @@ new (function() {
                 };
     })();
 
+    /** Sets regular expression to select "tag" nodes to included in render passes
+     */
+    Scene.prototype.setTagMask = function(tagMask) {
+        if (!this.tagSelector) {
+            this.tagSelector = {};
+        }
+        this.tagSelector.mask = tagMask;
+        this.tagSelector.regex = tagMask ? new RegExp(tagMask) : null
+    };
+
+    /** Gets regular expression that selects "tag" nodes to include in render passes
+     */
+    Scene.prototype.getTagMask = function() {
+        return this.tagSelector ? this.tagSelector.mask : null;
+    };
+
     /**
      * Starts the render loop for this scene
      */
@@ -251,7 +271,10 @@ new (function() {
                         sleeping = false;
                         SceneJS_compileModule.finishSceneCompile();
 
-                        SceneJS_DrawList.renderFrame({ profileFunc: cfg.profileFunc });
+                        SceneJS_DrawList.renderFrame({
+                            profileFunc: cfg.profileFunc,
+                            tagSelector: self.tagSelector
+                        });
 
                         if (cfg.frameFunc) {
                             cfg.frameFunc({
@@ -317,12 +340,11 @@ new (function() {
         if (this._destroyed) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
-        if (!SceneJS_DrawList.pick({
+        var nodeId = SceneJS_DrawList.pick({
             sceneId: this.attr.id,
             canvasX : canvasX,
-            canvasY : canvasY }, options)) {
-            this._fireEvent("notpicked", { }, options);
-        }
+            canvasY : canvasY }, options);
+        return nodeId ? { nodeId : nodeId, canvasX: canvasX, canvasY: canvasY } : null;
     };
 
     Scene.prototype._compile = function() {

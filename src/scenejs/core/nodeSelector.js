@@ -141,7 +141,7 @@
 
     NodeSelector.prototype.numNodes = function() {
         return this._targetNode.children.length;
-    };   
+    };
 
     /** Sets an attribute of the selected node
      */
@@ -217,7 +217,7 @@
      */
     NodeSelector.prototype.get = function(attr) {
         if (!attr) {
-            return this._targetNode.getJSON();
+            return this._targetNode.getJSON(); 
         }
         var funcName = "get" + attr.substr(0, 1).toUpperCase() + attr.substr(1);
         var func = this._targetNode[funcName];
@@ -308,21 +308,9 @@
         if (this._targetNode.attr.type != "scene") {
             throw SceneJS_errorModule.fatalError("pick attempted on node that is not a \"scene\" type: '" + this._targetNode.attr.id + "'");
         }
-        this._targetNode.pick(offsetX, offsetY, options);
-        return this;
+        return this._targetNode.pick(offsetX, offsetY, options);        
     };
-
-    /**
-     * Renders the selected scene node, which must be a scene.
-     */
-    NodeSelector.prototype.render = function () {
-        if (this._targetNode.attr.type != "scene") {
-            throw SceneJS_errorModule.fatalError("render attempted on node that is not a \"scene\" type: '" + this._targetNode.attr.id + "'");
-        }
-        this._targetNode.render();
-        return this;
-    };
-
+    
     /**
      * Starts the selected scene node, which must be a scene.
      */

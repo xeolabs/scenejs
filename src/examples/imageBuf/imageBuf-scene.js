@@ -1,5 +1,5 @@
 /*
- Introductory SceneJS scene which demonstrates the imagebuf node
+ Introductory SceneJS scene which demonstrates the imageBuf node
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
@@ -41,7 +41,7 @@ SceneJS.createScene({
 
         {
             type: "imageBuf",
-            id: "teapot-imagebuf",
+            id: "teapot-imageBuf",
 
             nodes: [
 
@@ -202,7 +202,7 @@ SceneJS.createScene({
                                      */
                                     layers: [
                                         {
-                                            imageBuf: "teapot-imagebuf",
+                                            imageBuf: "teapot-imageBuf",
                                             blendMode: "multiply"
                                         }
                                     ],
