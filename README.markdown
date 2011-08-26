@@ -2,7 +2,7 @@
 
 On the inside, SceneJS is a fast draw list that's optimised for things like fast redraw and picking, while on the outside it's a convenient JSON-based scene graph API that easy to hook into the rest of the application stack.
 
-SceneJS is a lean rendering kernel which omits functionality such as physics and visibility culling. However, since it's very efficient to update the states of objects, it's therefore practical to integrate your choice of third-party toolkits for these tasks, such as [https://github.com/gskinner/TweenJS](TweenJS), [https://github.com/CasperPas/JSBullet](JSBullet) and [https://github.com/imbcmdth/jsBVH](jsBVH).
+SceneJS is a lean rendering kernel which omits functionality such as physics and visibility culling. However, since it's very efficient to update the states of objects, it's therefore practical to integrate your choice of third-party toolkits for these tasks, such as [TweenJS](https://github.com/gskinner/TweenJS), [JSBullet](https://github.com/CasperPas/JSBullet) and [jsBVH](https://github.com/imbcmdth/jsBVH).
 
 ![Tron Tank Demo](http://scenejs.org/images/tron-tank.jpg)
 
@@ -24,7 +24,11 @@ SceneJS is a lean rendering kernel which omits functionality such as physics and
  * [Google Group](http://groups.google.co.nz/group/scenejs?lnk=gcimh)
  * [Issues](https://github.com/xeolabs/scenejs/issues?sort=created&direction=desc&state=open)
 
-## Key Features
+## Tools
+
+* **[scenejs-pycollada](https://github.com/xeolabs/scenejs-pycollada)** - a Python-based COLLADA importer
+
+## Features
 (Not a complete list)
 
 * **[Logical JSON API](JSON API)** - SceneJS provides an almost pure JSON-based API that plays well with the rest of the application stack. JSON content is nice to export, store in a database (like CouchDB), transport across a network, transform, and read by humans.
@@ -74,4 +78,3 @@ Create the "dist" directory and populate the lib directory with scenejs.js, scen
 `ant packge-examples`
 
 Create the "dist" directory and populate the lib directory and the examples directory.
-
