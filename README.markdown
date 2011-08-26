@@ -2,7 +2,7 @@
 
 On the inside, SceneJS is a fast draw list that's optimised for things like fast redraw and picking, while on the outside it's a convenient JSON-based scene graph API that easy to hook into the rest of the application stack.
 
-SceneJS is a lean rendering kernel which omits functionality such as physics and visibility culling. However, since it's very efficient to update the states of objects, it's therefore practical to integrate your choice of third-party toolkits for these tasks, such as TweenJS, JSBullet and jsBVH.
+SceneJS is a lean rendering kernel which omits functionality such as physics and visibility culling. However, since it's very efficient to update the states of objects, it's therefore practical to integrate your choice of third-party toolkits for these tasks, such as [https://github.com/gskinner/TweenJS](TweenJS), [https://github.com/CasperPas/JSBullet](JSBullet) and [https://github.com/imbcmdth/jsBVH](jsBVH).
 
 ![Tron Tank Demo](http://scenejs.org/images/tron-tank.jpg)
 
