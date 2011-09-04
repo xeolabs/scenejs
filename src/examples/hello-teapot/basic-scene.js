@@ -16,8 +16,6 @@
 
 SceneJS.createScene({
 
-    type: "scene",
-
     /* ID that we'll access the scene by when we want to render it
      */
     id: "theScene",
@@ -26,14 +24,9 @@ SceneJS.createScene({
      */
     canvasId: "theCanvas",
 
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
-    loggingElementId: "theLoggingDiv",
-
     nodes: [
 
-        /* Viewing transform specifies eye position, looking
-         * at the origin by default
+        /* Viewing transform
          */
         {
             type: "lookAt",
@@ -43,7 +36,7 @@ SceneJS.createScene({
 
             nodes: [
 
-                /* Camera describes the projection
+                /* Projection
                  */
                 {
                     type: "camera",
@@ -57,11 +50,7 @@ SceneJS.createScene({
 
                     nodes: [
 
-
-                        /* A lights node inserts point lights into scene, to illuminate everything
-                         * that is encountered after them during scene traversal.
-                         *
-                         * You can have many of these, nested within modelling transforms if you want to move them.
+                        /* Point lights
                          */
                         {
                             type: "light",
@@ -81,8 +70,7 @@ SceneJS.createScene({
                             dir:                    { x: 0.0, y: -0.5, z: -1.0 }
                         },
 
-                        /* Next, modelling transforms to orient our teapot. See how these have IDs,
-                         * so we can access them to set their angle attributes.
+                        /* Modelling transforms - note the IDs, "pitch" and "yaw"
                          */
                         {
                             type: "rotate",
@@ -99,8 +87,7 @@ SceneJS.createScene({
 
                                     nodes: [
 
-                                        /* Specify the amounts of ambient, diffuse and specular
-                                         * lights our teapot reflects
+                                        /* Ambient, diffuse and specular surface properties
                                          */
                                         {
                                             type: "material",
@@ -111,28 +98,11 @@ SceneJS.createScene({
                                             shine:          70.0,
 
                                             nodes: [
+
+                                                /* Teapot geometry - a built-in teapot type
+                                                 */
                                                 {
-                                                    type: "translate",
-                                                    // Example translation
-                                                    x:0.0,
-                                                    y:0.0,
-                                                    z:0.0,
-
-                                                    nodes : [
-                                                        {
-                                                            type: "scale",
-                                                            // Example scaling
-                                                            x:1.0,
-                                                            y:1.0,
-                                                            z:1.0,
-
-                                                            nodes: [
-                                                                {
-                                                                    type : "teapot"                                                                   
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
+                                                    type : "teapot"
                                                 }
                                             ]
                                         }
@@ -147,21 +117,23 @@ SceneJS.createScene({
     ]
 });
 
-SceneJS.setDebugConfigs({
- shading : {
-        logScripts : true 
-    } 
-});
 
+/* Get handles to some nodes
+ */
+var scene = SceneJS.scene("theScene");
+var yawNode = scene.findNode("yaw");
+var pitchNode = scene.findNode("pitch");
 
-/*----------------------------------------------------------------------
- * Scene rendering loop and mouse handler stuff follows
- *---------------------------------------------------------------------*/
-var yaw = 0;
-var pitch = 0;
+/* As mouse drags, we'll update the rotate nodes
+ */
+
 var lastX;
 var lastY;
 var dragging = false;
+
+var newInput = false;
+var yaw = 0;
+var pitch = 0;
 
 
 var canvas = document.getElementById("theCanvas");
@@ -176,21 +148,16 @@ function mouseUp() {
     dragging = false;
 }
 
-/* On a mouse drag, we'll re-render the scene, passing in
- * incremented angles in each time.
- */
 function mouseMove(event) {
     if (dragging) {
+
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * 0.5;
 
-        var scene = SceneJS.scene("theScene");
-        
-        scene.findNode("yaw").set("angle", yaw);
-        scene.findNode("pitch").set("angle", pitch);
-
         lastX = event.clientX;
         lastY = event.clientY;
+
+        newInput = true;
     }
 }
 
@@ -198,5 +165,15 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.scene("theScene").start();
+/* Start the scene rendering
+ */
+scene.start({
+    idleFunc: function() {
+        if (newInput) {
+            yawNode.set("angle", yaw);
+            pitchNode.set("angle", pitch);
+            newInput = false;
+        }
+    }
+});
 
