@@ -193,19 +193,19 @@ var SceneJS_compileCfg = new (function() {
 
         "lookAt": {
             set: {
-                level: this.REDRAW
+                level: this.COMPILE_PATH
             },
             inc: {
-                level: this.REDRAW
+                level: this.COMPILE_PATH
             }
         },
 
         "camera": {
             set: {
-                level: this.REDRAW
+                level: this.COMPILE_PATH
             },
             inc: {
-                level: this.REDRAW
+                level: this.COMPILE_PATH
             }
         },
 

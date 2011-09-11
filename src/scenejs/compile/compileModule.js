@@ -78,8 +78,7 @@ var SceneJS_compileModule = new (function() {
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.INIT,
             function() {
-                self._debugCfg = SceneJS_debugModule.getConfigs("compilation");
-            //    self._enableCompiler = !!self._debugCfg.enabled;
+              self._debugCfg = SceneJS_debugModule.getConfigs("compilation");
             });
 
     SceneJS_eventModule.addListener(
@@ -249,11 +248,11 @@ var SceneJS_compileModule = new (function() {
         };
         var stats = compileScene.stats;
 
-        if (this._debugCfg.logTrace) {
-            SceneJS_loggingModule.info("-------------------------------------------------------------------");
-            SceneJS_loggingModule.info("COMPILING ...");
-            SceneJS_loggingModule.info("");
-        }
+//        if (this._debugCfg.logTrace) {
+//            SceneJS_loggingModule.info("-------------------------------------------------------------------");
+//            SceneJS_loggingModule.info("COMPILING ...");
+//            SceneJS_loggingModule.info("");
+//        }
 
         var result = {
             level: this.REDRAW,     // Just flag display redraw until we know we need any node recompilations
@@ -297,9 +296,9 @@ var SceneJS_compileModule = new (function() {
             }
         }
 
-        if (this._debugCfg.logTrace) {
-            SceneJS_loggingModule.info("-------------------------------------------------------------------");
-        }
+//        if (this._debugCfg.logTrace) {
+//            SceneJS_loggingModule.info("-------------------------------------------------------------------");
+//        }
 
         return result;
     };
