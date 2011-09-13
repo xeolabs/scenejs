@@ -81,37 +81,57 @@ SceneJS.Services.addService(
                 };
             })());
 
+    function updateNode(scene, target, params) {
+        var targetNode = scene.findNode(target);
+        if (!targetNode) { // Node might have been blown away by some other command
+            return;
+        }
+        var sett = params["set"];
+        if (sett) {
+            callNodeMethods("set", sett, targetNode);
+        }
+        if (params.insert) {
+            callNodeMethods("insert", params.insert, targetNode);
+        }
+        if (params.inc) {
+            callNodeMethods("inc", params.inc, targetNode);
+        }
+        if (params.dec) {
+            callNodeMethods("dec", params.dec, targetNode);
+        }
+        if (params.add) {
+            callNodeMethods("add", params.add, targetNode);
+        }
+        if (params.remove) {
+            callNodeMethods("remove", params.remove, targetNode);
+        }
+    }
+
     commandService.addCommand("update", {
         execute: function(ctx, params) {
-            var scenes = ctx.scenes || SceneJS._scenes;
+
+            var scenes;
             var target = params.target;
             var scene;
-            var targetNode;
-            for (var i = 0, len = scenes.length; i < len; i++) {
-                scene = scenes[i];
-                if (scene) { // Scene might have been blown away by some other command
-                    targetNode = scene.findNode(target);
-                    if (!targetNode) { // Node might have been blown away by some other command
-                        continue;
+
+            if (ctx.scenes) {
+                scenes = ctx.scenes;
+                for (var i = 0, len = scenes.length; i < len; i++) {
+                    scene = scenes[i];
+                    if (scene) { // Scene might have been blown away by some other command
+                        updateNode(scene, target, params);
                     }
-                    var sett = params["set"];
-                    if (sett) {
-                        callNodeMethods("set", sett, targetNode);
-                    }
-                    if (params.insert) {
-                        callNodeMethods("insert", params.insert, targetNode);
-                    }
-                    if (params.inc) {
-                        callNodeMethods("inc", params.inc, targetNode);
-                    }
-                    if (params.dec) {
-                        callNodeMethods("dec", params.dec, targetNode);
-                    }
-                    if (params.add) {
-                        callNodeMethods("add", params.add, targetNode);
-                    }
-                    if (params.remove) {
-                        callNodeMethods("remove", params.remove, targetNode);
+                }
+
+            } else {
+
+                scenes = SceneJS._scenes;
+                for (var sceneId in scenes) {
+                    if (scenes.hasOwnProperty(sceneId)) {
+                        scene = scenes[sceneId];
+                        if (scene) { // Scene might have been blown away by some other command
+                            updateNode(scene, target, params);
+                        }
                     }
                 }
             }

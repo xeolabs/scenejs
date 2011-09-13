@@ -404,26 +404,55 @@ function mouseMove(event) {
          * the nodes individually, as done with the method shown above.
          *---------------------------------------------------------------------------*/
 
-        SceneJS.Message.sendMessage({
-            command: "selectScenes",
-            scenes: ["scene1", "scene2", "scene3", "scene4"],
-            messages: [
-                {
-                    command: "update",
-                    target: "yaw",
-                    set: {
-                        angle: yaw
-                    }
-                },
-                {
-                    command: "update",
-                    target: "pitch",
-                    set: {
-                        angle: pitch
-                    }
+        var broadcast = false;  // Set true to try broadcasting
+
+        if (broadcast) {
+
+            /* Broadcast rotation updates to all scenes
+             */
+
+            SceneJS.Message.sendMessage({
+                command: "update",
+                target: "yaw",
+                set: {
+                    angle: yaw
                 }
-            ]
-        });
+            });
+
+            SceneJS.Message.sendMessage({
+                command: "update",
+                target: "pitch",
+                set: {
+                    angle: pitch
+                }
+            });
+
+        } else {
+
+            /* Send rotation updates to selected scenes:
+             */
+
+            SceneJS.Message.sendMessage({
+                command: "selectScenes",
+                scenes: ["scene1", "scene2", "scene3", "scene4"],
+                messages: [
+                    {
+                        command: "update",
+                        target: "yaw",
+                        set: {
+                            angle: yaw
+                        }
+                    },
+                    {
+                        command: "update",
+                        target: "pitch",
+                        set: {
+                            angle: pitch
+                        }
+                    }
+                ]
+            });
+        }
     }
 }
 
