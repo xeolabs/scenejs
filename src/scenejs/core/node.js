@@ -446,8 +446,7 @@ SceneJS._Node.prototype.splice = function() {
         return null;
     }
     var parent = this.parent;
-    var children = this.children;
-    this.children = [];
+    var children = this.disconnectNodes();
     for (var i = 0, len = children.length; i < len; i++) {  // Link this node's children to new parent
         children[i].parent = this.parent;
     }
@@ -799,8 +798,4 @@ SceneJS._Node.prototype._findNodesByType = function(type, list, recursive) {
 SceneJS._Node.prototype.getJSON = function() {
     return this.attr;
 };
-
-
-
-
 
