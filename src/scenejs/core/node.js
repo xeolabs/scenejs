@@ -343,19 +343,43 @@ SceneJS._Node.prototype.getNode = function(id) {
     return null;
 };
 
-/** Removes the child node at the given index
+/** Disconnects the child node at the given index from its parent node
  * @param {int} index Child node index
- * @returns {Node} The removed child node if located, else null
+ * @returns {Node} The disconnected child node if located, else null
  */
-SceneJS._Node.prototype.removeNodeAt = function(index) {
+SceneJS._Node.prototype.disconnectNodeAt = function(index) {
     var r = this.children.splice(index, 1);
     this._resetCompilationMemos();
     if (r.length > 0) {
         r[0].parent = null;
-        r[0].destroy();
         return r[0];
     } else {
         return null;
+    }
+};
+
+/** Disconnects the child node from its parent, given as a node object
+ * @param {String | Node} id The target child node, or its ID
+ * @returns {Node} The removed child node if located
+ */
+SceneJS._Node.prototype.disconnect = function() {
+    if (this.parent) {
+        for (var i = 0; i < this.parent.children.length; i++) {
+            if (this.parent.children[i].attr.id == this.attr.id) {
+                //this._resetCompilationMemos(); (disconnectNodeAt already does this)
+                return this.disconnectNodeAt(i);
+            }
+        }
+    }
+};
+
+/** Removes the child node at the given index
+ * @param {int} index Child node index
+ */
+SceneJS._Node.prototype.removeNodeAt = function(index) {
+    var child = this.disconnectNodeAt(index);
+    if (child) {
+        child.destroy();
     }
 };
 
@@ -393,18 +417,27 @@ SceneJS._Node.prototype.removeNode = function(node) {
             "Node#removeNode - child node not found: " + (node._compile ? ": " + node.attr.id : node));
 };
 
-/** Removes all child nodes and returns them in an array.
- * @returns {Array[Node]} The removed child nodes
+/** Disconnects all child nodes from their parent node and returns them in an array.
+ * @returns {Array[Node]} The disconnected child nodes
  */
-SceneJS._Node.prototype.removeNodes = function() {
+SceneJS._Node.prototype.disconnectNodes = function() {
     for (var i = 0; i < this.children.length; i++) {  // Unlink children from this
-        if (this.children[i].parent = null) {
-        }
+        this.children[i].parent = null;
     }
     var children = this.children;
     this.children = [];
     this._resetCompilationMemos();
     return children;
+};
+
+/** Removes all child nodes and returns them in an array.
+ * @returns {Array[Node]} The removed child nodes
+ */
+SceneJS._Node.prototype.removeNodes = function() {
+    var children = disconnectNodes();
+    for (var i = 0; i < children.length; i++) {
+        this.children[i].destroy();
+    }
 };
 
 /** Destroys node and moves children up to parent, inserting them where this node resided.
@@ -517,7 +550,7 @@ SceneJS._Node.prototype.insertNode = function(node, i) {
 
         /* Insert node above children when no index given
          */
-        var children = this.removeNodes();
+        var children = this.disconnectNodes();
 
         /* Move children to right-most leaf of inserted graph
          */
@@ -615,17 +648,15 @@ SceneJS._Node.prototype.addListener = function(eventName, fn, options) {
 SceneJS._Node.prototype.destroy = function() {
     if (!this._destroyed) {
         this._destroyed = true;
-        this._scheduleNodeDestroy(this);
+        this._scheduleNodeDestroy();
     }
     return this;
 };
 
 /** Schedule the destruction of this node
  */
-SceneJS._Node.prototype._scheduleNodeDestroy = function(node) {
-    if (this.parent) {
-        this.parent.removeNode(this);
-    }
+SceneJS._Node.prototype._scheduleNodeDestroy = function() {
+    this.disconnect();
     this.scene.nodeMap.removeItem(this.attr.id);
     if (this.children.length > 0) {
         var children = this.children.slice(0);      // destruction will modify this.children
