@@ -172,13 +172,11 @@ SceneJS._Node.prototype._compileNodes = function() { // Selected children - usef
     var children = this.children;  // Set of child nodes we'll be rendering
     var numChildren = children.length;
     var child;
-    var childId;
     var i;
 
     if (numChildren > 0) {
         for (i = 0; i < numChildren; i++) {
             child = children[i];
-            childId = child.attr.id;
 
             if (SceneJS_compileModule.preVisitNode(child)) {
                 child._compileWithEvents();
@@ -365,7 +363,7 @@ SceneJS._Node.prototype.disconnectNodeAt = function(index) {
 SceneJS._Node.prototype.disconnect = function() {
     if (this.parent) {
         for (var i = 0; i < this.parent.children.length; i++) {
-            if (this.parent.children[i].attr.id == this.attr.id) {
+            if (this.parent.children[i] === this) {
                 //this._resetCompilationMemos(); (disconnectNodeAt already does this)
                 return this.disconnectNodeAt(i);
             }
@@ -406,7 +404,7 @@ SceneJS._Node.prototype.removeNode = function(node) {
     }
     if (node._compile) { //  instance of node
         for (var i = 0; i < this.children.length; i++) {
-            if (this.children[i].attr.id == node.attr.id) {
+            if (this.children[i] === node) {
                 //this._resetCompilationMemos(); (removeNodeAt already does this)
                 return this.removeNodeAt(i);
             }
@@ -448,14 +446,13 @@ SceneJS._Node.prototype.splice = function() {
         return null;
     }
     var parentChildren = this.parent.children;
-    var thisId = this.attr.id;
     var children = this.children;
     this.children = [];
     for (var i = 0, len = children.length; i < len; i++) {  // Link this node's children to new parent
         children[i].parent = this.parent;
     }
     for (var i = 0, len = parentChildren.length; i < len; i++) { // Replace node on parent's children with this node's children
-        if (parentChildren[i].attr.id == thisId) {
+        if (parentChildren[i] === this) {
             this.parent.children = parentChildren.splice(i, 1, children);
             this.parent._resetTreeCompilationMemos();
             this.destroy();
