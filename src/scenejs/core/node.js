@@ -352,6 +352,7 @@ SceneJS._Node.prototype.removeNodeAt = function(index) {
     this._resetCompilationMemos();
     if (r.length > 0) {
         r[0].parent = null;
+        r[0].destroy();
         return r[0];
     } else {
         return null;
@@ -382,7 +383,7 @@ SceneJS._Node.prototype.removeNode = function(node) {
     if (node._compile) { //  instance of node
         for (var i = 0; i < this.children.length; i++) {
             if (this.children[i].attr.id == node.attr.id) {
-                this._resetCompilationMemos();
+                //this._resetCompilationMemos(); (removeNodeAt already does this)
                 return this.removeNodeAt(i);
             }
         }
