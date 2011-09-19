@@ -187,12 +187,12 @@ var SceneJS_math_subVec3 = function(u, v, dest) {
 };
 
 var SceneJS_math_lerpVec3 = function(t, t1, t2, p1, p2) {
-    var f = (t - t1) / (t2 - t1);
-    var p1x = p1.x, p1y = p1.y, p1z = p1.z;
+    var f2 = (t - t1) / (t2 - t1);
+    var f1 = 1.0 - f2;
     return  {
-        x: p1x + (f * p2.x - p1x),
-        y: p1y + (f * p2.y - p1y),
-        z: p1z + (f * p2.z - p1z)
+        x: p1.x * f1 + p2.x * f2,
+        y: p1.y * f1 + p2.y * f2,
+        z: p1.z * f1 + p2.z * f2
     };
 };
 
