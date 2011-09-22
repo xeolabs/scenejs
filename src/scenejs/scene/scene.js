@@ -224,7 +224,7 @@ new (function() {
             this.tagSelector = {};
         }
         this.tagSelector.mask = tagMask;
-        this.tagSelector.regex = tagMask ? new RegExp(tagMask) : null
+        this.tagSelector.regex = tagMask ? new RegExp(tagMask) : null;
     };
 
     /** Gets regular expression that selects "tag" nodes to include in render passes
@@ -243,7 +243,7 @@ new (function() {
 
         var getFPS = this._setupFps();
 
-        if (!this._running || this._paused) {
+        if (!this._running) {
             cfg = cfg || {};
 
             this._running = true;
@@ -322,9 +322,7 @@ new (function() {
         if (this._destroyed) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
-        if (this._running && this._created) {
-            this._paused = doPause;
-        }
+        this._paused = doPause;
     };
 
     /** Returns true if the scene is currently rendering repeatedly in a loop after being started with {@link #start}.
@@ -336,14 +334,16 @@ new (function() {
     /**
      * Picks whatever geometry will be rendered at the given canvas coordinates.
      */
-    Scene.prototype.pick = function(canvasX, canvasY, options) {
+    Scene.prototype.pick = function(canvasX, canvasY) {
         if (this._destroyed) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
         var nodeId = SceneJS_DrawList.pick({
             sceneId: this.attr.id,
             canvasX : canvasX,
-            canvasY : canvasY }, options);
+            canvasY : canvasY,
+            tagSelector: this.tagSelector
+        });
         return nodeId ? { nodeId : nodeId, canvasX: canvasX, canvasY: canvasY } : null;
     };
 
@@ -417,6 +417,22 @@ new (function() {
         }
         var node = this.nodeMap.items[nodeId];
         return (node) ? true : false;
+    };
+
+    /** Finds nodes in this scene that have nodes IDs matching the given regular expression
+     */
+    Scene.prototype.findNodes = function(nodeIdRegex) {
+        var regex = new RegExp(nodeIdRegex);
+        var nodes = [];
+        var nodeMap = this.nodeMap.items;
+        for (var nodeId in nodeMap) {
+            if (nodeMap.hasOwnProperty(nodeId)) {
+                if (regex.test(nodeId)) {
+                    nodes.push(nodeMap[nodeId]);
+                }
+            }
+        }
+        return nodes;
     };
 
     Scene.prototype.findNode = function(nodeId) {

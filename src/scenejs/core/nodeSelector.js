@@ -52,6 +52,17 @@
         return this._targetNode.findNode(nodeId);
     };
 
+    /** Find nodes in scene that have IDs matching the given regular expression
+     *
+     */
+    NodeSelector.prototype.findNodes = function (nodeIdRegex) {
+        if (this._targetNode.attr.type != "scene") {
+            SceneJS_errorModule.fatalError("findNode attempted on node that is not a \"scene\" type: '" + this._targetNode.attr.id + "'");
+        }
+        return this._targetNode.findNodes(nodeIdRegex);
+    };
+
+
     /** Returns the scene to which the node belongs
      */
     NodeSelector.prototype.scene = function() {
@@ -217,7 +228,7 @@
      */
     NodeSelector.prototype.get = function(attr) {
         if (!attr) {
-            return this._targetNode.getJSON(); 
+            return this._targetNode.getJSON();
         }
         var funcName = "get" + attr.substr(0, 1).toUpperCase() + attr.substr(1);
         var func = this._targetNode[funcName];
@@ -308,9 +319,9 @@
         if (this._targetNode.attr.type != "scene") {
             throw SceneJS_errorModule.fatalError("pick attempted on node that is not a \"scene\" type: '" + this._targetNode.attr.id + "'");
         }
-        return this._targetNode.pick(offsetX, offsetY, options);        
+        return this._targetNode.pick(offsetX, offsetY, options);
     };
-    
+
     /**
      * Starts the selected scene node, which must be a scene.
      */

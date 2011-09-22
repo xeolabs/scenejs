@@ -195,29 +195,34 @@ SceneJS.createScene({
                                                         {
                                                             stage:  "fragment",
 
-                                                            code:  "uniform float time;\n\
+                                                             code:  "uniform float time;  float time2 = time;\n\
                                                                     \n\
                                                                     float myMaterialAlphaFunc(float alpha){\n\
-                                                                        return alpha+sin(time);\n\
+                                                                        return alpha+sin(time2);\n\
                                                                     }\n\
-                                                                    bool myWorldClipFunc(vec4 worldVertex){\n\
-                                                                        return (worldVertex.x < 1.0);\n\
+                                                                    void myWorldPosFunc(vec4 worldVertex){\n\
+                                                                        if (worldVertex.x > 0.0) time2 = time2 * 3.0;\n\
                                                                     }\n\
-                                                                    \n\
                                                                     vec4 myPixelColorFunc(vec4 color){\n\
-                                                                        color.r=color.r+sin(time)*0.3;\n\
-                                                                        color.g=color.g+sin(time+0.3)*0.3;\n\
-                                                                        color.b=color.b+sin(time+0.6)*0.3;\n\
-                                                                        color.a=color.a+sin(time);\n\
+                                                                        color.r=color.r+sin(time2)*0.3;\n\
+                                                                        color.g=color.g+sin(time2+0.3)*0.3;\n\
+                                                                        color.b=color.b+sin(time2+0.6)*0.3;\n\
+                                                                        color.a=color.a+sin(time2);\n\
                                                                         return color;\n\
+                                                                    }\n\
+                                                                    void myEyeVecFunc(vec3 eyeVec){\n\
+                                                                    }\n\
+                                                                    void myNormalFunc(vec3 normal){\n\
                                                                     }\n",
 
                                                             /* Bind our custom function to a SceneJS vertex shader hook
                                                              */
                                                             hooks: {
-                                                                //  worldPosClip:"myWorldClipFunc",
-                                                                materialAlpha: "myMaterialAlphaFunc",
-                                                                pixelColor: "myPixelColorFunc"
+                                                                worldPos:       "myWorldPosFunc",
+                                                                eyeVec:         "myEyeVecFunc",
+                                                                normal:         "normalFunc",
+                                                                materialAlpha:  "myMaterialAlphaFunc",
+                                                                pixelColor:     "myPixelColorFunc"
                                                             }
                                                         }
                                                     ],

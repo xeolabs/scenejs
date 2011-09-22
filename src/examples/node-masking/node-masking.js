@@ -4,7 +4,7 @@
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
 
- 
+
 
  */
 
@@ -106,21 +106,34 @@ for (var x = -10.0; x < 10.0; x += 3.0) {
             x: x,
             z: z,
             nodes: [
+
+                /* tag node
+                 */
                 {
                     type: "tag",
                     tag: tags[i].tag,
 
                     nodes : [
+
+                        /* name node for picking
+                         */
                         {
-                            type: "material",
-                            baseColor: tags[i].color,
-                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                            specular:       1.0,
-                            shine:          70.0,
+                            type: "name",
+                            id: "sphere at (x=" + x + ", z=" + z + ")",
 
                             nodes: [
                                 {
-                                    type : "sphere"
+                                    type: "material",
+                                    baseColor: tags[i].color,
+                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                    specular:       1.0,
+                                    shine:          70.0,
+
+                                    nodes: [
+                                        {
+                                            type : "sphere"
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -212,5 +225,47 @@ setInterval(function() {
     }
 
 }, 500);
+
+
+/* Pick listener
+ */
+
+
+canvas.addEventListener(
+        'mousedown',
+        function (event) {
+            var coords = clickCoordsWithinElement(event);
+
+            var pickRecord = scene.pick(coords.x, coords.y);
+
+            if (pickRecord) {
+                alert("Picked 'name' node with id '" + pickRecord.nodeId + "' at canvasX=" + pickRecord.canvasX + ", canvasY=" + pickRecord.canvasY);
+            } else {
+                alert("Nothing picked");
+            }
+        }, false);
+
+function clickCoordsWithinElement(event) {
+    var coords = { x: 0, y: 0};
+    if (!event) {
+        event = window.event;
+        coords.x = event.x;
+        coords.y = event.y;
+    } else {
+        var element = event.target ;
+        var totalOffsetLeft = 0;
+        var totalOffsetTop = 0 ;
+
+        while (element.offsetParent)
+        {
+            totalOffsetLeft += element.offsetLeft;
+            totalOffsetTop += element.offsetTop;
+            element = element.offsetParent;
+        }
+        coords.x = event.pageX - totalOffsetLeft;
+        coords.y = event.pageY - totalOffsetTop;
+    }
+    return coords;
+}
 
 
