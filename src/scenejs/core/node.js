@@ -364,8 +364,7 @@ SceneJS._Node.prototype.disconnect = function() {
     if (this.parent) {
         for (var i = 0; i < this.parent.children.length; i++) {
             if (this.parent.children[i] === this) {
-                //this._resetCompilationMemos(); (disconnectNodeAt already does this)
-                return this.disconnectNodeAt(i);
+                return this.parent.disconnectNodeAt(i);
             }
         }
     }
@@ -432,7 +431,7 @@ SceneJS._Node.prototype.disconnectNodes = function() {
  * @returns {Array[Node]} The removed child nodes
  */
 SceneJS._Node.prototype.removeNodes = function() {
-    var children = disconnectNodes();
+    var children = this.disconnectNodes();
     for (var i = 0; i < children.length; i++) {
         this.children[i].destroy();
     }
