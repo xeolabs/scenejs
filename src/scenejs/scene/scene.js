@@ -234,6 +234,51 @@ new (function() {
     };
 
     /**
+     * Perform any scheduled scene compilations and return true if the scene needs a redraw
+     */
+    Scene.prototype._compileScene = function() {
+        var compileFlags = SceneJS_compileModule.beginSceneCompile(this.attr.id);
+        if (compileFlags.level != SceneJS_compileModule.COMPILE_NOTHING) {          // level could be REDRAW
+            SceneJS_DrawList.bindScene({ sceneId: this.attr.id }, {
+                compileMode: compileFlags.level == SceneJS_compileModule.COMPILE_EVERYTHING ?
+                             SceneJS_DrawList.COMPILE_SCENE : SceneJS_DrawList.COMPILE_NODES,
+                resort: compileFlags.resort });
+            this._compileWithEvents();
+            SceneJS_compileModule.finishSceneCompile();
+            return true; // Redraw needed
+        }
+        return false; // No redraw needed
+    };
+
+    /**
+     * Render a single frame if new frame pending, or force a new frame
+     * Returns true if frame rendered
+     */
+    Scene.prototype.renderFrame = function(params) {
+        if (this._compileScene()) {         // Try doing pending compile/redraw
+            SceneJS_DrawList.renderFrame({
+                profileFunc: cfg.profileFunc,
+                tagSelector: this.tagSelector
+            });
+            return true;
+        }
+        if (params && params.force) {
+            SceneJS_DrawList.bindScene({    //  Else force redraw
+                sceneId: this.attr.id
+            }, {
+                compileMode: SceneJS_DrawList.COMPILE_NODES,
+                resort: false
+            });
+            SceneJS_DrawList.renderFrame({
+                profileFunc: cfg.profileFunc,
+                tagSelector: this.tagSelector
+            });
+            return true;
+        }
+        return false;
+    };
+
+    /**
      * Starts the render loop for this scene
      */
     Scene.prototype.start = function(cfg) {
@@ -257,31 +302,21 @@ new (function() {
             SceneJS_compileModule.nodeUpdated(this, "start");
 
             window[fnName] = function() {
-                if (self._running && !self._paused) { // idleFunc may have stopped render loop
+                if (self._running && !self._paused) {   // idleFunc may have stopped render loop
                     if (cfg.idleFunc) {
                         cfg.idleFunc();
                     }
-                    var compileFlags = SceneJS_compileModule.beginSceneCompile(self.attr.id);
-                    if (compileFlags.level != SceneJS_compileModule.COMPILE_NOTHING) {          // level could be REDRAW
-                        SceneJS_DrawList.bindScene({ sceneId: self.attr.id }, {
-                            compileMode: compileFlags.level == SceneJS_compileModule.COMPILE_EVERYTHING ?
-                                         SceneJS_DrawList.COMPILE_SCENE : SceneJS_DrawList.COMPILE_NODES,
-                            resort: compileFlags.resort });
-                        self._compileWithEvents();
+                    if (self._compileScene()) {         // Attempt pending compile and redraw
                         sleeping = false;
-                        SceneJS_compileModule.finishSceneCompile();
-
                         SceneJS_DrawList.renderFrame({
                             profileFunc: cfg.profileFunc,
                             tagSelector: self.tagSelector
                         });
-
                         if (cfg.frameFunc) {
                             cfg.frameFunc({
                                 fps: getFPS()
                             });
                         }
-
                         requestAnimFrame(window[fnName]);
                     } else {
                         if (!sleeping && cfg.sleepFunc) {
@@ -338,6 +373,7 @@ new (function() {
         if (this._destroyed) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
+        this._compileScene();                   // Do any pending scene recompilations
         var nodeId = SceneJS_DrawList.pick({
             sceneId: this.attr.id,
             canvasX : canvasX,
@@ -402,10 +438,7 @@ new (function() {
         }
         if (this._running) {
             this._running = false;
-            window["__scenejs_compileScene" + this.attr.id] = null;
-            if (!this._startCfg.requestAnimFrame) {
-                window.clearInterval(this._pInterval);
-            }
+            window["__scenejs_sceneLoop" + this.attr.id] = null;
         }
     };
 
