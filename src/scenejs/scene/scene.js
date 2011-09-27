@@ -269,8 +269,7 @@ new (function() {
                 compileMode: SceneJS_DrawList.COMPILE_NODES,
                 resort: false
             });
-            SceneJS_DrawList.renderFrame({
-                profileFunc: cfg.profileFunc,
+            SceneJS_DrawList.renderFrame({              
                 tagSelector: this.tagSelector
             });
             return true;
