@@ -323,6 +323,28 @@
     };
 
     /**
+     * Either render frame on selected scene if pending (ie update compilations pending), or
+     * force a new frame to be rendered.
+     *
+     * Returns true if frame was rendered.
+     *
+     * Render if pending:
+     *
+     * var wasRendered = SceneJS.scene("my-scene").renderFrame()
+     *
+     * Force a new frame, returns true:
+     *
+     * SceneJS.scene("my-scene").renderFrame({ force: true })
+     */
+    NodeSelector.prototype.renderFrame = function (params) {
+        if (this._targetNode.attr.type != "scene") {
+            throw SceneJS_errorModule.fatalError("renderFrame attempted on node that is not a \"scene\" type: '" + this._targetNode.attr.id + "'");
+        }
+        return this._targetNode.renderFrame(params);
+    };
+
+
+    /**
      * Starts the selected scene node, which must be a scene.
      */
     NodeSelector.prototype.start = function (cfg) {
