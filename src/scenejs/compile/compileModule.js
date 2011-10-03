@@ -429,8 +429,7 @@ var SceneJS_compileModule = new (function() {
     };
 
     this.finishSceneCompile = function() {
-        var scene = this._scene;
-        scene.flagSceneCompile = false;
+        this._scene.flagSceneCompile = false;
     };
 
 })();

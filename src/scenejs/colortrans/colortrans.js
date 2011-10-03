@@ -153,7 +153,7 @@ new (function() {
 
     Colortrans.prototype._compile = function() {
 
-        idStack[stackLen] = this.attr.id;
+        idStack[stackLen] = this.core._coreId; // Tie draw list state to core, not to scene node
         colortransStack[stackLen] = this.core;
         stackLen++;
         dirty = true;

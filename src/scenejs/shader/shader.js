@@ -14,28 +14,16 @@ new (function() {
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_RENDERING,
-            function(params) {
+            function() {
                 if (dirty) {
                     if (stackLen > 0) {
                         SceneJS_DrawList.setShader(idStack[stackLen - 1], shaderStack[stackLen - 1]);
-                    } else { // Full compile supplies it's own default states
+                    } else {
                         SceneJS_DrawList.setShader();
                     }
                     dirty = false;
                 }
             });
-
-    function pushShaders(id, shaders) {
-        idStack[stackLen] = id;
-        shaderStack[stackLen] = shaders;
-        stackLen++;
-        dirty = true;
-    }
-
-    function popShaders() {
-        stackLen--;
-        dirty = true;
-    }
 
     var Shader = SceneJS.createNodeType("shader");
 
@@ -82,16 +70,20 @@ new (function() {
     };
 
     Shader.prototype._compile = function() {
-        this._preCompile();
+
+        /* Push
+         */
+        idStack[stackLen] = this.core._coreId; // Draw list node tied to core, not node
+        shaderStack[stackLen] = { shaders: this.core.shaders, vars: this.core.vars };
+        stackLen++;
+        dirty = true;
+
         this._compileNodes();
-        this._postCompile();
+
+        /* Pop
+         */
+        stackLen--;
+        dirty = true;
     };
 
-    Shader.prototype._preCompile = function() {
-        pushShaders(this.attr.id, { shaders: this.core.shaders, vars: this.core.vars });
-    };
-
-    Shader.prototype._postCompile = function() {
-        popShaders();
-    };
 })();

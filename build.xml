@@ -120,6 +120,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/imageBuf/imageBuf.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/shader/shader.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/shader/shaderVars.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/node-events/nodeEventsModule.js"/>
     </path>

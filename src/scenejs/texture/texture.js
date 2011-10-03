@@ -299,7 +299,7 @@ var SceneJS_textureModule = new (function() {
     };
 
     Texture.prototype._compile = function() {
-        idStack[stackLen] = this.attr.id;
+        idStack[stackLen] = this.core._coreId; // Tie draw list state to core, not to scene node
         textureStack[stackLen] = this.core;
         stackLen++;
         dirty = true;

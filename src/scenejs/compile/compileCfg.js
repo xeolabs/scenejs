@@ -276,6 +276,16 @@ var SceneJS_compileCfg = new (function() {
             }
         },
 
+        "shaderVars": {
+            set: {
+                attr: {
+                    vars: {
+                        level: this.REDRAW
+                    }
+                }
+            }
+        },
+
         "flags": {
             "set" : {
                 attr: {

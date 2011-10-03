@@ -167,7 +167,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             }
 
             this._program.bind();
-
+          
             if (node.shaderState.shader && node.shaderState.shader.vars) { // Custom shader - set any vars we have
                 var vars = node.shaderState.shader.vars;
                 for (var name in vars) {
@@ -193,12 +193,28 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._lastFogStateId = -1;
             this._lastPickListenersStateId = -1;
             this._lastRenderListenersStateId = -1;
+            this._lastShaderVarsStateId = -1;
             this._lastProgramId = node.program.id;
         }
 
         var program = this._program;
         var gl = this._context;
 
+        /*----------------------------------------------------------------------------------------------------------
+         * shaderVarsState
+         *--------------------------------------------------------------------------------------------------------*/
+
+        if (node.shaderVarsState._stateId != this._lastShaderVarsStateId) {
+            if (node.shaderVarsState.vars) { // Custom shader vars - set any vars we have
+                var vars = node.shaderVarsState.vars;
+                for (var name in vars) {
+                    if (vars.hasOwnProperty(name)) {
+                        this._program.setUniform(name, vars[name]);
+                    }
+                }
+            }
+            this._lastShaderVarsStateId = node.shaderVarsState._stateId;
+        }
 
         /*----------------------------------------------------------------------------------------------------------
          * imageBuf
@@ -639,6 +655,12 @@ var SceneJS_NodeRenderer = function(cfg) {
                 }
             }
 
+            program.setUniform("SCENEJS_uTransparent", !!newFlags.transparent);
+
+            program.setUniform("SCENEJS_uBackfaceTexturing", newFlags.backfaceTexturing == undefined ? true : !!newFlags.backfaceTexturing);
+            program.setUniform("SCENEJS_uBackfaceLighting", newFlags.backfaceLighting == undefined ? true : !!newFlags.backfaceLighting);
+
+            
             //            var mask = newFlags.colorMask;
             //
             //            if (!oldFlags || (mask && (mask.r != oldFlags.r || mask.g != oldFlags.g || mask.b != oldFlags.b || mask.a != oldFlags.a))) {

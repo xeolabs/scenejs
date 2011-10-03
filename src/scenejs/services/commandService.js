@@ -45,37 +45,56 @@ SceneJS.Services.addService(
 (function() {
     var commandService = SceneJS.Services.getService(SceneJS.Services.COMMAND_SERVICE_ID);
 
+    function createNodes(scene, target, nodes) {
+        var node;
+        var targetNode;
+        for (var i = 0; i < nodes.length; i++) {
+            node = nodes[i];
+            if (target) {
+                targetNode = scene.findNode(target);
+                if (!targetNode) {
+                    continue;
+                }
+                targetNode.add("node", nodes[i]);
+            } else {
+                scene.addNode(nodes[i]);
+            }
+        }
+    }
+
     commandService.addCommand("create",
             (function() {
                 return {
                     execute: function(ctx, params) {
                         var nodes = params.nodes;
-                        var target = params.target;
-                        var targetNode;
+
                         if (nodes) {
-                            var scenes = ctx.scenes || SceneJS._scenes;
+
+                            var target = params.target;
+                            var scenes;
                             var scene;
-                            var node;
-                            for (var i = 0, len = scenes.length; i < len; i++) {
-                                scene = scenes[i];
-                                if (scene) {
-                                    for (var j = 0; j < nodes.length; j++) {
-                                        node = nodes[j];
-                                        if (!node.id) {
-                                            throw  SceneJS_errorModule.fatalError("Message 'create' must have ID for new node");
-                                        }
-                                        if (target) {
-                                            targetNode = scene.findNode(target);
-                                            if (!target) {
-                                                continue;
-                                            }
-                                            target.add("node", nodes[i]);
-                                        } else {
-                                            scene.addNode(nodes[i]);
+
+                            if (ctx.scenes) {
+                                scenes = ctx.scenes;
+                                for (var i = 0, len = scenes.length; i < len; i++) {
+                                    scene = scenes[i];
+                                    if (scene) { // Scene might have been blown away by some other command
+                                        createNodes(scene, target, nodes);
+                                    }
+                                }
+
+                            } else {
+                                scenes = SceneJS._scenes;
+                                for (var sceneId in scenes) {
+                                    if (scenes.hasOwnProperty(sceneId)) {
+                                        scene = scenes[sceneId];
+                                        if (scene) { // Scene might have been blown away by some other command
+                                            createNodes(scene, target, nodes);
                                         }
                                     }
                                 }
                             }
+
                         }
                     }
                 };
