@@ -14,16 +14,16 @@
 var SceneJS_eventModule = new (function() {
 
     this.ERROR = 0;
-    this.INIT = 1;                           // SceneJS framework initialised
-    this.RESET = 2;                          // SceneJS framework reset
-    this.TIME_UPDATED = 3;                   // System time updated
-    this.SCENE_CREATED = 4;                  // Scene has just been created
-    this.SCENE_COMPILING = 5;                // Scene about to be traversed
-    this.SCENE_COMPILED = 6;              // Scene just been completely traversed
-    this.SCENE_DESTROYED = 7;                // Scene just been destroyed
-    this.RENDERER_UPDATED = 8;                // Current WebGL context has been updated to the given state
-    this.RENDERER_EXPORTED = 9;               // Export of the current WebGL context state
-//    this.CANVAS_ACTIVATED = 10;
+    this.INIT = 1;                          // SceneJS framework initialised
+    this.RESET = 2;                         // SceneJS framework reset
+    this.TIME_UPDATED = 3;                  // System time updated
+    this.SCENE_CREATED = 4;                 // Scene has just been created
+    this.SCENE_IDLE = 5;                    // Scene maybe about to be compiled and redrawn
+    this.SCENE_COMPILING = 6;               // Scene about to be compiled and drawn
+    this.SCENE_COMPILED = 7;                // Scene just been completely traversed
+    this.SCENE_DESTROYED = 8;               // Scene just been destroyed
+    this.RENDERER_UPDATED = 9;              // Current WebGL context has been updated to the given state
+    this.RENDERER_EXPORTED = 10;            // Export of the current WebGL context state
     this.CANVAS_DEACTIVATED = 11;
     this.GEOMETRY_UPDATED = 13;
     this.GEOMETRY_EXPORTED = 14;
@@ -42,7 +42,6 @@ var SceneJS_eventModule = new (function() {
     this.SHADER_ACTIVATE = 27;
     this.SHADER_ACTIVATED = 28;
     this.SCENE_RENDERING = 29;
-
     this.LOGGING_ELEMENT_ACTIVATED = 37;
     this.PICK_COLOR_EXPORTED = 38;
     this.NODE_CREATED = 39;

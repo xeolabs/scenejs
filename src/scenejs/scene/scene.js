@@ -305,6 +305,9 @@ new (function() {
                     if (cfg.idleFunc) {
                         cfg.idleFunc();
                     }
+                    SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_IDLE, { 
+                        sceneId: self.attr.id
+                    });
                     if (self._compileScene()) {         // Attempt pending compile and redraw
                         sleeping = false;
                         SceneJS_DrawList.renderFrame({

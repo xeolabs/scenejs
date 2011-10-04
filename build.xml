@@ -117,6 +117,8 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/layer/layerModule.js"/>
 
+        <fileset dir="${SRC_DIR}" includes="scenejs/video/video.js"/>
+        
         <fileset dir="${SRC_DIR}" includes="scenejs/imageBuf/imageBuf.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/shader/shader.js"/>
