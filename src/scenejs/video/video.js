@@ -2,16 +2,9 @@ new (function() {
 
     var sceneBufs = {};
 
-    var idStack = [];
-    var bufStack = [];
-    var stackLen = 0;
-
-    var dirty;
-
     //------------------------------------------------------------
     // TODO: remove bufs when all video nodes deleted for a scene otherwise we'll have inifite redraw
     //--------------------------------------------------------
-
 
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.SCENE_IDLE,
@@ -24,26 +17,6 @@ new (function() {
                         }
                     }
                     SceneJS_compileModule.redraw(params.sceneId);   // Trigger scene redraw after texture update
-                }
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_COMPILING,
-            function() {
-                stackLen = 0;
-                dirty = true;
-            });
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_RENDERING,
-            function() {
-                if (dirty) {
-                    if (stackLen > 0) {
-                        //                      SceneJS_DrawList.setVideo(idStack[stackLen - 1], bufStack[stackLen - 1]);
-                    } else { // Full compile supplies it's own default states
-                        //                    SceneJS_DrawList.setVideo(); // No video
-                    }
-                    dirty = false;
                 }
             });
 
@@ -65,7 +38,7 @@ new (function() {
         /* Create hidden video canvas
          */
         var video = this._video = document.createElement("video");
-        //  video.style.display = "none";
+        video.style.display = "none";
         video.setAttribute("loop", "loop");
         video.autoplay = true;
         video.addEventListener("ended", // looping broken in FF
@@ -102,7 +75,7 @@ new (function() {
 
                 gl.bindTexture(gl.TEXTURE_2D, texture);
 
-                // TODO: fix when minefield is up to spec
+                // TODO: fix when minefield is up to spec - thanks GLGE
 
                 if (video.readyState > 0) {
 
@@ -131,7 +104,9 @@ new (function() {
                     gl.generateMipmap(gl.TEXTURE_2D);
 
                     /*
-                     use when video is working in webkit
+
+                    For when webkit works - thanks GLGE
+
                      try{gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);}
                      catch(e){gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video,null);}
                      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -151,7 +126,7 @@ new (function() {
                     },
 
                     unbind : function(unit) {
-                        var gl = self._gl
+                        var gl = self._gl;
                         gl.activeTexture(gl["TEXTURE" + unit]);
                         gl.bindTexture(gl.TEXTURE_2D, null);
                     }
@@ -177,32 +152,18 @@ new (function() {
             var bufs = sceneBufs[sceneId];
             return {
                 bind: function(unit) {
-                    var buf = bufs[id];
-                    //  if (buf && buf.isRendered()) {
-                    buf.getTexture().bind(unit);
-                    //}
+                    bufs[id].getTexture().bind(unit);
                 },
 
                 unbind: function(unit) {
-                    var buf = bufs[id];
-                    // if (buf && buf.isRendered()) {
-                    buf.getTexture().unbind(unit);
-                    // }
+                    bufs[id].getTexture().unbind(unit);
                 }
             };
         }
     });
 
     Video.prototype._compile = function() {
-        idStack[stackLen] = this.attr.id;
-        bufStack[stackLen] = this._buf;
-        stackLen++;
-        dirty = true;
-
         this._compileNodes();
-
-        stackLen--;
-        dirty = true;
     };
 
     Video.prototype._destroy = function() {
