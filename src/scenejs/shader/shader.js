@@ -30,7 +30,7 @@ new (function() {
     Shader.prototype._init = function(params) {
         if (this.core._nodeCount == 1) { // This node is the resource definer
             this._setShaders(params.shaders);
-            this.setVars(params.vars);
+            this.setParams(params.params);
         }
     };
 
@@ -60,13 +60,13 @@ new (function() {
         }
     };
 
-    Shader.prototype.setVars = function(vars) {
-        vars = vars || {};
+    Shader.prototype.setParams = function(params) {
+        params = params || {};
         var core = this.core;
-        if (!core.vars) {
-            core.vars = {};
+        if (!core.params) {
+            core.params = {};
         }
-        SceneJS._apply(vars, core.vars);
+        SceneJS._apply(params, core.params);
     };
 
     Shader.prototype._compile = function() {
@@ -74,7 +74,7 @@ new (function() {
         /* Push
          */
         idStack[stackLen] = this.core._coreId; // Draw list node tied to core, not node
-        shaderStack[stackLen] = { shaders: this.core.shaders, vars: this.core.vars };
+        shaderStack[stackLen] = { shaders: this.core.shaders, params: this.core.params };
         stackLen++;
         dirty = true;
 

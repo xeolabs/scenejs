@@ -44,7 +44,7 @@ var SceneJS_DrawList = new (function() {
     this._TAG = 18;
     this._RENDER_LISTENERS = 19;
     this._SHADER = 20;
-    this._SHADER_VARS = 21;
+    this._SHADER_PARAMS = 21;
 
     /*----------------------------------------------------------------------
      * Default state values
@@ -180,8 +180,8 @@ var SceneJS_DrawList = new (function() {
         shader : {}
     });
 
-    this._DEFAULT_SHADER_VARS_STATE = createState({
-        vars: null
+    this._DEFAULT_SHADER_PARAMS_STATE = createState({
+        params: null
     });
 
     /** Shader programs currently allocated on all canvases
@@ -236,7 +236,7 @@ var SceneJS_DrawList = new (function() {
     var tagState;
     var renderListenersState;
     var shaderState;
-    var shaderVarsState;
+    var shaderParamsState;
 
     /** Current scene state hash
      */
@@ -361,7 +361,7 @@ var SceneJS_DrawList = new (function() {
             tagState = this._DEFAULT_TAG_STATE;
             renderListenersState = this._DEFAULT_RENDER_LISTENERS_STATE;
             shaderState = this._DEFAULT_SHADER_STATE;
-            shaderVarsState = this._DEFAULT_SHADER_VARS_STATE;
+            shaderParamsState = this._DEFAULT_SHADER_PARAMS_STATE;
 
             this._forceBinSort(true);             // Sort display list with orders re-built from layer orders
 
@@ -722,13 +722,13 @@ var SceneJS_DrawList = new (function() {
         this._stateHash = null;
     };
 
-    this.setShaderVars = function(id, vars) {
+    this.setShaderParams = function(id, params) {
         if (arguments.length == 0) {
-            shaderVarsState = this._DEFAULT_SHADER_VARS_STATE;
+            shaderParamsState = this._DEFAULT_SHADER_PARAMS_STATE;
             return;
         }
-        shaderVarsState = this._getState(this._SHADER_VARS, id);
-        shaderVarsState.vars = vars;
+        shaderParamsState = this._getState(this._SHADER_PARAMS, id);
+        shaderParamsState.params = params;
     };
 
     /**
@@ -840,7 +840,7 @@ var SceneJS_DrawList = new (function() {
         tagState._nodeCount++;
         renderListenersState._nodeCount++;
         shaderState._nodeCount++;
-        shaderVarsState._nodeCount++;
+        shaderParamsState._nodeCount++;
 
         node = {
             id: id,
@@ -872,7 +872,7 @@ var SceneJS_DrawList = new (function() {
             tagState:              tagState,
             renderListenersState:   renderListenersState,
             shaderState:            shaderState,
-            shaderVarsState:        shaderVarsState
+            shaderParamsState:        shaderParamsState
         };
 
         this._states.nodeMap[id] = node;
@@ -937,7 +937,7 @@ var SceneJS_DrawList = new (function() {
             this._releaseState(node.tagState);
             this._releaseState(node.renderListenersState);
             this._releaseState(node.shaderState);
-            this._releaseState(node.shaderVarsState);
+            this._releaseState(node.shaderParamsState);
         }
         geoNodesMap[id] = null;
         sceneState.lenEnabledBin = 0;

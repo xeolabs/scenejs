@@ -168,11 +168,11 @@ var SceneJS_NodeRenderer = function(cfg) {
 
             this._program.bind();
           
-            if (node.shaderState.shader && node.shaderState.shader.vars) { // Custom shader - set any vars we have
-                var vars = node.shaderState.shader.vars;
-                for (var name in vars) {
-                    if (vars.hasOwnProperty(name)) {
-                        this._program.setUniform(name, vars[name]);
+            if (node.shaderState.shader && node.shaderState.shader.params) { // Custom shader - set any params we have
+                var params = node.shaderState.shader.params;
+                for (var name in params) {
+                    if (params.hasOwnProperty(name)) {
+                        this._program.setUniform(name, params[name]);
                     }
                 }
             }
@@ -193,7 +193,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._lastFogStateId = -1;
             this._lastPickListenersStateId = -1;
             this._lastRenderListenersStateId = -1;
-            this._lastShaderVarsStateId = -1;
+            this._lastShaderParamsStateId = -1;
             this._lastProgramId = node.program.id;
         }
 
@@ -201,19 +201,19 @@ var SceneJS_NodeRenderer = function(cfg) {
         var gl = this._context;
 
         /*----------------------------------------------------------------------------------------------------------
-         * shaderVarsState
+         * shaderParamsState
          *--------------------------------------------------------------------------------------------------------*/
 
-        if (node.shaderVarsState._stateId != this._lastShaderVarsStateId) {
-            if (node.shaderVarsState.vars) { // Custom shader vars - set any vars we have
-                var vars = node.shaderVarsState.vars;
-                for (var name in vars) {
-                    if (vars.hasOwnProperty(name)) {
-                        this._program.setUniform(name, vars[name]);
+        if (node.shaderParamsState._stateId != this._lastShaderParamsStateId) {
+            if (node.shaderParamsState.params) { // Custom shader params - set any params we have
+                var params = node.shaderParamsState.params;
+                for (var name in params) {
+                    if (params.hasOwnProperty(name)) {
+                        this._program.setUniform(name, params[name]);
                     }
                 }
             }
-            this._lastShaderVarsStateId = node.shaderVarsState._stateId;
+            this._lastShaderParamsStateId = node.shaderParamsState._stateId;
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -252,12 +252,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                         }
                         program.setUniform("SCENEJS_uLayer" + j + "BlendFactor", layer.blendFactor);
                     }
-                }
-                //            if (numLayers != countBound) {
-                //                if (node.texState.params.waitForLoad) { // Abort if waiting for missing textures
-                //                    return;
-                //                }
-                //            }
+                }              
             }
             this._lastTexStateId = node.texState._stateId;
         }

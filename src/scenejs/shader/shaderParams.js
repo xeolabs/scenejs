@@ -1,7 +1,7 @@
 new (function() {
 
     var idStack = [];
-    var shaderVarsStack = [];
+    var shaderParamsStack = [];
     var stackLen = 0;
     var dirty;
 
@@ -17,41 +17,41 @@ new (function() {
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_DrawList.setShaderVars(idStack[stackLen - 1], shaderVarsStack[stackLen - 1]);
+                        SceneJS_DrawList.setShaderParams(idStack[stackLen - 1], shaderParamsStack[stackLen - 1]);
                     } else { // Full compile supplies it's own default states
-                        SceneJS_DrawList.setShaderVars();
+                        SceneJS_DrawList.setShaderParams();
                     }
                     dirty = false;
                 }
             });
 
-    var ShaderVars = SceneJS.createNodeType("shaderVars");
+    var ShaderParams = SceneJS.createNodeType("shaderParams");
 
-    ShaderVars.prototype._init = function(params) {
+    ShaderParams.prototype._init = function(params) {
         if (this.core._nodeCount == 1) { // This node is the resource definer
-            this.setVars(params.vars);
+            this.setParams(params.params);
         }
     };
 
-    ShaderVars.prototype.setVars = function(vars) {
-        vars = vars || {};
+    ShaderParams.prototype.setParams = function(params) {
+        params = params || {};
         var core = this.core;
-        if (!core.vars) {
-            core.vars = {};
+        if (!core.params) {
+            core.params = {};
         }
-        SceneJS._apply(vars, core.vars);
+        SceneJS._apply(params, core.params);
     };
 
-    ShaderVars.prototype._compile = function() {
+    ShaderParams.prototype._compile = function() {
 
         idStack[stackLen] = this.core._coreId; // Tie draw list state to core, not to scene node
-        shaderVarsStack[stackLen] = this.core.vars;
+        shaderParamsStack[stackLen] = this.core.params;
         stackLen++;
         dirty = true;
 
         this._compileNodes();
 
-        stackLen--;                                 // pop vars
+        stackLen--;                                 // pop params
         dirty = true;
     };
 })();
