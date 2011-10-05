@@ -257,7 +257,6 @@ new (function() {
     Scene.prototype.renderFrame = function(params) {
         if (this._compileScene()) {         // Try doing pending compile/redraw
             SceneJS_DrawList.renderFrame({
-                profileFunc: cfg.profileFunc,
                 tagSelector: this.tagSelector
             });
             return true;
