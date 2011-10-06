@@ -85,7 +85,7 @@ new (function() {
             props: props,
 
             setProps: function(context) {
-                setProperties(context, props);
+                setProperties(context, props.props);
             },
 
             restoreProps : function(context) {
