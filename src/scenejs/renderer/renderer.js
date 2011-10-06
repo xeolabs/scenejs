@@ -48,7 +48,7 @@ new (function() {
 
 
                 // Not sure if needed:
-                setProperties(canvas.context, props);
+                setProperties(canvas.context, props.props);
 
                 pushProps("__scenejs_default_props", props);
             });
