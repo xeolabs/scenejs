@@ -140,7 +140,7 @@ new (function() {
 
                     unbind : function(unit) {
                         gl.activeTexture(gl["TEXTURE" + unit]);
-                        gl.bindTexture(this.target, null);
+                        gl.bindTexture(gl.TEXTURE_2D, null);
                     }
                 };
             }

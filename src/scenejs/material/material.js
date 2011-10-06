@@ -156,7 +156,7 @@ new (function() {
         //        }
         //        this._material.fixed = (origMemoLevel == 1); // State not changed because of update to this node
 
-        idStack[stackLen] = this.attr.id;           // Push material
+        idStack[stackLen] = this.core._coreId; // Tie draw list state to core, not to scene node - reduces amount of state
         materialStack[stackLen] = this.core;       
         stackLen++;
         dirty = true;

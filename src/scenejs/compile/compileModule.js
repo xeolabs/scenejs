@@ -78,7 +78,7 @@ var SceneJS_compileModule = new (function() {
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.INIT,
             function() {
-              self._debugCfg = SceneJS_debugModule.getConfigs("compilation");
+                self._debugCfg = SceneJS_debugModule.getConfigs("compilation");
             });
 
     SceneJS_eventModule.addListener(
@@ -123,6 +123,20 @@ var SceneJS_compileModule = new (function() {
      * NOTIFICATION
      *
      *----------------------------------------------------------------------------------------------------------------*/
+
+    /**
+     * Notifies compilation module that a redraw of the given scene is required
+     */
+    this.redraw = function(sceneId) {
+        if (!this._enableCompiler) {
+            return;
+        }
+        var compileScene = this._scenes[sceneId];
+        if (compileScene.compilingScene) {
+            return;
+        }
+        compileScene.redraw = true;
+    };
 
     /**
      * Notifies compilation module that a node has been modified
@@ -248,11 +262,11 @@ var SceneJS_compileModule = new (function() {
         };
         var stats = compileScene.stats;
 
-//        if (this._debugCfg.logTrace) {
-//            SceneJS_loggingModule.info("-------------------------------------------------------------------");
-//            SceneJS_loggingModule.info("COMPILING ...");
-//            SceneJS_loggingModule.info("");
-//        }
+        //        if (this._debugCfg.logTrace) {
+        //            SceneJS_loggingModule.info("-------------------------------------------------------------------");
+        //            SceneJS_loggingModule.info("COMPILING ...");
+        //            SceneJS_loggingModule.info("");
+        //        }
 
         var result = {
             level: this.REDRAW,     // Just flag display redraw until we know we need any node recompilations
@@ -291,14 +305,14 @@ var SceneJS_compileModule = new (function() {
                 // stats.path++;
                 result.level = this.COMPILE_PARTIAL;
 
-            }  else if (level == SceneJS_compileCfg.RESORT) {
+            } else if (level == SceneJS_compileCfg.RESORT) {
                 result.resort = true;
             }
         }
 
-//        if (this._debugCfg.logTrace) {
-//            SceneJS_loggingModule.info("-------------------------------------------------------------------");
-//        }
+        //        if (this._debugCfg.logTrace) {
+        //            SceneJS_loggingModule.info("-------------------------------------------------------------------");
+        //        }
 
         return result;
     };
@@ -313,12 +327,12 @@ var SceneJS_compileModule = new (function() {
             id = node.attr.id;
 
             // TODO: why do these two lines break compilation within instanced subtrees?
-                        if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
-                            return;
-                        }
-                        if (compileScene.dirtyNodesWithinBranches[id]) { // Node on path already marked, along with all instances of it
-                            return;
-                        }
+            if (dirtyNodes[id]) { // Node on path already marked, along with all instances of it
+                return;
+            }
+            if (compileScene.dirtyNodesWithinBranches[id]) { // Node on path already marked, along with all instances of it
+                return;
+            }
             dirtyNodes[id] = true;
             node = node.parent;
         }
@@ -429,8 +443,7 @@ var SceneJS_compileModule = new (function() {
     };
 
     this.finishSceneCompile = function() {
-        var scene = this._scene;
-        scene.flagSceneCompile = false;
+        this._scene.flagSceneCompile = false;
     };
 
 })();

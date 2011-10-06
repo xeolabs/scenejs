@@ -141,10 +141,10 @@ var SceneJS_textureModule = new (function() {
 
             for (var i = 0; i < params.layers.length; i++) {
                 var layerParam = params.layers[i];
-                if (!layerParam.uri && !layerParam.imageBuf && !layerParam.image && !layerParam.canvasId) {
+                if (!layerParam.uri && !layerParam.imageBuf && !layerParam.video && !layerParam.image && !layerParam.canvasId) {
                     throw SceneJS_errorModule.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture layer " + i + "  has no uri, imageBuf or canvasId specified");
+                            "texture layer " + i + "  has no uri, imageBuf, video or canvasId specified");
                 }
                 if (layerParam.applyFrom) {
                     if (layerParam.applyFrom != "uv" &&
@@ -198,6 +198,10 @@ var SceneJS_textureModule = new (function() {
 
                 if (layer.creationParams.imageBuf) {
                     layer.texture = SceneJS._compilationStates.getState("imageBuf", this.scene.attr.id, layer.creationParams.imageBuf);
+
+                } else if (layer.creationParams.video) {
+                    layer.texture = SceneJS._compilationStates.getState("video", this.scene.attr.id, layer.creationParams.video);
+
                 } else {
                     var self = this;
                     layer.texture = createTexture(
@@ -299,7 +303,7 @@ var SceneJS_textureModule = new (function() {
     };
 
     Texture.prototype._compile = function() {
-        idStack[stackLen] = this.attr.id;
+        idStack[stackLen] = this.core._coreId; // Tie draw list state to core, not to scene node
         textureStack[stackLen] = this.core;
         stackLen++;
         dirty = true;

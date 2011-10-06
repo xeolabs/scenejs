@@ -14,8 +14,6 @@
 
  In this demo we're just doing (1).
 
- More info on the shader node on the Wiki: http://scenejs.wikispaces.com/shader
-
  */
 
 SceneJS.createScene({
@@ -103,35 +101,6 @@ SceneJS.createScene({
 
                                     nodes: [
 
-                                        //                                        {
-                                        //                                            type: "material",
-                                        //                                            emit: 0,
-                                        //                                            baseColor:      { r: 0.4, g: 0.9, b: 0.9 },
-                                        //                                            specularColor:  { r: 0.4, g: 0.9, b: 0.9 },
-                                        //                                            specular:       0.7,
-                                        //                                            shine:          10.0,
-                                        //                                            alpha: 0.7,
-                                        //
-                                        //                                            flags: {
-                                        //                                                transparent: true,
-                                        //                                                backfaces: false
-                                        //                                            },
-                                        //
-                                        //                                            nodes: [
-                                        //                                                {
-                                        //                                                    type: "scale",
-                                        //                                                    x: 4,
-                                        //                                                    y: 4,
-                                        //                                                    z: 4,
-                                        //                                                    nodes: [
-                                        //                                                        {
-                                        //                                                            type: "cube"
-                                        //                                                        }
-                                        //                                                    ]
-                                        //                                                }
-                                        //                                            ]
-                                        //                                        },
-
                                         /* Specify the amounts of ambient, diffuse and specular
                                          * lights our teapot reflects
                                          */
@@ -172,18 +141,22 @@ SceneJS.createScene({
                                                         {
                                                             stage:  "vertex",
 
-                                                            /* GLSL fragment with custom function (which is pinched
-                                                             * from the custom shader demo for GLGE - http://www.glge.com).
+                                                            /* GLSL fragment with custom function.
+                                                             *
+                                                             * The fragment can be given as either a string or an array
+                                                             * of strings.
                                                              */
-                                                            code:  "uniform float time;\n\
-                                                                    vec4 myModelPosFunc(vec4 pos){\n\
-                                                                        pos.x=pos.x+sin(pos.x*5.0+time+10.0)*0.1;\n\
-                                                                        pos.y=pos.y+sin(pos.y*5.0+time+10.0)*0.1;\n\
-                                                                        pos.z=pos.z+sin(pos.z*5.0+time+10.0)*0.1;\n\
-                                                                        return pos;\n\
-                                                                    }\n",
+                                                            code: [
+                                                                "uniform float time;",
 
-                                                            /* Bind our custom function to a SceneJS vertex shader hook                                                            
+                                                                "vec4 myModelPosFunc(vec4 pos){",
+                                                                "   pos.x=pos.x+sin(pos.x*5.0+time+10.0)*0.1;",
+                                                                "   pos.y=pos.y+sin(pos.y*5.0+time+10.0)*0.1;",
+                                                                "   pos.z=pos.z+sin(pos.z*5.0+time+10.0)*0.1;",
+                                                                "   return pos;",
+                                                                "}"],
+
+                                                            /* Bind our custom function to a SceneJS vertex shader hook
                                                              */
                                                             hooks: {
                                                                 modelPos: "myModelPosFunc"
@@ -191,29 +164,37 @@ SceneJS.createScene({
                                                         },
 
                                                         /* Fragment shader
+                                                         *
+                                                         * The fragment can be given as either a string or an array
+                                                         * of strings.
                                                          */
                                                         {
                                                             stage:  "fragment",
 
-                                                             code:  "uniform float time;  float time2 = time;\n\
-                                                                    \n\
-                                                                    float myMaterialAlphaFunc(float alpha){\n\
-                                                                        return alpha+sin(time2);\n\
-                                                                    }\n\
-                                                                    void myWorldPosFunc(vec4 worldVertex){\n\
-                                                                        if (worldVertex.x > 0.0) time2 = time2 * 3.0;\n\
-                                                                    }\n\
-                                                                    vec4 myPixelColorFunc(vec4 color){\n\
-                                                                        color.r=color.r+sin(time2)*0.3;\n\
-                                                                        color.g=color.g+sin(time2+0.3)*0.3;\n\
-                                                                        color.b=color.b+sin(time2+0.6)*0.3;\n\
-                                                                        color.a=color.a+sin(time2);\n\
-                                                                        return color;\n\
-                                                                    }\n\
-                                                                    void myEyeVecFunc(vec3 eyeVec){\n\
-                                                                    }\n\
-                                                                    void myNormalFunc(vec3 normal){\n\
-                                                                    }\n",
+                                                            code:  [
+                                                                "uniform float time;  float time2 = time;",
+
+                                                                "float myMaterialAlphaFunc(float alpha){",
+                                                                "   return alpha+sin(time2);",
+                                                                "}",
+
+                                                                "void myWorldPosFunc(vec4 worldVertex){",
+                                                                "   if (worldVertex.x > 0.0) time2 = time2 * 3.0;",
+                                                                "}",
+
+                                                                "vec4 myPixelColorFunc(vec4 color){",
+                                                                "   color.r=color.r+sin(time2)*0.3;",
+                                                                "   color.g=color.g+sin(time2+0.3)*0.3;",
+                                                                "   color.b=color.b+sin(time2+0.6)*0.3;",
+                                                                "   color.a=color.a+sin(time2);",
+                                                                "   return color;",
+                                                                "}",
+
+                                                                "void myEyeVecFunc(vec3 eyeVec){",
+                                                                "}",
+
+                                                                "void myNormalFunc(vec3 normal){",
+                                                                "}"],
 
                                                             /* Bind our custom function to a SceneJS vertex shader hook
                                                              */
@@ -229,15 +210,33 @@ SceneJS.createScene({
 
                                                     /* Optional initial values for uniforms within our GLSL:
                                                      */
-                                                    params: {
-                                                        time: 0.5
+                                                    vars: {
+                                                        time: 0.0
                                                     },
 
-                                                    /* This teapot will enjoy our custom shader injection:
-                                                     */
+
                                                     nodes: [
+
+                                                        /* Inject a variable value into our custom shader:
+                                                         */
                                                         {
-                                                            type : "teapot"
+                                                            type: "shaderVars",
+
+                                                            id: "myShaderVars",
+
+                                                            vars: {
+                                                                time: 0.5
+                                                            },
+
+                                                            nodes: [
+
+                                                                /* This teapot will enjoy our custom shader injection:
+                                                                 */
+
+                                                                {
+                                                                    type : "teapot"
+                                                                }
+                                                            ]
                                                         }
                                                     ]
                                                 }
@@ -310,7 +309,7 @@ var time = 0;
 
 SceneJS.scene("theScene").start({
     idleFunc: function() {
-        this.findNode("myShader").set("params", {
+        this.findNode("myShaderVars").set("vars", {
             time: time ,
             time2: time
         });

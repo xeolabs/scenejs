@@ -44,6 +44,7 @@ var SceneJS_DrawList = new (function() {
     this._TAG = 18;
     this._RENDER_LISTENERS = 19;
     this._SHADER = 20;
+    this._SHADER_PARAMS = 21;
 
     /*----------------------------------------------------------------------
      * Default state values
@@ -179,6 +180,10 @@ var SceneJS_DrawList = new (function() {
         shader : {}
     });
 
+    this._DEFAULT_SHADER_PARAMS_STATE = createState({
+        params: null
+    });
+
     /** Shader programs currently allocated on all canvases
      */
     this._programs = {};
@@ -231,6 +236,7 @@ var SceneJS_DrawList = new (function() {
     var tagState;
     var renderListenersState;
     var shaderState;
+    var shaderParamsState;
 
     /** Current scene state hash
      */
@@ -355,6 +361,7 @@ var SceneJS_DrawList = new (function() {
             tagState = this._DEFAULT_TAG_STATE;
             renderListenersState = this._DEFAULT_RENDER_LISTENERS_STATE;
             shaderState = this._DEFAULT_SHADER_STATE;
+            shaderParamsState = this._DEFAULT_SHADER_PARAMS_STATE;
 
             this._forceBinSort(true);             // Sort display list with orders re-built from layer orders
 
@@ -593,17 +600,6 @@ var SceneJS_DrawList = new (function() {
         morphState.morph = morph;
     };
 
-    //    this.setPickColor = function(id, pickColor) {
-    //        if (arguments.length == 0) {
-    //            pickColorState = this._DEFAULT_PICK_COLOR_STATE;
-    //            this._stateHash = null;
-    //            return;
-    //        }
-    //        pickColorState = this._getState(this._PICKCOLOR, id);
-    //        pickColorState.pickColor = pickColor;
-    //        this._stateHash = null;
-    //    };
-
     this.setTexture = function(id, core) {
         if (arguments.length == 0) {
             texState = this._DEFAULT_TEXTURE_STATE;
@@ -726,6 +722,15 @@ var SceneJS_DrawList = new (function() {
         this._stateHash = null;
     };
 
+    this.setShaderParams = function(id, params) {
+        if (arguments.length == 0) {
+            shaderParamsState = this._DEFAULT_SHADER_PARAMS_STATE;
+            return;
+        }
+        shaderParamsState = this._getState(this._SHADER_PARAMS, id);
+        shaderParamsState.params = params;
+    };
+
     /**
      * Add a geometry and link it to currently active resources (states)
      *
@@ -835,6 +840,7 @@ var SceneJS_DrawList = new (function() {
         tagState._nodeCount++;
         renderListenersState._nodeCount++;
         shaderState._nodeCount++;
+        shaderParamsState._nodeCount++;
 
         node = {
             id: id,
@@ -865,7 +871,8 @@ var SceneJS_DrawList = new (function() {
             nameState:              nameState,
             tagState:              tagState,
             renderListenersState:   renderListenersState,
-            shaderState:            shaderState
+            shaderState:            shaderState,
+            shaderParamsState:        shaderParamsState
         };
 
         this._states.nodeMap[id] = node;
@@ -930,6 +937,7 @@ var SceneJS_DrawList = new (function() {
             this._releaseState(node.tagState);
             this._releaseState(node.renderListenersState);
             this._releaseState(node.shaderState);
+            this._releaseState(node.shaderParamsState);
         }
         geoNodesMap[id] = null;
         sceneState.lenEnabledBin = 0;
@@ -1157,15 +1165,17 @@ var SceneJS_DrawList = new (function() {
             states.pickBufDirty = true;
         }
 
+        var nodeRenderer = states.nodeRenderer;
+
         pickBuf.bind();
 
         if (states.pickBufDirty) {
 
             pickBuf.clear();
 
-            states.nodeRenderer.init({ picking: true });
+            nodeRenderer.init({ picking: true });
             this._renderBin(states, true, params.tagSelector);
-            states.nodeRenderer.cleanup();
+            nodeRenderer.cleanup();
 
             states.pickBufDirty = false;
         }
@@ -1173,27 +1183,27 @@ var SceneJS_DrawList = new (function() {
         var pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
         var pickIndex = (pickedNodeIndex >= 1) ? pickedNodeIndex - 1 : -1;
 
-        //        var wasPicked = false;
-        //        var pickListeners = states.nodeRenderer.pickListeners[pickIndex];
-        //        if (pickListeners) {
-        //            var listeners = pickListeners.listeners;
+        pickBuf.unbind();
+
+        //        var pickNames = nodeRenderer.pickNames[pickIndex];
+        //        if (pickNames) {
         //
-        //            var canvasZ = (options.zPick) ? this._zPick(states, canvasX, canvasY, pickListeners._stateId) : undefined;
+        //            alert(JSON.stringify(pickNames));
         //
-        //            for (var i = listeners.length - 1; i >= 0; i--) {
-        //                wasPicked = true;
-        //                listeners[i]({
-        //                    canvasX: canvasX,
-        //                    canvasY: canvasY,
-        //                    canvasZ: canvasZ
-        //                }, options);
-        //            }
+        ////            var canvasZ = (options.zPick) ? this._zPick(states, canvasX, canvasY, pickNames._stateId) : undefined;
+        //
+        ////            for (var i = listeners.length - 1; i >= 0; i--) {
+        ////                wasPicked = true;
+        ////                listeners[i]({
+        ////                    canvasX: canvasX,
+        ////                    canvasY: canvasY,
+        ////                    canvasZ: canvasZ
+        ////                }, options);
+        ////            }
         //
         //        }
 
-        pickBuf.unbind();
-
-        return states.nodeRenderer.pickNames[pickIndex];
+        return nodeRenderer.pickNames[pickIndex];
     };
 
     this._zPick = function(states, canvasX, canvasY, pickListenersStateId) {
@@ -1278,12 +1288,14 @@ var SceneJS_DrawList = new (function() {
     this._getSceneHash = function() {
         return ([                           // Same hash for both render and pick shaders
             this._states.canvas.canvasId,
-            rendererState.hash,
+            clipState.hash,
+            colortransState.hash,
             fogState.hash,
             lightState.hash,
-            texState.hash,
-            clipState.hash,
             morphState.hash,
+            texState.hash,
+            shaderState.hash,
+            rendererState.hash,
             geoState.hash
         ]).join(";");
     };
@@ -1348,7 +1360,7 @@ var SceneJS_DrawList = new (function() {
         }
     };
 
-     this._composePickingVertexShader = function() {
+    this._composePickingVertexShader = function() {
 
         var customShaders = shaderState.shader.shaders || {};
 
@@ -1728,12 +1740,17 @@ var SceneJS_DrawList = new (function() {
 
         var customShaders = shaderState.shader.shaders || {};
 
+        /* Do a full custom shader replacement if code supplied without hooks
+         */
+        if (customShaders.vertex && customShaders.vertex.code && !customShaders.vertex.hooks) {
+            return customShaders.vertex.code;
+        }
+
         var customVertexShader = customShaders.vertex || {};
         var vertexHooks = customVertexShader.hooks || {};
 
         var customFragmentShader = customShaders.fragment || {};
         var fragmentHooks = customFragmentShader.hooks || {};
-
 
         var texturing = this._isTexturing();
         var normals = this._hasNormals();
@@ -1949,6 +1966,13 @@ var SceneJS_DrawList = new (function() {
     this._composeRenderingFragmentShader = function() {
 
         var customShaders = shaderState.shader.shaders || {};
+
+        /* Do a full custom shader replacement if code supplied without hooks
+         */
+        if (customShaders.fragment && customShaders.fragment.code && !customShaders.fragment.hooks) {
+            return customShaders.fragment.code;
+        }
+
         var customFragmentShader = customShaders.fragment || {};
         var fragmentHooks = customFragmentShader.hooks || {};
 
@@ -2001,6 +2025,15 @@ var SceneJS_DrawList = new (function() {
                 src.push("uniform float SCENEJS_uLayer" + i + "BlendFactor;");
             }
         }
+
+        /* True when lighting
+         */
+        src.push("uniform bool  SCENEJS_uBackfaceTexturing;");
+        src.push("uniform bool  SCENEJS_uBackfaceLighting;");
+
+        /* True when rendering transparency
+         */
+        src.push("uniform bool  SCENEJS_uTransparent;");
 
         /* Vertex color variable
          */
@@ -2089,6 +2122,10 @@ var SceneJS_DrawList = new (function() {
             src.push(fragmentHooks.viewPos + "(SCENEJS_vViewVertex);");
         }
 
+        if (fragmentHooks.worldEyeVec) {
+            src.push(fragmentHooks.worldEyeVec + "(SCENEJS_vEyeVec);");
+        }
+
         if (normals && fragmentHooks.worldNormal) {
             src.push(fragmentHooks.worldNormal + "(SCENEJS_vWorldNormal);");
         }
@@ -2135,6 +2172,9 @@ var SceneJS_DrawList = new (function() {
 
         var layer;
         if (texturing) {
+
+            src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vWorldNormal, SCENEJS_vEyeVec) > 0.0) {");
+
             src.push("  vec4    texturePos;");
             src.push("  vec2    textureCoord=vec2(0.0,0.0);");
 
@@ -2217,9 +2257,14 @@ var SceneJS_DrawList = new (function() {
                     src.push("normalVec *= -bump;");
                 }
             }
+            src.push("}");
         }
 
+        src.push("  vec4    fragColor;");
+
         if (normals) {
+
+            src.push("if (SCENEJS_uBackfaceLighting || dot(SCENEJS_vWorldNormal, SCENEJS_vEyeVec) > 0.0) {");
 
             src.push("  vec3    lightValue      = SCENEJS_uAmbient;");
             src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
@@ -2233,11 +2278,9 @@ var SceneJS_DrawList = new (function() {
                 src.push("lightVec = SCENEJS_vLightVecAndDist" + i + ".xyz;");
 
                 if (light.mode == "point") {
-
+                    src.push("dotN = max(dot(normalVec, lightVec) ,0.0);");
+                    //src.push("if (dotN > 0.0) {");
                     src.push("lightDist = SCENEJS_vLightVecAndDist" + i + ".w;");
-
-                    src.push("dotN = max(dot(normalVec, lightVec),0.0);");
-                    src.push("if (dotN > 0.0) {");
                     src.push("  attenuation = 1.0 / (" +
                              "  SCENEJS_uLightAttenuation" + i + "[0] + " +
                              "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
@@ -2249,11 +2292,12 @@ var SceneJS_DrawList = new (function() {
                         src.push("specularValue += attenuation * specularColor * SCENEJS_uLightColor" + i +
                                  " * specular  * pow(max(dot(reflect(lightVec, normalVec), SCENEJS_vEyeVec),0.0), shine);");
                     }
-                    src.push("}");
+                    //src.push("}");
                 }
 
                 if (light.mode == "dir") {
                     src.push("dotN = max(dot(normalVec,lightVec),0.0);");
+                    //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
                         src.push("lightValue += dotN * SCENEJS_uLightColor" + i + ";");
                     }
@@ -2261,13 +2305,17 @@ var SceneJS_DrawList = new (function() {
                         src.push("specularValue += specularColor * SCENEJS_uLightColor" + i +
                                  " * specular  * pow(max(dot(reflect(lightVec, normalVec),SCENEJS_vEyeVec),0.0), shine);");
                     }
+                    // src.push("}");
                 }
             }
 
-            src.push("vec4 fragColor = vec4((specularValue.rgb + color.rgb * lightValue.rgb) + (emit * color.rgb), alpha);");
+            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * lightValue.rgb) + (emit * color.rgb), alpha);");
+            src.push("   } else {");
+            src.push("      fragColor = vec4(color.rgb + (emit * color.rgb), alpha);");
+            src.push("   }");
 
         } else { // No normals
-            src.push("vec4 fragColor = vec4(emit * color.rgb, alpha);");
+            src.push("fragColor = vec4((emit * color.rgb) + (emit * color.rgb), alpha);");
         }
 
         /* Fog

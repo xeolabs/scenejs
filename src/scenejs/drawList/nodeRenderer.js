@@ -167,12 +167,12 @@ var SceneJS_NodeRenderer = function(cfg) {
             }
 
             this._program.bind();
-
-            if (node.shaderState.shader && node.shaderState.shader.vars) { // Custom shader - set any vars we have
-                var vars = node.shaderState.shader.vars;
-                for (var name in vars) {
-                    if (vars.hasOwnProperty(name)) {
-                        this._program.setUniform(name, vars[name]);
+          
+            if (node.shaderState.shader && node.shaderState.shader.params) { // Custom shader - set any params we have
+                var params = node.shaderState.shader.params;
+                for (var name in params) {
+                    if (params.hasOwnProperty(name)) {
+                        this._program.setUniform(name, params[name]);
                     }
                 }
             }
@@ -193,12 +193,28 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._lastFogStateId = -1;
             this._lastPickListenersStateId = -1;
             this._lastRenderListenersStateId = -1;
+            this._lastShaderParamsStateId = -1;
             this._lastProgramId = node.program.id;
         }
 
         var program = this._program;
         var gl = this._context;
 
+        /*----------------------------------------------------------------------------------------------------------
+         * shaderParamsState
+         *--------------------------------------------------------------------------------------------------------*/
+
+        if (node.shaderParamsState._stateId != this._lastShaderParamsStateId) {
+            if (node.shaderParamsState.params) { // Custom shader params - set any params we have
+                var params = node.shaderParamsState.params;
+                for (var name in params) {
+                    if (params.hasOwnProperty(name)) {
+                        this._program.setUniform(name, params[name]);
+                    }
+                }
+            }
+            this._lastShaderParamsStateId = node.shaderParamsState._stateId;
+        }
 
         /*----------------------------------------------------------------------------------------------------------
          * imageBuf
@@ -236,12 +252,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                         }
                         program.setUniform("SCENEJS_uLayer" + j + "BlendFactor", layer.blendFactor);
                     }
-                }
-                //            if (numLayers != countBound) {
-                //                if (node.texState.params.waitForLoad) { // Abort if waiting for missing textures
-                //                    return;
-                //                }
-                //            }
+                }              
             }
             this._lastTexStateId = node.texState._stateId;
         }
@@ -639,6 +650,12 @@ var SceneJS_NodeRenderer = function(cfg) {
                 }
             }
 
+            program.setUniform("SCENEJS_uTransparent", !!newFlags.transparent);
+
+            program.setUniform("SCENEJS_uBackfaceTexturing", newFlags.backfaceTexturing == undefined ? true : !!newFlags.backfaceTexturing);
+            program.setUniform("SCENEJS_uBackfaceLighting", newFlags.backfaceLighting == undefined ? true : !!newFlags.backfaceLighting);
+
+            
             //            var mask = newFlags.colorMask;
             //
             //            if (!oldFlags || (mask && (mask.r != oldFlags.r || mask.g != oldFlags.g || mask.b != oldFlags.b || mask.a != oldFlags.a))) {

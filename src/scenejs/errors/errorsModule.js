@@ -3,14 +3,7 @@
  *
  * @private
  */
-var SceneJS_errorModule = new (function() {
-
-    SceneJS_eventModule.addListener(
-            SceneJS_eventModule.SCENE_COMPILING,
-            function() {
-                var time = (new Date()).getTime();
-                SceneJS_eventModule.fireEvent(SceneJS_eventModule.TIME_UPDATED, time);
-            });
+var SceneJS_errorModule = new (function() {   
 
     this.fatalError = function(code, message) {
         if (typeof code == "string") {

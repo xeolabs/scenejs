@@ -257,7 +257,6 @@ new (function() {
     Scene.prototype.renderFrame = function(params) {
         if (this._compileScene()) {         // Try doing pending compile/redraw
             SceneJS_DrawList.renderFrame({
-                profileFunc: cfg.profileFunc,
                 tagSelector: this.tagSelector
             });
             return true;
@@ -305,6 +304,9 @@ new (function() {
                     if (cfg.idleFunc) {
                         cfg.idleFunc();
                     }
+                    SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_IDLE, { 
+                        sceneId: self.attr.id
+                    });
                     if (self._compileScene()) {         // Attempt pending compile and redraw
                         sleeping = false;
                         SceneJS_DrawList.renderFrame({
