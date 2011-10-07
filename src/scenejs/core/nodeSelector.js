@@ -40,7 +40,7 @@
             SceneJS_errorModule.fatalError("node param 'node' should be either an index number or an ID string");
         }
         if (!nodeGot) {
-            throw "node not found: '" + node + "'";
+            return null;
         }
         return SceneJS._selectNode(nodeGot);
     };
