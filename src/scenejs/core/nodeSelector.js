@@ -224,6 +224,12 @@
         return this;
     };
 
+    /** Disconnect a node from the scene graph
+     */
+    NodeSelector.prototype.disconnect = function() {
+        return this._targetNode.disconnect();
+    };
+
     /** Returns the value of an attribute of the selected node
      */
     NodeSelector.prototype.get = function(attr) {
