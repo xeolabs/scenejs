@@ -269,17 +269,17 @@ var SceneJS_compileCfg = new (function() {
         "shader": {
             set: {
                 attr: {
-                    vars: {
-                        level: this.COMPILE_BRANCH
+                    params: {
+                        level: this.REDRAW
                     }
                 }
             }
         },
 
-        "shaderVars": {
+        "shaderParams": {
             set: {
                 attr: {
-                    vars: {
+                    params: {
                         level: this.REDRAW
                     }
                 }

@@ -18,7 +18,7 @@
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_DrawList.setProjectionTransform(idStack[stackLen - 1], transformStack[stackLen-1]);
+                        SceneJS_DrawList.setProjectionTransform(idStack[stackLen - 1], transformStack[stackLen - 1]);
                     } else {
                         SceneJS_DrawList.setProjectionTransform();
                     }
@@ -38,11 +38,13 @@
         var core = this.core;
         if (!optics) {
             core.optics = {
-                type: "perspective",
-                fovy : 60.0,
-                aspect : 1.0,
-                near : 0.10,
-                far : 5000.0
+                type: optics.type,
+                left : optics.left || -1.0,
+                bottom : optics.bottom || -1.0,
+                near : optics.near || 0.1,
+                right : optics.right || 1.00,
+                top : optics.top || 1.0,
+                far : optics.far || 5000.0
             };
         } else {
             if (optics.type == "ortho") {

@@ -143,8 +143,7 @@ new (function() {
         if (!bufs) {
             bufs = sceneBufs[sceneId] = {};
         }
-        bufs[bufId] = buf;
-        return buf;
+        this._buf = bufs[bufId] = buf;
     };
 
     SceneJS._compilationStates.setSupplier("video", {
@@ -168,7 +167,8 @@ new (function() {
 
     Video.prototype._destroy = function() {
         if (this._buf) {
-            //destroyVideofer(this._buf);
+            var bufs = sceneBufs[this.scene.attr.id];
+
         }
     };
 })();

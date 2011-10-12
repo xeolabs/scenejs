@@ -1,42 +1,25 @@
 /*
- GLSL function injection using the shader node
+ Custom vertex displacement shader example
+
+ Read through the comments inline for more information.
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
-
- For each of our vertex/fragment shaders we can use the shader node to:
-
- 1) inject custom functions - supply fragments of GLSL and bind them to hooks within SceneJS'
- automatically-generated shader
-
- 2) replace the whole shader - we specify a shader complete with a main function and do not specify any bindings,
- causing SceneJS to discard the shader it would have created and substitute ours instead
-
- In this demo we're just doing (1).
 
  */
 
 SceneJS.createScene({
 
     type: "scene",
-
-    /* ID that we'll access the scene by when we want to render it
-     */
     id: "theScene",
-
-    /* Bind scene to a WebGL canvas:
-     */
     canvasId: "theCanvas",
-
-    /* You can optionally write logging to a DIV - scene will log to the console as well.
-     */
     loggingElementId: "theLoggingDiv",
 
     nodes: [
 
-        /* Viewing transform specifies eye position, looking
-         * at the origin by default
-         */
+        /*----------------------------------------------------------------------
+         * View and projection transforms
+         *--------------------------------------------------------------------*/
         {
             type: "lookAt",
             eye : { x: 0.0, y: 10.0, z: 15 },
@@ -44,9 +27,6 @@ SceneJS.createScene({
             up : { y: 1.0 },
 
             nodes: [
-
-                /* Camera describes the projection
-                 */
                 {
                     type: "camera",
                     optics: {
@@ -59,12 +39,10 @@ SceneJS.createScene({
 
                     nodes: [
 
+                        /*----------------------------------------------------------------------
+                         * Lighting
+                         *--------------------------------------------------------------------*/
 
-                        /* A lights node inserts point lights into scene, to illuminate everything
-                         * that is encountered after them during scene traversal.
-                         *
-                         * You can have many of these, nested within modelling transforms if you want to move them.
-                         */
                         {
                             type: "light",
                             mode:                   "dir",
@@ -83,9 +61,10 @@ SceneJS.createScene({
                             dir:                    { x: 0.0, y: -0.5, z: -1.0 }
                         },
 
-                        /* Next, modelling transforms to orient our teapot. See how these have IDs,
-                         * so we can access them to set their angle attributes.
-                         */
+                        /*----------------------------------------------------------------------
+                         * Modelling transforms
+                         *--------------------------------------------------------------------*/
+
                         {
                             type: "rotate",
                             id: "pitch",
@@ -101,9 +80,10 @@ SceneJS.createScene({
 
                                     nodes: [
 
-                                        /* Specify the amounts of ambient, diffuse and specular
-                                         * lights our teapot reflects
-                                         */
+                                        /*----------------------------------------------------------------------
+                                         * Material properties
+                                         *--------------------------------------------------------------------*/
+
                                         {
                                             type: "material",
                                             emit: 0,
@@ -111,11 +91,6 @@ SceneJS.createScene({
                                             specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
                                             specular:       0.7,
                                             shine:          10.0,
-                                            alpha: 0.9,
-
-                                            flags: {
-                                                transparent: true
-                                            },
 
                                             nodes: [
 
@@ -172,43 +147,28 @@ SceneJS.createScene({
                                                             stage:  "fragment",
 
                                                             code:  [
-                                                                "uniform float time;  float time2 = time;",
-
-                                                                "float myMaterialAlphaFunc(float alpha){",
-                                                                "   return alpha+sin(time2);",
-                                                                "}",
-
-                                                                "void myWorldPosFunc(vec4 worldVertex){",
-                                                                "   if (worldVertex.x > 0.0) time2 = time2 * 3.0;",
-                                                                "}",
+                                                                "uniform float time;  ",
 
                                                                 "vec4 myPixelColorFunc(vec4 color){",
-                                                                "   color.r=color.r+sin(time2)*0.3;",
-                                                                "   color.g=color.g+sin(time2+0.3)*0.3;",
-                                                                "   color.b=color.b+sin(time2+0.6)*0.3;",
-                                                                "   color.a=color.a+sin(time2);",
+                                                                "   color.r=color.r+sin(time)*0.3;",
+                                                                "   color.g=color.g+sin(time+0.3)*0.3;",
+                                                                "   color.b=color.b+sin(time+0.6)*0.3;",
+                                                                "   color.a=color.a+sin(time);",
                                                                 "   return color;",
-                                                                "}",
-
-                                                                "void myEyeVecFunc(vec3 eyeVec){",
-                                                                "}",
-
-                                                                "void myNormalFunc(vec3 normal){",
                                                                 "}"],
 
                                                             /* Bind our custom function to a SceneJS vertex shader hook
                                                              */
                                                             hooks: {
-                                                                worldPos:       "myWorldPosFunc",
-                                                                eyeVec:         "myEyeVecFunc",
-                                                                normal:         "normalFunc",
-                                                                materialAlpha:  "myMaterialAlphaFunc",
                                                                 pixelColor:     "myPixelColorFunc"
                                                             }
                                                         }
                                                     ],
 
-                                                    /* Optional initial values for uniforms within our GLSL:
+                                                    /* Optional initial values for uniforms within our GLSL -
+                                                     * note that these are initial values that are not rewritable
+                                                     * on the "shader" node - we rewrite them using a "shaderParams"
+                                                     * node
                                                      */
                                                     params: {
                                                         time: 0.0
@@ -253,13 +213,6 @@ SceneJS.createScene({
     ]
 });
 
-
-SceneJS.setDebugConfigs({
-    shading : {
-        logScripts : false,
-        validate: true
-    }
-});
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows

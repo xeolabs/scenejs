@@ -28,23 +28,22 @@ var SceneJS_DrawList = new (function() {
     this._COLORTRANS = 2;
     this._FLAGS = 3;
     this._LAYER = 4;
-    this._FOG = 5;
-    this._IMAGEBUF = 6;
-    this._LIGHTS = 7;
-    this._MATERIAL = 8;
-    this._MORPH = 9;
-    this._PICKCOLOR = 10;
-    this._TEXTURE = 11;
-    this._RENDERER = 12;
-    this._MODEL_TRANSFORM = 13;
-    this._PROJ_TRANSFORM = 14;
-    this._VIEW_TRANSFORM = 15;
-    this._PICK_LISTENERS = 16;
-    this._NAME = 17;
-    this._TAG = 18;
-    this._RENDER_LISTENERS = 19;
-    this._SHADER = 20;
-    this._SHADER_PARAMS = 21;
+    this._IMAGEBUF = 5;
+    this._LIGHTS = 6;
+    this._MATERIAL = 7;
+    this._MORPH = 8;
+    this._PICKCOLOR = 9;
+    this._TEXTURE = 10;
+    this._RENDERER = 11;
+    this._MODEL_TRANSFORM = 12;
+    this._PROJ_TRANSFORM = 13;
+    this._VIEW_TRANSFORM = 14;
+    this._PICK_LISTENERS = 15;
+    this._NAME = 16;
+    this._TAG = 17;
+    this._RENDER_LISTENERS = 18;
+    this._SHADER = 19;
+    this._SHADER_PARAMS = 20;
 
     /*----------------------------------------------------------------------
      * Default state values
@@ -83,7 +82,6 @@ var SceneJS_DrawList = new (function() {
 
     this._DEFAULT_FLAGS_STATE = createState({
         flags : {
-            fog: true,              // Fog enabled
             colortrans : true,      // Effect of colortrans enabled
             picking : true,         // Picking enabled
             clipping : true,        // User-defined clipping enabled
@@ -99,11 +97,6 @@ var SceneJS_DrawList = new (function() {
             priority : 0,
             enabled: true
         }
-    });
-
-    this._DEFAULT_FOG_STATE = createState({
-        fog: null,
-        hash: ""
     });
 
     this._DEFAULT_IMAGEBUF_STATE = createState({
@@ -221,7 +214,6 @@ var SceneJS_DrawList = new (function() {
     var lightState;
     var colortransState;
     var materialState;
-    var fogState;
     var texState;
     var geoState;
     var modelXFormState;
@@ -345,7 +337,6 @@ var SceneJS_DrawList = new (function() {
             colortransState = this._DEFAULT_COLORTRANS_STATE;
             flagsState = this._DEFAULT_FLAGS_STATE;
             layerState = this._DEFAULT_LAYER_STATE;
-            fogState = this._DEFAULT_FOG_STATE;
             imageBufState = this._DEFAULT_IMAGEBUF_STATE;
             lightState = this._DEFAULT_LIGHTS_STATE;
             materialState = this._DEFAULT_MATERIAL_STATE;
@@ -517,20 +508,6 @@ var SceneJS_DrawList = new (function() {
         layerState = this._getState(this._LAYER, id);
         layerState.core = core;
         this._states.lenEnabledBin = 0;
-    };
-
-    this.setFog = function(id, fog) {
-        if (arguments.length == 0) {
-            fogState = this._DEFAULT_FOG_STATE;
-            this._stateHash = null;
-            return;
-        }
-        fogState = this._getState(this._FOG, id);
-        fogState.fog = fog;
-        if (true && this.compileMode == SceneJS_DrawList.COMPILE_SCENE) {   // Only make hash for full recompile
-            fogState.hash = fog ? fog.mode : "";
-            this._stateHash = null;
-        }
     };
 
     this.setImagebuf = function(id, imageBuf) {
@@ -718,17 +695,17 @@ var SceneJS_DrawList = new (function() {
         }
         shaderState = this._getState(this._SHADER, id);
         shaderState.shader = shader || {};
-        shaderState.hash = id;
+        shaderState.hash = shader.hash;
         this._stateHash = null;
     };
 
-    this.setShaderParams = function(id, params) {
+    this.setShaderParams = function(id, paramsStack) {
         if (arguments.length == 0) {
             shaderParamsState = this._DEFAULT_SHADER_PARAMS_STATE;
             return;
         }
         shaderParamsState = this._getState(this._SHADER_PARAMS, id);
-        shaderParamsState.params = params;
+        shaderParamsState.paramsStack = paramsStack;
     };
 
     /**
@@ -826,7 +803,6 @@ var SceneJS_DrawList = new (function() {
         lightState._nodeCount++;
         colortransState._nodeCount++;
         materialState._nodeCount++;
-        fogState._nodeCount++;
         modelXFormState._nodeCount++;
         viewXFormState._nodeCount++;
         projXFormState._nodeCount++;
@@ -858,7 +834,6 @@ var SceneJS_DrawList = new (function() {
             lightState:             lightState,
             colortransState :       colortransState,
             materialState:          materialState,
-            fogState :              fogState,
             modelXFormState:        modelXFormState,
             viewXFormState:         viewXFormState,
             projXFormState:         projXFormState,
@@ -923,7 +898,6 @@ var SceneJS_DrawList = new (function() {
             this._releaseState(node.lightState);
             this._releaseState(node.colortransState);
             this._releaseState(node.materialState);
-            this._releaseState(node.fogState);
             this._releaseState(node.modelXFormState);
             this._releaseState(node.viewXFormState);
             this._releaseState(node.projXFormState);
@@ -1249,7 +1223,7 @@ var SceneJS_DrawList = new (function() {
 
         var worldPos = SceneJS_math_transformPoint3(inViewMat, [nx, ny, nz]);
 
-        alert(JSON.stringify(worldPos));
+        //        alert(JSON.stringify(worldPos));
         //alert(JSON.stringify(projMat));
 
         zPickBuf.unbind();
@@ -1290,7 +1264,6 @@ var SceneJS_DrawList = new (function() {
             this._states.canvas.canvasId,
             clipState.hash,
             colortransState.hash,
-            fogState.hash,
             lightState.hash,
             morphState.hash,
             texState.hash,
@@ -1357,6 +1330,16 @@ var SceneJS_DrawList = new (function() {
     this._logShaderLoggingSource = function(src) {
         for (var i = 0, len = src.length; i < len; i++) {
             console.error(src[i]);
+        }
+    };
+
+    this._writeHooks = function(src, varName, hookName, hooks, returns) {
+        for (var i = 0, len = hooks.length; i < len; i++) {
+            if (returns) {
+                src.push(varName + "=" + hookName + "(" + varName + ");");
+            } else {
+                src.push(hookName + "(" + varName + ");");
+            }
         }
     };
 
@@ -1754,7 +1737,6 @@ var SceneJS_DrawList = new (function() {
 
         var texturing = this._isTexturing();
         var normals = this._hasNormals();
-        var fogging = fogState.fog && true;
         var clipping = clipState.clips.length > 0;
         var morphing = morphState.morph && true;
 
@@ -1824,7 +1806,7 @@ var SceneJS_DrawList = new (function() {
             src.push("varying vec4 SCENEJS_vWorldVertex;");         // Varying for fragment clip or world pos hook
         }
 
-        if (fragmentHooks.viewPos || fogging) {
+        if (fragmentHooks.viewPos) {
             src.push("varying vec4 SCENEJS_vViewVertex;");          // Varying for fragment view clip hook
         }
 
@@ -1907,7 +1889,7 @@ var SceneJS_DrawList = new (function() {
             src.push("  SCENEJS_vWorldVertex = worldVertex;");                  // Varying for fragment world clip or hooks
         }
 
-        if (fragmentHooks.viewPos || fogging) {
+        if (fragmentHooks.viewPos) {
             src.push("  SCENEJS_vViewVertex = viewVertex;");                    // Varying for fragment hooks
         }
 
@@ -1978,7 +1960,6 @@ var SceneJS_DrawList = new (function() {
 
         var texturing = this._isTexturing();
         var normals = this._hasNormals();
-        var fogging = fogState.fog && true;
         var clipping = clipState && clipState.clips.length > 0;
         var colortrans = colortransState && colortransState.core;
 
@@ -1993,7 +1974,7 @@ var SceneJS_DrawList = new (function() {
             src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
         }
 
-        if (fragmentHooks.viewPos || fogging) {
+        if (fragmentHooks.viewPos) {
             src.push("varying vec4 SCENEJS_vViewVertex;");              // View-space vertex
         }
 
@@ -2069,17 +2050,6 @@ var SceneJS_DrawList = new (function() {
                 }
                 src.push("varying vec4  SCENEJS_vLightVecAndDist" + i + ";");         // Vector from light to vertex
             }
-        }
-
-
-        /* Fog uniforms
-         */
-        if (fogging) {
-            src.push("uniform float SCENEJS_uFogMode;");
-            src.push("uniform vec3  SCENEJS_uFogColor;");
-            src.push("uniform float SCENEJS_uFogDensity;");
-            src.push("uniform float SCENEJS_uFogStart;");
-            src.push("uniform float SCENEJS_uFogEnd;");
         }
 
         if (colortrans) {
@@ -2244,6 +2214,7 @@ var SceneJS_DrawList = new (function() {
                     }
                 }
 
+
                 if (layer.applyTo == "specular" && normals) {
                     if (layer.blendMode == "multiply") {
                         src.push("specular  = specular * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
@@ -2318,32 +2289,16 @@ var SceneJS_DrawList = new (function() {
             src.push("fragColor = vec4((emit * color.rgb) + (emit * color.rgb), alpha);");
         }
 
-        /* Fog
-         */
-        if (fogging) {
-            src.push("if (SCENEJS_uFogMode != 0.0) {");          // not "disabled"
-            src.push("    float fogFact = (1.0 - SCENEJS_uFogDensity);");
-            src.push("    if (SCENEJS_uFogMode != 4.0) {");      // not "constant"
-            src.push("       if (SCENEJS_uFogMode == 1.0) {");  // "linear"
-            src.push("          fogFact *= clamp(pow(max((SCENEJS_uFogEnd - length(-SCENEJS_vViewVertex.xyz)) / (SCENEJS_uFogEnd - SCENEJS_uFogStart), 0.0), 2.0), 0.0, 1.0);");
-            src.push("       } else {");                // "exp" or "exp2"
-            src.push("          fogFact *= clamp((SCENEJS_uFogEnd - length(-SCENEJS_vViewVertex.xyz)) / (SCENEJS_uFogEnd - SCENEJS_uFogStart), 0.0, 1.0);");
-            src.push("       }");
-            src.push("    }");
-            src.push("    fragColor = fragColor * (fogFact + vec4(SCENEJS_uFogColor, 1)) * (1.0 - fogFact);");
-            src.push("}");
-        }
-
         /* Color transformations
          */
         if (colortrans) {
-            src.push("    if (SCENEJS_uColorTransMode != 0.0) {");     // Not disabled
-            src.push("        if (SCENEJS_uColorTransSaturation < 0.0) {");
-            src.push("            float intensity = 0.3 * fragColor.r + 0.59 * fragColor.g + 0.11 * fragColor.b;");
-            src.push("            fragColor = vec4((intensity * -SCENEJS_uColorTransSaturation) + fragColor.rgb * (1.0 + SCENEJS_uColorTransSaturation), 1.0);");
-            src.push("        }");
-            src.push("        fragColor = (fragColor * SCENEJS_uColorTransScale) + SCENEJS_uColorTransAdd;");
-            src.push("    }");
+//            src.push("    if (SCENEJS_uColorTransMode != 0.0) {");     // Not disabled
+//            src.push("        if (SCENEJS_uColorTransSaturation < 0.0) {");
+//            src.push("            float intensity = 0.3 * fragColor.r + 0.59 * fragColor.g + 0.11 * fragColor.b;");
+//            src.push("            fragColor = vec4((intensity * -SCENEJS_uColorTransSaturation) + fragColor.rgb * (1.0 + SCENEJS_uColorTransSaturation), 1.0);");
+//            src.push("        }");
+//            src.push("        fragColor = (fragColor * SCENEJS_uColorTransScale) + SCENEJS_uColorTransAdd;");
+//            src.push("    }");
         }
 
         if (fragmentHooks.pixelColor) {

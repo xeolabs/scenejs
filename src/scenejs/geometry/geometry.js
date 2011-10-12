@@ -299,8 +299,8 @@ new (function() {
     };
 
     SceneJS_geometry.prototype.setPositions = function(params) {
-        //    sceneResources["theCanvas"].items["my-geometry"].vertexBuf.setData(new Float32Array(params.positions), params.offset);
-        //return this.core.arrays.positions.set(params.positions, params.offset);
+        this.core.vertexBuf.bind();
+        this.core.vertexBuf.setData(params.positions, params.offset || 0);
     };
 
     SceneJS_geometry.prototype.getNormals = function() {

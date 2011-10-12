@@ -17,7 +17,7 @@ new (function() {
             function() {
                 if (dirty) {
                     if (stackLen > 0) {
-                        SceneJS_DrawList.setShaderParams(idStack[stackLen - 1], shaderParamsStack[stackLen - 1]);
+                        SceneJS_DrawList.setShaderParams(idStack[stackLen - 1], shaderParamsStack.slice(0, stackLen));
                     } else { // Full compile supplies it's own default states
                         SceneJS_DrawList.setShaderParams();
                     }
@@ -39,7 +39,11 @@ new (function() {
         if (!core.params) {
             core.params = {};
         }
-        SceneJS._apply(params, core.params);
+        for (var name in params) {
+            if (params.hasOwnProperty(name)) {
+                core.params[name] = params[name];
+            }
+        }
     };
 
     ShaderParams.prototype._compile = function() {

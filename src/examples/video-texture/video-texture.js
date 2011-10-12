@@ -69,7 +69,7 @@ SceneJS.createScene({
                         },
                         {
                             type: "material",
-                            baseColor:      { r: 0.5, g: 0.5, b: 0.5 },
+                            baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
                             specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
                             specular:       0.2,
                             shine:          6.0,
