@@ -2,9 +2,9 @@
  This example demonstrates how to define billboards, in this case a simple quad sprite
  object that supports texturing.
 
- Cheers to Salomon Brys for this example - salomon.brys@gmail.com
+ Shouts to Salomon Brys for this example - salomon.brys@gmail.com
 
- Jul 24 2012 - Lindsay - Removed instance nodes for V2.0
+ https://github.com/xeolabs/scenejs/wiki/billboard
 
  */
 

@@ -8,6 +8,8 @@
 
  lindsay.kay@xeolabs.com
 
+ https://github.com/xeolabs/scenejs/wiki/morphGeometry
+
  */
 
 SceneJS.createScene({

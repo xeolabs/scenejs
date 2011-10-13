@@ -6,6 +6,8 @@
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
 
+ http://scenejs.wikispaces.com/shader
+
  */
 
 SceneJS.createScene({

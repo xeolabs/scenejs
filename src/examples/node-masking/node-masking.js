@@ -1,10 +1,9 @@
 /*
- SceneJS "tag" node test
+
+ Node render masking using the "tag" node
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
-
-
 
  */
 

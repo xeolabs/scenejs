@@ -14,6 +14,8 @@
 
  In this demo we're just doing (1).
 
+ http://scenejs.wikispaces.com/shader
+ 
  */
 
 SceneJS.createScene({

@@ -7,8 +7,6 @@
  *
  * Using the Canvas space centers, we can then float a DIV over each teapot on the canvas to report its center points.
  *
- * More info here: http://scenejs.wikispaces.com/SceneJS.withNode+-+bind
- *
  * Lindsay Kay
  * lindsay.kay@xeolabs.com
  * October 2010

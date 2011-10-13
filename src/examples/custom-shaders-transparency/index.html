@@ -12,8 +12,8 @@
 
         </div>
         <div id="header-inner">
-            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Using
-                Layers for Correct Transparency
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Custom
+                Shaders - Fancy Transparency
             </h1>
             <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
                     src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
@@ -32,18 +32,13 @@
                 &lt;canvas&gt; feature.</p>
         </canvas>
         <div id="info">
-            <h2>Introductory SceneJS scene which demonstrates the use of layers with transparency blending. </h2>
-
-            <p>In this example we have three nested cubes - an inner opaque blue cube, enclosed by a
-                transparent red cube, enclosed by an outer transparent green cube.</p>
-
-            <p>When SceneJS blends the cubes with (SRC_ALPHA, ONE_MINUS_SRC_ALPHA), we allocate "layers" to
-                the cubes to ensure that they are rendered in the order neccessary for a correct transparency
-                effect.</p>
+            <h2>Using a custom shader for a cool transparency effect. </h2>
             <br/>
             <br/>
             <ul>
-                <li><a target="_other" href="transparency-with-layers.js">Scene source code</a></li>
+                <li><a target="_other" href="custom-shader-transparency.js">Scene source code</a></li>
+                <li><a target="_other" href="https://github.com/xeolabs/scenejs/wiki/shader">Wiki page on custom
+                    shaders</a></li>
                 <li><a target="_other" href="https://github.com/xeolabs/scenejs/wiki/layer">Wiki page on layers</a></li>
             </ul>
         </div>
@@ -55,6 +50,6 @@
     </div>
 </div>
 
-<script type="text/javascript" src="transparency-with-layers.js"></script>
+<script type="text/javascript" src="custom-shader-transparency.js"></script>
 </body>
 </html>

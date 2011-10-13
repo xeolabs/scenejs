@@ -12,6 +12,8 @@
  Scroll down to the SceneJS.geometry node about one third of the way down
  this file and I'll guide you from there.
 
+ http://scenejs.wikispaces.com/geometry
+
  */
 
 

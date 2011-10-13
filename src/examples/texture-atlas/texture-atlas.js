@@ -1,7 +1,5 @@
 /**
  * Texture atlas example
- *
- * http://scenejs.wikispaces.com/Using+a+Texture+Atlas
  * 
  * Lindsay Kay
  * lindsay.kay AT xeolabs.com
