@@ -275,11 +275,11 @@ var SceneJS_DrawList = new (function() {
                             context: params.canvas.context
                         }),
 
-                        bin: [],                // Draw list - state sorting happens here
+                        bin: [],                 // Draw list - state sorting happens here
                         lenBin: 0,
 
-                        enabledBin: [],          // Draw list containing enabled nodes
-                        lenEnabledBin: 0,
+                        cachedVisibleBin: [],    // Cached draw list containing enabled nodes
+                        lenCachedVisibleBin: 0,
 
                         nodeMap: {},
                         geoNodesMap : {},        // Display list nodes findable by their geometry scene nodes
@@ -497,7 +497,7 @@ var SceneJS_DrawList = new (function() {
         flagsState = this._getState(this._FLAGS, id);
         flags = flags || this._DEFAULT_FLAGS_STATE.flags;
         flagsState.flags = flags || this._DEFAULT_FLAGS_STATE.flags;
-        this._states.lenEnabledBin = 0;
+       // this._states.lenEnabledBin = 0;
     };
 
     this.setLayer = function(id, core) {
@@ -507,7 +507,7 @@ var SceneJS_DrawList = new (function() {
         }
         layerState = this._getState(this._LAYER, id);
         layerState.core = core;
-        this._states.lenEnabledBin = 0;
+    //    this._states.lenEnabledBin = 0;
     };
 
     this.setImagebuf = function(id, imageBuf) {
@@ -914,7 +914,7 @@ var SceneJS_DrawList = new (function() {
             this._releaseState(node.shaderParamsState);
         }
         geoNodesMap[id] = null;
-        sceneState.lenEnabledBin = 0;
+        sceneState.lenCachedVisibleBin = 0;
     };
 
 
@@ -943,7 +943,7 @@ var SceneJS_DrawList = new (function() {
     };
 
     /**
-     * Presorts bins by shader program - shader switches are most
+     * Presorts bins by shader program, layer - shader switches are most
      * pathological because they force all other state switches.
      */
     this._preSortBins = function() {
@@ -953,7 +953,7 @@ var SceneJS_DrawList = new (function() {
         }
         states.bin.length = states.lenBin;
         states.bin.sort(this._sortNodes);
-        states.lenEnabledBin = 0;
+        states.lenCachedVisibleBin = 0;
     };
 
     this._sortNodes = function(a, b) {
@@ -998,16 +998,17 @@ var SceneJS_DrawList = new (function() {
 
         var context = states.canvas.context;
 
-        var enabledBin = states.enabledBin;
-        var lenEnabledBin = states.lenEnabledBin;
+        var cachedVisibleBin = states.cachedVisibleBin;
+        var lenCachedVisibleBin = states.lenCachedVisibleBin;
         var nodeRenderer = states.nodeRenderer;
         var nTransparent = 0;
         var _transparentBin = transparentBin;
 
-        var drawListFilter = false;  // TODO: breaks picking of transparent objects in BDS Human
-        if (drawListFilter && lenEnabledBin > 0) {
-            for (var i = 0; i < lenEnabledBin; i++) {
-                node = enabledBin[i];
+        var drawListFilter = true;
+
+        if (drawListFilter && lenCachedVisibleBin > 0) {
+            for (var i = 0; i < lenCachedVisibleBin; i++) {
+                node = cachedVisibleBin[i];
                 flags = node.flagsState.flags;
                 if (picking && flags.picking === false) {                   // When picking, skip unpickable node
                     continue;
@@ -1091,11 +1092,13 @@ var SceneJS_DrawList = new (function() {
 
                 } else {
                     nodeRenderer.renderNode(node);                          // Render node if opaque or in picking mode
-                    if (drawListFilter) {
-                        enabledBin[states.lenEnabledBin++] = node;
-                    }
+                }
+
+                if (drawListFilter) {
+                    cachedVisibleBin[states.lenCachedVisibleBin++] = node;
                 }
             }
+            
             if (countDestroyed > 0) {
                 bin.length -= countDestroyed;  // TODO: tidy this up
                 states.lenBin = bin.length;
@@ -2292,13 +2295,13 @@ var SceneJS_DrawList = new (function() {
         /* Color transformations
          */
         if (colortrans) {
-//            src.push("    if (SCENEJS_uColorTransMode != 0.0) {");     // Not disabled
-//            src.push("        if (SCENEJS_uColorTransSaturation < 0.0) {");
-//            src.push("            float intensity = 0.3 * fragColor.r + 0.59 * fragColor.g + 0.11 * fragColor.b;");
-//            src.push("            fragColor = vec4((intensity * -SCENEJS_uColorTransSaturation) + fragColor.rgb * (1.0 + SCENEJS_uColorTransSaturation), 1.0);");
-//            src.push("        }");
-//            src.push("        fragColor = (fragColor * SCENEJS_uColorTransScale) + SCENEJS_uColorTransAdd;");
-//            src.push("    }");
+            //            src.push("    if (SCENEJS_uColorTransMode != 0.0) {");     // Not disabled
+            //            src.push("        if (SCENEJS_uColorTransSaturation < 0.0) {");
+            //            src.push("            float intensity = 0.3 * fragColor.r + 0.59 * fragColor.g + 0.11 * fragColor.b;");
+            //            src.push("            fragColor = vec4((intensity * -SCENEJS_uColorTransSaturation) + fragColor.rgb * (1.0 + SCENEJS_uColorTransSaturation), 1.0);");
+            //            src.push("        }");
+            //            src.push("        fragColor = (fragColor * SCENEJS_uColorTransScale) + SCENEJS_uColorTransAdd;");
+            //            src.push("    }");
         }
 
         if (fragmentHooks.pixelColor) {
