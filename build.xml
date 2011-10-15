@@ -57,7 +57,7 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsModule.js"/>
 
-        <fileset dir="${SRC_DIR}" includes="scenejs/layers/layerModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/layers/layer.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/library/library.js"/>
 
