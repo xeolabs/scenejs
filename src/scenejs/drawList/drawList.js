@@ -1729,7 +1729,7 @@ var SceneJS_DrawList = new (function() {
         /* Do a full custom shader replacement if code supplied without hooks
          */
         if (customShaders.vertex && customShaders.vertex.code && !customShaders.vertex.hooks) {
-            return customShaders.vertex.code;
+            return [customShaders.vertex.code];
         }
 
         var customVertexShader = customShaders.vertex || {};
@@ -1955,7 +1955,7 @@ var SceneJS_DrawList = new (function() {
         /* Do a full custom shader replacement if code supplied without hooks
          */
         if (customShaders.fragment && customShaders.fragment.code && !customShaders.fragment.hooks) {
-            return customShaders.fragment.code;
+            return [customShaders.fragment.code];
         }
 
         var customFragmentShader = customShaders.fragment || {};
