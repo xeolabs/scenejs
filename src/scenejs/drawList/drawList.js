@@ -1350,7 +1350,7 @@ var SceneJS_DrawList = new (function() {
 
         var customShaders = shaderState.shader.shaders || {};
 
-        var customVertexShader = customShaders.vertex || {};
+        var customVertexShader = customShaders.vertexPick || {};
         var vertexHooks = customVertexShader.hooks || {};
 
         var customFragmentShader = customShaders.fragment || {};
@@ -1442,7 +1442,7 @@ var SceneJS_DrawList = new (function() {
     this._composePickingFragmentShader = function() {
 
         var customShaders = shaderState.shader.shaders || {};
-        var customFragmentShader = customShaders.fragment || {};
+        var customFragmentShader = customShaders.fragmentPick || {};
         var fragmentHooks = customFragmentShader.hooks || {};
 
         var clipping = clipState && clipState.clips.length > 0;
