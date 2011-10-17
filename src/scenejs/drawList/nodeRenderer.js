@@ -167,12 +167,17 @@ var SceneJS_NodeRenderer = function(cfg) {
             }
 
             this._program.bind();
-          
-            if (node.shaderState.shader && node.shaderState.shader.params) { // Custom shader - set any params we have
-                var params = node.shaderState.shader.params;
-                for (var name in params) {
-                    if (params.hasOwnProperty(name)) {
-                        this._program.setUniform(name, params[name]);
+
+            if (node.shaderState.shader && node.shaderState.shader.paramsStack) { // Custom shader - set any params we have
+                var paramsStack = node.shaderState.shader.paramsStack;
+                var params;
+                var name;
+                for (var i = 0, len = paramsStack.length; i < len; i++) {
+                    params = paramsStack[i];
+                    for (name in params) {
+                        if (params.hasOwnProperty(name)) {
+                            this._program.setUniform(name, params[name]);
+                        }
                     }
                 }
             }
@@ -190,7 +195,6 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._lastProjXFormStateId = -1;
             this._lastPickStateId = -1;
             this._lastImagebufStateId = -1;
-            this._lastFogStateId = -1;
             this._lastPickListenersStateId = -1;
             this._lastRenderListenersStateId = -1;
             this._lastShaderParamsStateId = -1;
@@ -205,11 +209,16 @@ var SceneJS_NodeRenderer = function(cfg) {
          *--------------------------------------------------------------------------------------------------------*/
 
         if (node.shaderParamsState._stateId != this._lastShaderParamsStateId) {
-            if (node.shaderParamsState.params) { // Custom shader params - set any params we have
-                var params = node.shaderParamsState.params;
-                for (var name in params) {
-                    if (params.hasOwnProperty(name)) {
-                        this._program.setUniform(name, params[name]);
+            if (node.shaderParamsState.paramsStack) { // Custom shader params - set any params we have
+                var paramsStack = node.shaderParamsState.paramsStack;
+                var params;
+                var name;
+                for (var i = 0, len = paramsStack.length; i < len; i++) {
+                    params = paramsStack[i];
+                    for (name in params) {
+                        if (params.hasOwnProperty(name)) {
+                            this._program.setUniform(name, params[name]);
+                        }
                     }
                 }
             }
@@ -252,7 +261,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                         }
                         program.setUniform("SCENEJS_uLayer" + j + "BlendFactor", layer.blendFactor);
                     }
-                }              
+                }
             }
             this._lastTexStateId = node.texState._stateId;
         }
@@ -427,47 +436,6 @@ var SceneJS_NodeRenderer = function(cfg) {
         }
 
         if (!this._picking && !this._zPicking) {
-
-            /*----------------------------------------------------------------------------------------------------------
-             * fog
-             *--------------------------------------------------------------------------------------------------------*/
-
-            if (node.fogState && node.fogState.fog &&
-                (node.fogState._stateId != this._lastFogStateId ||
-                 nodeFlagsState._stateId != this._lastFlagsStateId)) { // Flags can enable/disable fog
-
-                var fog = node.fogState.fog;
-
-                if (nodeFlagsState.flags.fog === false || fog.mode == "disabled") {
-
-                    // When fog is disabled, don't bother loading any of its parameters
-                    // because they will be ignored by the shader
-
-                    program.setUniform("SCENEJS_uFogMode", 0.0);
-                } else {
-
-                    if (fog.mode == "constant") {
-                        program.setUniform("SCENEJS_uFogMode", 4.0);
-                        program.setUniform("SCENEJS_uFogColor", fog.color);
-                        program.setUniform("SCENEJS_uFogDensity", fog.density);
-
-                    } else {
-
-                        if (fog.mode == "linear") {
-                            program.setUniform("SCENEJS_uFogMode", 1.0);
-                        } else if (fog.mode == "exp") {
-                            program.setUniform("SCENEJS_uFogMode", 2.0);
-                        } else if (fog.mode == "exp2") {
-                            program.setUniform("SCENEJS_uFogMode", 3.0); // mode is "exp2"
-                        }
-                        program.setUniform("SCENEJS_uFogColor", fog.color);
-                        program.setUniform("SCENEJS_uFogDensity", fog.density);
-                        program.setUniform("SCENEJS_uFogStart", fog.start);
-                        program.setUniform("SCENEJS_uFogEnd", fog.end);
-                    }
-                }
-                this._lastFogStateId = node.fogState._stateId;
-            }
 
             /*----------------------------------------------------------------------------------------------------------
              * colortrans
@@ -655,7 +623,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             program.setUniform("SCENEJS_uBackfaceTexturing", newFlags.backfaceTexturing == undefined ? true : !!newFlags.backfaceTexturing);
             program.setUniform("SCENEJS_uBackfaceLighting", newFlags.backfaceLighting == undefined ? true : !!newFlags.backfaceLighting);
 
-            
+
             //            var mask = newFlags.colorMask;
             //
             //            if (!oldFlags || (mask && (mask.r != oldFlags.r || mask.g != oldFlags.g || mask.b != oldFlags.b || mask.a != oldFlags.a))) {

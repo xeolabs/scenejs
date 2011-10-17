@@ -5,8 +5,8 @@
 
  Wiki articles:
 
- http://scenejs.wikispaces.com/GeoLoaderService
- http://scenejs.wikispaces.com/MorphGeoLoaderService
+ https://github.com/xeolabs/scenejs/wiki/GeoLoader-Service
+ https://github.com/xeolabs/scenejs/wiki/MorphGeoLoader-Service
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com

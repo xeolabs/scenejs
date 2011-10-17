@@ -299,8 +299,8 @@ new (function() {
     };
 
     SceneJS_geometry.prototype.setPositions = function(params) {
-        //    sceneResources["theCanvas"].items["my-geometry"].vertexBuf.setData(new Float32Array(params.positions), params.offset);
-        //return this.core.arrays.positions.set(params.positions, params.offset);
+        this.core.vertexBuf.bind();
+        this.core.vertexBuf.setData(params.positions, params.offset || 0);
     };
 
     SceneJS_geometry.prototype.getNormals = function() {
@@ -308,7 +308,8 @@ new (function() {
     };
 
     SceneJS_geometry.prototype.setNormals = function(params) {
-        return this._getArrays().normals.set(params.normals, params.offset);
+        this.core.normalBuf.bind();
+        this.core.normalBuf.setData(params.normals, params.offset || 0);
     };
 
     SceneJS_geometry.prototype.getColors = function() {
@@ -316,23 +317,22 @@ new (function() {
     };
 
     SceneJS_geometry.prototype.setColors = function(params) {
-        return this._getArrays().colors.set(params.colors, params.offset);
+        this.core.colorBuf.bind();
+        this.core.colorBuf.setData(params.colors, params.offset || 0);
     };
 
     SceneJS_geometry.prototype.getIndices = function() {
         return this._getArrays().indices;
     };
 
-    SceneJS_geometry.prototype.setIndices = function(params) {
-        return this._getArrays().colors.set(params.indices, params.offset);
-    };
 
     SceneJS_geometry.prototype.getUv = function() {
         return this._getArrays().uv;
     };
 
     SceneJS_geometry.prototype.setUv = function(params) {
-        return this._getArrays().uv.set(params.uv, params.offset);
+        this.core.uvBuf.bind();
+        this.core.uvBuf.setData(params.uv, params.offset || 0);
     };
 
     SceneJS_geometry.prototype.getUv2 = function() {
@@ -340,7 +340,8 @@ new (function() {
     };
 
     SceneJS_geometry.prototype.setUv2 = function(params) {
-        return this._getArrays().uv2.set(params.uv2, params.offset);
+        this.core.uvBuf2.bind();
+        this.core.uvBuf2.setData(params.uv2, params.offset || 0);
     };
 
     SceneJS_geometry.prototype.getPrimitive = function() {
@@ -402,11 +403,11 @@ new (function() {
     };
 
     SceneJS_geometry.prototype._compile = function() {
-         if (!this.core._loading) {
+        if (!this.core._loading) {
             pushGeometry(this.attr.id, this.core);
         }
         this._compileNodes();
-          if (!this.core._loading) {
+        if (!this.core._loading) {
             popGeometry();
         }
     };

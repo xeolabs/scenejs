@@ -18,6 +18,8 @@
  object in the other three canvases. Each of the rotatable Newell Teapots are illuminated by three 
  light sources from the same direction.
 
+ https://github.com/xeolabs/scenejs/wiki/Multiple-Scenes-in-a-Page
+
  */
 
 var myTeapot = {
@@ -94,11 +96,7 @@ SceneJS.createScene({
                                     type: "rotate",
                                     id: "yaw",
                                     angle: 0.0,
-                                    y : 1.0,
-
-                                    nodes: [
-                                        myTeapot
-                                    ]
+                                    y : 1.0
                                 }
                             ]
                         }
@@ -169,11 +167,7 @@ SceneJS.createScene({
                                     type: "rotate",
                                     id: "yaw",
                                     angle: 0.0,
-                                    y : 1.0,
-
-                                    nodes: [
-                                        myTeapot
-                                    ]
+                                    y : 1.0
                                 }
                             ]
                         }
@@ -246,11 +240,7 @@ SceneJS.createScene({
                                     type: "rotate",
                                     id: "yaw",
                                     angle: 0.0,
-                                    y : 1.0,
-
-                                    nodes: [
-                                        myTeapot
-                                    ]
+                                    y : 1.0
                                 }
                             ]
                         }
@@ -324,7 +314,9 @@ SceneJS.createScene({
                                     y : 1.0,
 
                                     nodes: [
-                                        myTeapot
+                                        {
+                                            type: "sphere"
+                                        }
                                     ]
                                 }
                             ]
@@ -335,6 +327,8 @@ SceneJS.createScene({
         }
     ]
 });
+
+
 
 var scene1 = SceneJS.scene("scene1");
 var scene2 = SceneJS.scene("scene2");
@@ -349,6 +343,22 @@ scene1.start();
 scene2.start();
 scene3.start();
 scene4.start();
+
+SceneJS.Message.sendMessage({
+    command: "selectScenes",
+    scenes: ["scene1", "scene2", "scene3", "scene4"],
+    messages: [
+        {
+            command: "create",
+            target: "yaw",
+            nodes: [
+                {
+                    type: "teapot"
+                }
+            ]
+        }
+    ]
+});
 
 /*----------------------------------------------------------------------
  * Define mouse handlers 

@@ -1,5 +1,5 @@
 /*
- Demonstration of how to apply a texture to the specular relection component of a material.
+ Demonstration of texture layers
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
@@ -364,47 +364,5 @@ scene.start({
         cloudsRotate -= 0.06;
     }
 });
-
-
-/*------------------------------------------------------------------
- * Observe "loading-status" events on the scene graph - these will
- * tell us the count of texture nodes that have finished loading
- * their textures. We'll open a "please wait" dialog when there
- * are textures loading, then close it when all textures have
- * loaded.
- *
- * See here for more info on "loading-status" events:
- *  
- *
- *-----------------------------------------------------------------*/
-
-var $dialog = $('<div></div>')
-        .html('<br/><p>Loading textures, please wait</p>')
-        .dialog({
-    autoOpen: false,
-    title: 'Just a second..'
-});
-
-
-var dialogOpen = false;
-
-scene.bind("loading-status",
-
-        function(event) {
-            var params = event.params;
-
-            if (params.numNodesLoading > 0) {
-                if (!dialogOpen) {
-                    $dialog.dialog('open');
-                    dialogOpen = true;
-                }
-            } else {
-                if (dialogOpen) {
-                    $dialog.dialog('close');
-                    dialogOpen = false;
-                }
-            }
-        });
-
 
 

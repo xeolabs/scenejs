@@ -8,7 +8,7 @@
  *
  * More info:
  *
- * http://scenejs.wikispaces.com/texture
+ * https://github.com/xeolabs/scenejs/wiki/texture
  *
  * Lindsay Kay
  * lindsay.kay AT xeolabs.com

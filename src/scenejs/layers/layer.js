@@ -1,4 +1,4 @@
-var SceneJS_layerModule = new (function() {
+(function() {
 
     this.DEFAULT_LAYER_NAME = "___default";
 

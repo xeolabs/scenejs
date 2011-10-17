@@ -2,7 +2,7 @@
 
  Demonstrates sharing node cores, a technique borrowed from OpenSG
 
- Docs: http://scenejs.wikispaces.com/Node+Cores
+ https://github.com/xeolabs/scenejs/wiki/Node-Cores
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
@@ -14,7 +14,7 @@
  * Not central to this demo, but just for testing completeness, one of our geometry nodes
  * will load through an IoC service.
  *
- * Docs: http://scenejs.wikispaces.com/GeoLoader+Service
+ * https://github.com/xeolabs/scenejs/wiki/GeoLoader-Service
  *
  * Define a stub geometry stream service that just provides a mock "stream" through which
  * a simple cube geometry data is available. We'll reference the stream with a geometry node

@@ -4,7 +4,7 @@
 
  Wiki article:
 
- http://scenejs.wikispaces.com/GeoLoaderService
+ https://github.com/xeolabs/scenejs/wiki/GeoLoader-Service
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com

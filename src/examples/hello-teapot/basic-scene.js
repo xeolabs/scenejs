@@ -12,6 +12,8 @@
  This scene is interactive; to rotate the view, it takes two variables, "yaw" and "pitch", which are
  updated on rotate nodes from mouse input.
 
+  https://github.com/xeolabs/scenejs/wiki/JSON-API
+
  */
 
 SceneJS.createScene({

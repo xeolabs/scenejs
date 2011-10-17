@@ -8,9 +8,15 @@
             type: "lookat"
         };
         if (this.core._nodeCount == 1) { // This node is the resource definer
-            this.setEye(params.eye);
-            this.setLook(params.look);
-            this.setUp(params.up);
+            if (!params.eye && !params.look && !params.up) {
+                this.setEye({x: 0, y: 0, z: 1.0 });
+                this.setLook({x: 0, y: 0, z: 0 });
+                this.setUp({x: 0, y: 1.0, z: 0 });
+            } else {
+                this.setEye(params.eye);
+                this.setLook(params.look);
+                this.setUp(params.up);
+            }
         }
     };
 

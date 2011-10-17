@@ -57,7 +57,7 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/errors/errorsModule.js"/>
 
-        <fileset dir="${SRC_DIR}" includes="scenejs/layers/layerModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/layers/layer.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/library/library.js"/>
 
@@ -106,8 +106,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/lighting/light.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/colortrans/colortrans.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/fog/fog.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>        
         <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometry.js"/>

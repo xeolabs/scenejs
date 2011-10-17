@@ -543,10 +543,10 @@ var SceneJS_webgl_ArrayBuffer;
         };
 
           this.setData = function(data, offset) {
-            if (offset) {
-                context.bufferSubData(type, offset, data);
+            if (offset || offset === 0) {
+                context.bufferSubData(type, offset, new Float32Array(data));
             } else {
-                context.bufferData(type, data);
+                context.bufferData(type, new Float32Array(data));
             }
         };
 
@@ -578,10 +578,13 @@ var SceneJS_webgl_VertexBuffer;
 
         this.setData = function(data, offset) {
             if (offset) {
-                context.bufferSubData(context.ARRAY_BUFFER, offset, new Float32Array([data]));
+                context.bufferSubData(context.ARRAY_BUFFER, offset, new Float32Array(data));
             } else {
-                context.bufferData(context.ARRAY_BUFFER, new Float32Array([data]));
+                context.bufferData(context.ARRAY_BUFFER, new Float32Array(data));
             }
+
+//             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elementVBO);
+//    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, elements, gl.STATIC_DRAW);
         };
 
         this.unbind = function() {

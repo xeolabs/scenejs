@@ -1,10 +1,10 @@
 /*
- Introductory SceneJS scene which demonstrates the imageBuf node
+ Introductory SceneJS scene which demonstrates using the imageBuf node for render-to-texture 
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
 
-
+ https://github.com/xeolabs/scenejs/wiki/imageBuf
 
  */
 SceneJS.createScene({

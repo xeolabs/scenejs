@@ -5,6 +5,8 @@
  * lindsay.kay AT xeolabs.com
  * January 2010
  *
+ * https://github.com/xeolabs/scenejs/wiki/texture
+ * 
  */
 
 /*----------------------------------------------------------------------

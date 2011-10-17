@@ -435,6 +435,7 @@ SceneJS._Node.prototype.removeNodes = function() {
     for (var i = 0; i < children.length; i++) {
         children[i].destroy();
     }
+
 };
 
 /** Destroys node and moves children up to parent, inserting them where this node resided.

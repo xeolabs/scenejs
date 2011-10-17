@@ -5,6 +5,7 @@
  * lindsay.kay AT xeolabs.com
  * March 2010
  *
+ * https://github.com/xeolabs/scenejs/wiki/picking
  */
 
 
