@@ -54,15 +54,17 @@ new (function() {
         var map1;
         var map2 = {};
         var name;
+        var empty = true;
         for (var i = 0; i < stackLen; i++) {
             map1 = maps[i];
             for (name in map1) {
                 if (map1.hasOwnProperty(name)) {
+                    empty = false;
                     map2[name] = map1[name];
                 }
             }
         }
-        return map2;
+        return empty? undefined : map2;
     }
 
     function pushHooks(hooks, hookStacks) {
