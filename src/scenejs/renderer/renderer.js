@@ -308,7 +308,12 @@ new (function() {
                     a : (color.a == undefined || color.a == null) ? 1 : color.a
                 };
             }
-            context.clearColor(color.r, color.g, color.b, color.a);
+            if (color.a === 0) {
+              context.clearColor(0,0,0,0);
+            }
+            else {
+              context.clearColor(color.r, color.g, color.b, color.a);
+            }
         },
 
         clearDepth: function(context, depth) {
