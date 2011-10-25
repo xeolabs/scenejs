@@ -252,7 +252,11 @@ var SceneJS_DrawList = new (function() {
             SceneJS_eventModule.RESET,
             function() {
                 for (var programId in self._programs) {  // Just free allocated programs
-                    self._programs[programId].destroy();
+                    //self._programs[programId].destroy();
+                    if (self._programs[programId].pick != null)
+                      self._programs[programId].pick.destroy();
+                    if (self._programs[programId].render != null)
+                      self._programs[programId].render.destroy();
                 }
                 self._programs = {};
                 nextProgramId = 0;
@@ -1805,7 +1809,7 @@ var SceneJS_DrawList = new (function() {
         src.push("uniform mat4 SCENEJS_uVMatrix;");                 // View matrix
         src.push("uniform mat4 SCENEJS_uPMatrix;");                 // Projection matrix
 
-        if (clipping || fragmentHooks.worldPos) {
+        if (clipping || !customFragmentShader.hooks || fragmentHooks.worldPos) {
             src.push("varying vec4 SCENEJS_vWorldVertex;");         // Varying for fragment clip or world pos hook
         }
 
@@ -1888,7 +1892,7 @@ var SceneJS_DrawList = new (function() {
             src.push("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
         }
 
-        if (clipping || fragmentHooks.worldPos) {
+        if (clipping || !customFragmentShader.hooks || fragmentHooks.worldPos) {
             src.push("  SCENEJS_vWorldVertex = worldVertex;");                  // Varying for fragment world clip or hooks
         }
 

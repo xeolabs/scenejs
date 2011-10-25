@@ -414,6 +414,10 @@ new (function() {
             scenes[sceneId] = null;
             nScenes--;
 
+            // TODO: Not sure whether this is supposed be done via some SCENE_DESTROYED event?
+            SceneJS._scenes[sceneId] = null;
+            ////
+
             SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_DESTROYED, {sceneId : sceneId });
             SceneJS_loggingModule.info("Scene destroyed: " + sceneId);
 

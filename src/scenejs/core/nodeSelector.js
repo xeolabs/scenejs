@@ -418,7 +418,13 @@
      * Destroys the selected scene node
      */
     NodeSelector.prototype.destroy = function() {
-        this._targetNode.destroy();
+        // Scene nodes should be destroyed directly
+        if (this._targetNode.attr.type === "scene") {
+          this._targetNode._destroy();
+        }
+        else {
+          this._targetNode.destroy();
+        }
         return this;
     };
 
