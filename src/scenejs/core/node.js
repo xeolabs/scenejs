@@ -161,10 +161,6 @@ SceneJS._Node.prototype._compile = function() {
  */
 SceneJS._Node.prototype._compileNodes = function() { // Selected children - useful for Selector node
 
-    if (this.listeners["picked"]) {
-        SceneJS_pickingModule.preVisitNode(this);
-    }
-
     if (this.listeners["rendered"]) {
         SceneJS_nodeEventsModule.preVisitNode(this);
     }
@@ -184,11 +180,7 @@ SceneJS._Node.prototype._compileNodes = function() { // Selected children - usef
             SceneJS_compileModule.postVisitNode(child);
         }
     }
-
-    if (this.listeners["picked"]) {
-        SceneJS_pickingModule.postVisitNode(this);
-    }
-
+    
     if (this.listeners["rendered"]) {
         SceneJS_nodeEventsModule.postVisitNode(this);
     }

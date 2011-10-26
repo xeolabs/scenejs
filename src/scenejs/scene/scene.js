@@ -105,6 +105,7 @@ new (function() {
                             + canvasId
                             + '\' failed to provide a supported WebGL context');
         }
+
         try {
             context.clearColor(0.0, 0.0, 0.0, 1.0);
             context.clearDepth(1.0);
@@ -124,14 +125,6 @@ new (function() {
             context: context,
             canvasId : canvasId
         };
-    }
-
-    function getSceneContext(sceneId) {
-        var scene = scenes[sceneId];
-        if (!scene) {
-            throw SceneJS_errorModule.fatalError("Scene not defined: '" + sceneId + "'");
-        }
-        return scene.canvas.context;
     }
 
     function getAllScenes() {
@@ -268,7 +261,7 @@ new (function() {
                 compileMode: SceneJS_DrawList.COMPILE_NODES,
                 resort: false
             });
-            SceneJS_DrawList.renderFrame({              
+            SceneJS_DrawList.renderFrame({
                 tagSelector: this.tagSelector
             });
             return true;
@@ -300,11 +293,14 @@ new (function() {
             SceneJS_compileModule.nodeUpdated(this, "start");
 
             window[fnName] = function() {
-                if (self._running && !self._paused) {   // idleFunc may have stopped render loop
+                if (self._running && !self._paused) {  // idleFunc may have paused scene
                     if (cfg.idleFunc) {
                         cfg.idleFunc();
                     }
-                    SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_IDLE, { 
+                    if (!self._running) { // idleFunc may have destroyed scene
+                        return;
+                    }
+                    SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_IDLE, {
                         sceneId: self.attr.id
                     });
                     if (self._compileScene()) {         // Attempt pending compile and redraw
@@ -370,18 +366,24 @@ new (function() {
     /**
      * Picks whatever geometry will be rendered at the given canvas coordinates.
      */
-    Scene.prototype.pick = function(canvasX, canvasY) {
+    Scene.prototype.pick = function(canvasX, canvasY, options) {
         if (this._destroyed) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
+        options = options || {};
         this._compileScene();                   // Do any pending scene recompilations
-        var nodeId = SceneJS_DrawList.pick({
+        var pickRecord = SceneJS_DrawList.pick({
             sceneId: this.attr.id,
             canvasX : canvasX,
             canvasY : canvasY,
+            zPick: options.zPick,
             tagSelector: this.tagSelector
         });
-        return nodeId ? { nodeId : nodeId, canvasX: canvasX, canvasY: canvasY } : null;
+        if (pickRecord) {
+            pickRecord.canvasX = canvasX;
+            pickRecord.canvasY = canvasY;
+        }
+        return pickRecord;
     };
 
     Scene.prototype._compile = function() {
@@ -404,11 +406,13 @@ new (function() {
      * Scene node's destroy handler, called by {@link SceneJS_node#destroy}
      * @private
      */
-    Scene.prototype._destroy = function() {
+    Scene.prototype.destroy = function() {
         if (!this._destroyed) {
             this.stop();
-
             this._destroyed = true;
+
+            this._scheduleNodeDestroy();    // Schedule all scene nodes for destruction
+            SceneJS._actionNodeDestroys();  // Action the schedule immediately
 
             var sceneId = this.attr.id;
             scenes[sceneId] = null;

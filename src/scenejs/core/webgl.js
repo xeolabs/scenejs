@@ -1,8 +1,3 @@
-/** Private WebGL support classes
- */
-
-
-
 /** Maps SceneJS node parameter names to WebGL enum names
  * @private
  */
@@ -58,15 +53,6 @@ var SceneJS_webgl_enumMap = {
     unsignedByte: "UNSIGNED_BYTE"
 };
 
-/** @private
- */
-var SceneJS_webgl_fogModes = {
-    EXP: 0,
-    EXP2: 1,
-    LINEAR: 2
-};
-
-/** @private */
 var SceneJS_webgl_ProgramUniform = function(context, program, name, type, size, location, logging) {
 
     var func = null;
@@ -134,12 +120,9 @@ var SceneJS_webgl_ProgramUniform = function(context, program, name, type, size, 
         throw "Unsupported shader uniform type: " + type;
     }
 
-    /** @private */
-    this.setValue = function(v) {
-        func(v);
-    };
+    this.setValue = func;
 
-    /** @private */
+
     this.getValue = function() {
         return context.getUniform(program, location);
     };
@@ -147,10 +130,9 @@ var SceneJS_webgl_ProgramUniform = function(context, program, name, type, size, 
     this.getLocation = function() {
         return location;
     };
-}
+};
 
-/** @private */
-var SceneJS_webgl_ProgramSampler = function(context, program, name, type, size, location, logging) {
+var SceneJS_webgl_ProgramSampler = function(context, program, name, type, size, location) {
     this.bindTexture = function(texture, unit) {
         if (texture.bind(unit)) {
             context.uniform1i(location, unit);
@@ -158,21 +140,19 @@ var SceneJS_webgl_ProgramSampler = function(context, program, name, type, size, 
         }
         return false;
     };
-}
+};
 
 /** An attribute within a shader
- * @private
  */
-var SceneJS_webgl_ProgramAttribute = function(context, program, name, type, size, location, logging) {
+var SceneJS_webgl_ProgramAttribute = function(context, program, name, type, size, location) {
     // logging.debug("Program attribute found in shader: " + name);
     this.bindFloatArrayBuffer = function(buffer) {
         buffer.bind();
         context.enableVertexAttribArray(location);
-
         context.vertexAttribPointer(location, buffer.itemSize, context.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
     };
 
-}
+};
 
 /**
  * A vertex/fragment shader in a program
@@ -203,8 +183,7 @@ var SceneJS_webgl_Shader = function(context, type, source, logging) {
         throw SceneJS_errorModule.fatalError(
                 SceneJS.errors.SHADER_COMPILATION_FAILURE, "Shader program failed to compile");
     }
-}
-
+};
 
 /**
  * A program on an active WebGL context
@@ -331,6 +310,15 @@ var SceneJS_webgl_Program = function(hash, context, vertexSources, fragmentSourc
         }
     };
 
+    this.getUniformLocation = function(name) {
+        var u = uniforms[name];
+        if (u) {
+            return u.getLocation();
+        } else {
+            // SceneJS_loggingModule.warn("Uniform not found in shader : " + name);
+        }
+    };
+
     this.setUniform = function(name, value) {
         var u = uniforms[name];
         if (u) {
@@ -340,6 +328,15 @@ var SceneJS_webgl_Program = function(hash, context, vertexSources, fragmentSourc
             }
         } else {
             //      SceneJS_loggingModule.warn("Shader uniform load failed - uniform not found in shader : " + name);
+        }
+    };
+
+    this.getAttribute = function(name) {
+        var attr = attributes[name];
+        if (attr) {
+            return attr;
+        } else {
+            //  logging.warn("Shader attribute bind failed - attribute not found in shader : " + name);
         }
     };
 
@@ -384,8 +381,7 @@ var SceneJS_webgl_Program = function(hash, context, vertexSources, fragmentSourc
             this.valid = false;
         }
     };
-}
-
+};
 
 var SceneJS_webgl_Texture2D = function(context, cfg, onComplete) {
 
@@ -542,7 +538,7 @@ var SceneJS_webgl_ArrayBuffer;
             context.bindBuffer(type, this.handle);
         };
 
-          this.setData = function(data, offset) {
+        this.setData = function(data, offset) {
             if (offset || offset === 0) {
                 context.bufferSubData(type, offset, new Float32Array(data));
             } else {
@@ -583,8 +579,8 @@ var SceneJS_webgl_VertexBuffer;
                 context.bufferData(context.ARRAY_BUFFER, new Float32Array(data));
             }
 
-//             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elementVBO);
-//    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, elements, gl.STATIC_DRAW);
+            //             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elementVBO);
+            //    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, elements, gl.STATIC_DRAW);
         };
 
         this.unbind = function() {
@@ -597,5 +593,3 @@ var SceneJS_webgl_VertexBuffer;
         };
     };
 })();
-
-
