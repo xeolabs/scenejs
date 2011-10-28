@@ -1243,7 +1243,7 @@ var SceneJS_DrawList = new (function() {
                 name: pickNameState.name
             };
 
-            if (params.zPick) {
+            if (false && params.zPick) {
 
                 var pickNameStateId = pickNameState._stateId;
 
