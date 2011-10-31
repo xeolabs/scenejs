@@ -6,9 +6,7 @@ var SceneJS_NodeRenderer = function(cfg) {
     this._canvas = cfg.canvas;
     this._context = cfg.context;
 
-    this.pickListeners = [];
-
-    this.pickNames = [];
+    this.pickNameStates = [];
 
     /** Facade to support node state queries while node rendering
      */
@@ -109,12 +107,11 @@ var SceneJS_NodeRenderer = function(cfg) {
         this._lastImagebufState = null;
         this._lastRenderListenersState = null;
         this._pickIndex = 0;
-        this.profile = params.doProfile ? {
-            program: 0,
-            uniform: 0,
-            varying: 0,
-            texture: 0
-        } : null;
+
+        this.stateSortProfile = {
+            numTextures: 0,
+            numGeometries: 0
+        };
     };
 
 
@@ -126,11 +123,6 @@ var SceneJS_NodeRenderer = function(cfg) {
      */
     this.renderNode = function(node) {
 
-        /* Prepare query facade
-         */
-        this._queryFacade._setNode(node);
-
-
         /* Cache some often-used node states for fast access
          */
         var nodeFlagsState = node.flagsState;
@@ -138,9 +130,13 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         /* Only pick nodes that are enabled for picking
          */
-        if ((this._picking || this._zPicking) && nodeFlagsState.flags.picking === false) {
-            return;
-        }
+//        if ((this._picking || this._zPicking) && nodeFlagsState.flags.picking === false) {
+//            return;
+//        }
+
+        /* Prepare query facade
+         */
+        this._queryFacade._setNode(node);
 
         /* Bind program if none bound, or if node uses different program
          * to that currently bound.
@@ -148,6 +144,7 @@ var SceneJS_NodeRenderer = function(cfg) {
          * Also flag all buffers as needing to be bound.
          */
         if ((!this._program) || (node.program.id != this._lastProgramId)) {
+
             //                if (this._program) {
             //                    this._program.unbind();
             //                }
@@ -162,7 +159,7 @@ var SceneJS_NodeRenderer = function(cfg) {
                 this._program = node.program.render;
             }
 
-            if (this.profile) {
+            if (this.stateSortProfile) {
                 this._program.setProfile(this.profile);
             }
 
@@ -195,7 +192,6 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._lastProjXFormStateId = -1;
             this._lastPickStateId = -1;
             this._lastImagebufStateId = -1;
-            this._lastPickListenersStateId = -1;
             this._lastRenderListenersStateId = -1;
             this._lastShaderParamsStateId = -1;
             this._lastProgramId = node.program.id;
@@ -263,6 +259,9 @@ var SceneJS_NodeRenderer = function(cfg) {
                     }
                 }
             }
+
+            this.stateSortProfile.numTextures++;
+
             this._lastTexStateId = node.texState._stateId;
         }
 
@@ -353,6 +352,9 @@ var SceneJS_NodeRenderer = function(cfg) {
                 program.bindFloatArrayBuffer("SCENEJS_aVertexColor", geo.colorBuf);
             }
             geo.indexBuf.bind();
+
+            this.stateSortProfile.numGeometries++;
+
             this._lastGeoStateId = nodeGeoState._stateId;
         }
 
@@ -407,6 +409,8 @@ var SceneJS_NodeRenderer = function(cfg) {
         if (node.projXFormState._stateId != this._lastProjXFormStateId) {
             var p = node.projXFormState;
             program.setUniform("SCENEJS_uPMatrix", p.mat);
+            program.setUniform("SCENEJS_uZNear", p.optics.near);
+            program.setUniform("SCENEJS_uZFar", p.optics.far);
             this._lastProjXFormStateId = p._stateId;
         }
 
@@ -538,7 +542,7 @@ var SceneJS_NodeRenderer = function(cfg) {
         if (this._picking) {
             if (! this._lastNameState || node.nameState._stateId != this._lastNameState._stateId) {
                 if (node.nameState.name) {
-                    this.pickNames[this._pickIndex++] = node.nameState.name;
+                    this.pickNameStates[this._pickIndex++] = node.nameState;
                     var b = this._pickIndex >> 16 & 0xFF;
                     var g = this._pickIndex >> 8 & 0xFF;
                     var r = this._pickIndex & 0xFF;
@@ -705,6 +709,5 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._program = null;
         }
         //        this._context.colorMask(true, true, true, true);
-        return this.pickListeners;
     };
 };

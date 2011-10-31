@@ -1201,6 +1201,17 @@ var SceneJS_math_LOOKAT_ARRAYS = {
     up:     [0, 1, 0.0 ]
 };
 
+/**
+ * Default orthographic projection properties
+ */
+var SceneJS_math_ORTHO_OBJ = {
+    left: -1.0,
+    right: 1.0,
+    bottom: -1.0,
+    near: 0.1,
+    top: 1.0,
+    far: 5000.0
+};
 
 /**
  * @param pos vec3 position of the viewer

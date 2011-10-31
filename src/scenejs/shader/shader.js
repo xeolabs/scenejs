@@ -29,6 +29,12 @@ new (function() {
                     if (stackLen > 0) {
                         var shader = {
                             shaders: {
+                                fragmentPick: {
+                                  // TODO
+                                },
+                                vertexPick: {
+                                  // TODO
+                                },
                                 fragment: {
                                     code: shaderFragmentCodeStack.slice(0, stackLen).join("\n"),
                                     hooks: combineMapStack(shaderFragmentHooksStack)
@@ -84,12 +90,12 @@ new (function() {
 
     Shader.prototype._init = function(params) {
         if (this.core._nodeCount == 1) { // This node is the resource definer
-            this._setShaders(params.shaders);
+            this.setShaders(params.shaders);
             this.setParams(params.params);
         }
     };
 
-    Shader.prototype._setShaders = function(shaders) {
+    Shader.prototype.setShaders = function(shaders) {
         shaders = shaders || [];
         this.core.shaders = {};
         var shader;
@@ -113,6 +119,7 @@ new (function() {
                 hooks: shader.hooks
             };
         }
+        //TODO: this.dirty = true;
     };
 
     Shader.prototype.setParams = function(params) {

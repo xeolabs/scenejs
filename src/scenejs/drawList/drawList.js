@@ -7,6 +7,14 @@
  */
 var SceneJS_DrawList = new (function() {
 
+    /*
+     */
+    this.SORT_ORDER_TEXTURE = 0;
+    this.SORT_ORDER_VBO = 1;
+
+    this._sortOrder = [this.SORT_ORDER_TEXTURE, this.SORT_ORDER_VBO];
+
+
     this._DEFAULT_STATE_SORT_DELAY = 10;
 
     /* Number of frames after each complete display list rebuild at which GL state is re-sorted.
@@ -156,7 +164,15 @@ var SceneJS_DrawList = new (function() {
     });
 
     this._DEFAULT_PROJ_TRANSFORM_STATE = createState({
-        mat : this._DEFAULT_MAT
+        mat: new Float32Array(
+                SceneJS_math_orthoMat4c(
+                        SceneJS_math_ORTHO_OBJ.left,
+                        SceneJS_math_ORTHO_OBJ.right,
+                        SceneJS_math_ORTHO_OBJ.bottom,
+                        SceneJS_math_ORTHO_OBJ.top,
+                        SceneJS_math_ORTHO_OBJ.near,
+                        SceneJS_math_ORTHO_OBJ.far)),
+        optics: SceneJS_math_ORTHO_OBJ
     });
 
     this._DEFAULT_VIEW_TRANSFORM_STATE = createState({
@@ -223,7 +239,6 @@ var SceneJS_DrawList = new (function() {
     var imageBufState;
     var clipState;
     var morphState;
-    var pickListenersState;
     var nameState;
     var tagState;
     var renderListenersState;
@@ -251,12 +266,14 @@ var SceneJS_DrawList = new (function() {
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
-                for (var programId in self._programs) {  // Just free allocated programs
-                    //self._programs[programId].destroy();
-                    if (self._programs[programId].pick != null)
-                      self._programs[programId].pick.destroy();
-                    if (self._programs[programId].render != null)
-                      self._programs[programId].render.destroy();
+                var programs = self._programs;
+                var program;
+                for (var programId in programs) {  // Just free allocated programs
+                    if (programs.hasOwnProperty(programId)) {
+                        program = programs[programId];
+                        program.pick.destroy();
+                        program.render.destroy();
+                    }
                 }
                 self._programs = {};
                 nextProgramId = 0;
@@ -282,8 +299,8 @@ var SceneJS_DrawList = new (function() {
                         bin: [],                 // Draw list - state sorting happens here
                         lenBin: 0,
 
-                        cachedVisibleBin: [],    // Cached draw list containing enabled nodes
-                        lenCachedVisibleBin: 0,
+                        visibleCacheBin: [],    // Cached draw list containing enabled nodes
+                        lenVisibleCacheBin: 0,
 
                         nodeMap: {},
                         geoNodesMap : {},        // Display list nodes findable by their geometry scene nodes
@@ -351,7 +368,6 @@ var SceneJS_DrawList = new (function() {
             modelXFormState = this._DEFAULT_MODEL_TRANSFORM_STATE;
             projXFormState = this._DEFAULT_PROJ_TRANSFORM_STATE;
             viewXFormState = this._DEFAULT_VIEW_TRANSFORM_STATE;
-            pickListenersState = this._DEFAULT_PICK_LISTENERS_STATE;
             nameState = this._DEFAULT_NAME_STATE;
             tagState = this._DEFAULT_TAG_STATE;
             renderListenersState = this._DEFAULT_RENDER_LISTENERS_STATE;
@@ -501,7 +517,7 @@ var SceneJS_DrawList = new (function() {
         flagsState = this._getState(this._FLAGS, id);
         flags = flags || this._DEFAULT_FLAGS_STATE.flags;
         flagsState.flags = flags || this._DEFAULT_FLAGS_STATE.flags;
-       // this._states.lenEnabledBin = 0;
+        // this._states.lenEnabledBin = 0;
     };
 
     this.setLayer = function(id, core) {
@@ -511,7 +527,7 @@ var SceneJS_DrawList = new (function() {
         }
         layerState = this._getState(this._LAYER, id);
         layerState.core = core;
-    //    this._states.lenEnabledBin = 0;
+        //    this._states.lenEnabledBin = 0;
     };
 
     this.setImagebuf = function(id, imageBuf) {
@@ -641,7 +657,8 @@ var SceneJS_DrawList = new (function() {
             return;
         }
         projXFormState = this._getState(this._PROJ_TRANSFORM, id);
-        projXFormState.mat = transform.matrixAsArray || this._DEFAULT_MAT;
+        projXFormState.mat = transform.matrixAsArray || this._DEFAULT_PROJ_TRANSFORM_STATE.mat;
+        projXFormState.optics = transform.optics || this._DEFAULT_PROJ_TRANSFORM_STATE.optics;
     };
 
     this.setViewTransform = function(id, mat, normalMat, lookAt) {
@@ -653,15 +670,6 @@ var SceneJS_DrawList = new (function() {
         viewXFormState.mat = mat || this._DEFAULT_MAT;
         viewXFormState.normalMat = normalMat || this._DEFAULT_NORMAL_MAT;
         viewXFormState.lookAt = lookAt || SceneJS_math_LOOKAT_ARRAYS;
-    };
-
-    this.setPickListeners = function(id, listeners) {
-        if (arguments.length == 0) {
-            pickListenersState = this._DEFAULT_PICK_LISTENERS_STATE;
-            return;
-        }
-        pickListenersState = this._getState(this._PICK_LISTENERS, id);
-        pickListenersState.listeners = listeners || [];
     };
 
     this.setName = function(id, name) {
@@ -766,11 +774,6 @@ var SceneJS_DrawList = new (function() {
                 node.renderListenersState = renderListenersState;
                 renderListenersState._nodeCount++;
             }
-            if (node.pickListenersState._stateId != pickListenersState._stateId) {
-                this._releaseState(node.pickListenersState);
-                node.pickListenersState = pickListenersState;
-                pickListenersState._nodeCount++;
-            }
             if (node.flagsState._stateId != flagsState._stateId) {
                 this._releaseState(node.flagsState);
                 node.flagsState = flagsState;
@@ -815,7 +818,6 @@ var SceneJS_DrawList = new (function() {
         imageBufState._nodeCount++;
         clipState._nodeCount++;
         morphState._nodeCount++;
-        pickListenersState._nodeCount++;
         nameState._nodeCount++;
         tagState._nodeCount++;
         renderListenersState._nodeCount++;
@@ -846,7 +848,6 @@ var SceneJS_DrawList = new (function() {
             imageBufState :         imageBufState,
             clipState :             clipState,
             morphState :            morphState,
-            pickListenersState:     pickListenersState,
             nameState:              nameState,
             tagState:              tagState,
             renderListenersState:   renderListenersState,
@@ -910,7 +911,6 @@ var SceneJS_DrawList = new (function() {
             this._releaseState(node.imageBufState);
             this._releaseState(node.clipState);
             this._releaseState(node.morphState);
-            this._releaseState(node.pickListenersState);
             this._releaseState(node.nameState);
             this._releaseState(node.tagState);
             this._releaseState(node.renderListenersState);
@@ -918,7 +918,7 @@ var SceneJS_DrawList = new (function() {
             this._releaseState(node.shaderParamsState);
         }
         geoNodesMap[id] = null;
-        sceneState.lenCachedVisibleBin = 0;
+        sceneState.lenVisibleCacheBin = 0;
     };
 
 
@@ -929,11 +929,58 @@ var SceneJS_DrawList = new (function() {
     this._createSortIDs = function(bin) {
         if (this._states.needSortIds) {
             var node;
-            var layerPriority;
             for (var i = 0, len = bin.length; i < len; i++) {
                 node = bin[i];
                 node.sortId = (node.layerState.core.priority * 100000) + node.program.id;
             }
+            this._states.needSortIds = false;
+        }
+    };
+
+    this._createSortIDsNew = function(bin) {
+        if (this._states.needSortIds) {
+            var node;
+
+            var lastProgramId;
+            var lastTextureId;
+            var lastGeometryId;
+
+            var numPrograms = 0;
+            var numTextures = 0;
+            var numGeometries = 0;
+
+            var i = bin.length;
+            while (i--) {
+                node = bin[i];
+
+                if (node.program.id != lastProgramId) {
+                    node.program._sortId = numPrograms;
+                    lastProgramId = node.program.id;
+                    numPrograms++;
+                }
+
+                if (node.texState._stateId != lastTextureId) {
+                    node.texState._sortId = numTextures;
+                    lastTextureId = node.texState._stateId;
+                    numTextures++;
+                }
+
+                if (node.geoState._stateId != lastGeometryId) {
+                    node.geoState._sortId = numGeometries;
+                    lastGeometryId = node.geoState._stateId;
+                    numGeometries++;
+                }
+            }
+
+            i = bin.length;
+            while (i--) {
+                node = bin[i];
+                node.sortId = (node.layerState.core.priority * numPrograms * numTextures)   // Layer
+                        + (node.program.id * numTextures)                                   // Shader
+                        + node.texState._sortId * numGeometries                            // Texture
+                        + node.geoState._sortId;                                           // Geometry
+            }
+
             this._states.needSortIds = false;
         }
     };
@@ -957,7 +1004,7 @@ var SceneJS_DrawList = new (function() {
         }
         states.bin.length = states.lenBin;
         states.bin.sort(this._sortNodes);
-        states.lenCachedVisibleBin = 0;
+        states.lenVisibleCacheBin = 0;
     };
 
     this._sortNodes = function(a, b) {
@@ -976,22 +1023,28 @@ var SceneJS_DrawList = new (function() {
         this._states.pickBufDirty = true; // Pick buff will now need rendering on next pick
 
         params = params || {};
+
+        var sorted = false;
+
         if (this._states.needSort) {
             this._preSortBins();
             this._states.needSort = false;
-        } else {
-            if (stateSortDelay >= 0) {
-                this._states.rendersUntilSort--;
-                if (this._states.rendersUntilSort == 0) { // Will not sort again until >= 0
-                    this._states.needSort = true;
-                }
-            }
+            sorted = true;
         }
+
+        var glCallListDirty = sorted || this.compileMode == SceneJS_DrawList.COMPILE_SCENE || this.compileMode == SceneJS_DrawList.COMPILE_BRANCH;
         var doProfile = params.profileFunc ? true : false;
+
         var nodeRenderer = this._states.nodeRenderer;
-        nodeRenderer.init({ doProfile: doProfile });
+        nodeRenderer.init({
+            doProfile: doProfile,
+            glCallListDirty: glCallListDirty
+        });
+
         this._renderBin(this._states, false, params.tagSelector); //Not picking
+
         nodeRenderer.cleanup();
+
         this._states = null;
         if (doProfile) {
             params.profileFunc(nodeRenderer.profile);
@@ -1002,29 +1055,39 @@ var SceneJS_DrawList = new (function() {
 
         var context = states.canvas.context;
 
-        var cachedVisibleBin = states.cachedVisibleBin;
-        var lenCachedVisibleBin = states.lenCachedVisibleBin;
+        var visibleCacheBin = states.visibleCacheBin;
+        var lenVisibleCacheBin = states.lenVisibleCacheBin;
         var nodeRenderer = states.nodeRenderer;
         var nTransparent = 0;
         var _transparentBin = transparentBin;
 
-        var drawListFilter = true;
+        if (lenVisibleCacheBin > 0) {
 
-        if (drawListFilter && lenCachedVisibleBin > 0) {
-            for (var i = 0; i < lenCachedVisibleBin; i++) {
-                node = cachedVisibleBin[i];
+            /*-------------------------------------------------------------
+             * Render visible cache bin
+             *  - build transparent bin
+             *-----------------------------------------------------------*/
+
+            for (var i = 0; i < lenVisibleCacheBin; i++) {
+                node = visibleCacheBin[i];
                 flags = node.flagsState.flags;
-                if (picking && flags.picking === false) {                   // When picking, skip unpickable node
+                if (picking && flags.picking === false) {           // When picking, skip unpickable node
                     continue;
                 }
-                if (!picking && flags.transparent === true) {               // Buffer transparent node when not picking
+                if (!picking && flags.transparent === true) {       // Buffer transparent node when not picking
                     _transparentBin[nTransparent++] = node;
 
                 } else {
-                    nodeRenderer.renderNode(node);                   // Render node if opaque or in picking mode
+                    nodeRenderer.renderNode(node);                  // Render node if opaque or in picking mode
                 }
             }
         } else {
+
+            /*-------------------------------------------------------------
+             *  Render main node bin
+             *      - build visible cache bin
+             *      - build transparent bin
+             *-----------------------------------------------------------*/
 
             var bin = states.bin;
 
@@ -1098,11 +1161,9 @@ var SceneJS_DrawList = new (function() {
                     nodeRenderer.renderNode(node);                          // Render node if opaque or in picking mode
                 }
 
-                if (drawListFilter) {
-                    cachedVisibleBin[states.lenCachedVisibleBin++] = node;
-                }
+                visibleCacheBin[states.lenVisibleCacheBin++] = node;      // Build visible node cache
             }
-            
+
             if (countDestroyed > 0) {
                 bin.length -= countDestroyed;  // TODO: tidy this up
                 states.lenBin = bin.length;
@@ -1110,8 +1171,11 @@ var SceneJS_DrawList = new (function() {
             }
         }
 
-        /* Render transparent nodes with blending
-         */
+        /*-------------------------------------------------------------
+         * Render transparent bin
+         *  - blending enabled
+         *-----------------------------------------------------------*/
+
         if (nTransparent > 0) {
             context.enable(context.BLEND);
             context.blendFunc(context.SRC_ALPHA, context.ONE_MINUS_SRC_ALPHA);  // Default - may be overridden by flags
@@ -1129,113 +1193,122 @@ var SceneJS_DrawList = new (function() {
      *
      *==================================================================================================================*/
 
-    this.pick = function(params, options) {
+    this.pick = function(params) {
         var states = this._sceneStates[params.sceneId];
         if (!states) {
             throw "No drawList found for scene '" + params.sceneId + "'";
         }
 
-        options = options || {};
+        var pickResult = null;
 
         var canvasX = params.canvasX;
         var canvasY = params.canvasY;
 
-        var pickBuf = states.pickBuf;
+        /*-------------------------------------------------------------
+         *  Normal pick
+         *-----------------------------------------------------------*/
+
+        var pickBuf = states.pickBuf;                                   // Lazy-create pick buffer
         if (!pickBuf) {
             pickBuf = states.pickBuf = new SceneJS_PickBuffer({ canvas: states.canvas });
             states.pickBufDirty = true;
         }
-
         var nodeRenderer = states.nodeRenderer;
-
         pickBuf.bind();
-
-        if (states.pickBufDirty) {
-
+        if (states.pickBufDirty) {                                      // Render pick buffer
             pickBuf.clear();
-
-            nodeRenderer.init({ picking: true });
+            nodeRenderer.init({
+                picking: true,
+                glCallListDirty: this.compileMode == SceneJS_DrawList.COMPILE_SCENE
+                        || this.compileMode == SceneJS_DrawList.COMPILE_BRANCH
+            });
             this._renderBin(states, true, params.tagSelector);
             nodeRenderer.cleanup();
-
-            states.pickBufDirty = false;
+            states.pickBufDirty = false;                                // Cache pick buffer
         }
-        var pix = pickBuf.read(canvasX, canvasY);
+        var pix = pickBuf.read(canvasX, canvasY);                       // Read pick buffer
         var pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
         var pickIndex = (pickedNodeIndex >= 1) ? pickedNodeIndex - 1 : -1;
-
         pickBuf.unbind();
 
-        //        var pickNames = nodeRenderer.pickNames[pickIndex];
-        //        if (pickNames) {
-        //
-        //            alert(JSON.stringify(pickNames));
-        //
-        ////            var canvasZ = (options.zPick) ? this._zPick(states, canvasX, canvasY, pickNames._stateId) : undefined;
-        //
-        ////            for (var i = listeners.length - 1; i >= 0; i--) {
-        ////                wasPicked = true;
-        ////                listeners[i]({
-        ////                    canvasX: canvasX,
-        ////                    canvasY: canvasY,
-        ////                    canvasZ: canvasZ
-        ////                }, options);
-        ////            }
-        //
-        //        }
+        var pickNameState = nodeRenderer.pickNameStates[pickIndex];
 
-        return nodeRenderer.pickNames[pickIndex];
-    };
+        /*-------------------------------------------------------------
+         *  Depth pick
+         *-----------------------------------------------------------*/
 
-    this._zPick = function(states, canvasX, canvasY, pickListenersStateId) {
+        if (pickNameState) {
 
-        states.pickBuf.unbind();
+            pickResult = {
+                name: pickNameState.name
+            };
 
-        var zPickBuf = states.zPickBuf;
-        if (!zPickBuf) {
-            zPickBuf = states.zPickBuf = new SceneJS_PickBuffer({ canvas: states.canvas });
-        }
+            if (false && params.zPick) {
 
-        zPickBuf.bind();
+                var pickNameStateId = pickNameState._stateId;
 
-        var nodeRenderer = states.nodeRenderer;
-        nodeRenderer.init({ zPick: true });
+                var zPickBuf = states.zPickBuf;                             // Lazy-create Z-pick buffer
+                if (!zPickBuf) {
+                    zPickBuf = states.zPickBuf = new SceneJS_PickBuffer({ canvas: states.canvas });
+                }
+                zPickBuf.bind();
+                zPickBuf.clear();
+                nodeRenderer.init({ zPick: true });
 
-        /* Do Z-intersect pass on render bin
-         */
-        var bin = states.bin;
-        var node;
-        var viewMat;
-        var projMat;
-        for (var i = 0, len = bin.length; i < len; i++) {
-            node = bin[i];
-            if (node.pickListenersState._stateId == pickListenersStateId) {
-                nodeRenderer.renderNode(node);
-                viewMat = node.viewXFormState.mat;
-                projMat = node.projXFormState.mat;
+                var visibleCacheBin = states.visibleCacheBin;
+                var lenVisibleCacheBin = states.lenVisibleCacheBin;
+                var node;
+                var flags;
+
+                nodeRenderer.init({ zPick: true });
+
+                for (var i = 0; i < lenVisibleCacheBin; i++) {
+                    node = visibleCacheBin[i];
+                    if (node.nameState._stateId == pickNameStateId) {
+                        flags = node.flagsState.flags;
+                        if (flags.picking === false) {                          // Skip unpickable node
+                            continue;
+                        }
+                        nodeRenderer.renderNode(node);
+                    }
+                }
+
+                nodeRenderer.cleanup();
+
+                var pix = zPickBuf.read(canvasX, canvasY);
+                //                var nx = pix[0];
+                //                var ny = pix[1];
+                var nz = -pix[2];
+
+                //alert(nz);
+                zPickBuf.unbind();
+
+                var viewMat = node.viewXFormState.mat;
+                var projMat = node.projXFormState.mat;
+
+                var optics = node.projXFormState.optics;
+
+
+                //            var nx = ((2.0 * (canvasX / canvas.width)) - 1.0) / projMat[0];
+                //          var ny = ((-2.0 * (canvasY / canvas.height)) + 1.0) / projMat[5];
+
+                //               var   nx = ((2.0 * (canvasX / canvas.width)) - 1.0) / projMat[0];
+                //            var ny = ((-2.0 * (canvasY / canvas.height)) + 1.0) / projMat[5];
+
+                var nx = -((2.0 * (canvasX / canvas.width)) - 1.0);
+                var ny = -((-2.0 * (canvasY / canvas.height)) + 1.0);
+
+
+                //  nz = optics.near + ((nz / 256.0) * (optics.far - optics.near));               // Denormalize
+                nz = 1.0;
+
+                var inViewMat = SceneJS_math_inverseMat4(viewMat, SceneJS_math_mat4());
+
+                pickResult.worldPos = SceneJS_math_transformPoint3(inViewMat, [nx, ny, nz]);
             }
         }
 
-
-        nodeRenderer.cleanup();
-
-        var pix = zPickBuf.read(canvasX, canvasY);
-        var nz = pix[2];
-
-        var canvas = states.canvas.canvas;
-
-        var nx = -((2.0 * (canvasX / canvas.width)) - 1.0) / projMat[0];
-        var ny = -((-2.0 * (canvasY / canvas.height)) + 1.0) / projMat[5];
-        var inViewMat = SceneJS_math_inverseMat4(viewMat, SceneJS_math_mat4());
-
-        var worldPos = SceneJS_math_transformPoint3(inViewMat, [nx, ny, nz]);
-
-        //        alert(JSON.stringify(worldPos));
-        //alert(JSON.stringify(projMat));
-
-        zPickBuf.unbind();
-
-        return worldPos[2];
+        return pickResult;
     };
 
     //    ayPick.prototype.execute = function(params, completed) {
@@ -1291,7 +1364,7 @@ var SceneJS_DrawList = new (function() {
 
                 render: this._createShader(this._composeRenderingVertexShader(), this._composeRenderingFragmentShader()),
                 pick: this._createShader(this._composePickingVertexShader(), this._composePickingFragmentShader()),
-                //     zPick: this._createShader(this._composeZIntersectVertexShader(), this._composeZIntersectFragmentShader()),
+                //                zPick: this._createShader(this._zPickVertexShader(), this._zPickFragmentShader()),
                 stateHash: stateHash,
                 refCount: 0
             };
@@ -1526,7 +1599,7 @@ var SceneJS_DrawList = new (function() {
      *
      *==================================================================================================================*/
 
-    this._composeZIntersectVertexShader = function() {
+    this._zPickVertexShader = function() {
 
         var customShaders = shaderState.shader.shaders || {};
 
@@ -1619,7 +1692,7 @@ var SceneJS_DrawList = new (function() {
         return src;
     };
 
-    this._composeZIntersectFragmentShader = function() {
+    this._zPickFragmentShader = function() {
 
         var customShaders = shaderState.shader.shaders || {};
         var customFragmentShader = customShaders.fragment || {};
@@ -1641,6 +1714,9 @@ var SceneJS_DrawList = new (function() {
         //}
 
         src.push("varying vec4 SCENEJS_vProjVertex;\n");
+
+        src.push("uniform float SCENEJS_uZNear;");
+        src.push("uniform float SCENEJS_uZFar;");
 
         /*-----------------------------------------------------------------------------------
          * Variables - Clipping
@@ -1684,10 +1760,13 @@ var SceneJS_DrawList = new (function() {
                 src.push("    }");
             }
         }
+        src.push("  float zNormalizedDepth = (SCENEJS_uZNear - SCENEJS_vViewVertex.z) / abs(SCENEJS_uZFar - SCENEJS_uZNear);");
+        //src.push("  gl_FragColor = vec4(zNormalizedDepth, zNormalizedDepth, zNormalizedDepth, 1.0); ");
 
-
-        //src.push("    gl_FragColor = vec4(1.0, 1.0, (800.0-SCENEJS_vProjVertex.z)/300.0, 1.0); ");
-        src.push("    gl_FragColor = vec4(SCENEJS_vWorldVertex.x, SCENEJS_vWorldVertex.y, SCENEJS_vWorldVertex.z, 1.0); ");
+        src.push("  gl_FragColor=vec4(" +
+                 "                  clamp(((pow(2,8)  * zNormalizedDepth) / 255.0,");
+        src.push("                  clamp(((pow(2,16) * zNormalizedDepth) / 255.0,");
+        src.push("                  clamp(((pow(2,24) * zNormalizedDepth) / 255.0, 1.0);");
 
         src.push("}");
 
@@ -2326,3 +2405,4 @@ var SceneJS_DrawList = new (function() {
         return src;
     };
 })();
+

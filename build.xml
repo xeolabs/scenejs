@@ -110,8 +110,7 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometry.js"/>
-
-        <fileset dir="${SRC_DIR}" includes="scenejs/pick/pickingModule.js"/>
+        
         <fileset dir="${SRC_DIR}" includes="scenejs/name/nameModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/layer/layerModule.js"/>
