@@ -319,6 +319,15 @@ var SceneJS_webgl_Program = function(hash, context, vertexSources, fragmentSourc
         }
     };
 
+    this.getUniform = function(name) {
+        var u = uniforms[name];
+        if (u) {
+            return u;
+        } else {
+            //      SceneJS_loggingModule.warn("Shader uniform load failed - uniform not found in shader : " + name);
+        }
+    };
+
     this.setUniform = function(name, value) {
         var u = uniforms[name];
         if (u) {

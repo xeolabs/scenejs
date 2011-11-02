@@ -65,7 +65,8 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/drawList/pickBuffer.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/drawList/drawList.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/drawList/nodeRenderer.js"/>
+        
+        <fileset dir="${SRC_DIR}" includes="scenejs/drawList/drawListRenderer.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
 

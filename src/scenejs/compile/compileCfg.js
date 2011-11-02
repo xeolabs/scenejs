@@ -111,6 +111,19 @@ var SceneJS_compileCfg = new (function() {
             mul: {
                 level: this.REDRAW
             }
+        },               
+
+        "layer": {
+            "set" : {
+                attr: {
+                    "priority": {
+                        level: this.RESORT
+                    },
+                    "enabled": {
+                        level: this.RESORT
+                    }
+                }
+            }
         },
 
         "lights": {
@@ -126,7 +139,11 @@ var SceneJS_compileCfg = new (function() {
             set: {
                 attr: {
                     "tagMask": {
-                        level: this.REDRAW
+
+                        /* Enabling/disabling nodes will change the sequence of states
+                         * in draw list, so draw list resort needed
+                         */
+                        level: this.RESORT
                     }
                 }
             }
@@ -145,6 +162,19 @@ var SceneJS_compileCfg = new (function() {
             alwaysCompile: true
         },
 
+        "tag" : {
+            set: {
+                attr: {
+                    "tag": {
+
+                        /* Enabling/disabling nodes will change the sequence of states
+                         * in draw list, so draw list resort needed
+                         */
+                        level: this.RESORT
+                    }
+                }
+            }
+        },
 
         "rotate": {
             set: {
@@ -290,6 +320,10 @@ var SceneJS_compileCfg = new (function() {
             "set" : {
                 attr: {
                     "flags": {
+
+                        /* Enabling/disabling nodes will change the sequence of states
+                         * in draw list, so draw list resort needed
+                         */
                         level: this.RESORT
                     }
                 }
@@ -306,19 +340,6 @@ var SceneJS_compileCfg = new (function() {
 
                             level: this.RESORT
                         }
-                    }
-                }
-            }
-        },
-
-        "layer": {
-            "set" : {
-                attr: {
-                    "priority": {
-                        level: this.RESORT
-                    },
-                    "enabled": {
-                        level: this.RESORT
                     }
                 }
             }
