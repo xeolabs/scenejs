@@ -15,7 +15,7 @@
  In this demo we're just doing (1).
 
  http://scenejs.wikispaces.com/shader
- 
+
  */
 
 SceneJS.createScene({
@@ -218,6 +218,8 @@ SceneJS.createScene({
                                                          * A shaderParams node to set the value of the "time" parameter
                                                          * of our shader.
                                                          *
+                                                         * We could instead set parameters directly on the shader node.
+                                                         *
                                                          * Within the "idleFunc" callback on our scene render loop
                                                          * (down below), we'll then update the "time" uniform to drive
                                                          * the wobbling.
@@ -238,7 +240,6 @@ SceneJS.createScene({
 
                                                                 /* This teapot will enjoy our custom shader injection:
                                                                  */
-
                                                                 {
                                                                     type : "teapot"
                                                                 }

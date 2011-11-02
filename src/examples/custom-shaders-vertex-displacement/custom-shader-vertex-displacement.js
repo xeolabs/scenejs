@@ -118,18 +118,18 @@ SceneJS.createScene({
                                                         {
                                                             stage:  "vertex",
 
-                                                            /* GLSL fragment with custom function.
+                                                            /* A GLSL snippet containing a custom function.
                                                              *
-                                                             * The fragment can be given as either a string or an array
+                                                             * The snippet can be given as either a string or an array
                                                              * of strings.
                                                              */
                                                             code: [
                                                                 "uniform float time;",
 
                                                                 "vec4 myModelPosFunc(vec4 pos){",
-                                                                "   pos.x=pos.x+sin(pos.x*5.0+time+10.0)*0.1;",
-                                                                "   pos.y=pos.y+sin(pos.y*5.0+time+10.0)*0.1;",
-                                                                "   pos.z=pos.z+sin(pos.z*5.0+time+10.0)*0.1;",
+                                                                "   pos.x+=sin(pos.x*5.0+time+10.0)*0.1;",
+                                                                "   pos.y+=sin(pos.y*5.0+time+10.0)*0.1;",
+                                                                "   pos.z+=sin(pos.z*5.0+time+10.0)*0.1;",
                                                                 "   return pos;",
                                                                 "}"],
 
@@ -141,9 +141,6 @@ SceneJS.createScene({
                                                         },
 
                                                         /* Fragment shader
-                                                         *
-                                                         * The fragment can be given as either a string or an array
-                                                         * of strings.
                                                          */
                                                         {
                                                             stage:  "fragment",
@@ -167,38 +164,20 @@ SceneJS.createScene({
                                                         }
                                                     ],
 
-                                                    /* Optional initial values for uniforms within our GLSL -
-                                                     * note that these are initial values that are not rewritable
-                                                     * on the "shader" node - we rewrite them using a "shaderParams"
-                                                     * node
+                                                    /* Expose the time uniform as a parameter which we'll set
+                                                     * on this shader node within the render loop.
+                                                     *
+                                                     * We can also set shader parameters using a child shaderParams
+                                                     * node - see other custom shader examples for how.
+                                                     *
                                                      */
                                                     params: {
                                                         time: 0.0
                                                     },
 
-
                                                     nodes: [
-
-                                                        /* Inject a variable value into our custom shader:
-                                                         */
                                                         {
-                                                            type: "shaderParams",
-
-                                                            id: "myShaderParams",
-
-                                                            params: {
-                                                                time: 0.5
-                                                            },
-
-                                                            nodes: [
-
-                                                                /* This teapot will enjoy our custom shader injection:
-                                                                 */
-
-                                                                {
-                                                                    type : "teapot"
-                                                                }
-                                                            ]
+                                                            type : "teapot"
                                                         }
                                                     ]
                                                 }
@@ -264,9 +243,8 @@ var time = 0;
 
 SceneJS.scene("theScene").start({
     idleFunc: function() {
-        this.findNode("myShaderParams").set("params", {
-            time: time ,
-            time2: time
+        this.findNode("myShader").set("params", {
+            time: time 
         });
         time += 0.1;
     }
