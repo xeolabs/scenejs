@@ -123,11 +123,17 @@ var SceneJS_compileCfg = new (function() {
             "start" : {
                 level: this.COMPILE_SCENE
             },
-            set: {
+            /*set: {
                 attr: {
                     "tagMask": {
                         level: this.REDRAW
                     }
+                }
+            }*/
+            // Temporary fix for issue #60 in BIMsurfer
+            set: {
+                "tagMask": {
+                    level: this.REDRAW
                 }
             }
         },

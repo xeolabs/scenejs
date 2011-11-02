@@ -425,7 +425,7 @@ SceneJS._Node.prototype.disconnectNodes = function() {
 SceneJS._Node.prototype.removeNodes = function() {
     var children = this.disconnectNodes();
     for (var i = 0; i < children.length; i++) {
-        this.children[i].destroy();
+        children[i].destroy();
     }
 
 };

@@ -1427,7 +1427,7 @@ var SceneJS_DrawList = new (function() {
 
         var customShaders = shaderState.shader.shaders || {};
 
-        var customVertexShader = customShaders.vertex || {};
+        var customVertexShader = customShaders.vertexPick || {};
         var vertexHooks = customVertexShader.hooks || {};
 
         var customFragmentShader = customShaders.fragment || {};
@@ -1519,7 +1519,7 @@ var SceneJS_DrawList = new (function() {
     this._composePickingFragmentShader = function() {
 
         var customShaders = shaderState.shader.shaders || {};
-        var customFragmentShader = customShaders.fragment || {};
+        var customFragmentShader = customShaders.fragmentPick || {};
         var fragmentHooks = customFragmentShader.hooks || {};
 
         var clipping = clipState && clipState.clips.length > 0;
@@ -1812,7 +1812,7 @@ var SceneJS_DrawList = new (function() {
         /* Do a full custom shader replacement if code supplied without hooks
          */
         if (customShaders.vertex && customShaders.vertex.code && !customShaders.vertex.hooks) {
-            return customShaders.vertex.code;
+            return [customShaders.vertex.code];
         }
 
         var customVertexShader = customShaders.vertex || {};
@@ -1888,7 +1888,7 @@ var SceneJS_DrawList = new (function() {
         src.push("uniform mat4 SCENEJS_uVMatrix;");                 // View matrix
         src.push("uniform mat4 SCENEJS_uPMatrix;");                 // Projection matrix
 
-        if (clipping || fragmentHooks.worldPos) {
+        if (clipping || !customFragmentShader.hooks || fragmentHooks.worldPos) {
             src.push("varying vec4 SCENEJS_vWorldVertex;");         // Varying for fragment clip or world pos hook
         }
 
@@ -1971,7 +1971,7 @@ var SceneJS_DrawList = new (function() {
             src.push("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
         }
 
-        if (clipping || fragmentHooks.worldPos) {
+        if (clipping || !customFragmentShader.hooks || fragmentHooks.worldPos) {
             src.push("  SCENEJS_vWorldVertex = worldVertex;");                  // Varying for fragment world clip or hooks
         }
 
@@ -2038,7 +2038,7 @@ var SceneJS_DrawList = new (function() {
         /* Do a full custom shader replacement if code supplied without hooks
          */
         if (customShaders.fragment && customShaders.fragment.code && !customShaders.fragment.hooks) {
-            return customShaders.fragment.code;
+            return [customShaders.fragment.code];
         }
 
         var customFragmentShader = customShaders.fragment || {};
@@ -2404,4 +2404,5 @@ var SceneJS_DrawList = new (function() {
         }
         return src;
     };
-}) ();
+})();
+

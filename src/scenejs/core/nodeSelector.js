@@ -40,7 +40,7 @@
             SceneJS_errorModule.fatalError("node param 'node' should be either an index number or an ID string");
         }
         if (!nodeGot) {
-            throw "node not found: '" + node + "'";
+            return null;
         }
         return SceneJS._selectNode(nodeGot);
     };
@@ -222,6 +222,12 @@
             this._callNodeMethods("remove", attr, this._targetNode);
         }
         return this;
+    };
+
+    /** Disconnect a node from the scene graph
+     */
+    NodeSelector.prototype.disconnect = function() {
+        return this._targetNode.disconnect();
     };
 
     /** Returns the value of an attribute of the selected node
@@ -412,7 +418,13 @@
      * Destroys the selected scene node
      */
     NodeSelector.prototype.destroy = function() {
-        this._targetNode.destroy();
+        // Scene nodes should be destroyed directly
+        if (this._targetNode.attr.type === "scene") {
+          this._targetNode._destroy();
+        }
+        else {
+          this._targetNode.destroy();
+        }
         return this;
     };
 
