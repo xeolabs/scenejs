@@ -227,8 +227,8 @@ var SceneJS_DrawListRenderer = function(cfg) {
             if (this._picking) {
 
                 this.createCall(
-                        this._callFuncs["shader"]
-                                || (this._callFuncs["shader"] =
+                        this._callFuncs["pickShader"]
+                                || (this._callFuncs["pickShader"] =
                                     (function() {
 
                                         var program = node.program.pick;
@@ -1073,8 +1073,8 @@ var SceneJS_DrawListRenderer = function(cfg) {
                 if (node.renderListenersState) {
 
                     this.createCall(
-                            this._callFuncs["renderListener"]
-                                    || (this._callFuncs["renderListener"] =
+                            this._callFuncs["rendered"]
+                                    || (this._callFuncs["rendered"] =
                                         (function() {
 
                                             var listeners = node.renderListenersState.listeners;
