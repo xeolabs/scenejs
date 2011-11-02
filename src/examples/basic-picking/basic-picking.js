@@ -246,7 +246,7 @@ function mouseDown(event) {
     var pickRecord = scene.pick(coords.x, coords.y);
 
     if (pickRecord) {
-        alert("Picked 'name' node with id '" + pickRecord.nodeId + "' at canvasX=" + pickRecord.canvasX + ", canvasY=" + pickRecord.canvasY);
+        alert("Picked 'name' node with id '" + pickRecord.name + "' at canvasX=" + pickRecord.canvasX + ", canvasY=" + pickRecord.canvasY);
     } else {
         alert("Nothing picked");
     }
