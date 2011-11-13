@@ -39,7 +39,7 @@ new (function() {
                                 }
                             },
                             paramsStack: shaderParamsStack.slice(0, stackLen),
-                            hash: idStack.slice(0, stackLen)
+                            hash: idStack.slice(0, stackLen).join(".")
                         };
 
                         SceneJS_DrawList.setShader(idStack[stackLen - 1], shader);
@@ -154,17 +154,17 @@ new (function() {
         shaderFragmentCodeStack[stackLen] = fragment.code || "";
         shaderFragmentHooksStack[stackLen] = fragment.hooks || {};
 
-//        if (fragment.hooks) {
-//            pushHooks(fragment.hooks, shaderFragmentHooksStack);
-//        }
+        //        if (fragment.hooks) {
+        //            pushHooks(fragment.hooks, shaderFragmentHooksStack);
+        //        }
 
         shaderVertexCodeStack[stackLen] = vertex.code || "";
         shaderVertexHooksStack[stackLen] = vertex.hooks || {};
 
-//        if (vertex.hooks) {
-//            pushHooks(vertex.hooks, shaderVertexHooksStack);
-//        }
-        
+        //        if (vertex.hooks) {
+        //            pushHooks(vertex.hooks, shaderVertexHooksStack);
+        //        }
+
         shaderParamsStack[stackLen] = this.core.params || {};
 
         stackLen++;

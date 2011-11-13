@@ -376,7 +376,7 @@ new (function() {
             sceneId: this.attr.id,
             canvasX : canvasX,
             canvasY : canvasY,
-            zPick: options.zPick,
+            rayPick: options.rayPick,
             tagSelector: this.tagSelector
         });
         if (pickRecord) {

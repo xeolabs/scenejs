@@ -1,10 +1,6 @@
 /**
  * Texture atlas example
  * 
- * Lindsay Kay
- * lindsay.kay AT xeolabs.com
- * January 2010
- *
  */
 
 SceneJS.createScene({
@@ -86,7 +82,7 @@ SceneJS.createScene({
 
                                     layers: [
                                         {
-                                            uri:"texture-atlas.jpg",
+                                            uri:"../web/images/texture-atlas.jpg",
                                             applyTo:"baseColor",
                                             blendMode: "multiply"
                                         }

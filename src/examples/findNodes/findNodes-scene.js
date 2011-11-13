@@ -1,9 +1,9 @@
 /*
 
+ Finding nodes using regular expression matching on their IDs
 
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
-
 
  */
 

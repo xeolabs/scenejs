@@ -1477,6 +1477,16 @@ var SceneJS_math_transformVector3 = function(m, v) {
     ];
 };
 
+var SceneJS_math_transformVector4 = function(m, v) {
+    var v0 = v[0], v1 = v[1], v2 = v[2], v3 = v[3];
+    return [
+        m[ 0] * v0 + m[ 4] * v1 + m[ 8] * v2 + m[12] * v3,
+        m[ 1] * v0 + m[ 5] * v1 + m[ 9] * v2 + m[13] * v3,
+        m[ 2] * v0 + m[ 6] * v1 + m[10] * v2 + m[14] * v3,
+        m[ 3] * v0 + m[ 7] * v1 + m[11] * v2 + m[15] * v3
+    ];
+};
+
 /** @private */
 var SceneJS_math_projectVec4 = function(v) {
     var f = 1.0 / v[3];

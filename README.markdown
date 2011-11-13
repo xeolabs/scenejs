@@ -73,7 +73,7 @@ specular, glow, transparency and bump maps.
 
 * **[Texture Animation](https://github.com/xeolabs/scenejs/wiki/texture)** - Rotate, scale, translate, blending
 
-* **[Render-to-Texture](https://github.com/xeolabs/scenejs/wiki/imageBuf)** - Scene subgraphs can be dynamically
+* **[Render-to-Texture](https://github.com/xeolabs/scenejs/wiki/frameBuf)** - Scene subgraphs can be dynamically
 captured to an image buffer, which can be applied as textures within other parts of the scene. This is useful for
 approximating reflection and can also be used in conjunction with SceneJS extensible shaders to apply post-processing
 effects.

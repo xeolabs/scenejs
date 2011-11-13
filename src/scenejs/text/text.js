@@ -74,12 +74,13 @@ SceneJS.Text.prototype._init = function(params) {
             ]
         });
     } else {
+        var self = this;
         this.addNode({
             type: "geometry",
             create: function() {
                 var geo = SceneJS_vectorTextModule.getGeometry(3, 0, 0, params.text); // Unit size
                 return {
-                    resource: this.attr.id, // Assuming text geometry varies a lot - don't try to share VBOs
+                    resource: self.attr.id, // Assuming text geometry varies a lot - don't try to share VBOs
                     primitive : "lines",
                     positions : geo.positions,
                     normals: [],

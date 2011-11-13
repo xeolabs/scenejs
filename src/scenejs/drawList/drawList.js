@@ -23,7 +23,7 @@ var SceneJS_DrawList = new (function() {
     this._COLORTRANS = 2;
     this._FLAGS = 3;
     this._LAYER = 4;
-    this._IMAGEBUF = 5;
+    this._FRAMEBUF = 5;
     this._LIGHTS = 6;
     this._MATERIAL = 7;
     this._MORPH = 8;
@@ -94,8 +94,8 @@ var SceneJS_DrawList = new (function() {
         }
     });
 
-    this._DEFAULT_IMAGEBUF_STATE = createState({
-        imageBuf: null
+    this._DEFAULT_FRAMEBUF_STATE = createState({
+        frameBuf: null
     });
 
     this._DEFAULT_LIGHTS_STATE = createState({
@@ -173,7 +173,8 @@ var SceneJS_DrawList = new (function() {
     });
 
     this._DEFAULT_SHADER_STATE = createState({
-        shader : {}
+        shader : {},
+        hash: ""
     });
 
     this._DEFAULT_SHADER_PARAMS_STATE = createState({
@@ -223,7 +224,7 @@ var SceneJS_DrawList = new (function() {
     var viewXFormState;
     var projXFormState;
     var pickColorState;
-    var imageBufState;
+    var frameBufState;
     var clipState;
     var morphState;
     var nameState;
@@ -347,7 +348,7 @@ var SceneJS_DrawList = new (function() {
             colortransState = this._DEFAULT_COLORTRANS_STATE;
             flagsState = this._DEFAULT_FLAGS_STATE;
             layerState = this._DEFAULT_LAYER_STATE;
-            imageBufState = this._DEFAULT_IMAGEBUF_STATE;
+            frameBufState = this._DEFAULT_FRAMEBUF_STATE;
             lightState = this._DEFAULT_LIGHTS_STATE;
             materialState = this._DEFAULT_MATERIAL_STATE;
             morphState = this._DEFAULT_MORPH_STATE;
@@ -519,13 +520,13 @@ var SceneJS_DrawList = new (function() {
         //    this._states.lenEnabledBin = 0;
     };
 
-    this.setImagebuf = function(id, imageBuf) {
+    this.setFrameBuf = function(id, frameBuf) {
         if (arguments.length == 0) {
-            imageBufState = this._DEFAULT_IMAGEBUF_STATE;
+            frameBufState = this._DEFAULT_FRAMEBUF_STATE;
             return;
         }
-        imageBufState = this._getState(this._IMAGEBUF, id);
-        imageBufState.imageBuf = imageBuf;
+        frameBufState = this._getState(this._FRAMEBUF, id);
+        frameBufState.frameBuf = frameBuf;
     };
 
     this.setLights = function(id, lights) {
@@ -692,6 +693,7 @@ var SceneJS_DrawList = new (function() {
     this.setShader = function(id, shader) {
         if (arguments.length == 0) {
             shaderState = this._DEFAULT_SHADER_STATE;
+            this._stateHash = null;
             return;
         }
         shaderState = this._getState(this._SHADER, id);
@@ -804,7 +806,7 @@ var SceneJS_DrawList = new (function() {
         projXFormState._nodeCount++;
         texState._nodeCount++;
         pickColorState._nodeCount++;
-        imageBufState._nodeCount++;
+        frameBufState._nodeCount++;
         clipState._nodeCount++;
         morphState._nodeCount++;
         nameState._nodeCount++;
@@ -834,7 +836,7 @@ var SceneJS_DrawList = new (function() {
             projXFormState:         projXFormState,
             texState:               texState,
             pickColorState :        pickColorState,
-            imageBufState :         imageBufState,
+            frameBufState :         frameBufState,
             clipState :             clipState,
             morphState :            morphState,
             nameState:              nameState,
@@ -896,7 +898,7 @@ var SceneJS_DrawList = new (function() {
             this._releaseState(node.projXFormState);
             this._releaseState(node.texState);
             this._releaseState(node.pickColorState);
-            this._releaseState(node.imageBufState);
+            this._releaseState(node.frameBufState);
             this._releaseState(node.clipState);
             this._releaseState(node.morphState);
             this._releaseState(node.nameState);
@@ -1075,13 +1077,13 @@ var SceneJS_DrawList = new (function() {
             throw "No drawList found for scene '" + params.sceneId + "'";
         }
 
-        var pickResult = null;
+        var hit = null;
 
         var canvasX = params.canvasX;
         var canvasY = params.canvasY;
 
         /*-------------------------------------------------------------
-         *  Normal pick
+         * Pick object using normal GPU colour-indexed pick
          *-----------------------------------------------------------*/
 
         var pickBuf = states.pickBuf;                                                   // Lazy-create pick buffer
@@ -1094,25 +1096,25 @@ var SceneJS_DrawList = new (function() {
 
         pickBuf.bind();                                                                 // Bind pick buffer
 
-        if (states.pickCallListDirty || states.pickBufDirty) {                          // Render pick buffer
+        //  if (states.pickCallListDirty || states.pickBufDirty) {                          // Render pick buffer
 
-            pickBuf.clear();
+        pickBuf.clear();
 
-            nodeRenderer.init({
-                picking: true,
-                callListDirty: states.pickCallListDirty,                                // (Re)create call list if dirty
-                callFuncsDirty: states.pickCallFuncsDirty                               // (Re)generate functions if dirty
-            });
+        nodeRenderer.init({
+            picking: true,
+            callListDirty: states.pickCallListDirty,                                // (Re)create call list if dirty
+            callFuncsDirty: states.pickCallFuncsDirty                               // (Re)generate functions if dirty
+        });
 
-            this._renderDrawList(states, true, params.tagSelector);
+        this._renderDrawList(states, true, params.tagSelector);
 
-            nodeRenderer.cleanup();                                                     // Flush render
+        nodeRenderer.cleanup();                                                     // Flush render
 
-            states.pickCallListDirty = false;                                           // Pick call list up to date
-            states.pickCallFuncsDirty = false;                                          // Pick function cache up to date
+        states.pickCallListDirty = false;                                           // Pick call list up to date
+        states.pickCallFuncsDirty = false;                                          // Pick function cache up to date
 
-            states.pickBufDirty = false;                                                // Pick buffer up to date
-        }
+        states.pickBufDirty = false;                                                // Pick buffer up to date
+        //  }
 
         var pix = pickBuf.read(canvasX, canvasY);                                       // Read pick buffer
         var pickedNodeIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
@@ -1122,83 +1124,137 @@ var SceneJS_DrawList = new (function() {
 
         var pickNameState = nodeRenderer.pickNameStates[pickIndex];                     // Map pixel to name
 
-        /*-------------------------------------------------------------
-         *  Depth pick
-         *-----------------------------------------------------------*/
-
         if (pickNameState) {
 
-            pickResult = {
+            hit = {
                 name: pickNameState.name
             };
-            //
-            //            if (false && params.zPick) {
-            //
-            //                var pickNameStateId = pickNameState._stateId;
-            //
-            //                var zPickBuf = states.zPickBuf;                             // Lazy-create Z-pick buffer
-            //                if (!zPickBuf) {
-            //                    zPickBuf = states.zPickBuf = new SceneJS_PickBuffer({ canvas: states.canvas });
-            //                }
-            //                zPickBuf.bind();
-            //                zPickBuf.clear();
-            //                nodeRenderer.init({ zPick: true });
-            //
-            //                var visibleCacheBin = states.visibleCacheBin;
-            //                var lenVisibleCacheBin = states.lenVisibleCacheBin;
-            //                var node;
-            //                var flags;
-            //
-            //                nodeRenderer.init({ zPick: true });
-            //
-            //                for (var i = 0; i < lenVisibleCacheBin; i++) {
-            //                    node = visibleCacheBin[i];
-            //                    if (node.nameState._stateId == pickNameStateId) {
-            //                        flags = node.flagsState.flags;
-            //                        if (flags.picking === false) {                          // Skip unpickable node
-            //                            continue;
-            //                        }
-            //                        nodeRenderer.renderNode(node);
-            //                    }
-            //                }
-            //
-            //                nodeRenderer.cleanup();
-            //
-            //                var pix = zPickBuf.read(canvasX, canvasY);
-            //                //                var nx = pix[0];
-            //                //                var ny = pix[1];
-            //                var nz = -pix[2];
-            //
-            //                //alert(nz);
-            //                zPickBuf.unbind();
-            //
-            //                var viewMat = node.viewXFormState.mat;
-            //                var projMat = node.projXFormState.mat;
-            //
-            //                var optics = node.projXFormState.optics;
-            //
-            //
-            //                //            var nx = ((2.0 * (canvasX / canvas.width)) - 1.0) / projMat[0];
-            //                //          var ny = ((-2.0 * (canvasY / canvas.height)) + 1.0) / projMat[5];
-            //
-            //                //               var   nx = ((2.0 * (canvasX / canvas.width)) - 1.0) / projMat[0];
-            //                //            var ny = ((-2.0 * (canvasY / canvas.height)) + 1.0) / projMat[5];
-            //
-            //                var nx = -((2.0 * (canvasX / canvas.width)) - 1.0);
-            //                var ny = -((-2.0 * (canvasY / canvas.height)) + 1.0);
-            //
-            //
-            //                //  nz = optics.near + ((nz / 256.0) * (optics.far - optics.near));               // Denormalize
-            //                nz = 1.0;
-            //
-            //                var inViewMat = SceneJS_math_inverseMat4(viewMat, SceneJS_math_mat4());
-            //
-            //                pickResult.worldPos = SceneJS_math_transformPoint3(inViewMat, [nx, ny, nz]);
-            //            }
+
+            /*-------------------------------------------------------------
+             * Ray pick to find 3D pick position
+             *-----------------------------------------------------------*/
+
+            if (params.rayPick) {
+
+                var rayPickBuf = states.rayPickBuf;             // Lazy-create Z-pick buffer
+                if (!rayPickBuf) {
+                    rayPickBuf = states.rayPickBuf = new SceneJS_PickBuffer({ canvas: states.canvas });
+                }
+
+                rayPickBuf.bind();
+                rayPickBuf.clear();
+
+                nodeRenderer.init({                             // Initialise renderer
+                    pick:           false,
+                    rayPick:          true,
+                    callListDirty:  false,                      // Pick calls clean from pick pass
+                    callFuncsDirty: false                       // Call funcs clean from pick pass
+                });
+
+                var visibleCacheBin = states.visibleCacheBin;   // Render visible object cache
+                var lenVisibleCacheBin = states.lenVisibleCacheBin;
+                var node;
+                var flags;
+
+                for (var i = 0; i < lenVisibleCacheBin; i++) {  // Need to render all nodes for pick
+                    node = visibleCacheBin[i];                  // due to frameBuf effects etc.
+                    flags = node.flagsState.flags;
+                    if (flags.picking === false) {
+                        continue;
+                    }
+                    nodeRenderer.renderNode(node);
+                }
+
+                nodeRenderer.cleanup();
+
+                pix = rayPickBuf.read(canvasX, canvasY);
+
+                rayPickBuf.unbind();
+
+                var worldPickZ = (this._unpackDepth(pix) - 0.5) / 0.001;
+
+                //----------------------------------------------------------------------------------------------------
+
+                var w = canvas.width;
+                var h = canvas.height;
+
+                var x = (canvasX - w / 2) / (w / 2) ;           // Calculate clip space coordinates
+                var y = -(canvasY - h / 2) / (h / 2) ;
+
+                var viewMat = node.viewXFormState.mat;
+                var projMat = node.projXFormState.mat;
+
+                var pvMat = SceneJS_math_mulMat4(projMat, viewMat, []);
+                var pvMatInverse = SceneJS_math_inverseMat4(pvMat, []);
+
+                var world1 = SceneJS_math_transformVector4(pvMatInverse, [x,y,-1,1]);
+                world1 = SceneJS_math_mulVec4Scalar(world1, 1 / world1[3]);
+
+                var world2 = SceneJS_math_transformVector4(pvMatInverse, [x,y,0,1]);
+                world2 = SceneJS_math_mulVec4Scalar(world2, 1 / world2[3]);
+
+                var dir = SceneJS_math_normalizeVec3(SceneJS_math_subVec3(world2, world1, []), []);
+
+                var eye = node.viewXFormState.lookAt.eye;
+
+              //  var vecScale = (worldPickZ - eye[2]) / dir[2];
+
+                //var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec3Scalar(dir, vecScale, []), []);
+
+                // Output depth as distance to camera then: eye + worldPickZ * vRay
+
+                var vWorld = SceneJS_math_addVec4(eye, SceneJS_math_mulVec4Scalar(dir, worldPickZ, []), []);
+
+                hit.canvasPos = [canvasX, canvasY];
+                hit.worldPos = vWorld;
+
+                //----------------------------------------------------------------------------------------------------
+
+//                var w = canvas.width;
+//                var h = canvas.height;
+//
+//                var x = (canvasX - w / 2) / (w / 2) ;           // Calculate clip space coordinates
+//                var y = -(canvasY - h / 2) / (h / 2) ;
+//
+//                var viewMat = node.viewXFormState.mat;
+//                var projMat = node.projXFormState.mat;
+//
+//                var pvMat = SceneJS_math_mulMat4(projMat, viewMat, []);
+//                var pvMatInverse = SceneJS_math_inverseMat4(pvMat, []);
+//
+//                var world1 = SceneJS_math_transformVector4(pvMatInverse, [x,y,-1,1]);
+//                world1 = SceneJS_math_mulVec4Scalar(world1, 1 / world1[3]);
+//
+//                var world2 = SceneJS_math_transformVector4(pvMatInverse, [x,y,0,1]);
+//                world2 = SceneJS_math_mulVec4Scalar(world2, 1 / world2[3]);
+//
+//                var dir = SceneJS_math_normalizeVec3(SceneJS_math_subVec3(world2, world1, []), []);
+//
+//                var eye = node.viewXFormState.lookAt.eye;
+//
+//                var vecScale = (worldPickZ - eye[2]) / dir[2];
+//
+//                var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec3Scalar(dir, vecScale, []), []);
+//
+//                // Output depth as distance to camera then:
+//                // vWorld = vEye + fDepth * vRay
+//
+//                hit.canvasPos = [canvasX, canvasY];
+//                hit.worldPos = vWorld;
+                //   hit.worldPos[2] = worldPickZ;
+            }
         }
 
-        return pickResult;
+        return hit;
     };
+
+
+    this._unpackDepth = function(rgba_depth) {
+        var vec = [rgba_depth[0] / 256.0, rgba_depth[1] / 256.0, rgba_depth[2] / 256.0, rgba_depth[3] / 256.0];
+        var bit_shift = [1.0 / (256.0 * 256.0 * 256.0), 1.0 / (256.0 * 256.0), 1.0 / 256.0, 1.0];
+        return SceneJS_math_dotVector4(vec, bit_shift);
+    };
+
 
     this._renderDrawList = function(states, picking, tagSelector) {
 
@@ -1335,6 +1391,45 @@ var SceneJS_DrawList = new (function() {
         }
     };
 
+    //    this._unproject = function(winx, winy, winz, ) {
+    //        // winz is either 0 (near plane), 1 (far plane) or somewhere in between.
+    //        // if it's not given a value we'll produce coords for both.
+    //        if (typeof(winz) == "number") {
+    //            winx = parseFloat(winx);
+    //            winy = parseFloat(winy);
+    //            winz = parseFloat(winz);
+    //
+    //            var inf = [];
+    //            var mm = this.getTransformationMatrix();
+    //            var pm = this.matrices.p;
+    //            var viewport = [0, 0, pm.width, pm.height];
+    //
+    //            //Calculation for inverting a matrix, compute projection x modelview; then compute the inverse
+    //            var m = mat4.set(mm, mat4.create());
+    //
+    //            mat4.inverse(m, m); // WHY do I have to do this? --see Jax.Context#reloadMatrices
+    //            mat4.multiply(pm, m, m);
+    //            mat4.inverse(m, m);
+    //
+    //            // Transformation of normalized coordinates between -1 and 1
+    //            inf[0] = (winx - viewport[0]) / viewport[2] * 2.0 - 1.0;
+    //            inf[1] = (winy - viewport[1]) / viewport[3] * 2.0 - 1.0;
+    //            inf[2] = 2.0 * winz - 1.0;
+    //            inf[3] = 1.0;
+    //
+    //            //Objects coordinates
+    //            var out = vec3.create();
+    //            mat4.multiplyVec4(m, inf, out);
+    //            if (out[3] == 0.0)
+    //                return null;
+    //
+    //            out[3] = 1.0 / out[3];
+    //            return [out[0] * out[3], out[1] * out[3], out[2] * out[3]];
+    //        }
+    //        else
+    //            return [this.unproject(winx, winy, 0), this.unproject(winx, winy, 1)];
+    //    },
+
 
     //    ayPick.prototype.execute = function(params, completed) {
     //        var inViewMat, nx, ny, projMat, rayDirection, rayOrigin, viewMat;
@@ -1389,7 +1484,9 @@ var SceneJS_DrawList = new (function() {
 
                 render: this._createShader(this._composeRenderingVertexShader(), this._composeRenderingFragmentShader()),
                 pick: this._createShader(this._composePickingVertexShader(), this._composePickingFragmentShader()),
-                //                zPick: this._createShader(this._zPickVertexShader(), this._zPickFragmentShader()),
+
+                //                rayPick: this._createShader(this._rayPickVertexShader(), this._rayPickFragmentShader()),
+
                 stateHash: stateHash,
                 refCount: 0
             };
@@ -1470,13 +1567,16 @@ var SceneJS_DrawList = new (function() {
             "uniform mat4 SCENEJS_uVMatrix;",
             "uniform mat4 SCENEJS_uPMatrix;"];
 
-        if (clipping || fragmentHooks.worldPosClip) {
-            src.push("varying vec4 SCENEJS_vWorldVertex;");
-        }
+        src.push("varying vec4 SCENEJS_vModelVertex;");
 
-        if (fragmentHooks.viewPosClip) {
-            src.push("varying vec4 SCENEJS_vViewVertex;\n");
-        }
+        // if (clipping || fragmentHooks.worldPosClip) {
+        src.push("varying vec4 SCENEJS_vWorldVertex;");
+        // }
+
+
+        src.push("varying vec4 SCENEJS_vViewVertex;\n");
+
+        src.push("varying vec4 SCENEJS_vProjVertex;\n");
 
         if (customVertexShader.code) {
             src.push("\n" + customVertexShader.code + "\n");
@@ -1491,6 +1591,8 @@ var SceneJS_DrawList = new (function() {
 
         src.push("void main(void) {");
         src.push("   vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
+
+        src.push("  SCENEJS_vModelVertex = tmpVertex; ");
 
         if (vertexHooks.modelPos) {
             src.push("tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
@@ -1508,15 +1610,16 @@ var SceneJS_DrawList = new (function() {
             }
         }
 
+
         src.push("  tmpVertex = SCENEJS_uMMatrix * tmpVertex; ");
 
         if (vertexHooks.worldPos) {
             src.push("tmpVertex=" + vertexHooks.worldPos + "(tmpVertex);");
         }
 
-        if (clipping || fragmentHooks.worldPosClip) {
-            src.push("  SCENEJS_vWorldVertex = tmpVertex; ");
-        }
+        // if (clipping || fragmentHooks.worldPosClip) {
+        src.push("  SCENEJS_vWorldVertex = tmpVertex; ");
+        //    }
 
         src.push("  tmpVertex = SCENEJS_uVMatrix * tmpVertex; ");
 
@@ -1524,11 +1627,11 @@ var SceneJS_DrawList = new (function() {
             src.push("tmpVertex=" + vertexHooks.viewPos + "(tmpVertex);");
         }
 
-        if (fragmentHooks.viewPosClip) {
-            src.push("  SCENEJS_vViewVertex = tmpVertex;");
-        }
+        src.push("  SCENEJS_vViewVertex = tmpVertex;");
 
-        src.push("  gl_Position = SCENEJS_uPMatrix * tmpVertex;");
+        src.push("  SCENEJS_vProjVertex = SCENEJS_uPMatrix * tmpVertex;");
+
+        src.push("  gl_Position = SCENEJS_vProjVertex;");
         src.push("}");
 
         if (debugCfg.logScripts == true) {
@@ -1554,15 +1657,29 @@ var SceneJS_DrawList = new (function() {
             "   precision highp float;",
             "#endif"];
 
+        src.push("vec4 packDepth(const in float depth) {");
+        src.push("  const vec4 bit_shift = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);");
+        src.push("  const vec4 bit_mask  = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);");
+        src.push("  vec4 res = fract(depth * bit_shift);");
+        src.push("  res -= res.xxyz * bit_mask;");
+        src.push("  return res;");
+        src.push("}");
+
         if (clipping || fragmentHooks.worldPosClip) {
             src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
         }
 
-        if (fragmentHooks.viewPosClip) {
-            src.push("varying vec4 SCENEJS_vViewVertex;");              // View-space vertex
-        }
+        src.push("varying vec4 SCENEJS_vModelVertex;");
+        src.push("varying vec4 SCENEJS_vWorldVertex;");
+        src.push("varying vec4 SCENEJS_vViewVertex;");                  // View-space vertex
+        src.push("varying vec4 SCENEJS_vProjVertex;");
 
-        src.push("uniform vec3 SCENEJS_uPickColor;");
+        src.push("uniform bool SCENEJS_uRayPickMode;");                   // Z-pick mode when true else colour-pick
+
+        src.push("uniform vec3 SCENEJS_uPickColor;");                   // Used in colour-pick mode
+
+        src.push("uniform float SCENEJS_uZNear;");                      // Used in Z-pick mode
+        src.push("uniform float SCENEJS_uZFar;");                       // Used in Z-pick mode
 
         /*-----------------------------------------------------------------------------------
          * Variables - Clipping
@@ -1607,7 +1724,21 @@ var SceneJS_DrawList = new (function() {
                 src.push("    }");
             }
         }
-        src.push("    gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
+        src.push("    if (SCENEJS_uRayPickMode) {");
+        
+        //src.push("          float zNormalizedDepth = (SCENEJS_uZNear - SCENEJS_vViewVertex.z) / abs(SCENEJS_uZFar - SCENEJS_uZNear);");
+        //src.push("          gl_FragColor = packDepth(clamp((zNormalizedDepth * 0.001), -0.5, 0.5) + 0.5); ");
+
+        // World Z depth
+        src.push("          gl_FragColor = packDepth(clamp((SCENEJS_vWorldVertex.z * 0.001), -0.5, 0.5) + 0.5); ");
+
+
+//        src.push("          gl_FragColor = packDepth(gl_FragCoord.z); ");
+
+
+        src.push("    } else {");
+        src.push("          gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
+        src.push("    }");
         src.push("}");
         // }
 
@@ -1618,188 +1749,188 @@ var SceneJS_DrawList = new (function() {
     };
 
 
-    /*===================================================================================================================
-     *
-     * Z-intersect shaders
-     *
-     *==================================================================================================================*/
-
-    this._zPickVertexShader = function() {
-
-        var customShaders = shaderState.shader.shaders || {};
-
-        var customVertexShader = customShaders.vertex || {};
-        var vertexHooks = customVertexShader.hooks || {};
-
-        var customFragmentShader = customShaders.fragment || {};
-        var fragmentHooks = customFragmentShader.hooks || {};
-
-        var clipping = clipState.clips.length > 0;
-        var morphing = morphState.morph && true;
-
-        var src = [
-            "#ifdef GL_ES",
-            "   precision highp float;",
-            "#endif",
-            "attribute vec3 SCENEJS_aVertex;",
-            "uniform mat4 SCENEJS_uMMatrix;",
-            "uniform mat4 SCENEJS_uVMatrix;",
-            "uniform mat4 SCENEJS_uPMatrix;"];
-
-        if (clipping || fragmentHooks.worldPosClip) {
-            src.push("varying vec4 SCENEJS_vWorldVertex;");
-        }
-
-        //  if (fragmentHooks.viewPosClip) {
-        src.push("varying vec4 SCENEJS_vViewVertex;\n");
-        //   }
-
-        src.push("varying vec4 SCENEJS_vProjVertex;\n");
-
-        if (customVertexShader.code) {
-            src.push("\n" + customVertexShader.code + "\n");
-        }
-
-        if (morphing) {
-            src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
-            if (morphState.morph.targets[0].vertexBuf) {      // target2 has these arrays also
-                src.push("attribute vec3 SCENEJS_aMorphVertex;");
-            }
-        }
-
-        src.push("void main(void) {");
-        src.push("   vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
-
-        if (vertexHooks.modelPos) {
-            src.push("tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
-        }
-
-        if (morphing) {
-            if (morphState.morph.targets[0].vertexBuf) {
-                src.push("  vec4 vMorphVertex = vec4(SCENEJS_aMorphVertex, 1.0); ");
-
-                if (vertexHooks.modelPos) {
-                    src.push("vMorphVertex=" + vertexHooks.modelPos + "(vMorphVertex);");
-                }
-
-                src.push("  tmpVertex = vec4(mix(tmpVertex.xyz, vMorphVertex.xyz, SCENEJS_uMorphFactor), 1.0); ");
-            }
-        }
-
-        src.push("  tmpVertex = SCENEJS_uMMatrix * tmpVertex; ");
-
-        if (vertexHooks.worldPos) {
-            src.push("tmpVertex=" + vertexHooks.worldPos + "(tmpVertex);");
-        }
-
-        if (clipping || fragmentHooks.worldPosClip) {
-            src.push("  SCENEJS_vWorldVertex = tmpVertex; ");
-        }
-
-        src.push("  tmpVertex = SCENEJS_uVMatrix * tmpVertex; ");
-
-        if (vertexHooks.viewPos) {
-            src.push("tmpVertex=" + vertexHooks.viewPos + "(tmpVertex);");
-        }
-
-        //if (fragmentHooks.viewPosClip) {
-        src.push("  SCENEJS_vViewVertex = tmpVertex;");
-        //  }
-
-        src.push("  SCENEJS_vProjVertex = SCENEJS_uPMatrix * tmpVertex;");
-
-        src.push("  gl_Position = SCENEJS_vProjVertex;");
-        src.push("}");
-
-        if (debugCfg.logScripts == true) {
-            SceneJS_loggingModule.info(src);
-        }
-        return src;
-    };
-
-    this._zPickFragmentShader = function() {
-
-        var customShaders = shaderState.shader.shaders || {};
-        var customFragmentShader = customShaders.fragment || {};
-        var fragmentHooks = customFragmentShader.hooks || {};
-
-        var clipping = clipState && clipState.clips.length > 0;
-
-        var src = [
-            "#ifdef GL_ES",
-            "   precision highp float;",
-            "#endif"];
-
-        if (clipping || fragmentHooks.worldPosClip) {
-            src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
-        }
-
-        //  if (fragmentHooks.viewPosClip) {
-        src.push("varying vec4 SCENEJS_vViewVertex;");              // View-space vertex
-        //}
-
-        src.push("varying vec4 SCENEJS_vProjVertex;\n");
-
-        src.push("uniform float SCENEJS_uZNear;");
-        src.push("uniform float SCENEJS_uZFar;");
-
-        /*-----------------------------------------------------------------------------------
-         * Variables - Clipping
-         *----------------------------------------------------------------------------------*/
-
-        if (clipping) {
-            for (var i = 0; i < clipState.clips.length; i++) {
-                src.push("uniform float SCENEJS_uClipMode" + i + ";");
-                src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
-            }
-        }
-
-        /*-----------------------------------------------------------------------------------
-         * Custom GLSL
-         *----------------------------------------------------------------------------------*/
-
-        if (customFragmentShader.code) {
-            src.push("\n" + customFragmentShader.code + "\n");
-        }
-
-        src.push("void main(void) {");
-
-        if (fragmentHooks.worldPos) {
-            src.push("if (" + fragmentHooks.worldPosClip + "(SCENEJS_vWorldVertex) == false) { discard; };");
-        }
-        if (fragmentHooks.viewPos) {
-            src.push("if (!" + fragmentHooks.viewPosClip + "(SCENEJS_vViewVertex) == false) { discard; };");
-        }
-
-        if (clipping) {
-            src.push("  float   dist;");
-            for (var i = 0; i < clipState.clips.length; i++) {
-                src.push("    if (SCENEJS_uClipMode" + i + " != 0.0) {");
-                src.push("        dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w;");
-                src.push("        if (SCENEJS_uClipMode" + i + " == 1.0) {");
-                src.push("            if (dist < 0.0) { discard; }");
-                src.push("        }");
-                src.push("        if (SCENEJS_uClipMode" + i + " == 2.0) {");
-                src.push("            if (dist > 0.0) { discard; }");
-                src.push("        }");
-                src.push("    }");
-            }
-        }
-        src.push("  float zNormalizedDepth = (SCENEJS_uZNear - SCENEJS_vViewVertex.z) / abs(SCENEJS_uZFar - SCENEJS_uZNear);");
-        //src.push("  gl_FragColor = vec4(zNormalizedDepth, zNormalizedDepth, zNormalizedDepth, 1.0); ");
-
-        src.push("  gl_FragColor=vec4(" +
-                 "                  clamp(((pow(2,8)  * zNormalizedDepth) / 255.0,");
-        src.push("                  clamp(((pow(2,16) * zNormalizedDepth) / 255.0,");
-        src.push("                  clamp(((pow(2,24) * zNormalizedDepth) / 255.0, 1.0);");
-
-        src.push("}");
-
-        if (debugCfg.logScripts == true) {
-            SceneJS_loggingModule.info(src);
-        }
-        return src;
-    };
+    //    /*===================================================================================================================
+    //     *
+    //     * Z-intersect shaders
+    //     *
+    //     *==================================================================================================================*/
+    //
+    //    this._rayPickVertexShader = function() {
+    //
+    //        var customShaders = shaderState.shader.shaders || {};
+    //
+    //        var customVertexShader = customShaders.vertex || {};
+    //        var vertexHooks = customVertexShader.hooks || {};
+    //
+    //        var customFragmentShader = customShaders.fragment || {};
+    //        var fragmentHooks = customFragmentShader.hooks || {};
+    //
+    //        var clipping = clipState.clips.length > 0;
+    //        var morphing = morphState.morph && true;
+    //
+    //        var src = [
+    //            "#ifdef GL_ES",
+    //            "   precision highp float;",
+    //            "#endif",
+    //            "attribute vec3 SCENEJS_aVertex;",
+    //            "uniform mat4 SCENEJS_uMMatrix;",
+    //            "uniform mat4 SCENEJS_uVMatrix;",
+    //            "uniform mat4 SCENEJS_uPMatrix;"];
+    //
+    //        if (clipping || fragmentHooks.worldPosClip) {
+    //            src.push("varying vec4 SCENEJS_vWorldVertex;");
+    //        }
+    //
+    //        //  if (fragmentHooks.viewPosClip) {
+    //        src.push("varying vec4 SCENEJS_vViewVertex;\n");
+    //        //   }
+    //
+    //        src.push("varying vec4 SCENEJS_vProjVertex;\n");
+    //
+    //        if (customVertexShader.code) {
+    //            src.push("\n" + customVertexShader.code + "\n");
+    //        }
+    //
+    //        if (morphing) {
+    //            src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
+    //            if (morphState.morph.targets[0].vertexBuf) {      // target2 has these arrays also
+    //                src.push("attribute vec3 SCENEJS_aMorphVertex;");
+    //            }
+    //        }
+    //
+    //        src.push("void main(void) {");
+    //        src.push("   vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
+    //
+    //        if (vertexHooks.modelPos) {
+    //            src.push("tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
+    //        }
+    //
+    //        if (morphing) {
+    //            if (morphState.morph.targets[0].vertexBuf) {
+    //                src.push("  vec4 vMorphVertex = vec4(SCENEJS_aMorphVertex, 1.0); ");
+    //
+    //                if (vertexHooks.modelPos) {
+    //                    src.push("vMorphVertex=" + vertexHooks.modelPos + "(vMorphVertex);");
+    //                }
+    //
+    //                src.push("  tmpVertex = vec4(mix(tmpVertex.xyz, vMorphVertex.xyz, SCENEJS_uMorphFactor), 1.0); ");
+    //            }
+    //        }
+    //
+    //        src.push("  tmpVertex = SCENEJS_uMMatrix * tmpVertex; ");
+    //
+    //        if (vertexHooks.worldPos) {
+    //            src.push("tmpVertex=" + vertexHooks.worldPos + "(tmpVertex);");
+    //        }
+    //
+    //        if (clipping || fragmentHooks.worldPosClip) {
+    //            src.push("  SCENEJS_vWorldVertex = tmpVertex; ");
+    //        }
+    //
+    //        src.push("  tmpVertex = SCENEJS_uVMatrix * tmpVertex; ");
+    //
+    //        if (vertexHooks.viewPos) {
+    //            src.push("tmpVertex=" + vertexHooks.viewPos + "(tmpVertex);");
+    //        }
+    //
+    //        //if (fragmentHooks.viewPosClip) {
+    //        src.push("  SCENEJS_vViewVertex = tmpVertex;");
+    //        //  }
+    //
+    //        src.push("  gl_Position = SCENEJS_uPMatrix * tmpVertex;");
+    //        src.push("}");
+    //
+    //        if (debugCfg.logScripts == true) {
+    //            SceneJS_loggingModule.info(src);
+    //        }
+    //        return src;
+    //    };
+    //
+    //    this._rayPickFragmentShader = function() {
+    //
+    //        var customShaders = shaderState.shader.shaders || {};
+    //        var customFragmentShader = customShaders.fragment || {};
+    //        var fragmentHooks = customFragmentShader.hooks || {};
+    //
+    //        var clipping = clipState && clipState.clips.length > 0;
+    //
+    //        var src = [
+    //            "#ifdef GL_ES",
+    //            "   precision highp float;",
+    //            "#endif"];
+    //
+    //        if (clipping || fragmentHooks.worldPosClip) {
+    //            src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
+    //        }
+    //
+    //        //  if (fragmentHooks.viewPosClip) {
+    //        src.push("varying vec4 SCENEJS_vViewVertex;");              // View-space vertex
+    //        //}
+    //
+    //        src.push("uniform float SCENEJS_uZNear;");
+    //        src.push("uniform float SCENEJS_uZFar;");
+    //
+    //        /*-----------------------------------------------------------------------------------
+    //         * Variables - Clipping
+    //         *----------------------------------------------------------------------------------*/
+    //
+    //        if (clipping) {
+    //            for (var i = 0; i < clipState.clips.length; i++) {
+    //                src.push("uniform float SCENEJS_uClipMode" + i + ";");
+    //                src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
+    //            }
+    //        }
+    //
+    //        /*-----------------------------------------------------------------------------------
+    //         * Custom GLSL
+    //         *----------------------------------------------------------------------------------*/
+    //
+    //        if (customFragmentShader.code) {
+    //            src.push("\n" + customFragmentShader.code + "\n");
+    //        }
+    //
+    //        src.push("void main(void) {");
+    //
+    //        if (fragmentHooks.worldPos) {
+    //            src.push("if (" + fragmentHooks.worldPosClip + "(SCENEJS_vWorldVertex) == false) { discard; };");
+    //        }
+    //        if (fragmentHooks.viewPos) {
+    //            src.push("if (!" + fragmentHooks.viewPosClip + "(SCENEJS_vViewVertex) == false) { discard; };");
+    //        }
+    //
+    //        if (clipping) {
+    //            src.push("  float   dist;");
+    //            for (var i = 0; i < clipState.clips.length; i++) {
+    //                src.push("    if (SCENEJS_uClipMode" + i + " != 0.0) {");
+    //                src.push("        dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w;");
+    //                src.push("        if (SCENEJS_uClipMode" + i + " == 1.0) {");
+    //                src.push("            if (dist < 0.0) { discard; }");
+    //                src.push("        }");
+    //                src.push("        if (SCENEJS_uClipMode" + i + " == 2.0) {");
+    //                src.push("            if (dist > 0.0) { discard; }");
+    //                src.push("        }");
+    //                src.push("    }");
+    //            }
+    //        }
+    //        src.push("  float zNormalizedDepth = (SCENEJS_uZNear - SCENEJS_vViewVertex.z) / abs(SCENEJS_uZFar - SCENEJS_uZNear);");
+    //        //src.push("  gl_FragColor = vec4(zNormalizedDepth, zNormalizedDepth, zNormalizedDepth, 1.0); ");
+    //
+    //        src.push("  gl_FragColor= vec4(0.5, 0.0, 0.0, 0.0);");
+    //
+    //        //src.push("  gl_FragColor= vec4(zNormalizedDepth, 0.0,0.0,0.0);");
+    //        //        src.push("  gl_FragColor=vec4(" +
+    //        //                 "                  clamp(((pow(2,8)  * zNormalizedDepth) / 255.0,");
+    //        //        src.push("                  clamp(((pow(2,16) * zNormalizedDepth) / 255.0,");
+    //        //        src.push("                  clamp(((pow(2,24) * zNormalizedDepth) / 255.0,");
+    //        //        src.push("                  clamp(((pow(2,32) * zNormalizedDepth) / 255.0)");
+    //
+    //        src.push("}");
+    //
+    //        if (debugCfg.logScripts == true) {
+    //            SceneJS_loggingModule.info(src);
+    //        }
+    //        return src;
+    //    };
 
 
     /*===================================================================================================================
@@ -1984,7 +2115,12 @@ var SceneJS_DrawList = new (function() {
             src.push("worldVertex=" + vertexHooks.worldPos + "(worldVertex);");
         }
 
-        src.push("  vec4 viewVertex  = SCENEJS_uVMatrix * worldVertex; ");
+        if (vertexHooks.viewMatrix) {
+            src.push("vec4 viewVertex = " + vertexHooks.viewMatrix + "(SCENEJS_uVMatrix) * worldVertex;");
+        } else {
+            src.push("vec4 viewVertex  = SCENEJS_uVMatrix * worldVertex; ");
+        }
+
 
         if (vertexHooks.viewPos) {
             src.push("viewVertex=" + vertexHooks.viewPos + "(viewVertex);");    // Vertex hook function
@@ -2004,7 +2140,11 @@ var SceneJS_DrawList = new (function() {
             src.push("  SCENEJS_vViewVertex = viewVertex;");                    // Varying for fragment hooks
         }
 
-        src.push("  gl_Position = SCENEJS_uPMatrix * viewVertex;");
+        if (vertexHooks.projMatrix) {
+            src.push("gl_Position = " + vertexHooks.projMatrix + "(SCENEJS_uPMatrix) * viewVertex;");
+        } else {
+            src.push("  gl_Position = SCENEJS_uPMatrix * viewVertex;");
+        }
 
         /*-----------------------------------------------------------------------------------
          * Logic - normals
@@ -2145,7 +2285,7 @@ var SceneJS_DrawList = new (function() {
         src.push("  vec3    ambientValue=SCENEJS_uAmbient;");
         src.push("  float   emit    = SCENEJS_uMaterialEmit;");
 
-        src.push("varying vec3 SCENEJS_vEyeVec;");                  // Direction of view-space vertex from eye
+        src.push("varying vec3 SCENEJS_vEyeVec;");                          // Direction of view-space vertex from eye
 
         if (normals) {
 

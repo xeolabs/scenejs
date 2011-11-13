@@ -8,6 +8,8 @@ var SceneJS_DrawListRenderer = function(cfg) {
 
     this.pickNameStates = [];
 
+    this._callCtx = {};                                   // State retained within a single iteration of the call list
+
     /** Facade to support node state queries while node rendering
      */
 
@@ -101,21 +103,26 @@ var SceneJS_DrawListRenderer = function(cfg) {
     this.init = function(params) {
         params = params || {};
         this._picking = params.picking;
-        this._zPicking = params.zPick;
+        this._rayPicking = params.rayPick;
 
         this._callListDirty = params.callListDirty;
         this._callFuncsDirty = params.callFuncsDirty;
 
         this._program = null;
-        this._lastImagebuf = null;
+        this._lastFramebuf = null;
         this._lastFlagsState = null;
         this._lastRendererState = null;
         this._lastRenderListenersState = null;
 
         this._pickIndex = 0;
 
-        this._callCtx = {                                   // State retained within a single iteration of the call list
-        };
+        /* Initialialise call context
+         */
+        this._callCtx.picking = this._picking;
+        this._callCtx.rayPicking = this._rayPicking;
+        this._callCtx.lastFrameBuf = null;
+        this._callCtx.lastRendererProps = null;
+        this._callCtx.lastFlagsState = null;
 
         this.stateSortProfile = {
             numTextures: 0,
@@ -140,7 +147,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
      */
     this.renderNode = function(node) {
 
-        if (this._picking) {                                        // Picking mode
+        if (this._picking || this._rayPicking) {                      // Picking mode - same calls for pick and Z-pick
 
             if (!(this._callListDirty || this._callFuncsDirty)) {   // Call list and function cache still good
                 var pickList = node.__pickCallList;                 // Execute call list and return
@@ -166,6 +173,8 @@ var SceneJS_DrawListRenderer = function(cfg) {
 
         } else {                                                    // Drawing mode
 
+            this._queryFacade._setNode(node);                       // Activate query facade for render listeners
+
             if (!(this._callListDirty || this._callFuncsDirty)) {   // Call list and function cache still good
                 var drawList = node.__drawCallList;                 // Execute pick call list and return
                 for (var i = 0, len = node.__drawCallListLen; i < len; i++) {
@@ -184,13 +193,11 @@ var SceneJS_DrawListRenderer = function(cfg) {
             if (this._callFuncsDirty) {                             // (Re)building function cache
                 node._drawCallFuncs = {};
             }
-
-            this._queryFacade._setNode(node);                       // Activate query facade for render listeners
         }
 
         this._node = node;
 
-        this._callFuncs = this._picking
+        this._callFuncs = this._picking                             // Draw list is built once for colour pick and z-pick
                 ? node._pickCallFuncs                               // Activate cache of WebGL call functions for pick or draw
                 : node._drawCallFuncs;
 
@@ -209,9 +216,6 @@ var SceneJS_DrawListRenderer = function(cfg) {
             if (this._picking) {
                 this._program = node.program.pick;
 
-            } else if (this._zPicking) {
-                this._program = node.program.zPick;
-
             } else {
                 this._program = node.program.render;
             }
@@ -229,12 +233,31 @@ var SceneJS_DrawListRenderer = function(cfg) {
                 this.createCall(
                         this._callFuncs["pickShader"]
                                 || (this._callFuncs["pickShader"] =
+
                                     (function() {
 
                                         var program = node.program.pick;
 
+                                        var context = self._context;
+
+                                        var callCtx = self._callCtx;
+
+                                        var rayPickModeLocation;
+
                                         return function() {
+
+                                            if (callCtx.program) {
+                                                callCtx.program.unbind();
+                                            }
+
                                             program.bind();
+
+                                            if (!rayPickModeLocation) {
+                                                rayPickModeLocation = program.getUniformLocation("SCENEJS_uRayPickMode");
+                                            }
+                                            context.uniform1i(rayPickModeLocation, !!callCtx.rayPicking);
+
+                                            callCtx.program = program;
                                         };
                                     })()));
             } else {
@@ -246,8 +269,17 @@ var SceneJS_DrawListRenderer = function(cfg) {
 
                                         var program = node.program.render;
 
+                                        var callCtx = self._callCtx;
+
                                         return function() {
+
+                                            if (callCtx.program) {
+                                                callCtx.program.unbind();
+                                            }
+
                                             program.bind();
+
+                                            callCtx.program = program;
                                         };
                                     })()));
             }
@@ -269,7 +301,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
             this._lastModelXFormStateId = -1;
             this._lastProjXFormStateId = -1;
             this._lastPickStateId = -1;
-            this._lastImagebufStateId = -1;
+            this._lastFramebufStateId = -1;
             this._lastRenderListenersStateId = -1;
 
             /*----------------------------------------------------------------------------------------------------------
@@ -369,35 +401,35 @@ var SceneJS_DrawListRenderer = function(cfg) {
         }
 
         /*----------------------------------------------------------------------------------------------------------
-         * imageBuf - maybe unbind old and maybe bind new
+         * frameBuf - maybe unbind old and maybe bind new
          *--------------------------------------------------------------------------------------------------------*/
 
-        if ((!this._lastImageBuf) || this._lastImagebufStateId != node.imageBufState._stateId) {
+        if ((!this._lastFrameBuf) || this._lastFramebufStateId != node.frameBufState._stateId) {
 
             this.createCall(
-                    this._callFuncs["imageBuf"]
-                            || (this._callFuncs["imageBuf"] =
+                    this._callFuncs["frameBuf"]
+                            || (this._callFuncs["frameBuf"] =
                                 (function() {
 
                                     var context = self._context;
 
                                     var callCtx = self._callCtx;
 
-                                    var imageBuf = node.imageBufState.imageBuf;
+                                    var frameBuf = node.frameBufState.frameBuf;
 
                                     return function() {
-                                        if (callCtx._lastImageBuf) {
-                                            context.finish(); // Force imageBuf to complete
-                                            callCtx._lastImageBuf.unbind();
+                                        if (callCtx.lastFrameBuf) {
+                                            context.finish(); // Force frameBuf to complete
+                                            callCtx.lastFrameBuf.unbind();
                                         }
-                                        if (imageBuf) {
-                                            imageBuf.bind();
+                                        if (frameBuf) {
+                                            frameBuf.bind();
                                         }
-                                        callCtx._lastImageBuf = imageBuf;  // Must flush on cleanup
+                                        callCtx.lastFrameBuf = frameBuf;  // Must flush on cleanup
                                     };
                                 })()));
 
-            this._lastImagebufStateId = node.imageBufState._stateId;
+            this._lastFramebufStateId = node.frameBufState._stateId;
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -525,18 +557,19 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                                 morphNormalAttr.bindFloatArrayBuffer(target2.normalBuf);
                                                 morphNormalBufBound = true;
 
-                                            } else if (normalAttr) {
+                                            } else if (normalAttr && target1.normalBuf) {
                                                 normalAttr.bindFloatArrayBuffer(target1.normalBuf);
                                                 morphNormalBufBound = true;
                                             }
 
-                                            if (morphUVAttr) {
+                                            if (morphUVAttr && target1.uvBuf) {
                                                 program.bindFloatArrayBuffer(target1.uvBuf);
                                                 program.bindFloatArrayBuffer(target2.uvBuf);
                                                 morphUVBufBound = true;
                                             }
-
-                                            context.uniform1f(uMorphFactor, morph.factor); // Bind LERP factor
+                                            if (uMorphFactor) {
+                                                context.uniform1f(uMorphFactor, morph.factor); // Bind LERP factor
+                                            }
                                         };
                                     })()));
 
@@ -648,13 +681,13 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                     var rendererState = node.rendererState;
 
                                     return function() {
-                                        if (callCtx._lastRendererProps) {
-                                            callCtx._lastRendererProps.restoreProps(context);
+                                        if (callCtx.lastRendererProps) {
+                                            callCtx.lastRendererProps.restoreProps(context);
                                         }
                                         if (rendererState.props) {
                                             rendererState.props.setProps(context);
                                         }
-                                        callCtx._lastRendererProps = rendererState.props;
+                                        callCtx.lastRendererProps = rendererState.props;
                                     };
                                 })()));
 
@@ -778,9 +811,12 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                     var program = self._program;
                                     var context = self._context;
 
+                                    var callCtx = self._callCtx;
+
                                     var projXFormState = node.projXFormState;
 
                                     var matLocation = program.getUniformLocation("SCENEJS_uPMatrix");
+
                                     var zNearLocation = program.getUniformLocation("SCENEJS_uZNear");
                                     var zFarLocation = program.getUniformLocation("SCENEJS_uZFar");
 
@@ -791,11 +827,14 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                         if (matLocation) {
                                             context.uniformMatrix4fv(matLocation, context.FALSE, mat);
                                         }
-                                        if (zNearLocation) {
-                                            context.uniform1f(zNearLocation, optics.near);
-                                        }
-                                        if (zFarLocation) {
-                                            context.uniform1f(zFarLocation, optics.far);
+
+                                        if (callCtx.rayPicking) { // Z-pick pass: feed near and far clip planes into shader
+                                            if (zFarLocation) {
+                                                context.uniform1f(zNearLocation, optics.near);
+                                            }
+                                            if (zFarLocation) {
+                                                context.uniform1f(zFarLocation, optics.far);
+                                            }
                                         }
                                     };
                                 })()));
@@ -850,7 +889,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
          * colortrans
          *--------------------------------------------------------------------------------------------------------*/
 
-        if (!this._picking && !this._zPicking) {
+        if (!this._picking && !this._rayPicking) {
 
             if (node.colortransState && node.colortransState.core
                     && (node.colortransState._stateId != this._lastColortransStateId ||
@@ -1041,20 +1080,26 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                         var program = self._program;
                                         var context = self._context;
 
+                                        var callCtx = self._callCtx;
+
                                         var nameState = node.nameState;
 
                                         var uPickColorLocation = program.getUniformLocation("SCENEJS_uPickColor");
 
                                         return function() {
-                                            if (nameState.name) {
 
-                                                self.pickNameStates[self._pickIndex++] = nameState;
+                                            if (callCtx.picking) { // Colour-pick pass - feed name's colour into pick shader
 
-                                                var b = self._pickIndex >> 16 & 0xFF;
-                                                var g = self._pickIndex >> 8 & 0xFF;
-                                                var r = self._pickIndex & 0xFF;
+                                                if (nameState.name) {
 
-                                                context.uniform3fv(uPickColorLocation, [r / 255,g / 255,b / 255]);
+                                                    self.pickNameStates[self._pickIndex++] = nameState;
+
+                                                    var b = self._pickIndex >> 16 & 0xFF;
+                                                    var g = self._pickIndex >> 8 & 0xFF;
+                                                    var r = self._pickIndex & 0xFF;
+
+                                                    context.uniform3fv(uPickColorLocation, [r / 255, g / 255, b / 255]);
+                                                }
                                             }
                                         };
                                     })()));
@@ -1067,7 +1112,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
          * Render listeners
          *------------------------------------------------------------------------------------------------------------*/
 
-        if (!this._picking && !this._zPicking) {    // TODO: do we ever want matrices during a pick pass?
+        if (!this._picking) {    // TODO: do we ever want matrices during a pick pass?
 
             if (! this._lastRenderListenersState || node.renderListenersState._stateId != this._lastRenderListenersState._stateId) {
                 if (node.renderListenersState) {
@@ -1114,7 +1159,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                     return function() {
 
                                         var newFlags = flagsState.flags;
-                                        var oldFlagsState = callCtx._lastFlagsState;
+                                        var oldFlagsState = callCtx.lastFlagsState;
                                         var oldFlags = oldFlagsState ? oldFlagsState.flags : null;
 
                                         //            var clear = newFlags.clear;
@@ -1231,17 +1276,20 @@ var SceneJS_DrawListRenderer = function(cfg) {
         var callCtx = this._callCtx;
 
         this._lastRendererState = null;                             // Forget last "renderer" state
-        if (callCtx._lastRendererProps) {                           // Forget last call-time renderer properties
-            callCtx._lastRendererProps.restoreProps(this._context);
+        if (callCtx.lastRendererProps) {                           // Forget last call-time renderer properties
+            callCtx.lastRendererProps.restoreProps(this._context);
         }
 
         this._lastFlagsState = null;
-        this._lastImageBufState = null;
+        this._lastFrameBufState = null;
+        this._lastNameState = null;
 
-        if (callCtx._lastImageBuf) {
-            callCtx._lastImageBuf.unbind();
-            callCtx._lastImageBuf = null;
+        if (callCtx.lastFrameBuf) {
+            callCtx.lastFrameBuf.unbind();
+            callCtx.lastFrameBuf = null;
         }
+
+        this._lastProgramId = -1;
 
         this._program = null;
 

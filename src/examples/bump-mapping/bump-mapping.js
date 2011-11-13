@@ -1,9 +1,7 @@
 /**
  * Bump mapping example
  *
- * Lindsay Kay
- * lindsay.kay AT xeolabs.com
- * January 2010
+ * More info:
  *
  * https://github.com/xeolabs/scenejs/wiki/texture
  * 
@@ -76,7 +74,7 @@ SceneJS.createScene({
                                         /* Our first texture layer is applied to the baseColor of our material.
                                          */
                                         {
-                                            uri:"pattern.jpg",
+                                            uri:"../web/images/pattern.jpg",
                                             minFilter: "linear",
                                             magFilter: "linear",
                                             wrapS: "repeat",
@@ -99,7 +97,7 @@ SceneJS.createScene({
                                          * our geometry node's normal vectors.
                                          */
                                         {
-                                            uri:"normal_map.jpg",
+                                            uri:"../web/images/normal_map.jpg",
                                             minFilter: "linear",
                                             magFilter: "linear",
                                             wrapS: "repeat",

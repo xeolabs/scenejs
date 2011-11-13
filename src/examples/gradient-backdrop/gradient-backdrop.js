@@ -66,7 +66,7 @@ SceneJS.createScene({
                                             type: "texture",
                                             layers: [
                                                 {
-                                                    uri: "BrickWall.jpg",
+                                                    uri: "../web/images/BrickWall.jpg",
                                                     applyTo:"baseColor",                                                   
                                                     blendMode: "multiply",
 

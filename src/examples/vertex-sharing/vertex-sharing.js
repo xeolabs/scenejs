@@ -4,16 +4,16 @@
  (faces, lines etc).  When a geometry is defined with positions but no indices, then child Geometry nodes are expected
  to supply the indices.
 
- This is a powerful technique for optimising static scenes, and is used in games such as Quake 3 etc. It is also
+ This is a powerful technique for optimising static scenes, and is used in games such as Quake etc. It is also
  neccessary for "multi-materials", where different materials/textures can be applied to different subsections of the
  same mesh.
 
  It may also be useful for switching representations of geometry - between wireframe and solid, for example.
 
- Lindsay S. Kay,
- lindsay.kay@xeolabs.com
-
  This example constructs a custom cube from multiple geometries, decorating different faces with different textures.
+
+
+  https://github.com/xeolabs/scenejs/wiki/geometry
 
  */
 
@@ -242,7 +242,7 @@ SceneJS.createScene({
 
                                                     layers: [
                                                         {
-                                                            uri:"images/BrickWall.jpg" ,
+                                                            uri:"../web/images/BrickWall.jpg" ,
                                                             minFilter: "linear",
                                                             magFilter: "linear",
                                                             wrapS: "repeat",
@@ -327,7 +327,7 @@ SceneJS.createScene({
                                                      */
                                                     layers: [
                                                         {
-                                                            uri:"images/general-zod.jpg",
+                                                            uri:"../web/images/general-zod.jpg",
                                                             minFilter: "linear",
                                                             magFilter: "linear",
                                                             wrapS: "repeat",

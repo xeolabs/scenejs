@@ -103,7 +103,7 @@ h4 {
     margin: 0 auto;
     border: 0;
     clear: both;
-    background: url('box-shadow.png') repeat-y 0% 0%;
+    background: url("images/box-shadow.png") repeat-y 0% 0%;
     padding: 0px 10px;
 }
 
@@ -121,7 +121,7 @@ h4 {
 }
 
 #header-inner {
-    background: #ffffff url(a-xeolabs-project.png) no-repeat scroll right center;
+    background: #ffffff url(images/a-xeolabs-project.png) no-repeat scroll right center;
     text-align: left;
     vertical-align: middle;
     margin: 0 auto;

@@ -1,10 +1,7 @@
 /*
  This example demonstrates how to define a color at each vertex of a geometry
 
- Lindsay S. Kay,
- lindsay.kay@xeolabs.com
-
- http://scenejs.wikispaces.com/geometry#x-Vertex Colors
+  https://github.com/xeolabs/scenejs/wiki/geometry
 
  */
 
@@ -76,7 +73,7 @@ SceneJS.createScene({
                                                     type: "texture",
                                                     layers: [
                                                         {
-                                                            uri:"images/BrickWall.jpg" ,
+                                                            uri:"../web/images/BrickWall.jpg" ,
                                                             minFilter: "linear",
                                                             magFilter: "linear",
                                                             wrapS: "repeat",

@@ -28,12 +28,19 @@
     var Name = SceneJS.createNodeType("name");
 
     Name.prototype._init = function(params) {
+     if (this.core._nodeCount == 1) {
+            this.setName(params.name);
+        }
+    };
+
+    Name.prototype.setName = function(name) {
+        this.core.name = name || "unnamed";
     };
 
     Name.prototype._compile = function() {
         var id = this.attr.id;
         idStack[stackLen] = id;
-        nameStack[stackLen] = id;
+        nameStack[stackLen] = this.core.name;
         stackLen++;
         dirty = true;
 

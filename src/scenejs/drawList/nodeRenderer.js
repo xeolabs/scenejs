@@ -101,10 +101,10 @@ var SceneJS_NodeRenderer = function(cfg) {
     this.init = function(params) {
         params = params || {};
         this._picking = params.picking;
-        this._zPicking = params.zPick;
+        this._rayPicking = params.rayPick;
         this._program = null;
         this._lastRendererState = null;
-        this._lastImagebufState = null;
+        this._lastFramebufState = null;
         this._lastRenderListenersState = null;
         this._pickIndex = 0;
 
@@ -130,7 +130,7 @@ var SceneJS_NodeRenderer = function(cfg) {
 
         /* Only pick nodes that are enabled for picking
          */
-//        if ((this._picking || this._zPicking) && nodeFlagsState.flags.picking === false) {
+//        if ((this._picking || this._rayPicking) && nodeFlagsState.flags.picking === false) {
 //            return;
 //        }
 
@@ -152,8 +152,8 @@ var SceneJS_NodeRenderer = function(cfg) {
             if (this._picking) {
                 this._program = node.program.pick;
 
-            } else if (this._zPicking) {
-                this._program = node.program.zPick;
+            } else if (this._rayPicking) {
+                this._program = node.program.rayPick;
 
             } else {
                 this._program = node.program.render;
@@ -191,7 +191,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._lastModelXFormStateId = -1;
             this._lastProjXFormStateId = -1;
             this._lastPickStateId = -1;
-            this._lastImagebufStateId = -1;
+            this._lastFramebufStateId = -1;
             this._lastRenderListenersStateId = -1;
             this._lastShaderParamsStateId = -1;
             this._lastProgramId = node.program.id;
@@ -222,18 +222,18 @@ var SceneJS_NodeRenderer = function(cfg) {
         }
 
         /*----------------------------------------------------------------------------------------------------------
-         * imageBuf
+         * frameBuf
          *--------------------------------------------------------------------------------------------------------*/
 
-        if (! this._lastImagebufState || node.imageBufState._stateId != this._lastImagebufState._stateId) {
-            if (this._lastImagebufState && this._lastImagebufState.imageBuf) {
-                gl.finish(); // Force imageBuf to complete
-                this._lastImagebufState.imageBuf.unbind();
+        if (! this._lastFramebufState || node.frameBufState._stateId != this._lastFramebufState._stateId) {
+            if (this._lastFramebufState && this._lastFramebufState.frameBuf) {
+                gl.finish(); // Force frameBuf to complete
+                this._lastFramebufState.frameBuf.unbind();
             }
-            if (node.imageBufState.imageBuf) {
-                node.imageBufState.imageBuf.bind();
+            if (node.frameBufState.frameBuf) {
+                node.frameBufState.frameBuf.bind();
             }
-            this._lastImagebufState = node.imageBufState;
+            this._lastFramebufState = node.frameBufState;
         }
 
         /*----------------------------------------------------------------------------------------------------------
@@ -439,7 +439,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             this._lastClipStateId = node.clipState._stateId;
         }
 
-        if (!this._picking && !this._zPicking) {
+        if (!this._picking && !this._rayPicking) {
 
             /*----------------------------------------------------------------------------------------------------------
              * colortrans
@@ -536,7 +536,7 @@ var SceneJS_NodeRenderer = function(cfg) {
         }
 
         /*----------------------------------------------------------------------------------------------------------
-         * Pick listeners
+         * Pick names
          *--------------------------------------------------------------------------------------------------------*/
 
         if (this._picking) {
@@ -552,7 +552,7 @@ var SceneJS_NodeRenderer = function(cfg) {
             }
         }
 
-        if (!this._picking && !this._zPicking) {    // TODO: do we ever want matrices during a pick pass?
+        if (!this._picking && !this._rayPicking) {    // TODO: do we ever want matrices during a pick pass?
 
             /*----------------------------------------------------------------------------------------------------------
              * Render listeners
@@ -699,9 +699,9 @@ var SceneJS_NodeRenderer = function(cfg) {
         //                this._lastRendererState.props.restoreProps(canvas.context);
         //            }
 
-        if (this._lastImagebufState && this._lastImagebufState.imageBuf) {
-            this._lastImagebufState.imageBuf.unbind();
-            this._lastImagebufState = null;
+        if (this._lastFramebufState && this._lastFramebufState.frameBuf) {
+            this._lastFramebufState.frameBuf.unbind();
+            this._lastFramebufState = null;
         }
 
         if (this._program) {

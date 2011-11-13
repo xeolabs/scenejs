@@ -7,6 +7,8 @@
  Lindsay S. Kay,
  lindsay.kay@xeolabs.com
 
+ https://github.com/xeolabs/scenejs/wiki/light
+
  */
 
 SceneJS.createScene({

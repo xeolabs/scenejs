@@ -198,6 +198,12 @@ SceneJS.createScene({
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
+
+var scene = SceneJS.scene("theScene");
+var pitchRotate = scene.findNode("pitch");
+var yawRotate = scene.findNode("yaw");
+var shader = scene.findNode("myShader");
+
 var yaw = 0;
 var pitch = 0;
 var lastX;
@@ -227,8 +233,8 @@ function mouseMove(event) {
 
         var scene = SceneJS.scene("theScene");
 
-        scene.findNode("yaw").set("angle", yaw);
-        scene.findNode("pitch").set("angle", pitch);
+        yawRotate.set("angle", yaw);
+        pitchRotate.set("angle", pitch);
 
         lastX = event.clientX;
         lastY = event.clientY;
@@ -241,9 +247,9 @@ canvas.addEventListener('mouseup', mouseUp, true);
 
 var time = 0;
 
-SceneJS.scene("theScene").start({
+scene.start({
     idleFunc: function() {
-        this.findNode("myShader").set("params", {
+        shader.set("params", {
             time: time 
         });
         time += 0.1;

@@ -7,9 +7,9 @@
  *
  * Using the Canvas space centers, we can then float a DIV over each teapot on the canvas to report its center points.
  *
- * Lindsay Kay
- * lindsay.kay@xeolabs.com
- * October 2010
+ * More info:
+ *
+ * https://github.com/xeolabs/scenejs/wiki/Node-Events
  *
  */
 

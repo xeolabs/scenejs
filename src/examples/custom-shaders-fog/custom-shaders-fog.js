@@ -3,13 +3,11 @@
 
  Demonstrates the parameterised reuse of a custom shader via a shared node core.
 
- Read through the comments inline for more information.
-
- Lindsay S. Kay,
- lindsay.kay@xeolabs.com
+ More info on custom shaders:
 
  http://scenejs.wikispaces.com/shader
- 
+ http://scenejs.wikispaces.com/shaderParams
+
  */
 
 SceneJS.createScene({
@@ -277,6 +275,11 @@ SceneJS.createScene({
  * Scene rendering loop and mouse handler stuff follows
  *---------------------------------------------------------------------*/
 
+
+var scene = SceneJS.scene("theScene");
+var pitchRotate = scene.findNode("pitch");
+var yawRotate = scene.findNode("yaw");
+
 var yaw = 0;
 var pitch = 0;
 var lastX;
@@ -303,10 +306,8 @@ function mouseMove(event) {
         yaw += (event.clientX - lastX) * 0.5;
         pitch += (event.clientY - lastY) * 0.5;
 
-        var scene = SceneJS.scene("theScene");
-
-        scene.findNode("yaw").set("angle", yaw);
-        scene.findNode("pitch").set("angle", pitch);
+        yawRotate.set("angle", yaw);
+        pitchRotate.set("angle", pitch);
 
         lastX = event.clientX;
         lastY = event.clientY;
@@ -317,5 +318,5 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.scene("theScene").start();
+scene.start();
 

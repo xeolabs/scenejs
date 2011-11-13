@@ -1,9 +1,7 @@
 /**
  * SceneJS Example - Basic picking example
  *
- * Lindsay Kay
- * lindsay.kay AT xeolabs.com
- * March 2010
+ * More info:
  *
  * https://github.com/xeolabs/scenejs/wiki/picking
  */
@@ -234,19 +232,13 @@ scene.start();
 
 var canvas = document.getElementById("theCanvas");
 
-/* On mouse down, we render the scene in picking mode, passing in the 
- * mouse canvas coordinates. This will cause a scene render traversal in which
- * all the "picked" listeners will fire on nodes situated above whatever
- * geometry node was picked, as those nodes are visited.
- *
- */
 function mouseDown(event) {
     var coords = clickCoordsWithinElement(event);
 
-    var pickRecord = scene.pick(coords.x, coords.y);
+    var hit = scene.pick(coords.x, coords.y);
 
-    if (pickRecord) {
-        alert("Picked 'name' node with id '" + pickRecord.name + "' at canvasX=" + pickRecord.canvasX + ", canvasY=" + pickRecord.canvasY);
+    if (hit) {
+        alert("Picked 'name' node with id '" + hit.name + "' at canvasX=" + hit.canvasX + ", canvasY=" + hit.canvasY);
     } else {
         alert("Nothing picked");
     }

@@ -160,7 +160,7 @@ SceneJS.createScene({
                                                     type: "texture",
                                                     layers: [
                                                         {
-                                                            uri:"images/BrickWall.jpg",
+                                                            uri:"../web/images/BrickWall.jpg",
                                                             blendMode: "multiply",
                                                             scale : {
                                                                 x: .1,
@@ -242,26 +242,6 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 var scene = SceneJS.scene("the-scene");
-
-/* On a mouse drag, we'll re-render the scene, passing in
- * incremented angles in each time.
- */
-function mouseMove(event) {
-    if (dragging) {
-        yaw += (event.clientX - lastX) * 0.5;
-        pitch += (event.clientY - lastY) * -0.5;
-
-        lastX = event.clientX;
-        lastY = event.clientY;
-
-        scene.findNode("pitch").set("angle", pitch);
-        scene.findNode("yaw").set("angle", yaw);
-    }
-}
-
-canvas.addEventListener('mousedown', mouseDown, true);
-canvas.addEventListener('mousemove', mouseMove, true);
-canvas.addEventListener('mouseup', mouseUp, true);
 
 
 /* Run the scene, cycling the morphGeometry through it's keys:

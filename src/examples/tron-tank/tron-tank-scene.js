@@ -67,7 +67,6 @@ SceneJS.createScene({
                             dir:                    { x: -1.0, y: -.5, z: 1.0  }
                         },
 
-
                         /* Integrate our JSON Tron Tank model, which is defined in tron-tank-model.js
                          * and loaded via a <script> tag in index.html.
                          *

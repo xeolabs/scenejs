@@ -1,18 +1,9 @@
 /*
- This example demonstrates how to define geometry, in this case a simple cube
- object that supports texturing.
+ Defining custom geometry
 
- Lindsay S. Kay,
- lindsay.kay@xeolabs.com
+ More info:
 
- This example assumes that you have looked at a few of the other examples
- and now have an understanding of concepts such as basic SceneJS syntax,
- lighting, material, data flow etc.
-
- Scroll down to the SceneJS.geometry node about one third of the way down
- this file and I'll guide you from there.
-
- http://scenejs.wikispaces.com/geometry
+ https://github.com/xeolabs/scenejs/wiki/geometry
 
  */
 
@@ -92,7 +83,7 @@ SceneJS.createScene({
                                                     type: "texture",
                                                     layers: [
                                                         {
-                                                            uri:"images/BrickWall.jpg" ,
+                                                            uri:"../web/images/BrickWall.jpg" ,
 
                                                             /* Texture scale factors
                                                              */
@@ -105,10 +96,7 @@ SceneJS.createScene({
 
                                                     nodes: [
 
-                                                        /* Aha, here you are, glad you made it!
-                                                         *
-                                                         * Here is the geometry node which defines our
-                                                         * custom object, a simple cube.
+                                                        /* Geometry node which defines our custom object, a simple cube.
                                                          */
                                                         {
 
@@ -141,7 +129,7 @@ SceneJS.createScene({
                                                             primitive: "triangles",
 
                                                             /* The vertices - eight for our cube, each
-                                                             * one spaining three array elements for X,Y and Z
+                                                             * one spanning three array elements for X,Y and Z
                                                              */
                                                             positions : [
 
@@ -354,6 +342,8 @@ function mouseUp() {
 }
 
 var scene = SceneJS.scene("the-scene");
+var pitchRotate = scene.findNode("pitch");
+var yawRotate = scene.findNode("yaw");
 
 /* On a mouse drag, we'll re-render the scene, passing in
  * incremented angles in each time.
@@ -366,8 +356,8 @@ function mouseMove(event) {
         lastX = event.clientX;
         lastY = event.clientY;
 
-        scene.findNode("pitch").set("angle", pitch);
-        scene.findNode("yaw").set("angle", yaw);
+        pitchRotate.set("angle", pitch);
+        yawRotate.set("angle", yaw);
     }
 }
 

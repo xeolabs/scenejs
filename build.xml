@@ -65,13 +65,13 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/drawList/pickBuffer.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/drawList/drawList.js"/>
-        
+
         <fileset dir="${SRC_DIR}" includes="scenejs/drawList/drawListRenderer.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/renderer/renderer.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/flags/flagsModule.js"/>
-        
+
         <fileset dir="${SRC_DIR}" includes="scenejs/tag/tagModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/load-status/loadStatusModule.js"/>
@@ -107,18 +107,18 @@
         <fileset dir="${SRC_DIR}" includes="scenejs/lighting/light.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/material/material.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/colortrans/colortrans.js"/>
-        <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>        
+        <fileset dir="${SRC_DIR}" includes="scenejs/texture/texture.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/clip/clip.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/morphGeometry/morphGeometry.js"/>
-        
+
         <fileset dir="${SRC_DIR}" includes="scenejs/name/nameModule.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/layer/layer.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/layer/layerModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/video/video.js"/>
-        
-        <fileset dir="${SRC_DIR}" includes="scenejs/imageBuf/imageBuf.js"/>
+
+        <fileset dir="${SRC_DIR}" includes="scenejs/frameBuf/frameBuf.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/shader/shader.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/shader/shaderParams.js"/>

@@ -40,11 +40,11 @@ var SceneJS_PickBuffer = function(cfg) {
 
         try {
             // Do it the way the spec requires
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, null);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
         } catch (exception) {
             // Workaround for what appears to be a Minefield bug.
             var textureStorage = new WebGLUnsignedByteArray(width * height * 3);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, width, height, 0, gl.RGB, gl.UNSIGNED_BYTE, textureStorage);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureStorage);
         }
         gl.bindRenderbuffer(gl.RENDERBUFFER, pickBuf.renderBuf);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);

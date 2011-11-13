@@ -213,7 +213,7 @@ var SceneJS_compileModule = new (function() {
      *----------------------------------------------------------------------------------------------------------------*/
 
     this.COMPILE_NOTHING = 0;       // No recompilations
-    this.REDRAW = 1;                // Redraw display list, resolves render-time node dependencies like texture->imageBuf
+    this.REDRAW = 1;                // Redraw display list, resolves render-time node dependencies like texture->frameBuf
     this.COMPILE_PARTIAL = 2;       // Recompile some nodes back into display list
     this.COMPILE_EVERYTHING = 3;    // Recompile all nodes, rebuilding the entire display list
 

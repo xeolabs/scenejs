@@ -113,7 +113,7 @@ SceneJS.createScene({
                                                                                  * baseColor to render the continents, oceans etc.
                                                                                  *--------------------------------------------------------*/
                                                                                 {
-                                                                                    uri: "images/earth.jpg",
+                                                                                    uri: "../web/images/earth.jpg",
                                                                                     applyTo:"baseColor",
                                                                                     blendMode: "multiply",
                                                                                     flipY: false
@@ -124,7 +124,7 @@ SceneJS.createScene({
                                                                                  * specular component to make the ocean shiney.
                                                                                  *--------------------------------------------------------*/
                                                                                 {
-                                                                                    uri: "images/earth-specular.gif",
+                                                                                    uri: "../web/images/earth-specular.gif",
                                                                                     applyTo:"specular",
                                                                                     blendMode:"multiply",
                                                                                     flipY: false
@@ -136,7 +136,7 @@ SceneJS.createScene({
                                                                                  * emission component to show lights on the dark side.
                                                                                  *--------------------------------------------------------*/
                                                                                 {
-                                                                                    uri: "images/earth-lights.gif",
+                                                                                    uri: "../web/images/earth-lights.gif",
                                                                                     applyTo:"emit",
                                                                                     blendMode:"add",
                                                                                     flipY: false
@@ -215,7 +215,7 @@ SceneJS.createScene({
                                                                                          *--------------------------------------------------------*/
 
                                                                                         {
-                                                                                            uri: "images/earthclouds.jpg",
+                                                                                            uri: "../web/images/earthclouds.jpg",
                                                                                             applyTo:"alpha",
                                                                                             blendMode: "multiply",
                                                                                             flipY: false

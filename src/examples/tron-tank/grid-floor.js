@@ -10,7 +10,7 @@ var gridFloorJSON = {
             type: "texture",
             layers: [
                 {
-                    uri: "images/grid.jpg",
+                    uri: "../web/images/grid.jpg",
                     minFilter: "linearMipMapLinear",
                     magFilter: "linear",
                     wrapS: "repeat",

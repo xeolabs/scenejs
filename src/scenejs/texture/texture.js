@@ -141,10 +141,10 @@ var SceneJS_textureModule = new (function() {
 
             for (var i = 0; i < params.layers.length; i++) {
                 var layerParam = params.layers[i];
-                if (!layerParam.uri && !layerParam.imageBuf && !layerParam.video && !layerParam.image && !layerParam.canvasId) {
+                if (!layerParam.uri && !layerParam.frameBuf && !layerParam.video && !layerParam.image && !layerParam.canvasId) {
                     throw SceneJS_errorModule.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture layer " + i + "  has no uri, imageBuf, video or canvasId specified");
+                            "texture layer " + i + "  has no uri, frameBuf, video or canvasId specified");
                 }
                 if (layerParam.applyFrom) {
                     if (layerParam.applyFrom != "uv" &&
@@ -196,8 +196,8 @@ var SceneJS_textureModule = new (function() {
 
                 this._setLayerTransform(layerParam, layer);
 
-                if (layer.creationParams.imageBuf) {
-                    layer.texture = SceneJS._compilationStates.getState("imageBuf", this.scene.attr.id, layer.creationParams.imageBuf);
+                if (layer.creationParams.frameBuf) {
+                    layer.texture = SceneJS._compilationStates.getState("frameBuf", this.scene.attr.id, layer.creationParams.frameBuf);
 
                 } else if (layer.creationParams.video) {
                     layer.texture = SceneJS._compilationStates.getState("video", this.scene.attr.id, layer.creationParams.video);

@@ -191,7 +191,7 @@ SceneJS.createScene({
 
                     layers: [
                         {
-                            uri:"images/BrickWall.jpg" ,
+                            uri:"../web/images/BrickWall.jpg" ,
                             applyTo: "baseColor",
                             blendMode: "multiply",
                             scale : { // Texture scale factors

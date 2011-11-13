@@ -10,8 +10,8 @@
  only whenever something changes), but since this scene contains a video, it needs to
  redraw to keep updating the texture.
 
- Lindsay S. Kay,
- lindsay.kay@xeolabs.com
+
+  https://github.com/xeolabs/scenejs/wiki/video
 
  */
 SceneJS.createScene({
@@ -30,7 +30,7 @@ SceneJS.createScene({
         {
             type: "video",
             id: "my-video",
-            src: "bunny.ogg"
+            src: "../web/movies/bunny.ogg"
         },
 
         {
@@ -170,14 +170,5 @@ canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
 
-/* Start rendering the scene graph. On each frame, increment the rotation
- * of the teapot.
- */
-
-scene.start({
-    idleFunc: function() {
-        //        scene.findNode("cube-yaw").inc("angle", .1);
-        //        scene.findNode("cube-pitch").inc("angle", .2);
-    }
-});
+scene.start();
 

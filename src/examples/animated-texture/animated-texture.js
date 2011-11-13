@@ -10,10 +10,6 @@
  *
  * https://github.com/xeolabs/scenejs/wiki/texture
  *
- * Lindsay Kay
- * lindsay.kay AT xeolabs.com
- * January 2010
- *
  */
 
 
@@ -72,7 +68,7 @@ SceneJS.createScene({
 
                                     layers: [
                                         {
-                                            uri:"superman.jpg",
+                                            uri:"../web/images/superman.jpg",
                                             minFilter: "linear",
                                             magFilter: "linear",
                                             wrapS: "repeat",
@@ -92,7 +88,7 @@ SceneJS.createScene({
                                             blendFactor: 1.0
                                         },
                                         {
-                                            uri:"general-zod.jpg",
+                                            uri:"../web/images/general-zod.jpg",
                                             minFilter: "linear",
                                             magFilter: "linear",
                                             wrapS: "repeat",

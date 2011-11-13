@@ -45,7 +45,7 @@ SceneJS.Services.addService(SceneJS.Services.GEO_LOADER_SERVICE_ID, new MyGeoLoa
  */
 SceneJS.createScene({
     type: "scene",
-    id: "the-scene",
+    id: "theScene",
     canvasId: "theCanvas",
     loggingElementId: "theLoggingDiv",
 
@@ -114,7 +114,7 @@ SceneJS.createScene({
                                                     type: "texture",
                                                     layers: [
                                                         {
-                                                            uri:"images/BrickWall.jpg",
+                                                            uri:"../web/images/BrickWall.jpg",
                                                             blendMode: "multiply",
                                                             scale : {
                                                                 x: .1,
@@ -148,6 +148,9 @@ SceneJS.createScene({
     ]
 });
 
+var scene = SceneJS.scene("theScene");
+var pitchRotate = scene.findNode("pitch");
+var yawRotate = scene.findNode("yaw");
 
 var yaw = 30;
 var pitch = -30;
@@ -167,8 +170,6 @@ function mouseUp() {
     dragging = false;
 }
 
-var scene = SceneJS.scene("the-scene");
-
 /* On a mouse drag, we'll re-render the scene, passing in
  * incremented angles in each time.
  */
@@ -180,8 +181,8 @@ function mouseMove(event) {
         lastX = event.clientX;
         lastY = event.clientY;
 
-        scene.findNode("pitch").set("angle", pitch);
-        scene.findNode("yaw").set("angle", yaw);
+        pitchRotate.set("angle", pitch);
+        yawRotate.set("angle", yaw);
     }
 }
 
@@ -189,7 +190,7 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.scene("the-scene").start();
+scene.start();
 
 
 

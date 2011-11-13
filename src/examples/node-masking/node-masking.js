@@ -2,9 +2,8 @@
 
  Node render masking using the "tag" node
 
- Lindsay S. Kay,
- lindsay.kay@xeolabs.com
-
+ https://github.com/xeolabs/scenejs/wiki/tag
+ 
  */
 
 SceneJS.createScene({

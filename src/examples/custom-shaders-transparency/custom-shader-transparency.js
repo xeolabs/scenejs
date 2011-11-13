@@ -269,18 +269,16 @@ SceneJS.createScene({
  * Scene rendering loop and mouse handler stuff
  *---------------------------------------------------------------------*/
 
+
+var scene = SceneJS.scene("theScene");
+var pitchRotate = scene.findNode("pitch");
+var yawRotate = scene.findNode("yaw");
+
 var yaw = -30;
 var pitch = 30;
 var lastX;
 var lastY;
 var dragging = false;
-
-var texAngle = 0.0;
-var texScale = 1.0;
-
-/* For texture animation
- */
-var timeLast = (new Date()).getTime();
 
 var canvas = document.getElementById("theCanvas");
 
@@ -301,10 +299,8 @@ function mouseMove(event) {
         lastX = event.clientX;
         lastY = event.clientY;
 
-        var scene = SceneJS.scene("theScene");
-
-        scene.findNode("pitch").set("angle", pitch);
-        scene.findNode("yaw").set("angle", yaw);
+        pitchRotate.set("angle", pitch);
+        yawRotate.set("angle", yaw);
     }
 }
 
@@ -312,5 +308,5 @@ canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
 
-SceneJS.scene("theScene").start();
+scene.start();
 
