@@ -82,7 +82,7 @@ SceneJS.createScene({
                                                             nodes: [
                                                                 {
                                                                     type: "name",
-                                                                    id: "left-blue-sphere",
+                                                                    name: "left-blue-sphere",
 
                                                                     nodes: [
                                                                         {
@@ -92,7 +92,7 @@ SceneJS.createScene({
                                                                 },
                                                                 {
                                                                     type: "name",
-                                                                    id: "right-blue-sphere",
+                                                                    name: "right-blue-sphere",
 
                                                                     nodes: [
 
@@ -136,7 +136,7 @@ SceneJS.createScene({
                                                             nodes: [
                                                                 {
                                                                     type: "name",
-                                                                    id: "left-green-sphere",
+                                                                    name: "green-spheres",
 
                                                                     nodes: [
                                                                         {
@@ -152,7 +152,7 @@ SceneJS.createScene({
                                                                 },
                                                                 {
                                                                     type: "name",
-                                                                    id: "right-green-sphere",
+                                                                    name: "green-spheres",
 
                                                                     nodes: [
                                                                         {
@@ -189,7 +189,7 @@ SceneJS.createScene({
                                                                             nodes: [
                                                                                 {
                                                                                     type: "name",
-                                                                                    id: "red-group-sphere",
+                                                                                    name: "red-sphere",
 
                                                                                     nodes: [
 
@@ -238,7 +238,7 @@ function mouseDown(event) {
     var hit = scene.pick(coords.x, coords.y);
 
     if (hit) {
-        alert("Picked 'name' node with id '" + hit.name + "' at canvasX=" + hit.canvasX + ", canvasY=" + hit.canvasY);
+        alert("Picked 'name' node with name '" + hit.name + "' at canvasX=" + hit.canvasX + ", canvasY=" + hit.canvasY);
     } else {
         alert("Nothing picked");
     }

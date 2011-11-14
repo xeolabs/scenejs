@@ -311,13 +311,7 @@ SceneJS.createScene({
                                     type: "rotate",
                                     id: "yaw",
                                     angle: 0.0,
-                                    y : 1.0,
-
-                                    nodes: [
-                                        {
-                                            type: "sphere"
-                                        }
-                                    ]
+                                    y : 1.0
                                 }
                             ]
                         }
@@ -327,7 +321,6 @@ SceneJS.createScene({
         }
     ]
 });
-
 
 
 var scene1 = SceneJS.scene("scene1");
@@ -353,7 +346,18 @@ SceneJS.Message.sendMessage({
             target: "yaw",
             nodes: [
                 {
-                    type: "teapot"
+                    type: "material",
+                    emit: 0,
+                    baseColor:      { r: 0.5, g: 0.5, b: 0.6 },
+                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                    specular:       1.0,
+                    shine:          70.0,
+
+                    nodes: [
+                        {
+                            type: "teapot"
+                        }
+                    ]
                 }
             ]
         }

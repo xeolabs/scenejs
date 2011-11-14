@@ -1197,7 +1197,7 @@ var SceneJS_DrawList = new (function() {
 
                 var eye = node.viewXFormState.lookAt.eye;
 
-              //  var vecScale = (worldPickZ - eye[2]) / dir[2];
+                //  var vecScale = (worldPickZ - eye[2]) / dir[2];
 
                 //var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec3Scalar(dir, vecScale, []), []);
 
@@ -1210,37 +1210,37 @@ var SceneJS_DrawList = new (function() {
 
                 //----------------------------------------------------------------------------------------------------
 
-//                var w = canvas.width;
-//                var h = canvas.height;
-//
-//                var x = (canvasX - w / 2) / (w / 2) ;           // Calculate clip space coordinates
-//                var y = -(canvasY - h / 2) / (h / 2) ;
-//
-//                var viewMat = node.viewXFormState.mat;
-//                var projMat = node.projXFormState.mat;
-//
-//                var pvMat = SceneJS_math_mulMat4(projMat, viewMat, []);
-//                var pvMatInverse = SceneJS_math_inverseMat4(pvMat, []);
-//
-//                var world1 = SceneJS_math_transformVector4(pvMatInverse, [x,y,-1,1]);
-//                world1 = SceneJS_math_mulVec4Scalar(world1, 1 / world1[3]);
-//
-//                var world2 = SceneJS_math_transformVector4(pvMatInverse, [x,y,0,1]);
-//                world2 = SceneJS_math_mulVec4Scalar(world2, 1 / world2[3]);
-//
-//                var dir = SceneJS_math_normalizeVec3(SceneJS_math_subVec3(world2, world1, []), []);
-//
-//                var eye = node.viewXFormState.lookAt.eye;
-//
-//                var vecScale = (worldPickZ - eye[2]) / dir[2];
-//
-//                var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec3Scalar(dir, vecScale, []), []);
-//
-//                // Output depth as distance to camera then:
-//                // vWorld = vEye + fDepth * vRay
-//
-//                hit.canvasPos = [canvasX, canvasY];
-//                hit.worldPos = vWorld;
+                //                var w = canvas.width;
+                //                var h = canvas.height;
+                //
+                //                var x = (canvasX - w / 2) / (w / 2) ;           // Calculate clip space coordinates
+                //                var y = -(canvasY - h / 2) / (h / 2) ;
+                //
+                //                var viewMat = node.viewXFormState.mat;
+                //                var projMat = node.projXFormState.mat;
+                //
+                //                var pvMat = SceneJS_math_mulMat4(projMat, viewMat, []);
+                //                var pvMatInverse = SceneJS_math_inverseMat4(pvMat, []);
+                //
+                //                var world1 = SceneJS_math_transformVector4(pvMatInverse, [x,y,-1,1]);
+                //                world1 = SceneJS_math_mulVec4Scalar(world1, 1 / world1[3]);
+                //
+                //                var world2 = SceneJS_math_transformVector4(pvMatInverse, [x,y,0,1]);
+                //                world2 = SceneJS_math_mulVec4Scalar(world2, 1 / world2[3]);
+                //
+                //                var dir = SceneJS_math_normalizeVec3(SceneJS_math_subVec3(world2, world1, []), []);
+                //
+                //                var eye = node.viewXFormState.lookAt.eye;
+                //
+                //                var vecScale = (worldPickZ - eye[2]) / dir[2];
+                //
+                //                var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec3Scalar(dir, vecScale, []), []);
+                //
+                //                // Output depth as distance to camera then:
+                //                // vWorld = vEye + fDepth * vRay
+                //
+                //                hit.canvasPos = [canvasX, canvasY];
+                //                hit.worldPos = vWorld;
                 //   hit.worldPos[2] = worldPickZ;
             }
         }
@@ -1652,6 +1652,8 @@ var SceneJS_DrawList = new (function() {
 
         var clipping = clipState && clipState.clips.length > 0;
 
+        var normals = this._hasNormals();
+
         var src = [
             "#ifdef GL_ES",
             "   precision highp float;",
@@ -1681,6 +1683,14 @@ var SceneJS_DrawList = new (function() {
         src.push("uniform float SCENEJS_uZNear;");                      // Used in Z-pick mode
         src.push("uniform float SCENEJS_uZFar;");                       // Used in Z-pick mode
 
+        src.push("varying vec3 SCENEJS_vEyeVec;");                          // Direction of view-space vertex from eye
+
+        if (normals) {
+
+            src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
+            src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
+        }
+        
         /*-----------------------------------------------------------------------------------
          * Variables - Clipping
          *----------------------------------------------------------------------------------*/
@@ -1691,7 +1701,6 @@ var SceneJS_DrawList = new (function() {
                 src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
             }
         }
-
 
         /*-----------------------------------------------------------------------------------
          * Custom GLSL
@@ -1724,8 +1733,29 @@ var SceneJS_DrawList = new (function() {
                 src.push("    }");
             }
         }
+
+        if (fragmentHooks.worldPos) {
+            src.push(fragmentHooks.worldPos + "(SCENEJS_vWorldVertex);");
+        }
+
+        if (fragmentHooks.viewPos) {
+            src.push(fragmentHooks.viewPos + "(SCENEJS_vViewVertex);");
+        }
+
+        if (fragmentHooks.worldEyeVec) {
+            src.push(fragmentHooks.worldEyeVec + "(SCENEJS_vEyeVec);");
+        }
+
+        if (normals && fragmentHooks.worldNormal) {
+            src.push(fragmentHooks.worldNormal + "(SCENEJS_vWorldNormal);");
+        }
+
+        if (normals && fragmentHooks.viewNormal) {
+            src.push(fragmentHooks.viewNormal + "(SCENEJS_vViewNormal);");
+        }
+
         src.push("    if (SCENEJS_uRayPickMode) {");
-        
+
         //src.push("          float zNormalizedDepth = (SCENEJS_uZNear - SCENEJS_vViewVertex.z) / abs(SCENEJS_uZFar - SCENEJS_uZNear);");
         //src.push("          gl_FragColor = packDepth(clamp((zNormalizedDepth * 0.001), -0.5, 0.5) + 0.5); ");
 
@@ -1733,7 +1763,7 @@ var SceneJS_DrawList = new (function() {
         src.push("          gl_FragColor = packDepth(clamp((SCENEJS_vWorldVertex.z * 0.001), -0.5, 0.5) + 0.5); ");
 
 
-//        src.push("          gl_FragColor = packDepth(gl_FragCoord.z); ");
+        //        src.push("          gl_FragColor = packDepth(gl_FragCoord.z); ");
 
 
         src.push("    } else {");
@@ -1747,190 +1777,6 @@ var SceneJS_DrawList = new (function() {
         }
         return src;
     };
-
-
-    //    /*===================================================================================================================
-    //     *
-    //     * Z-intersect shaders
-    //     *
-    //     *==================================================================================================================*/
-    //
-    //    this._rayPickVertexShader = function() {
-    //
-    //        var customShaders = shaderState.shader.shaders || {};
-    //
-    //        var customVertexShader = customShaders.vertex || {};
-    //        var vertexHooks = customVertexShader.hooks || {};
-    //
-    //        var customFragmentShader = customShaders.fragment || {};
-    //        var fragmentHooks = customFragmentShader.hooks || {};
-    //
-    //        var clipping = clipState.clips.length > 0;
-    //        var morphing = morphState.morph && true;
-    //
-    //        var src = [
-    //            "#ifdef GL_ES",
-    //            "   precision highp float;",
-    //            "#endif",
-    //            "attribute vec3 SCENEJS_aVertex;",
-    //            "uniform mat4 SCENEJS_uMMatrix;",
-    //            "uniform mat4 SCENEJS_uVMatrix;",
-    //            "uniform mat4 SCENEJS_uPMatrix;"];
-    //
-    //        if (clipping || fragmentHooks.worldPosClip) {
-    //            src.push("varying vec4 SCENEJS_vWorldVertex;");
-    //        }
-    //
-    //        //  if (fragmentHooks.viewPosClip) {
-    //        src.push("varying vec4 SCENEJS_vViewVertex;\n");
-    //        //   }
-    //
-    //        src.push("varying vec4 SCENEJS_vProjVertex;\n");
-    //
-    //        if (customVertexShader.code) {
-    //            src.push("\n" + customVertexShader.code + "\n");
-    //        }
-    //
-    //        if (morphing) {
-    //            src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
-    //            if (morphState.morph.targets[0].vertexBuf) {      // target2 has these arrays also
-    //                src.push("attribute vec3 SCENEJS_aMorphVertex;");
-    //            }
-    //        }
-    //
-    //        src.push("void main(void) {");
-    //        src.push("   vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
-    //
-    //        if (vertexHooks.modelPos) {
-    //            src.push("tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
-    //        }
-    //
-    //        if (morphing) {
-    //            if (morphState.morph.targets[0].vertexBuf) {
-    //                src.push("  vec4 vMorphVertex = vec4(SCENEJS_aMorphVertex, 1.0); ");
-    //
-    //                if (vertexHooks.modelPos) {
-    //                    src.push("vMorphVertex=" + vertexHooks.modelPos + "(vMorphVertex);");
-    //                }
-    //
-    //                src.push("  tmpVertex = vec4(mix(tmpVertex.xyz, vMorphVertex.xyz, SCENEJS_uMorphFactor), 1.0); ");
-    //            }
-    //        }
-    //
-    //        src.push("  tmpVertex = SCENEJS_uMMatrix * tmpVertex; ");
-    //
-    //        if (vertexHooks.worldPos) {
-    //            src.push("tmpVertex=" + vertexHooks.worldPos + "(tmpVertex);");
-    //        }
-    //
-    //        if (clipping || fragmentHooks.worldPosClip) {
-    //            src.push("  SCENEJS_vWorldVertex = tmpVertex; ");
-    //        }
-    //
-    //        src.push("  tmpVertex = SCENEJS_uVMatrix * tmpVertex; ");
-    //
-    //        if (vertexHooks.viewPos) {
-    //            src.push("tmpVertex=" + vertexHooks.viewPos + "(tmpVertex);");
-    //        }
-    //
-    //        //if (fragmentHooks.viewPosClip) {
-    //        src.push("  SCENEJS_vViewVertex = tmpVertex;");
-    //        //  }
-    //
-    //        src.push("  gl_Position = SCENEJS_uPMatrix * tmpVertex;");
-    //        src.push("}");
-    //
-    //        if (debugCfg.logScripts == true) {
-    //            SceneJS_loggingModule.info(src);
-    //        }
-    //        return src;
-    //    };
-    //
-    //    this._rayPickFragmentShader = function() {
-    //
-    //        var customShaders = shaderState.shader.shaders || {};
-    //        var customFragmentShader = customShaders.fragment || {};
-    //        var fragmentHooks = customFragmentShader.hooks || {};
-    //
-    //        var clipping = clipState && clipState.clips.length > 0;
-    //
-    //        var src = [
-    //            "#ifdef GL_ES",
-    //            "   precision highp float;",
-    //            "#endif"];
-    //
-    //        if (clipping || fragmentHooks.worldPosClip) {
-    //            src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
-    //        }
-    //
-    //        //  if (fragmentHooks.viewPosClip) {
-    //        src.push("varying vec4 SCENEJS_vViewVertex;");              // View-space vertex
-    //        //}
-    //
-    //        src.push("uniform float SCENEJS_uZNear;");
-    //        src.push("uniform float SCENEJS_uZFar;");
-    //
-    //        /*-----------------------------------------------------------------------------------
-    //         * Variables - Clipping
-    //         *----------------------------------------------------------------------------------*/
-    //
-    //        if (clipping) {
-    //            for (var i = 0; i < clipState.clips.length; i++) {
-    //                src.push("uniform float SCENEJS_uClipMode" + i + ";");
-    //                src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
-    //            }
-    //        }
-    //
-    //        /*-----------------------------------------------------------------------------------
-    //         * Custom GLSL
-    //         *----------------------------------------------------------------------------------*/
-    //
-    //        if (customFragmentShader.code) {
-    //            src.push("\n" + customFragmentShader.code + "\n");
-    //        }
-    //
-    //        src.push("void main(void) {");
-    //
-    //        if (fragmentHooks.worldPos) {
-    //            src.push("if (" + fragmentHooks.worldPosClip + "(SCENEJS_vWorldVertex) == false) { discard; };");
-    //        }
-    //        if (fragmentHooks.viewPos) {
-    //            src.push("if (!" + fragmentHooks.viewPosClip + "(SCENEJS_vViewVertex) == false) { discard; };");
-    //        }
-    //
-    //        if (clipping) {
-    //            src.push("  float   dist;");
-    //            for (var i = 0; i < clipState.clips.length; i++) {
-    //                src.push("    if (SCENEJS_uClipMode" + i + " != 0.0) {");
-    //                src.push("        dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w;");
-    //                src.push("        if (SCENEJS_uClipMode" + i + " == 1.0) {");
-    //                src.push("            if (dist < 0.0) { discard; }");
-    //                src.push("        }");
-    //                src.push("        if (SCENEJS_uClipMode" + i + " == 2.0) {");
-    //                src.push("            if (dist > 0.0) { discard; }");
-    //                src.push("        }");
-    //                src.push("    }");
-    //            }
-    //        }
-    //        src.push("  float zNormalizedDepth = (SCENEJS_uZNear - SCENEJS_vViewVertex.z) / abs(SCENEJS_uZFar - SCENEJS_uZNear);");
-    //        //src.push("  gl_FragColor = vec4(zNormalizedDepth, zNormalizedDepth, zNormalizedDepth, 1.0); ");
-    //
-    //        src.push("  gl_FragColor= vec4(0.5, 0.0, 0.0, 0.0);");
-    //
-    //        //src.push("  gl_FragColor= vec4(zNormalizedDepth, 0.0,0.0,0.0);");
-    //        //        src.push("  gl_FragColor=vec4(" +
-    //        //                 "                  clamp(((pow(2,8)  * zNormalizedDepth) / 255.0,");
-    //        //        src.push("                  clamp(((pow(2,16) * zNormalizedDepth) / 255.0,");
-    //        //        src.push("                  clamp(((pow(2,24) * zNormalizedDepth) / 255.0,");
-    //        //        src.push("                  clamp(((pow(2,32) * zNormalizedDepth) / 255.0)");
-    //
-    //        src.push("}");
-    //
-    //        if (debugCfg.logScripts == true) {
-    //            SceneJS_loggingModule.info(src);
-    //        }
-    //        return src;
-    //    };
 
 
     /*===================================================================================================================

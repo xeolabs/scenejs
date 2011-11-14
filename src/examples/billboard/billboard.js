@@ -69,7 +69,7 @@ SceneJS.createScene({
                                                     type: "texture",
                                                     layers: [
                                                         {
-                                                            uri: "images/mars.jpg",
+                                                            uri: "../web/images/mars.jpg",
                                                             flipY: false
                                                         }
                                                     ],
@@ -92,7 +92,7 @@ SceneJS.createScene({
                                                                     type: "texture",
                                                                     layers: [
                                                                         {
-                                                                            uri: "images/avatar.png" ,
+                                                                            uri: "../web/images/avatar.png" ,
                                                                             blendMode: "add"
                                                                         }
                                                                     ],
@@ -123,7 +123,7 @@ SceneJS.createScene({
                                                             type: "texture",
                                                             layers: [
                                                                 {
-                                                                    uri: "images/avatar.png" ,
+                                                                    uri: "../web/images/avatar.png" ,
                                                                     blendMode: "add"
                                                                 }
                                                             ],
