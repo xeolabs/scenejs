@@ -12,7 +12,7 @@
  This scene is interactive; to rotate the view, it takes two variables, "yaw" and "pitch", which are
  updated on rotate nodes from mouse input.
 
-  https://github.com/xeolabs/scenejs/wiki/JSON-API
+ https://github.com/xeolabs/scenejs/wiki/JSON-API
 
  */
 
@@ -52,59 +52,73 @@ SceneJS.createScene({
 
                     nodes: [
 
-                        /* Point lights
+                        /* Renderer node to set BG colour
                          */
                         {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                            diffuse:                true,
-                            specular:               true,
-                            dir:                    { x: 1.0, y: -0.5, z: -1.0 }
-                        },
-
-                        {
-                            type: "light",
-                            mode:                   "dir",
-                            color:                  { r: 1.0, g: 1.0, b: 0.8 },
-                            diffuse:                true,
-                            specular:               false,
-                            dir:                    { x: 0.0, y: -0.5, z: -1.0 }
-                        },
-
-                        /* Modelling transforms - note the IDs, "pitch" and "yaw"
-                         */
-                        {
-                            type: "rotate",
-                            id: "pitch",
-                            angle: 0.0,
-                            x : 1.0,
+                            type: "renderer",
+                            clearColor: { r: 0.3, g: 0.3, b: 0.6 },
+                            clear: {
+                                depth : true,
+                                color : true
+                            },
 
                             nodes: [
+
+                                /* Point lights
+                                 */
+                                {
+                                    type: "light",
+                                    mode:                   "dir",
+                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 1.0, y: -0.5, z: -1.0 }
+                                },
+
+                                {
+                                    type: "light",
+                                    mode:                   "dir",
+                                    color:                  { r: 1.0, g: 1.0, b: 0.8 },
+                                    diffuse:                true,
+                                    specular:               false,
+                                    dir:                    { x: 0.0, y: -0.5, z: -1.0 }
+                                },
+
+                                /* Modelling transforms - note the IDs, "pitch" and "yaw"
+                                 */
                                 {
                                     type: "rotate",
-                                    id: "yaw",
+                                    id: "pitch",
                                     angle: 0.0,
-                                    y : 1.0,
+                                    x : 1.0,
 
                                     nodes: [
-
-                                        /* Ambient, diffuse and specular surface properties
-                                         */
                                         {
-                                            type: "material",
-                                            emit: 0,
-                                            baseColor:      { r: 0.5, g: 0.5, b: 0.6 },
-                                            specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                            specular:       1.0,
-                                            shine:          70.0,
+                                            type: "rotate",
+                                            id: "yaw",
+                                            angle: 0.0,
+                                            y : 1.0,
 
                                             nodes: [
 
-                                                /* Teapot geometry - a built-in teapot type
+                                                /* Ambient, diffuse and specular surface properties
                                                  */
                                                 {
-                                                    type : "teapot"
+                                                    type: "material",
+                                                    emit: 0,
+                                                    baseColor:      { r: 0.5, g: 0.5, b: 0.6 },
+                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
+                                                    specular:       1.0,
+                                                    shine:          70.0,
+
+                                                    nodes: [
+
+                                                        /* Teapot geometry - a built-in teapot type
+                                                         */
+                                                        {
+                                                            type : "teapot"
+                                                        }
+                                                    ]
                                                 }
                                             ]
                                         }
