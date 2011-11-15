@@ -1202,6 +1202,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
 
                                         program.setUniform("SCENEJS_uBackfaceTexturing", newFlags.backfaceTexturing == undefined ? true : !!newFlags.backfaceTexturing);
                                         program.setUniform("SCENEJS_uBackfaceLighting", newFlags.backfaceLighting == undefined ? true : !!newFlags.backfaceLighting);
+                                        program.setUniform("SCENEJS_uSpecularLighting", newFlags.specular == undefined ? true : !!newFlags.specular);
 
                                         //            var mask = newFlags.colorMask;
                                         //

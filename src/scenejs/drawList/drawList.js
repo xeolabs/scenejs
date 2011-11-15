@@ -1665,11 +1665,7 @@ var SceneJS_DrawList = new (function() {
         src.push("  vec4 res = fract(depth * bit_shift);");
         src.push("  res -= res.xxyz * bit_mask;");
         src.push("  return res;");
-        src.push("}");
-
-        if (clipping || fragmentHooks.worldPosClip) {
-            src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
-        }
+        src.push("}");     
 
         src.push("varying vec4 SCENEJS_vModelVertex;");
         src.push("varying vec4 SCENEJS_vWorldVertex;");
@@ -2109,6 +2105,8 @@ var SceneJS_DrawList = new (function() {
         src.push("uniform bool  SCENEJS_uBackfaceTexturing;");
         src.push("uniform bool  SCENEJS_uBackfaceLighting;");
 
+        src.push("uniform bool  SCENEJS_uSpecularLighting;");
+
         /* True when rendering transparency
          */
         src.push("uniform bool  SCENEJS_uTransparent;");
@@ -2357,7 +2355,7 @@ var SceneJS_DrawList = new (function() {
                         src.push("  lightValue += dotN *  SCENEJS_uLightColor" + i + " * attenuation;");
                     }
                     if (light.specular) {
-                        src.push("specularValue += attenuation * specularColor * SCENEJS_uLightColor" + i +
+                        src.push("if (SCENEJS_uSpecularLighting) specularValue += attenuation * specularColor * SCENEJS_uLightColor" + i +
                                  " * specular  * pow(max(dot(reflect(lightVec, normalVec), SCENEJS_vEyeVec),0.0), shine);");
                     }
                     //src.push("}");
@@ -2370,7 +2368,7 @@ var SceneJS_DrawList = new (function() {
                         src.push("lightValue += dotN * SCENEJS_uLightColor" + i + ";");
                     }
                     if (light.specular) {
-                        src.push("specularValue += specularColor * SCENEJS_uLightColor" + i +
+                        src.push("if (SCENEJS_uSpecularLighting) specularValue += specularColor * SCENEJS_uLightColor" + i +
                                  " * specular  * pow(max(dot(reflect(lightVec, normalVec),SCENEJS_vEyeVec),0.0), shine);");
                     }
                     // src.push("}");
