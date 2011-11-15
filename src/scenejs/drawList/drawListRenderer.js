@@ -938,9 +938,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
 
                                         var program = self._program;
                                         var context = self._context;
-
-                                        var flags = node.flagsState.flags;
-
+                                       
                                         var uMaterialBaseColorLocation = program.getUniformLocation("SCENEJS_uMaterialBaseColor");
                                         var uMaterialSpecularColorLocation = program.getUniformLocation("SCENEJS_uMaterialSpecularColor");
                                         var uMaterialSpecularLocation = program.getUniformLocation("SCENEJS_uMaterialSpecular");
@@ -957,7 +955,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                                 context.uniform3fv(uMaterialSpecularColorLocation, material.specularColor);
                                             }
                                             if (uMaterialSpecularLocation) {
-                                                context.uniform1f(uMaterialSpecularColorLocation, material.specular);
+                                                context.uniform1f(uMaterialSpecularLocation, material.specular);
                                             }
                                             if (uMaterialShineLocation) {
                                                 context.uniform1f(uMaterialShineLocation, material.shine);

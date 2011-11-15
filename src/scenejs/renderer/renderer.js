@@ -18,7 +18,7 @@ new (function() {
                         depth : true,
                         color : true
                     },
-                    // clearColor: {r: 0, g : 0, b : 0 },
+                 //    clearColor: {r: 0, g : 0, b : 0 },
                     clearDepth: 1.0,
                     enableDepthTest:true,
                     enableCullFace: false,
