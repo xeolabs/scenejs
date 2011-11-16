@@ -105,7 +105,7 @@ new (function() {
 
                     /*
 
-                    For when webkit works - thanks GLGE
+                     For when webkit works - thanks GLGE
 
                      try{gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);}
                      catch(e){gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video,null);}
@@ -151,11 +151,17 @@ new (function() {
             var bufs = sceneBufs[sceneId];
             return {
                 bind: function(unit) {
-                    bufs[id].getTexture().bind(unit);
+                    var buf = bufs[id];
+                    if (buf) {                              // Lazy-bind when video node shows up
+                        buf.getTexture().bind(unit);
+                    }
                 },
 
                 unbind: function(unit) {
-                    bufs[id].getTexture().unbind(unit);
+                    var buf = bufs[id];
+                    if (buf) {
+                        buf.getTexture().unbind(unit);
+                    }
                 }
             };
         }

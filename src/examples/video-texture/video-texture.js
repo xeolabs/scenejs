@@ -87,7 +87,7 @@ SceneJS.createScene({
                                     layers: [
                                         {
                                             video: "my-video",
-                                            blendMode: "multiply"
+                                            blendMode: "add"
                                         }
                                     ],
 
