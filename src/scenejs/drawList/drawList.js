@@ -1575,8 +1575,10 @@ var SceneJS_DrawList = new (function() {
 
 
         src.push("varying vec4 SCENEJS_vViewVertex;\n");
-
         src.push("varying vec4 SCENEJS_vProjVertex;\n");
+
+        src.push("uniform vec3 SCENEJS_uEye;");                     // World-space eye position
+        src.push("varying vec3 SCENEJS_vEyeVec;");
 
         if (customVertexShader.code) {
             src.push("\n" + customVertexShader.code + "\n");
@@ -1621,6 +1623,8 @@ var SceneJS_DrawList = new (function() {
         src.push("  SCENEJS_vWorldVertex = tmpVertex; ");
         //    }
 
+       src.push("SCENEJS_vEyeVec = normalize(SCENEJS_uEye - tmpVertex.xyz);");
+
         src.push("  tmpVertex = SCENEJS_uVMatrix * tmpVertex; ");
 
         if (vertexHooks.viewPos) {
@@ -1630,6 +1634,8 @@ var SceneJS_DrawList = new (function() {
         src.push("  SCENEJS_vViewVertex = tmpVertex;");
 
         src.push("  SCENEJS_vProjVertex = SCENEJS_uPMatrix * tmpVertex;");
+
+
 
         src.push("  gl_Position = SCENEJS_vProjVertex;");
         src.push("}");
