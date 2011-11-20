@@ -37,8 +37,8 @@
     </style>
 
     <script type="text/javascript" src="../../lib/scenejs.js"></script>
-    <script type="text/javascript" src="../web/jquery/jquery.min.js"></script>
-    <script type="text/javascript" src="../web/sylvester.js"></script>
+    <script type="text/javascript" src="../web/libs/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../web/libs/sylvester.js"></script>
 
 </head>
 <body>
@@ -48,7 +48,7 @@
 
         </div>
         <div id="header-inner">
-            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Ray Picking with 1.2M Triangles
+            <h1><a href="http://scenejs.org">SceneJS</a> &gt; <a href="../index.html">Examples</a> &gt;&nbsp;Ray Picking
             </h1>
             <a class="a2a_dd" href="http://www.addtoany.com/share_save?linkname=s&amp;linkurl=s"><img
                     src="http://static.addtoany.com/buttons/share_save_171_16.png" width="171" height="16" border="0"
@@ -67,16 +67,10 @@
                 &lt;canvas&gt; feature.</p>
         </canvas>
         <div id="info">
-            <h1>Querying World, View and Canvas-space origins</h1>
+            <h1>Fast Ray Picking</h1>
 
-            <p>Querying node World, View and Canvas-space origins via a "rendered" event.</p>
-
-            <p>For each of these teapots we're listening to "rendered" events on their scene nodes, which report
-                their centre points in various coordinate systems, along with the Model, View and Projection matrices
-                that are applied to them.</p>
-
-            <p>Using the Canvas space centers, we can then float a DIV over each teapot on the canvas to report its
-                center points.</p>
+            <p>In this example we do a pick with the 'rayPick' option set. The hit result then returns the
+                world-space point of ray intersect with the picked object.</p>
 
             <ul>
                 <li><a target="_other" href="ray-picking.js">Scene source code</a></li>

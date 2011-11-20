@@ -1171,13 +1171,17 @@ var SceneJS_DrawList = new (function() {
 
                 rayPickBuf.unbind();
 
-                var worldPickZ = (this._unpackDepth(pix) - 0.5) / 0.001;
-
-                //----------------------------------------------------------------------------------------------------
+                /* Read normalised device Z coordinate, which will be
+                 * in range of [0..1] with z=0 at front
+                 */
+                var screenZ = this._unpackDepth(pix);
 
                 var w = canvas.width;
                 var h = canvas.height;
 
+                /* Calculate clip space coordinates, which will be in range
+                 * of x=[-1..1] and y=[-1..1], with y=(+1) at top
+                 */
                 var x = (canvasX - w / 2) / (w / 2) ;           // Calculate clip space coordinates
                 var y = -(canvasY - h / 2) / (h / 2) ;
 
@@ -1187,61 +1191,20 @@ var SceneJS_DrawList = new (function() {
                 var pvMat = SceneJS_math_mulMat4(projMat, viewMat, []);
                 var pvMatInverse = SceneJS_math_inverseMat4(pvMat, []);
 
-                var world1 = SceneJS_math_transformVector4(pvMatInverse, [x,y,-1,1]);
+                var world1 = SceneJS_math_transformVector4(pvMatInverse, [x,y,0,1]);
                 world1 = SceneJS_math_mulVec4Scalar(world1, 1 / world1[3]);
 
-                var world2 = SceneJS_math_transformVector4(pvMatInverse, [x,y,0,1]);
+                var world2 = SceneJS_math_transformVector4(pvMatInverse, [x,y,1,1]);
                 world2 = SceneJS_math_mulVec4Scalar(world2, 1 / world2[3]);
 
-                var dir = SceneJS_math_normalizeVec3(SceneJS_math_subVec3(world2, world1, []), []);
+                var dir = SceneJS_math_subVec3(world2, world1, []);
 
                 var eye = node.viewXFormState.lookAt.eye;
 
-                //  var vecScale = (worldPickZ - eye[2]) / dir[2];
-
-                //var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec3Scalar(dir, vecScale, []), []);
-
-                // Output depth as distance to camera then: eye + worldPickZ * vRay
-
-                var vWorld = SceneJS_math_addVec4(eye, SceneJS_math_mulVec4Scalar(dir, worldPickZ, []), []);
+                var vWorld = SceneJS_math_addVec4(eye, SceneJS_math_mulVec4Scalar(dir, screenZ, []), []);
 
                 hit.canvasPos = [canvasX, canvasY];
                 hit.worldPos = vWorld;
-
-                //----------------------------------------------------------------------------------------------------
-
-                //                var w = canvas.width;
-                //                var h = canvas.height;
-                //
-                //                var x = (canvasX - w / 2) / (w / 2) ;           // Calculate clip space coordinates
-                //                var y = -(canvasY - h / 2) / (h / 2) ;
-                //
-                //                var viewMat = node.viewXFormState.mat;
-                //                var projMat = node.projXFormState.mat;
-                //
-                //                var pvMat = SceneJS_math_mulMat4(projMat, viewMat, []);
-                //                var pvMatInverse = SceneJS_math_inverseMat4(pvMat, []);
-                //
-                //                var world1 = SceneJS_math_transformVector4(pvMatInverse, [x,y,-1,1]);
-                //                world1 = SceneJS_math_mulVec4Scalar(world1, 1 / world1[3]);
-                //
-                //                var world2 = SceneJS_math_transformVector4(pvMatInverse, [x,y,0,1]);
-                //                world2 = SceneJS_math_mulVec4Scalar(world2, 1 / world2[3]);
-                //
-                //                var dir = SceneJS_math_normalizeVec3(SceneJS_math_subVec3(world2, world1, []), []);
-                //
-                //                var eye = node.viewXFormState.lookAt.eye;
-                //
-                //                var vecScale = (worldPickZ - eye[2]) / dir[2];
-                //
-                //                var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec3Scalar(dir, vecScale, []), []);
-                //
-                //                // Output depth as distance to camera then:
-                //                // vWorld = vEye + fDepth * vRay
-                //
-                //                hit.canvasPos = [canvasX, canvasY];
-                //                hit.worldPos = vWorld;
-                //   hit.worldPos[2] = worldPickZ;
             }
         }
 
@@ -1391,66 +1354,6 @@ var SceneJS_DrawList = new (function() {
         }
     };
 
-    //    this._unproject = function(winx, winy, winz, ) {
-    //        // winz is either 0 (near plane), 1 (far plane) or somewhere in between.
-    //        // if it's not given a value we'll produce coords for both.
-    //        if (typeof(winz) == "number") {
-    //            winx = parseFloat(winx);
-    //            winy = parseFloat(winy);
-    //            winz = parseFloat(winz);
-    //
-    //            var inf = [];
-    //            var mm = this.getTransformationMatrix();
-    //            var pm = this.matrices.p;
-    //            var viewport = [0, 0, pm.width, pm.height];
-    //
-    //            //Calculation for inverting a matrix, compute projection x modelview; then compute the inverse
-    //            var m = mat4.set(mm, mat4.create());
-    //
-    //            mat4.inverse(m, m); // WHY do I have to do this? --see Jax.Context#reloadMatrices
-    //            mat4.multiply(pm, m, m);
-    //            mat4.inverse(m, m);
-    //
-    //            // Transformation of normalized coordinates between -1 and 1
-    //            inf[0] = (winx - viewport[0]) / viewport[2] * 2.0 - 1.0;
-    //            inf[1] = (winy - viewport[1]) / viewport[3] * 2.0 - 1.0;
-    //            inf[2] = 2.0 * winz - 1.0;
-    //            inf[3] = 1.0;
-    //
-    //            //Objects coordinates
-    //            var out = vec3.create();
-    //            mat4.multiplyVec4(m, inf, out);
-    //            if (out[3] == 0.0)
-    //                return null;
-    //
-    //            out[3] = 1.0 / out[3];
-    //            return [out[0] * out[3], out[1] * out[3], out[2] * out[3]];
-    //        }
-    //        else
-    //            return [this.unproject(winx, winy, 0), this.unproject(winx, winy, 1)];
-    //    },
-
-
-    //    ayPick.prototype.execute = function(params, completed) {
-    //        var inViewMat, nx, ny, projMat, rayDirection, rayOrigin, viewMat;
-    //        viewMat = SceneJS.withNode(this._cfg.lookAtNode).get("matrix");
-    //        projMat = SceneJS.withNode(this._cfg.cameraNode).get("matrix");
-    //        nx = -((2.0 * (params.x / this._cfg.canvasWidth)) - 1.0) / projMat[0];
-    //        ny = -((-2.0 * (params.y / this._cfg.canvasHeight)) + 1.0) / projMat[5];
-    //        inViewMat = this._inverseMat4(viewMat);
-    //        rayOrigin = [0, 0, 0, 1];
-    //        rayDirection = [nx, ny, 1, 0];
-    //        rayOrigin = this._mulMat4v4(inViewMat, rayOrigin);
-    //        rayDirection = this._mulMat4v4(inViewMat, rayDirection);
-    //        this._result = {
-    //            rayOrigin: rayOrigin,
-    //            rayDirection: rayDirection
-    //        };
-    //        if (completed) {
-    //            completed(this);
-    //        }
-    //        return this;
-    //    };
 
 
     /*===================================================================================================================
@@ -1557,15 +1460,26 @@ var SceneJS_DrawList = new (function() {
 
         var clipping = clipState.clips.length > 0;
         var morphing = morphState.morph && true;
+        var normals = this._hasNormals();
 
         var src = [
             "#ifdef GL_ES",
             "   precision highp float;",
             "#endif",
             "attribute vec3 SCENEJS_aVertex;",
+            "attribute vec3 SCENEJS_aNormal;",
+
             "uniform mat4 SCENEJS_uMMatrix;",
+            "uniform mat4 SCENEJS_uMNMatrix;",
             "uniform mat4 SCENEJS_uVMatrix;",
-            "uniform mat4 SCENEJS_uPMatrix;"];
+            "uniform mat4 SCENEJS_uVNMatrix;",
+            "uniform mat4 SCENEJS_uPMatrix;"
+        ];
+
+        if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
+            src.push("varying   vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
+            src.push("varying   vec3 SCENEJS_vViewNormal;");   // Output world-space vertex normal
+        }
 
         src.push("varying vec4 SCENEJS_vModelVertex;");
 
@@ -1593,6 +1507,10 @@ var SceneJS_DrawList = new (function() {
 
         src.push("void main(void) {");
         src.push("   vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
+
+        if (normals) {
+            src.push("  vec4 modelNormal = vec4(SCENEJS_aNormal, 0.0); ");
+        }
 
         src.push("  SCENEJS_vModelVertex = tmpVertex; ");
 
@@ -1623,7 +1541,7 @@ var SceneJS_DrawList = new (function() {
         src.push("  SCENEJS_vWorldVertex = tmpVertex; ");
         //    }
 
-       src.push("SCENEJS_vEyeVec = normalize(SCENEJS_uEye - tmpVertex.xyz);");
+        src.push("SCENEJS_vEyeVec = normalize(SCENEJS_uEye - tmpVertex.xyz);");
 
         src.push("  tmpVertex = SCENEJS_uVMatrix * tmpVertex; ");
 
@@ -1633,8 +1551,13 @@ var SceneJS_DrawList = new (function() {
 
         src.push("  SCENEJS_vViewVertex = tmpVertex;");
 
-        src.push("  SCENEJS_vProjVertex = SCENEJS_uPMatrix * tmpVertex;");
+        if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
+            src.push("  vec3 worldNormal = normalize((SCENEJS_uMNMatrix * modelNormal).xyz); ");
+            src.push("  SCENEJS_vWorldNormal = worldNormal;");
+            src.push("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
+        }
 
+        src.push("  SCENEJS_vProjVertex = SCENEJS_uPMatrix * tmpVertex;");
 
 
         src.push("  gl_Position = SCENEJS_vProjVertex;");
@@ -1671,7 +1594,7 @@ var SceneJS_DrawList = new (function() {
         src.push("  vec4 res = fract(depth * bit_shift);");
         src.push("  res -= res.xxyz * bit_mask;");
         src.push("  return res;");
-        src.push("}");     
+        src.push("}");
 
         src.push("varying vec4 SCENEJS_vModelVertex;");
         src.push("varying vec4 SCENEJS_vWorldVertex;");
@@ -1687,12 +1610,11 @@ var SceneJS_DrawList = new (function() {
 
         src.push("varying vec3 SCENEJS_vEyeVec;");                          // Direction of view-space vertex from eye
 
-        if (normals) {
+        if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
 
-            src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
+            src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal            
             src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
         }
-        
         /*-----------------------------------------------------------------------------------
          * Variables - Clipping
          *----------------------------------------------------------------------------------*/
@@ -1757,22 +1679,13 @@ var SceneJS_DrawList = new (function() {
         }
 
         src.push("    if (SCENEJS_uRayPickMode) {");
-
-        //src.push("          float zNormalizedDepth = (SCENEJS_uZNear - SCENEJS_vViewVertex.z) / abs(SCENEJS_uZFar - SCENEJS_uZNear);");
-        //src.push("          gl_FragColor = packDepth(clamp((zNormalizedDepth * 0.001), -0.5, 0.5) + 0.5); ");
-
-        // World Z depth
-        src.push("          gl_FragColor = packDepth(clamp((SCENEJS_vWorldVertex.z * 0.001), -0.5, 0.5) + 0.5); ");
-
-
-        //        src.push("          gl_FragColor = packDepth(gl_FragCoord.z); ");
-
+        src.push("          float zNormalizedDepth = (SCENEJS_uZNear - SCENEJS_vViewVertex.z) / abs(SCENEJS_uZFar - SCENEJS_uZNear);");
+        src.push("          gl_FragColor = packDepth(zNormalizedDepth); ");
 
         src.push("    } else {");
         src.push("          gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
         src.push("    }");
         src.push("}");
-        // }
 
         if (debugCfg.logScripts == true) {
             SceneJS_loggingModule.info(src);

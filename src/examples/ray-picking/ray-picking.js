@@ -9,17 +9,23 @@
  */
 
 
+
 /*----------------------------------------------------------------------
- * Scene graph definition
+ * Function to return JSON defining a 3D array of teapots.
+ *
+ * Each teapot has a random colour, and is wrapped by a "name" node
+ * which identifies the teapot's world-space location.
+ *
+ * A picking hit will contain the name of the picked teapot.
  *---------------------------------------------------------------------*/
 
-function createobjects() {
+function createTeapotArray() {
 
     var nodes = [];
 
-    for (var x = -250; x <= 250; x += 50) {
-        for (var y = -250; y <= 250; y += 50) {
-            for (var z = -250; z <= 250; z += 50) {
+    for (var x = -250; x <= 250; x += 100) {
+        for (var y = -250; y <= 250; y += 100) {
+            for (var z = -250; z <= 250; z += 100) {
                 nodes.push({
                     type: "material",
                     baseColor:      { r: 0.2 + Math.random(), g: 0.2 + Math.random(), b: 0.2 + Math.random() },
@@ -67,6 +73,13 @@ function createobjects() {
     };
 }
 
+/*----------------------------------------------------------------------
+ * Create scene containing our array of teapots.
+ *
+ * The scene also contains a white sphere that we will move to the
+ * world-space location of the ray intersection of each pick hit, to
+ * indicate the picked point on the surface of each teapot we pick.
+ *---------------------------------------------------------------------*/
 
 SceneJS.createScene({
     type: "scene",
@@ -116,8 +129,10 @@ SceneJS.createScene({
                             nodes: [
 
                                 /*-----------------------------------------------------------------------
-                                 * White dot that indicates world-space picked position
-                                 * We'll update its translation with the pick position on each hit
+                                 * White dot that indicates world-space ray intersection point
+                                 * of each pick hit.
+                                 *
+                                 * We'll update its translation with the pick position on each hit.
                                  *----------------------------------------------------------------------*/
 
                                 {
@@ -160,10 +175,10 @@ SceneJS.createScene({
                                 },
 
                                 /*-----------------------------------------------------------------------
-                                 * Add cloud of pickable objects
+                                 * Add array of pickable teapots
                                  *----------------------------------------------------------------------*/
 
-                                createobjects()
+                                createTeapotArray()
                             ]
                         }
                     ]
