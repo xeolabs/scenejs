@@ -128,13 +128,6 @@ SceneJS.createScene({
                             type: "node",
                             nodes: [
 
-                                /*-----------------------------------------------------------------------
-                                 * White dot that indicates world-space ray intersection point
-                                 * of each pick hit.
-                                 *
-                                 * We'll update its translation with the pick position on each hit.
-                                 *----------------------------------------------------------------------*/
-
                                 {
                                     type: "material",
                                     baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
@@ -143,27 +136,48 @@ SceneJS.createScene({
                                     shine:          6.0,
 
                                     nodes: [
+
+                                        /*-----------------------------------------------------------------------
+                                         * Add array of pickable teapots
+                                         *----------------------------------------------------------------------*/
+
+                                        createTeapotArray(),
+
+                                        /*-----------------------------------------------------------------------
+                                         * White dot that indicates world-space ray intersection point
+                                         * of each pick hit.
+                                         *
+                                         * We'll update its translation with the pick position on each hit.
+                                         *----------------------------------------------------------------------*/
                                         {
                                             type: "name",
                                             name: "indicator",
                                             nodes: [
                                                 {
-                                                    type: "translate",
-                                                    id: "pickIndicator",
-
-                                                    x: -20,
-                                                    z: -70,
+                                                    type: "material",
+                                                    baseColor: { r: 1, g: 1, b: 1 },
+                                                    specularColor: { r: 1, g: 1, b: 1 },
 
                                                     nodes: [
                                                         {
-                                                            type: "scale",
-                                                            x: 2,
-                                                            y: 2,
-                                                            z: 2,
-                                                            nodes: [
+                                                            type: "translate",
+                                                            id: "pickIndicator",
 
+                                                            x: -20,
+                                                            z: -70,
+
+                                                            nodes: [
                                                                 {
-                                                                    type: "sphere"
+                                                                    type: "scale",
+                                                                    x: 1.5,
+                                                                    y: 1.5,
+                                                                    z: 1.5,
+                                                                    nodes: [
+
+                                                                        {
+                                                                            type: "sphere"
+                                                                        }
+                                                                    ]
                                                                 }
                                                             ]
                                                         }
@@ -172,13 +186,8 @@ SceneJS.createScene({
                                             ]
                                         }
                                     ]
-                                },
+                                }
 
-                                /*-----------------------------------------------------------------------
-                                 * Add array of pickable teapots
-                                 *----------------------------------------------------------------------*/
-
-                                createTeapotArray()
                             ]
                         }
                     ]
@@ -217,7 +226,21 @@ function mouseDown(event) {
 function mouseUp(event) {
     dragging = false;
 
-    if (event.clientX == lastX && event.clientY == lastY) {
+    //    if (event.clientX == lastX && event.clientY == lastY) {
+    //
+    //
+    //    }
+}
+
+function mouseMove(event) {
+    if (dragging) {
+        yaw += (event.clientX - lastX) * -.1;
+        pitch += (lastY - event.clientY) * .1;
+        lastX = event.clientX;
+        lastY = event.clientY;
+        updated = true;
+
+    } else {
 
         /*-----------------------------------------------------------------------
          * On click, do ray-pick; if we get a hit, update the white
@@ -228,27 +251,32 @@ function mouseUp(event) {
 
         var hit = scene.pick(coords.x, coords.y, { rayPick: true });
 
-        if (hit) {
+        if (hit) {   // Ignore hits on the indicator sphere
 
-            var worldPos = hit.worldPos;
+            if (hit.name != "indicator") {
+                
+                $("#pickIndicator").show();
 
-            indicatorSphere.set({
-                x: worldPos[0],
-                y: worldPos[1],
-                z: worldPos[2]
-            });
+                var worldPos = hit.worldPos;
 
-            updateLabelPos(
-                    hit.name,
-                    hit.canvasPos,
-                    hit.worldPos);
+                indicatorSphere.set({
+                    x: worldPos[0],
+                    y: worldPos[1],
+                    z: worldPos[2]
+                });
 
+                updateLabelPos(
+                        hit.name,
+                        hit.canvasPos,
+                        hit.worldPos);
+            }
 
-        } else {
+        } else { // Nothing picked
             $("#pickIndicator").hide();
         }
     }
 }
+
 
 function clickCoordsWithinElement(event) {
     var coords = { x: 0, y: 0};
@@ -285,22 +313,12 @@ function updateLabelPos(pickName, canvasPos, worldPos) {
                     + "<br/>worldPos : " + roundFloat(worldPos[0]) + ", " + roundFloat(worldPos[1]) + ", " + roundFloat(worldPos[2])
             );
 
-    $("#pickIndicator").css("left", offset.left + canvasPos[0]);
-    $("#pickIndicator").css("top", offset.top + canvasPos[1]);
+    $("#pickIndicator").css("left", offset.left + canvasPos[0] + 5);
+    $("#pickIndicator").css("top", offset.top + canvasPos[1] + 5);
 }
 
 function roundFloat(v) {
     return Math.round(v * 10) / 10;
-}
-
-function mouseMove(event) {
-    if (dragging) {
-        yaw += (event.clientX - lastX) * -.1;
-        pitch += (lastY - event.clientY) * .1;
-        lastX = event.clientX;
-        lastY = event.clientY;
-        updated = true;
-    }
 }
 
 function mouseWheel(event) {
