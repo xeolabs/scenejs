@@ -1077,6 +1077,8 @@ var SceneJS_DrawList = new (function() {
             throw "No drawList found for scene '" + params.sceneId + "'";
         }
 
+        var canvas = states.canvas.canvas;
+
         var hit = null;
 
         var canvasX = params.canvasX;
@@ -1212,10 +1214,10 @@ var SceneJS_DrawList = new (function() {
     };
 
 
-    this._unpackDepth = function(rgba_depth) {
-        var vec = [rgba_depth[0] / 256.0, rgba_depth[1] / 256.0, rgba_depth[2] / 256.0, rgba_depth[3] / 256.0];
-        var bit_shift = [1.0 / (256.0 * 256.0 * 256.0), 1.0 / (256.0 * 256.0), 1.0 / 256.0, 1.0];
-        return SceneJS_math_dotVector4(vec, bit_shift);
+    this._unpackDepth = function(depthZ) {
+        var vec = [depthZ[0] / 256.0, depthZ[1] / 256.0, depthZ[2] / 256.0, depthZ[3] / 256.0];
+        var bitShift = [1.0 / (256.0 * 256.0 * 256.0), 1.0 / (256.0 * 256.0), 1.0 / 256.0, 1.0];
+        return SceneJS_math_dotVector4(vec, bitShift);
     };
 
 
@@ -1589,10 +1591,10 @@ var SceneJS_DrawList = new (function() {
             "#endif"];
 
         src.push("vec4 packDepth(const in float depth) {");
-        src.push("  const vec4 bit_shift = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);");
-        src.push("  const vec4 bit_mask  = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);");
-        src.push("  vec4 res = fract(depth * bit_shift);");
-        src.push("  res -= res.xxyz * bit_mask;");
+        src.push("  const vec4 bitShift = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);");
+        src.push("  const vec4 bitMask  = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);");
+        src.push("  vec4 res = fract(depth * bitShift);");
+        src.push("  res -= res.xxyz * bitMask;");
         src.push("  return res;");
         src.push("}");
 
@@ -1686,6 +1688,7 @@ var SceneJS_DrawList = new (function() {
         src.push("          gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
         src.push("    }");
         src.push("}");
+
 
         if (debugCfg.logScripts == true) {
             SceneJS_loggingModule.info(src);
