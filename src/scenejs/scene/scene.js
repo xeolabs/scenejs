@@ -314,20 +314,20 @@ new (function() {
                                 fps: getFPS()
                             });
                         }
-                        requestAnimFrame(window[fnName]);
+                        window.requestAnimFrame(window[fnName]);
                     } else {
                         if (!sleeping && cfg.sleepFunc) {
                             cfg.sleepFunc();
                         }
                         sleeping = true;
-                        requestAnimFrame(window[fnName]);
+                        window.requestAnimFrame(window[fnName]);
                     }
                 } else {
-                    requestAnimFrame(window[fnName]);
+                    window.requestAnimFrame(window[fnName]);
                 }
             };
             this._startCfg = cfg;
-            requestAnimFrame(window[fnName]); // Push one frame immediately
+            window.requestAnimFrame(window[fnName]); // Push one frame immediately
         }
     };
 
