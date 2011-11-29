@@ -4,6 +4,8 @@ new (function() {
     var scenes = {};
     var nScenes = 0;
 
+    var Scene = SceneJS.createNodeType("scene");
+
     SceneJS_eventModule.addListener(
             SceneJS_eventModule.RESET,
             function() {
@@ -142,8 +144,6 @@ new (function() {
 
     }
 
-    var Scene = SceneJS.createNodeType("scene");
-
     Scene.prototype._init = function(params) {
 
         if (!params.canvasId) {
@@ -196,7 +196,7 @@ new (function() {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
         var context = this.canvas.context;
-        return context.getParameter(context.DEPTH_BITS)
+        return context.getParameter(context.DEPTH_BITS);
     };
 
     window.requestAnimFrame = (function() {
