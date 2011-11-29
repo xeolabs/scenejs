@@ -56,10 +56,11 @@ var SceneJS_DrawListRenderer = function(cfg) {
             var x = (pc[0] / pc[3]) * this._mem.canvasWidth * 0.5;
             var y = (pc[1] / pc[3]) * this._mem.canvasHeight * 0.5;
 
-            return this._mem.canvasPos = {
+            this._mem.canvasPos = {
                 x: x + (self._canvas.width * 0.5),
                 y: this._mem.canvasHeight - y - (this._mem.canvasHeight * 0.5)
             };
+            return this._mem.canvasPos;
         },
 
         getCameraPos : function(offset) {
