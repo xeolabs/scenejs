@@ -4,7 +4,7 @@
 
 // Various functions for helping debug WebGL apps.
 
-WebGLDebugUtils = function() {
+var WebGLDebugUtils = function() {
 
 /**
  * Wrapped logging function.
@@ -196,7 +196,7 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
               (mightBeEnum(args[ii]) ? glEnumToString(args[ii]) : args[ii]);
         }
         return functionName +  "(" + argStr + ")";
-      };
+      }
 
   opt_onErrorFunc = opt_onErrorFunc || function(err, functionName, args) {
         alert("WebGL error "+ glEnumToString(err) + " in "+
@@ -214,7 +214,7 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
         log('gl.setTracing(' + newTracing + ');');
       }
       tracing = newTracing;
-  }
+  };
 
   var escapeDict = {
     '\'' : '\\\'',
@@ -253,7 +253,7 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
           var sym = name + counter;
           counter++;
           return sym;
-      }
+      };
   }
 
   var constructorDict = {
@@ -277,7 +277,7 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
     "[object WebGLIntArray]" : "WebGLIntArray",
     "[object WebGLUnsignedIntArray]" : "WebGLUnsignedIntArray",
     "[object Float32Array]" : "Float32Array"
-  }
+  };
 
   function asWebGLArray(a) {
     var arrayType = arrayTypeDict[a];
@@ -293,7 +293,7 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
     // }
     buf += '] )';
     return buf;
-  };
+  }
 
   function traceFunctionCall(functionName, args) {
         var argStr = "";
@@ -325,7 +325,7 @@ function makeDebugContext(ctx, opt_onErrorFunc) {
             }
         }
         return "gl." + functionName +  "(" + argStr + ");";
-  };
+  }
 
   // Makes a function that calls a WebGL function and then calls getError.
   function makeErrorWrapper(ctx, functionName) {
