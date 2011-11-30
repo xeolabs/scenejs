@@ -73,7 +73,7 @@
      * @param {Number|String} node Child node index or ID
      */
     NodeSelector.prototype.hasNode = function(node) {
-        if (!node === null || typeof(node) === "undefined") {
+        if (node === null || typeof(node) === "undefined") {
             throw SceneJS_errorModule.fatalError("hasNode param 'node' is null or undefined");
         }
         var type = typeof node;
