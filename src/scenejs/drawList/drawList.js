@@ -782,7 +782,9 @@ var SceneJS_DrawList = new (function() {
             geo.normalBuf ? "t" : "f",
             geo.uvBuf ? "t" : "f",
             geo.uvBuf2 ? "t" : "f",
-            geo.colorBuf ? "t" : "f"]).join("");
+            geo.colorBuf ? "t" : "f",
+            geo.primitive
+        ]).join("");
 
         /* Identify what GLSL is required for the current state soup elements
          */
@@ -1265,7 +1267,7 @@ var SceneJS_DrawList = new (function() {
             var countDestroyed = 0;
             var flags;
             var tagCore;
-            var _picking = picking;
+            var _picking = picking;   // For optimised lookup
 
             /* Tag matching
              */
@@ -1301,7 +1303,7 @@ var SceneJS_DrawList = new (function() {
                     continue;
                 }
 
-                /* Skip unmatched tags
+                /* Skip unmatched tags. Visible node caching helps prevent this being done on every frame.
                  */
                 if (tagMask) {
                     tagCore = node.tagState.core;
@@ -1331,7 +1333,7 @@ var SceneJS_DrawList = new (function() {
                     nodeRenderer.renderNode(node);                          // Render node if opaque or in picking mode
                 }
 
-                visibleCacheBin[states.lenVisibleCacheBin++] = node;      // Build visible node cache
+                visibleCacheBin[states.lenVisibleCacheBin++] = node;        // Cache visible node
             }
 
             if (countDestroyed > 0) {
@@ -1355,7 +1357,6 @@ var SceneJS_DrawList = new (function() {
             context.disable(context.BLEND);
         }
     };
-
 
 
     /*===================================================================================================================
@@ -1465,9 +1466,7 @@ var SceneJS_DrawList = new (function() {
         var normals = this._hasNormals();
 
         var src = [
-            "#ifdef GL_ES",
-            "   precision highp float;",
-            "#endif",
+            "precision mediump float;",
             "attribute vec3 SCENEJS_aVertex;",
             "attribute vec3 SCENEJS_aNormal;",
 
@@ -1586,9 +1585,8 @@ var SceneJS_DrawList = new (function() {
         var normals = this._hasNormals();
 
         var src = [
-            "#ifdef GL_ES",
-            "   precision highp float;",
-            "#endif"];
+            "precision mediump float;"
+        ];
 
         src.push("vec4 packDepth(const in float depth) {");
         src.push("  const vec4 bitShift = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);");
@@ -1681,7 +1679,7 @@ var SceneJS_DrawList = new (function() {
         }
 
         src.push("    if (SCENEJS_uRayPickMode) {");
-        src.push("          float zNormalizedDepth = (SCENEJS_uZNear - SCENEJS_vViewVertex.z) / abs(SCENEJS_uZFar - SCENEJS_uZNear);");
+        src.push("          float zNormalizedDepth = (SCENEJS_uZNear - SCENEJS_vViewVertex.z) / (SCENEJS_uZFar- SCENEJS_uZNear);");
         src.push("          gl_FragColor = packDepth(zNormalizedDepth); ");
 
         src.push("    } else {");
@@ -1747,9 +1745,7 @@ var SceneJS_DrawList = new (function() {
         var morphing = morphState.morph && true;
 
         var src = [
-            "#ifdef GL_ES",
-            "   precision highp float;",
-            "#endif"
+            "precision mediump float;",
         ];
 
         src.push("attribute vec3 SCENEJS_aVertex;");                // Model coordinates
@@ -1980,9 +1976,7 @@ var SceneJS_DrawList = new (function() {
 
         var src = ["\n"];
 
-        src.push("#ifdef GL_ES");
-        src.push("   precision highp float;");
-        src.push("#endif");
+        src.push("precision mediump float;");
 
 
         if (clipping || fragmentHooks.worldPos) {
