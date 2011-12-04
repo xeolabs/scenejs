@@ -372,18 +372,18 @@ new (function() {
         }
         options = options || {};
         this._compileScene();                   // Do any pending scene recompilations
-        var pickRecord = SceneJS_DrawList.pick({
+        var hit = SceneJS_DrawList.pick({
             sceneId: this.attr.id,
             canvasX : canvasX,
             canvasY : canvasY,
             rayPick: options.rayPick,
             tagSelector: this.tagSelector
         });
-        if (pickRecord) {
-            pickRecord.canvasX = canvasX;
-            pickRecord.canvasY = canvasY;
+        if (hit) {
+            hit.canvasX = canvasX;
+            hit.canvasY = canvasY;
         }
-        return pickRecord;
+        return hit;
     };
 
     Scene.prototype._compile = function() {

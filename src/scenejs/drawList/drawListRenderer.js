@@ -938,7 +938,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
 
                                         var program = self._program;
                                         var context = self._context;
-                                       
+
                                         var uMaterialBaseColorLocation = program.getUniformLocation("SCENEJS_uMaterialBaseColor");
                                         var uMaterialSpecularColorLocation = program.getUniformLocation("SCENEJS_uMaterialSpecularColor");
                                         var uMaterialSpecularLocation = program.getUniformLocation("SCENEJS_uMaterialSpecular");
@@ -1152,6 +1152,10 @@ var SceneJS_DrawListRenderer = function(cfg) {
 
                                     var callCtx = self._callCtx;
 
+                                    var uBackfaceTexturingLocation = program.getUniformLocation("SCENEJS_uBackfaceTexturing");
+                                    var uBackfaceLightingLocation = program.getUniformLocation("SCENEJS_uBackfaceLighting");
+                                    var uSpecularLightingLocation = program.getUniformLocation("SCENEJS_uSpecularLighting");
+
                                     var flagsState = nodeFlagsState;
 
                                     return function() {
@@ -1200,9 +1204,9 @@ var SceneJS_DrawListRenderer = function(cfg) {
                                             }
                                         }
 
-                                        program.setUniform("SCENEJS_uBackfaceTexturing", newFlags.backfaceTexturing == undefined ? true : !!newFlags.backfaceTexturing);
-                                        program.setUniform("SCENEJS_uBackfaceLighting", newFlags.backfaceLighting == undefined ? true : !!newFlags.backfaceLighting);
-                                        program.setUniform("SCENEJS_uSpecularLighting", newFlags.specular == undefined ? true : !!newFlags.specular);
+                                        context.uniform1i(uBackfaceTexturingLocation, newFlags.backfaceTexturing == undefined ? true : !!newFlags.backfaceTexturing);
+                                        context.uniform1i(uBackfaceLightingLocation, newFlags.backfaceLighting == undefined ? true : !!newFlags.backfaceLighting);
+                                        context.uniform1i(uSpecularLightingLocation, newFlags.specular == undefined ? true : !!newFlags.specular);
 
                                         //            var mask = newFlags.colorMask;
                                         //
