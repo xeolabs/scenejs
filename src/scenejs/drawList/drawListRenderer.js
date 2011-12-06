@@ -56,10 +56,11 @@ var SceneJS_DrawListRenderer = function(cfg) {
             var x = (pc[0] / pc[3]) * this._mem.canvasWidth * 0.5;
             var y = (pc[1] / pc[3]) * this._mem.canvasHeight * 0.5;
 
-            return this._mem.canvasPos = {
+            this._mem.canvasPos = {
                 x: x + (self._canvas.width * 0.5),
                 y: this._mem.canvasHeight - y - (this._mem.canvasHeight * 0.5)
             };
+            return this._mem.canvasPos;
         },
 
         getCameraPos : function(offset) {
@@ -147,11 +148,13 @@ var SceneJS_DrawListRenderer = function(cfg) {
      */
     this.renderNode = function(node) {
 
+        var i, len, k;
+        
         if (this._picking || this._rayPicking) {                      // Picking mode - same calls for pick and Z-pick
 
             if (!(this._callListDirty || this._callFuncsDirty)) {   // Call list and function cache still good
                 var pickList = node.__pickCallList;                 // Execute call list and return
-                for (var i = 0, len = node.__pickCallListLen; i < len; i++) {
+                for (i = 0, len = node.__pickCallListLen; i < len; i++) {
                     pickList[i]();
                 }
                 return;
@@ -177,7 +180,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
 
             if (!(this._callListDirty || this._callFuncsDirty)) {   // Call list and function cache still good
                 var drawList = node.__drawCallList;                 // Execute pick call list and return
-                for (var i = 0, len = node.__drawCallListLen; i < len; i++) {
+                for (i = 0, len = node.__drawCallListLen; i < len; i++) {
                     drawList[i]();
                 }
                 return;
@@ -853,7 +856,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
             /* Load clip planes for draw and pick
              */
             var clips = node.clipState.clips;
-            for (var k = 0, len = clips.length; k < len; k++) {
+            for (k = 0, len = clips.length; k < len; k++) {
                 this.createCall(
                         (function() {
                             var context = self._context;
@@ -983,7 +986,7 @@ var SceneJS_DrawListRenderer = function(cfg) {
                 /* Load lights for draw
                  */
                 var lights = node.lightState.lights;
-                for (var k = 0, len = lights.length; k < len; k++) {
+                for (k = 0, len = lights.length; k < len; k++) {
 
                     this.createCall(
                             this._callFuncs["light" + k]

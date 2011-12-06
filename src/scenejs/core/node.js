@@ -32,7 +32,7 @@ SceneJS._Node = function(cfg, scene) {
      * knows not to recompute that state when next compiled. Since internal state is usually dependent on the
      * states of higher nodes, this is reset whenever the node is attached to a new parent.
      */
-    this._compileMemoLevel = 0
+    this._compileMemoLevel = 0;
 
     /* Deregister default ID
      */
@@ -434,15 +434,18 @@ SceneJS._Node.prototype.removeNodes = function() {
  * @returns {Node} The parent
  */
 SceneJS._Node.prototype.splice = function() {
+
+    var i, len;
+
     if (this.parent == null) {
         return null;
     }
     var parent = this.parent;
     var children = this.disconnectNodes();
-    for (var i = 0, len = children.length; i < len; i++) {  // Link this node's children to new parent
+    for (i = 0, len = children.length; i < len; i++) {  // Link this node's children to new parent
         children[i].parent = this.parent;
     }
-    for (var i = 0, len = parent.children.length; i < len; i++) { // Replace node on parent's children with this node's children
+    for (i = 0, len = parent.children.length; i < len; i++) { // Replace node on parent's children with this node's children
         if (parent.children[i] === this) {
             parent.children.splice.apply(parent.children, [i, 1].concat(children));
             this.parent = null;
@@ -768,14 +771,17 @@ SceneJS._Node.prototype.findNodesByType = function(type, recursive) {
 
 /** @private */
 SceneJS._Node.prototype._findNodesByType = function(type, list, recursive) {
-    for (var i = 0; i < this.children; i++) {
+
+    var i;
+
+    for (i = 0; i < this.children; i++) {
         var node = this.children[i];
         if (node.type == type) {
             list.add(node);
         }
     }
     if (recursive) {
-        for (var i = 0; i < this.children; i++) {
+        for (i = 0; i < this.children; i++) {
             this.children[i]._findNodesByType(type, list, recursive);
         }
     }

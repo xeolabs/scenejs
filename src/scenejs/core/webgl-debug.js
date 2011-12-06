@@ -1,4 +1,4 @@
-WebGLDebugUtils = function() {
+var WebGLDebugUtils = function() {
 
 /**
  * Wrapped logging function.

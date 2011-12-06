@@ -413,11 +413,11 @@ var SceneJS_compileModule = new (function() {
     };
 
     this._alwaysCompilePath = function(compileScene, targetNode) {
-        if (compileScene.nodeAlwaysCompile[id]) {
-            return;
-        }
         var id;
         var node = targetNode;
+        if (compileScene.nodeAlwaysCompile[node.attr.id]) {
+            return;
+        }
         while (node) {
             id = node.attr.id;
             compileScene.nodeAlwaysCompile[id] = true;

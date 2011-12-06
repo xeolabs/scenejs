@@ -196,15 +196,18 @@ var SceneJS_webgl_Shader = function(context, type, source, logging) {
  * @param logging Program and shaders will write to logging's debug channel as they compile and link
  */
 var SceneJS_webgl_Program = function(hash, context, vertexSources, fragmentSources, logging) {
+    
+    var a, i, u, u_name, location, shader;
+    
     this.hash = hash;
 
     /* Create shaders from sources
      */
     var shaders = [];
-    for (var i = 0; i < vertexSources.length; i++) {
+    for (i = 0; i < vertexSources.length; i++) {
         shaders.push(new SceneJS_webgl_Shader(context, context.VERTEX_SHADER, vertexSources[i], logging));
     }
-    for (var i = 0; i < fragmentSources.length; i++) {
+    for (i = 0; i < fragmentSources.length; i++) {
         shaders.push(new SceneJS_webgl_Shader(context, context.FRAGMENT_SHADER, fragmentSources[i], logging));
     }
 
@@ -212,8 +215,8 @@ var SceneJS_webgl_Program = function(hash, context, vertexSources, fragmentSourc
      */
     var handle = context.createProgram();
 
-    for (var i = 0; i < shaders.length; i++) {
-        var shader = shaders[i];
+    for (i = 0; i < shaders.length; i++) {
+        shader = shaders[i];
         if (shader.valid) {
             context.attachShader(handle, shader.handle);
         }
@@ -248,14 +251,14 @@ var SceneJS_webgl_Program = function(hash, context, vertexSources, fragmentSourc
      * gl.getActiveUniform was producing uniform names that had a trailing NUL in Chrome 6.0.466.0 dev
      * Issue ticket at: https://xeolabs.lighthouseapp.com/projects/50643/tickets/124-076-live-examples-blank-canvas-in-chrome-5037599
      */
-    for (var i = 0; i < numUniforms; ++i) {
-        var u = context.getActiveUniform(handle, i);
+    for (i = 0; i < numUniforms; ++i) {
+        u = context.getActiveUniform(handle, i);
         if (u) {
-            var u_name = u.name;
+            u_name = u.name;
             if (u_name[u_name.length - 1] == "\u0000") {
                 u_name = u_name.substr(0, u_name.length - 1);
             }
-            var location = context.getUniformLocation(handle, u_name);
+            location = context.getUniformLocation(handle, u_name);
             if ((u.type == context.SAMPLER_2D) || (u.type == context.SAMPLER_CUBE) || (u.type == 35682)) {
 
                 samplers[u_name] = new SceneJS_webgl_ProgramSampler(
@@ -284,10 +287,10 @@ var SceneJS_webgl_Program = function(hash, context, vertexSources, fragmentSourc
     var attributes = {};
 
     var numAttribs = context.getProgramParameter(handle, context.ACTIVE_ATTRIBUTES);
-    for (var i = 0; i < numAttribs; i++) {
-        var a = context.getActiveAttrib(handle, i);
+    for (i = 0; i < numAttribs; i++) {
+        a = context.getActiveAttrib(handle, i);
         if (a) {
-            var location = context.getAttribLocation(handle, a.name);
+            location = context.getAttribLocation(handle, a.name);
             attributes[a.name] = new SceneJS_webgl_ProgramAttribute(
                     context,
                     handle,

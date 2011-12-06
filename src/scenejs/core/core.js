@@ -135,7 +135,7 @@ var SceneJS = {
     },
 
     _parseNodeJSON : function(json, scene) {
-        var newNode = this._createNode(json, scene)
+        var newNode = this._createNode(json, scene);
         scene = scene || newNode;
         newNode.scene = scene;
         if (json.nodes) {
@@ -313,7 +313,7 @@ var SceneJS = {
         var o2 = {};
         for (var name in o) {
             if (o.hasOwnProperty(name)) {
-                o2[name] = o[name]
+                o2[name] = o[name];
             }
         }
         return o2;
