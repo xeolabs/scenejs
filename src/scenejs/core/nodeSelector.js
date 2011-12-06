@@ -37,7 +37,7 @@
         } else if (type == "string") {
             nodeGot = this._targetNode.getNode(node);
         } else {
-            SceneJS_errorModule.fatalError("node param 'node' should be either an index number or an ID string");
+            throw SceneJS_errorModule.fatalError("node param 'node' should be either an index number or an ID string");
         }
         if (!nodeGot) {
             throw "node not found: '" + node + "'";
@@ -47,7 +47,7 @@
 
     NodeSelector.prototype.findNode = function (nodeId) {
         if (this._targetNode.attr.type != "scene") {
-            SceneJS_errorModule.fatalError("findNode attempted on node that is not a \"scene\" type: '" + this._targetNode.attr.id + "'");
+            throw SceneJS_errorModule.fatalError("findNode attempted on node that is not a \"scene\" type: '" + this._targetNode.attr.id + "'");
         }
         return this._targetNode.findNode(nodeId);
     };
@@ -57,7 +57,7 @@
      */
     NodeSelector.prototype.findNodes = function (nodeIdRegex) {
         if (this._targetNode.attr.type != "scene") {
-            SceneJS_errorModule.fatalError("findNode attempted on node that is not a \"scene\" type: '" + this._targetNode.attr.id + "'");
+            throw SceneJS_errorModule.fatalError("findNode attempted on node that is not a \"scene\" type: '" + this._targetNode.attr.id + "'");
         }
         return this._targetNode.findNodes(nodeIdRegex);
     };
@@ -73,7 +73,7 @@
      * @param {Number|String} node Child node index or ID
      */
     NodeSelector.prototype.hasNode = function(node) {
-        if (!node === null || typeof(node) === "undefined") {
+        if (node === null || typeof(node) === "undefined") {
             throw SceneJS_errorModule.fatalError("hasNode param 'node' is null or undefined");
         }
         var type = typeof node;

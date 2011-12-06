@@ -129,13 +129,14 @@ SceneJS.Services.addService(
     commandService.addCommand("update", {
         execute: function(ctx, params) {
 
+            var i, len;
             var scenes;
             var target = params.target;
             var scene;
 
             if (ctx.scenes) {
                 scenes = ctx.scenes;
-                for (var i = 0, len = scenes.length; i < len; i++) {
+                for (i = 0, len = scenes.length; i < len; i++) {
                     scene = scenes[i];
                     if (scene) { // Scene might have been blown away by some other command
                         updateNode(scene, target, params);
@@ -159,7 +160,7 @@ SceneJS.Services.addService(
              */
             var messages = params.messages;
             if (messages && messages.length > 0) {
-                for (var i = 0; i < messages.length; i++) {
+                for (i = 0; i < messages.length; i++) {
                     commandService.executeCommand(ctx, messages[i]);
                 }
             }
@@ -168,6 +169,8 @@ SceneJS.Services.addService(
 
     commandService.addCommand("selectScenes", {
         execute: function(ctx, params) {
+
+            var i, len;
             var scenes = params.scenes;
             if (scenes) {
 
@@ -176,7 +179,7 @@ SceneJS.Services.addService(
                 var existingScenes = [];
                 var sceneId;
                 var scene;
-                for (var i = 0, len = scenes.length; i < len; i++) {
+                for (i = 0, len = scenes.length; i < len; i++) {
                     sceneId = scenes[i];
                     if (SceneJS._scenes[sceneId]) {
                         existingScenes.push(SceneJS.scene(sceneId));
@@ -190,7 +193,7 @@ SceneJS.Services.addService(
              */
             var messages = params.messages;
             if (messages) {
-                for (var i = 0; i < messages.length; i++) {
+                for (i = 0; i < messages.length; i++) {
                     commandService.executeCommand(ctx, messages[i]);
                 }
             }
