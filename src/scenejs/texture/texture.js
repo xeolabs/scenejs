@@ -40,9 +40,10 @@ var SceneJS_textureModule = new (function() {
     function createTexture(scene, cfg, onComplete) {
         var context = scene.canvas.context;
         var textureId = SceneJS._createUUID();
+        var update;
         try {
             if (cfg.autoUpdate) {
-                var update = function() {
+                update = function() {
                     //TODO: fix this when minefield is upto spec
                     try {
                         context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
