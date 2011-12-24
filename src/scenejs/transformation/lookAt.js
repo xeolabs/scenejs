@@ -118,7 +118,7 @@
         var x = (up.x != undefined && up.x != null) ? up.x : 0;
         var y = (up.y != undefined && up.y != null) ? up.y : 0;
         var z = (up.z != undefined && up.z != null) ? up.z : 0;
-        if (x + y + z == 0) {
+        if (x == 0 && y == 0 && z == 0) {
             throw SceneJS_errorModule.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Lookat up vector is zero length - at least one of its x,y and z components must be non-zero");
