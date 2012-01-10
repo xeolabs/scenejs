@@ -776,6 +776,7 @@ var SceneJS_DrawList = new (function() {
         /*
          */
 
+        var oldGeoHash = geoState ? geoState.hash : null;
         geoState = this._getState(this._GEO, id);
         geoState.geo = geo;
         geoState.hash = ([                           // Safe to build geometry hash here - geometry is immutable
@@ -788,7 +789,7 @@ var SceneJS_DrawList = new (function() {
 
         /* Identify what GLSL is required for the current state soup elements
          */
-        if (!this._stateHash) {
+        if (!this._stateHash || oldGeoHash != geoState.hash)) {
             this._stateHash = this._getSceneHash();
         }
 
