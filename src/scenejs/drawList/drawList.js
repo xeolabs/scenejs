@@ -1195,7 +1195,7 @@ var SceneJS_DrawList = new (function() {
                 var pvMat = SceneJS_math_mulMat4(projMat, viewMat, []);
                 var pvMatInverse = SceneJS_math_inverseMat4(pvMat, []);
 
-                var world1 = SceneJS_math_transformVector4(pvMatInverse, [x,y,0,1]);
+                var world1 = SceneJS_math_transformVector4(pvMatInverse, [x,y,-1,1]);
                 world1 = SceneJS_math_mulVec4Scalar(world1, 1 / world1[3]);
 
                 var world2 = SceneJS_math_transformVector4(pvMatInverse, [x,y,1,1]);
@@ -1203,9 +1203,7 @@ var SceneJS_DrawList = new (function() {
 
                 var dir = SceneJS_math_subVec3(world2, world1, []);
 
-                var eye = node.viewXFormState.lookAt.eye;
-
-                var vWorld = SceneJS_math_addVec4(eye, SceneJS_math_mulVec4Scalar(dir, screenZ, []), []);
+                var vWorld = SceneJS_math_addVec4(world1, SceneJS_math_mulVec4Scalar(dir, screenZ, []), []);
 
                 hit.canvasPos = [canvasX, canvasY];
                 hit.worldPos = vWorld;
@@ -1593,6 +1591,7 @@ var SceneJS_DrawList = new (function() {
         src.push("  const vec4 bitMask  = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);");
         src.push("  vec4 res = fract(depth * bitShift);");
         src.push("  res -= res.xxyz * bitMask;");
+		src.push("  res *= 256.0 / 255.0;");
         src.push("  return res;");
         src.push("}");
 
@@ -1679,7 +1678,7 @@ var SceneJS_DrawList = new (function() {
         }
 
         src.push("    if (SCENEJS_uRayPickMode) {");
-        src.push("          float zNormalizedDepth = (SCENEJS_uZNear - SCENEJS_vViewVertex.z) / (SCENEJS_uZFar- SCENEJS_uZNear);");
+        src.push("          float zNormalizedDepth = abs((SCENEJS_uZNear + SCENEJS_vViewVertex.z) / (SCENEJS_uZFar - SCENEJS_uZNear));");
         src.push("          gl_FragColor = packDepth(zNormalizedDepth); ");
 
         src.push("    } else {");
