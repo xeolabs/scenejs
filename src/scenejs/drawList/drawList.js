@@ -2116,7 +2116,7 @@ var SceneJS_DrawList = new (function() {
         }
 
         if (geoState.geo.colorBuf) {
-            src.push("  vec3    color   = SCENEJS_vColor.rgb;");
+            src.push("  vec3    color   = SCENEJS_vColor.rgb * SCENEJS_uMaterialBaseColor;");
         } else {
             src.push("  vec3    color   = SCENEJS_uMaterialBaseColor;")
         }
