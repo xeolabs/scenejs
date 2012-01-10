@@ -2272,7 +2272,7 @@ var SceneJS_DrawList = new (function() {
                     }
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) specularValue += attenuation * specularColor * SCENEJS_uLightColor" + i +
-                                 " * specular  * pow(max(dot(reflect(lightVec, normalVec), SCENEJS_vEyeVec),0.0), shine);");
+                                 " * specular  * pow(max(dot(normalize(SCENEJS_vEyeVec + lightVec), normalVec),0.0), shine);");
                     }
                     //src.push("}");
                 }
@@ -2285,7 +2285,7 @@ var SceneJS_DrawList = new (function() {
                     }
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) specularValue += specularColor * SCENEJS_uLightColor" + i +
-                                 " * specular  * pow(max(dot(reflect(lightVec, normalVec),SCENEJS_vEyeVec),0.0), shine);");
+                                 " * specular  * pow(max(dot(normalize(SCENEJS_vEyeVec + lightVec), normalVec),0.0), shine);");
                     }
                     // src.push("}");
                 }
