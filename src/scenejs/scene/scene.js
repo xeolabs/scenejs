@@ -371,7 +371,7 @@ new (function() {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
         options = options || {};
-        this._compileScene();                   // Do any pending scene recompilations
+        this.renderFrame();                   // Do any pending scene recompilations
         var hit = SceneJS_DrawList.pick({
             sceneId: this.attr.id,
             canvasX : canvasX,
