@@ -454,6 +454,7 @@ var SceneJS_webgl_Texture2D = function(context, cfg, onComplete) {
         }
         var self = this;
         var img = new Image();
+        img.crossOrigin = "anonymous";
         img.onload = function() {
             self._init(img);
         };
