@@ -307,21 +307,47 @@ function mouseDown(event) {
     dragging = true;
 }
 
+function touchStart(event) {
+    lastX = event.targetTouches[0].clientX;
+    lastX2 = lastX;
+    lastY2 = lastY;
+    lastY = event.targetTouches[0].clientY;
+    dragging = true;
+}
+
 function mouseUp() {
     dragging = false;
     tankYawInc = 0;
     pitchInc = 0;
 }
 
-/* On a mouse drag, we'll re-render the scene, passing in
+function touchEnd() {
+    dragging = false;
+    tankYawInc = 0;
+    pitchInc = 0;
+}
+
+function mouseMove(event) {
+    var posX = event.clientX;
+    var posY = event.clientY;
+    actionMove(posX,posY);
+}
+
+function touchMove(event) {
+    var posX = event.targetTouches[0].clientX;
+    var posY = event.targetTouches[0].clientY;
+    actionMove(posX,posY);
+}
+
+/* On a mouse/touch drag, we'll re-render the scene, passing in
  * incremented angles in each time.
  */
-function mouseMove(event) {
+function actionMove(posX, posY) {
     if (dragging) {
-        tankYawInc = (event.clientX - lastX) * -0.01;
-        pitchInc = (lastY - event.clientY) * 0.001;
-        lastX2 = event.clientX;
-        lastY2 = event.clientY;
+        tankYawInc = (posX - lastX) * -0.01;
+        pitchInc = (lastY - posY) * 0.001;
+        lastX2 = posX;
+        lastY2 = posY;
     }
 }
 
@@ -350,6 +376,9 @@ function mouseWheel(event) {
 canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
+canvas.addEventListener('touchstart', touchStart, true);
+canvas.addEventListener('touchmove', touchMove, true);
+canvas.addEventListener('touchend', touchEnd, true);
 canvas.addEventListener('mousewheel', mouseWheel, true);
 canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
