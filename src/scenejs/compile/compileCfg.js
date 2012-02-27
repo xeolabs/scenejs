@@ -74,7 +74,7 @@ var SceneJS_compileCfg = new (function() {
             "bind": {
                 attr: {
                     "rendered": {
-                        level: this.COMPILE_BRANCH
+                        level: this.COMPILE_SCENE
                     }
                 }
             },
@@ -82,9 +82,13 @@ var SceneJS_compileCfg = new (function() {
             "unbind": {
                 attr: {
                     "rendered": {
-                        level: this.COMPILE_BRANCH
+                        level: this.COMPILE_SCENE
                     }
                 }
+            },
+
+            "destroyed": {
+                level: this.COMPILE_SCENE
             }
         },
 

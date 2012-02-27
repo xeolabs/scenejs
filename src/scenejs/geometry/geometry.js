@@ -58,7 +58,7 @@ new (function() {
         }
     }
 
-    function createGeometry(scene, source, callback) {
+    function createGeometry(scene, source, callback, options) {
 
         if (typeof source == "string") {
 
@@ -67,21 +67,24 @@ new (function() {
             var geoService = SceneJS.Services.getService(SceneJS.Services.GEO_LOADER_SERVICE_ID);
             geoService.loadGeometry(source,
                     function(data) {
-                        callback(_createGeometry(scene, data));
+                        callback(_createGeometry(scene, data, options));
                     });
         } else {
 
             /* Create from arrays
              */
-            var data = createTypedArrays(source);
+            var data = createTypedArrays(source, options);
             data.primitive = source.primitive;
             return _createGeometry(scene, data);
         }
     }
 
-    function createTypedArrays(data) {
+    function createTypedArrays(data, options) {
         return {
-            positions: data.positions ? new Float32Array(data.positions) : undefined,
+            positions: data.positions
+                    ? new Float32Array((options.scale || options.origin)
+                    ? applyOptions(data.positions, options)
+                    : data.positions) : undefined,
             normals: data.normals ? new Float32Array(data.normals) : undefined,
             uv: data.uv ? new Float32Array(data.uv) : undefined,
             uv2: data.uv2 ? new Float32Array(data.uv2) : undefined,
@@ -180,6 +183,39 @@ new (function() {
         }
     }
 
+    function applyOptions(positions, options) {
+        var positions2 = positions.slice(0);
+
+        if (options.scale) {
+
+            var scaleX = options.scale.x != undefined ? options.scale.x : 1.0;
+            var scaleY = options.scale.y != undefined ? options.scale.y : 1.0;
+            var scaleZ = options.scale.z != undefined ? options.scale.z : 1.0;
+
+            for (var i = 0, len = positions2.length; i < len; i += 3) {
+                positions2[i + 0] *= scaleX;
+                positions2[i + 1] *= scaleY;
+                positions2[i + 2] *= scaleZ;
+            }
+        }
+
+        if (options.origin) {
+
+            var originX = options.origin.x != undefined ? options.origin.x : 0.0;
+            var originY = options.origin.y != undefined ? options.origin.y : 0.0;
+            var originZ = options.origin.z != undefined ? options.origin.z : 0.0;
+
+            for (var i = 0, len = positions2.length; i < len; i += 3) {
+                positions2[i + 0] -= originX;
+                positions2[i + 1] -= originY;
+                positions2[i + 2] -= originZ;
+            }
+        }
+
+        return positions2;
+    }
+
+
     function destroyGeometry(geo) {
         destroyVBOs(geo);
     }
@@ -245,13 +281,18 @@ new (function() {
 
         if (this.core._nodeCount == 1) { // This node defines the core
 
+            var options = {
+                origin : params.origin,
+                scale: params.scale
+            };
+
             if (params.create instanceof Function) {
 
                 /* Create using factory function
                  * Expose the arrays on the node
                  */
                 var data = params.create();
-                SceneJS._apply(createGeometry(this.scene, data), this.core);
+                SceneJS._apply(createGeometry(this.scene, data, null, options), this.core);
 
             } else if (params.stream) {
 
@@ -269,7 +310,8 @@ new (function() {
                             SceneJS._apply(geo, self.core);
                             self.core._loading = false;
                             SceneJS_compileModule.nodeUpdated(self, "loaded"); // Compile again to apply freshly-loaded geometry
-                        });
+                        },
+                        options);
             } else {
 
                 /* Create from arrays
@@ -285,7 +327,7 @@ new (function() {
                     primitive : params.primitive || "triangles"
                 };
 
-                SceneJS._apply(createGeometry(this.scene, arrays), this.core);
+                SceneJS._apply(createGeometry(this.scene, arrays, null, options), this.core);
             }
         }
     };

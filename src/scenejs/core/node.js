@@ -642,6 +642,7 @@ SceneJS._Node.prototype.destroy = function() {
         this._destroyed = true;
         this._scheduleNodeDestroy();
     }
+    SceneJS_compileModule.nodeUpdated(this, "destroyed"); // Compile again to rebuild display        
     return this;
 };
 

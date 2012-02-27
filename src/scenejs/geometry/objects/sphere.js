@@ -58,6 +58,11 @@
              */
             coreId : params.coreId || "sphere_" + radius + "_" + rings + "_" + slices + "_" + semiMajorAxis + "_" + sweep + "_" + sliceDepth,
 
+            /* Optional pre-applied static model-space transforms
+             */
+            scale: params.scale,
+            origin: params.origin,
+
             /* Callback that does the creation in case we can't find matching sphere to reuse
              */
             create : function() {

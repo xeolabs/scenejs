@@ -2154,7 +2154,9 @@ var SceneJS_DrawList = new (function() {
         var layer;
         if (texturing) {
 
-            src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vWorldNormal, SCENEJS_vEyeVec) > 0.0) {");
+            if (normals) {
+                src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vWorldNormal, SCENEJS_vEyeVec) > 0.0) {");
+            }
 
             src.push("  vec4    texturePos;");
             src.push("  vec2    textureCoord=vec2(0.0,0.0);");
@@ -2239,7 +2241,9 @@ var SceneJS_DrawList = new (function() {
                     src.push("normalVec *= -bump;");
                 }
             }
-            src.push("}");
+            if (normals) {
+                src.push("}");
+            }
         }
 
         src.push("  vec4    fragColor;");
