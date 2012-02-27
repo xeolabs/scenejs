@@ -150,22 +150,44 @@ function mouseDown(event) {
     dragging = true;
 }
 
+function touchStart(event) {
+    lastX = event.targetTouches[0].clientX;
+    lastY = event.targetTouches[0].clientY;
+    dragging = true;
+}
+
 function mouseUp() {
+    dragging = false;
+}
+
+function touchEnd() {
     dragging = false;
 }
 
 var scene = SceneJS.scene("the-scene");
 
+function mouseMove(event) {
+    var posX = event.clientX;
+    var posY = event.clientY;
+    actionMove(posX,posY);
+}
+
+function touchMove(event) {
+    var posX = event.targetTouches[0].clientX;
+    var posY = event.targetTouches[0].clientY;
+    actionMove(posX,posY);
+}
+
 /* On a mouse drag, we'll re-render the scene, passing in
  * incremented angles in each time.
  */
-function mouseMove(event) {
+function actionMove(posX, posY) {
     if (dragging) {
-        yaw += (event.clientX - lastX) * 0.5;
-        pitch += (event.clientY - lastY) * 0.5;
+        yaw += (posX - lastX) * 0.5;
+        pitch += (posY - lastY) * 0.5;
 
-        lastX = event.clientX;
-        lastY = event.clientY;
+        lastX = posX;
+        lastY = posY;
 
         scene.findNode("pitch").set("angle", pitch);
         scene.findNode("yaw").set("angle", yaw);
@@ -175,6 +197,9 @@ function mouseMove(event) {
 canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
+canvas.addEventListener('touchstart', touchStart, true);
+canvas.addEventListener('touchmove', touchMove, true);
+canvas.addEventListener('touchend', touchEnd, true);
 
 var geometry = scene.findNode("my-geometry");
 
