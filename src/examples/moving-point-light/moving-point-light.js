@@ -181,19 +181,41 @@ function mouseDown(event) {
     dragging = true;
 }
 
+function touchStart(event) {
+    lastX = event.targetTouches[0].clientX;
+    lastY = event.targetTouches[0].clientY;
+    dragging = true;
+}
+
 function mouseUp() {
+    dragging = false;
+}
+
+function touchEnd() {
     dragging = false;
 }
 
 var scene = SceneJS.scene("theScene");
 
-/* On a mouse drag, we'll re-render the scene, passing in
+function mouseMove(event) {
+    var posX = event.clientX;
+    var posY = event.clientY;
+    actionMove(posX,posY);
+}
+
+function touchMove(event) {
+    var posX = event.targetTouches[0].clientX;
+    var posY = event.targetTouches[0].clientY;
+    actionMove(posX,posY);
+}
+
+/* On a mouse/touch drag, we'll re-render the scene, passing in
  * incremented angles in each time.
  */
-function mouseMove(event) {
+function actionMove(posX, posY) {
     if (dragging) {
-        roty = (event.clientX - lastX);
-        rotx = (event.clientY - lastY);
+        roty = (posX - lastX);
+        rotx = (posY - lastY);
 
         if (Math.abs(roty) > Math.abs(rotx)) {
 
@@ -213,14 +235,17 @@ function mouseMove(event) {
                 }
             });
         }
-        lastX = event.clientX;
-        lastY = event.clientY;
+        lastX = posX;
+        lastY = posY;
     }
 }
 
 canvas.addEventListener('mousedown', mouseDown, true);
 canvas.addEventListener('mousemove', mouseMove, true);
 canvas.addEventListener('mouseup', mouseUp, true);
+canvas.addEventListener('touchstart', touchStart, true);
+canvas.addEventListener('touchmove', touchMove, true);
+canvas.addEventListener('touchend', touchEnd, true);
 
 SceneJS.bind("error", function(e) {
     alert(e.exception.message);
