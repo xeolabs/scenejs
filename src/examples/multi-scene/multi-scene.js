@@ -380,22 +380,44 @@ function mouseDown(event) {
     dragging = true;
 }
 
+function touchStart(event) {
+    lastX = event.targetTouches[0].clientX;
+    lastY = event.targetTouches[0].clientY;
+    dragging = true;
+}
+
 function mouseUp() {
     dragging = false;
 }
 
-/* On a mouse drag, we'll update the yaw and pitch rotations in each scene
- */
+function touchEnd() {
+    dragging = false;
+}
+
 function mouseMove(event) {
+    var posX = event.clientX;
+    var posY = event.clientY;
+    actionMove(posX,posY);
+}
+
+function touchMove(event) {
+    var posX = event.targetTouches[0].clientX;
+    var posY = event.targetTouches[0].clientY;
+    actionMove(posX,posY);
+}
+
+/* On a mouse/touch drag, we'll update the yaw and pitch rotations in each scene
+ */
+function actionMove(posX, posY) {
     if (dragging) {
-        yaw += (event.clientX - lastX) * 0.2;
-        pitch += (event.clientY - lastY) * -0.2;
+        yaw += (posX - lastX) * 0.2;
+        pitch += (posY - lastY) * -0.2;
 
         scene1.findNode("yaw").set("angle", yaw);
         scene1.findNode("pitch").set("angle", pitch);
 
-        lastX = event.clientX;
-        lastY = event.clientY;
+        lastX = posX;
+        lastY = posY;
 
         /*----------------------------------------------------------------------------
          * We can update our scenes by selecting the rotate nodes
@@ -473,15 +495,27 @@ function mouseMove(event) {
 document.getElementById("theCanvas1").addEventListener('mousedown', mouseDown, true);
 document.getElementById("theCanvas1").addEventListener('mousemove', mouseMove, true);
 document.getElementById("theCanvas1").addEventListener('mouseup', mouseUp, true);
+document.getElementById("theCanvas1").addEventListener('touchstart', touchStart, true);
+document.getElementById("theCanvas1").addEventListener('touchmove', touchMove, true);
+document.getElementById("theCanvas1").addEventListener('touchend', touchEnd, true);
 
 document.getElementById("theCanvas2").addEventListener('mousedown', mouseDown, true);
 document.getElementById("theCanvas2").addEventListener('mousemove', mouseMove, true);
 document.getElementById("theCanvas2").addEventListener('mouseup', mouseUp, true);
+document.getElementById("theCanvas2").addEventListener('touchstart', touchStart, true);
+document.getElementById("theCanvas2").addEventListener('touchmove', touchMove, true);
+document.getElementById("theCanvas2").addEventListener('touchend', touchEnd, true);
 
 document.getElementById("theCanvas3").addEventListener('mousedown', mouseDown, true);
 document.getElementById("theCanvas3").addEventListener('mousemove', mouseMove, true);
 document.getElementById("theCanvas3").addEventListener('mouseup', mouseUp, true);
+document.getElementById("theCanvas3").addEventListener('touchstart', touchStart, true);
+document.getElementById("theCanvas3").addEventListener('touchmove', touchMove, true);
+document.getElementById("theCanvas3").addEventListener('touchend', touchEnd, true);
 
 document.getElementById("theCanvas4").addEventListener('mousedown', mouseDown, true);
 document.getElementById("theCanvas4").addEventListener('mousemove', mouseMove, true);
 document.getElementById("theCanvas4").addEventListener('mouseup', mouseUp, true);
+document.getElementById("theCanvas4").addEventListener('touchstart', touchStart, true);
+document.getElementById("theCanvas4").addEventListener('touchmove', touchMove, true);
+document.getElementById("theCanvas4").addEventListener('touchend', touchEnd, true);
