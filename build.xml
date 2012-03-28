@@ -74,7 +74,7 @@
 
         <fileset dir="${SRC_DIR}" includes="scenejs/tag/tagModule.js"/>
 
-        <fileset dir="${SRC_DIR}" includes="scenejs/load-status/loadStatusModule.js"/>
+        <fileset dir="${SRC_DIR}" includes="scenejs/status/sceneStatusModule.js"/>
 
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/geometry.js"/>
         <fileset dir="${SRC_DIR}" includes="scenejs/geometry/objects/teapot.js"/>

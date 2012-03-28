@@ -302,6 +302,8 @@ new (function() {
                 this._stream = params.stream;
                 this.core._loading = true;
 
+                self._fireEvent("loading");
+
                 var self = this;
                 createGeometry(
                         this.scene,
@@ -309,6 +311,7 @@ new (function() {
                         function(geo) {
                             SceneJS._apply(geo, self.core);
                             self.core._loading = false;
+                            self._fireEvent("loaded");
                             SceneJS_compileModule.nodeUpdated(self, "loaded"); // Compile again to apply freshly-loaded geometry
                         },
                         options);

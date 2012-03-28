@@ -175,7 +175,7 @@ SceneJS._Node.prototype._compileNodes = function() { // Selected children - usef
             child = children[i];
 
             if (SceneJS_compileModule.preVisitNode(child)) {
-                child._compileWithEvents();
+                child._compile();
             }
             SceneJS_compileModule.postVisitNode(child);
         }
@@ -184,30 +184,6 @@ SceneJS._Node.prototype._compileNodes = function() { // Selected children - usef
     if (this.listeners["rendered"]) {
         SceneJS_nodeEventsModule.postVisitNode(this);
     }
-};
-
-
-/**
- * Wraps _compile to fire built-in events either side of rendering.
- * @private */
-SceneJS._Node.prototype._compileWithEvents = function() {
-
-    /* As scene is traversed, SceneJS_loadStatusModule will track the counts
-     * of nodes that are still initialising
-     *
-     * If we are listening to "loading-status" events on this node, then we'll
-     * get a snapshot of those stats, then report the difference from that
-     * via the event once we have rendered this node.
-     */
-    var loadStatusSnapshot;
-    if (this.listeners["loading-status"]) {
-        loadStatusSnapshot = SceneJS_loadStatusModule.getStatusSnapshot();
-    }
-    this._compile();
-    if (this.listeners["loading-status"]) { // Report diff of loading stats that occurred while rending this tree
-        this._fireEvent("loading-status", SceneJS_loadStatusModule.diffStatus(loadStatusSnapshot));
-    }
-
 };
 
 /**

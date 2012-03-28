@@ -204,11 +204,19 @@ var SceneJS_textureModule = new (function() {
                     layer.texture = SceneJS._compilationStates.getState("video", this.scene.attr.id, layer.creationParams.video);
 
                 } else {
+
+                   SceneJS_sceneStatusModule.nodeLoading(this);
+                   this._fireEvent("loading");
+
                     var self = this;
+
                     layer.texture = createTexture(
                             this.scene,
                             layer.creationParams,
-                            function() {
+
+                            function() { // onComplete                                
+                                SceneJS_sceneStatusModule.nodeLoaded(self);
+                                self._fireEvent("loaded");
                                 if (self._destroyed) {
                                     destroyTexture(layer.texture);
                                 }

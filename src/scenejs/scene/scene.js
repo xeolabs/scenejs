@@ -199,16 +199,43 @@ new (function() {
         return context.getParameter(context.DEPTH_BITS);
     };
 
-    window.requestAnimFrame = (function() {
-        return  window.requestAnimationFrame ||
-                window.webkitRequestAnimationFrame ||
-                window.mozRequestAnimationFrame ||
-                window.oRequestAnimationFrame ||
-                window.msRequestAnimationFrame ||
-                function(/* function */ callback, /* DOMElement */ element) {
-                    window.setTimeout(callback, 1000 / 60);
-                };
-    })();
+    if (! self.Int32Array) {
+
+        self.Int32Array = Array;
+        self.Float32Array = Array;
+
+    }
+
+    // Ripped off from THREE.js - https://github.com/mrdoob/three.js/blob/master/src/Three.js
+    // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+    // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+
+    (function() {
+        var lastTime = 0;
+        var vendors = ['ms', 'moz', 'webkit', 'o'];
+        for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+            window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+            window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame']
+                    || window[vendors[x] + 'RequestCancelAnimationFrame'];
+        }
+
+        if (!window.requestAnimationFrame)
+            window.requestAnimationFrame = function(callback, element) {
+                var currTime = new Date().getTime();
+                var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                var id = window.setTimeout(function() {
+                    callback(currTime + timeToCall);
+                },
+                        timeToCall);
+                lastTime = currTime + timeToCall;
+                return id;
+            };
+
+        if (!window.cancelAnimationFrame)
+            window.cancelAnimationFrame = function(id) {
+                clearTimeout(id);
+            };
+    }());
 
     /** Sets regular expression to select "tag" nodes to included in render passes
      */
@@ -236,7 +263,7 @@ new (function() {
                 compileMode: compileFlags.level == SceneJS_compileModule.COMPILE_EVERYTHING ?
                              SceneJS_DrawList.COMPILE_SCENE : SceneJS_DrawList.COMPILE_NODES,
                 resort: compileFlags.resort });
-            this._compileWithEvents();
+            this._compile();
             SceneJS_compileModule.finishSceneCompile();
             return true; // Redraw needed
         }
@@ -273,6 +300,7 @@ new (function() {
      * Starts the render loop for this scene
      */
     Scene.prototype.start = function(cfg) {
+        
         if (this._destroyed) {
             throw SceneJS_errorModule.fatalError(SceneJS.errors.NODE_ILLEGAL_STATE, "Scene has been destroyed");
         }
@@ -292,6 +320,8 @@ new (function() {
 
             SceneJS_compileModule.nodeUpdated(this, "start");
 
+            var sceneId = self.attr.id;
+
             window[fnName] = function() {
                 if (self._running && !self._paused) {  // idleFunc may have paused scene
                     if (cfg.idleFunc) {
@@ -301,7 +331,7 @@ new (function() {
                         return;
                     }
                     SceneJS_eventModule.fireEvent(SceneJS_eventModule.SCENE_IDLE, {
-                        sceneId: self.attr.id
+                        sceneId: sceneId
                     });
                     if (self._compileScene()) {         // Attempt pending compile and redraw
                         sleeping = false;
@@ -314,20 +344,20 @@ new (function() {
                                 fps: getFPS()
                             });
                         }
-                        window.requestAnimFrame(window[fnName]);
+                        window.requestAnimationFrame(window[fnName]);
                     } else {
                         if (!sleeping && cfg.sleepFunc) {
                             cfg.sleepFunc();
                         }
                         sleeping = true;
-                        window.requestAnimFrame(window[fnName]);
+                        window.requestAnimationFrame(window[fnName]);
                     }
                 } else {
-                    window.requestAnimFrame(window[fnName]);
+                    window.requestAnimationFrame(window[fnName]);
                 }
             };
             this._startCfg = cfg;
-            window.requestAnimFrame(window[fnName]); // Push one frame immediately
+            window.requestAnimationFrame(window[fnName]); // Push one frame immediately
         }
     };
 
@@ -487,6 +517,29 @@ new (function() {
         //    }
         return node ? SceneJS._selectNode(node) : null;
     };
+
+    /**
+     * Returns the current status of this scene.
+     *
+     * When the scene has been destroyed, the returned status will be a map like this:
+     *
+     * {
+     *      destroyed: true
+     * }
+     *
+     * Otherwise, the status will be:
+     *
+     * {
+     *      numLoading: Number // Number of asset loads (eg. texture, geometry stream etc.) currently in progress
+     * }
+     *
+     */
+    Scene.prototype.getStatus = function() {
+        return (this._destroyed)
+                ? { destroyed: true }
+                : SceneJS._shallowClone(SceneJS_sceneStatusModule.sceneStatus[this.attr.id]);
+    };
+
 
     SceneJS.reset = function() {
         var scenes = getAllScenes();
