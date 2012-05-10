@@ -10,7 +10,7 @@ SceneJS._bitmapTextModule = new (function() {
 
             });
 
-    function getHMTLColor(color) {
+    function getHTMLColor(color) {
         if (color.length != 4) {
             return color;
         }
@@ -20,7 +20,7 @@ SceneJS._bitmapTextModule = new (function() {
         return 'rgba(' + color.join(',') + ')';
     }
 
-    this.createText = function(font, size, text) {
+    this.createText = function(font, size, color, text) {
         var canvas = document.createElement("canvas");
         var cx = canvas.getContext('2d');
 
@@ -32,19 +32,12 @@ SceneJS._bitmapTextModule = new (function() {
 
         cx.font = size + "px " + font;
         cx.textBaseline = "middle";
-        cx.fillStyle = getHMTLColor([.5, 10, 30, .5]);
-        cx.fillStyle = "#FFFF00";
-
+        cx.fillStyle = getHTMLColor(color);
 
         var x = 0;
         var y = (size / 2);
         cx.fillText(text, x, y);
-
-
-        //cx.fillText(text, 0, size);
-
-        //                canvas.width = 400;
-        //        canvas.height = 400;
+        
         return {
             image: canvas,
             width: canvas.width,
