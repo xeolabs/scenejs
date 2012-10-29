@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Texture Layers</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+
+        body {
+            background-color: #000000;
+            margin: 0px;
+            overflow: auto;
+            height: 100%;
+        }
+
+        #info {
+            position: absolute;
+            top: 0px;
+            width: 100%;
+            color: #ffffff;
+            padding: 5px;
+            font-family: Monospace;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        #theCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        a {
+            color: #ffffff;
+        }
+
+        a:hover {
+            color: #0080ff;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container"></div>
+<div id="info">
+    <a href="http://github.com/xeolabs/scenejs" target="_blank">SceneJS V3</a> - Texture Layers Example.<br/>
+</div>
+
+<canvas id="theCanvas"></canvas>
+
+<!-- SceneJS engine -->
+
+<script src="../build/scenejs.js"></script>
+
+<!-- Plugins for "sphere" geometry asset type -->
+
+<script src="../plugins/geometry/scenejs.sphere.js"></script>
+
+<script>
+
+SceneJS.createScene({
+    type: "scene",
+    id: "the-scene",
+    canvasId: "theCanvas",
+    loggingElementId: "theLoggingDiv",
+
+    nodes: [
+
+        {
+            type: "lookAt",
+            id: "the-lookat",
+            eye : { x: 0, y: 0, z: 10 },
+            look : { x: 0, y: 0, z: 0 },
+            up : { y: 1.0 },
+
+            nodes: [
+                {
+                    type: "camera",
+                    optics: {
+                        type: "perspective",
+                        fovy : 25.0,
+                        aspect : 1.47,
+                        near : 0.10,
+                        far : 600.0
+                    },
+
+                    nodes: [
+
+                        {
+                            type: "lights",
+                            lights: [
+                                {
+                                    mode:                   "dir",
+                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 0.5, y: -0.5, z: -0.75 }
+                                }
+                            ],
+
+                            nodes: [
+
+                                {
+                                    type: "rotate",
+                                    id: "pitch",
+                                    x: 1,
+                                    nodes: [
+                                        {
+                                            type: "rotate",
+                                            id: "yaw",
+                                            y: 1,
+                                            nodes: [
+                                                {
+                                                    type: "rotate",
+                                                    z: 1,
+                                                    angle : 195,
+                                                    nodes: [
+                                                        {
+                                                            type: "rotate",
+                                                            y: 1,
+                                                            id: "earth-rotate",
+
+                                                            nodes: [
+
+                                                                /*--------------------------------------------------------------
+                                                                 * Layer 0: Earth's surface with color, specular
+                                                                 * and emissive maps
+                                                                 *------------------------------------------------------------*/
+
+                                                                {
+                                                                    type :"layer",
+                                                                    priority: 0,
+
+                                                                    nodes: [
+                                                                        {
+                                                                            type: "scale",
+                                                                            x: 2,
+                                                                            y: 2,
+                                                                            z: 2,
+
+                                                                            nodes: [
+
+                                                                                {
+                                                                                    type: "texture",
+                                                                                    layers: [
+
+
+                                                                                        //                                                                        {
+                                                                                        //                                                                            src:"images/earthbump.jpg",
+                                                                                        //                                                                            minFilter: "linear",
+                                                                                        //                                                                            magFilter: "linear",
+                                                                                        //                                                                            wrapS: "repeat",
+                                                                                        //                                                                            wrapT: "repeat",
+                                                                                        //                                                                            isDepth: false,
+                                                                                        //                                                                            depthMode:"luminance",
+                                                                                        //                                                                            depthCompareMode: "compareRToTexture",
+                                                                                        //                                                                            depthCompareFunc: "lequal",
+                                                                                        //                                                                            flipY: false,
+                                                                                        //                                                                            width: 1,
+                                                                                        //                                                                            height: 1,
+                                                                                        //                                                                            internalFormat:"lequal",
+                                                                                        //                                                                            sourceFormat:"alpha",
+                                                                                        //                                                                            sourceType: "unsignedByte",
+                                                                                        //                                                                            applyTo:"normals",
+                                                                                        //                                                                            blendMode: "multiply"
+                                                                                        //                                                                        }
+                                                                                        //                                                                        ,
+
+                                                                                        /*---------------------------------------------------------
+                                                                                         * Underlying texture layer applied to the Earth material's
+                                                                                         * baseColor to render the continents, oceans etc.
+                                                                                         *--------------------------------------------------------*/
+                                                                                        {
+                                                                                            src: "textures/earth.jpg",
+                                                                                            applyTo:"baseColor",
+                                                                                            blendMode: "multiply",
+                                                                                            flipY: false
+                                                                                        },
+
+                                                                                        /*---------------------------------------------------------
+                                                                                         * Second texture layer applied to the Earth material's
+                                                                                         * specular component to make the ocean shiney.
+                                                                                         *--------------------------------------------------------*/
+                                                                                        {
+                                                                                            src: "textures/earth-specular.gif",
+                                                                                            applyTo:"specular",
+                                                                                            blendMode:"multiply",
+                                                                                            flipY: false
+                                                                                        } ,
+                                                                                        //
+
+                                                                                        /*---------------------------------------------------------
+                                                                                         * Second texture layer applied to the Earth material's
+                                                                                         * emission component to show lights on the dark side.
+                                                                                         *--------------------------------------------------------*/
+                                                                                        {
+                                                                                            src: "textures/earth-lights.gif",
+                                                                                            applyTo:"emit",
+                                                                                            blendMode:"add",
+                                                                                            flipY: false
+                                                                                        }
+                                                                                    ],
+
+                                                                                    /*---------------------------------------------------------
+                                                                                     * Sphere with some material
+                                                                                     *--------------------------------------------------------*/
+                                                                                    nodes: [
+
+                                                                                        {
+                                                                                            type: "material",
+                                                                                            specular: 5,
+                                                                                            shine:100,
+                                                                                            emit: 0.0,
+                                                                                            baseColor: {r: 1, g: 1, b: 1},
+                                                                                            nodes: [
+                                                                                                {
+                                                                                                    type: "geometry",
+                                                                                                    asset: {
+                                                                                                        type: "sphere"
+                                                                                                    }
+                                                                                                }
+                                                                                            ]
+
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+
+                                                                /*--------------------------------------------------------------
+                                                                 * Layer 1: Cloud layer with alpha map
+                                                                 *------------------------------------------------------------*/
+
+                                                                {
+                                                                    type :"layer",
+                                                                    priority: 1,
+
+                                                                    nodes: [
+
+                                                                        {
+                                                                            type: "flags",
+
+
+                                                                            flags: {
+                                                                                transparent: true,
+                                                                                specular:false,
+                                                                                blendFunc: {
+                                                                                    sfactor: "srcAlpha",
+                                                                                    dfactor: "one"
+                                                                                },
+                                                                                backfaces: true  // TODO: Sphere backfaces seem to be reversed if this is needed
+                                                                            },
+
+                                                                            nodes: [
+                                                                                {
+                                                                                    type: "scale",
+                                                                                    x: 2.05,
+                                                                                    y: 2.05,
+                                                                                    z: 2.05,
+
+                                                                                    nodes: [
+
+                                                                                        /*------------------------------------------------------------------
+                                                                                         *
+                                                                                         *----------------------------------------------------------------*/
+
+                                                                                        {
+                                                                                            type: "texture",
+                                                                                            layers: [
+
+                                                                                                /*---------------------------------------------------------
+                                                                                                 *  Alpha map
+                                                                                                 *
+                                                                                                 *--------------------------------------------------------*/
+
+                                                                                                {
+                                                                                                    src: "textures/earthclouds.jpg",
+                                                                                                    applyTo:"alpha",
+                                                                                                    blendMode: "multiply",
+                                                                                                    flipY: false
+                                                                                                }
+
+                                                                                            ],
+
+                                                                                            /*---------------------------------------------------------
+                                                                                             * Sphere with some material
+                                                                                             *--------------------------------------------------------*/
+
+                                                                                            nodes: [
+                                                                                                {
+                                                                                                    type: "node",
+                                                                                                    z: 1,
+                                                                                                    angle : 195,
+                                                                                                    nodes: [
+                                                                                                        {
+                                                                                                            type: "rotate",
+                                                                                                            y: 1,
+                                                                                                            id: "clouds-rotate",
+                                                                                                            nodes: [
+                                                                                                                {
+                                                                                                                    type: "material",
+                                                                                                                    specular: 0,
+                                                                                                                    shine:0.0001,
+                                                                                                                    emit: 0.0,
+                                                                                                                    alpha: 1.0,
+                                                                                                                    baseColor: {
+                                                                                                                        r: 1, g: 1, b: 1
+                                                                                                                    },
+                                                                                                                    nodes: [
+                                                                                                                        {
+                                                                                                                            type: "geometry",
+                                                                                                                            asset: {
+                                                                                                                                type: "sphere"
+                                                                                                                            }
+                                                                                                                        }
+                                                                                                                    ]
+
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    ]
+                                                                                                }
+                                                                                            ]
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
+
+var scene = SceneJS.getScene("the-scene");
+
+var earthRotateNode = scene.getNode("earth-rotate");
+var cloudsRotateNode = scene.getNode("clouds-rotate");
+var earthRotateXNode = scene.getNode("pitch");
+var earthRotateYNode = scene.getNode("yaw");
+var lookAtNode = scene.getNode("the-lookat");
+
+var yaw = 0;
+var pitch = 0;
+var lastX;
+var lastY;
+var dragging = false;
+
+var posZ = 10;
+
+var earthRotate = 0;
+var cloudsRotate = 0;
+
+var canvas = document.getElementById("theCanvas");
+
+function mouseDown(event) {
+    lastX = event.clientX;
+    lastY = event.clientY;
+    dragging = true;
+}
+
+function touchStart(event) {
+    lastX = event.targetTouches[0].clientX;
+    lastY = event.targetTouches[0].clientY;
+    dragging = true;
+}
+
+function mouseUp() {
+    dragging = false;
+}
+
+function touchEnd() {
+    dragging = false;
+}
+
+function mouseMove(event) {
+    var posX = event.clientX;
+    var posY = event.clientY;
+    actionMove(posX, posY);
+}
+
+function touchMove(event) {
+    var posX = event.targetTouches[0].clientX;
+    var posY = event.targetTouches[0].clientY;
+    actionMove(posX, posY);
+}
+
+/* On a mouse/touch drag, we'll re-render the scene, passing in
+ * incremented angles in each time.
+ */
+function actionMove(posX, posY) {
+
+    if (dragging) {
+
+        yaw += (posX - lastX) * 0.3;
+        pitch += (posY - lastY) * 0.3;
+
+        lastX = posX;
+        lastY = posY;
+
+        earthRotateXNode.setAngle(pitch);
+        earthRotateYNode.setAngle(yaw);
+    }
+}
+
+function mouseWheel(event) {
+
+    var delta = 0;
+
+    if (!event) event = window.event;
+
+    if (event.wheelDelta) {
+        delta = event.wheelDelta / 120;
+        if (window.opera) delta = -delta;
+
+    } else if (event.detail) {
+        delta = -event.detail / 3;
+    }
+
+    if (delta) {
+        if (delta < 0) {
+            posZ -= 0.6;
+        } else {
+            posZ += 0.6;
+        }
+    }
+
+    if (event.preventDefault)
+        event.preventDefault();
+
+    event.returnValue = false;
+
+    lookAtNode.setEye({ x: 0, y: 0, z: posZ });
+}
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+canvas.addEventListener('touchstart', touchStart, true);
+canvas.addEventListener('touchmove', touchMove, true);
+canvas.addEventListener('touchend', touchEnd, true);
+canvas.addEventListener('mousewheel', mouseWheel, true);
+canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
+
+
+scene.start({
+    idleFunc: function() {
+
+        earthRotateNode.setAngle(earthRotate);
+        cloudsRotateNode.setAngle(cloudsRotate);
+
+        earthRotate -= 0.02;
+        cloudsRotate -= 0.06;
+    }
+});
+
+</script>
+</body>
+</html>

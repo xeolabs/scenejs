@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Video Texture</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+
+        body {
+            background-color: #000000;
+            margin: 0px;
+            overflow: auto;
+            height: 100%;
+        }
+
+        #info {
+            position: absolute;
+            top: 0px;
+            width: 100%;
+            color: #ffffff;
+            padding: 5px;
+            font-family: Monospace;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        #theCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        a {
+            color: #ffffff;
+        }
+
+        a:hover {
+            color: #0080ff;
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="container"></div>
+<div id="info">
+    <a href="http://github.com/xeolabs/scenejs" target="_blank">SceneJS V3</a> - Video Texture Example.<br/>
+</div>
+
+<canvas id="theCanvas"></canvas>
+
+<!-- SceneJS engine -->
+
+<script src="../build/scenejs.js"></script>
+
+<!-- Plugins for "box" geometry asset type -->
+
+<script src="../plugins/geometry/scenejs.box.js"></script>
+
+<!-- Plugins for "video" texture asset type -->
+
+<script src="../plugins/texture/scenejs.texture.js"></script>
+
+<script type="text/javascript" src="../libs/dat.gui.min.js"></script>
+
+<script>
+SceneJS.createScene({
+    type: "scene",
+    id: "theScene",
+    canvasId: "theCanvas",
+
+    nodes: [
+        {
+            type: "lookAt",
+            eye : { x: 0.0, y: 0.0, z: 10},
+            look : { x : 0.0, y : 0.0, z : 0 },
+            up : { x: 0.0, y: 1.0, z: 0.0 },
+
+            nodes: [
+                {
+                    type: "camera",
+
+                    optics: {
+                        type: "perspective",
+                        fovy : 25.0,
+                        aspect : 1.47,
+                        near : 0.10,
+                        far : 300.0
+                    },
+
+                    nodes: [
+                        {
+                            type: "lights",
+
+                            lights: [
+                                {
+                                    mode:                   "dir",
+                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 1.0, y: -0.5, z: -1.0 }
+                                },
+                                {
+                                    mode:                   "dir",
+                                    color:                  { r: 0.7, g: 0.7, b: 0.7 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 1.0, y: 0.5, z: -1.0 }
+                                }
+                            ],
+
+                            nodes: [
+                                {
+                                    type: "material",
+                                    baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
+                                    specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
+                                    specular:       0.2,
+                                    shine:          6.0,
+
+                                    nodes: [
+                                        {
+                                            type: "texture",
+
+                                            id: "theTexture",
+
+                                            layers: [
+                                                {
+                                                    asset: {
+                                                        type: "image",
+                                                        src: "textures/superman.jpg"
+                                                    },
+                                                    blendMode: "add"
+                                                }
+                                            ],
+
+                                            nodes: [
+                                                {
+                                                    type: "rotate",
+                                                    id: "pitch",
+                                                    angle: -30.0,
+                                                    x : 1.0,
+
+                                                    nodes: [
+                                                        {
+                                                            type: "rotate",
+                                                            id: "yaw",
+                                                            angle: -30.0,
+                                                            y : 1.0,
+
+                                                            nodes: [
+                                                                {
+                                                                    type: "geometry",
+
+                                                                    asset: {
+                                                                        type: "box"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
+
+/*----------------------------------------------------------------------
+ * Scene rendering loop and mouse handler stuff
+ *---------------------------------------------------------------------*/
+
+var scene = SceneJS.getScene("theScene");
+var rotateXNode = scene.getNode("pitch");
+var rotateYNode = scene.getNode("yaw");
+var textureNode = scene.getNode("theTexture");
+
+var yaw = -30;
+var pitch = -30;
+var lastX;
+var lastY;
+var dragging = false;
+
+
+/* For texture animation
+ */
+var timeLast = (new Date()).getTime();
+
+var canvas = document.getElementById("theCanvas");
+
+function mouseDown(event) {
+    lastX = event.clientX;
+    lastY = event.clientY;
+    dragging = true;
+}
+
+function touchStart(event) {
+    lastX = event.targetTouches[0].clientX;
+    lastY = event.targetTouches[0].clientY;
+    dragging = true;
+}
+
+function mouseUp() {
+    dragging = false;
+}
+
+function touchEnd() {
+    dragging = false;
+}
+
+function mouseMove(event) {
+    var posX = event.clientX;
+    var posY = event.clientY;
+    actionMove(posX, posY);
+}
+
+function touchMove(event) {
+    var posX = event.targetTouches[0].clientX;
+    var posY = event.targetTouches[0].clientY;
+    actionMove(posX, posY);
+}
+
+function actionMove(posX, posY) {
+
+    if (dragging) {
+
+        yaw += (posX - lastX) * 0.5;
+        pitch += (posY - lastY) * 0.5;
+        lastX = posX;
+        lastY = posY;
+
+        rotateXNode.setAngle(pitch);
+        rotateYNode.setAngle(yaw);
+    }
+}
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+canvas.addEventListener('touchstart', touchStart, true);
+canvas.addEventListener('touchmove', touchMove, true);
+canvas.addEventListener('touchend', touchEnd, true);
+
+scene.start({
+    idleFunc: function() {
+    }
+});
+
+
+var TextureSwitcher = function() {
+
+    this.superman = function() {
+
+        textureNode.setLayers({
+
+            "0": { // Texture layer 0
+                asset: {
+                    src: "textures/superman.jpg"
+                }
+            }
+        });
+
+    };
+
+    this.generalZod = function() {
+
+        textureNode.setLayers({
+
+            "0": { // Texture layer 0
+                asset: {
+                    src: "textures/general-zod.jpg"
+                }
+            }
+        });
+    };
+};
+
+var textureSwitcher = new TextureSwitcher();
+
+var gui = new dat.GUI();
+
+var f1 = gui.addFolder('Switch texture');
+
+f1.add(textureSwitcher, 'superman');
+f1.add(textureSwitcher, 'generalZod');
+
+f1.open();
+
+</script>
+</body>
+</html>

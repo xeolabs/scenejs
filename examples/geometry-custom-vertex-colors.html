@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Custom Geometry with Vertex Colors</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+
+        body {
+            background-color: #000000;
+            margin: 0px;
+            overflow: auto;
+            height: 100%;
+        }
+
+        #info {
+            position: absolute;
+            top: 0px;
+            width: 100%;
+            color: #ffffff;
+            padding: 5px;
+            font-family: Monospace;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        #theCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        a {
+            color: #ffffff;
+        }
+
+        a:hover {
+            color: #0080ff;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container"></div>
+<div id="info">
+    <a href="http://github.com/xeolabs/scenejs" target="_blank">SceneJS V3</a> - Custom Geometry with Vertex Colors.<br/>
+</div>
+
+<canvas id="theCanvas"></canvas>
+
+<!-- SceneJS engine -->
+
+<script src="../build/scenejs.js"></script>
+
+
+<script>
+
+SceneJS.createScene({
+
+    id: "theScene",
+
+    canvasId: "theCanvas",
+
+    nodes: [
+        {
+            type: "lookAt",
+            id: "theLookAt",
+            eye : { x: 0.0, y: 10.0, z: 55 },
+            look : { y:1.0 },
+            up : { y: 1.0 },
+
+            nodes: [
+                {
+                    type: "camera",
+                    optics: {
+                        type: "perspective",
+                        fovy : 25.0,
+                        aspect : 1.47,
+                        near : 0.10,
+                        far : 300.0
+                    },
+
+                    nodes: [
+                        {
+                            type: "lights",
+                            lights: [
+                                {
+                                    mode:                   "dir",
+                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
+                                    diffuse:                true,
+                                    specular:               true,
+                                    dir:                    { x: 1.0, y: -0.5, z: -1.0 } ,
+                                    space:                  "world"
+                                },
+
+                                {
+                                    mode:                   "dir",
+                                    color:                  { r: 1.0, g: 1.0, b: 0.8 },
+                                    diffuse:                true,
+                                    specular:               false,
+                                    dir:                    { x: 0.0, y: -0.5, z: -1.0 },
+                                    space:                  "world"
+                                }
+                            ],
+                            nodes: [
+                                {
+                                    type: "rotate",
+                                    id: "pitch",
+                                    angle: 0.0,
+                                    x : 1.0,
+
+                                    nodes: [
+                                        {
+                                            type: "rotate",
+                                            id: "yaw",
+                                            angle: 0.0,
+                                            y : 1.0,
+
+                                            nodes: [
+
+                                                /* Geometry node which defines our custom object, a simple cube.
+                                                 */
+                                                {
+
+                                                    type: "geometry",
+
+                                                    /* Optional coreID, must be unique among all
+                                                     * geometries - if another geometry has already
+                                                     * been defined with that core ID, then that
+                                                     * geometry will be instanced here in place of
+                                                     * this one, and this geometry definition will be
+                                                     * ignored.
+                                                     */
+                                                    coreId: "my-geometry",
+
+                                                    /* The primitive type - allowed values are
+                                                     * "points", "lines", "line-loop", "line-strip",
+                                                     * "triangles", "triangle-strip" and "triangle-fan".
+                                                     *
+                                                     * Try setting this config to these different
+                                                     * types, it's quite freaky.
+                                                     *
+                                                     * See the OpenGL/WebGL specification docs for
+                                                     * how the coordinate arrays are supposed to be laid out
+                                                     * for them.
+                                                     */
+                                                    primitive: "triangles",
+
+                                                    /* The vertices - eight for our cube, each
+                                                     * one spanning three array elements for X,Y and Z
+                                                     */
+                                                    positions : [
+
+                                                        /* v0-v1-v2-v3 front
+                                                         */
+                                                        5, 5, 5,
+                                                        -5, 5, 5,
+                                                        -5,-5, 5,
+                                                        5,-5, 5,
+
+                                                        /* v0-v3-v4-v5 right
+                                                         */
+                                                        5, 5, 5,
+                                                        5,-5, 5,
+                                                        5,-5,-5,
+                                                        5, 5,-5,
+
+                                                        /* v0-v5-v6-v1 top
+                                                         */
+                                                        5, 5, 5,
+                                                        5, 5,-5,
+                                                        -5, 5,-5,
+                                                        -5, 5, 5,
+
+                                                        /* v1-v6-v7-v2 left
+                                                         */
+                                                        -5, 5, 5,
+                                                        -5, 5,-5,
+                                                        -5,-5,-5,
+                                                        -5,-5, 5,
+
+                                                        /* v7-v4-v3-v2 bottom
+                                                         */
+                                                        -5,-5,-5,
+                                                        5,-5,-5,
+                                                        5,-5, 5,
+                                                        -5,-5, 5,
+
+                                                        /* v4-v7-v6-v5 back
+                                                         */
+                                                        5,-5,-5,
+                                                        -5,-5,-5,
+                                                        -5, 5,-5,
+                                                        5, 5,-5
+                                                    ],
+
+                                                    /* Normal vectors, one for each vertex
+                                                     */
+                                                    normals : [
+
+                                                        /* v0-v1-v2-v3 front
+                                                         */
+                                                        0, 0, 1,
+                                                        0, 0, 1,
+                                                        0, 0, 1,
+                                                        0, 0, 1,
+
+                                                        /* v0-v3-v4-v5 right
+                                                         */
+                                                        1, 0, 0,
+                                                        1, 0, 0,
+                                                        1, 0, 0,
+                                                        1, 0, 0,
+
+                                                        /* v0-v5-v6-v1 top
+                                                         */
+                                                        0, 1, 0,
+                                                        0, 1, 0,
+                                                        0, 1, 0,
+                                                        0, 1, 0,
+
+                                                        /* v1-v6-v7-v2 left
+                                                         */
+                                                        -1, 0, 0,
+                                                        -1, 0, 0,
+                                                        -1, 0, 0,
+                                                        -1, 0, 0,
+
+                                                        /* v7-v4-v3-v2 bottom
+                                                         */
+                                                        0,-1, 0,
+                                                        0,-1, 0,
+                                                        0,-1, 0,
+                                                        0,-1, 0,
+
+                                                        /* v4-v7-v6-v5 back
+                                                         */
+                                                        0, 0,-1,
+                                                        0, 0,-1,
+                                                        0, 0,-1,
+                                                        0, 0,-1
+                                                    ],
+
+                                                    /* 2D texture coordinates corresponding to the
+                                                     * 3D positions defined above - eight for our cube, each
+                                                     * one spaining two array elements for X and Y
+                                                     */
+                                                    uv : [
+
+                                                        /* v0-v1-v2-v3 front
+                                                         */
+                                                        5, 5,
+                                                        0, 5,
+                                                        0, 0,
+                                                        5, 0,
+
+                                                        /* v0-v3-v4-v5 right
+                                                         */
+                                                        0, 5,
+                                                        0, 0,
+                                                        5, 0,
+                                                        5, 5,
+
+                                                        /* v0-v5-v6-v1 top
+                                                         */
+                                                        5, 0,
+                                                        5, 5,
+                                                        0, 5,
+                                                        0, 0,
+
+                                                        /* v1-v6-v7-v2 left
+                                                         */
+                                                        5, 5,
+                                                        0, 5,
+                                                        0, 0,
+                                                        5, 0,
+
+                                                        /* v7-v4-v3-v2 bottom
+                                                         */
+                                                        0, 0,
+                                                        5, 0,
+                                                        5, 5,
+                                                        0, 5,
+
+                                                        /* v4-v7-v6-v5 back
+                                                         */
+                                                        0, 0,
+                                                        5, 0,
+                                                        5, 5,
+                                                        0, 5
+                                                    ],
+
+                                                    /* Color for each vertes
+                                                     */
+                                                    colors : [
+
+                                                        /* v0-v1-v2-v3 front
+                                                         */
+                                                        1.0, 0.0, 0.0, 1.5,
+                                                        0.0, 1.0, 0.0, 1.0,
+                                                        0.0, 0.0, 1.0, 1.0,
+                                                        0.0, 0.0, 0.0, 1.0,
+
+                                                        /* v0-v3-v4-v5 right
+                                                         */
+                                                        1.0, 0.0, 0.0, 1.0,
+                                                        0.0, 0.0, 1.0, 1.0,
+                                                        0.0, 0.0, 0.0, 1.0,
+                                                        0.0, 0.0, 0.0, 1.0,
+
+                                                        /* v0-v5-v6-v1 top
+                                                         */
+                                                        1.0, 0.0, 0.0, 1.0,
+                                                        0.0, 0.0, 0.0, 1.0,
+                                                        0.0, 0.0, 0.0, 1.0,
+                                                        0.0, 0.0, 1.0, 1.0,
+
+                                                        /* v1-v6-v7-v2 left
+                                                         */
+                                                        1.0, 0.0, 0.0, 1.0,
+                                                        1.0, 1.0, 0.0, 1.0,
+                                                        0.0, 0.0, 0.0, 1.0,
+                                                        0.0, 0.0, 1.0, 1.0,
+
+                                                        /* v7-v4-v3-v2 bottom
+                                                         */
+                                                        0.0, 0.0, 0.0, 1.0,
+                                                        1.0, 0.0, 1.0, 1.0,
+                                                        0.0, 0.0, 1.0, 1.0,
+                                                        0.0, 0.0, 1.0, 1.0,
+
+                                                        /* v4-v7-v6-v5 back
+                                                         */
+                                                        1.0, 0.0, 1.0, 1.0,
+                                                        0.0, 1.0, 1.0, 1.0,
+                                                        1.0, 1.0, 0.0, 1.0,
+                                                        1.0, 1.0, 1.0, 1.0
+                                                    ],
+
+                                                    /* Indices - these organise the
+                                                     * positions and uv texture coordinates
+                                                     * into geometric primitives in accordance
+                                                     * with the "primitive" parameter,
+                                                     * in this case a set of three indices
+                                                     * for each triangle.
+                                                     *
+                                                     * Note that each triangle is specified
+                                                     * in counter-clockwise winding order.
+                                                     *
+                                                     * You can specify them in clockwise
+                                                     * order if you configure the SceneJS.State
+                                                     * node's frontFace property as "cw", instead of
+                                                     * the default "ccw".
+                                                     */
+                                                    indices : [
+                                                        0, 1, 2,
+                                                        0, 2, 3,
+                                                        // front
+                                                        4, 5, 6,
+                                                        4, 6, 7,
+                                                        // right
+                                                        8, 9,10,
+                                                        8,10,11,
+                                                        // top
+                                                        12,13,14,
+                                                        12,14,15,
+                                                        // left
+                                                        16,17,18,
+                                                        16,18,19,
+                                                        // bottom
+                                                        20,21,22,
+                                                        20,22,23
+
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
+
+/* Get handles to some nodes
+ */
+var scene = SceneJS.getScene("theScene");
+var yawNode = scene.getNode("yaw");
+var pitchNode = scene.getNode("pitch");
+var lookAtNode = scene.getNode("theLookAt");
+
+/* As mouse drags, we'll update the rotate nodes
+ */
+
+var lastX;
+var lastY;
+var dragging = false;
+
+var newInput = false;
+var yaw = 0;
+var pitch = 0;
+
+var canvas = document.getElementById("theCanvas");
+
+function mouseDown(event) {
+    lastX = event.clientX;
+    lastY = event.clientY;
+    dragging = true;
+}
+
+function touchStart(event) {
+    lastX = event.targetTouches[0].clientX;
+    lastY = event.targetTouches[0].clientY;
+    dragging = true;
+}
+
+function mouseUp() {
+    dragging = false;
+}
+
+function touchEnd() {
+    dragging = false;
+}
+
+function mouseMove(event) {
+    var posX = event.clientX;
+    var posY = event.clientY;
+    actionMove(posX, posY);
+}
+
+function touchMove(event) {
+    var posX = event.targetTouches[0].clientX;
+    var posY = event.targetTouches[0].clientY;
+    actionMove(posX, posY);
+}
+
+function actionMove(posX, posY) {
+    if (dragging) {
+
+        yaw += (posX - lastX) * 0.5;
+        pitch += (posY - lastY) * 0.5;
+
+        lastX = posX;
+        lastY = posY;
+
+        yawNode.set("angle", yaw);
+        pitchNode.set("angle", pitch);
+    }
+}
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+canvas.addEventListener('touchstart', touchStart, true);
+canvas.addEventListener('touchmove', touchMove, true);
+canvas.addEventListener('touchend', touchEnd, true);
+
+scene.start();
+
+</script>
+</body>
+</html>
