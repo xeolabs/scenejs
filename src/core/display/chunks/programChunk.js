@@ -28,6 +28,12 @@ SceneJS_ChunkFactory.createChunkType({
         frameCtx.colorBuf = false;
 
         frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
+
+        var gl = this.program.gl;
+
+        for (var i = 0; i < 10; i++) {
+            gl.disableVertexAttribArray(i);
+        }
     },
 
     pick : function(frameCtx) {
@@ -40,7 +46,9 @@ SceneJS_ChunkFactory.createChunkType({
 
         pickProgram.bind();
 
-        this.program.gl.uniform1i(this._rayPickMode, frameCtx.rayPick);
+        var gl = this.program.gl;
+
+        gl.uniform1i(this._rayPickMode, frameCtx.rayPick);
 
         frameCtx.program = pickProgram;
 
@@ -55,6 +63,9 @@ SceneJS_ChunkFactory.createChunkType({
 
         frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
 
+        for (var i = 0; i < 10; i++) {
+            gl.disableVertexAttribArray(i);
+        }
     }
 });
 

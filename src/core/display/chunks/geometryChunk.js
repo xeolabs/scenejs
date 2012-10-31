@@ -35,45 +35,31 @@ SceneJS_ChunkFactory.createChunkType({
 
     draw:function (ctx) {
 
-        // TODO: Avoid redundantly rebinding these VBOs
-        // TODO: ctx.morphXXX will not be reset on program switch
-
         var gl = this.program.gl;
 
         if (ctx.geoChunkId != this.id) { // HACK until we have distinct state chunks for VBOs and draw call
 
             if (this._aVertexDraw && !ctx.vertexBuf) {
                 this._aVertexDraw.bindFloatArrayBuffer(this.core.vertexBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aNormalDraw && !ctx.normalBuf) {
                 this._aNormalDraw.bindFloatArrayBuffer(this.core.normalBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aUVDraw && !ctx.uvBuf) {
                 this._aUVDraw.bindFloatArrayBuffer(this.core.uvBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aUV2Draw && !ctx.uvBuf2) {
                 this._aUV2Draw.bindFloatArrayBuffer(this.core.uvBuf2);
-                ctx.numVBOs++;
             }
 
             if (this._aColorDraw && !ctx.colorBuf) {
                 this._aColorDraw.bindFloatArrayBuffer(this.core.colorBuf);
-                ctx.numVBOs++;
             }
 
             this.core.indexBuf.bind();
-
-            /* Disable remaining Vertex attrib arrays
-             */
-            for (var i = ctx.numVBOs; i < 10; i++) {
-                gl.disableVertexAttribArray(i);
-            }
 
             ctx.geoChunkId = this.id;
         }
@@ -89,31 +75,21 @@ SceneJS_ChunkFactory.createChunkType({
 
             if (this._aVertexPick && !ctx.vertexBuf) {
                 this._aVertexPick.bindFloatArrayBuffer(this.core.vertexBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aNormalPick && !ctx.normalBuf) {
                 this._aNormalPick.bindFloatArrayBuffer(this.core.normalBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aUVPick && !ctx.uvBuf) {
                 this._aUVPick.bindFloatArrayBuffer(this.core.uvBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aUV2Pick && !ctx.uvBuf2) {
                 this._aUV2Pick.bindFloatArrayBuffer(this.core.uvBuf2);
-                ctx.numVBOs++;
             }
 
             this.core.indexBuf.bind();
-
-            /* Disable remaining Vertex attrib arrays
-             */
-            for (var i = ctx.numVBOs; i < 10; i++) {
-                gl.disableVertexAttribArray(i);
-            }
 
             ctx.geoChunkId = this.id;
         }

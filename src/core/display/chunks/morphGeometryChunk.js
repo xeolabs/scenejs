@@ -123,7 +123,6 @@ SceneJS_ChunkFactory.createChunkType({
             this._aVertexPick.bindFloatArrayBuffer(target1.vertexBuf);
             this._aMorphVertexPick.bindFloatArrayBuffer(target2.vertexBuf);
             ctx.vertexBuf = true;
-            ctx.numVBOs += 2;
         } else {
             ctx.vertexBuf = false;
         }
@@ -132,7 +131,6 @@ SceneJS_ChunkFactory.createChunkType({
             this._aNormalPick.bindFloatArrayBuffer(target1.normalBuf);
             this._aMorphNormalPick.bindFloatArrayBuffer(target2.normalBuf);
             ctx.normalBuf = true;
-            ctx.numVBOs += 2;
         } else {
             ctx.normalBuf = false;
         }
@@ -141,7 +139,6 @@ SceneJS_ChunkFactory.createChunkType({
             this._aUVPick.bindFloatArrayBuffer(target1.uvBuf);
             this._aMorphUVPick.bindFloatArrayBuffer(target2.uvBuf);
             ctx.uvBuf = true;
-            ctx.numVBOs += 2;
         } else {
             ctx.uvBuf = false;
         }
@@ -150,7 +147,6 @@ SceneJS_ChunkFactory.createChunkType({
             this._aUV2Pick.bindFloatArrayBuffer(target1.uvBuf2);
             this._aMorphUV2Pick.bindFloatArrayBuffer(target2.uvBuf2);
             ctx.uvBuf2 = true;
-            ctx.numVBOs += 2;
         } else {
             ctx.uvBuf2 = false;
         }
@@ -159,7 +155,6 @@ SceneJS_ChunkFactory.createChunkType({
             this._aColorPick.bindFloatArrayBuffer(target1.colorBuf);
             this._aMorphColorPick.bindFloatArrayBuffer(target2.colorBuf);
             ctx.colorBuf = true;
-            ctx.numVBOs += 2;
         } else {
             ctx.colorBuf = false;
         }
