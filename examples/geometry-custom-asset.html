@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>SceneJS V3 Basic Example</title>
+    <title>SceneJS V3 Geometry Asset Plugin</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
@@ -37,110 +37,107 @@
             color: #0080ff;
         }
     </style>
+
+    <script src="../build/scenejs.js"></script>
+
+    <script src="../plugins/geometry/scenejs.sphere.js"></script>
+
+    <script type="text/javascript" src="libs/dat.gui.min.js"></script>
+
 </head>
 <body>
 
 <div id="container"></div>
 <div id="info">
-    <a href="http://github.com/xeolabs/scenejs" target="_blank">SceneJS V3</a> - Basic Teapot Example.<br/>
+    <a href="http://github.com/xeolabs/scenejs" target="_blank">SceneJS V3</a> - Geometry Asset Plugin Example.<br/>
 </div>
 
 <canvas id="theCanvas"></canvas>
-
-<!-- SceneJS engine -->
-
-<script src="../build/scenejs.js"></script>
-
-<!-- Plugins for "wobblyBox" custom geometry asset type -->
-
-<script src="../plugins/geometry/scenejs.sphere.js"></script>
-
-<script type="text/javascript" src="../libs/dat.gui.min.js"></script>
 
 <script>
 
 SceneJS.createScene({
 
-    id: "theScene",
+    id:"theScene",
 
-    canvasId: "theCanvas",
+    canvasId:"theCanvas",
 
-    nodes: [
+    nodes:[
         {
-            type: "lookAt",
-            id: "theLookAt",
-            eye : { x: 0.0, y: 10.0, z: 55 },
-            look : { y:1.0 },
-            up : { y: 1.0 },
+            type:"lookAt",
+            id:"theLookAt",
+            eye:{ x:0.0, y:10.0, z:55 },
+            look:{ y:1.0 },
+            up:{ y:1.0 },
 
-            nodes: [
+            nodes:[
                 {
-                    type: "camera",
-                    optics: {
-                        type: "perspective",
-                        fovy : 25.0,
-                        aspect : 1.47,
-                        near : 0.10,
-                        far : 300.0
+                    type:"camera",
+                    optics:{
+                        type:"perspective",
+                        fovy:25.0,
+                        aspect:1.47,
+                        near:0.10,
+                        far:300.0
                     },
 
-                    nodes: [
+                    nodes:[
 
                         {
-                            type: "lights",
-                            lights: [
+                            type:"lights",
+                            lights:[
                                 {
-                                    mode:                   "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 1.0, y: -0.5, z: -1.0 } ,
-                                    space:                  "world"
+                                    mode:"dir",
+                                    color:{ r:1.0, g:1.0, b:1.0 },
+                                    diffuse:true,
+                                    specular:true,
+                                    dir:{ x:1.0, y:-0.5, z:-1.0 },
+                                    space:"world"
                                 },
 
                                 {
-                                    mode:                   "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 0.8 },
-                                    diffuse:                true,
-                                    specular:               false,
-                                    dir:                    { x: 0.0, y: -0.5, z: -1.0 },
-                                    space:                  "world"
+                                    mode:"dir",
+                                    color:{ r:1.0, g:1.0, b:0.8 },
+                                    diffuse:true,
+                                    specular:false,
+                                    dir:{ x:0.0, y:-0.5, z:-1.0 },
+                                    space:"world"
                                 }
                             ],
-                            nodes: [
+                            nodes:[
                                 {
-                                    type: "rotate",
-                                    id: "pitch",
-                                    angle: 0.0,
-                                    x : 1.0,
+                                    type:"rotate",
+                                    id:"pitch",
+                                    angle:0.0,
+                                    x:1.0,
 
-                                    nodes: [
+                                    nodes:[
                                         {
-                                            type: "rotate",
-                                            id: "yaw",
-                                            angle: 0.0,
-                                            y : 1.0,
+                                            type:"rotate",
+                                            id:"yaw",
+                                            angle:0.0,
+                                            y:1.0,
 
-                                            nodes: [
+                                            nodes:[
                                                 {
-                                                    type: "material",
-                                                    emit: 0,
-                                                    baseColor:      { r: 0.5, g: 0.5, b: 0.6 },
-                                                    specularColor:  { r: 0.9, g: 0.9, b: 0.9 },
-                                                    specular:       1.0,
-                                                    shine:          70.0,
+                                                    type:"material",
+                                                    emit:0,
+                                                    baseColor:{ r:0.5, g:0.5, b:0.6 },
+                                                    specularColor:{ r:0.9, g:0.9, b:0.9 },
+                                                    specular:1.0,
+                                                    shine:70.0,
 
-                                                    nodes: [
+                                                    nodes:[
                                                         {
-                                                            type: "geometry",
+                                                            type:"geometry",
 
-                                                            id: "theGeometry",
+                                                            id:"theGeometry",
 
-                                                            asset: {
-                                                                type: "sphere" ,
-                                                                slices: 5,
-                                                                rings: 3,
-                                                                radius: 2.0
+                                                            asset:{
+                                                                type:"sphere",
+                                                                slices:5,
+                                                                rings:3,
+                                                                radius:2.0
                                                             }
                                                         }
                                                     ]
@@ -237,17 +234,17 @@ canvas.addEventListener('touchend', touchEnd, true);
 scene.start();
 
 
-var Controller = function() {
+var Controller = function () {
 
     this.slices = 5;
     this.rings = 5;
     this.radius = 1;
 
-    this.update = function() {
+    this.update = function () {
         geometryNode.setAsset({
-            slices: this.slices,
-            rings: this.rings,
-            radius: 2.0
+            slices:this.slices,
+            rings:this.rings,
+            radius:2.0
         });
     };
 };
