@@ -15587,6 +15587,4 @@ SceneJS_ChunkFactory.createChunkType({
         ctx.modelMat = this.core.mat;
     }
 });
-SceneJS.configure({
-    pluginPath: "../../../plugins"
-});
+SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/build/latest/plugins" });
