@@ -10,18 +10,17 @@
         empty:false,
         lights:[
             {
-                mode:"dir",
-                color:[1.0, 1.0, 1.0], // Core has arrays for WebGL loading
+                mode:"ambient",
+                color:[0.6, 0.6, 0.6], // Core has arrays for WebGL loading
                 diffuse:true,
-                specular:true,
-                dir:[1.0, 0.0, -1.0 ]
+                specular:false
             },
             {
                 mode:"dir",
                 color:[1.0, 1.0, 1.0 ],
                 diffuse:true,
                 specular:true,
-                dir:[0.0, 1.0, 1.0 ]
+                dir:[0.5, -1.0, -0.6 ]
             },
             {
                 mode:"dir",

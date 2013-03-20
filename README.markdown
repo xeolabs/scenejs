@@ -19,7 +19,7 @@ it shows just to give a sense of what nodes play a part in a scene.
 ### Geometry
 
 * **[Custom Mesh](http://xeolabs.github.com/scenejs/examples/ex/geometry/geometry-custom.html)** - [[source]](examples/ex/geometry/geometry-custom.html)
-* **[Vertex Colouring](http://xeolabs.github.com/scenejs/examples/ex/geometry/geometry-custom-vertex-colors.html)** - [[source]](examples/ex/geometry/geometry-vertex-colors.html)
+* **[Vertex Colouring](http://xeolabs.github.com/scenejs/examples/ex/geometry/geometry-vertex-colors.html)** - [[source]](examples/ex/geometry/geometry-vertex-colors.html)
 
 ### Texture
 

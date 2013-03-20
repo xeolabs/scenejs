@@ -665,7 +665,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("  vec3    ambientValue=SCENEJS_uAmbient;");
+        src.push("  vec3    ambient=SCENEJS_uAmbient;");
         src.push("  float   emit    = SCENEJS_uMaterialEmit;");
 
         src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
@@ -869,7 +869,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
 
             src.push("if (SCENEJS_uBackfaceLighting || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
 
-            src.push("  vec3    lightValue      = SCENEJS_uAmbient;");
+            src.push("  vec3    lightValue      = vec3(0.0, 0.0, 0.0);");
             src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
             src.push("  vec3    viewLightVec;");
             src.push("  float   dotN;");
@@ -923,9 +923,9 @@ var SceneJS_ProgramSourceFactory = new (function() {
                 }
             }
 
-            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * lightValue.rgb) + (emit * color.rgb), alpha);");
+            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * color.rgb), alpha);");
             src.push("   } else {");
-            src.push("      fragColor = vec4(color.rgb + (emit * color.rgb), alpha);");
+            src.push("      fragColor = vec4((color.rgb + (emit * color.rgb)) * ambient.rgb, alpha);");
             src.push("   }");
 
         } else { // No normals

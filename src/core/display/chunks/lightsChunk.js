@@ -3,10 +3,11 @@
  */
 SceneJS_ChunkFactory.createChunkType({
 
-    type: "lights",
-    
-    build : function() {
+    type:"lights",
 
+    build:function () {
+
+        this._uAmbient = this._uAmbient || [];
         this._uLightColor = this._uLightColor || [];
         this._uLightDir = this._uLightDir || [];
         this._uLightPos = this._uLightPos || [];
@@ -22,9 +23,7 @@ SceneJS_ChunkFactory.createChunkType({
             switch (lights[i].mode) {
 
                 case "ambient":
-                    this._uLightColor[i] = (program.draw.getUniformLocation("SCENEJS_uLightColor" + i));
-                    this._uLightPos[i] = null;
-                    this._uLightDir[i] = null;
+                    this._uAmbient[i] = (program.draw.getUniformLocation("SCENEJS_uAmbient"));
                     break;
 
                 case "dir":
@@ -42,7 +41,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     },
 
-    draw : function(ctx) {
+    draw:function (ctx) {
 
         if (ctx.dirty) {
             this.build();
@@ -57,16 +56,22 @@ SceneJS_ChunkFactory.createChunkType({
 
             light = lights[i];
 
-            if (this._uLightColor[i]) {
-                gl.uniform3fv(this._uLightColor[i], light.color);
-            }
+            if (this._uAmbient[i]) {
+                gl.uniform3fv(this._uAmbient[i], light.color);
 
-            if (this._uLightPos[i]) {
-                gl.uniform3fv(this._uLightPos[i], light.pos);
-            }
+            } else {
 
-            if (this._uLightDir[i]) {
-                gl.uniform3fv(this._uLightDir[i], light.dir);
+                if (this._uLightColor[i]) {
+                    gl.uniform3fv(this._uLightColor[i], light.color);
+                }
+
+                if (this._uLightPos[i]) {
+                    gl.uniform3fv(this._uLightPos[i], light.pos);
+                }
+
+                if (this._uLightDir[i]) {
+                    gl.uniform3fv(this._uLightDir[i], light.dir);
+                }
             }
         }
     }

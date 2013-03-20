@@ -201,6 +201,11 @@ var SceneJS_Display = function (cfg) {
     this._objects = {};
 
     /**
+     * Ambient color, which must be given to gl.clearColor before draw list iteration
+     */
+    this._ambientColor = [0, 0, 0];
+
+    /**
      * The object list, containing all elements of #_objects, kept in GL state-sorted order
      */
     this._objectList = [];
@@ -421,6 +426,24 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
     }
 
     object.chunks[order] = this._chunkFactory.getChunk(chunkId, chunkType, object.program, core); // Attach new chunk
+
+    // Ambient light is global across everything in display, and
+    // can never be disabled, so grab it now because we want to
+    // feed it to gl.clearColor before each display list render
+    if (chunkType == "lights") {
+        this._setAmbient(core);
+    }
+};
+
+SceneJS_Display.prototype._setAmbient = function (core) {
+    var lights = core.lights;
+    var light;
+    for (var i = 0, len = lights.length; i < len; i++) {
+        light = lights[i];
+        if (light.mode == "ambient") {
+            this._ambientColor = light.color;
+        }
+    }
 };
 
 /**
@@ -830,6 +853,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     var gl = this._canvas.gl;
 
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
+    gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     gl.lineWidth(3);
     gl.frontFace(gl.CCW);
@@ -875,7 +899,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     }
 
     if (frameCtx.renderer) {                           // Forget last call-time renderer properties
-   //     frameCtx.renderer.props.restoreProps(gl);
+        //     frameCtx.renderer.props.restoreProps(gl);
     }
 };
 

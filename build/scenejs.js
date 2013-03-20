@@ -1528,7 +1528,7 @@ SceneJS_Canvas.prototype.initWebGL = function () {
             'Failed to get a WebGL context');
     }
 
-    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+//    this.gl.clearColor(1.0, 1.0, 1.0, 1.0);
     this.gl.clearDepth(1.0);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.disable(this.gl.CULL_FACE);
@@ -8365,18 +8365,17 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         empty:false,
         lights:[
             {
-                mode:"dir",
-                color:[1.0, 1.0, 1.0], // Core has arrays for WebGL loading
+                mode:"ambient",
+                color:[0.6, 0.6, 0.6], // Core has arrays for WebGL loading
                 diffuse:true,
-                specular:true,
-                dir:[1.0, 0.0, -1.0 ]
+                specular:false
             },
             {
                 mode:"dir",
                 color:[1.0, 1.0, 1.0 ],
                 diffuse:true,
                 specular:true,
-                dir:[0.0, 1.0, 1.0 ]
+                dir:[0.5, -1.0, -0.6 ]
             },
             {
                 mode:"dir",
@@ -12369,6 +12368,11 @@ var SceneJS_Display = function (cfg) {
     this._objects = {};
 
     /**
+     * Ambient color, which must be given to gl.clearColor before draw list iteration
+     */
+    this._ambientColor = [0, 0, 0];
+
+    /**
      * The object list, containing all elements of #_objects, kept in GL state-sorted order
      */
     this._objectList = [];
@@ -12589,6 +12593,24 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
     }
 
     object.chunks[order] = this._chunkFactory.getChunk(chunkId, chunkType, object.program, core); // Attach new chunk
+
+    // Ambient light is global across everything in display, and
+    // can never be disabled, so grab it now because we want to
+    // feed it to gl.clearColor before each display list render
+    if (chunkType == "lights") {
+        this._setAmbient(core);
+    }
+};
+
+SceneJS_Display.prototype._setAmbient = function (core) {
+    var lights = core.lights;
+    var light;
+    for (var i = 0, len = lights.length; i < len; i++) {
+        light = lights[i];
+        if (light.mode == "ambient") {
+            this._ambientColor = light.color;
+        }
+    }
 };
 
 /**
@@ -12998,6 +13020,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     var gl = this._canvas.gl;
 
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
+    gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     gl.lineWidth(3);
     gl.frontFace(gl.CCW);
@@ -13043,7 +13066,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     }
 
     if (frameCtx.renderer) {                           // Forget last call-time renderer properties
-   //     frameCtx.renderer.props.restoreProps(gl);
+        //     frameCtx.renderer.props.restoreProps(gl);
     }
 };
 
@@ -13718,7 +13741,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("  vec3    ambientValue=SCENEJS_uAmbient;");
+        src.push("  vec3    ambient=SCENEJS_uAmbient;");
         src.push("  float   emit    = SCENEJS_uMaterialEmit;");
 
         src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
@@ -13922,7 +13945,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
 
             src.push("if (SCENEJS_uBackfaceLighting || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
 
-            src.push("  vec3    lightValue      = SCENEJS_uAmbient;");
+            src.push("  vec3    lightValue      = vec3(0.0, 0.0, 0.0);");
             src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
             src.push("  vec3    viewLightVec;");
             src.push("  float   dotN;");
@@ -13976,9 +13999,9 @@ var SceneJS_ProgramSourceFactory = new (function() {
                 }
             }
 
-            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * lightValue.rgb) + (emit * color.rgb), alpha);");
+            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * color.rgb), alpha);");
             src.push("   } else {");
-            src.push("      fragColor = vec4(color.rgb + (emit * color.rgb), alpha);");
+            src.push("      fragColor = vec4((color.rgb + (emit * color.rgb)) * ambient.rgb, alpha);");
             src.push("   }");
 
         } else { // No normals
@@ -14911,10 +14934,11 @@ SceneJS_ChunkFactory.createChunkType({
  */
 SceneJS_ChunkFactory.createChunkType({
 
-    type: "lights",
-    
-    build : function() {
+    type:"lights",
 
+    build:function () {
+
+        this._uAmbient = this._uAmbient || [];
         this._uLightColor = this._uLightColor || [];
         this._uLightDir = this._uLightDir || [];
         this._uLightPos = this._uLightPos || [];
@@ -14930,9 +14954,7 @@ SceneJS_ChunkFactory.createChunkType({
             switch (lights[i].mode) {
 
                 case "ambient":
-                    this._uLightColor[i] = (program.draw.getUniformLocation("SCENEJS_uLightColor" + i));
-                    this._uLightPos[i] = null;
-                    this._uLightDir[i] = null;
+                    this._uAmbient[i] = (program.draw.getUniformLocation("SCENEJS_uAmbient"));
                     break;
 
                 case "dir":
@@ -14950,7 +14972,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     },
 
-    draw : function(ctx) {
+    draw:function (ctx) {
 
         if (ctx.dirty) {
             this.build();
@@ -14965,16 +14987,22 @@ SceneJS_ChunkFactory.createChunkType({
 
             light = lights[i];
 
-            if (this._uLightColor[i]) {
-                gl.uniform3fv(this._uLightColor[i], light.color);
-            }
+            if (this._uAmbient[i]) {
+                gl.uniform3fv(this._uAmbient[i], light.color);
 
-            if (this._uLightPos[i]) {
-                gl.uniform3fv(this._uLightPos[i], light.pos);
-            }
+            } else {
 
-            if (this._uLightDir[i]) {
-                gl.uniform3fv(this._uLightDir[i], light.dir);
+                if (this._uLightColor[i]) {
+                    gl.uniform3fv(this._uLightColor[i], light.color);
+                }
+
+                if (this._uLightPos[i]) {
+                    gl.uniform3fv(this._uLightPos[i], light.pos);
+                }
+
+                if (this._uLightDir[i]) {
+                    gl.uniform3fv(this._uLightDir[i], light.dir);
+                }
             }
         }
     }

@@ -87,7 +87,7 @@ SceneJS_Canvas.prototype.initWebGL = function () {
             'Failed to get a WebGL context');
     }
 
-    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+//    this.gl.clearColor(1.0, 1.0, 1.0, 1.0);
     this.gl.clearDepth(1.0);
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.disable(this.gl.CULL_FACE);
