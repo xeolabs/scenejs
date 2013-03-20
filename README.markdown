@@ -37,7 +37,7 @@ different regions of the atlas. So long as each of the geometry nodes inherit th
 and can therefore share the same shader, SceneJS will bind the texture once for all the geometries as they are rendered.
 Another important benefit of texture atlases is that they reduce the number of HTTP requests for texture images.
 
-* **[Vertex Sharing](http://xeolabs.github.com/scenejs/examples/ex/optimization/geometry-custom-vertex-sharing.html)** - [[source]](examples/ex/optimization/geometry-vertex-sharing.html)
+* **[Vertex Sharing](http://xeolabs.github.com/scenejs/examples/ex/optimization/geometry-vertex-sharing.html)** - [[source]](examples/ex/optimization/geometry-vertex-sharing.html)
  Vertex sharing is a technique in which a parent geometry node defines vertices (consisting of position, normal and UV arrays)
 that are inherited by child geometry nodes, which supply their own index arrays pointing into different portions of the
 vertices. The VBOs for the parent vertex arrays are then bound once across the draw calls for all the children. Each child is a seperate object,
