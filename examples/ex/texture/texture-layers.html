@@ -88,7 +88,7 @@ var scene = SceneJS.createScene({
 
                                                                                 // Bump map
                                                                                 {
-                                                                                    src:"images/earthbump.jpg",
+                                                                                    src:"../../textures/earthbump.jpg",
                                                                                     wrapS:"repeat",
                                                                                     wrapT:"repeat",
                                                                                     applyTo:"normals"
@@ -97,14 +97,14 @@ var scene = SceneJS.createScene({
                                                                                 // Underlying texture layer applied to the Earth material's
                                                                                 // baseColor to render the continents, oceans etc.
                                                                                 {
-                                                                                    src:"textures/earth.jpg",
+                                                                                    src:"../../textures/earth.jpg",
                                                                                     applyTo:"baseColor"
                                                                                 },
 
                                                                                 // Second texture layer applied to the Earth material's
                                                                                 // specular component to make the ocean shiney.
                                                                                 {
-                                                                                    src:"textures/earth-specular.gif",
+                                                                                    src:"../../textures/earth-specular.gif",
                                                                                     applyTo:"specular"
                                                                                 } ,
                                                                                 //
@@ -112,7 +112,7 @@ var scene = SceneJS.createScene({
                                                                                 // Second texture layer applied to the Earth material's
                                                                                 // emission component to show lights on the dark side.
                                                                                 {
-                                                                                    src:"textures/earth-lights.gif",
+                                                                                    src:"../../textures/earth-lights.gif",
                                                                                     applyTo:"emit"
                                                                                 }
                                                                             ],
@@ -165,7 +165,7 @@ var scene = SceneJS.createScene({
                                                                                     type:"texture",
                                                                                     layers:[
                                                                                         {
-                                                                                            src:"textures/earthclouds.jpg",
+                                                                                            src:"../../textures/earthclouds.jpg",
                                                                                             applyTo:"alpha",
                                                                                             blendMode:"multiply",
                                                                                             flipY:false
