@@ -48,3 +48,33 @@ inherits a similar combination of states and thus avoids needing to switch shade
 Traditionally, re-use within a scene graph is done by attaching nodes to multiple parents. For dynamically updated
 scenes this can have a performance impact when the engine must traverse multiple parent paths in the scene graph,
 so SceneJS takes an alternative approach with "node cores", a concept borrowed from OpenSG.
+
+
+## Plugins
+
+### Geometry
+
+* **[box](http://xeolabs.github.com/scenejs/build/plugins/geometry/box.js)**
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam id dolor sed tortor hendrerit imperdiet. Nullam tincidunt
+augue sed nisl varius placerat. Maecenas metus nibh, dignissim fringilla adipiscing ut, luctus nec nunc. Nam et accumsan
+risus. Phasellus ac nisi vel est aliquet scelerisque. Vivamus accumsan hendrerit dolor, eget eleifend velit aliquam nec.
+
+* **[sphere](http://xeolabs.github.com/scenejs/build/plugins/geometry/sphere.js)**
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam id dolor sed tortor hendrerit imperdiet. Nullam tincidunt
+augue sed nisl varius placerat. Maecenas metus nibh, dignissim fringilla adipiscing ut, luctus nec nunc. Nam et accumsan
+risus. Phasellus ac nisi vel est aliquet scelerisque. Vivamus accumsan hendrerit dolor, eget eleifend velit aliquam nec.
+
+
+### Texture
+
+* **[video](http://xeolabs.github.com/scenejs/build/plugins/geometry/box.js)**
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam id dolor sed tortor hendrerit imperdiet. Nullam tincidunt
+augue sed nisl varius placerat. Maecenas metus nibh, dignissim fringilla adipiscing ut, luctus nec nunc. Nam et accumsan
+risus. Phasellus ac nisi vel est aliquet scelerisque. Vivamus accumsan hendrerit dolor, eget eleifend velit aliquam nec.
+
+* **[canvas](http://xeolabs.github.com/scenejs/build/plugins/geometry/sphere.js)**
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam id dolor sed tortor hendrerit imperdiet. Nullam tincidunt
+augue sed nisl varius placerat. Maecenas metus nibh, dignissim fringilla adipiscing ut, luctus nec nunc. Nam et accumsan
+risus. Phasellus ac nisi vel est aliquet scelerisque. Vivamus accumsan hendrerit dolor, eget eleifend velit aliquam nec.
+
+
