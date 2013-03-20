@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>SceneJS V3 Geometry Source Plugin</title>
+    <title>SceneJS V3 Clip Planes</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
@@ -37,40 +37,54 @@
             color: #0080ff;
         }
     </style>
-
-    <script src="../build/scenejs.js"></script>
-
-    <script src="../plugins/geometry/scenejs.sphere.js"></script>
-
-    <script type="text/javascript" src="libs/dat.gui.min.js"></script>
-
 </head>
 <body>
 
 <div id="container"></div>
 <div id="info">
-    <a href="http://github.com/xeolabs/scenejs" target="_blank">SceneJS V3</a> - Geometry Source Plugin Example.<br/>
+    <a href="http://github.com/xeolabs/scenejs" target="_blank">SceneJS V3</a> - Clip Planes Example.<br/>
 </div>
 
 <canvas id="theCanvas"></canvas>
+
+<!-- SceneJS engine -->
+
+<script src="../build/scenejs.js"></script>
+
+<!-- Plugins for "teapot" geometry source type -->
+
+<script src="../plugins/geometry/scenejs.teapot.js"></script>
 
 <script>
 
 SceneJS.createScene({
 
+    type:"scene",
+
+    /* ID that we'll access the scene by when we want to render it
+     */
     id:"theScene",
 
+    /* Bind scene to a WebGL canvas:
+     */
     canvasId:"theCanvas",
 
     nodes:[
+
+
+        /* Viewing transform specifies eye position, looking
+         * at the origin by default
+         */
         {
             type:"lookAt",
-            id:"theLookAt",
-            eye:{ x:0.0, y:10.0, z:55 },
+            eye:{ x:0.0, y:10.0, z:-15 },
             look:{ y:1.0 },
             up:{ y:1.0 },
 
             nodes:[
+
+                /* Camera describes the projection
+                 */
                 {
                     type:"camera",
                     optics:{
@@ -83,6 +97,11 @@ SceneJS.createScene({
 
                     nodes:[
 
+
+                        /* A lights node inserts  point lights into the world-space.
+                         * You can have many of these, nested within modelling transforms
+                         * if you want to move them around.
+                         */
                         {
                             type:"lights",
                             lights:[
@@ -104,7 +123,13 @@ SceneJS.createScene({
                                     space:"world"
                                 }
                             ],
+
                             nodes:[
+
+
+                                /* Next, modelling transforms to orient our teapot. See how these have IDs,
+                                 * so we can access them to set their angle attributes.
+                                 */
                                 {
                                     type:"rotate",
                                     id:"pitch",
@@ -119,26 +144,61 @@ SceneJS.createScene({
                                             y:1.0,
 
                                             nodes:[
+
+                                                /* Specify the amounts of ambient, diffuse and specular
+                                                 * lights our teapot reflects
+                                                 */
                                                 {
                                                     type:"material",
                                                     emit:0,
-                                                    baseColor:{ r:0.5, g:0.5, b:0.6 },
+                                                    baseColor:{ r:0.3, g:0.3, b:0.9 },
                                                     specularColor:{ r:0.9, g:0.9, b:0.9 },
-                                                    specular:1.0,
-                                                    shine:70.0,
+                                                    specular:0.9,
+                                                    shine:100.0,
 
                                                     nodes:[
+
+                                                        /* Clipping plane
+                                                         */
                                                         {
-                                                            type:"geometry",
+                                                            type:"clips",
+                                                            clips:[
+                                                                {
+                                                                    mode:"inside",
+                                                                    a:{ x:-4, y:-2, z:-10 },
+                                                                    b:{ x:0, y:0, z:10 },
+                                                                    c:{ x:0, y:2, z:-10 }
+                                                                }
+//                                                        ,
+//                                                        {
+//                                                            mode:"outside",
+//                                                            a:{ x:-4, y:-2, z:-10 },
+//                                                            b:{ x:0, y:0, z:10 },
+//                                                            c:{ x:0, y:2, z:-10 }
+//                                                        }
+                                                            ],
 
-                                                            id:"theGeometry",
+                                                            nodes:[
 
-                                                            source:{
-                                                                type:"sphere",
-                                                                slices:5,
-                                                                rings:3,
-                                                                radius:2.0
-                                                            }
+                                                                /* Teapot's geometry
+                                                                 */
+                                                                {
+                                                                    type:"scale",
+                                                                    x:1.0,
+                                                                    y:1.0,
+                                                                    z:1.0,
+
+                                                                    nodes:[
+                                                                        {
+                                                                            type:"geometry",
+
+                                                                            source:{
+                                                                                type:"teapot"
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
                                                         }
                                                     ]
                                                 }
@@ -158,12 +218,10 @@ SceneJS.createScene({
 
 /* Get handles to some nodes
  */
-var scene = SceneJS.getScene("theScene");
-var yawNode = scene.getNode("yaw");
-var pitchNode = scene.getNode("pitch");
-var lookAtNode = scene.getNode("theLookAt");
-
-var geometryNode = scene.getNode("theGeometry");
+var scene = SceneJS.scene("theScene");
+var yawNode = scene.findNode("yaw");
+var pitchNode = scene.findNode("pitch");
+var lookAtNode = scene.findNode("theLookAt");
 
 /* As mouse drags, we'll update the rotate nodes
  */
@@ -232,35 +290,6 @@ canvas.addEventListener('touchmove', touchMove, true);
 canvas.addEventListener('touchend', touchEnd, true);
 
 scene.start();
-
-
-var Controller = function () {
-
-    this.slices = 5;
-    this.rings = 5;
-    this.radius = 1;
-
-    this.update = function () {
-        geometryNode.setSource({
-            slices:this.slices,
-            rings:this.rings,
-            radius:2.0
-        });
-    };
-};
-
-var controller = new Controller();
-
-var gui = new dat.GUI();
-
-var f1 = gui.addFolder('Sphere properties');
-
-f1.add(controller, 'slices', 5, 50);
-f1.add(controller, 'rings', 5, 50);
-f1.add(controller, 'radius', 1, 6);
-gui.add(controller, 'update');
-
-f1.open();
 
 </script>
 </body>

@@ -1,14 +1,14 @@
 SceneJS.Plugins.addPlugin(
 
-        SceneJS.Plugins.TEXTURE_ASSET_PLUGIN,
+        SceneJS.Plugins.TEXTURE_SOURCE_PLUGIN,
 
         "image",
         
         new (function() {
 
-            var assetService = this;
+            var sourceService = this;
 
-            this.getAsset = function (params) {
+            this.getSource = function (params) {
 
                 var gl = params.gl;
                 var configs = {};
@@ -40,7 +40,7 @@ SceneJS.Plugins.addPlugin(
                             
                             gl.bindTexture(gl.TEXTURE_2D, texture);
 
-                            var potImage = assetService._ensureImageSizePowerOfTwo(image); // WebGL hates NPOT images
+                            var potImage = sourceService._ensureImageSizePowerOfTwo(image); // WebGL hates NPOT images
 
                             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, potImage);
 

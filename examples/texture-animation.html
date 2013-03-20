@@ -4,64 +4,22 @@
     <title>SceneJS V3 Texture Animation</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <style>
-
-        body {
-            background-color: #000000;
-            margin: 0px;
-            overflow: auto;
-            height: 100%;
-        }
-
-        #info {
-            position: absolute;
-            top: 0px;
-            width: 100%;
-            color: #ffffff;
-            padding: 5px;
-            font-family: Monospace;
-            font-size: 13px;
-            text-align: center;
-        }
-
-        #theCanvas {
-            width: 100%;
-            height: 100%;
-        }
-
-        a {
-            color: #ffffff;
-        }
-
-        a:hover {
-            color: #0080ff;
-        }
-    </style>
 
 </head>
 <body>
 
-<div id="container"></div>
-<div id="info">
-    <a href="http://github.com/xeolabs/scenejs" target="_blank">SceneJS V3</a> - Texture Animation Example.<br/>
-</div>
-
-<canvas id="theCanvas"></canvas>
 
 <!-- SceneJS engine -->
 
 <script src="../build/scenejs.js"></script>
 
-<!-- Plugins for "box" geometry asset type -->
+<!-- Plugins for "box" geometry source type -->
 
 <script src="../plugins/geometry/scenejs.box.js"></script>
 
 <script>
 
-SceneJS.createScene({
-    type: "scene",
-    id: "theScene",
-    canvasId: "theCanvas",
+var scene = SceneJS.createScene({
 
     nodes: [
         {
@@ -195,7 +153,7 @@ SceneJS.createScene({
                                                                 {
                                                                     type: "geometry",
 
-                                                                    asset: {
+                                                                    source: {
                                                                         type: "box"
                                                                     }
                                                                 }
@@ -221,7 +179,6 @@ SceneJS.createScene({
  * Scene rendering loop and mouse handler stuff
  *---------------------------------------------------------------------*/
 
-var scene = SceneJS.getScene("theScene");
 var rotateXNode = scene.getNode("pitch");
 var rotateYNode = scene.getNode("yaw");
 var textureNode = scene.getNode("theTexture");

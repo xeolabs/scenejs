@@ -20,8 +20,8 @@ new (function() {
     var defaultCore = {
         type: "material",
         stateId: SceneJS._baseStateId++,
-        baseColor :  [ 0.0, 0.0, 0.0 ],
-        specularColor :  [ 0.0,  0.0,  0.0 ],
+        baseColor :  [ 1.0, 1.0, 1.0 ],
+        specularColor :  [ 1.0,  1.0,  1.0 ],
         specular : 0.4,
         shine :  20.0,
         alpha :  1.0,

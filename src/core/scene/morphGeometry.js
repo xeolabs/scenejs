@@ -31,47 +31,47 @@ new (function() {
 
         if (this._core.useCount == 1) { // This node defines the resource
 
-            this._assetConfigs = params.asset;
-            this._asset = null;
+            this._sourceConfigs = params.source;
+            this._source = null;
 
-            if (params.asset) {
+            if (params.source) {
 
                 /*---------------------------------------------------------------------------------------------------
                  * Build node core (possibly asynchronously) using a factory object
                  *--------------------------------------------------------------------------------------------------*/
 
-                if (!params.asset.type) {
+                if (!params.source.type) {
                     throw SceneJS_error.fatalError(
                             SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                            "morphGeometry config expected: asset.type");
+                            "morphGeometry config expected: source.type");
                 }
 
-                var assetService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.MORPH_GEO_ASSET_PLUGIN, this._assetConfigs.type);
+                var sourceService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN, this._sourceConfigs.type);
 
-                if (!assetService) {
+                if (!sourceService) {
                     throw SceneJS_error.fatalError(
                             SceneJS.errors.PLUGIN_INVALID,
-                            "morphGeometry: no support for asset type '" + this._assetConfigs.type + "' - need to include plugin for this asset type, " +
-                            "or install a custom asset service with SceneJS.Plugins.addPlugin(SceneJS.Plugins.MORPH_GEO_ASSET_PLUGIN, '" + this._assetConfigs.type + "', <your service>).");
+                            "morphGeometry: no support for source type '" + this._sourceConfigs.type + "' - need to include plugin for this source type, " +
+                            "or install a custom source service with SceneJS.Plugins.addPlugin(SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN, '" + this._sourceConfigs.type + "', <your service>).");
                 }
 
-                if (!assetService.getAsset) {
+                if (!sourceService.getSource) {
                     throw SceneJS_error.fatalError(
                             SceneJS.errors.PLUGIN_INVALID,
-                            "morphGeometry: 'getAsset' method not found on MorphGeoFactoryService (SceneJS.Plugins.MORPH_GEO_ASSET_PLUGIN)");
+                            "morphGeometry: 'getSource' method not found on MorphGeoFactoryService (SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN)");
                 }
 
-                this._asset = assetService.getAsset();
+                this._source = sourceService.getSource();
 
-                if (!this._asset.onUpdate) {
+                if (!this._source.onUpdate) {
                     throw SceneJS_error.fatalError(
                             SceneJS.errors.PLUGIN_INVALID,
-                            "morphGeometry: 'onUpdate' method not found on asset provided by plugin type '" + params.asset.type + "'");
+                            "morphGeometry: 'onUpdate' method not found on source provided by plugin type '" + params.source.type + "'");
                 }
 
                 var self = this;
 
-                this._asset.onCreate(// Get notification when factory creates the morph
+                this._source.onCreate(// Get notification when factory creates the morph
                         function(data) {
 
                             self._buildNodeCore(data);
@@ -82,8 +82,8 @@ new (function() {
                             self._engine.branchDirty(this); // TODO
                         });
 
-                if (this._asset.onUpdate) {
-                    this._asset.onUpdate(// Reload factory updates to the morph
+                if (this._source.onUpdate) {
+                    this._source.onUpdate(// Reload factory updates to the morph
                             function(data) {
 
                                 if (data.targets) {
@@ -117,7 +117,7 @@ new (function() {
 
                 this._fireEvent("loading");
 
-                this._asset.setConfigs(this._assetConfigs);
+                this._source.setConfigs(this._sourceConfigs);
 
             } else if (params.create instanceof Function) {
 
@@ -272,16 +272,16 @@ new (function() {
         }
     };
 
-    SceneJS.MorphGeometry.prototype.setAsset = function(assetConfigs) {
-        this._assetConfigs = assetConfigs;
-        var asset = this._asset;
-        if (asset) {
-            asset.setConfigs(assetConfigs);
+    SceneJS.MorphGeometry.prototype.setSource = function(sourceConfigs) {
+        this._sourceConfigs = sourceConfigs;
+        var source = this._source;
+        if (source) {
+            source.setConfigs(sourceConfigs);
         }
     };
 
-    SceneJS.MorphGeometry.prototype.getAsset = function() {
-        return this._assetConfigs;
+    SceneJS.MorphGeometry.prototype.getSource = function() {
+        return this._sourceConfigs;
     };
 
     SceneJS.MorphGeometry.prototype.setFactor = function(factor) {
@@ -374,8 +374,8 @@ new (function() {
                     }
                 }
             }
-            if (this._asset) {
-                this._asset.destroy();
+            if (this._source) {
+                this._source.destroy();
             }
         }
     };

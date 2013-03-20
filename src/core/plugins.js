@@ -3,11 +3,11 @@
  */
 SceneJS.Plugins = new (function() {
 
-    this.GEO_ASSET_PLUGIN = "geoAsset";
+    this.GEO_SOURCE_PLUGIN = "geoSource";
 
-    this.MORPH_GEO_ASSET_PLUGIN = "morphGeoAsset";
+    this.MORPH_GEO_SOURCE_PLUGIN = "morphGeoSource";
 
-    this.TEXTURE_ASSET_PLUGIN = "textureAsset";
+    this.TEXTURE_SOURCE_PLUGIN = "textureSource";
 
     this._pluginTypes = {};
 

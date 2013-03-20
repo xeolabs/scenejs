@@ -39,7 +39,7 @@ var gridFloorJSON = {
                     nodes: [
                         {
                             type: "geometry",
-                            asset: {
+                            source: {
                                 type: "box"
                             }
                         }

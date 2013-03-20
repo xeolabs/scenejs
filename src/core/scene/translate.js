@@ -27,6 +27,30 @@ SceneJS.Translate.prototype._init = function(params) {
 };
 
 /**
+ * Get Model matrix
+ * @return {*}
+ */
+SceneJS.Translate.prototype.getModelMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return this._core.matrix;
+};
+
+/**
+ * Get World matrix. That's the multiplication of this node's Model matrix by the World matrix of the the next
+ * tranform (scale, translate, translate etc) node on the path to the scene root.
+ * @return {*}
+ */
+SceneJS.Translate.prototype.getWorldMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return Array.apply( [], this._core.mat);
+};
+
+
+/**
  * Sets the multiplication order of this node's transform matrix with respect to the parent modeling transform
  * in the scene graph.
  *

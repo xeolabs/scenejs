@@ -601,20 +601,20 @@ var SceneJS_PickBuffer = function (cfg) {
             } else { // Buffer needs reallocation for new canvas size
 
                 gl.deleteTexture(pickBuf.texture);
-                gl.deleteFramebuffer(pickBuf.frameBuf);
-                gl.deleteRenderbuffer(pickBuf.renderBuf);
+                gl.deleteFramebuffer(pickBuf.framebuf);
+                gl.deleteRenderbuffer(pickBuf.renderbuf);
             }
         }
 
         pickBuf = {
-            frameBuf:gl.createFramebuffer(),
-            renderBuf:gl.createRenderbuffer(),
+            framebuf:gl.createFramebuffer(),
+            renderbuf:gl.createRenderbuffer(),
             texture:gl.createTexture(),
             width:width,
             height:height
         };
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
 
         gl.bindTexture(gl.TEXTURE_2D, pickBuf.texture);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -630,18 +630,18 @@ var SceneJS_PickBuffer = function (cfg) {
             var textureStorage = new WebGLUnsignedByteArray(width * height * 3);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureStorage);
         }
-        gl.bindRenderbuffer(gl.RENDERBUFFER, pickBuf.renderBuf);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, pickBuf.renderbuf);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickBuf.texture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickBuf.renderBuf);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickBuf.renderbuf);
         gl.bindTexture(gl.TEXTURE_2D, null);
         gl.bindRenderbuffer(gl.RENDERBUFFER, null);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         /* Verify framebuffer is OK
          */
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
-        if (!gl.isFramebuffer(pickBuf.frameBuf)) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
+        if (!gl.isFramebuffer(pickBuf.framebuf)) {
             throw  SceneJS_errorModule.fatalError("Invalid framebuffer");
         }
         var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
@@ -671,7 +671,7 @@ var SceneJS_PickBuffer = function (cfg) {
             return;
         }
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
 
         bound = true;
     };
@@ -731,20 +731,20 @@ var SceneJS_PickBufferOLD = function (cfg) {
             } else { // Buffer needs reallocation for new canvas size
 
                 gl.deleteTexture(pickBuf.texture);
-                gl.deleteFramebuffer(pickBuf.frameBuf);
-                gl.deleteRenderbuffer(pickBuf.renderBuf);
+                gl.deleteFramebuffer(pickBuf.framebuf);
+                gl.deleteRenderbuffer(pickBuf.renderbuf);
             }
         }
 
         pickBuf = {
-            frameBuf:gl.createFramebuffer(),
-            renderBuf:gl.createRenderbuffer(),
+            framebuf:gl.createFramebuffer(),
+            renderbuf:gl.createRenderbuffer(),
             texture:gl.createTexture(),
             width:width,
             height:height
         };
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
 
         gl.bindTexture(gl.TEXTURE_2D, pickBuf.texture);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -761,10 +761,10 @@ var SceneJS_PickBufferOLD = function (cfg) {
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureStorage);
         }
 
-        gl.bindRenderbuffer(gl.RENDERBUFFER, pickBuf.renderBuf);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, pickBuf.renderbuf);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickBuf.texture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickBuf.renderBuf);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickBuf.renderbuf);
 
         gl.bindTexture(gl.TEXTURE_2D, null);
         gl.bindRenderbuffer(gl.RENDERBUFFER, null);
@@ -772,8 +772,8 @@ var SceneJS_PickBufferOLD = function (cfg) {
 
         /* Verify framebuffer is OK
          */
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
-        if (!gl.isFramebuffer(pickBuf.frameBuf)) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
+        if (!gl.isFramebuffer(pickBuf.framebuf)) {
             throw  SceneJS_error.fatalError("Invalid framebuffer");
         }
 
@@ -801,7 +801,7 @@ var SceneJS_PickBufferOLD = function (cfg) {
         if (this.bound) {
             return;
         }
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
         this.bound = true;
     };
 

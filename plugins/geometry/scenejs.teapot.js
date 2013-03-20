@@ -8,15 +8,15 @@
  */
 SceneJS.Plugins.addPlugin(
 
-        SceneJS.Plugins.GEO_ASSET_PLUGIN,
+        SceneJS.Plugins.GEO_SOURCE_PLUGIN,
 
         "teapot",
 
         new (function() {
 
-            var assetService = this;
+            var sourceService = this;
 
-            this.getAsset = function () {
+            this.getSource = function () {
 
                 var created;
                 var updated;
@@ -35,7 +35,7 @@ SceneJS.Plugins.addPlugin(
 
                     setConfigs : function(cfg) {
                         configs = cfg;
-                        created(assetService.buildTeapot(cfg));
+                        created(sourceService.buildTeapot(cfg));
                     },
 
                     getConfigs : function() {

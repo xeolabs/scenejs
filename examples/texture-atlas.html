@@ -1,301 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>SceneJS V3 Texture Atlas</title>
+    <title>SceneJS Example</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <style>
-
-        body {
-            background-color: #000000;
-            margin: 0px;
-            overflow: auto;
-            height: 100%;
-        }
-
-        #info {
-            position: absolute;
-            top: 0px;
-            width: 100%;
-            color: #ffffff;
-            padding: 5px;
-            font-family: Monospace;
-            font-size: 13px;
-            text-align: center;
-        }
-
-        #theCanvas {
-            width: 100%;
-            height: 100%;
-        }
-
-        a {
-            color: #ffffff;
-        }
-
-        a:hover {
-            color: #0080ff;
-        }
-    </style>
 </head>
 <body>
-
-<div id="container"></div>
-<div id="info">
-    <a href="http://github.com/xeolabs/scenejs" target="_blank">SceneJS V3</a> - Texture Atlas.<br/>
-</div>
-
-<canvas id="theCanvas"></canvas>
 
 <!-- SceneJS engine -->
 
 <script src="../build/scenejs.js"></script>
 
+<!-- Utility function that binds mouse to certain rotate nodes - just using this to cut down example maintenance -->
+
+<script src="libs/mouseOrbitUtility.js"></script>
 
 <script>
 
-SceneJS.createScene({
+    var scene = SceneJS.createScene({
 
-    id: "theScene",
+        nodes:[
+            {
+                type:"lookAt",
+                eye:{  z:10 },
 
-    canvasId: "theCanvas",
+                nodes:[
 
-    nodes: [
-        {
-            type: "lookAt",
-            id: "theLookAt",
-            eye : { x: 0.0, y: 0.0, z: 10 },
-            look : { y:0.0 },
-            up : { y: 1.0 },
+                    // Our texture atlas
+                    // The atlas is the General Zod portrait and the brickwall pattern,
+                    //arranged side-by-side within the same image file.
+                    {
+                        type:"texture",
+                        layers:[
+                            {
+                                uri:"textures/texture-atlas.jpg",
+                                applyTo:"baseColor",
+                                blendMode:"multiply"
+                            }
+                        ],
 
-            nodes: [
-                {
-                    type: "camera",
-                    optics: {
-                        type: "perspective",
-                        fovy : 25.0,
-                        aspect : 1.47,
-                        near : 0.10,
-                        far : 300.0
-                    },
+                        nodes:[
+                            {
+                                type:"rotate",
+                                id:"pitch",
+                                angle:-30.0,
+                                x:1.0,
 
-                    nodes: [
-                        {
-                            type: "lights",
-                            lights: [
-                                {
-                                    mode:                 "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 1.0, y: 0.0, z: -1.0 }
-                                },
-                                {
-                                    mode:                 "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: 0.0, y: 1.0, z: 1.0 }
-                                },
-                                {
-                                    mode:                 "dir",
-                                    color:                  { r: 1.0, g: 1.0, b: 1.0 },
-                                    diffuse:                true,
-                                    specular:               true,
-                                    dir:                    { x: -1.0, y: 0.0, z: 0.0 }
-                                }
-                            ],
-                            nodes: [
-                                {
-                                    type: "material",
-                                    baseColor:      { r: 1.0, g: 1.0, b: 1.0 },
-                                    specularColor:  { r: 1.0, g: 1.0, b: 1.0 },
-                                    specular:       0.2,
-                                    shine:          6.0,
+                                nodes:[
+                                    {
+                                        type:"rotate",
+                                        id:"yaw",
+                                        angle:-30.0,
+                                        y:1.0,
 
-                                    nodes: [
+                                        nodes:[
 
+                                            // Two quads - geometry nodes that define a four-sided polygon.
+                                            //
+                                            // These are arranged on the X-axis by a couple of translate
+                                            // nodes.
+                                            //
+                                            // Each of the quads have different UV coordinates, causing
+                                            // their verices to map to different regions within the texture.
+                                            //
+                                            // The first quad maps to GeneralZod, while second maps to
+                                            // the brick wall.
 
-                                        /*------------------------------------------------------------------
-                                         * Our texture atlas
-                                         *
-                                         * The atlas is the General Zod portrait and the brickwall pattern,
-                                         * arranged side-by-side within the same image file.
-                                         *-----------------------------------------------------------------*/
+                                            // 1. General Zod
+                                            {
+                                                type:"translate",
+                                                x:1.5,
 
-                                        {
-                                            type: "texture",
+                                                nodes:[
+                                                    {
+                                                        type:"geometry",
+                                                        positions:[ 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0 ],
+                                                        normals:[ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
 
-                                            layers: [
-                                                {
-                                                    uri:"textures/texture-atlas.jpg",
-                                                    applyTo:"baseColor",
-                                                    blendMode: "multiply"
-                                                }
-                                            ],
+                                                        // UV coords map to left half of texture image
+                                                        uv:[ 1, 1, .5, 1, .5, 0, 1, 0 ],
+                                                        indices:[ 0, 1, 2, 0, 2, 3]
+                                                    }
+                                                ]
+                                            },
 
-                                            nodes: [
-                                                {
-                                                    type: "rotate",
-                                                    id: "pitch",
-                                                    angle: -30.0,
-                                                    x : 1.0,
+                                            // 2. Brick wall
+                                            {
+                                                type:"translate",
+                                                x:-1.5,
 
-                                                    nodes: [
-                                                        {
-                                                            type: "rotate",
-                                                            id: "yaw",
-                                                            angle: -30.0,
-                                                            y : 1.0,
+                                                nodes:[
+                                                    {
+                                                        type:"geometry",
+                                                        positions:[ 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0 ],
+                                                        normals:[ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
 
-                                                            nodes: [
+                                                        // UV coords map to right half of texture image
+                                                        uv:[ .5, 1, 0, 1, 0, 0, .5, 0 ],
+                                                        indices:[ 0, 1, 2, 0, 2, 3]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
 
-                                                                /*--------------------------------------------------------------
-                                                                 * Two quads - geometry nodes that define a four-sided polygon.
-                                                                 *
-                                                                 * These are arranged on the X-axis by a couple of translate
-                                                                 * nodes.
-                                                                 *
-                                                                 * Each of the quads have different UV coordinates, causing
-                                                                 * their verices to map to different regions within the texture.
-                                                                 *
-                                                                 * The first quad maps to GeneralZod, while second maps to
-                                                                 * the brick wall.
-                                                                 *-----------------------------------------------------------------*/
+    scene.start();
 
-                                                                /* General Zod
-                                                                 */
-                                                                {
-                                                                    type: "translate",
-
-                                                                    x: 1.5,
-
-                                                                    nodes: [
-                                                                        {
-                                                                            type: "geometry",
-                                                                            positions : [ 1, 1, 0, - 1, 1, 0, -1, -1, 0, 1, -1, 0 ],
-                                                                            normals : [ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
-
-                                                                            /* UV coords map to left half of texture image
-                                                                             */
-                                                                            uv : [ 1, 1, .5, 1, .5, 0, 1, 0 ],
-                                                                            indices : [ 0, 1, 2,0, 2, 3]
-                                                                        }
-                                                                    ]
-                                                                },
-
-                                                                /* Brick wall
-                                                                 */
-                                                                {
-                                                                    type: "translate",
-
-                                                                    x: -1.5,
-
-                                                                    nodes: [
-                                                                        {
-                                                                            type: "geometry",
-                                                                            positions : [ 1, 1, 0, - 1, 1, 0, -1, -1, 0, 1, -1, 0 ],
-                                                                            normals : [ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
-
-                                                                            /* UV coords map to right half of texture image
-                                                                             */
-                                                                            uv : [ .5, 1, 0, 1, 0, 0, .5, 0 ],
-                                                                            indices : [ 0, 1, 2,0, 2, 3]
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
-});
-
-
-/* Get handles to some nodes
- */
-var scene = SceneJS.getScene("theScene");
-var yawNode = scene.getNode("yaw");
-var pitchNode = scene.getNode("pitch");
-var lookAtNode = scene.getNode("theLookAt");
-
-/* As mouse drags, we'll update the rotate nodes
- */
-
-var lastX;
-var lastY;
-var dragging = false;
-
-var newInput = false;
-var yaw = 0;
-var pitch = 0;
-
-var canvas = document.getElementById("theCanvas");
-
-function mouseDown(event) {
-    lastX = event.clientX;
-    lastY = event.clientY;
-    dragging = true;
-}
-
-function touchStart(event) {
-    lastX = event.targetTouches[0].clientX;
-    lastY = event.targetTouches[0].clientY;
-    dragging = true;
-}
-
-function mouseUp() {
-    dragging = false;
-}
-
-function touchEnd() {
-    dragging = false;
-}
-
-function mouseMove(event) {
-    var posX = event.clientX;
-    var posY = event.clientY;
-    actionMove(posX, posY);
-}
-
-function touchMove(event) {
-    var posX = event.targetTouches[0].clientX;
-    var posY = event.targetTouches[0].clientY;
-    actionMove(posX, posY);
-}
-
-function actionMove(posX, posY) {
-    if (dragging) {
-
-        yaw += (posX - lastX) * 0.5;
-        pitch += (posY - lastY) * 0.5;
-
-        lastX = posX;
-        lastY = posY;
-
-        yawNode.set("angle", yaw);
-        pitchNode.set("angle", pitch);
-    }
-}
-
-canvas.addEventListener('mousedown', mouseDown, true);
-canvas.addEventListener('mousemove', mouseMove, true);
-canvas.addEventListener('mouseup', mouseUp, true);
-canvas.addEventListener('touchstart', touchStart, true);
-canvas.addEventListener('touchmove', touchMove, true);
-canvas.addEventListener('touchend', touchEnd, true);
-
-scene.start();
+    mouseOrbitUtility(scene);
 
 </script>
 </body>

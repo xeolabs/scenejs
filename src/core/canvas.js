@@ -1,11 +1,31 @@
 /**
  *
  */
-var SceneJS_Canvas = function(canvasId, contextAttr, options) {
+var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
 
     /**
      * ID of this canvas
      */
+    this.canvasId;
+
+    if (!canvasId) {
+        // Automatic default canvas
+        canvasId = "canvas-" + id;
+        var body = document.getElementsByTagName("body")[0];
+        body.innerHTML = '';
+        var newdiv = document.createElement('div');
+        newdiv.style.height = "100%";
+        newdiv.style.width = "100%";
+        newdiv.innerHTML = '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
+        body.appendChild(newdiv);
+    }
+
+    // Bind to canvas
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) {
+        throw SceneJS_error.fatalError(SceneJS.errors.CANVAS_NOT_FOUND,
+            "SceneJS.Scene attribute 'canvasId' does not match any elements in the page");
+    }
     this.canvasId = canvasId;
 
     /**
@@ -13,19 +33,9 @@ var SceneJS_Canvas = function(canvasId, contextAttr, options) {
      */
     this.options = options || {};
 
-    /**
-     * The HTML canvas element
-     */
-    var canvas = document.getElementById(canvasId);
-
-    if (!canvas) {
-        throw SceneJS_error.fatalError(SceneJS.errors.CANVAS_NOT_FOUND,
-                "SceneJS.Scene attribute 'canvasId' does not match any elements in the page");
-    }
-
     this.canvas = (this.options.simulateWebGLContextLost)
-            ? WebGLDebugUtils.makeLostContextSimulatingCanvas(canvas)
-            : canvas;
+        ? WebGLDebugUtils.makeLostContextSimulatingCanvas(canvas)
+        : canvas;
 
     // If the canvas uses css styles to specify the sizes make sure the basic
     // width and height attributes match or the WebGL context will use 300 x 150
@@ -61,7 +71,7 @@ SceneJS_Canvas.prototype._WEBGL_CONTEXT_NAMES = [
  * Initialise the WebGL context
 
  */
-SceneJS_Canvas.prototype.initWebGL = function() {
+SceneJS_Canvas.prototype.initWebGL = function () {
 
     for (var i = 0; !this.gl && i < this._WEBGL_CONTEXT_NAMES.length; i++) {
         try {
@@ -73,8 +83,8 @@ SceneJS_Canvas.prototype.initWebGL = function() {
 
     if (!this.gl) {
         throw SceneJS_error.fatalError(
-                SceneJS.errors.WEBGL_NOT_SUPPORTED,
-                'Failed to get a WebGL context');
+            SceneJS.errors.WEBGL_NOT_SUPPORTED,
+            'Failed to get a WebGL context');
     }
 
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -90,7 +100,7 @@ SceneJS_Canvas.prototype.initWebGL = function() {
  * Simulate a lost WebGL context.
  * Only works if the simulateWebGLContextLost was given as an option to the canvas' constructor.
  */
-SceneJS_Canvas.prototype.loseWebGLContext = function() {
+SceneJS_Canvas.prototype.loseWebGLContext = function () {
     if (this.options.simulateWebGLContextLost) {
         this.canvas.loseContext();
     }

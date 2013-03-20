@@ -854,6 +854,70 @@ return {
 
 }();
 /**
+ * @class Generic map of IDs to items - can generate own IDs or accept given IDs. IDs should be strings in order to not
+ * clash with internally generated IDs, which are numbers.
+ * @private
+ */
+var SceneJS_Map = function(items, _baseId) {
+
+    /**
+     * @property Items in this map
+     */
+    this.items = items || [];
+
+
+    var baseId = _baseId || 0;
+    var lastUniqueId = baseId + 1;
+
+    /**
+     * Adds an item to the map and returns the ID of the item in the map. If an ID is given, the item is
+     * mapped to that ID. Otherwise, the map automatically generates the ID and maps to that.
+     *
+     * id = myMap.addItem("foo") // ID internally generated
+     *
+     * id = myMap.addItem("foo", "bar") // ID is "foo"
+     *
+     */
+    this.addItem = function() {
+
+        var item;
+
+        if (arguments.length == 2) {
+
+            var id = arguments[0];
+
+            item = arguments[1];
+
+            if (this.items[id]) { // Won't happen if given ID is string
+                throw SceneJS_error.fatalError(SceneJS.errors.ID_CLASH, "ID clash: '" + id + "'");
+            }
+
+            this.items[id] = item;
+
+            return id;
+
+        } else {
+
+            while (true) {
+
+                item = arguments[0];
+                var findId = lastUniqueId++;
+
+                if (!this.items[findId]) {
+                    this.items[findId] = item;
+                    return findId;
+                }
+            }
+        }
+    };
+
+    /**
+     * Removes the item of the given ID from the map
+     */
+    this.removeItem = function(id) {
+        delete this.items[id];
+    };
+};/**
  * The SceneJS object.
  */
 var SceneJS = new (function () {
@@ -863,13 +927,14 @@ var SceneJS = new (function () {
      */
     this.VERSION = '3.0.0.0';
 
-
     this._baseStateId = 0;
 
     /**
      * @property {SceneJS_Engine} Engines currently in existance
      */
     this._engines = {};
+
+    this._engineIds = new SceneJS_Map();
 
     /**
      * Creates a new scene from the given JSON description
@@ -885,16 +950,15 @@ var SceneJS = new (function () {
             throw SceneJS_error.fatalError("param 'json' is null or undefined");
         }
 
-        if (!json.id) { // TODO: make optional
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "'id' is mandatory for the Scene node");
-        }
-
-        if (this._engines[json.id]) {
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Scene already exists with this ID: '" + json.id + "'");
+        if (json.id) {
+            if (this._engines[json.id]) {
+                throw SceneJS_error.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Scene already exists with this ID: '" + json.id + "'");
+            }
+            this._engineIds.addItem(json.id, {});
+        } else {
+            json.id = this._engineIds.addItem({});
         }
 
         var engine = new SceneJS_Engine(json, options);
@@ -952,22 +1016,6 @@ var SceneJS = new (function () {
 
         return scenes;
     };
-
-//    var fnName = "__scenejs_sceneLoop";
-//
-//    window[fnName] = function () {
-//
-//        var engine;
-//
-//        for (var engineId in this._engines) {
-//            if (this._engines.hasOwnProperty(this._engines)) {
-//                engine = this._engines[engineId];
-//                engine.renderFrame();
-//            }
-//        }
-//
-//        window.requestAnimationFrame(window[fnName]);
-//    };
 
     /**
      * Tests if the given object is an array
@@ -1042,6 +1090,8 @@ var SceneJS = new (function () {
                 temp.push(this._engines[id]);
 
                 delete this._engines[id];
+
+                this._engineIds.removeItem(id);
             }
         }
 
@@ -1054,70 +1104,6 @@ var SceneJS = new (function () {
 
 })();
 /**
- * @class Generic map of IDs to items - can generate own IDs or accept given IDs. IDs should be strings in order to not
- * clash with internally generated IDs, which are numbers.
- * @private
- */
-var SceneJS_Map = function(items, _baseId) {
-
-    /**
-     * @property Items in this map
-     */
-    this.items = items || [];
-
-
-    var baseId = _baseId || 0;
-    var lastUniqueId = baseId + 1;
-
-    /**
-     * Adds an item to the map and returns the ID of the item in the map. If an ID is given, the item is
-     * mapped to that ID. Otherwise, the map automatically generates the ID and maps to that.
-     *
-     * id = myMap.addItem("foo") // ID internally generated
-     *
-     * id = myMap.addItem("foo", "bar") // ID is "foo"
-     *
-     */
-    this.addItem = function() {
-
-        var item;
-
-        if (arguments.length == 2) {
-
-            var id = arguments[0];
-
-            item = arguments[1];
-
-            if (this.items[id]) { // Won't happen if given ID is string
-                throw SceneJS_error.fatalError(SceneJS.errors.ID_CLASH, "ID clash: '" + id + "'");
-            }
-
-            this.items[id] = item;
-
-            return id;
-
-        } else {
-
-            while (true) {
-
-                item = arguments[0];
-                var findId = lastUniqueId++;
-
-                if (!this.items[findId]) {
-                    this.items[findId] = item;
-                    return findId;
-                }
-            }
-        }
-    };
-
-    /**
-     * Removes the item of the given ID from the map
-     */
-    this.removeItem = function(id) {
-        delete this.items[id];
-    };
-};/**
  *  @private
  */
 var SceneJS_eventManager = function() {
@@ -1217,11 +1203,11 @@ SceneJS_eventManager.prototype.unEvent = function(handlerId) {
  */
 SceneJS.Plugins = new (function() {
 
-    this.GEO_ASSET_PLUGIN = "geoAsset";
+    this.GEO_SOURCE_PLUGIN = "geoSource";
 
-    this.MORPH_GEO_ASSET_PLUGIN = "morphGeoAsset";
+    this.MORPH_GEO_SOURCE_PLUGIN = "morphGeoSource";
 
-    this.TEXTURE_ASSET_PLUGIN = "textureAsset";
+    this.TEXTURE_SOURCE_PLUGIN = "textureSource";
 
     this._pluginTypes = {};
 
@@ -1270,25 +1256,24 @@ SceneJS.Plugins = new (function() {
 })();/**
  *  @private
  */
-var SceneJS_events = new (function() {
+var SceneJS_events = new (function () {
 
     this.ERROR = 0;
     this.RESET = 1;                         // SceneJS framework reset
-
-    this.SCENE_CREATED = 2;                 // Scene has just been created
-    this.SCENE_COMPILING = 3;               // Scene about to be compiled and drawn
-    this.SCENE_DESTROYED = 4;               // Scene just been destroyed
-    this.OBJECT_COMPILING = 5;
-    this.WEBGL_CONTEXT_LOST = 6;
-    this.WEBGL_CONTEXT_RESTORED = 7;
-
+    this.NODE_CREATED = 2;                 // Scene has just been created
+    this.SCENE_CREATED = 3;                 // Scene has just been created
+    this.SCENE_COMPILING = 4;               // Scene about to be compiled and drawn
+    this.SCENE_DESTROYED = 5;               // Scene just been destroyed
+    this.OBJECT_COMPILING = 6;
+    this.WEBGL_CONTEXT_LOST = 7;
+    this.WEBGL_CONTEXT_RESTORED = 8;
 
     /* Priority queue for each type of event
      */
-    var events = new Array(37);
+    var events = [];
 
     /**
-     * Registers a handler for the given event
+     * Registers a handler for the given event and returns a subscription handle
      *
      * The handler can be registered with an optional priority number which specifies the order it is
      * called among the other handler already registered for the event.
@@ -1302,70 +1287,134 @@ var SceneJS_events = new (function() {
      * @param type Event type - one of the values in SceneJS_events
      * @param command - Handler function that will accept whatever parameter object accompanies the event
      * @param priority - Optional priority number (see above)
+     * @return {String} - Subscription handle
      */
-    this.addListener = function(type, command, priority) {
+    this.addListener = function (type, command, priority) {
+
         var list = events[type];
+
         if (!list) {
             list = [];
             events[type] = list;
         }
+
         var handler = {
-            command: command,
-            priority : (priority == undefined) ? list.length : priority
+            command:command,
+            priority:(priority == undefined) ? list.length : priority
         };
-        for (var i = 0; i < list.length; i++) {
-            if (list[i].priority > handler.priority) {
-                list.splice(i, 0, handler);
-                return;
+
+        var index = -1;
+
+        for (var i = 0, len = list.length; i < len; i++) {
+            if (!list[i]) {
+                index = i;
+                break;
             }
         }
-        list.push(handler);
+
+        if (index < 0) {
+            list.push(handler);
+            index = list.length - 1;
+        }
+
+//
+//        for (var i = 0; i < list.length; i++) {
+//            if (list[i].priority > handler.priority) {
+//                list.splice(i, 0, handler);
+//                return i;
+//            }
+//        }
+
+
+        var handle = type + "." + index;
+
+        return handle;
+    };
+
+    /**
+     * Removes a listener
+     * @param handle Subscription handle
+     */
+    this.removeListener = function (handle) {
+
+        var lastIdx = handle.lastIndexOf(".");
+
+        var type = parseInt(handle.substr(0, lastIdx));
+        var index = parseInt(handle.substr(lastIdx + 1));
+
+        var list = events[type];
+
+        if (!list) {
+            return;
+        }
+
+        delete list[index];
     };
 
     /**
      * @private
      */
-    this.fireEvent = function(type, params) {
+    this.fireEvent = function (type, params) {
+
         var list = events[type];
+
         if (list) {
-            if (!params) {
-                params = {};
-            }
+            params = params || {};
             for (var i = 0; i < list.length; i++) {
-                list[i].command(params);
+                if (list[i]) {
+                    list[i].command(params);
+                }
             }
         }
     };
-        
+
 })();
+
 
 /**
  * Subscribe to SceneJS events
  * @deprecated
  */
-SceneJS.bind = function(name, func) {
+SceneJS.bind = function (name, func) {
     switch (name) {
 
-        case "error" : SceneJS_events.addListener(SceneJS_events.ERROR, func);
+        case "error" :
+
+            return SceneJS_events.addListener(SceneJS_events.ERROR, func);
             break;
 
-        case "reset" : SceneJS_events.addListener(
-                SceneJS_events.RESET,
-                function() {
-                    func();
-                });
-            break;
+        case "nodeCreated" :
 
-     case "webglcontextlost" : SceneJS_events.addListener(
-                SceneJS_events.WEBGL_CONTEXT_LOST,
-                function(params) {
+            return SceneJS_events.addListener(
+                SceneJS_events.NODE_CREATED,
+                function (params) {
                     func(params);
                 });
             break;
 
-    case "webglcontextrestored" : SceneJS_events.addListener(
+        case "reset" :
+
+            return SceneJS_events.addListener(
+                SceneJS_events.RESET,
+                function () {
+                    func();
+                });
+            break;
+
+        case "webglcontextlost" :
+
+            return SceneJS_events.addListener(
+                SceneJS_events.WEBGL_CONTEXT_LOST,
+                function (params) {
+                    func(params);
+                });
+            break;
+
+        case "webglcontextrestored" :
+
+            return SceneJS_events.addListener(
                 SceneJS_events.WEBGL_CONTEXT_RESTORED,
-                function(params) {
+                function (params) {
                     func(params);
                 });
             break;
@@ -1380,14 +1429,44 @@ SceneJS.bind = function(name, func) {
  */
 SceneJS.onEvent = SceneJS.bind;
 
-SceneJS.addListener = SceneJS.onEvent = SceneJS.bind;/**
+/* Unsubscribe from event
+ */
+SceneJS.unEvent = function (handle) {
+    return SceneJS_events.removeListener(handle);
+};
+
+SceneJS.subscribe = SceneJS.addListener = SceneJS.onEvent = SceneJS.bind;
+
+SceneJS.unsubscribe = SceneJS.unEvent;
+
+/**
  *
  */
-var SceneJS_Canvas = function(canvasId, contextAttr, options) {
+var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
 
     /**
      * ID of this canvas
      */
+    this.canvasId;
+
+    if (!canvasId) {
+        // Automatic default canvas
+        canvasId = "canvas-" + id;
+        var body = document.getElementsByTagName("body")[0];
+        body.innerHTML = '';
+        var newdiv = document.createElement('div');
+        newdiv.style.height = "100%";
+        newdiv.style.width = "100%";
+        newdiv.innerHTML = '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
+        body.appendChild(newdiv);
+    }
+
+    // Bind to canvas
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) {
+        throw SceneJS_error.fatalError(SceneJS.errors.CANVAS_NOT_FOUND,
+            "SceneJS.Scene attribute 'canvasId' does not match any elements in the page");
+    }
     this.canvasId = canvasId;
 
     /**
@@ -1395,19 +1474,9 @@ var SceneJS_Canvas = function(canvasId, contextAttr, options) {
      */
     this.options = options || {};
 
-    /**
-     * The HTML canvas element
-     */
-    var canvas = document.getElementById(canvasId);
-
-    if (!canvas) {
-        throw SceneJS_error.fatalError(SceneJS.errors.CANVAS_NOT_FOUND,
-                "SceneJS.Scene attribute 'canvasId' does not match any elements in the page");
-    }
-
     this.canvas = (this.options.simulateWebGLContextLost)
-            ? WebGLDebugUtils.makeLostContextSimulatingCanvas(canvas)
-            : canvas;
+        ? WebGLDebugUtils.makeLostContextSimulatingCanvas(canvas)
+        : canvas;
 
     // If the canvas uses css styles to specify the sizes make sure the basic
     // width and height attributes match or the WebGL context will use 300 x 150
@@ -1443,7 +1512,7 @@ SceneJS_Canvas.prototype._WEBGL_CONTEXT_NAMES = [
  * Initialise the WebGL context
 
  */
-SceneJS_Canvas.prototype.initWebGL = function() {
+SceneJS_Canvas.prototype.initWebGL = function () {
 
     for (var i = 0; !this.gl && i < this._WEBGL_CONTEXT_NAMES.length; i++) {
         try {
@@ -1455,8 +1524,8 @@ SceneJS_Canvas.prototype.initWebGL = function() {
 
     if (!this.gl) {
         throw SceneJS_error.fatalError(
-                SceneJS.errors.WEBGL_NOT_SUPPORTED,
-                'Failed to get a WebGL context');
+            SceneJS.errors.WEBGL_NOT_SUPPORTED,
+            'Failed to get a WebGL context');
     }
 
     this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -1472,7 +1541,7 @@ SceneJS_Canvas.prototype.initWebGL = function() {
  * Simulate a lost WebGL context.
  * Only works if the simulateWebGLContextLost was given as an option to the canvas' constructor.
  */
-SceneJS_Canvas.prototype.loseWebGLContext = function() {
+SceneJS_Canvas.prototype.loseWebGLContext = function () {
     if (this.options.simulateWebGLContextLost) {
         this.canvas.loseContext();
     }
@@ -1495,7 +1564,7 @@ var SceneJS_Engine = function(json, options) {
     /**
      * Canvas and GL context for this engine
      */
-    this.canvas = new SceneJS_Canvas(json.canvasId, json.contextAttr, options);
+    this.canvas = new SceneJS_Canvas(this.id, json.canvasId, json.contextAttr, options);
 
     /**
      * Manages firing of and subscription to events
@@ -1635,6 +1704,12 @@ SceneJS_Engine.prototype.createNode = function(json) {
     //try {
     node = this._nodeFactory.getNode(this, json, core);
 
+    SceneJS_events.fireEvent(SceneJS_events.NODE_CREATED, {
+        sceneId: this.id, // Engine ID is same as scene ID
+        nodeId: node.nodeId
+    });
+
+
     //    } catch (e) {
     //
     //        this._coreFactory.putCore(core); // Clean up after node create failed
@@ -1691,6 +1766,12 @@ SceneJS_Engine.prototype.branchDirty = function(node) {
 
     if (this.sceneDirty) {
         return; // Whole scene will recompile anyway
+    }
+
+    /* Dealing with some weirdness with the embedded window and iframe / window fascism.
+     */
+    if (node == window) {
+        return;
     }
 
     node.branchDirty = true;
@@ -1885,6 +1966,7 @@ SceneJS_Engine.prototype._tryCompile = function() {
             || this.display.drawListDirty // Draw list needs rebuild
             || this.display.stateSortDirty // Draw list needs to redetermine state order
             || this.display.stateOrderDirty // Draw list needs state sort
+            || this.display.objectListDirty // Draw list needs to be rebuilt
             || this._sceneBranchesDirty // One or more branches in scene graph need (re)compilation
             || this.sceneDirty) { // Whole scene needs recompilation
 
@@ -1977,8 +2059,6 @@ SceneJS_Engine.prototype._doDestroyNodes = function() {
  * Destroys this engine
  */
 SceneJS_Engine.prototype.destroy = function() {
-
-    this.scene.destroy(); // Each node in scene will destroy itself via #destroyNode
 
     this.destroyed = true;
 
@@ -4984,20 +5064,20 @@ var SceneJS_PickBuffer = function (cfg) {
             } else { // Buffer needs reallocation for new canvas size
 
                 gl.deleteTexture(pickBuf.texture);
-                gl.deleteFramebuffer(pickBuf.frameBuf);
-                gl.deleteRenderbuffer(pickBuf.renderBuf);
+                gl.deleteFramebuffer(pickBuf.framebuf);
+                gl.deleteRenderbuffer(pickBuf.renderbuf);
             }
         }
 
         pickBuf = {
-            frameBuf:gl.createFramebuffer(),
-            renderBuf:gl.createRenderbuffer(),
+            framebuf:gl.createFramebuffer(),
+            renderbuf:gl.createRenderbuffer(),
             texture:gl.createTexture(),
             width:width,
             height:height
         };
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
 
         gl.bindTexture(gl.TEXTURE_2D, pickBuf.texture);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -5013,18 +5093,18 @@ var SceneJS_PickBuffer = function (cfg) {
             var textureStorage = new WebGLUnsignedByteArray(width * height * 3);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureStorage);
         }
-        gl.bindRenderbuffer(gl.RENDERBUFFER, pickBuf.renderBuf);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, pickBuf.renderbuf);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickBuf.texture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickBuf.renderBuf);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickBuf.renderbuf);
         gl.bindTexture(gl.TEXTURE_2D, null);
         gl.bindRenderbuffer(gl.RENDERBUFFER, null);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         /* Verify framebuffer is OK
          */
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
-        if (!gl.isFramebuffer(pickBuf.frameBuf)) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
+        if (!gl.isFramebuffer(pickBuf.framebuf)) {
             throw  SceneJS_errorModule.fatalError("Invalid framebuffer");
         }
         var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
@@ -5054,7 +5134,7 @@ var SceneJS_PickBuffer = function (cfg) {
             return;
         }
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
 
         bound = true;
     };
@@ -5114,20 +5194,20 @@ var SceneJS_PickBufferOLD = function (cfg) {
             } else { // Buffer needs reallocation for new canvas size
 
                 gl.deleteTexture(pickBuf.texture);
-                gl.deleteFramebuffer(pickBuf.frameBuf);
-                gl.deleteRenderbuffer(pickBuf.renderBuf);
+                gl.deleteFramebuffer(pickBuf.framebuf);
+                gl.deleteRenderbuffer(pickBuf.renderbuf);
             }
         }
 
         pickBuf = {
-            frameBuf:gl.createFramebuffer(),
-            renderBuf:gl.createRenderbuffer(),
+            framebuf:gl.createFramebuffer(),
+            renderbuf:gl.createRenderbuffer(),
             texture:gl.createTexture(),
             width:width,
             height:height
         };
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
 
         gl.bindTexture(gl.TEXTURE_2D, pickBuf.texture);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -5144,10 +5224,10 @@ var SceneJS_PickBufferOLD = function (cfg) {
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureStorage);
         }
 
-        gl.bindRenderbuffer(gl.RENDERBUFFER, pickBuf.renderBuf);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, pickBuf.renderbuf);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickBuf.texture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickBuf.renderBuf);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickBuf.renderbuf);
 
         gl.bindTexture(gl.TEXTURE_2D, null);
         gl.bindRenderbuffer(gl.RENDERBUFFER, null);
@@ -5155,8 +5235,8 @@ var SceneJS_PickBufferOLD = function (cfg) {
 
         /* Verify framebuffer is OK
          */
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
-        if (!gl.isFramebuffer(pickBuf.frameBuf)) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
+        if (!gl.isFramebuffer(pickBuf.framebuf)) {
             throw  SceneJS_error.fatalError("Invalid framebuffer");
         }
 
@@ -5184,7 +5264,7 @@ var SceneJS_PickBufferOLD = function (cfg) {
         if (this.bound) {
             return;
         }
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.frameBuf);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
         this.bound = true;
     };
 
@@ -6358,6 +6438,17 @@ SceneJS.Node.prototype._findNodesByType = function(type, list, recursive) {
     return list;
 };
 
+/** Finds the first node on path up to root whose type equals that given
+ */
+SceneJS.Node.prototype.findParentByType = function(type) {
+    var parent = this.parent;
+    while (parent && parent.type != type) {
+        parent = parent.parent;
+    }
+    return parent;
+};
+
+
 /**
  * Given a map of name-value pairs, calls a getter method for each name,
  * feeding into it the corresponding value.
@@ -6767,44 +6858,42 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
 
     this.nodes.removeItem(node.id);
 };
-(function() {
+(function () {
 
-    /**
-     * The default state core singleton for {@link SceneJS.Camera} nodes
-     */
+    // The default state core singleton for {@link SceneJS.Camera} nodes
     var defaultCore = {
 
-        type: "camera",
+        type:"camera",
 
-        stateId: SceneJS._baseStateId++,
+        stateId:SceneJS._baseStateId++,
 
-        /** Default orthographic projection matrix
-         */
-        mat: new Float32Array(
-                SceneJS_math_orthoMat4c(
-                        SceneJS_math_ORTHO_OBJ.left,
-                        SceneJS_math_ORTHO_OBJ.right,
-                        SceneJS_math_ORTHO_OBJ.bottom,
-                        SceneJS_math_ORTHO_OBJ.top,
-                        SceneJS_math_ORTHO_OBJ.near,
-                        SceneJS_math_ORTHO_OBJ.far)),
+        // Default perspective projection matrix
+        mat:SceneJS_math_perspectiveMatrix4(
+            45, // fovy
+            1, // aspect
+            0.1, // near
+            5000), // far
 
-        /** Default optical attributes for ortho projection
-         */
-        optics: SceneJS_math_ORTHO_OBJ
+        //Default optical attributes for perspective projection
+        optics:{
+            type:"perspective",
+            fovy:45.0,
+            aspect:1.0,
+            near:0.1,
+            far:5000.0
+        }
     };
 
     var coreStack = [];
     var stackLen = 0;
 
-    /* Set default core on the display at the start of each new scene compilation
-     */
+    // Set default core on the display at the start of each new scene compilation
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function(params) {
-                params.engine.display.projTransform = defaultCore;
-                stackLen = 0;
-            });
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.projTransform = defaultCore;
+            stackLen = 0;
+        });
 
     /**
      * @class Scene graph node which defines the projection transform to apply to the {@link SceneJS.Geometry} nodes in its subgraph
@@ -6812,62 +6901,61 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
      */
     SceneJS.Camera = SceneJS_NodeFactory.createNodeType("camera");
 
-    SceneJS.Camera.prototype._init = function(params) {
+    SceneJS.Camera.prototype._init = function (params) {
         if (this._core.useCount == 1) {
             this.setOptics(params.optics); // Can be undefined
         }
     };
 
-    SceneJS.Camera.prototype.setOptics = function(optics) {
+    SceneJS.Camera.prototype.setOptics = function (optics) {
         var core = this._core;
         if (!optics) {
             core.optics = {
-                type: optics.type,
-                left : optics.left || -1.0,
-                bottom : optics.bottom || -1.0,
-                near : optics.near || 0.1,
-                right : optics.right || 1.00,
-                top : optics.top || 1.0,
-                far : optics.far || 5000.0
+                type:type,
+                fovy:60.0,
+                aspect:1.0,
+                near:0.1,
+                far:5000.0
             };
         } else {
-            if (optics.type == "ortho") {
+            var type = optics.type || core.optics.type;
+            if (type == "ortho") {
                 core.optics = SceneJS._applyIf(SceneJS_math_ORTHO_OBJ, {
-                    type: optics.type,
-                    left : optics.left,
-                    bottom : optics.bottom,
-                    near : optics.near,
-                    right : optics.right,
-                    top : optics.top,
-                    far : optics.far
+                    type:type,
+                    left:optics.left,
+                    bottom:optics.bottom,
+                    near:optics.near,
+                    right:optics.right,
+                    top:optics.top,
+                    far:optics.far
                 });
-            } else if (optics.type == "frustum") {
+            } else if (type == "frustum") {
                 core.optics = {
-                    type: optics.type,
-                    left : optics.left || -1.0,
-                    bottom : optics.bottom || -1.0,
-                    near : optics.near || 0.1,
-                    right : optics.right || 1.00,
-                    top : optics.top || 1.0,
-                    far : optics.far || 5000.0
+                    type:type,
+                    left:optics.left || -1.0,
+                    bottom:optics.bottom || -1.0,
+                    near:optics.near || 0.1,
+                    right:optics.right || 1.00,
+                    top:optics.top || 1.0,
+                    far:optics.far || 5000.0
                 };
-            } else  if (optics.type == "perspective") {
+            } else if (type == "perspective") {
                 core.optics = {
-                    type: optics.type,
-                    fovy : optics.fovy || 60.0,
-                    aspect: optics.aspect == undefined ? 1.0 : optics.aspect,
-                    near : optics.near || 0.1,
-                    far : optics.far || 5000.0
+                    type:type,
+                    fovy:optics.fovy || 60.0,
+                    aspect:optics.aspect == undefined ? 1.0 : optics.aspect,
+                    near:optics.near || 0.1,
+                    far:optics.far || 5000.0
                 };
             } else if (!optics.type) {
                 throw SceneJS_error.fatalError(
-                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "SceneJS.Camera configuration invalid: optics type not specified - " +
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "SceneJS.Camera configuration invalid: optics type not specified - " +
                         "supported types are 'perspective', 'frustum' and 'ortho'");
             } else {
                 throw SceneJS_error.fatalError(
-                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "SceneJS.Camera configuration invalid: optics type not supported - " +
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "SceneJS.Camera configuration invalid: optics type not supported - " +
                         "supported types are 'perspective', 'frustum' and 'ortho'");
             }
         }
@@ -6879,28 +6967,28 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         var optics = this._core.optics;
         if (optics.type == "ortho") {
             this._core.matrix = SceneJS_math_orthoMat4c(
-                    optics.left,
-                    optics.right,
-                    optics.bottom,
-                    optics.top,
-                    optics.near,
-                    optics.far);
+                optics.left,
+                optics.right,
+                optics.bottom,
+                optics.top,
+                optics.near,
+                optics.far);
 
         } else if (optics.type == "frustum") {
             this._core.matrix = SceneJS_math_frustumMatrix4(
-                    optics.left,
-                    optics.right,
-                    optics.bottom,
-                    optics.top,
-                    optics.near,
-                    optics.far);
+                optics.left,
+                optics.right,
+                optics.bottom,
+                optics.top,
+                optics.near,
+                optics.far);
 
         } else if (optics.type == "perspective") {
             this._core.matrix = SceneJS_math_perspectiveMatrix4(
-                    optics.fovy * Math.PI / 180.0,
-                    optics.aspect,
-                    optics.near,
-                    optics.far);
+                optics.fovy * Math.PI / 180.0,
+                optics.aspect,
+                optics.near,
+                optics.far);
         }
         if (!this._core.mat) {
             this._core.mat = new Float32Array(this._core.matrix);
@@ -6909,7 +6997,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         }
     };
 
-    SceneJS.Camera.prototype.getOptics = function() {
+    SceneJS.Camera.prototype.getOptics = function () {
         var optics = {};
         for (var key in this._core.optics) {
             if (this._core.optics.hasOwnProperty(key)) {
@@ -6919,7 +7007,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         return optics;
     };
 
-    SceneJS.Camera.prototype.getMatrix = function() {
+    SceneJS.Camera.prototype.getMatrix = function () {
         return this._core.matrix.slice(0);
     };
 
@@ -6927,7 +7015,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
      * Compiles this camera node, setting this node's state core on the display, compiling sub-nodes,
      * then restoring the previous camera state core back onto the display on exit.
      */
-    SceneJS.Camera.prototype._compile = function() {
+    SceneJS.Camera.prototype._compile = function () {
         this._engine.display.projTransform = coreStack[stackLen++] = this._core;
         this._compileNodes();
         this._engine.display.projTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
@@ -7003,7 +7091,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
 
         var clip = this._core.clips[index] || (this._core.clips[index] = {});
 
-        clip.normalAndDist = [cfg.x,  cfg.y, cfg.z, cfg.dist];
+        clip.normalAndDist = [cfg.x || 0,  cfg.y || 0, cfg.z || 0, cfg.dist || 0];
 
         var mode = cfg.mode || clip.mode || "disabled";
 
@@ -7289,18 +7377,18 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
 })();new (function() {
 
     /**
-     * The default state core singleton for {@link SceneJS.FrameBuf} nodes
+     * The default state core singleton for {@link SceneJS.Framebuf} nodes
      */
     var defaultCore = {
 
-        type: "frameBuf",
+        type: "framebuf",
         stateId: SceneJS._baseStateId++,
         empty: true,
 
-        frameBuf: null
+        framebuf: null
     };
 
-    var nodeCoreMap = {}; // Map of frameBuf nodes to cores, for reallocation on WebGL context restore
+    var nodeCoreMap = {}; // Map of framebuf nodes to cores, for reallocation on WebGL context restore
 
     var coreStack = [];
     var stackLen = 0;
@@ -7308,7 +7396,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
     SceneJS_events.addListener(
             SceneJS_events.SCENE_COMPILING,
             function(params) {
-                params.engine.display.frameBuf = defaultCore;
+                params.engine.display.framebuf = defaultCore;
                 stackLen = 0;
             });
 
@@ -7341,24 +7429,24 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
      * The frame buffer may be referenced as an image source by successive {@link SceneJS.Texture} nodes.
      * @extends SceneJS.Node
      */
-    SceneJS.FrameBuf = SceneJS_NodeFactory.createNodeType("frameBuf");
+    SceneJS.Framebuf = SceneJS_NodeFactory.createNodeType("framebuf");
 
-    SceneJS.FrameBuf.prototype._init = function() {
+    SceneJS.Framebuf.prototype._init = function() {
 
         nodeCoreMap[this._core.coreId] = this; // Register for core rebuild on WEBGL_CONTEXT_RESTORED
 
         this._buildNodeCore();
     };
 
-    SceneJS.FrameBuf.prototype._buildNodeCore = function() {
+    SceneJS.Framebuf.prototype._buildNodeCore = function() {
 
         var canvas = this._engine.canvas;
         var gl = canvas.gl;
         var width = canvas.canvas.width;
         var height = canvas.canvas.height;
 
-        var frameBuf = gl.createFramebuffer();
-        var renderBuf = gl.createRenderbuffer();
+        var framebuf = gl.createFramebuffer();
+        var renderbuf = gl.createRenderbuffer();
         var texture = gl.createTexture() ;
 
         var rendered = false;
@@ -7367,7 +7455,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             this._core = {};
         }
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuf);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuf);
 
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -7383,22 +7471,26 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             var textureStorage = new WebGLUnsignedByteArray(width * height * 4);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureStorage);
         }
-        gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuf);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuf);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderBuf);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuf);
         gl.bindTexture(gl.TEXTURE_2D, null);
         gl.bindRenderbuffer(gl.RENDERBUFFER, null);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         /* Verify framebuffer is OK
          */
-        gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuf);
-        if (!gl.isFramebuffer(frameBuf)) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuf);
+
+        if (!gl.isFramebuffer(framebuf)) {
             throw SceneJS_error.fatalError("Invalid framebuffer");
         }
 
         var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+
+        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
         switch (status) {
             case gl.FRAMEBUFFER_COMPLETE:
@@ -7415,15 +7507,15 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
                 throw SceneJS_error.fatalError("Incomplete framebuffer: " + status);
         }
 
-        this._core.frameBuf = {
+        this._core.framebuf = {
 
             id: this.id, // TODO: maybe unused?
 
             /** Binds the image buffer as target for subsequent geometry renders
              */
             bind: function() {
-                // gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuf);
-                gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuf);
+             //   gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuf);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, framebuf);
                 gl.clearColor(0.0, 0.0, 0.0, 1.0);
                 gl.clearDepth(1.0);
                 gl.enable(gl.DEPTH_TEST);
@@ -7438,8 +7530,8 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
              */
             unbind:function() {
                 gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuf);
+               // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuf);
                 rendered = true;
             },
 
@@ -7452,6 +7544,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             /** Gets the texture from this image buffer
              */
             getTexture: function() {
+
                 return {
 
                     bind: function(unit) {
@@ -7468,29 +7561,29 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         };
     };
 
-    SceneJS.FrameBuf.prototype._compile = function() {
-        this._engine.display.frameBuf = coreStack[stackLen++] = this._core;
+    SceneJS.Framebuf.prototype._compile = function() {
+        this._engine.display.framebuf = coreStack[stackLen++] = this._core;
         this._compileNodes();
-        this._engine.display.frameBuf = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        this._engine.display.framebuf = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-    SceneJS.FrameBuf.prototype._destroy = function() {
+    SceneJS.Framebuf.prototype._destroy = function() {
         if (this._core) {
             //destroyFrameBuffer(this._buf);
         }
     };
 
 
-})();new (function() {
+})();new (function () {
 
     var coreStack = [];
     var stackLen = 0;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function() {
-                stackLen = 0;
-            });
+        SceneJS_events.SCENE_COMPILING,
+        function () {
+            stackLen = 0;
+        });
 
     /**
      * @class Scene graph node that defines geometry.
@@ -7501,193 +7594,199 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
      */
     SceneJS.Geometry = SceneJS_NodeFactory.createNodeType("geometry");
 
-    SceneJS.Geometry.prototype._init = function(params) {
+    SceneJS.Geometry.prototype._init = function (params) {
 
         if (this._core.useCount == 1) { // This node defines the core
 
             var options = {
-                origin : params.origin,
-                scale: params.scale
+                origin:params.origin,
+                scale:params.scale
             };
-
-            this._assetConfigs = params.asset;
-            this._asset = null;
 
             var self = this;
 
-            if (params.asset) {
+            this._sourceConfigs = null;
+            this._source = null;
+
+            if (params.plugin) {
+                this._sourceConfigs = SceneJS._apply({ type:params.plugin }, params);
+            } else if (params.source) {
+                this._sourceConfigs = params.source;
+            }
+
+            if (this._sourceConfigs) {
 
                 /*---------------------------------------------------------------------------------------------------
                  * Build node core (possibly asynchronously) using a factory object
                  *--------------------------------------------------------------------------------------------------*/
 
-                if (!params.asset.type) {
+                if (!this._sourceConfigs.type) {
                     throw SceneJS_error.fatalError(
-                            SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                            "geometry config expected: asset.type");
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "geometry config expected: source.type");
                 }
 
-                var assetService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.GEO_ASSET_PLUGIN, this._assetConfigs.type);
+                var sourceService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.GEO_SOURCE_PLUGIN, this._sourceConfigs.type);
 
-                if (!assetService) {
+                if (!sourceService) {
                     throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "geometry: no plugin installed for geometry asset type '" + this._assetConfigs.type + "'.");
+                        SceneJS.errors.PLUGIN_INVALID,
+                        "geometry: no plugin installed for geometry source type '" + this._sourceConfigs.type + "'.");
                 }
 
-                if (!assetService.getAsset) {
+                if (!sourceService.getSource) {
                     throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "geometry: 'getAsset' method missing on plugin for geometry asset type '" + this._assetConfigs.type + "'.");
+                        SceneJS.errors.PLUGIN_INVALID,
+                        "geometry: 'getSource' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'.");
                 }
 
-                this._asset = assetService.getAsset();
+                this._source = sourceService.getSource();
 
-                if (!this._asset.onUpdate) {
+                if (!this._source.onUpdate) {
                     throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "geometry: 'onUpdate' method missing on plugin for geometry asset type '" + params.asset.type + "'");
+                        SceneJS.errors.PLUGIN_INVALID,
+                        "geometry: 'onUpdate' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'");
                 }
 
-                this._asset.onCreate(// Get notification when asset creates the geometry
-                        function(data) { // Data contains both typed arrays and primitive name
+                this._source.onCreate(// Get notification when source creates the geometry
+                    function (data) { // Data contains both typed arrays and primitive name
 
-                            if (options) { // HACK - should apply this on GPU
-                                data.positions = data.positions
-                                        ? new Float32Array((options.scale || options.origin)
-                                        ? self._applyOptions(data.positions, options)
-                                        : data.positions) : undefined;
-                            }
+                        if (options) { // HACK - should apply this on GPU
+                            data.positions = data.positions
+                                ? new Float32Array((options.scale || options.origin)
+                                ? self._applyOptions(data.positions, options)
+                                : data.positions) : undefined;
+                        }
 
-                            self._initNodeCore(data);
+                        self._initNodeCore(data);
 
-                            SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
+                        SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
 
-                            self._core._loading = false;
-                            self._fireEvent("loaded");
+                        self._core._loading = false;
+                        self._fireEvent("loaded");
 
-                            self._engine.display.imageDirty = true;
+                        self._engine.display.imageDirty = true;
 
-                            self._engine.branchDirty(self); // TODO
-                        });
+                        self._engine.branchDirty(self); // TODO
+                    });
 
-                if (this._asset.onUpdate) {
-                    this._asset.onUpdate(// Reload core arrays from factory updates to the geometry
-                            function(data) {
+                if (this._source.onUpdate) {
+                    this._source.onUpdate(// Reload core arrays from factory updates to the geometry
+                        function (data) {
 
-                                var core = self._core;
+                            var core = self._core;
 
-                                if (data.positions && core.vertexBuf) {
+                            if (data.positions && core.vertexBuf) {
 
 //                                    if (data.positions.length > core.vertexBuf.length) {
 //                                        alert("too long");
 //                                    }
 
-                                    core.vertexBuf.bind();
-                                    core.vertexBuf.setData(data.positions, data.positionsOffset || 0);
+                                core.vertexBuf.bind();
+                                core.vertexBuf.setData(data.positions, data.positionsOffset || 0);
 
-                                    if (data.positions.length > core.arrays.positions.length) {
-                                        core.arrays.positions = data.positions;
+                                if (data.positions.length > core.arrays.positions.length) {
+                                    core.arrays.positions = data.positions;
 
-                                    } else {
-                                        core.arrays.positions.set(data.positions, data.positionsOffset || 0);
-                                    }
+                                } else {
+                                    core.arrays.positions.set(data.positions, data.positionsOffset || 0);
+                                }
+                            }
+
+                            if (data.normals && core.normalBuf) {
+
+                                core.normalBuf.bind();
+                                core.normalBuf.setData(data.normals, data.normalsOffset || 0);
+
+                                if (data.normals.length > core.arrays.normals.length) {
+                                    core.arrays.normals = data.normals;
+
+                                } else {
+                                    core.arrays.normals.set(data.normals, data.normalsOffset || 0);
+                                }
+                            }
+
+                            if (data.uv && core.uvBuf) {
+
+                                core.uvBuf.bind();
+                                core.uvBuf.setData(data.uv, data.uvOffset || 0);
+
+                                if (data.uv.length > core.arrays.uv.length) {
+                                    core.arrays.uv = data.uv;
+
+                                } else {
+                                    core.arrays.uv.set(data.uv, data.uvOffset || 0);
+                                }
+                            }
+
+                            if (data.uv2 && core.uvBuf2) {
+
+                                core.uvBuf2.bind();
+                                core.uvBuf2.setData(data.uv2, data.uv2Offset || 0);
+
+                                if (data.uv2.length > core.arrays.uv2.length) {
+                                    core.arrays.uv2 = data.uv2;
+
+                                } else {
+                                    core.arrays.uv2.set(data.uv2, data.uv2Offset || 0);
+                                }
+                            }
+
+                            if (data.colors && core.colorBuf) {
+
+                                if (data.colors.length > core.arrays.colors.length) {
+                                    core.arrays.colors = data.colors;
+
+                                } else {
+                                    core.arrays.colors.set(data.colors, data.colorsOffset || 0);
                                 }
 
-                                if (data.normals && core.normalBuf) {
+                                core.colorBuf.bind();
+                                core.colorBuf.setData(data.colors, data.colorsOffset || 0);
+                            }
 
-                                    core.normalBuf.bind();
-                                    core.normalBuf.setData(data.normals, data.normalsOffset || 0);
+                            if (data.indices && core.indexBuf) {
 
-                                    if (data.normals.length > core.arrays.normals.length) {
-                                        core.arrays.normals = data.normals;
+                                if (data.indices.length > core.arrays.indices.length) {
+                                    core.arrays.indices = data.indices;
 
-                                    } else {
-                                        core.arrays.normals.set(data.normals, data.normalsOffset || 0);
-                                    }
+                                } else {
+                                    core.arrays.indices.set(data.indices, data.indicesOffset || 0);
                                 }
 
-                                if (data.uv && core.uvBuf) {
+                                core.indexBuf.bind();
+                                core.indexBuf.setData(data.indices, data.indicesOffset || 0);
 
-                                    core.uvBuf.bind();
-                                    core.uvBuf.setData(data.uv, data.uvOffset || 0);
-
-                                    if (data.uv.length > core.arrays.uv.length) {
-                                        core.arrays.uv = data.uv;
-
-                                    } else {
-                                        core.arrays.uv.set(data.uv, data.uvOffset || 0);
+                                for (var i = 0; i < data.indices.length; i++) {
+                                    var idx = data.indices[i];
+                                    if (idx < 0 || idx >= core.arrays.positions.length) {
+                                        alert("out of range ");
+                                    }
+                                    if (core.arrays.normals && (idx < 0 || idx >= core.arrays.normals.length)) {
+                                        alert("out of range ");
+                                    }
+                                    if (core.arrays.uv && (idx < 0 || idx >= core.arrays.uv.length)) {
+                                        alert("out of range ");
+                                    }
+                                    if (core.arrays.uv2 && (idx < 0 || idx >= core.arrays.uv2.length)) {
+                                        alert("out of range ");
+                                    }
+                                    if (core.arrays.colors && (idx < 0 || idx >= core.arrays.colors.length)) {
+                                        alert("out of range ");
                                     }
                                 }
-
-                                if (data.uv2 && core.uvBuf2) {
-
-                                    core.uvBuf2.bind();
-                                    core.uvBuf2.setData(data.uv2, data.uv2Offset || 0);
-
-                                    if (data.uv2.length > core.arrays.uv2.length) {
-                                        core.arrays.uv2 = data.uv2;
-
-                                    } else {
-                                        core.arrays.uv2.set(data.uv2, data.uv2Offset || 0);
-                                    }
-                                }
-
-                                if (data.colors && core.colorBuf) {
-
-                                    if (data.colors.length > core.arrays.colors.length) {
-                                        core.arrays.colors = data.colors;
-
-                                    } else {
-                                        core.arrays.colors.set(data.colors, data.colorsOffset || 0);
-                                    }
-
-                                    core.colorBuf.bind();
-                                    core.colorBuf.setData(data.colors, data.colorsOffset || 0);
-                                }
-
-                                if (data.indices && core.indexBuf) {
-
-                                    if (data.indices.length > core.arrays.indices.length) {
-                                        core.arrays.indices = data.indices;
-
-                                    } else {
-                                        core.arrays.indices.set(data.indices, data.indicesOffset || 0);
-                                    }
-
-                                    core.indexBuf.bind();
-                                    core.indexBuf.setData(data.indices, data.indicesOffset || 0);
-
-                                    for (var i = 0; i < data.indices.length; i++) {
-                                        var idx = data.indices[i];
-                                        if (idx < 0 || idx >= core.arrays.positions.length) {
-                                            alert("out of range ");
-                                        }
-                                        if (core.arrays.normals && (idx < 0 || idx >= core.arrays.normals.length)) {
-                                            alert("out of range ");
-                                        }
-                                        if (core.arrays.uv && (idx < 0 || idx >= core.arrays.uv.length)) {
-                                            alert("out of range ");
-                                        }
-                                        if (core.arrays.uv2 && (idx < 0 || idx >= core.arrays.uv2.length)) {
-                                            alert("out of range ");
-                                        }
-                                        if (core.arrays.colors && (idx < 0 || idx >= core.arrays.colors.length)) {
-                                            alert("out of range ");
-                                        }
-                                    }
-                                }
+                            }
 
 
-                                self._engine.display.imageDirty = true;
-                            });
+                            self._engine.display.imageDirty = true;
+                        });
                 }
 
                 this._core._loading = true;
 
                 this._fireEvent("loading");
 
-                this._asset.setConfigs(this._assetConfigs);
+                this._source.setConfigs(this._sourceConfigs);
 
             } else if (params.create instanceof Function) {
 
@@ -7712,7 +7811,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
                 SceneJS.Geometry._buildNodeCore(this._engine.canvas.gl, this._core);
             }
 
-            this._core.webglRestored = function() {
+            this._core.webglRestored = function () {
                 SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
             };
 
@@ -7723,30 +7822,30 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
      * Convert JSON arrays into typed arrays,
      * apply optional baked Model-space transforms to positions
      */
-    SceneJS.Geometry.prototype._initNodeCore = function(data, options) {
+    SceneJS.Geometry.prototype._initNodeCore = function (data, options) {
 
         options = options || {};
 
         this._core.primitive = this._getPrimitiveType(data.primitive || "triangles");
 
         this._core.arrays = {
-            positions: data.positions
-                    ? new Float32Array((options.scale || options.origin)
-                    ? this._applyOptions(data.positions, options)
-                    : data.positions) : undefined,
+            positions:data.positions
+                ? new Float32Array((options.scale || options.origin)
+                ? this._applyOptions(data.positions, options)
+                : data.positions) : undefined,
 
-            normals: data.normals ? new Float32Array(data.normals) : undefined,
-            uv: data.uv ? new Float32Array(data.uv) : undefined,
-            uv2: data.uv2 ? new Float32Array(data.uv2) : undefined,
-            colors: data.colors ? new Float32Array(data.colors) : undefined,
-            indices: data.indices ? new Uint16Array(data.indices) : undefined
+            normals:data.normals ? new Float32Array(data.normals) : undefined,
+            uv:data.uv ? new Float32Array(data.uv) : undefined,
+            uv2:data.uv2 ? new Float32Array(data.uv2) : undefined,
+            colors:data.colors ? new Float32Array(data.colors) : undefined,
+            indices:data.indices ? new Uint16Array(data.indices) : undefined
         };
     };
 
     /**
      * Returns WebGL constant for primitive name
      */
-    SceneJS.Geometry.prototype._getPrimitiveType = function(primitive) {
+    SceneJS.Geometry.prototype._getPrimitiveType = function (primitive) {
 
         var gl = this._engine.canvas.gl;
 
@@ -7775,8 +7874,8 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
 
             default:
                 throw SceneJS_error.fatalError(
-                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "geometry primitive unsupported: '" +
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "geometry primitive unsupported: '" +
                         primitive +
                         "' - supported types are: 'points', 'lines', 'line-loop', " +
                         "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'");
@@ -7786,8 +7885,8 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
     /**
      * Apply baked Model-space transformations to give position array
      */
-    SceneJS.Geometry.prototype._applyOptions = function(positions, options) {
-        
+    SceneJS.Geometry.prototype._applyOptions = function (positions, options) {
+
         var positions2 = positions.slice ? positions.slice(0) : new Float32Array(positions);  // HACK
 
         if (options.scale) {
@@ -7825,7 +7924,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
      * In addition to initially allocating those, this is called to reallocate them after
      * WebGL context is regained after being lost.
      */
-    SceneJS.Geometry._buildNodeCore = function(gl, core) {
+    SceneJS.Geometry._buildNodeCore = function (gl, core) {
 
         var usage = gl.STATIC_DRAW; //var usage = (!arrays.fixed) ? gl.STREAM_DRAW : gl.STATIC_DRAW;
 
@@ -7890,12 +7989,12 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             }
 
             throw SceneJS_error.fatalError(
-                    SceneJS.errors.ERROR,
-                    "Failed to allocate geometry: " + e);
+                SceneJS.errors.ERROR,
+                "Failed to allocate geometry: " + e);
         }
     };
 
-    SceneJS.Geometry.prototype._updateArray = function(array, items, offset) {
+    SceneJS.Geometry.prototype._updateArray = function (array, items, offset) {
 
         var arrayLen = array.length;
         var itemsLen = items.length;
@@ -7904,25 +8003,25 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             itemsLen -= (itemsLen + offset) - arrayLen;
         }
 
-        for (var i = offset, j = 0; j < itemsLen; i++,j++) {
+        for (var i = offset, j = 0; j < itemsLen; i++, j++) {
             array[i] = items[j];
         }
 
     };
 
-    SceneJS.Geometry.prototype.setAsset = function(assetConfigs) {
-        this._assetConfigs = assetConfigs;
-        var asset = this._asset;
-        if (asset) {
-            asset.setConfigs(assetConfigs);
+    SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
+        this._sourceConfigs = sourceConfigs;
+        var source = this._source;
+        if (source) {
+            source.setConfigs(sourceConfigs);
         }
     };
 
-    SceneJS.Geometry.prototype.getAsset = function() {
-        return this._assetConfigs || {};
+    SceneJS.Geometry.prototype.getSource = function () {
+        return this._sourceConfigs || {};
     };
 
-    SceneJS.Geometry.prototype.setPositions = function(data) {
+    SceneJS.Geometry.prototype.setPositions = function (data) {
         if (data.positions && this._core.vertexBuf) {
             var core = this._core;
             core.vertexBuf.bind();
@@ -7932,11 +8031,11 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         }
     };
 
-    SceneJS.Geometry.prototype.getPositions = function() {
+    SceneJS.Geometry.prototype.getPositions = function () {
         return this._core.arrays ? this._core.arrays.positions : null;
     };
 
-    SceneJS.Geometry.prototype.setNormals = function(data) {
+    SceneJS.Geometry.prototype.setNormals = function (data) {
         if (data.normals && this._core.normalBuf) {
             var core = this._core;
             core.normalBuf.bind();
@@ -7946,11 +8045,11 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         }
     };
 
-    SceneJS.Geometry.prototype.getNormals = function() {
+    SceneJS.Geometry.prototype.getNormals = function () {
         return this._core.arrays ? this._core.arrays.normals : null;
     };
 
-    SceneJS.Geometry.prototype.setColors = function(data) {
+    SceneJS.Geometry.prototype.setColors = function (data) {
         if (data.colors && this._core.colorBuf) {
             var core = this._core;
             core.colorBuf.bind();
@@ -7960,15 +8059,15 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         }
     };
 
-    SceneJS.Geometry.prototype.getColors = function() {
+    SceneJS.Geometry.prototype.getColors = function () {
         return this._core.arrays ? this._core.arrays.colors : null;
     };
 
-    SceneJS.Geometry.prototype.getIndices = function() {
+    SceneJS.Geometry.prototype.getIndices = function () {
         return this._core.arrays ? this._core.arrays.indices : null;
     };
 
-    SceneJS.Geometry.prototype.setUV = function(data) {
+    SceneJS.Geometry.prototype.setUV = function (data) {
         if (data.uv && this._core.colorBuf) {
             var core = this._core;
             core.colorBuf.bind();
@@ -7978,11 +8077,11 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         }
     };
 
-    SceneJS.Geometry.prototype.getUV = function() {
+    SceneJS.Geometry.prototype.getUV = function () {
         return this._core.arrays ? this._core.arrays.uv : null;
     };
 
-    SceneJS.Geometry.prototype.setUV2 = function(data) {
+    SceneJS.Geometry.prototype.setUV2 = function (data) {
         if (data.uv2 && this._core.colorBuf) {
             var core = this._core;
             core.colorBuf.bind();
@@ -7992,15 +8091,15 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         }
     };
 
-    SceneJS.Geometry.prototype.getUV2 = function() {
+    SceneJS.Geometry.prototype.getUV2 = function () {
         return this._core.arrays ? this._core.arrays.uv2 : null;
     };
 
-    SceneJS.Geometry.prototype.getPrimitive = function() {
+    SceneJS.Geometry.prototype.getPrimitive = function () {
         return this.primitive;
     };
 
-    SceneJS.Geometry.prototype.getBoundary = function() {
+    SceneJS.Geometry.prototype.getBoundary = function () {
         if (this._boundary) {
             return this._boundary;
         }
@@ -8018,12 +8117,12 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         }
 
         this._boundary = {
-            xmin : SceneJS_math_MAX_DOUBLE,
-            ymin : SceneJS_math_MAX_DOUBLE,
-            zmin : SceneJS_math_MAX_DOUBLE,
-            xmax : SceneJS_math_MIN_DOUBLE,
-            ymax : SceneJS_math_MIN_DOUBLE,
-            zmax : SceneJS_math_MIN_DOUBLE
+            xmin:SceneJS_math_MAX_DOUBLE,
+            ymin:SceneJS_math_MAX_DOUBLE,
+            zmin:SceneJS_math_MAX_DOUBLE,
+            xmax:SceneJS_math_MIN_DOUBLE,
+            ymax:SceneJS_math_MIN_DOUBLE,
+            zmax:SceneJS_math_MIN_DOUBLE
         };
 
         var x, y, z;
@@ -8057,7 +8156,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         return this._boundary;
     };
 
-    SceneJS.Geometry.prototype._compile = function() {
+    SceneJS.Geometry.prototype._compile = function () {
 
         if (this._core._loading) {
             this._compileNodes();
@@ -8095,7 +8194,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             this._engine.display.geometry = coreStack[stackLen++] = core;
 
             SceneJS_events.fireEvent(SceneJS_events.OBJECT_COMPILING, { // Pull in state updates from scenes nodes
-                display: this._engine.display
+                display:this._engine.display
             });
 
             this._engine.display.buildObject(this.id); // Use node ID since we may inherit from many cores
@@ -8109,16 +8208,16 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         stackLen--;
     };
 
-    SceneJS.Geometry.prototype._inheritVBOs = function(core) {
+    SceneJS.Geometry.prototype._inheritVBOs = function (core) {
 
         var core2 = {
-            primitive: core.primitive,
-            boundary: core.boundary,
-            normalBuf: core.normalBuf,
-            uvBuf: core.uvBuf,
-            uvBuf2: core.uvBuf2,
-            colorBuf: core.colorBuf,
-            indexBuf: core.indexBuf
+            primitive:core.primitive,
+            boundary:core.boundary,
+            normalBuf:core.normalBuf,
+            uvBuf:core.uvBuf,
+            uvBuf2:core.uvBuf2,
+            colorBuf:core.colorBuf,
+            indexBuf:core.indexBuf
         };
 
         for (var i = stackLen - 1; i >= 0; i--) {
@@ -8136,7 +8235,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         return core2;
     };
 
-    SceneJS.Geometry.prototype._destroy = function() {
+    SceneJS.Geometry.prototype._destroy = function () {
 
         this._engine.display.removeObject(this.id);
 
@@ -8146,13 +8245,13 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
 
             this._destroyNodeCore();
 
-            if (this._asset) {
-                this._asset.destroy();
+            if (this._source) {
+                this._source.destroy();
             }
         }
     };
 
-    SceneJS.Geometry.prototype._destroyNodeCore = function() {
+    SceneJS.Geometry.prototype._destroyNodeCore = function () {
 
         if (document.getElementById(this._engine.canvas.canvasId)) { // Context won't exist if canvas has disappeared
 
@@ -8254,28 +8353,75 @@ SceneJS.Library = SceneJS_NodeFactory.createNodeType("library");
 SceneJS.Library.prototype._compile = function() { // Bypass child nodes
 };
 
-(function() {
+(function () {
 
     /**
      * The default state core singleton for {@link SceneJS.Lights} nodes
      */
     var defaultCore = {
-        type: "lights",
-        stateId: SceneJS._baseStateId++,
-        hash: "",
-        empty: true,
-        lights : []
+        type:"lights",
+        stateId:SceneJS._baseStateId++,
+        hash:null,
+        empty:false,
+        lights:[
+            {
+                mode:"dir",
+                color:[1.0, 1.0, 1.0], // Core has arrays for WebGL loading
+                diffuse:true,
+                specular:true,
+                dir:[1.0, 0.0, -1.0 ]
+            },
+            {
+                mode:"dir",
+                color:[1.0, 1.0, 1.0 ],
+                diffuse:true,
+                specular:true,
+                dir:[0.0, 1.0, 1.0 ]
+            },
+            {
+                mode:"dir",
+                color:[1.0, 1.0, 1.0 ],
+                diffuse:true,
+                specular:true,
+                dir:[-1.0, 0.0, 0.0 ]
+            }
+        ]
     };
+
+    makeHash(defaultCore);
+
+    function makeHash(core) {
+        if (core.lights && core.lights.length > 0) {
+            var lights = core.lights;
+            var parts = [];
+            var light;
+            for (var i = 0, len = lights.length; i < len; i++) {
+                light = lights[i];
+                parts.push(light.mode);
+                if (light.specular) {
+                    parts.push("s");
+                }
+                if (light.diffuse) {
+                    parts.push("d");
+                }
+                parts.push((light.space == "world") ? "w" : "v");
+            }
+            core.hash = parts.join("");
+
+        } else {
+            core.hash = "";
+        }
+    }
 
     var coreStack = [];
     var stackLen = 0;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function(params) {
-                params.engine.display.lights = defaultCore;
-                stackLen = 0;
-            });
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.lights = defaultCore;
+            stackLen = 0;
+        });
 
     /**
      * @class Scene graph node which defines light sources to illuminate the {@link SceneJS.Geometry}s within its subgraph
@@ -8283,7 +8429,7 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
      */
     SceneJS.Lights = SceneJS_NodeFactory.createNodeType("lights");
 
-    SceneJS.Lights.prototype._init = function(params) {
+    SceneJS.Lights.prototype._init = function (params) {
 
         if (this._core.useCount == 1) { // This node defines the resource
 
@@ -8291,8 +8437,8 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
 
             if (!lights) {
                 throw SceneJS_error.fatalError(
-                        SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "lights node attribute missing : 'lights'");
+                    SceneJS.errors.NODE_CONFIG_EXPECTED,
+                    "lights node attribute missing : 'lights'");
             }
 
             this._core.lights = this._core.lights || [];
@@ -8303,7 +8449,7 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         }
     };
 
-    SceneJS.Lights.prototype.setLights = function(lights) {
+    SceneJS.Lights.prototype.setLights = function (lights) {
         var indexNum;
         for (var index in lights) {
             if (lights.hasOwnProperty(index)) {
@@ -8311,8 +8457,8 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
                     indexNum = parseInt(index);
                     if (indexNum < 0 || indexNum >= this._core.lights.length) {
                         throw SceneJS_error.fatalError(
-                                SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                                "Invalid argument to set 'lights': index out of range (" + this._core.lights.length + " lights defined)");
+                            SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                            "Invalid argument to set 'lights': index out of range (" + this._core.lights.length + " lights defined)");
                     }
                     this._setLight(indexNum, lights[index] || {});
                 }
@@ -8321,15 +8467,15 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Lights.prototype._setLight = function(index, cfg) {
+    SceneJS.Lights.prototype._setLight = function (index, cfg) {
 
         var light = this._core.lights[index] || (this._core.lights[index] = []);
 
         var mode = cfg.mode || "dir";
         if (mode != "dir" && mode != "point") {
             throw SceneJS_error.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "Light mode not supported - should be 'dir' or 'point' or 'ambient'");
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Light mode not supported - should be 'dir' or 'point' or 'ambient'");
         }
 
         var pos = cfg.pos;
@@ -8346,7 +8492,7 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         light.diffuse = (cfg.diffuse != undefined) ? cfg.diffuse : true;
         light.specular = cfg.specular != undefined ? cfg.specular : true;
         light.pos = cfg.pos ? [ pos.x || 0, pos.y || 0, pos.z || 0 ] : undefined;
-        light.dir = cfg.dir ? [dir.x || 0,dir.y || 0, dir.z || 0] : undefined;
+        light.dir = cfg.dir ? [dir.x || 0, dir.y || 0, dir.z || 0] : undefined;
         light.constantAttenuation = (cfg.constantAttenuation != undefined) ? cfg.constantAttenuation : 1.0;
         light.linearAttenuation = (cfg.linearAttenuation || 0.0);
         light.quadraticAttenuation = (cfg.quadraticAttenuation || 0.0);
@@ -8360,8 +8506,8 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         } else if (space != "view" && space != "world") {
 
             throw SceneJS_error.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
         }
 
         light.space = space;
@@ -8369,47 +8515,15 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         this._core.hash = null;
     };
 
-    SceneJS.Lights.prototype._compile = function() {
+    SceneJS.Lights.prototype._compile = function () {
 
         if (!this._core.hash) {
-            this._makeHash();
+            makeHash(this._core);
         }
 
         this._engine.display.lights = coreStack[stackLen++] = this._core;
         this._compileNodes();
         this._engine.display.lights = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
-    };
-
-    SceneJS.Lights.prototype._makeHash = function() {
-
-        var core = this._core;
-        if (core.lights && core.lights.length > 0) {
-
-            var lights = core.lights;
-            var parts = [];
-            var light;
-
-            for (var i = 0, len = lights.length; i < len; i++) {
-
-                light = lights[i];
-                parts.push(light.mode);
-
-                if (light.specular) {
-                    parts.push("s");
-                }
-
-                if (light.diffuse) {
-                    parts.push("d");
-                }
-
-                parts.push((light.space == "world") ? "w" : "v");
-            }
-
-            core.hash = parts.join("");
-
-        } else {
-            core.hash = "";
-        }
     };
 
 })();(function() {
@@ -8471,7 +8585,7 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
             this._core.lookZ = 0;
 
             this._core.upX = 0;
-            this._core.upY = 0;
+            this._core.upY = 1;
             this._core.upZ = 0;
 
             if (!params.eye && !params.look && !params.up) {
@@ -8820,8 +8934,8 @@ new (function() {
     var defaultCore = {
         type: "material",
         stateId: SceneJS._baseStateId++,
-        baseColor :  [ 0.0, 0.0, 0.0 ],
-        specularColor :  [ 0.0,  0.0,  0.0 ],
+        baseColor :  [ 1.0, 1.0, 1.0 ],
+        specularColor :  [ 1.0,  1.0,  1.0 ],
         specular : 0.4,
         shine :  20.0,
         alpha :  1.0,
@@ -8972,47 +9086,47 @@ new (function() {
 
         if (this._core.useCount == 1) { // This node defines the resource
 
-            this._assetConfigs = params.asset;
-            this._asset = null;
+            this._sourceConfigs = params.source;
+            this._source = null;
 
-            if (params.asset) {
+            if (params.source) {
 
                 /*---------------------------------------------------------------------------------------------------
                  * Build node core (possibly asynchronously) using a factory object
                  *--------------------------------------------------------------------------------------------------*/
 
-                if (!params.asset.type) {
+                if (!params.source.type) {
                     throw SceneJS_error.fatalError(
                             SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                            "morphGeometry config expected: asset.type");
+                            "morphGeometry config expected: source.type");
                 }
 
-                var assetService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.MORPH_GEO_ASSET_PLUGIN, this._assetConfigs.type);
+                var sourceService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN, this._sourceConfigs.type);
 
-                if (!assetService) {
+                if (!sourceService) {
                     throw SceneJS_error.fatalError(
                             SceneJS.errors.PLUGIN_INVALID,
-                            "morphGeometry: no support for asset type '" + this._assetConfigs.type + "' - need to include plugin for this asset type, " +
-                            "or install a custom asset service with SceneJS.Plugins.addPlugin(SceneJS.Plugins.MORPH_GEO_ASSET_PLUGIN, '" + this._assetConfigs.type + "', <your service>).");
+                            "morphGeometry: no support for source type '" + this._sourceConfigs.type + "' - need to include plugin for this source type, " +
+                            "or install a custom source service with SceneJS.Plugins.addPlugin(SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN, '" + this._sourceConfigs.type + "', <your service>).");
                 }
 
-                if (!assetService.getAsset) {
+                if (!sourceService.getSource) {
                     throw SceneJS_error.fatalError(
                             SceneJS.errors.PLUGIN_INVALID,
-                            "morphGeometry: 'getAsset' method not found on MorphGeoFactoryService (SceneJS.Plugins.MORPH_GEO_ASSET_PLUGIN)");
+                            "morphGeometry: 'getSource' method not found on MorphGeoFactoryService (SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN)");
                 }
 
-                this._asset = assetService.getAsset();
+                this._source = sourceService.getSource();
 
-                if (!this._asset.onUpdate) {
+                if (!this._source.onUpdate) {
                     throw SceneJS_error.fatalError(
                             SceneJS.errors.PLUGIN_INVALID,
-                            "morphGeometry: 'onUpdate' method not found on asset provided by plugin type '" + params.asset.type + "'");
+                            "morphGeometry: 'onUpdate' method not found on source provided by plugin type '" + params.source.type + "'");
                 }
 
                 var self = this;
 
-                this._asset.onCreate(// Get notification when factory creates the morph
+                this._source.onCreate(// Get notification when factory creates the morph
                         function(data) {
 
                             self._buildNodeCore(data);
@@ -9023,8 +9137,8 @@ new (function() {
                             self._engine.branchDirty(this); // TODO
                         });
 
-                if (this._asset.onUpdate) {
-                    this._asset.onUpdate(// Reload factory updates to the morph
+                if (this._source.onUpdate) {
+                    this._source.onUpdate(// Reload factory updates to the morph
                             function(data) {
 
                                 if (data.targets) {
@@ -9058,7 +9172,7 @@ new (function() {
 
                 this._fireEvent("loading");
 
-                this._asset.setConfigs(this._assetConfigs);
+                this._source.setConfigs(this._sourceConfigs);
 
             } else if (params.create instanceof Function) {
 
@@ -9213,16 +9327,16 @@ new (function() {
         }
     };
 
-    SceneJS.MorphGeometry.prototype.setAsset = function(assetConfigs) {
-        this._assetConfigs = assetConfigs;
-        var asset = this._asset;
-        if (asset) {
-            asset.setConfigs(assetConfigs);
+    SceneJS.MorphGeometry.prototype.setSource = function(sourceConfigs) {
+        this._sourceConfigs = sourceConfigs;
+        var source = this._source;
+        if (source) {
+            source.setConfigs(sourceConfigs);
         }
     };
 
-    SceneJS.MorphGeometry.prototype.getAsset = function() {
-        return this._assetConfigs;
+    SceneJS.MorphGeometry.prototype.getSource = function() {
+        return this._sourceConfigs;
     };
 
     SceneJS.MorphGeometry.prototype.setFactor = function(factor) {
@@ -9315,8 +9429,8 @@ new (function() {
                     }
                 }
             }
-            if (this._asset) {
-                this._asset.destroy();
+            if (this._source) {
+                this._source.destroy();
             }
         }
     };
@@ -10187,7 +10301,6 @@ SceneJS.Scene.prototype.unEvent = function(handle) {
 /**
  * Simulate a lost WebGL context for testing purposes.
  * Only works if the simulateWebGLLost was given as an option to {@link SceneJS.createScene}.
- * @private
  */
 SceneJS.Scene.prototype.loseWebGLContext = function() {
     this._engine.loseWebGLContext();
@@ -10289,7 +10402,14 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
  * @private
  */
 SceneJS.Scene.prototype.destroy = function() {
-    this._engine.destroy();
+
+    if (!this.destroyed) {
+
+        delete SceneJS._engines[this.id];  // HACK: circular dependency
+        SceneJS._engineIds.removeItem(this.id); // HACK: circular dependency
+
+        this.destroyed = true;
+    }
 };
 
 /**
@@ -10769,11 +10889,11 @@ new (function() {
 
                 layerParams = params.layers[i];
 
-                if (!layerParams.asset && !layerParams.uri && !layerParams.src && !layerParams.frameBuf && !layerParams.video) {
+                if (!layerParams.source && !layerParams.uri && !layerParams.src && !layerParams.framebuf && !layerParams.video) {
 
                     throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture layer " + i + "  has no uri, src, asset, frameBuf, video or canvasId specified");
+                            "texture layer " + i + "  has no uri, src, source, framebuf, video or canvasId specified");
                 }
 
                 if (layerParams.applyFrom) {
@@ -10832,12 +10952,12 @@ new (function() {
 
                 this._setLayerTransform(layerParams, layer);
 
-                if (layer.frameBuf) { // Create from a frameBuf node preceeding this texture in the scene graph
+                if (layer.framebuf) { // Create from a framebuf node preceeding this texture in the scene graph
 
-                    var targetNode = this._engine.findNode(layer.frameBuf);
+                    var targetNode = this._engine.findNode(layer.framebuf);
 
-                    if (targetNode && targetNode.type == "frameBuf") {
-                        layer.texture = targetNode._core.frameBuf.getTexture(); // TODO: what happens when the frameBuf is destroyed?
+                    if (targetNode && targetNode.type == "framebuf") {
+                        layer.texture = targetNode._core.framebuf.getTexture(); // TODO: what happens when the framebuf is destroyed?
                     }
 
                 } else { // Create from texture node's layer configs
@@ -10872,41 +10992,41 @@ new (function() {
 
         var self = this;
 
-        var assetConfigs = layer.asset;
+        var sourceConfigs = layer.source;
 
-        if (assetConfigs) {
+        if (sourceConfigs) {
 
-            /* Load from asset
+            /* Load from source
              */
-            var assetService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.TEXTURE_ASSET_PLUGIN, assetConfigs.type);
+            var sourceService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.TEXTURE_SOURCE_PLUGIN, sourceConfigs.type);
 
-            if (!assetService) {
+            if (!sourceService) {
                 throw SceneJS_error.fatalError(
                         SceneJS.errors.PLUGIN_INVALID,
-                        "texture: no plugin installed for texture asset type '" + assetConfigs.type + "'.");
+                        "texture: no plugin installed for texture source type '" + sourceConfigs.type + "'.");
             }
 
-            if (!assetService.getAsset) {
+            if (!sourceService.getSource) {
                 throw SceneJS_error.fatalError(
                         SceneJS.errors.PLUGIN_INVALID,
-                        "texture: 'getAsset' method missing on plugin for texture asset type '" + assetConfigs.type + "'.");
+                        "texture: 'getSource' method missing on plugin for texture source type '" + sourceConfigs.type + "'.");
             }
 
-            var asset = assetService.getAsset({ gl: gl });
+            var source = sourceService.getSource({ gl: gl });
 
-            if (!asset.onUpdate) {
+            if (!source.onUpdate) {
                 throw SceneJS_error.fatalError(
                         SceneJS.errors.PLUGIN_INVALID,
-                        "texture: 'onUpdate' method missing on plugin for texture asset type '" + assetConfigs.type + "'");
+                        "texture: 'onUpdate' method missing on plugin for texture source type '" + sourceConfigs.type + "'");
             }
 
-            asset.onUpdate(// Get notification whenever asset updates the texture
+            source.onUpdate(// Get notification whenever source updates the texture
                     (function() {
                         var loaded = false;
                         return function() {
                             if (!loaded) { // Texture first initialised - create layer
                                 loaded = true;
-                                self._setLayerTexture(gl, layer, asset.getTexture());
+                                self._setLayerTexture(gl, layer, source.getTexture());
 
                             } else { // Texture updated - layer already has the handle to it, so just signal a redraw
                                 self._engine.display.imageDirty = true;
@@ -10914,11 +11034,11 @@ new (function() {
                         };
                     })());
 
-         //   this._setLayerTexture(gl, layer, asset.getTexture());
+         //   this._setLayerTexture(gl, layer, source.getTexture());
 
-            asset.setConfigs(assetConfigs); // Configure the asset, which may cause it to update the texture
+            source.setConfigs(sourceConfigs); // Configure the source, which may cause it to update the texture
 
-            layer._asset = asset;
+            layer._source = source;
 
         } else {
 
@@ -11080,10 +11200,10 @@ new (function() {
             layer.blendFactor = cfg.blendFactor;
         }
 
-        if (cfg.asset) {
-            var asset = layer._asset;
-            if (asset) {
-                asset.setConfigs(cfg.asset);
+        if (cfg.source) {
+            var source = layer._source;
+            if (source) {
+                source.setConfigs(cfg.source);
             }
         }
 
@@ -11194,15 +11314,15 @@ new (function() {
         if (this._core.useCount == 1) { // Last resource user
             var layers = this._core.layers;
             var layer;
-            var asset;
+            var source;
             for (var i = 0, len = layers.length; i < len; i++) {
                 layer = layers[i];
                 if (layer.texture) {
                     layer.texture.destroy();
                 }
-                asset = layer._asset;
-                if (asset && asset.destroy) {
-                    asset.destroy();
+                source = layer._source;
+                if (source && source.destroy) {
+                    source.destroy();
                 }
             }
         }
@@ -11223,6 +11343,30 @@ SceneJS.XForm.prototype._init = function (params) {
         this.setElements(params.elements);
     }
 };
+
+/**
+ * Get Model matrix
+ * @return {*}
+ */
+SceneJS.XForm.prototype.getModelMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return this._core.matrix;
+};
+
+/**
+ * Get World matrix. That's the multiplication of this node's Model matrix by the World matrix of the the next
+ * tranform (scale, XForm, translate etc) node on the path to the scene root.
+ * @return {*}
+ */
+SceneJS.XForm.prototype.getWorldMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return Array.apply( [], this._core.mat);
+};
+
 
 SceneJS.XForm.prototype.setElements = function (elements) {
 
@@ -11279,6 +11423,29 @@ SceneJS.Matrix.prototype._init = function(params) {
 
         this.setElements(params.elements);
     }
+};
+
+/**
+ * Get Model matrix
+ * @return {*}
+ */
+SceneJS.Matrix.prototype.getModelMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return this._core.matrix;
+};
+
+/**
+ * Get World matrix. That's the multiplication of this node's Model matrix by the World matrix of the the next
+ * tranform (scale, matrix, translate etc) node on the path to the scene root.
+ * @return {*}
+ */
+SceneJS.Matrix.prototype.getWorldMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return Array.apply( [], this._core.mat);
 };
 
 /**
@@ -11354,6 +11521,29 @@ SceneJS.Rotate.prototype._init = function(params) {
             core.matrix = SceneJS_math_rotationMat4v(core.angle * Math.PI / 180.0, [core.x, core.y, core.z]);
         };
     }
+};
+
+/**
+ * Get Model matrix
+ * @return {*}
+ */
+SceneJS.Rotate.prototype.getModelMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return this._core.matrix;
+};
+
+/**
+ * Get World matrix. That's the multiplication of this node's Model matrix by the World matrix of the the next
+ * tranform (scale, rotate, translate etc) node on the path to the scene root.
+ * @return {*}
+ */
+SceneJS.Rotate.prototype.getWorldMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return Array.apply( [], this._core.mat);
 };
 
 /**
@@ -11478,6 +11668,30 @@ SceneJS.Translate.prototype._init = function(params) {
         };
     }
 };
+
+/**
+ * Get Model matrix
+ * @return {*}
+ */
+SceneJS.Translate.prototype.getModelMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return this._core.matrix;
+};
+
+/**
+ * Get World matrix. That's the multiplication of this node's Model matrix by the World matrix of the the next
+ * tranform (scale, translate, translate etc) node on the path to the scene root.
+ * @return {*}
+ */
+SceneJS.Translate.prototype.getWorldMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return Array.apply( [], this._core.mat);
+};
+
 
 /**
  * Sets the multiplication order of this node's transform matrix with respect to the parent modeling transform
@@ -11612,6 +11826,30 @@ SceneJS.Scale.prototype._init = function(params) {
         };
     }
 };
+
+/**
+ * Get Model matrix
+ * @return {*}
+ */
+SceneJS.Scale.prototype.getModelMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return this._core.matrix;
+};
+
+/**
+ * Get World matrix. That's the multiplication of this node's Model matrix by the World matrix of the the next
+ * tranform (scale, scale, translate etc) node on the path to the scene root.
+ * @return {*}
+ */
+SceneJS.Scale.prototype.getWorldMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return Array.apply( [], this._core.mat);
+};
+
 
 /**
  * Sets the multiplication order of this node's transform matrix with respect to the parent modeling transform
@@ -11818,6 +12056,20 @@ var SceneJS_modelXFormStack = new (function () {
         };
 
         /**
+         * Recursively flag this subtree of transforms cores as dirty,
+         * ie. needing their matrices rebuilt.
+         */
+        function setDirty(core) {
+
+            core.dirty = true;
+            core.matrixDirty = true;
+
+            for (var i = 0, len = core.numCores; i < len; i++) {
+                setDirty(core.cores[i]);
+            }
+        }
+
+        /**
          * Pre-multiply matrices at cores on path up to root into matrix at this core
          */
         core.build = function () {
@@ -11887,20 +12139,6 @@ var SceneJS_modelXFormStack = new (function () {
             core.dirty = false;
         };
     };
-
-    /**
-     * Recursively flag this subtree of transforms cores as dirty,
-     * ie. needing their matrices rebuilt.
-     */
-    function setDirty(core) {
-
-        core.dirty = true;
-
-        core.matrixDirty = true;
-        for (var i = 0, len = core.numCores; i < len; i++) {
-            setDirty(core.cores[i]);
-        }
-    }
 
     this.push = function (core) {
 
@@ -12068,10 +12306,10 @@ var SceneJS_Display = function (cfg) {
     this.projTransform = null;
 
     /**
-     * Node state core for the last {@link SceneJS.FrameBuf} visited during scene graph compilation traversal
+     * Node state core for the last {@link SceneJS.Framebuf} visited during scene graph compilation traversal
      * @type Object
      */
-    this.frameBuf = null;
+    this.framebuf = null;
 
     /**
      * Node state core for the last {@link SceneJS.Clips} visited during scene graph compilation traversal
@@ -12302,17 +12540,11 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 8, "lights", this.lights);
     this._setChunk(object, 9, "material", this.material);
     this._setChunk(object, 10, "texture", this.texture);
-    this._setChunk(object, 11, "framebuf", this.frameBuf);
+    this._setChunk(object, 11, "framebuf", this.framebuf);
     this._setChunk(object, 12, "clips", this.clips);
     this._setChunk(object, 13, "morphGeometry", this.morphGeometry);
     this._setChunk(object, 14, "listeners", this.renderListeners);      // Must be after the above chunks
     this._setChunk(object, 15, "geometry", this.geometry); // Must be last
-    //this._setChunk(object, 16, "draw", this.geometry);       // Must be last
-
-    var x = 0;
-    if (x ==9) {
-        alert("SS")
-    }
 };
 
 SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, unique) {
@@ -12749,7 +12981,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     var frameCtx = this._frameCtx;                                                // Reset rendering context
 
     frameCtx.program = null;
-    frameCtx.frameBuf = null;
+    frameCtx.framebuf = null;
     frameCtx.viewMat = null;
     frameCtx.modelMat = null;
     frameCtx.cameraMat = null;
@@ -12759,7 +12991,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     frameCtx.uvBuf = false;
     frameCtx.uvBuf2 = false;
     frameCtx.colorBuf = false;
-    frameCtx.numVBOs = 0;
     frameCtx.backfaces = false;
     frameCtx.frontface = "ccw";
     frameCtx.pick = !!pick;
@@ -12806,12 +13037,13 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
         //frameCtx.program.unbind();
     }
 
-    if (frameCtx.frameBuf) {                                                 // Unbind remaining frame buffer
-        //frameCtx.frameBuf.unbind();
+    if (frameCtx.framebuf) {                                                 // Unbind remaining frame buffer
+        gl.finish();
+        frameCtx.framebuf.unbind();
     }
 
     if (frameCtx.renderer) {                           // Forget last call-time renderer properties
-        frameCtx.renderer.props.restoreProps(gl);
+   //     frameCtx.renderer.props.restoreProps(gl);
     }
 };
 
@@ -14549,31 +14781,31 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });/**
- *   Create display state chunk type for draw and pick render of frameBuf
+ *   Create display state chunk type for draw and pick render of framebuf
  */
 SceneJS_ChunkFactory.createChunkType({
 
-    type: "frameBuf",
+    type: "framebuf",
 
     build: function() {
     },
 
     drawAndPick: function(ctx) {
 
-        if (ctx.frameBuf) {
+        if (ctx.framebuf) {
 
-            this.program.gl.finish(); // Force frameBuf to complete
-            
-            ctx.frameBuf.unbind();
+            this.program.gl.finish(); // Force framebuf to complete
+
+            ctx.framebuf.unbind();
         }
 
-        var frameBuf = this.core.frameBuf;
+        var framebuf = this.core.framebuf;
 
-        if (frameBuf) {
+        if (framebuf) {
 
-            frameBuf.bind();
+            framebuf.bind();
 
-            ctx.frameBuf = frameBuf;  // Must flush on cleanup
+            ctx.framebuf = framebuf;  // Must flush on cleanup
         }
     }
 });/**
@@ -14613,45 +14845,31 @@ SceneJS_ChunkFactory.createChunkType({
 
     draw:function (ctx) {
 
-        // TODO: Avoid redundantly rebinding these VBOs
-        // TODO: ctx.morphXXX will not be reset on program switch
-
         var gl = this.program.gl;
 
         if (ctx.geoChunkId != this.id) { // HACK until we have distinct state chunks for VBOs and draw call
 
             if (this._aVertexDraw && !ctx.vertexBuf) {
                 this._aVertexDraw.bindFloatArrayBuffer(this.core.vertexBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aNormalDraw && !ctx.normalBuf) {
                 this._aNormalDraw.bindFloatArrayBuffer(this.core.normalBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aUVDraw && !ctx.uvBuf) {
                 this._aUVDraw.bindFloatArrayBuffer(this.core.uvBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aUV2Draw && !ctx.uvBuf2) {
                 this._aUV2Draw.bindFloatArrayBuffer(this.core.uvBuf2);
-                ctx.numVBOs++;
             }
 
             if (this._aColorDraw && !ctx.colorBuf) {
                 this._aColorDraw.bindFloatArrayBuffer(this.core.colorBuf);
-                ctx.numVBOs++;
             }
 
             this.core.indexBuf.bind();
-
-            /* Disable remaining Vertex attrib arrays
-             */
-            for (var i = ctx.numVBOs; i < 10; i++) {
-                gl.disableVertexAttribArray(i);
-            }
 
             ctx.geoChunkId = this.id;
         }
@@ -14667,31 +14885,21 @@ SceneJS_ChunkFactory.createChunkType({
 
             if (this._aVertexPick && !ctx.vertexBuf) {
                 this._aVertexPick.bindFloatArrayBuffer(this.core.vertexBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aNormalPick && !ctx.normalBuf) {
                 this._aNormalPick.bindFloatArrayBuffer(this.core.normalBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aUVPick && !ctx.uvBuf) {
                 this._aUVPick.bindFloatArrayBuffer(this.core.uvBuf);
-                ctx.numVBOs++;
             }
 
             if (this._aUV2Pick && !ctx.uvBuf2) {
                 this._aUV2Pick.bindFloatArrayBuffer(this.core.uvBuf2);
-                ctx.numVBOs++;
             }
 
             this.core.indexBuf.bind();
-
-            /* Disable remaining Vertex attrib arrays
-             */
-            for (var i = ctx.numVBOs; i < 10; i++) {
-                gl.disableVertexAttribArray(i);
-            }
 
             ctx.geoChunkId = this.id;
         }
@@ -15012,7 +15220,6 @@ SceneJS_ChunkFactory.createChunkType({
             this._aVertexPick.bindFloatArrayBuffer(target1.vertexBuf);
             this._aMorphVertexPick.bindFloatArrayBuffer(target2.vertexBuf);
             ctx.vertexBuf = true;
-            ctx.numVBOs += 2;
         } else {
             ctx.vertexBuf = false;
         }
@@ -15021,7 +15228,6 @@ SceneJS_ChunkFactory.createChunkType({
             this._aNormalPick.bindFloatArrayBuffer(target1.normalBuf);
             this._aMorphNormalPick.bindFloatArrayBuffer(target2.normalBuf);
             ctx.normalBuf = true;
-            ctx.numVBOs += 2;
         } else {
             ctx.normalBuf = false;
         }
@@ -15030,7 +15236,6 @@ SceneJS_ChunkFactory.createChunkType({
             this._aUVPick.bindFloatArrayBuffer(target1.uvBuf);
             this._aMorphUVPick.bindFloatArrayBuffer(target2.uvBuf);
             ctx.uvBuf = true;
-            ctx.numVBOs += 2;
         } else {
             ctx.uvBuf = false;
         }
@@ -15039,7 +15244,6 @@ SceneJS_ChunkFactory.createChunkType({
             this._aUV2Pick.bindFloatArrayBuffer(target1.uvBuf2);
             this._aMorphUV2Pick.bindFloatArrayBuffer(target2.uvBuf2);
             ctx.uvBuf2 = true;
-            ctx.numVBOs += 2;
         } else {
             ctx.uvBuf2 = false;
         }
@@ -15048,13 +15252,12 @@ SceneJS_ChunkFactory.createChunkType({
             this._aColorPick.bindFloatArrayBuffer(target1.colorBuf);
             this._aMorphColorPick.bindFloatArrayBuffer(target2.colorBuf);
             ctx.colorBuf = true;
-            ctx.numVBOs += 2;
         } else {
             ctx.colorBuf = false;
         }
 
-        if (this._uMorphFactorDraw) {
-            gl.uniform1f(this._uMorphFactorDraw, this.core.factor); // Bind LERP factor
+        if (this._uMorphFactorPick) {
+            gl.uniform1f(this._uMorphFactorPick, this.core.factor); // Bind LERP factor
         }
     }
 });
@@ -15112,6 +15315,12 @@ SceneJS_ChunkFactory.createChunkType({
         frameCtx.colorBuf = false;
 
         frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
+
+        var gl = this.program.gl;
+
+        for (var i = 0; i < 10; i++) {
+            gl.disableVertexAttribArray(i);
+        }
     },
 
     pick : function(frameCtx) {
@@ -15124,7 +15333,9 @@ SceneJS_ChunkFactory.createChunkType({
 
         pickProgram.bind();
 
-        this.program.gl.uniform1i(this._rayPickMode, frameCtx.rayPick);
+        var gl = this.program.gl;
+
+        gl.uniform1i(this._rayPickMode, frameCtx.rayPick);
 
         frameCtx.program = pickProgram;
 
@@ -15139,6 +15350,9 @@ SceneJS_ChunkFactory.createChunkType({
 
         frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
 
+        for (var i = 0; i < 10; i++) {
+            gl.disableVertexAttribArray(i);
+        }
     }
 });
 

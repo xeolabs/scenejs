@@ -8,13 +8,14 @@ var SceneJS = new (function () {
      */
     this.VERSION = '3.0.0.0';
 
-
     this._baseStateId = 0;
 
     /**
      * @property {SceneJS_Engine} Engines currently in existance
      */
     this._engines = {};
+
+    this._engineIds = new SceneJS_Map();
 
     /**
      * Creates a new scene from the given JSON description
@@ -30,16 +31,15 @@ var SceneJS = new (function () {
             throw SceneJS_error.fatalError("param 'json' is null or undefined");
         }
 
-        if (!json.id) { // TODO: make optional
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "'id' is mandatory for the Scene node");
-        }
-
-        if (this._engines[json.id]) {
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Scene already exists with this ID: '" + json.id + "'");
+        if (json.id) {
+            if (this._engines[json.id]) {
+                throw SceneJS_error.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Scene already exists with this ID: '" + json.id + "'");
+            }
+            this._engineIds.addItem(json.id, {});
+        } else {
+            json.id = this._engineIds.addItem({});
         }
 
         var engine = new SceneJS_Engine(json, options);
@@ -97,22 +97,6 @@ var SceneJS = new (function () {
 
         return scenes;
     };
-
-//    var fnName = "__scenejs_sceneLoop";
-//
-//    window[fnName] = function () {
-//
-//        var engine;
-//
-//        for (var engineId in this._engines) {
-//            if (this._engines.hasOwnProperty(this._engines)) {
-//                engine = this._engines[engineId];
-//                engine.renderFrame();
-//            }
-//        }
-//
-//        window.requestAnimationFrame(window[fnName]);
-//    };
 
     /**
      * Tests if the given object is an array
@@ -187,6 +171,8 @@ var SceneJS = new (function () {
                 temp.push(this._engines[id]);
 
                 delete this._engines[id];
+
+                this._engineIds.removeItem(id);
             }
         }
 

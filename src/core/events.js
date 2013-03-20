@@ -1,25 +1,24 @@
 /**
  *  @private
  */
-var SceneJS_events = new (function() {
+var SceneJS_events = new (function () {
 
     this.ERROR = 0;
     this.RESET = 1;                         // SceneJS framework reset
-
-    this.SCENE_CREATED = 2;                 // Scene has just been created
-    this.SCENE_COMPILING = 3;               // Scene about to be compiled and drawn
-    this.SCENE_DESTROYED = 4;               // Scene just been destroyed
-    this.OBJECT_COMPILING = 5;
-    this.WEBGL_CONTEXT_LOST = 6;
-    this.WEBGL_CONTEXT_RESTORED = 7;
-
+    this.NODE_CREATED = 2;                 // Scene has just been created
+    this.SCENE_CREATED = 3;                 // Scene has just been created
+    this.SCENE_COMPILING = 4;               // Scene about to be compiled and drawn
+    this.SCENE_DESTROYED = 5;               // Scene just been destroyed
+    this.OBJECT_COMPILING = 6;
+    this.WEBGL_CONTEXT_LOST = 7;
+    this.WEBGL_CONTEXT_RESTORED = 8;
 
     /* Priority queue for each type of event
      */
-    var events = new Array(37);
+    var events = [];
 
     /**
-     * Registers a handler for the given event
+     * Registers a handler for the given event and returns a subscription handle
      *
      * The handler can be registered with an optional priority number which specifies the order it is
      * called among the other handler already registered for the event.
@@ -33,70 +32,134 @@ var SceneJS_events = new (function() {
      * @param type Event type - one of the values in SceneJS_events
      * @param command - Handler function that will accept whatever parameter object accompanies the event
      * @param priority - Optional priority number (see above)
+     * @return {String} - Subscription handle
      */
-    this.addListener = function(type, command, priority) {
+    this.addListener = function (type, command, priority) {
+
         var list = events[type];
+
         if (!list) {
             list = [];
             events[type] = list;
         }
+
         var handler = {
-            command: command,
-            priority : (priority == undefined) ? list.length : priority
+            command:command,
+            priority:(priority == undefined) ? list.length : priority
         };
-        for (var i = 0; i < list.length; i++) {
-            if (list[i].priority > handler.priority) {
-                list.splice(i, 0, handler);
-                return;
+
+        var index = -1;
+
+        for (var i = 0, len = list.length; i < len; i++) {
+            if (!list[i]) {
+                index = i;
+                break;
             }
         }
-        list.push(handler);
+
+        if (index < 0) {
+            list.push(handler);
+            index = list.length - 1;
+        }
+
+//
+//        for (var i = 0; i < list.length; i++) {
+//            if (list[i].priority > handler.priority) {
+//                list.splice(i, 0, handler);
+//                return i;
+//            }
+//        }
+
+
+        var handle = type + "." + index;
+
+        return handle;
+    };
+
+    /**
+     * Removes a listener
+     * @param handle Subscription handle
+     */
+    this.removeListener = function (handle) {
+
+        var lastIdx = handle.lastIndexOf(".");
+
+        var type = parseInt(handle.substr(0, lastIdx));
+        var index = parseInt(handle.substr(lastIdx + 1));
+
+        var list = events[type];
+
+        if (!list) {
+            return;
+        }
+
+        delete list[index];
     };
 
     /**
      * @private
      */
-    this.fireEvent = function(type, params) {
+    this.fireEvent = function (type, params) {
+
         var list = events[type];
+
         if (list) {
-            if (!params) {
-                params = {};
-            }
+            params = params || {};
             for (var i = 0; i < list.length; i++) {
-                list[i].command(params);
+                if (list[i]) {
+                    list[i].command(params);
+                }
             }
         }
     };
-        
+
 })();
+
 
 /**
  * Subscribe to SceneJS events
  * @deprecated
  */
-SceneJS.bind = function(name, func) {
+SceneJS.bind = function (name, func) {
     switch (name) {
 
-        case "error" : SceneJS_events.addListener(SceneJS_events.ERROR, func);
+        case "error" :
+
+            return SceneJS_events.addListener(SceneJS_events.ERROR, func);
             break;
 
-        case "reset" : SceneJS_events.addListener(
-                SceneJS_events.RESET,
-                function() {
-                    func();
-                });
-            break;
+        case "nodeCreated" :
 
-     case "webglcontextlost" : SceneJS_events.addListener(
-                SceneJS_events.WEBGL_CONTEXT_LOST,
-                function(params) {
+            return SceneJS_events.addListener(
+                SceneJS_events.NODE_CREATED,
+                function (params) {
                     func(params);
                 });
             break;
 
-    case "webglcontextrestored" : SceneJS_events.addListener(
+        case "reset" :
+
+            return SceneJS_events.addListener(
+                SceneJS_events.RESET,
+                function () {
+                    func();
+                });
+            break;
+
+        case "webglcontextlost" :
+
+            return SceneJS_events.addListener(
+                SceneJS_events.WEBGL_CONTEXT_LOST,
+                function (params) {
+                    func(params);
+                });
+            break;
+
+        case "webglcontextrestored" :
+
+            return SceneJS_events.addListener(
                 SceneJS_events.WEBGL_CONTEXT_RESTORED,
-                function(params) {
+                function (params) {
                     func(params);
                 });
             break;
@@ -111,4 +174,13 @@ SceneJS.bind = function(name, func) {
  */
 SceneJS.onEvent = SceneJS.bind;
 
-SceneJS.addListener = SceneJS.onEvent = SceneJS.bind;
+/* Unsubscribe from event
+ */
+SceneJS.unEvent = function (handle) {
+    return SceneJS_events.removeListener(handle);
+};
+
+SceneJS.subscribe = SceneJS.addListener = SceneJS.onEvent = SceneJS.bind;
+
+SceneJS.unsubscribe = SceneJS.unEvent;
+

@@ -814,6 +814,17 @@ SceneJS.Node.prototype._findNodesByType = function(type, list, recursive) {
     return list;
 };
 
+/** Finds the first node on path up to root whose type equals that given
+ */
+SceneJS.Node.prototype.findParentByType = function(type) {
+    var parent = this.parent;
+    while (parent && parent.type != type) {
+        parent = parent.parent;
+    }
+    return parent;
+};
+
+
 /**
  * Given a map of name-value pairs, calls a getter method for each name,
  * feeding into it the corresponding value.

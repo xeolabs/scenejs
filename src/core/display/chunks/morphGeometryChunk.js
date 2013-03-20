@@ -159,8 +159,8 @@ SceneJS_ChunkFactory.createChunkType({
             ctx.colorBuf = false;
         }
 
-        if (this._uMorphFactorDraw) {
-            gl.uniform1f(this._uMorphFactorDraw, this.core.factor); // Bind LERP factor
+        if (this._uMorphFactorPick) {
+            gl.uniform1f(this._uMorphFactorPick, this.core.factor); // Bind LERP factor
         }
     }
 });

@@ -51,11 +51,11 @@
 
 <script src="../build/scenejs.js"></script>
 
-<!-- Plugins for "box" geometry asset type -->
+<!-- Plugins for "box" geometry source type -->
 
 <script src="../plugins/geometry/scenejs.box.js"></script>
 
-<!-- Plugins for "teapot" geometry asset type -->
+<!-- Plugins for "teapot" geometry source type -->
 
 <script src="../plugins/geometry/scenejs.teapot.js"></script>
 
@@ -84,7 +84,7 @@ SceneJS.createScene({
          *------------------------------------------------------------------------------------------*/
 
         {
-            type: "frameBuf",
+            type: "framebuf",
             id: "teapot-frameBuf",
 
             nodes: [
@@ -142,7 +142,7 @@ SceneJS.createScene({
                                                             nodes:[
                                                                 {
                                                                     type : "geometry",
-                                                                    asset: {
+                                                                    source: {
                                                                         type: "box"
                                                                     }
                                                                 }
@@ -182,7 +182,7 @@ SceneJS.createScene({
                                                             nodes: [
                                                                 {
                                                                     type : "geometry",
-                                                                    asset: {
+                                                                    source: {
                                                                         type: "teapot"
                                                                     }
                                                                 }
@@ -262,7 +262,7 @@ SceneJS.createScene({
                                              */
                                             layers: [
                                                 {
-                                                    frameBuf: "teapot-frameBuf",
+                                                    framebuf: "teapot-frameBuf",
                                                     blendMode: "multiply"
                                                 }
                                             ],
@@ -284,7 +284,7 @@ SceneJS.createScene({
                                                             nodes: [
                                                                 {
                                                                     type: "geometry",
-                                                                    asset: {
+                                                                    source: {
                                                                         type: "box"
                                                                     }
                                                                 }

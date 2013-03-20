@@ -69,7 +69,7 @@
 
         var clip = this._core.clips[index] || (this._core.clips[index] = {});
 
-        clip.normalAndDist = [cfg.x,  cfg.y, cfg.z, cfg.dist];
+        clip.normalAndDist = [cfg.x || 0,  cfg.y || 0, cfg.z || 0, cfg.dist || 0];
 
         var mode = cfg.mode || clip.mode || "disabled";
 

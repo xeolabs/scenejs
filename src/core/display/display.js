@@ -138,10 +138,10 @@ var SceneJS_Display = function (cfg) {
     this.projTransform = null;
 
     /**
-     * Node state core for the last {@link SceneJS.FrameBuf} visited during scene graph compilation traversal
+     * Node state core for the last {@link SceneJS.Framebuf} visited during scene graph compilation traversal
      * @type Object
      */
-    this.frameBuf = null;
+    this.framebuf = null;
 
     /**
      * Node state core for the last {@link SceneJS.Clips} visited during scene graph compilation traversal
@@ -372,17 +372,11 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 8, "lights", this.lights);
     this._setChunk(object, 9, "material", this.material);
     this._setChunk(object, 10, "texture", this.texture);
-    this._setChunk(object, 11, "framebuf", this.frameBuf);
+    this._setChunk(object, 11, "framebuf", this.framebuf);
     this._setChunk(object, 12, "clips", this.clips);
     this._setChunk(object, 13, "morphGeometry", this.morphGeometry);
     this._setChunk(object, 14, "listeners", this.renderListeners);      // Must be after the above chunks
     this._setChunk(object, 15, "geometry", this.geometry); // Must be last
-    //this._setChunk(object, 16, "draw", this.geometry);       // Must be last
-
-    var x = 0;
-    if (x ==9) {
-        alert("SS")
-    }
 };
 
 SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, unique) {
@@ -819,7 +813,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     var frameCtx = this._frameCtx;                                                // Reset rendering context
 
     frameCtx.program = null;
-    frameCtx.frameBuf = null;
+    frameCtx.framebuf = null;
     frameCtx.viewMat = null;
     frameCtx.modelMat = null;
     frameCtx.cameraMat = null;
@@ -875,12 +869,13 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
         //frameCtx.program.unbind();
     }
 
-    if (frameCtx.frameBuf) {                                                 // Unbind remaining frame buffer
-        //frameCtx.frameBuf.unbind();
+    if (frameCtx.framebuf) {                                                 // Unbind remaining frame buffer
+        gl.finish();
+        frameCtx.framebuf.unbind();
     }
 
     if (frameCtx.renderer) {                           // Forget last call-time renderer properties
-        frameCtx.renderer.props.restoreProps(gl);
+   //     frameCtx.renderer.props.restoreProps(gl);
     }
 };
 

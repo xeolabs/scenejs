@@ -1,0 +1,30 @@
+body {
+    background-color: #000000;
+    margin: 0px;
+    overflow: auto;
+    height: 100%;
+}
+
+#info {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    color: #ffffff;
+    padding: 5px;
+    font-family: Monospace;
+    font-size: 13px;
+    text-align: center;
+}
+
+#theCanvas {
+    width: 100%;
+    height: 100%;
+}
+
+a {
+    color: #ffffff;
+}
+
+a:hover {
+    color: #0080ff;
+}

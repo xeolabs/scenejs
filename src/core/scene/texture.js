@@ -58,11 +58,11 @@ new (function() {
 
                 layerParams = params.layers[i];
 
-                if (!layerParams.asset && !layerParams.uri && !layerParams.src && !layerParams.frameBuf && !layerParams.video) {
+                if (!layerParams.source && !layerParams.uri && !layerParams.src && !layerParams.framebuf && !layerParams.video) {
 
                     throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture layer " + i + "  has no uri, src, asset, frameBuf, video or canvasId specified");
+                            "texture layer " + i + "  has no uri, src, source, framebuf, video or canvasId specified");
                 }
 
                 if (layerParams.applyFrom) {
@@ -121,12 +121,12 @@ new (function() {
 
                 this._setLayerTransform(layerParams, layer);
 
-                if (layer.frameBuf) { // Create from a frameBuf node preceeding this texture in the scene graph
+                if (layer.framebuf) { // Create from a framebuf node preceeding this texture in the scene graph
 
-                    var targetNode = this._engine.findNode(layer.frameBuf);
+                    var targetNode = this._engine.findNode(layer.framebuf);
 
-                    if (targetNode && targetNode.type == "frameBuf") {
-                        layer.texture = targetNode._core.frameBuf.getTexture(); // TODO: what happens when the frameBuf is destroyed?
+                    if (targetNode && targetNode.type == "framebuf") {
+                        layer.texture = targetNode._core.framebuf.getTexture(); // TODO: what happens when the framebuf is destroyed?
                     }
 
                 } else { // Create from texture node's layer configs
@@ -161,41 +161,41 @@ new (function() {
 
         var self = this;
 
-        var assetConfigs = layer.asset;
+        var sourceConfigs = layer.source;
 
-        if (assetConfigs) {
+        if (sourceConfigs) {
 
-            /* Load from asset
+            /* Load from source
              */
-            var assetService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.TEXTURE_ASSET_PLUGIN, assetConfigs.type);
+            var sourceService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.TEXTURE_SOURCE_PLUGIN, sourceConfigs.type);
 
-            if (!assetService) {
+            if (!sourceService) {
                 throw SceneJS_error.fatalError(
                         SceneJS.errors.PLUGIN_INVALID,
-                        "texture: no plugin installed for texture asset type '" + assetConfigs.type + "'.");
+                        "texture: no plugin installed for texture source type '" + sourceConfigs.type + "'.");
             }
 
-            if (!assetService.getAsset) {
+            if (!sourceService.getSource) {
                 throw SceneJS_error.fatalError(
                         SceneJS.errors.PLUGIN_INVALID,
-                        "texture: 'getAsset' method missing on plugin for texture asset type '" + assetConfigs.type + "'.");
+                        "texture: 'getSource' method missing on plugin for texture source type '" + sourceConfigs.type + "'.");
             }
 
-            var asset = assetService.getAsset({ gl: gl });
+            var source = sourceService.getSource({ gl: gl });
 
-            if (!asset.onUpdate) {
+            if (!source.onUpdate) {
                 throw SceneJS_error.fatalError(
                         SceneJS.errors.PLUGIN_INVALID,
-                        "texture: 'onUpdate' method missing on plugin for texture asset type '" + assetConfigs.type + "'");
+                        "texture: 'onUpdate' method missing on plugin for texture source type '" + sourceConfigs.type + "'");
             }
 
-            asset.onUpdate(// Get notification whenever asset updates the texture
+            source.onUpdate(// Get notification whenever source updates the texture
                     (function() {
                         var loaded = false;
                         return function() {
                             if (!loaded) { // Texture first initialised - create layer
                                 loaded = true;
-                                self._setLayerTexture(gl, layer, asset.getTexture());
+                                self._setLayerTexture(gl, layer, source.getTexture());
 
                             } else { // Texture updated - layer already has the handle to it, so just signal a redraw
                                 self._engine.display.imageDirty = true;
@@ -203,11 +203,11 @@ new (function() {
                         };
                     })());
 
-         //   this._setLayerTexture(gl, layer, asset.getTexture());
+         //   this._setLayerTexture(gl, layer, source.getTexture());
 
-            asset.setConfigs(assetConfigs); // Configure the asset, which may cause it to update the texture
+            source.setConfigs(sourceConfigs); // Configure the source, which may cause it to update the texture
 
-            layer._asset = asset;
+            layer._source = source;
 
         } else {
 
@@ -369,10 +369,10 @@ new (function() {
             layer.blendFactor = cfg.blendFactor;
         }
 
-        if (cfg.asset) {
-            var asset = layer._asset;
-            if (asset) {
-                asset.setConfigs(cfg.asset);
+        if (cfg.source) {
+            var source = layer._source;
+            if (source) {
+                source.setConfigs(cfg.source);
             }
         }
 
@@ -483,15 +483,15 @@ new (function() {
         if (this._core.useCount == 1) { // Last resource user
             var layers = this._core.layers;
             var layer;
-            var asset;
+            var source;
             for (var i = 0, len = layers.length; i < len; i++) {
                 layer = layers[i];
                 if (layer.texture) {
                     layer.texture.destroy();
                 }
-                asset = layer._asset;
-                if (asset && asset.destroy) {
-                    asset.destroy();
+                source = layer._source;
+                if (source && source.destroy) {
+                    source.destroy();
                 }
             }
         }

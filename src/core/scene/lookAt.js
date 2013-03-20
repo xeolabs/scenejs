@@ -57,7 +57,7 @@
             this._core.lookZ = 0;
 
             this._core.upX = 0;
-            this._core.upY = 0;
+            this._core.upY = 1;
             this._core.upZ = 0;
 
             if (!params.eye && !params.look && !params.up) {

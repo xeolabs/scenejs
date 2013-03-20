@@ -1,12 +1,12 @@
 SceneJS.Plugins.addPlugin(
 
-        SceneJS.Plugins.TEXTURE_ASSET_PLUGIN,
+        SceneJS.Plugins.TEXTURE_SOURCE_PLUGIN,
 
         "video",
 
         new (function() {
 
-            this.getAsset = function (params) {
+            this.getSource = function (params) {
 
                 var gl = params.gl;
                 var configs = {};

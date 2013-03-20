@@ -62,7 +62,7 @@ var skySphereJSON = {
                     nodes: [
                         {
                             type: "geometry",
-                            asset: {
+                            source: {
                                 type: "sphere"
                             }
                         }

@@ -103,6 +103,20 @@ var SceneJS_modelXFormStack = new (function () {
         };
 
         /**
+         * Recursively flag this subtree of transforms cores as dirty,
+         * ie. needing their matrices rebuilt.
+         */
+        function setDirty(core) {
+
+            core.dirty = true;
+            core.matrixDirty = true;
+
+            for (var i = 0, len = core.numCores; i < len; i++) {
+                setDirty(core.cores[i]);
+            }
+        }
+
+        /**
          * Pre-multiply matrices at cores on path up to root into matrix at this core
          */
         core.build = function () {
@@ -172,20 +186,6 @@ var SceneJS_modelXFormStack = new (function () {
             core.dirty = false;
         };
     };
-
-    /**
-     * Recursively flag this subtree of transforms cores as dirty,
-     * ie. needing their matrices rebuilt.
-     */
-    function setDirty(core) {
-
-        core.dirty = true;
-
-        core.matrixDirty = true;
-        for (var i = 0, len = core.numCores; i < len; i++) {
-            setDirty(core.cores[i]);
-        }
-    }
 
     this.push = function (core) {
 

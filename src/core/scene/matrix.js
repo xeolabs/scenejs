@@ -16,6 +16,29 @@ SceneJS.Matrix.prototype._init = function(params) {
 };
 
 /**
+ * Get Model matrix
+ * @return {*}
+ */
+SceneJS.Matrix.prototype.getModelMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return this._core.matrix;
+};
+
+/**
+ * Get World matrix. That's the multiplication of this node's Model matrix by the World matrix of the the next
+ * tranform (scale, matrix, translate etc) node on the path to the scene root.
+ * @return {*}
+ */
+SceneJS.Matrix.prototype.getWorldMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return Array.apply( [], this._core.mat);
+};
+
+/**
  * Sets the matrix elements
  * @type {Function}
  */

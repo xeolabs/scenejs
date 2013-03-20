@@ -14,6 +14,30 @@ SceneJS.XForm.prototype._init = function (params) {
     }
 };
 
+/**
+ * Get Model matrix
+ * @return {*}
+ */
+SceneJS.XForm.prototype.getModelMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return this._core.matrix;
+};
+
+/**
+ * Get World matrix. That's the multiplication of this node's Model matrix by the World matrix of the the next
+ * tranform (scale, XForm, translate etc) node on the path to the scene root.
+ * @return {*}
+ */
+SceneJS.XForm.prototype.getWorldMatrix = function() {
+    if (this._core.dirty) {
+        this._core.build();
+    }
+    return Array.apply( [], this._core.mat);
+};
+
+
 SceneJS.XForm.prototype.setElements = function (elements) {
 
     elements = elements || SceneJS_math_identityMat4();

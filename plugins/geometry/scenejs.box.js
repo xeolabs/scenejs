@@ -8,15 +8,15 @@
  */
 SceneJS.Plugins.addPlugin(
 
-        SceneJS.Plugins.GEO_ASSET_PLUGIN, // This is a geometry asset factory plugin
+        SceneJS.Plugins.GEO_SOURCE_PLUGIN, // This is a geometry source factory plugin
 
-        "box", // Type of asset created by this plugin
+        "box", // Type of source created by this plugin
 
         new (function() {
 
-            var assetService = this;
+            var sourceService = this;
 
-            this.getAsset = function () {
+            this.getSource = function () {
 
                 var created;
                 var updated;
@@ -35,7 +35,7 @@ SceneJS.Plugins.addPlugin(
 
                     setConfigs : function(cfg) {
                         configs = cfg;
-                        created(assetService.buildBox(cfg));
+                        created(sourceService.buildBox(cfg));
                     },
 
                     getConfigs : function() {

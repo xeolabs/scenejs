@@ -8,15 +8,13 @@
  */
 SceneJS.Plugins.addPlugin(
 
-        SceneJS.Plugins.GEO_ASSET_PLUGIN,
+        SceneJS.Plugins.GEO_SOURCE_PLUGIN,
 
         "vectorText",
 
         new (function() {
 
-            var assetService = this;
-
-            this.getAsset = function () {
+            this.getSource = function () {
 
                 var created;
                 var updated;
@@ -35,7 +33,7 @@ SceneJS.Plugins.addPlugin(
 
                     setConfigs : function(cfg) {
                         configs = cfg;
-                        created(assetService._getGeometry(cfg));
+                        created(getGeometry(cfg));
                     },
 
                     getConfigs : function() {
@@ -47,8 +45,7 @@ SceneJS.Plugins.addPlugin(
                 };
             };
 
-
-            this._getGeometry = function(cfg) {
+            function getGeometry(cfg) {
 
                 var positions = [];
                 var indices = [];

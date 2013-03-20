@@ -38,7 +38,6 @@ SceneJS.Scene.prototype.unEvent = function(handle) {
 /**
  * Simulate a lost WebGL context for testing purposes.
  * Only works if the simulateWebGLLost was given as an option to {@link SceneJS.createScene}.
- * @private
  */
 SceneJS.Scene.prototype.loseWebGLContext = function() {
     this._engine.loseWebGLContext();
@@ -140,7 +139,14 @@ SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
  * @private
  */
 SceneJS.Scene.prototype.destroy = function() {
-    this._engine.destroy();
+
+    if (!this.destroyed) {
+
+        delete SceneJS._engines[this.id];  // HACK: circular dependency
+        SceneJS._engineIds.removeItem(this.id); // HACK: circular dependency
+
+        this.destroyed = true;
+    }
 };
 
 /**

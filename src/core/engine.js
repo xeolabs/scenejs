@@ -17,7 +17,7 @@ var SceneJS_Engine = function(json, options) {
     /**
      * Canvas and GL context for this engine
      */
-    this.canvas = new SceneJS_Canvas(json.canvasId, json.contextAttr, options);
+    this.canvas = new SceneJS_Canvas(this.id, json.canvasId, json.contextAttr, options);
 
     /**
      * Manages firing of and subscription to events
@@ -157,6 +157,12 @@ SceneJS_Engine.prototype.createNode = function(json) {
     //try {
     node = this._nodeFactory.getNode(this, json, core);
 
+    SceneJS_events.fireEvent(SceneJS_events.NODE_CREATED, {
+        sceneId: this.id, // Engine ID is same as scene ID
+        nodeId: node.nodeId
+    });
+
+
     //    } catch (e) {
     //
     //        this._coreFactory.putCore(core); // Clean up after node create failed
@@ -213,6 +219,12 @@ SceneJS_Engine.prototype.branchDirty = function(node) {
 
     if (this.sceneDirty) {
         return; // Whole scene will recompile anyway
+    }
+
+    /* Dealing with some weirdness with the embedded window and iframe / window fascism.
+     */
+    if (node == window) {
+        return;
     }
 
     node.branchDirty = true;
@@ -407,6 +419,7 @@ SceneJS_Engine.prototype._tryCompile = function() {
             || this.display.drawListDirty // Draw list needs rebuild
             || this.display.stateSortDirty // Draw list needs to redetermine state order
             || this.display.stateOrderDirty // Draw list needs state sort
+            || this.display.objectListDirty // Draw list needs to be rebuilt
             || this._sceneBranchesDirty // One or more branches in scene graph need (re)compilation
             || this.sceneDirty) { // Whole scene needs recompilation
 
@@ -499,8 +512,6 @@ SceneJS_Engine.prototype._doDestroyNodes = function() {
  * Destroys this engine
  */
 SceneJS_Engine.prototype.destroy = function() {
-
-    this.scene.destroy(); // Each node in scene will destroy itself via #destroyNode
 
     this.destroyed = true;
 

@@ -1,13 +1,13 @@
-new (function() {
+new (function () {
 
     var coreStack = [];
     var stackLen = 0;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function() {
-                stackLen = 0;
-            });
+        SceneJS_events.SCENE_COMPILING,
+        function () {
+            stackLen = 0;
+        });
 
     /**
      * @class Scene graph node that defines geometry.
@@ -18,193 +18,199 @@ new (function() {
      */
     SceneJS.Geometry = SceneJS_NodeFactory.createNodeType("geometry");
 
-    SceneJS.Geometry.prototype._init = function(params) {
+    SceneJS.Geometry.prototype._init = function (params) {
 
         if (this._core.useCount == 1) { // This node defines the core
 
             var options = {
-                origin : params.origin,
-                scale: params.scale
+                origin:params.origin,
+                scale:params.scale
             };
-
-            this._assetConfigs = params.asset;
-            this._asset = null;
 
             var self = this;
 
-            if (params.asset) {
+            this._sourceConfigs = null;
+            this._source = null;
+
+            if (params.plugin) {
+                this._sourceConfigs = SceneJS._apply({ type:params.plugin }, params);
+            } else if (params.source) {
+                this._sourceConfigs = params.source;
+            }
+
+            if (this._sourceConfigs) {
 
                 /*---------------------------------------------------------------------------------------------------
                  * Build node core (possibly asynchronously) using a factory object
                  *--------------------------------------------------------------------------------------------------*/
 
-                if (!params.asset.type) {
+                if (!this._sourceConfigs.type) {
                     throw SceneJS_error.fatalError(
-                            SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                            "geometry config expected: asset.type");
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "geometry config expected: source.type");
                 }
 
-                var assetService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.GEO_ASSET_PLUGIN, this._assetConfigs.type);
+                var sourceService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.GEO_SOURCE_PLUGIN, this._sourceConfigs.type);
 
-                if (!assetService) {
+                if (!sourceService) {
                     throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "geometry: no plugin installed for geometry asset type '" + this._assetConfigs.type + "'.");
+                        SceneJS.errors.PLUGIN_INVALID,
+                        "geometry: no plugin installed for geometry source type '" + this._sourceConfigs.type + "'.");
                 }
 
-                if (!assetService.getAsset) {
+                if (!sourceService.getSource) {
                     throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "geometry: 'getAsset' method missing on plugin for geometry asset type '" + this._assetConfigs.type + "'.");
+                        SceneJS.errors.PLUGIN_INVALID,
+                        "geometry: 'getSource' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'.");
                 }
 
-                this._asset = assetService.getAsset();
+                this._source = sourceService.getSource();
 
-                if (!this._asset.onUpdate) {
+                if (!this._source.onUpdate) {
                     throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "geometry: 'onUpdate' method missing on plugin for geometry asset type '" + params.asset.type + "'");
+                        SceneJS.errors.PLUGIN_INVALID,
+                        "geometry: 'onUpdate' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'");
                 }
 
-                this._asset.onCreate(// Get notification when asset creates the geometry
-                        function(data) { // Data contains both typed arrays and primitive name
+                this._source.onCreate(// Get notification when source creates the geometry
+                    function (data) { // Data contains both typed arrays and primitive name
 
-                            if (options) { // HACK - should apply this on GPU
-                                data.positions = data.positions
-                                        ? new Float32Array((options.scale || options.origin)
-                                        ? self._applyOptions(data.positions, options)
-                                        : data.positions) : undefined;
-                            }
+                        if (options) { // HACK - should apply this on GPU
+                            data.positions = data.positions
+                                ? new Float32Array((options.scale || options.origin)
+                                ? self._applyOptions(data.positions, options)
+                                : data.positions) : undefined;
+                        }
 
-                            self._initNodeCore(data);
+                        self._initNodeCore(data);
 
-                            SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
+                        SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
 
-                            self._core._loading = false;
-                            self._fireEvent("loaded");
+                        self._core._loading = false;
+                        self._fireEvent("loaded");
 
-                            self._engine.display.imageDirty = true;
+                        self._engine.display.imageDirty = true;
 
-                            self._engine.branchDirty(self); // TODO
-                        });
+                        self._engine.branchDirty(self); // TODO
+                    });
 
-                if (this._asset.onUpdate) {
-                    this._asset.onUpdate(// Reload core arrays from factory updates to the geometry
-                            function(data) {
+                if (this._source.onUpdate) {
+                    this._source.onUpdate(// Reload core arrays from factory updates to the geometry
+                        function (data) {
 
-                                var core = self._core;
+                            var core = self._core;
 
-                                if (data.positions && core.vertexBuf) {
+                            if (data.positions && core.vertexBuf) {
 
 //                                    if (data.positions.length > core.vertexBuf.length) {
 //                                        alert("too long");
 //                                    }
 
-                                    core.vertexBuf.bind();
-                                    core.vertexBuf.setData(data.positions, data.positionsOffset || 0);
+                                core.vertexBuf.bind();
+                                core.vertexBuf.setData(data.positions, data.positionsOffset || 0);
 
-                                    if (data.positions.length > core.arrays.positions.length) {
-                                        core.arrays.positions = data.positions;
+                                if (data.positions.length > core.arrays.positions.length) {
+                                    core.arrays.positions = data.positions;
 
-                                    } else {
-                                        core.arrays.positions.set(data.positions, data.positionsOffset || 0);
-                                    }
+                                } else {
+                                    core.arrays.positions.set(data.positions, data.positionsOffset || 0);
+                                }
+                            }
+
+                            if (data.normals && core.normalBuf) {
+
+                                core.normalBuf.bind();
+                                core.normalBuf.setData(data.normals, data.normalsOffset || 0);
+
+                                if (data.normals.length > core.arrays.normals.length) {
+                                    core.arrays.normals = data.normals;
+
+                                } else {
+                                    core.arrays.normals.set(data.normals, data.normalsOffset || 0);
+                                }
+                            }
+
+                            if (data.uv && core.uvBuf) {
+
+                                core.uvBuf.bind();
+                                core.uvBuf.setData(data.uv, data.uvOffset || 0);
+
+                                if (data.uv.length > core.arrays.uv.length) {
+                                    core.arrays.uv = data.uv;
+
+                                } else {
+                                    core.arrays.uv.set(data.uv, data.uvOffset || 0);
+                                }
+                            }
+
+                            if (data.uv2 && core.uvBuf2) {
+
+                                core.uvBuf2.bind();
+                                core.uvBuf2.setData(data.uv2, data.uv2Offset || 0);
+
+                                if (data.uv2.length > core.arrays.uv2.length) {
+                                    core.arrays.uv2 = data.uv2;
+
+                                } else {
+                                    core.arrays.uv2.set(data.uv2, data.uv2Offset || 0);
+                                }
+                            }
+
+                            if (data.colors && core.colorBuf) {
+
+                                if (data.colors.length > core.arrays.colors.length) {
+                                    core.arrays.colors = data.colors;
+
+                                } else {
+                                    core.arrays.colors.set(data.colors, data.colorsOffset || 0);
                                 }
 
-                                if (data.normals && core.normalBuf) {
+                                core.colorBuf.bind();
+                                core.colorBuf.setData(data.colors, data.colorsOffset || 0);
+                            }
 
-                                    core.normalBuf.bind();
-                                    core.normalBuf.setData(data.normals, data.normalsOffset || 0);
+                            if (data.indices && core.indexBuf) {
 
-                                    if (data.normals.length > core.arrays.normals.length) {
-                                        core.arrays.normals = data.normals;
+                                if (data.indices.length > core.arrays.indices.length) {
+                                    core.arrays.indices = data.indices;
 
-                                    } else {
-                                        core.arrays.normals.set(data.normals, data.normalsOffset || 0);
-                                    }
+                                } else {
+                                    core.arrays.indices.set(data.indices, data.indicesOffset || 0);
                                 }
 
-                                if (data.uv && core.uvBuf) {
+                                core.indexBuf.bind();
+                                core.indexBuf.setData(data.indices, data.indicesOffset || 0);
 
-                                    core.uvBuf.bind();
-                                    core.uvBuf.setData(data.uv, data.uvOffset || 0);
-
-                                    if (data.uv.length > core.arrays.uv.length) {
-                                        core.arrays.uv = data.uv;
-
-                                    } else {
-                                        core.arrays.uv.set(data.uv, data.uvOffset || 0);
+                                for (var i = 0; i < data.indices.length; i++) {
+                                    var idx = data.indices[i];
+                                    if (idx < 0 || idx >= core.arrays.positions.length) {
+                                        alert("out of range ");
+                                    }
+                                    if (core.arrays.normals && (idx < 0 || idx >= core.arrays.normals.length)) {
+                                        alert("out of range ");
+                                    }
+                                    if (core.arrays.uv && (idx < 0 || idx >= core.arrays.uv.length)) {
+                                        alert("out of range ");
+                                    }
+                                    if (core.arrays.uv2 && (idx < 0 || idx >= core.arrays.uv2.length)) {
+                                        alert("out of range ");
+                                    }
+                                    if (core.arrays.colors && (idx < 0 || idx >= core.arrays.colors.length)) {
+                                        alert("out of range ");
                                     }
                                 }
-
-                                if (data.uv2 && core.uvBuf2) {
-
-                                    core.uvBuf2.bind();
-                                    core.uvBuf2.setData(data.uv2, data.uv2Offset || 0);
-
-                                    if (data.uv2.length > core.arrays.uv2.length) {
-                                        core.arrays.uv2 = data.uv2;
-
-                                    } else {
-                                        core.arrays.uv2.set(data.uv2, data.uv2Offset || 0);
-                                    }
-                                }
-
-                                if (data.colors && core.colorBuf) {
-
-                                    if (data.colors.length > core.arrays.colors.length) {
-                                        core.arrays.colors = data.colors;
-
-                                    } else {
-                                        core.arrays.colors.set(data.colors, data.colorsOffset || 0);
-                                    }
-
-                                    core.colorBuf.bind();
-                                    core.colorBuf.setData(data.colors, data.colorsOffset || 0);
-                                }
-
-                                if (data.indices && core.indexBuf) {
-
-                                    if (data.indices.length > core.arrays.indices.length) {
-                                        core.arrays.indices = data.indices;
-
-                                    } else {
-                                        core.arrays.indices.set(data.indices, data.indicesOffset || 0);
-                                    }
-
-                                    core.indexBuf.bind();
-                                    core.indexBuf.setData(data.indices, data.indicesOffset || 0);
-
-                                    for (var i = 0; i < data.indices.length; i++) {
-                                        var idx = data.indices[i];
-                                        if (idx < 0 || idx >= core.arrays.positions.length) {
-                                            alert("out of range ");
-                                        }
-                                        if (core.arrays.normals && (idx < 0 || idx >= core.arrays.normals.length)) {
-                                            alert("out of range ");
-                                        }
-                                        if (core.arrays.uv && (idx < 0 || idx >= core.arrays.uv.length)) {
-                                            alert("out of range ");
-                                        }
-                                        if (core.arrays.uv2 && (idx < 0 || idx >= core.arrays.uv2.length)) {
-                                            alert("out of range ");
-                                        }
-                                        if (core.arrays.colors && (idx < 0 || idx >= core.arrays.colors.length)) {
-                                            alert("out of range ");
-                                        }
-                                    }
-                                }
+                            }
 
 
-                                self._engine.display.imageDirty = true;
-                            });
+                            self._engine.display.imageDirty = true;
+                        });
                 }
 
                 this._core._loading = true;
 
                 this._fireEvent("loading");
 
-                this._asset.setConfigs(this._assetConfigs);
+                this._source.setConfigs(this._sourceConfigs);
 
             } else if (params.create instanceof Function) {
 
@@ -229,7 +235,7 @@ new (function() {
                 SceneJS.Geometry._buildNodeCore(this._engine.canvas.gl, this._core);
             }
 
-            this._core.webglRestored = function() {
+            this._core.webglRestored = function () {
                 SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
             };
 
@@ -240,30 +246,30 @@ new (function() {
      * Convert JSON arrays into typed arrays,
      * apply optional baked Model-space transforms to positions
      */
-    SceneJS.Geometry.prototype._initNodeCore = function(data, options) {
+    SceneJS.Geometry.prototype._initNodeCore = function (data, options) {
 
         options = options || {};
 
         this._core.primitive = this._getPrimitiveType(data.primitive || "triangles");
 
         this._core.arrays = {
-            positions: data.positions
-                    ? new Float32Array((options.scale || options.origin)
-                    ? this._applyOptions(data.positions, options)
-                    : data.positions) : undefined,
+            positions:data.positions
+                ? new Float32Array((options.scale || options.origin)
+                ? this._applyOptions(data.positions, options)
+                : data.positions) : undefined,
 
-            normals: data.normals ? new Float32Array(data.normals) : undefined,
-            uv: data.uv ? new Float32Array(data.uv) : undefined,
-            uv2: data.uv2 ? new Float32Array(data.uv2) : undefined,
-            colors: data.colors ? new Float32Array(data.colors) : undefined,
-            indices: data.indices ? new Uint16Array(data.indices) : undefined
+            normals:data.normals ? new Float32Array(data.normals) : undefined,
+            uv:data.uv ? new Float32Array(data.uv) : undefined,
+            uv2:data.uv2 ? new Float32Array(data.uv2) : undefined,
+            colors:data.colors ? new Float32Array(data.colors) : undefined,
+            indices:data.indices ? new Uint16Array(data.indices) : undefined
         };
     };
 
     /**
      * Returns WebGL constant for primitive name
      */
-    SceneJS.Geometry.prototype._getPrimitiveType = function(primitive) {
+    SceneJS.Geometry.prototype._getPrimitiveType = function (primitive) {
 
         var gl = this._engine.canvas.gl;
 
@@ -292,8 +298,8 @@ new (function() {
 
             default:
                 throw SceneJS_error.fatalError(
-                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "geometry primitive unsupported: '" +
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "geometry primitive unsupported: '" +
                         primitive +
                         "' - supported types are: 'points', 'lines', 'line-loop', " +
                         "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'");
@@ -303,8 +309,8 @@ new (function() {
     /**
      * Apply baked Model-space transformations to give position array
      */
-    SceneJS.Geometry.prototype._applyOptions = function(positions, options) {
-        
+    SceneJS.Geometry.prototype._applyOptions = function (positions, options) {
+
         var positions2 = positions.slice ? positions.slice(0) : new Float32Array(positions);  // HACK
 
         if (options.scale) {
@@ -342,7 +348,7 @@ new (function() {
      * In addition to initially allocating those, this is called to reallocate them after
      * WebGL context is regained after being lost.
      */
-    SceneJS.Geometry._buildNodeCore = function(gl, core) {
+    SceneJS.Geometry._buildNodeCore = function (gl, core) {
 
         var usage = gl.STATIC_DRAW; //var usage = (!arrays.fixed) ? gl.STREAM_DRAW : gl.STATIC_DRAW;
 
@@ -407,12 +413,12 @@ new (function() {
             }
 
             throw SceneJS_error.fatalError(
-                    SceneJS.errors.ERROR,
-                    "Failed to allocate geometry: " + e);
+                SceneJS.errors.ERROR,
+                "Failed to allocate geometry: " + e);
         }
     };
 
-    SceneJS.Geometry.prototype._updateArray = function(array, items, offset) {
+    SceneJS.Geometry.prototype._updateArray = function (array, items, offset) {
 
         var arrayLen = array.length;
         var itemsLen = items.length;
@@ -421,25 +427,25 @@ new (function() {
             itemsLen -= (itemsLen + offset) - arrayLen;
         }
 
-        for (var i = offset, j = 0; j < itemsLen; i++,j++) {
+        for (var i = offset, j = 0; j < itemsLen; i++, j++) {
             array[i] = items[j];
         }
 
     };
 
-    SceneJS.Geometry.prototype.setAsset = function(assetConfigs) {
-        this._assetConfigs = assetConfigs;
-        var asset = this._asset;
-        if (asset) {
-            asset.setConfigs(assetConfigs);
+    SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
+        this._sourceConfigs = sourceConfigs;
+        var source = this._source;
+        if (source) {
+            source.setConfigs(sourceConfigs);
         }
     };
 
-    SceneJS.Geometry.prototype.getAsset = function() {
-        return this._assetConfigs || {};
+    SceneJS.Geometry.prototype.getSource = function () {
+        return this._sourceConfigs || {};
     };
 
-    SceneJS.Geometry.prototype.setPositions = function(data) {
+    SceneJS.Geometry.prototype.setPositions = function (data) {
         if (data.positions && this._core.vertexBuf) {
             var core = this._core;
             core.vertexBuf.bind();
@@ -449,11 +455,11 @@ new (function() {
         }
     };
 
-    SceneJS.Geometry.prototype.getPositions = function() {
+    SceneJS.Geometry.prototype.getPositions = function () {
         return this._core.arrays ? this._core.arrays.positions : null;
     };
 
-    SceneJS.Geometry.prototype.setNormals = function(data) {
+    SceneJS.Geometry.prototype.setNormals = function (data) {
         if (data.normals && this._core.normalBuf) {
             var core = this._core;
             core.normalBuf.bind();
@@ -463,11 +469,11 @@ new (function() {
         }
     };
 
-    SceneJS.Geometry.prototype.getNormals = function() {
+    SceneJS.Geometry.prototype.getNormals = function () {
         return this._core.arrays ? this._core.arrays.normals : null;
     };
 
-    SceneJS.Geometry.prototype.setColors = function(data) {
+    SceneJS.Geometry.prototype.setColors = function (data) {
         if (data.colors && this._core.colorBuf) {
             var core = this._core;
             core.colorBuf.bind();
@@ -477,15 +483,15 @@ new (function() {
         }
     };
 
-    SceneJS.Geometry.prototype.getColors = function() {
+    SceneJS.Geometry.prototype.getColors = function () {
         return this._core.arrays ? this._core.arrays.colors : null;
     };
 
-    SceneJS.Geometry.prototype.getIndices = function() {
+    SceneJS.Geometry.prototype.getIndices = function () {
         return this._core.arrays ? this._core.arrays.indices : null;
     };
 
-    SceneJS.Geometry.prototype.setUV = function(data) {
+    SceneJS.Geometry.prototype.setUV = function (data) {
         if (data.uv && this._core.colorBuf) {
             var core = this._core;
             core.colorBuf.bind();
@@ -495,11 +501,11 @@ new (function() {
         }
     };
 
-    SceneJS.Geometry.prototype.getUV = function() {
+    SceneJS.Geometry.prototype.getUV = function () {
         return this._core.arrays ? this._core.arrays.uv : null;
     };
 
-    SceneJS.Geometry.prototype.setUV2 = function(data) {
+    SceneJS.Geometry.prototype.setUV2 = function (data) {
         if (data.uv2 && this._core.colorBuf) {
             var core = this._core;
             core.colorBuf.bind();
@@ -509,15 +515,15 @@ new (function() {
         }
     };
 
-    SceneJS.Geometry.prototype.getUV2 = function() {
+    SceneJS.Geometry.prototype.getUV2 = function () {
         return this._core.arrays ? this._core.arrays.uv2 : null;
     };
 
-    SceneJS.Geometry.prototype.getPrimitive = function() {
+    SceneJS.Geometry.prototype.getPrimitive = function () {
         return this.primitive;
     };
 
-    SceneJS.Geometry.prototype.getBoundary = function() {
+    SceneJS.Geometry.prototype.getBoundary = function () {
         if (this._boundary) {
             return this._boundary;
         }
@@ -535,12 +541,12 @@ new (function() {
         }
 
         this._boundary = {
-            xmin : SceneJS_math_MAX_DOUBLE,
-            ymin : SceneJS_math_MAX_DOUBLE,
-            zmin : SceneJS_math_MAX_DOUBLE,
-            xmax : SceneJS_math_MIN_DOUBLE,
-            ymax : SceneJS_math_MIN_DOUBLE,
-            zmax : SceneJS_math_MIN_DOUBLE
+            xmin:SceneJS_math_MAX_DOUBLE,
+            ymin:SceneJS_math_MAX_DOUBLE,
+            zmin:SceneJS_math_MAX_DOUBLE,
+            xmax:SceneJS_math_MIN_DOUBLE,
+            ymax:SceneJS_math_MIN_DOUBLE,
+            zmax:SceneJS_math_MIN_DOUBLE
         };
 
         var x, y, z;
@@ -574,7 +580,7 @@ new (function() {
         return this._boundary;
     };
 
-    SceneJS.Geometry.prototype._compile = function() {
+    SceneJS.Geometry.prototype._compile = function () {
 
         if (this._core._loading) {
             this._compileNodes();
@@ -612,7 +618,7 @@ new (function() {
             this._engine.display.geometry = coreStack[stackLen++] = core;
 
             SceneJS_events.fireEvent(SceneJS_events.OBJECT_COMPILING, { // Pull in state updates from scenes nodes
-                display: this._engine.display
+                display:this._engine.display
             });
 
             this._engine.display.buildObject(this.id); // Use node ID since we may inherit from many cores
@@ -626,16 +632,16 @@ new (function() {
         stackLen--;
     };
 
-    SceneJS.Geometry.prototype._inheritVBOs = function(core) {
+    SceneJS.Geometry.prototype._inheritVBOs = function (core) {
 
         var core2 = {
-            primitive: core.primitive,
-            boundary: core.boundary,
-            normalBuf: core.normalBuf,
-            uvBuf: core.uvBuf,
-            uvBuf2: core.uvBuf2,
-            colorBuf: core.colorBuf,
-            indexBuf: core.indexBuf
+            primitive:core.primitive,
+            boundary:core.boundary,
+            normalBuf:core.normalBuf,
+            uvBuf:core.uvBuf,
+            uvBuf2:core.uvBuf2,
+            colorBuf:core.colorBuf,
+            indexBuf:core.indexBuf
         };
 
         for (var i = stackLen - 1; i >= 0; i--) {
@@ -653,7 +659,7 @@ new (function() {
         return core2;
     };
 
-    SceneJS.Geometry.prototype._destroy = function() {
+    SceneJS.Geometry.prototype._destroy = function () {
 
         this._engine.display.removeObject(this.id);
 
@@ -663,13 +669,13 @@ new (function() {
 
             this._destroyNodeCore();
 
-            if (this._asset) {
-                this._asset.destroy();
+            if (this._source) {
+                this._source.destroy();
             }
         }
     };
 
-    SceneJS.Geometry.prototype._destroyNodeCore = function() {
+    SceneJS.Geometry.prototype._destroyNodeCore = function () {
 
         if (document.getElementById(this._engine.canvas.canvasId)) { // Context won't exist if canvas has disappeared
 

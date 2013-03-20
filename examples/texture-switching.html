@@ -52,11 +52,11 @@
 
 <script src="../build/scenejs.js"></script>
 
-<!-- Plugins for "box" geometry asset type -->
+<!-- Plugins for "box" geometry source type -->
 
 <script src="../plugins/geometry/scenejs.box.js"></script>
 
-<!-- Plugins for "video" texture asset type -->
+<!-- Plugins for "video" texture source type -->
 
 <script src="../plugins/texture/scenejs.texture.js"></script>
 
@@ -124,7 +124,7 @@ SceneJS.createScene({
 
                                             layers: [
                                                 {
-                                                    asset: {
+                                                    source: {
                                                         type: "image",
                                                         src: "textures/superman.jpg"
                                                     },
@@ -150,7 +150,7 @@ SceneJS.createScene({
                                                                 {
                                                                     type: "geometry",
 
-                                                                    asset: {
+                                                                    source: {
                                                                         type: "box"
                                                                     }
                                                                 }
@@ -260,7 +260,7 @@ var TextureSwitcher = function() {
         textureNode.setLayers({
 
             "0": { // Texture layer 0
-                asset: {
+                source: {
                     src: "textures/superman.jpg"
                 }
             }
@@ -273,7 +273,7 @@ var TextureSwitcher = function() {
         textureNode.setLayers({
 
             "0": { // Texture layer 0
-                asset: {
+                source: {
                     src: "textures/general-zod.jpg"
                 }
             }

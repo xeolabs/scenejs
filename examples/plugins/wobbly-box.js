@@ -1,6 +1,6 @@
 SceneJS.Plugins.addPlugin(
 
-        SceneJS.Plugins.GEO_ASSET_PLUGIN,
+        SceneJS.Plugins.GEO_SOURCE_PLUGIN,
 
         "wobblyBox",
 
@@ -11,7 +11,7 @@ SceneJS.Plugins.addPlugin(
             /**
              * Returns a new geometry factory
              */
-            this.getAsset = function () {
+            this.getSource = function () {
 
                 var wasCreated = false;
                 var created;
