@@ -50,185 +50,168 @@ new (function () {
                         "geometry config expected: source.type");
                 }
 
-                var sourceService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.GEO_SOURCE_PLUGIN, this._sourceConfigs.type);
+                SceneJS.Plugins.getPlugin(
+                    "geometry",
+                    this._sourceConfigs.type,
+                    function (plugin) {
 
-                if (!sourceService) {
-                    throw SceneJS_error.fatalError(
-                        SceneJS.errors.PLUGIN_INVALID,
-                        "geometry: no plugin installed for geometry source type '" + this._sourceConfigs.type + "'.");
-                }
-
-                if (!sourceService.getSource) {
-                    throw SceneJS_error.fatalError(
-                        SceneJS.errors.PLUGIN_INVALID,
-                        "geometry: 'getSource' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'.");
-                }
-
-                this._source = sourceService.getSource();
-
-                if (!this._source.onUpdate) {
-                    throw SceneJS_error.fatalError(
-                        SceneJS.errors.PLUGIN_INVALID,
-                        "geometry: 'onUpdate' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'");
-                }
-
-                this._source.onCreate(// Get notification when source creates the geometry
-                    function (data) { // Data contains both typed arrays and primitive name
-
-                        if (options) { // HACK - should apply this on GPU
-                            data.positions = data.positions
-                                ? new Float32Array((options.scale || options.origin)
-                                ? self._applyOptions(data.positions, options)
-                                : data.positions) : undefined;
+                        if (!plugin.getSource) {
+                            throw SceneJS_error.fatalError(
+                                SceneJS.errors.PLUGIN_INVALID,
+                                "geometry: 'getSource' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'.");
                         }
 
-                        self._initNodeCore(data);
+                        self._source = plugin.getSource();
 
-                        SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
+                        if (!self._source.onUpdate) {
+                            throw SceneJS_error.fatalError(
+                                SceneJS.errors.PLUGIN_INVALID,
+                                "geometry: 'onUpdate' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'");
+                        }
 
-                        self._core._loading = false;
-                        self._fireEvent("loaded");
+                        self._source.onCreate(// Get notification when source creates the geometry
+                            function (data) { // Data contains both typed arrays and primitive name
 
-                        self._engine.display.imageDirty = true;
+                                if (options) { // HACK - should apply this on GPU
+                                    data.positions = data.positions
+                                        ? new Float32Array((options.scale || options.origin)
+                                        ? self._applyOptions(data.positions, options)
+                                        : data.positions) : undefined;
+                                }
 
-                        self._engine.branchDirty(self); // TODO
-                    });
+                                self._initNodeCore(data);
 
-                if (this._source.onUpdate) {
-                    this._source.onUpdate(// Reload core arrays from factory updates to the geometry
-                        function (data) {
+                                SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
 
-                            var core = self._core;
+                                self._core._loading = false;
+                                self._fireEvent("loaded");
 
-                            if (data.positions && core.vertexBuf) {
+                                self._engine.display.imageDirty = true;
+
+                                self._engine.branchDirty(self); // TODO
+                            });
+
+                        if (self._source.onUpdate) {
+                            self._source.onUpdate(// Reload core arrays from factory updates to the geometry
+                                function (data) {
+
+                                    var core = self._core;
+
+                                    if (data.positions && core.vertexBuf) {
 
 //                                    if (data.positions.length > core.vertexBuf.length) {
 //                                        alert("too long");
 //                                    }
 
-                                core.vertexBuf.bind();
-                                core.vertexBuf.setData(data.positions, data.positionsOffset || 0);
+                                        core.vertexBuf.bind();
+                                        core.vertexBuf.setData(data.positions, data.positionsOffset || 0);
 
-                                if (data.positions.length > core.arrays.positions.length) {
-                                    core.arrays.positions = data.positions;
+                                        if (data.positions.length > core.arrays.positions.length) {
+                                            core.arrays.positions = data.positions;
 
-                                } else {
-                                    core.arrays.positions.set(data.positions, data.positionsOffset || 0);
-                                }
-                            }
-
-                            if (data.normals && core.normalBuf) {
-
-                                core.normalBuf.bind();
-                                core.normalBuf.setData(data.normals, data.normalsOffset || 0);
-
-                                if (data.normals.length > core.arrays.normals.length) {
-                                    core.arrays.normals = data.normals;
-
-                                } else {
-                                    core.arrays.normals.set(data.normals, data.normalsOffset || 0);
-                                }
-                            }
-
-                            if (data.uv && core.uvBuf) {
-
-                                core.uvBuf.bind();
-                                core.uvBuf.setData(data.uv, data.uvOffset || 0);
-
-                                if (data.uv.length > core.arrays.uv.length) {
-                                    core.arrays.uv = data.uv;
-
-                                } else {
-                                    core.arrays.uv.set(data.uv, data.uvOffset || 0);
-                                }
-                            }
-
-                            if (data.uv2 && core.uvBuf2) {
-
-                                core.uvBuf2.bind();
-                                core.uvBuf2.setData(data.uv2, data.uv2Offset || 0);
-
-                                if (data.uv2.length > core.arrays.uv2.length) {
-                                    core.arrays.uv2 = data.uv2;
-
-                                } else {
-                                    core.arrays.uv2.set(data.uv2, data.uv2Offset || 0);
-                                }
-                            }
-
-                            if (data.colors && core.colorBuf) {
-
-                                if (data.colors.length > core.arrays.colors.length) {
-                                    core.arrays.colors = data.colors;
-
-                                } else {
-                                    core.arrays.colors.set(data.colors, data.colorsOffset || 0);
-                                }
-
-                                core.colorBuf.bind();
-                                core.colorBuf.setData(data.colors, data.colorsOffset || 0);
-                            }
-
-                            if (data.indices && core.indexBuf) {
-
-                                if (data.indices.length > core.arrays.indices.length) {
-                                    core.arrays.indices = data.indices;
-
-                                } else {
-                                    core.arrays.indices.set(data.indices, data.indicesOffset || 0);
-                                }
-
-                                core.indexBuf.bind();
-                                core.indexBuf.setData(data.indices, data.indicesOffset || 0);
-
-                                for (var i = 0; i < data.indices.length; i++) {
-                                    var idx = data.indices[i];
-                                    if (idx < 0 || idx >= core.arrays.positions.length) {
-                                        alert("out of range ");
+                                        } else {
+                                            core.arrays.positions.set(data.positions, data.positionsOffset || 0);
+                                        }
                                     }
-                                    if (core.arrays.normals && (idx < 0 || idx >= core.arrays.normals.length)) {
-                                        alert("out of range ");
+
+                                    if (data.normals && core.normalBuf) {
+
+                                        core.normalBuf.bind();
+                                        core.normalBuf.setData(data.normals, data.normalsOffset || 0);
+
+                                        if (data.normals.length > core.arrays.normals.length) {
+                                            core.arrays.normals = data.normals;
+
+                                        } else {
+                                            core.arrays.normals.set(data.normals, data.normalsOffset || 0);
+                                        }
                                     }
-                                    if (core.arrays.uv && (idx < 0 || idx >= core.arrays.uv.length)) {
-                                        alert("out of range ");
+
+                                    if (data.uv && core.uvBuf) {
+
+                                        core.uvBuf.bind();
+                                        core.uvBuf.setData(data.uv, data.uvOffset || 0);
+
+                                        if (data.uv.length > core.arrays.uv.length) {
+                                            core.arrays.uv = data.uv;
+
+                                        } else {
+                                            core.arrays.uv.set(data.uv, data.uvOffset || 0);
+                                        }
                                     }
-                                    if (core.arrays.uv2 && (idx < 0 || idx >= core.arrays.uv2.length)) {
-                                        alert("out of range ");
+
+                                    if (data.uv2 && core.uvBuf2) {
+
+                                        core.uvBuf2.bind();
+                                        core.uvBuf2.setData(data.uv2, data.uv2Offset || 0);
+
+                                        if (data.uv2.length > core.arrays.uv2.length) {
+                                            core.arrays.uv2 = data.uv2;
+
+                                        } else {
+                                            core.arrays.uv2.set(data.uv2, data.uv2Offset || 0);
+                                        }
                                     }
-                                    if (core.arrays.colors && (idx < 0 || idx >= core.arrays.colors.length)) {
-                                        alert("out of range ");
+
+                                    if (data.colors && core.colorBuf) {
+
+                                        if (data.colors.length > core.arrays.colors.length) {
+                                            core.arrays.colors = data.colors;
+
+                                        } else {
+                                            core.arrays.colors.set(data.colors, data.colorsOffset || 0);
+                                        }
+
+                                        core.colorBuf.bind();
+                                        core.colorBuf.setData(data.colors, data.colorsOffset || 0);
                                     }
-                                }
-                            }
 
+                                    if (data.indices && core.indexBuf) {
 
-                            self._engine.display.imageDirty = true;
-                        });
-                }
+                                        if (data.indices.length > core.arrays.indices.length) {
+                                            core.arrays.indices = data.indices;
 
-                this._core._loading = true;
+                                        } else {
+                                            core.arrays.indices.set(data.indices, data.indicesOffset || 0);
+                                        }
 
-                this._fireEvent("loading");
+                                        core.indexBuf.bind();
+                                        core.indexBuf.setData(data.indices, data.indicesOffset || 0);
 
-                this._source.setConfigs(this._sourceConfigs);
+                                        for (var i = 0; i < data.indices.length; i++) {
+                                            var idx = data.indices[i];
+                                            if (idx < 0 || idx >= core.arrays.positions.length) {
+                                                alert("out of range ");
+                                            }
+                                            if (core.arrays.normals && (idx < 0 || idx >= core.arrays.normals.length)) {
+                                                alert("out of range ");
+                                            }
+                                            if (core.arrays.uv && (idx < 0 || idx >= core.arrays.uv.length)) {
+                                                alert("out of range ");
+                                            }
+                                            if (core.arrays.uv2 && (idx < 0 || idx >= core.arrays.uv2.length)) {
+                                                alert("out of range ");
+                                            }
+                                            if (core.arrays.colors && (idx < 0 || idx >= core.arrays.colors.length)) {
+                                                alert("out of range ");
+                                            }
+                                        }
+                                    }
 
-            } else if (params.create instanceof Function) {
+                                    self._engine.display.imageDirty = true;
+                                });
+                        }
 
-                /*---------------------------------------------------------------------------------------------------
-                 * Build node core from JSON arrays and primitive name returned by factory function
-                 *--------------------------------------------------------------------------------------------------*/
+                        self._core._loading = true;
 
-                var json = params.create();
+                        self._fireEvent("loading");
 
-                this._initNodeCore(json, options);
-
-                SceneJS.Geometry._buildNodeCore(this._engine.canvas.gl, this._core);
+                        self._source.setConfigs(self._sourceConfigs);
+                    });
 
             } else {
 
-                /*---------------------------------------------------------------------------------------------------
-                 * Build node core from JSON arrays and primitive name given in node properties
-                 *--------------------------------------------------------------------------------------------------*/
+                // Build node core from JSON arrays and primitive name given in node properties
 
                 this._initNodeCore(params, options);
 

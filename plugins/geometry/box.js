@@ -8,9 +8,8 @@
  */
 SceneJS.Plugins.addPlugin(
 
-        SceneJS.Plugins.GEO_SOURCE_PLUGIN, // This is a geometry source factory plugin
-
-        "box", // Type of source created by this plugin
+        "geometry", // Node type
+        "box", // Plugin type
 
         new (function() {
 

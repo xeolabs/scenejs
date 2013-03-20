@@ -3,6 +3,10 @@ arcticulated and pickable objects as required for high-detail visualisation appl
 
 V3.0 is a major rewrite of V2.0
 
+## Downloads
+
+* **[Latest build](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
+
 ## Examples
 
 ### Basic
@@ -67,12 +71,12 @@ risus. Phasellus ac nisi vel est aliquet scelerisque. Vivamus accumsan hendrerit
 
 ### Texture
 
-* **[video](http://xeolabs.github.com/scenejs/build/plugins/geometry/box.js)**
+* **[video](build/plugins/geometry/box.js)**
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam id dolor sed tortor hendrerit imperdiet. Nullam tincidunt
 augue sed nisl varius placerat. Maecenas metus nibh, dignissim fringilla adipiscing ut, luctus nec nunc. Nam et accumsan
 risus. Phasellus ac nisi vel est aliquet scelerisque. Vivamus accumsan hendrerit dolor, eget eleifend velit aliquam nec.
 
-* **[canvas](http://xeolabs.github.com/scenejs/build/plugins/geometry/sphere.js)**
+* **[canvas](build/plugins/geometry/sphere.js)**
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam id dolor sed tortor hendrerit imperdiet. Nullam tincidunt
 augue sed nisl varius placerat. Maecenas metus nibh, dignissim fringilla adipiscing ut, luctus nec nunc. Nam et accumsan
 risus. Phasellus ac nisi vel est aliquet scelerisque. Vivamus accumsan hendrerit dolor, eget eleifend velit aliquam nec.

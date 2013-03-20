@@ -8,8 +8,7 @@
  */
 SceneJS.Plugins.addPlugin(
 
-    SceneJS.Plugins.GEO_SOURCE_PLUGIN,
-
+    "geometry", // Node type
     "sphere",
 
     new (function() {

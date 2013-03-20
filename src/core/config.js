@@ -45,7 +45,7 @@ var SceneJS_debugModule = new (function() {
 
 /** Sets configurations.
  */
-SceneJS.setConfigs = SceneJS.setDebugConfigs = function () {
+SceneJS.configure = SceneJS.setConfigs = SceneJS.setDebugConfigs = function () {
     if (arguments.length == 1) {
         SceneJS_debugModule.setConfigs(null, arguments[0]);
     } else if (arguments.length == 2) {
