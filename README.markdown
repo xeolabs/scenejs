@@ -5,7 +5,10 @@ V3.0 is a major rewrite of V2.0
 
 ## Downloads
 
-* **[Latest build](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
+### Latest
+
+* **[scenejs.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
+* **[scenejs.min.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.min.js)**
 
 ## Examples
 
