@@ -116,7 +116,7 @@
         var light = this._core.lights[index] || (this._core.lights[index] = []);
 
         var mode = cfg.mode || "dir";
-        if (mode != "dir" && mode != "point") {
+        if (mode != "dir" && mode != "point" && mode != "ambient") {
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
                 "Light mode not supported - should be 'dir' or 'point' or 'ambient'");
