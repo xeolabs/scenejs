@@ -14,7 +14,7 @@ override them where you need specialised functionality.
 Though this first example has a few nodes (camera, lights and material) that could be omitted to fall back on defaults,
 it shows just to give a sense of what nodes play a part in a scene.
 
-* **[Newell Teapot](http://xeolabs.github.com/scenejs/examples/basic/teapot.html)** - [[source]](examples/basic/teapot.html)
+* **[Newell Teapot](http://xeolabs.github.com/scenejs/examples/ex/basic/teapot.html)** - [[source]](examples/ex/basic/teapot.html)
 
 ### Geometry
 
