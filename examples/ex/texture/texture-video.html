@@ -1,27 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>SceneJS V3 Video Texture</title>
+    <title>SceneJS V3 Example</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 </head>
 <body>
 
-<!-- SceneJS engine -->
+<script src="../../../build/scenejs.js"></script>
+<script src="../../../plugins/geometry/scenejs.box.js"></script>
+<script src="../../../plugins/texture/scenejs.video.js"></script>
 
-<script src="../build/scenejs.js"></script>
-
-<!-- Plugins for "box" geometry source type -->
-
-<script src="../plugins/geometry/scenejs.box.js"></script>
-
-<!-- Plugins for "video" texture source type -->
-
-<script src="../plugins/texture/scenejs.video.js"></script>
-
-<!-- Utility function that binds mouse to certain rotate nodes - just using this to cut down example maintenance -->
-
-<script src="libs/mouseOrbitUtility.js"></script>
+<script src="../../libs/mouseOrbitUtility.js"></script>
 
 <script>
 
@@ -29,8 +19,7 @@
         nodes:[
             {
                 type:"lookAt",
-                eye:{ x:0.0, y:0.0, z:10},
-
+                eye:{ x:0.0, y:0.0, z:10 },
                 nodes:[
                     {
                         type:"texture",
@@ -39,25 +28,21 @@
                                 source:{
                                     type:"video",
                                     src:"movies/bunny.ogg"
-                                },
-                                blendMode:"add"
+                                }
                             }
                         ],
-
                         nodes:[
                             {
                                 type:"rotate",
                                 id:"pitch",
                                 angle:-30.0,
                                 x:1.0,
-
                                 nodes:[
                                     {
                                         type:"rotate",
                                         id:"yaw",
                                         angle:-30.0,
                                         y:1.0,
-
                                         nodes:[
                                             {
                                                 type:"geometry",
@@ -79,7 +64,6 @@
     scene.start();
 
     mouseOrbitUtility(scene);
-
 
 </script>
 </body>

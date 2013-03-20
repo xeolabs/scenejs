@@ -9,15 +9,15 @@
 
 <!-- SceneJS engine -->
 
-<script src="../build/scenejs.js"></script>
+<script src="../../../build/scenejs.js"></script>
 
 <!-- Plugins for "box" geometry source type -->
 
-<script src="../plugins/geometry/scenejs.box.js"></script>
+<script src="../../../plugins/geometry/scenejs.box.js"></script>
 
 <!-- Utility function that binds mouse to certain rotate nodes - just using this to cut down example maintenance -->
 
-<script src="libs/mouseOrbitUtility.js"></script>
+<script src="../../libs/mouseOrbitUtility.js"></script>
 
 <script>
 
@@ -45,57 +45,27 @@
                                 nodes:[
 
                                     // Texture with colour and bump map layers
+                                    // A texture can have multiple layers, each applying a map to a different material
+                                    // or geometry component.
                                     {
                                         type:"texture",
-
-                                        // A texture can have multiple layers, each applying an
-                                        // image to a different material or geometry component.
-
                                         layers:[
 
-                                            // Our first texture layer is applied to the baseColor of our material.
+                                            // First layer is a color map, applied to the current material baseColor
                                             {
                                                 uri:"textures/pattern.jpg",
-                                                minFilter:"linear",
-                                                magFilter:"linear",
                                                 wrapS:"repeat",
                                                 wrapT:"repeat",
-                                                isDepth:false,
-                                                depthMode:"luminance",
-                                                depthCompareMode:"compareRToTexture",
-                                                depthCompareFunc:"lequal",
-                                                flipY:false,
-                                                width:1,
-                                                height:1,
-                                                internalFormat:"lequal",
-                                                sourceFormat:"alpha",
-                                                sourceType:"unsignedByte",
-                                                applyTo:"baseColor",
-                                                blendMode:"multiply"
+                                                applyTo:"baseColor" // Default value
                                             },
 
-                                            // Our second layer texture is the bump map, and is applied to
-                                            // our geometry node's normal vectors.
+                                            // Second layer is the bump map, applied to the geometry's normals
                                             {
                                                 uri:"textures/normal_map.jpg",
-                                                minFilter:"linear",
-                                                magFilter:"linear",
                                                 wrapS:"repeat",
                                                 wrapT:"repeat",
-                                                isDepth:false,
-                                                depthMode:"luminance",
-                                                depthCompareMode:"compareRToTexture",
-                                                depthCompareFunc:"lequal",
-                                                flipY:false,
-                                                width:1,
-                                                height:1,
-                                                internalFormat:"lequal",
-                                                sourceFormat:"alpha",
-                                                sourceType:"unsignedByte",
-                                                applyTo:"normals",
-                                                blendMode:"multiply"
+                                                applyTo:"normals"
                                             }
-
                                         ],
 
                                         nodes:[

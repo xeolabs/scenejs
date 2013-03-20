@@ -14,17 +14,21 @@ override them where you need specialised functionality.
 Though this first example has a few nodes (camera, lights and material) that could be omitted to fall back on defaults,
 it shows just to give a sense of what nodes play a part in a scene.
 
-* **[Newell teapot](http://xeolabs.github.com/scenejs/examples/teapot.html)** - [[source]](examples/teapot.html)
+* **[Newell Teapot](http://xeolabs.github.com/scenejs/examples/teapot.html)** - [[source]](examples/teapot.html)
 
 ### Geometry
 
-* **[Custom mesh](http://xeolabs.github.com/scenejs/examples/geometry-custom.html)** - [[source]](examples/geometry-custom.html)
+* **[Custom Mesh](http://xeolabs.github.com/scenejs/examples/geometry-custom.html)** - [[source]](examples/geometry-custom.html)
+* **[Vertex Colouring](http://xeolabs.github.com/scenejs/examples/geometry-custom-vertex-colors.html)** - [[source]](examples/geometry-vertex-colors.html)
 
-* **[Vertex colouring](http://xeolabs.github.com/scenejs/examples/geometry-custom-vertex-colors.html)** - [[source]](examples/geometry-vertex-colors.html)
+### Texture
 
-### Optimisation Techniques
+* **[Bump Mapping](http://xeolabs.github.com/scenejs/examples/ex/texture/texture-bump-map.html)** - [[source]](examples/ex/texture/texture-bump-mapp.html)
+* **[Video Texture](http://xeolabs.github.com/scenejs/examples/ex/texture/texture-video.html)** - [[source]](examples/ex/texture/texture-video.html)
+* **[Multitexturing](http://xeolabs.github.com/scenejs/examples/ex/texture/texture-layers.html)** - [[source]](examples/ex/texture/texture-layers.html)
+* **[Texture Animation](http://xeolabs.github.com/scenejs/examples/ex/texture/texture-animation.html)** - [[source]](examples/ex/texture/texture-animation.html)
 
-SceneJS is designed to support various scene optimisation techniques
+### Supported Scene Optimisation Techniques
 
 * **[Texture Atlas](http://xeolabs.github.com/scenejs/examples/texture-atlas.html)** - [[source]](examples/texture-atlas.html)
  A texture atlas is a large image that contains many sub-images, each of which is used as a texture for a different geometry,

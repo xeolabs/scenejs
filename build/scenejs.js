@@ -10941,7 +10941,7 @@ new (function() {
                     texture: null,
                     applyFrom: layerParams.applyFrom || "uv",
                     applyTo: layerParams.applyTo || "baseColor",
-                    blendMode: layerParams.blendMode || "add",
+                    blendMode: layerParams.blendMode || "multiply",
                     blendFactor: (layerParams.blendFactor != undefined && layerParams.blendFactor != null) ? layerParams.blendFactor : 1.0,
                     translate: { x:0, y: 0},
                     scale: { x: 1, y: 1 },
