@@ -15,7 +15,7 @@ arcticulated and pickable objects as required for high-detail visualisation appl
 
 ## Downloads
 
-You can hotlink to these binaries and they will dynamically [load plugins on demand](plugin-system) from this repository as you need them.
+You can hotlink to these binaries and they will dynamically [load plugins on demand](plugin-system) from this repository as required.
 
 ### Latest
 
@@ -102,3 +102,35 @@ so SceneJS takes an alternative approach with "node cores", a concept borrowed f
 
 ## Plugin System
 
+SceneJS now uses plugins for non-core things like geometry primitives (box, teapot, text etc.) and fancy texture functionality
+(video etc).
+
+Plugins are used from within node definitions, like this:
+
+```javascript
+ myNode.addNode({
+    type:"geometry",
+    plugin:{
+        type:"sphere",
+        latitudeBands : 30,
+        longitudeBands : 30,
+        radius : 2
+    }
+ });
+```
+
+When SceneJS adds this node, it's going to dynamically load a plugin from [./plugins/geometry/sphere.js](plugins/geometry/sphere.js),
+ which happens to be a factory that creates sphere primitives.
+
+ By default, SceneJS is hardwired to download plugins from [a directory in this repository](build/latest/plugins). This means you can
+ just hotlink to the SceneJS core library downloads and they will download the plugins automatically as you need them. That's
+ nice for putting SceneJS examples on code sharing sites like jsFiddle.
+
+ However, if you'd rather load them off your own server, grab a copy of the plugins and configure SceneJS to load them
+   from there:
+
+ ```javascript
+ SceneJS.configure({
+     pluginPath: "./foo/myPluginsDir"
+ });
+ ```
