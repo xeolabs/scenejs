@@ -22,15 +22,16 @@ arcticulated and pickable objects as required for high-detail visualisation appl
 
 ## What's new in V3
 
-Though V2 was released a year previously, V3 has since been under active development in the context of several
-applications. V3 is an 80% rewrite that introduces some major enhancements:
+Though V2 was released a year prior, V3 has since been under active development in the context of several
+apps currently in production. V3 has some major enhancements, including:
 
-* architecture review followed by rewrite of 80% of the codebase
-* lots of JS object pooling to minimise the impact of garbage collection on FPS
+* many more defaults, resulting in simpler scene definitions
 * seamless recovery from lost WebGL context
+* an architecture review followed by a 70% rewrite
+* lots of JS object pooling, to minimise the impact of garbage collection on FPS
 * a swish new plugin system
 
-Check out the examples below for info on the new features.
+Check out the examples below for more info.
 
 ## Documentation
 
