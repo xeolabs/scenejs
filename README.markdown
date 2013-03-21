@@ -2,7 +2,7 @@
 arcticulated and pickable objects as required for high-detail visualisation applications.
 
 
-## Contents
+# Contents
 * [Downloads](#downloads)
 * [What's new in V3](#downloads)
 * [Examples](#examples)
@@ -13,14 +13,14 @@ arcticulated and pickable objects as required for high-detail visualisation appl
  * [Nodes](#nodes)
 * [Plugin System](#plugin-system)
 
-## Downloads
+# Downloads
 
 ### Latest
 
 * **[scenejs.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
 * **[scenejs.min.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.min.js)**
 
-## What's new in V3
+# What's new in V3
 
 Though V2 was released a year prior, V3 has since been under active development in the context of several
 apps currently in production. V3 has some major enhancements, including:
@@ -33,14 +33,14 @@ apps currently in production. V3 has some major enhancements, including:
 
 Check out the examples below for more info.
 
-## Documentation
+# Documentation
 
 * **[Class Docs](http://xeolabs.github.com/scenejs/docs/index.html)** -
 Documentation in progress for the SceneJS class API, which is the core implementation beneath the JSON API. You can use this
 to build scenes programmatically, instead of declaratively with JSON as shown in the examples. You would also use this API when
    when manipulating nodes (even they were defined with JSON).
 
-## Examples
+# Examples
 
 ### Basic
 
@@ -98,5 +98,5 @@ Traditionally, re-use within a scene graph is done by attaching nodes to multipl
 scenes this can have a performance impact when the engine must traverse multiple parent paths in the scene graph,
 so SceneJS takes an alternative approach with "node cores", a concept borrowed from OpenSG.
 
-## Plugin System
+# Plugin System
 
