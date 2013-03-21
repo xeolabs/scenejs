@@ -36,20 +36,21 @@ it shows just to give a sense of what nodes play a part in a scene.
 SceneJS provides default ambient and directional lights, but you can override these with your own.
 
 Directional and positional lights can be defined in either World space, where they move relative to changes in viewpoint,
- or in View space, where they are fixed in alignment with the view frustum as if they were moving with us like
- lights on a helmet.
+ or in View space, where they are fixed in alignment with the view frustum as if they were moving with the viewpoint like
+ lights on a helmet. The maximum number of lights is only limited by the number of ```vars``` supported by your GPU,
+ and a modern one should support at least 4-6.
 
-The maximum number of lights allowed is limited by the number of ```vars``` supported by your GPU, and a modern one should support
-at least 4-6 lights. Only one ambient light should be used.
-
-* **[Ambient](http://xeolabs.github.com/scenejs/examples/ex/lighting/ambient.html)** - [[source]](examples/ex/lighting/ambient.html)
+* **[Ambient Light](http://xeolabs.github.com/scenejs/examples/ex/lighting/ambient.html)** - [[source]](examples/ex/lighting/ambient.html)
 * **[World-Space Directional Light](http://xeolabs.github.com/scenejs/examples/ex/lighting/directional-world.html)** - [[source]](examples/ex/lighting/directional-world.html)
 * **[View-Space Directional Light](http://xeolabs.github.com/scenejs/examples/ex/lighting/directional-view.html)** - [[source]](examples/ex/lighting/directional-view.html)
 
 ### Geometry
-
-* **[Custom Mesh](http://xeolabs.github.com/scenejs/examples/ex/geometry/geometry-custom.html)** - [[source]](examples/ex/geometry/geometry-custom.html)
+Many of the examples here use plugins that create geometric primitives like cubes and teapots, but you can also manually
+ define your own meshes, line segments and points.
+* **[Custom Mesh](http://xeolabs.github.com/scenejs/examples/ex/geometry/geometry-custom.html)** - [[source]](examples/ex/geometry/geometry-custom.html) -
+A cube geometry complete with positions, normals and UVs and a color map texture.
 * **[Vertex Colouring](http://xeolabs.github.com/scenejs/examples/ex/geometry/geometry-vertex-colors.html)** - [[source]](examples/ex/geometry/geometry-vertex-colors.html)
+- Another cube geometry, but this time with vertex colors.
 
 ### Texture
 
