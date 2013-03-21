@@ -3,8 +3,8 @@ function mouseOrbitUtility(scene) {
 
 // Get handles to scene nodes
 
-    var xeyeNode = scene.getNode("xeye");
-    var yeyeNode = scene.getNode("yeye");
+    var yawNode = scene.getNode("yaw");
+    var pitchNode = scene.getNode("pitch");
 
 // Rotate with mouse drags
 
@@ -13,8 +13,8 @@ function mouseOrbitUtility(scene) {
     var dragging = false;
 
     var newInput = false;
-    var xeye = 0;
-    var yeye = 0;
+    var yaw = 0;
+    var pitch = 0;
 
     var canvas = scene.getCanvas();
 
@@ -53,14 +53,14 @@ function mouseOrbitUtility(scene) {
     function actionMove(posX, posY) {
         if (dragging) {
 
-            xeye += (posX - lastX) * 0.5;
-            yeye += (posY - lastY) * 0.5;
+            yaw += (posX - lastX) * 0.5;
+            pitch += (posY - lastY) * 0.5;
 
             lastX = posX;
             lastY = posY;
 
-            xeyeNode.set("angle", xeye);
-            yeyeNode.set("angle", yeye);
+            yawNode.set("angle", yaw);
+            pitchNode.set("angle", pitch);
         }
     }
 
