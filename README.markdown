@@ -15,6 +15,8 @@ arcticulated and pickable objects as required for high-detail visualisation appl
 
 ## Downloads
 
+You can hotlink to these binaries and they will dynamically [load plugins on demand](plugin-system) from this repository as you need them.
+
 ### Latest
 
 * **[scenejs.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
