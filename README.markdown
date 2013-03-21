@@ -1,26 +1,17 @@
 **SceneJS 3.0** is an open-source 3D engine on WebGL that's geared towards rendering large numbers of individually
 arcticulated and pickable objects as required for high-detail visualisation applications.
 
-Though V2 was released over a year previous, V3 has been under active development in the context of several
-applications that are based on it. In fact, V3 is an 80% rewrite that introduces some serious enhancements, such
-as:
-
-* minimised garbage collection using object pools
-* efficient scene update/restructure
-* a swish new plugin system
-
-Check out the examples below for info on the new features.
 
 ## Contents
-* [Downloads]()
-* [Examples]()
- * [Basic]()
- * [Geometry]()
- * [Texture]()
- * [Supported Scene Optimization Techniques]()
-* [Plugin System]()
-
-
+* [Downloads](#downloads)
+* [What's new in V3](#downloads)
+* [Examples](#examples)
+ * [Basic](#basic)
+ * [Lighting](#lighting)
+ * [Geometry](#geometry)
+ * [Texture](#texture)
+ * [Supported Scene Optimization Techniques]($supported-scene-optimization-techniques)
+* [Plugin System](#plugin-system)
 
 ## Downloads
 
@@ -28,6 +19,18 @@ Check out the examples below for info on the new features.
 
 * **[scenejs.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
 * **[scenejs.min.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.min.js)**
+
+## What's new in V3
+
+Though V2 was released a year previously, V3 has since been under active development in the context of several
+applications. V3 is an 80% rewrite that introduces some major enhancements:
+
+* architecture review followed by rewrite of 80% of the codebase
+* lots of JS object pooling to minimise the impact of garbage collection on FPS
+* seamless recovery from lost WebGL context
+* a swish new plugin system
+
+Check out the examples below for info on the new features.
 
 ## Documentation
 
