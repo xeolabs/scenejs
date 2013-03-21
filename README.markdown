@@ -30,7 +30,10 @@ override them where you need specialised functionality.
 Though this first example has a few nodes (camera, lights and material) that could be omitted to fall back on defaults,
 it shows just to give a sense of what nodes play a part in a scene.
 
-* **[Newell Teapot](http://xeolabs.github.com/scenejs/examples/ex/basic/teapot.html)** - [[source]](examples/ex/basic/teapot.html)
+* **[Newell Teapot](http://xeolabs.github.com/scenejs/examples/ex/basic/teapot.html)** - [[source]](examples/ex/basic/teapot.html) -
+A simple scene showing the ```lookat```, ```camera```, ```lights``` and ```material``` nodes that SceneJS will
+provide by default.
+
 
 ### Lighting
 SceneJS provides default ambient and directional lights, but you can override these with your own.
@@ -45,12 +48,12 @@ Directional and positional lights can be defined in either World space, where th
 * **[View-Space Directional Light](http://xeolabs.github.com/scenejs/examples/ex/lighting/directional-view.html)** - [[source]](examples/ex/lighting/directional-view.html)
 
 ### Geometry
-Many of the examples here use plugins that create geometric primitives like cubes and teapots, but you can also manually
- define your own meshes, line segments and points.
+Many of the examples here use plugins to create primitives like cubes and teapots, but you can also manually
+ create your own meshes, line segments and points.
 * **[Custom Mesh](http://xeolabs.github.com/scenejs/examples/ex/geometry/geometry-custom.html)** - [[source]](examples/ex/geometry/geometry-custom.html) -
-A cube geometry complete with positions, normals and UVs and a color map texture.
-* **[Vertex Colouring](http://xeolabs.github.com/scenejs/examples/ex/geometry/geometry-vertex-colors.html)** - [[source]](examples/ex/geometry/geometry-vertex-colors.html)
-- Another cube geometry, but this time with vertex colors.
+A cube geometry complete with positions, normals, UVs and a texture.
+* **[Vertex Colouring](http://xeolabs.github.com/scenejs/examples/ex/geometry/geometry-vertex-colors.html)** - [[source]](examples/ex/geometry/geometry-vertex-colors.html) -
+Another cube geometry, but this time with vertex colors.
 
 ### Texture
 
