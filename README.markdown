@@ -1,7 +1,15 @@
 **SceneJS 3.0** is an open-source 3D engine on WebGL that's geared towards rendering large numbers of individually
 arcticulated and pickable objects as required for high-detail visualisation applications.
 
-V3.0 is a major rewrite of V2.0
+Though V2 was released over a year previous, V3 has been under active development in the context of several
+applications that are based on it. In fact, V3 is an 80% rewrite that introduces some serious enhancements, such
+as:
+
+* minimised garbage collection using object pools
+* efficient scene update/restructure
+* a swish new plugin system
+
+Check out the examples below for info on the new features.
 
 ## Contents
 * [Downloads]()
@@ -10,7 +18,9 @@ V3.0 is a major rewrite of V2.0
  * [Geometry]()
  * [Texture]()
  * [Supported Scene Optimization Techniques]()
-* [Plugins]()
+* [Plugin System]()
+
+
 
 ## Downloads
 
@@ -23,8 +33,8 @@ V3.0 is a major rewrite of V2.0
 
 * **[Class Docs](http://xeolabs.github.com/scenejs/docs/index.html)** -
 Documentation in progress for the SceneJS class API, which is the core implementation beneath the JSON API. You can use this
-to build scenes programmatically, instead of declaratively with JSON as shown in the examples. You would also use it when
-   you are setting or getting state on node objects, even when those were defined with JSON.
+to build scenes programmatically, instead of declaratively with JSON as shown in the examples. You would also use this API when
+   when manipulating nodes (even they were defined with JSON).
 
 ## Examples
 
