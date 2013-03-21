@@ -32,7 +32,7 @@ it shows just to give a sense of what nodes play a part in a scene.
 
 * **[Newell Teapot](http://xeolabs.github.com/scenejs/examples/ex/basic/teapot.html)** - [[source]](examples/ex/basic/teapot.html)
 
-## Lighting
+### Lighting
 SceneJS provides default ambient and directional lights, but you can override these with your own.
 
 Directional and positional lights can be defined in either World space, where they move relative to changes in viewpoint,
