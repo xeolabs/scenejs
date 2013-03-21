@@ -8481,9 +8481,10 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
             color.b != undefined ? color.b : 1.0
         ];
 
+        // Ambient lights hardwired to contribute to diffuse lighting
         light.mode = mode;
-        light.diffuse = (cfg.diffuse != undefined) ? cfg.diffuse : true;
-        light.specular = cfg.specular != undefined ? cfg.specular : true;
+        light.diffuse = (mode == "ambient") ? true : ((cfg.diffuse != undefined) ? cfg.diffuse : true);
+        light.specular = (mode == "ambient") ? false : ((cfg.specular != undefined) ? cfg.specular : true);
         light.pos = cfg.pos ? [ pos.x || 0, pos.y || 0, pos.z || 0 ] : undefined;
         light.dir = cfg.dir ? [dir.x || 0, dir.y || 0, dir.z || 0] : undefined;
         light.constantAttenuation = (cfg.constantAttenuation != undefined) ? cfg.constantAttenuation : 1.0;

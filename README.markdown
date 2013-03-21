@@ -19,6 +19,11 @@ V3.0 is a major rewrite of V2.0
 * **[scenejs.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
 * **[scenejs.min.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.min.js)**
 
+## Documentation
+
+* **[Class Documentation](docs/index.html)** -
+Documentation (in progress!) for the class API, generated with JSDoc.
+
 ## Examples
 
 ### Basic
@@ -26,9 +31,6 @@ V3.0 is a major rewrite of V2.0
 SceneJS is based on the [convention over configuration](http://en.wikipedia.org/wiki/Convention_over_configuration)
 paradigm, automatically providing defaults, which allows you to get started quickly then
 override them where you need specialised functionality.
-
-Though this first example has a few nodes (camera, lights and material) that could be omitted to fall back on defaults,
-it shows just to give a sense of what nodes play a part in a scene.
 
 * **[Newell Teapot](http://xeolabs.github.com/scenejs/examples/ex/basic/teapot.html)** - [[source]](examples/ex/basic/teapot.html) -
 A simple scene showing the ```lookat```, ```camera```, ```lights``` and ```material``` nodes that SceneJS will
