@@ -21,8 +21,10 @@ V3.0 is a major rewrite of V2.0
 
 ## Documentation
 
-* **[Class Documentation](docs/index.html)** -
-Documentation (in progress!) for the class API, generated with JSDoc.
+* **[Class Docs](http://xeolabs.github.com/scenejs/docs/index.html)** -
+Documentation in progress for the SceneJS class API, which is the core implementation beneath the JSON API. You can use this
+to build scenes programmatically, instead of declaratively with JSON as shown in the examples. You would also use it when
+   you are setting or getting state on node objects, even when those were defined with JSON.
 
 ## Examples
 
