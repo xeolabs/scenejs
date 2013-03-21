@@ -3,6 +3,15 @@ arcticulated and pickable objects as required for high-detail visualisation appl
 
 V3.0 is a major rewrite of V2.0
 
+## Contents
+* [Downloads]()
+* [Examples]()
+ * [Basic]()
+ * [Geometry]()
+ * [Texture]()
+ * [Supported Scene Optimization Techniques]()
+* [Plugins]()
+
 ## Downloads
 
 ### Latest
@@ -22,6 +31,20 @@ Though this first example has a few nodes (camera, lights and material) that cou
 it shows just to give a sense of what nodes play a part in a scene.
 
 * **[Newell Teapot](http://xeolabs.github.com/scenejs/examples/ex/basic/teapot.html)** - [[source]](examples/ex/basic/teapot.html)
+
+## Lighting
+SceneJS provides default ambient and directional lights, but you can override these with your own.
+
+Directional and positional lights can be defined in either World space, where they move relative to changes in viewpoint,
+ or in View space, where they are fixed in alignment with the view frustum as if they were moving with us like
+ lights on a helmet.
+
+The maximum number of lights allowed is limited by the number of ```vars``` supported by your GPU, and a modern one should support
+at least 4-6 lights. Only one ambient light should be used.
+
+* **[Ambient](http://xeolabs.github.com/scenejs/examples/ex/lighting/ambient.html)** - [[source]](examples/ex/lighting/ambient.html)
+* **[World-Space Directional Light](http://xeolabs.github.com/scenejs/examples/ex/lighting/directional-world.html)** - [[source]](examples/ex/lighting/directional-world.html)
+* **[View-Space Directional Light](http://xeolabs.github.com/scenejs/examples/ex/lighting/directional-view.html)** - [[source]](examples/ex/lighting/directional-view.html)
 
 ### Geometry
 
