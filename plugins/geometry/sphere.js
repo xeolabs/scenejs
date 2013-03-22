@@ -13,8 +13,6 @@ SceneJS.Plugins.addPlugin(
 
     new (function() {
 
-        var sourceService = this;
-
         this.getSource = function () {
 
             var created;
@@ -40,13 +38,13 @@ SceneJS.Plugins.addPlugin(
 
                     if (!wasCreated) {
 
-                        created(sourceService.buildSphere(cfg));
+                        created(buildSphere(cfg));
 
                         wasCreated = true;
 
                     } else {
 
-                        updated(sourceService.buildSphere(cfg));
+                        updated(buildSphere(cfg));
                     }
                 },
 
@@ -59,13 +57,13 @@ SceneJS.Plugins.addPlugin(
             };
         };
 
-        this.buildSphere = function(configs) {
+        function buildSphere(cfg) {
 
             // Thanks awfully to: http://learningwebgl.com/cookbook/index.php/How_to_draw_a_sphere
 
-            var latitudeBands = configs.latitudeBands || 30;
-            var longitudeBands = configs.longitudeBands || 30;
-            var radius = configs.radius || 2;
+            var latitudeBands = cfg.latitudeBands || 30;
+            var longitudeBands = cfg.longitudeBands || 30;
+            var radius = cfg.radius || 2;
 
             var positions = [];
             var normals = [];
@@ -120,5 +118,5 @@ SceneJS.Plugins.addPlugin(
                 uv : new Float32Array(uvs),
                 indices : new Uint16Array(indices)
             };
-        };
+        }
     })());

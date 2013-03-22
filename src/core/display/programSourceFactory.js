@@ -645,6 +645,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
         src.push("uniform bool  SCENEJS_uBackfaceLighting;");
         src.push("uniform bool  SCENEJS_uSpecularLighting;");
         src.push("uniform bool  SCENEJS_uClipping;");
+        src.push("uniform bool  SCENEJS_uAmbient;");
 
         /* True when rendering transparency
          */
@@ -656,7 +657,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
             src.push("varying vec4 SCENEJS_vColor;");
         }
 
-        src.push("uniform vec3  SCENEJS_uAmbient;");                         // Scene ambient colour - taken from clear colour
+        src.push("uniform vec3  SCENEJS_uAmbientColor;");                         // Scene ambient colour - taken from clear colour
 
         src.push("uniform vec3  SCENEJS_uMaterialBaseColor;");
         src.push("uniform float SCENEJS_uMaterialAlpha;");
@@ -665,7 +666,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("  vec3    ambient=SCENEJS_uAmbient;");
+        src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
         src.push("  float   emit    = SCENEJS_uMaterialEmit;");
 
         src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
@@ -925,11 +926,11 @@ var SceneJS_ProgramSourceFactory = new (function() {
 
             src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * color.rgb), alpha);");
             src.push("   } else {");
-            src.push("      fragColor = vec4((color.rgb + (emit * color.rgb)) * ambient.rgb, alpha);");
+            src.push("      fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
             src.push("   }");
 
         } else { // No normals
-            src.push("fragColor = vec4((emit * color.rgb) + (emit * color.rgb), alpha);");
+            src.push("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
         }
 
         if (fragmentHooks.pixelColor) {

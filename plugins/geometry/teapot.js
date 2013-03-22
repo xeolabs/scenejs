@@ -13,12 +13,11 @@ SceneJS.Plugins.addPlugin(
 
     new (function () {
 
-        var sourceService = this;
-
         this.getSource = function () {
 
             var created;
             var updated;
+            var cachedTeapot;  // All teapots are the same, so just reuse the same data
 
             var configs = {};
 
@@ -34,7 +33,7 @@ SceneJS.Plugins.addPlugin(
 
                 setConfigs:function (cfg) {
                     configs = cfg;
-                    created(sourceService.buildTeapot(cfg));
+                    created(cachedTeapot || (cachedTeapot = buildTeapot(cfg)));
                 },
 
                 getConfigs:function () {
@@ -46,7 +45,7 @@ SceneJS.Plugins.addPlugin(
             };
         };
 
-        this.buildTeapot = function (configs) {
+        function buildTeapot(configs) {
             var positions = [
                 [-3.000000, 1.650000, 0.000000],
                 [-2.987110, 1.650000, -0.098438],
@@ -5843,5 +5842,6 @@ SceneJS.Plugins.addPlugin(
                 indices:new Uint16Array(flatten(indices, 3)),
                 normals:new Float32Array(flatten(calculateNormals(positions, indices), 3))
             };
-        };
+        }
+
     })());

@@ -7145,7 +7145,9 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         backfaces: true,            // Show backfaces
         frontface: "ccw",           // Default vertex winding for front face
         backfaceLighting: true,     // Shading enabled for backfaces
-        backfaceTexturing: true     // Texturing enabled for backfaces
+        backfaceTexturing: true,    // Texturing enabled for backfaces
+        specular: true,             // Specular lighting enabled
+        ambient: true               // Ambient lighting enabled
     };
 
     var coreStack = [];
@@ -7177,6 +7179,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             this._core.backfaceLighting = true;  // Shading enabled for backfaces
             this._core.backfaceTexturing = true; // Texturing enabled for backfaces
             this._core.specular = true;          // Specular lighting enabled by default
+            this._core.ambient = true;           // Ambient lighting enabled by default
 
             if (params.flags) {                 // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
@@ -7233,6 +7236,11 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             this._engine.display.imageDirty = true;
         }
 
+        if (flags.ambient != undefined) {
+            core.ambient = !!flags.ambient;
+            this._engine.display.imageDirty = true;
+        }
+
         return this;
     };
 
@@ -7259,7 +7267,8 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             transparent: core.transparent,
             backfaces: core.backfaces,
             frontface: core.frontface,
-            specular: core.specular
+            specular: core.specular,
+            ambient: core.ambient
         };
     };
 
@@ -7366,17 +7375,30 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         return this._core.backfaceTexturing;
     };
 
-    SceneJS.Flags.prototype.setSpecular = function(specular) {
-        specular = !!specular;
-        if (this._core.specular != specular) {
-            this._core.specular = specular;
+    SceneJS.Flags.prototype.setAmbient = function(ambient) {
+        ambient = !!ambient;
+        if (this._core.ambient != ambient) {
+            this._core.ambient = ambient;
             this._engine.display.imageDirty = true;
         }
         return this;
     };
 
-    SceneJS.Flags.prototype.getSpecular = function() {
-        return this._core.specular;
+    SceneJS.Flags.prototype.getAmbient = function() {
+        return this._core.ambient;
+    };
+
+    SceneJS.Flags.prototype.setAmbient = function(ambient) {
+        ambient = !!ambient;
+        if (this._core.ambient != ambient) {
+            this._core.ambient = ambient;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getAmbient = function() {
+        return this._core.ambient;
     };
 
     SceneJS.Flags.prototype._compile = function() {
@@ -13716,6 +13738,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
         src.push("uniform bool  SCENEJS_uBackfaceLighting;");
         src.push("uniform bool  SCENEJS_uSpecularLighting;");
         src.push("uniform bool  SCENEJS_uClipping;");
+        src.push("uniform bool  SCENEJS_uAmbient;");
 
         /* True when rendering transparency
          */
@@ -13727,7 +13750,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
             src.push("varying vec4 SCENEJS_vColor;");
         }
 
-        src.push("uniform vec3  SCENEJS_uAmbient;");                         // Scene ambient colour - taken from clear colour
+        src.push("uniform vec3  SCENEJS_uAmbientColor;");                         // Scene ambient colour - taken from clear colour
 
         src.push("uniform vec3  SCENEJS_uMaterialBaseColor;");
         src.push("uniform float SCENEJS_uMaterialAlpha;");
@@ -13736,7 +13759,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("  vec3    ambient=SCENEJS_uAmbient;");
+        src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
         src.push("  float   emit    = SCENEJS_uMaterialEmit;");
 
         src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
@@ -13996,11 +14019,11 @@ var SceneJS_ProgramSourceFactory = new (function() {
 
             src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * color.rgb), alpha);");
             src.push("   } else {");
-            src.push("      fragColor = vec4((color.rgb + (emit * color.rgb)) * ambient.rgb, alpha);");
+            src.push("      fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
             src.push("   }");
 
         } else { // No normals
-            src.push("fragColor = vec4((emit * color.rgb) + (emit * color.rgb), alpha);");
+            src.push("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
         }
 
         if (fragmentHooks.pixelColor) {
@@ -14756,6 +14779,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._uBackfaceLightingDraw = draw.getUniformLocation("SCENEJS_uBackfaceLighting");
         this._uSpecularLightingDraw = draw.getUniformLocation("SCENEJS_uSpecularLighting");
         this._uClippingDraw = draw.getUniformLocation("SCENEJS_uClipping");
+        this._uAmbientDraw = draw.getUniformLocation("SCENEJS_uAmbient");
 
         var pick = this.program.pick;
 
@@ -14796,6 +14820,7 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniform1i(this._uBackfaceLightingDraw, this.core.backfaceLighting);
             gl.uniform1i(this._uSpecularLightingDraw, this.core.specular);
             gl.uniform1i(this._uClippingDraw, this.core.clipping);
+            gl.uniform1i(this._uAmbientDraw, this.core.ambient);
         }
     }
 });/**
@@ -14933,7 +14958,7 @@ SceneJS_ChunkFactory.createChunkType({
 
     build:function () {
 
-        this._uAmbient = this._uAmbient || [];
+        this._uAmbientColor = this._uAmbientColor || [];
         this._uLightColor = this._uLightColor || [];
         this._uLightDir = this._uLightDir || [];
         this._uLightPos = this._uLightPos || [];
@@ -14949,7 +14974,7 @@ SceneJS_ChunkFactory.createChunkType({
             switch (lights[i].mode) {
 
                 case "ambient":
-                    this._uAmbient[i] = (program.draw.getUniformLocation("SCENEJS_uAmbient"));
+                    this._uAmbientColor[i] = (program.draw.getUniformLocation("SCENEJS_uAmbientColor"));
                     break;
 
                 case "dir":
@@ -14982,8 +15007,8 @@ SceneJS_ChunkFactory.createChunkType({
 
             light = lights[i];
 
-            if (this._uAmbient[i]) {
-                gl.uniform3fv(this._uAmbient[i], light.color);
+            if (this._uAmbientColor[i]) {
+                gl.uniform3fv(this._uAmbientColor[i], light.color);
 
             } else {
 

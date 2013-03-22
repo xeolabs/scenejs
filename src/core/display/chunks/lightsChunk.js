@@ -7,7 +7,7 @@ SceneJS_ChunkFactory.createChunkType({
 
     build:function () {
 
-        this._uAmbient = this._uAmbient || [];
+        this._uAmbientColor = this._uAmbientColor || [];
         this._uLightColor = this._uLightColor || [];
         this._uLightDir = this._uLightDir || [];
         this._uLightPos = this._uLightPos || [];
@@ -23,7 +23,7 @@ SceneJS_ChunkFactory.createChunkType({
             switch (lights[i].mode) {
 
                 case "ambient":
-                    this._uAmbient[i] = (program.draw.getUniformLocation("SCENEJS_uAmbient"));
+                    this._uAmbientColor[i] = (program.draw.getUniformLocation("SCENEJS_uAmbientColor"));
                     break;
 
                 case "dir":
@@ -56,8 +56,8 @@ SceneJS_ChunkFactory.createChunkType({
 
             light = lights[i];
 
-            if (this._uAmbient[i]) {
-                gl.uniform3fv(this._uAmbient[i], light.color);
+            if (this._uAmbientColor[i]) {
+                gl.uniform3fv(this._uAmbientColor[i], light.color);
 
             } else {
 

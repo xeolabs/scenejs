@@ -15,7 +15,9 @@
         backfaces: true,            // Show backfaces
         frontface: "ccw",           // Default vertex winding for front face
         backfaceLighting: true,     // Shading enabled for backfaces
-        backfaceTexturing: true     // Texturing enabled for backfaces
+        backfaceTexturing: true,    // Texturing enabled for backfaces
+        specular: true,             // Specular lighting enabled
+        ambient: true               // Ambient lighting enabled
     };
 
     var coreStack = [];
@@ -47,6 +49,7 @@
             this._core.backfaceLighting = true;  // Shading enabled for backfaces
             this._core.backfaceTexturing = true; // Texturing enabled for backfaces
             this._core.specular = true;          // Specular lighting enabled by default
+            this._core.ambient = true;           // Ambient lighting enabled by default
 
             if (params.flags) {                 // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
@@ -103,6 +106,11 @@
             this._engine.display.imageDirty = true;
         }
 
+        if (flags.ambient != undefined) {
+            core.ambient = !!flags.ambient;
+            this._engine.display.imageDirty = true;
+        }
+
         return this;
     };
 
@@ -129,7 +137,8 @@
             transparent: core.transparent,
             backfaces: core.backfaces,
             frontface: core.frontface,
-            specular: core.specular
+            specular: core.specular,
+            ambient: core.ambient
         };
     };
 
@@ -236,17 +245,30 @@
         return this._core.backfaceTexturing;
     };
 
-    SceneJS.Flags.prototype.setSpecular = function(specular) {
-        specular = !!specular;
-        if (this._core.specular != specular) {
-            this._core.specular = specular;
+    SceneJS.Flags.prototype.setAmbient = function(ambient) {
+        ambient = !!ambient;
+        if (this._core.ambient != ambient) {
+            this._core.ambient = ambient;
             this._engine.display.imageDirty = true;
         }
         return this;
     };
 
-    SceneJS.Flags.prototype.getSpecular = function() {
-        return this._core.specular;
+    SceneJS.Flags.prototype.getAmbient = function() {
+        return this._core.ambient;
+    };
+
+    SceneJS.Flags.prototype.setAmbient = function(ambient) {
+        ambient = !!ambient;
+        if (this._core.ambient != ambient) {
+            this._core.ambient = ambient;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getAmbient = function() {
+        return this._core.ambient;
     };
 
     SceneJS.Flags.prototype._compile = function() {
