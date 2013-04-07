@@ -11069,7 +11069,7 @@ new (function () {
                 self._setLayerTexture(gl, layer, texture);
             };
 
-            image.crossOrigin = "";
+            image.crossOrigin = "Anonymous";
             image.src = layer.uri || layer.src;
         }
     };
