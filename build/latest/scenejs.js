@@ -14,6 +14,7 @@
  * Various functions for helping debug WebGL apps.
  * http://khronos.org/webgl/wiki/Debugging
  * Copyright (c) 2009 The Chromium Authors. All rights reserved.
+ *
  */
 WebGLDebugUtils = function() {
 
