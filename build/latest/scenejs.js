@@ -14,7 +14,6 @@
  * Various functions for helping debug WebGL apps.
  * http://khronos.org/webgl/wiki/Debugging
  * Copyright (c) 2009 The Chromium Authors. All rights reserved.
- *
  */
 WebGLDebugUtils = function() {
 
@@ -13768,7 +13767,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
+        src.push("  vec3    ambient= SCENEJS_uAmbientColor;");
         src.push("  float   emit    = SCENEJS_uMaterialEmit;");
 
         src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
