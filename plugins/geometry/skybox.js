@@ -59,15 +59,6 @@ SceneJS.Plugins.addPlugin(
                     x,-y,-z,  -x,-y,-z, -x, y,-z,  x, y,-z // v4-v7-v6-v5 back
                 ];
 
-                var normals = [
-                    0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-                    1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-                    0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-                    -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
-                    0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
-                    0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1
-                ];
-
                 var uv = [
                     0.5, 0.6666,
                     0.25, 0.6666,
@@ -114,7 +105,6 @@ SceneJS.Plugins.addPlugin(
                     primitive : "triangles",
                     coreId: "skybox_" + x + "_" + y + "_" + z,
                     positions : new Float32Array(positions),
-                    normals: new Float32Array(normals),
                     uv : new Float32Array(uv),
                     indices : new Uint16Array(indices)
                 };
