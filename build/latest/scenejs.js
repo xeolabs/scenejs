@@ -11062,22 +11062,20 @@ new (function () {
              */
             var image = new Image();
 
-            var src = layer.uri || layer.src;
-
-            if (src.indexOf("data") == 0) {  // Image data
-                image.src = src;
-                makeTexture();
-            } else { // Image file
-                image.onload = makeTexture;
-                image.crossOrigin = "Anonymous";
-                image.src = src;
-            }
-
-            function makeTexture() {
+            image.onload = function() {
                 var texture = gl.createTexture();
                 gl.bindTexture(gl.TEXTURE_2D, texture);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self._ensureImageSizePowerOfTwo(image));
                 self._setLayerTexture(gl, layer, texture);
+            };
+
+            var src = layer.uri || layer.src;
+
+            if (src.indexOf("data") == 0) {  // Image data
+                image.src = src;
+            } else { // Image file
+                image.crossOrigin = "Anonymous";
+                image.src = src;
             }
         }
     };
