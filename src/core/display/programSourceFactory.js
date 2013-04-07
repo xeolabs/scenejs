@@ -20,13 +20,13 @@ var SceneJS_ProgramSourceFactory = new (function() {
 
         return this._sourceCache[hash] = new SceneJS_ProgramSource(
 
-                hash,
+            hash,
 
-                this._composePickingVertexShader(states), // pickVertexSrc
-                this._composePickingFragmentShader(states), // pickFragmentSrc
-                this._composeRenderingVertexShader(states), // drawVertexSrc
-                this._composeRenderingFragmentShader(states)  // drawfragmentSrc
-                );
+            this._composePickingVertexShader(states), // pickVertexSrc
+            this._composePickingFragmentShader(states), // pickFragmentSrc
+            this._composeRenderingVertexShader(states), // drawVertexSrc
+            this._composeRenderingFragmentShader(states)  // drawfragmentSrc
+        );
     };
 
     /**
@@ -892,9 +892,9 @@ var SceneJS_ProgramSourceFactory = new (function() {
                     src.push("lightDist = SCENEJS_vViewLightVecAndDist" + i + ".w;");
 
                     src.push("  attenuation = 1.0 / (" +
-                             "  SCENEJS_uLightAttenuation" + i + "[0] + " +
-                             "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
-                             "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
+                        "  SCENEJS_uLightAttenuation" + i + "[0] + " +
+                        "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
+                        "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
 
                     if (light.diffuse) {
                         src.push("  lightValue += dotN *  SCENEJS_uLightColor" + i + " * attenuation;");
@@ -902,7 +902,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
 
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) specularValue += attenuation * specularColor * SCENEJS_uLightColor" + i +
-                                 " * specular * pow(max(dot(reflect(viewLightVec, viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+                            " * specular * pow(max(dot(reflect(viewLightVec, viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
                     }
                     //src.push("}");
                 }
@@ -918,7 +918,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
 
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) specularValue += specularColor * SCENEJS_uLightColor" + i +
-                                 " * specular * pow(max(dot(reflect(viewLightVec, viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+                            " * specular * pow(max(dot(reflect(viewLightVec, viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
                     }
                     // src.push("}");
                 }
