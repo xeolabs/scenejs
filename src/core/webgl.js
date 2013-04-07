@@ -237,7 +237,7 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
 
     if (!this.valid) {
 
-        if (!gl.isglLost()) { // Handled explicitely elsewhere, so wont rehandle here
+        if (!gl.isContextLost()) { // Handled explicitely elsewhere, so wont rehandle here
 
             SceneJS.log.error("Shader program failed to link: " + gl.getProgramInfoLog(handle));
 
