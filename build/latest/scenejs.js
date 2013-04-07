@@ -4920,12 +4920,12 @@ var SceneJS_webgl_Texture2D = function (gl, cfg) {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, cfg.wrapT);
         }
 
-//        if (cfg.minFilter == gl.NEAREST_MIPMAP_NEAREST ||
-//            cfg.minFilter == gl.LINEAR_MIPMAP_NEAREST ||
-//            cfg.minFilter == gl.NEAREST_MIPMAP_LINEAR ||
-//            cfg.minFilter == gl.LINEAR_MIPMAP_LINEAR) {
-//            gl.generateMipmap(gl.TEXTURE_2D);
-//        }
+        if (cfg.minFilter == gl.NEAREST_MIPMAP_NEAREST ||
+            cfg.minFilter == gl.LINEAR_MIPMAP_NEAREST ||
+            cfg.minFilter == gl.NEAREST_MIPMAP_LINEAR ||
+            cfg.minFilter == gl.LINEAR_MIPMAP_LINEAR) {
+            gl.generateMipmap(gl.TEXTURE_2D);
+        }
 
         gl.bindTexture(this.target, null);
 
