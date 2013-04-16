@@ -93,7 +93,7 @@ SceneJS.Plugins.addPlugin(
                     uvs.push(i / segmentsT);
                     uvs.push(1 - j / segmentsR);
 
-                    vec = normalize(sub([x, y, z], [centerX, centerY, centerZ], []));
+                    vec = normalize(sub([x, y, z], [centerX, centerY, centerZ], []), []);
 
                     normals.push(vec[0]);
                     normals.push(vec[1]);
