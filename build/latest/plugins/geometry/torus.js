@@ -117,6 +117,7 @@ SceneJS.Plugins.addPlugin(
                     indices.push(a);
                     indices.push(b);
                     indices.push(c);
+
                     indices.push(c);
                     indices.push(d);
                     indices.push(a);
