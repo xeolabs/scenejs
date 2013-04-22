@@ -937,11 +937,12 @@ var SceneJS = new (function () {
     this._engineIds = new SceneJS_Map();
 
     /**
-     * Creates a new scene from the given JSON description
+     * Creates a new scene from the given JSON description and begins rendering it
      *
      * @param {String} json JSON scene description
-     * @param options Optional options
-     * @param options.simulateWebGLContextLost Optional options
+     * @param {*} options Optional options
+     * @param {Boolean} options.simulateWebGLContextLost Set true to enable simulation of lost WebGL context (has performance impact)
+     * @param {Function} options.idleFunc Callback called on each animation frame, which happens periodically, regardless of whether anything needs to be rendered or not
      * @returns {SceneJS.Scene} New scene
      */
     this.createScene = function (json, options) {
@@ -968,6 +969,8 @@ var SceneJS = new (function () {
         SceneJS_events.fireEvent(SceneJS_events.SCENE_CREATED, {    // Notify modules that need to know about new scene
             engine:engine
         });
+
+        engine.scene.start(options);
 
         return engine.scene;
     };
@@ -1887,10 +1890,6 @@ SceneJS_Engine.prototype.start = function(cfg) {
 
                 self.events.fireEvent("idle", idleEventParams);
 
-                if (cfg.idleFunc) {
-                    cfg.idleFunc();
-                }
-
                 if (!self.running) { // idleFunc may have destroyed scene
                     return;
                 }
@@ -1903,21 +1902,15 @@ SceneJS_Engine.prototype.start = function(cfg) {
 
                     self.events.fireEvent("rendered", idleEventParams);
 
-                    if (cfg.frameFunc) {
-                        cfg.frameFunc();
-                    }
-
                     window.requestAnimationFrame(window[fnName]);
 
                 } else {
 
-                    if (!sleeping && cfg.sleepFunc) {
-                        cfg.sleepFunc();
+                    if (!sleeping) {
+                        self.events.fireEvent("sleep", idleEventParams);
                     }
 
                     sleeping = true;
-
-                    self.events.fireEvent("sleep", idleEventParams);
 
                     window.requestAnimationFrame(window[fnName]);
                 }
@@ -10285,7 +10278,7 @@ new (function() {
 
 SceneJS.Scene = SceneJS_NodeFactory.createNodeType("scene");
 
-SceneJS.Scene.prototype._init = function(params) {
+SceneJS.Scene.prototype._init = function (params) {
 
     if (params.tagMask) {
         this.setTagMask(params.tagMask);
@@ -10300,8 +10293,19 @@ SceneJS.Scene.prototype._init = function(params) {
  * @param {String} type Event type
  * @param {Function} callback Callback that will be called with the event parameters
  * @return {String} handle Handle to the subcription
+ * @deprecated
  */
-SceneJS.Scene.prototype.onEvent = function(type, callback) {
+SceneJS.Scene.prototype.onEvent = function (type, callback) {
+    return this._engine.events.onEvent(type, callback);
+};
+
+/**
+ * Alias for #onEvent
+ * @param type
+ * @param callback
+ * @return {*|String}
+ */
+SceneJS.Scene.prototype.on = function (type, callback) {
     return this._engine.events.onEvent(type, callback);
 };
 
@@ -10309,16 +10313,40 @@ SceneJS.Scene.prototype.onEvent = function(type, callback) {
  * Unsubscribes to an event previously subscribed to on scene
  *
  * @param {String} handle Subscription handle
+ * @deprecated
  */
-SceneJS.Scene.prototype.unEvent = function(handle) {
+SceneJS.Scene.prototype.unEvent = function (handle) {
     this._engine.events.unEvent(handle);
 };
+
+/**
+ * Alias for #unEvent
+ *
+ * @param {String} handle Subscription handle
+ */
+SceneJS.Scene.prototype.off = function (handle) {
+    this._engine.events.unEvent(handle);
+};
+
+/**
+ * Subscribe to one occurrence of an event. This is equivalent to calling #off in the
+ * callback given to #on.
+ */
+SceneJS.Scene.prototype.once = function (type, callback) {
+    var self = this;
+    var handle = this._engine.events.onEvent(type,
+        function (params) {
+            self._engine.events.unEvent(handle);
+            callback(params);
+        });
+};
+
 
 /**
  * Simulate a lost WebGL context for testing purposes.
  * Only works if the simulateWebGLLost was given as an option to {@link SceneJS.createScene}.
  */
-SceneJS.Scene.prototype.loseWebGLContext = function() {
+SceneJS.Scene.prototype.loseWebGLContext = function () {
     this._engine.loseWebGLContext();
 };
 
@@ -10327,20 +10355,20 @@ SceneJS.Scene.prototype.loseWebGLContext = function() {
  * Returns the HTML canvas for this scene
  * @return {HTMLCanvas} The canvas
  */
-SceneJS.Scene.prototype.getCanvas = function() {
+SceneJS.Scene.prototype.getCanvas = function () {
     return this._engine.canvas.canvas;
 };
 
 /**
  * Returns the WebGL context for this scene
  */
-SceneJS.Scene.prototype.getGL = function() {
+SceneJS.Scene.prototype.getGL = function () {
     return this._engine.canvas.gl;
 };
 
 /** Returns the Z-buffer depth in bits of the webgl context that this scene is to bound to.
  */
-SceneJS.Scene.prototype.getZBufferDepth = function() {
+SceneJS.Scene.prototype.getZBufferDepth = function () {
 
     var gl = this._engine.canvas.gl;
 
@@ -10353,7 +10381,7 @@ SceneJS.Scene.prototype.getZBufferDepth = function() {
  * @see #getTagMask
  * @see SceneJS.Tag
  */
-SceneJS.Scene.prototype.setTagMask = function(tagMask) {
+SceneJS.Scene.prototype.setTagMask = function (tagMask) {
 
     if (!this._tagSelector) {
         this._tagSelector = {};
@@ -10371,7 +10399,7 @@ SceneJS.Scene.prototype.setTagMask = function(tagMask) {
  * @see SceneJS.Tag
  * @returns {String} Regular expression string that will be matched on the tag attributes of {@link SceneJS.Tag} nodes
  */
-SceneJS.Scene.prototype.getTagMask = function() {
+SceneJS.Scene.prototype.getTagMask = function () {
     return this._tagSelector ? this._tagSelector.mask : null;
 };
 
@@ -10379,14 +10407,14 @@ SceneJS.Scene.prototype.getTagMask = function() {
  * Render a single frame if new frame pending, or force a new frame
  * Returns true if frame rendered
  */
-SceneJS.Scene.prototype.renderFrame = function(params) {
+SceneJS.Scene.prototype.renderFrame = function (params) {
     return this._engine.renderFrame(params);
 };
 
 /**
  * Starts the render loop for this scene
  */
-SceneJS.Scene.prototype.start = function(params) {
+SceneJS.Scene.prototype.start = function (params) {
     this._engine.start(params);
 };
 
@@ -10394,7 +10422,7 @@ SceneJS.Scene.prototype.start = function(params) {
  * Pauses/unpauses current render loop that was started with {@link #start}. After this, {@link #isRunning} will return false.
  * @param {Boolean} doPause Indicates whether to pause or unpause the render loop
  */
-SceneJS.Scene.prototype.pause = function(doPause) {
+SceneJS.Scene.prototype.pause = function (doPause) {
     this._engine.pause(doPause);
 };
 
@@ -10402,22 +10430,22 @@ SceneJS.Scene.prototype.pause = function(doPause) {
  * Returns true if the scene's render loop is currently running.
  * @returns {Boolean} True when scene render loop is running
  */
-SceneJS.Scene.prototype.isRunning = function() {
+SceneJS.Scene.prototype.isRunning = function () {
     return this._engine.running;
 };
 
 /**
  * Picks whatever geometry will be rendered at the given canvas coordinates.
  */
-SceneJS.Scene.prototype.pick = function(canvasX, canvasY, options) {
+SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     return this._engine.pick(canvasX, canvasY, options);
 };
 
-/**                                  p
+/**
  * Scene node's destroy handler, called by {@link SceneJS_node#destroy}
  * @private
  */
-SceneJS.Scene.prototype.destroy = function() {
+SceneJS.Scene.prototype._destroy = function () {
 
     if (!this.destroyed) {
 
@@ -10432,20 +10460,20 @@ SceneJS.Scene.prototype.destroy = function() {
  * Returns true if scene active, ie. not destroyed. A destroyed scene becomes active again
  * when you render it.
  */
-SceneJS.Scene.prototype.isActive = function() {
+SceneJS.Scene.prototype.isActive = function () {
     return !this._engine.destroyed;
 };
 
 /**
  * Stops current render loop that was started with {@link #start}. After this, {@link #isRunning} will return false.
  */
-SceneJS.Scene.prototype.stop = function() {
+SceneJS.Scene.prototype.stop = function () {
     this._engine.stop();
 };
 
 /** Determines if node exists in this scene
  */
-SceneJS.Scene.prototype.containsNode = function(nodeId) {
+SceneJS.Scene.prototype.containsNode = function (nodeId) {
     return !!this._engine.findNode(nodeId);
 };
 
@@ -10455,7 +10483,7 @@ SceneJS.Scene.prototype.containsNode = function(nodeId) {
  * @param {String} nodeIdRegex Regular expression to match on node IDs
  * @return {[SceneJS.Node]} Array of nodes whose IDs match the given regex
  */
-SceneJS.Scene.prototype.findNodes = function(nodeIdRegex) {
+SceneJS.Scene.prototype.findNodes = function (nodeIdRegex) {
     return this._engine.findNodes(nodeIdRegex);
 };
 
@@ -10464,7 +10492,7 @@ SceneJS.Scene.prototype.findNodes = function(nodeIdRegex) {
  * @deprecated
  * @return {SceneJS.Node} The node if found, else null
  */
-SceneJS.Scene.prototype.findNode = function(nodeId) {
+SceneJS.Scene.prototype.findNode = function (nodeId) {
     return this._engine.findNode(nodeId);
 };
 
@@ -10472,7 +10500,7 @@ SceneJS.Scene.prototype.findNode = function(nodeId) {
  * @function Finds the node with the given ID in this scene
  * @return {SceneJS.Node} The node if found, else null
  */
-SceneJS.Scene.prototype.getNode  = function(nodeId) {
+SceneJS.Scene.prototype.getNode = function (nodeId) {
     return this._engine.findNode(nodeId);
 };
 
@@ -10492,10 +10520,10 @@ SceneJS.Scene.prototype.getNode  = function(nodeId) {
  * }
  *
  */
-SceneJS.Scene.prototype.getStatus = function() {
+SceneJS.Scene.prototype.getStatus = function () {
     return (this._engine.destroyed)
-            ? { destroyed: true }
-            : SceneJS._shallowClone(SceneJS_sceneStatusModule.sceneStatus[this.id]);
+        ? { destroyed:true }
+        : SceneJS._shallowClone(SceneJS_sceneStatusModule.sceneStatus[this.id]);
 };
 new (function() {
 

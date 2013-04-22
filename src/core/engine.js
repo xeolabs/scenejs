@@ -329,10 +329,6 @@ SceneJS_Engine.prototype.start = function(cfg) {
 
                 self.events.fireEvent("idle", idleEventParams);
 
-                if (cfg.idleFunc) {
-                    cfg.idleFunc();
-                }
-
                 if (!self.running) { // idleFunc may have destroyed scene
                     return;
                 }
@@ -345,21 +341,15 @@ SceneJS_Engine.prototype.start = function(cfg) {
 
                     self.events.fireEvent("rendered", idleEventParams);
 
-                    if (cfg.frameFunc) {
-                        cfg.frameFunc();
-                    }
-
                     window.requestAnimationFrame(window[fnName]);
 
                 } else {
 
-                    if (!sleeping && cfg.sleepFunc) {
-                        cfg.sleepFunc();
+                    if (!sleeping) {
+                        self.events.fireEvent("sleep", idleEventParams);
                     }
 
                     sleeping = true;
-
-                    self.events.fireEvent("sleep", idleEventParams);
 
                     window.requestAnimationFrame(window[fnName]);
                 }

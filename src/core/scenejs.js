@@ -18,11 +18,12 @@ var SceneJS = new (function () {
     this._engineIds = new SceneJS_Map();
 
     /**
-     * Creates a new scene from the given JSON description
+     * Creates a new scene from the given JSON description and begins rendering it
      *
      * @param {String} json JSON scene description
-     * @param options Optional options
-     * @param options.simulateWebGLContextLost Optional options
+     * @param {*} options Optional options
+     * @param {Boolean} options.simulateWebGLContextLost Set true to enable simulation of lost WebGL context (has performance impact)
+     * @param {Function} options.idleFunc Callback called on each animation frame, which happens periodically, regardless of whether anything needs to be rendered or not
      * @returns {SceneJS.Scene} New scene
      */
     this.createScene = function (json, options) {
@@ -49,6 +50,8 @@ var SceneJS = new (function () {
         SceneJS_events.fireEvent(SceneJS_events.SCENE_CREATED, {    // Notify modules that need to know about new scene
             engine:engine
         });
+
+        engine.scene.start(options);
 
         return engine.scene;
     };
