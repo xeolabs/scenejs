@@ -1,9 +1,5 @@
 /*
- * SceneJS WebGL Scene Graph Library for JavaScript
- * http://scenejs.org/
- * Dual licensed under the MIT or GPL Version 2 licenses.
- * http://scenejs.org/license
- * Copyright 2010, Lindsay Kay
+ * Based on TorusGeometry by Mr. Doob and oosmoxiecode
  *
  */
 SceneJS.Plugins.addPlugin(
@@ -33,10 +29,10 @@ SceneJS.Plugins.addPlugin(
                 setConfigs:function (cfg) {
                     configs = cfg;
                     if (!wasCreated) {
-                        created(buildTorus(cfg));
+                        created(build(cfg));
                         wasCreated = true;
                     } else {
-                        updated(buildTorus(cfg));
+                        updated(build(cfg));
                     }
                 },
 
@@ -49,7 +45,7 @@ SceneJS.Plugins.addPlugin(
             };
         };
 
-        function buildTorus(cfg) {
+        function build(cfg) {
 
             var radius = cfg.radius || 1;
             var tube = cfg.tube || 0.5;
