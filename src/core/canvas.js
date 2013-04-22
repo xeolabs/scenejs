@@ -12,11 +12,12 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
         // Automatic default canvas
         canvasId = "canvas-" + id;
         var body = document.getElementsByTagName("body")[0];
-        body.innerHTML = '';
         var newdiv = document.createElement('div');
         newdiv.style.height = "100%";
         newdiv.style.width = "100%";
-        newdiv.innerHTML = '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
+        newdiv.style.padding = "0";
+        newdiv.style.margin = "0";
+        newdiv.innerHTML += '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
         body.appendChild(newdiv);
     }
 
