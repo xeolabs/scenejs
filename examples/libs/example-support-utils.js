@@ -16,8 +16,6 @@ function mouseOrbitUtility(scene) {
     var yaw = 0;
     var pitch = 0;
 
-    var canvas = scene.getCanvas();
-
     function mouseDown(event) {
         lastX = event.clientX;
         lastY = event.clientY;
@@ -64,12 +62,12 @@ function mouseOrbitUtility(scene) {
         }
     }
 
-    canvas.addEventListener('mousedown', mouseDown, true);
-    canvas.addEventListener('mousemove', mouseMove, true);
-    canvas.addEventListener('mouseup', mouseUp, true);
-    canvas.addEventListener('touchstart', touchStart, true);
-    canvas.addEventListener('touchmove', touchMove, true);
-    canvas.addEventListener('touchend', touchEnd, true);
+    document.body.addEventListener('mousedown', mouseDown, true);
+    document.body.addEventListener('mousemove', mouseMove, true);
+    document.body.addEventListener('mouseup', mouseUp, true);
+    document.body.addEventListener('touchstart', touchStart, true);
+    document.body.addEventListener('touchmove', touchMove, true);
+    document.body.addEventListener('touchend', touchEnd, true);
 }
 
 
@@ -77,7 +75,7 @@ function mousePanLookatUtility(scene) {
 
 // Get handles to scene nodes
 
-    var lookatNode = scene.getNode("lookat");    
+    var lookatNode = scene.getNode("lookat");
 
 // Pan with mouse drags
 
@@ -132,15 +130,15 @@ function mousePanLookatUtility(scene) {
             lastY = posY;
 
             lookatNode.set({
-                eye: { x: xeye, y: yeye }
+                eye:{ x:xeye, y:yeye }
             });
         }
     }
 
-    canvas.addEventListener('mousedown', mouseDown, true);
-    canvas.addEventListener('mousemove', mouseMove, true);
-    canvas.addEventListener('mouseup', mouseUp, true);
-    canvas.addEventListener('touchstart', touchStart, true);
-    canvas.addEventListener('touchmove', touchMove, true);
-    canvas.addEventListener('touchend', touchEnd, true);
+    document.body.addEventListener('mousedown', mouseDown, true);
+    document.body.addEventListener('mousemove', mouseMove, true);
+    document.body.addEventListener('mouseup', mouseUp, true);
+    document.body.addEventListener('touchstart', touchStart, true);
+    document.body.addEventListener('touchmove', touchMove, true);
+    document.body.addEventListener('touchend', touchEnd, true);
 }
