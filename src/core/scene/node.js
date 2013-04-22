@@ -1023,8 +1023,16 @@ SceneJS.Node.prototype.bind = function(name, handler) {
 
     this._engine.branchDirty(this);
 
-    return this;
+    return handler;
 };
+
+/**
+ * Alias for #bind
+ * @param type
+ * @param callback
+ * @return {*|String}
+ */
+SceneJS.Node.prototype.on = SceneJS.Node.prototype.bind;
 
 /** Unbinds a listener for an event on the selected node
  *
@@ -1048,8 +1056,27 @@ SceneJS.Node.prototype.unbind = function(name, handler) {
     this.removeListener(name, handler);
 
     this._engine.branchDirty(this);
+};
 
-    return this;
+/**
+ * Alias for #unbind
+ * @param type
+ * @param callback
+ * @return {*|String}
+ */
+SceneJS.Node.prototype.off = SceneJS.Node.prototype.unbind;
+
+/**
+ * Subscribe to one occurrence of an event. This is equivalent to calling #off in the
+ * callback given to #on.
+ */
+SceneJS.Node.prototype.once = function (type, callback) {
+    var self = this;
+    var handle = this.on(type,
+        function (params) {
+            self._engine.events.unEvent(handle);
+            callback(params);
+        });
 };
 
 /**
