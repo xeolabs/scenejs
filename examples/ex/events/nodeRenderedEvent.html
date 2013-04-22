@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background-color: #000000;
+            margin: 0px;
+            overflow: auto;
+            height: 100%;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../libs/jquery-1.8.3.min.js"></script>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+
+    <script src="../../libs/example-support-utils.js"></script>
+
+    <style type="text/css">
+
+        .transparent-ui {
+            opacity: .75;
+        }
+
+        #teapot1 {
+            position: absolute;
+            width: 180px;
+            height: 90px;
+            clear: both;
+            padding: 8px;
+            overflow: hidden;
+            background: red;
+            color: white;
+            z-index: 2;
+            margin: 0 auto;
+            border: 1px solid;
+            text-align: left;
+            -webkit-box-shadow: #444 5px 5px 2px;
+            border-bottom-left-radius: 5px 5px;
+            border-bottom-right-radius: 5px 5px;
+            border-top-left-radius: 5px 5px;
+            border-top-right-radius: 5px 5px;
+        }
+
+        #teapot2 {
+            position: absolute;
+            width: 180px;
+            height: 90px;
+            clear: both;
+            padding: 8px;
+            overflow: hidden;
+            background: green;
+            color: white;
+            z-index: 2;
+            margin: 0 auto;
+            border: 1px solid;
+            text-align: left;
+            -webkit-box-shadow: #444 5px 5px 2px;
+            border-bottom-left-radius: 5px 5px;
+            border-bottom-right-radius: 5px 5px;
+            border-top-left-radius: 5px 5px;
+            border-top-right-radius: 5px 5px;
+        }
+
+        #teapot3 {
+            position: absolute;
+            width: 180px;
+            height: 90px;
+            clear: both;
+            padding: 8px;
+            overflow: hidden;
+            background: blue;
+            color: white;
+            z-index: 2;
+            margin: 0 auto;
+            border: 1px solid;
+            text-align: left;
+            -webkit-box-shadow: #444 5px 5px 2px;
+            border-bottom-left-radius: 5px 5px;
+            border-bottom-right-radius: 5px 5px;
+            border-top-left-radius: 5px 5px;
+            border-top-right-radius: 5px 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="teapot1" class="transparent-ui">
+    Teapot 1
+</div>
+
+<div id="teapot2" class="transparent-ui">
+    Teapot 2
+</div>
+
+<div id="teapot3" class="transparent-ui">
+    Teapot 3
+</div>
+
+<script>
+
+    jQuery(document).ready(
+            function ($) {
+
+                var scene = SceneJS.createScene({
+                    nodes:[
+                        {
+                            type:"lookAt",
+                            eye:{ z:-35.0},
+
+                            nodes:[
+                                {
+                                    type:"rotate",
+                                    id:"yaw",
+                                    angle:0.0,
+                                    y:1.0,
+
+                                    nodes:[
+                                        {
+                                            type:"rotate",
+                                            id:"pitch",
+                                            angle:-40.0,
+                                            x:1.0,
+
+                                            nodes:[
+                                                {
+                                                    type:"translate",
+                                                    x:-10.0,
+                                                    id:"teapot1",
+
+                                                    nodes:[
+                                                        {
+                                                            type:"material",
+                                                            baseColor:{ r:1.0, g:0.4, b:0.4 },
+
+                                                            nodes:[
+                                                                {
+                                                                    type:"geometry",
+                                                                    source:{
+                                                                        type:"teapot"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+
+                                                {
+                                                    type:"translate",
+                                                    z:-10.0,
+                                                    id:"teapot2",
+
+                                                    nodes:[
+                                                        {
+                                                            type:"material",
+                                                            baseColor:{ r:0.4, g:1.0, b:0.4 },
+
+                                                            nodes:[
+                                                                {
+                                                                    type:"geometry",
+                                                                    source:{
+                                                                        type:"teapot"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    type:"translate",
+                                                    z:10.0,
+                                                    id:"teapot3",
+
+                                                    nodes:[
+                                                        {
+                                                            type:"material",
+                                                            baseColor:{ r:0.4, g:0.4, b:1.0 },
+
+                                                            nodes:[
+                                                                {
+                                                                    type:"geometry",
+                                                                    source:{
+                                                                        type:"teapot"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                });
+
+                scene.findNode("teapot1").on(
+                        "rendered",
+                        function (event) {
+                            var params = event.params;
+
+                            updateLabelPos(
+                                    "teapot1",
+                                    params.getCanvasPos(),
+                                    params.getProjPos(),
+                                    params.getCameraPos(),
+                                    params.getViewPos(),
+                                    params.getWorldPos());
+                        });
+
+                scene.findNode("teapot2").on(
+                        "rendered",
+                        function (event) {
+                            var params = event.params;
+                            updateLabelPos(
+                                    "teapot2",
+                                    params.getCanvasPos(),
+                                    params.getProjPos(),
+                                    params.getCameraPos(),
+                                    params.getViewPos(),
+                                    params.getWorldPos());
+                        });
+
+                scene.findNode("teapot3").on(
+                        "rendered",
+                        function (event) {
+                            var params = event.params;
+                            updateLabelPos(
+                                    "teapot3",
+                                    params.getCanvasPos(),
+                                    params.getProjPos(),
+                                    params.getCameraPos(),
+                                    params.getViewPos(),
+                                    params.getWorldPos());
+                        });
+
+                function updateLabelPos(elementId, canvasPos, projPos, cameraPos, viewPos, worldPos) {
+
+                    var element = $("#" + elementId);
+
+                    element.html(elementId
+                            + "<br/>"
+                            + "<br/>Canvas: " + Math.round(canvasPos.x) + ", " + Math.round(canvasPos.y)
+                            + "<br/>Proj  : " + Math.round(projPos.x) + ", " + Math.round(projPos.y)
+                            + "<br/>Camera  : " + roundFloat(cameraPos.x) + ", " + roundFloat(cameraPos.y) + ", " + roundFloat(cameraPos.z)
+                            + "<br/>View  : " + roundFloat(viewPos.x) + ", " + roundFloat(viewPos.y) + ", " + roundFloat(viewPos.z)
+                            + "<br/>World : " + roundFloat(worldPos.x) + ", " + roundFloat(worldPos.y) + ", " + roundFloat(worldPos.z)
+                    );
+
+                    var canvas = scene.getCanvas();
+
+                    var zIndex = 10000 + roundFloat(viewPos.z);
+
+                    element.css("left", canvas.offsetLeft + canvasPos.x);
+                    element.css("top", canvas.offsetTop + canvasPos.y);
+                    element.css("z-index", zIndex);
+                }
+
+                function roundFloat(v) {
+                    return Math.round(v * 10) / 10;
+                }
+
+                mouseOrbitUtility(scene);
+
+            })
+    ;
+
+</script>
+</body>
+</html>
