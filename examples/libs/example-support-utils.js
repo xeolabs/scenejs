@@ -125,8 +125,8 @@ function mousePanLookatUtility(scene) {
     function actionMove(posX, posY) {
         if (dragging) {
 
-            xeye += (posX - lastX) * 0.5;
-            yeye += (posY - lastY) * 0.5;
+            xeye -= (posX - lastX) * 0.5;
+            yeye -= (posY - lastY) * 0.5;
 
             lastX = posX;
             lastY = posY;
