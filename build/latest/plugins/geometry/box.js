@@ -87,7 +87,7 @@ SceneJS.Plugins.addPlugin(
             ];  // back
 
             return {
-                primitive:solid ? "triangles" : "lines",
+                primitive:cfg.solid ? "triangles" : "lines",
                 coreId:"box_" + x + "_" + y + "_" + z + (solid ? "_solid" : "wire"),
                 positions:new Float32Array(positions),
                 normals:new Float32Array(normals),

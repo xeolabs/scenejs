@@ -942,7 +942,6 @@ var SceneJS = new (function () {
      * @param {String} json JSON scene description
      * @param {*} options Optional options
      * @param {Boolean} options.simulateWebGLContextLost Set true to enable simulation of lost WebGL context (has performance impact)
-     * @param {Function} options.idleFunc Callback called on each animation frame, which happens periodically, regardless of whether anything needs to be rendered or not
      * @returns {SceneJS.Scene} New scene
      */
     this.createScene = function (json, options) {
@@ -1467,11 +1466,12 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
         // Automatic default canvas
         canvasId = "canvas-" + id;
         var body = document.getElementsByTagName("body")[0];
-        body.innerHTML = '';
         var newdiv = document.createElement('div');
         newdiv.style.height = "100%";
         newdiv.style.width = "100%";
-        newdiv.innerHTML = '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
+        newdiv.style.padding = "0";
+        newdiv.style.margin = "0";
+        newdiv.innerHTML += '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
         body.appendChild(newdiv);
     }
 
@@ -6651,8 +6651,16 @@ SceneJS.Node.prototype.bind = function(name, handler) {
 
     this._engine.branchDirty(this);
 
-    return this;
+    return handler;
 };
+
+/**
+ * Alias for #bind
+ * @param type
+ * @param callback
+ * @return {*|String}
+ */
+SceneJS.Node.prototype.on = SceneJS.Node.prototype.bind;
 
 /** Unbinds a listener for an event on the selected node
  *
@@ -6676,8 +6684,27 @@ SceneJS.Node.prototype.unbind = function(name, handler) {
     this.removeListener(name, handler);
 
     this._engine.branchDirty(this);
+};
 
-    return this;
+/**
+ * Alias for #unbind
+ * @param type
+ * @param callback
+ * @return {*|String}
+ */
+SceneJS.Node.prototype.off = SceneJS.Node.prototype.unbind;
+
+/**
+ * Subscribe to one occurrence of an event. This is equivalent to calling #off in the
+ * callback given to #on.
+ */
+SceneJS.Node.prototype.once = function (type, callback) {
+    var self = this;
+    var handle = this.on(type,
+        function (params) {
+            self._engine.events.unEvent(handle);
+            callback(params);
+        });
 };
 
 /**
