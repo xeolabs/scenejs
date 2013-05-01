@@ -24,15 +24,6 @@ var SceneJS_Engine = function(json, options) {
      */
     this.events = new SceneJS_eventManager();
 
-    this.events.createEvent("started");
-    this.events.createEvent("idle");
-    this.events.createEvent("rendered");
-    this.events.createEvent("sleep");
-    this.events.createEvent("stopped");
-    this.events.createEvent("loading");     // Loading processes now exist
-    this.events.createEvent("loaded");      // No loading processes now exist
-    this.events.createEvent("destroyed");
-
     /**
      * State core factory - creates, stores, shares and destroys cores
      */
@@ -284,7 +275,7 @@ SceneJS_Engine.prototype.renderFrame = function(params) {
 //            sceneId: this.id
 //        };
 //
-        //self.events.fireEvent("idle", eventParams);
+        //self.events.fireEvent("tick", eventParams);
 
         this.display.render(params);
 
@@ -327,7 +318,7 @@ SceneJS_Engine.prototype.start = function(cfg) {
 
             if (self.running && !self.paused) {  // idleFunc may have paused scene
 
-                self.events.fireEvent("idle", idleEventParams);
+                self.events.fireEvent("tick", idleEventParams);
 
                 if (!self.running) { // idleFunc may have destroyed scene
                     return;

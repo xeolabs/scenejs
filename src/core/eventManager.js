@@ -1,7 +1,7 @@
 /**
  *  @private
  */
-var SceneJS_eventManager = function() {
+var SceneJS_eventManager = function () {
 
     this._handlerIds = new SceneJS_Map();
 
@@ -11,15 +11,15 @@ var SceneJS_eventManager = function() {
 /**
  *
  */
-SceneJS_eventManager.prototype.createEvent = function(type) {
+SceneJS_eventManager.prototype.createEvent = function (type) {
 
     if (this.typeHandlers[type]) {
         return;
     }
 
     this.typeHandlers[type] = {
-        handlers: {},
-        numSubs: 0
+        handlers:{},
+        numSubs:0
     };
 };
 
@@ -30,13 +30,12 @@ SceneJS_eventManager.prototype.createEvent = function(type) {
  * @param {Function} callback Handler function that will accept whatever parameter object accompanies the event
  * @return {String} handle Handle to the event binding
  */
-SceneJS_eventManager.prototype.onEvent = function(type, callback) {
+SceneJS_eventManager.prototype.onEvent = function (type, callback) {
 
-    var handlersForType = this.typeHandlers[type];
-
-    if (!handlersForType) {
-        throw "event type not supported: '" + type + "'";
-    }
+    var handlersForType = this.typeHandlers[type] || (this.typeHandlers[type] = {
+        handlers:{},
+        numSubs:0
+    });
 
     var handlerId = this._handlerIds.addItem(type);
 
@@ -50,13 +49,12 @@ SceneJS_eventManager.prototype.onEvent = function(type, callback) {
 /**
  *
  */
-SceneJS_eventManager.prototype.fireEvent = function(type, params) {
+SceneJS_eventManager.prototype.fireEvent = function (type, params) {
 
-    var handlersForType = this.typeHandlers[type];
-
-    if (!handlersForType) {
-        throw "event not supported: '" + type + "'";
-    }
+    var handlersForType = this.typeHandlers[type] || (this.typeHandlers[type] = {
+        handlers:{},
+        numSubs:0
+    });
 
     if (handlersForType.numSubs > 0) {
 
@@ -75,7 +73,7 @@ SceneJS_eventManager.prototype.fireEvent = function(type, params) {
  *
  * @param {String} handlerId Subscription handle
  */
-SceneJS_eventManager.prototype.unEvent = function(handlerId) {
+SceneJS_eventManager.prototype.unEvent = function (handlerId) {
 
     var type = this._handlerIds.items[handlerId];
     if (!type) {
