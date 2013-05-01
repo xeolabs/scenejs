@@ -166,7 +166,10 @@ SceneJS.Scene.prototype.isRunning = function () {
  * Picks whatever geometry will be rendered at the given canvas coordinates.
  */
 SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
-    return this._engine.pick(canvasX, canvasY, options);
+    var result = this._engine.pick(canvasX, canvasY, options);
+    if (result) {
+        this._engine.events.fireEvent("pick", result);
+    }
 };
 
 /**
