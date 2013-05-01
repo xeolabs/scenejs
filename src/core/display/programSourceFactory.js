@@ -902,7 +902,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
 
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) specularValue += attenuation * specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(viewLightVec, viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
                     }
                     //src.push("}");
                 }
@@ -918,7 +918,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
 
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) specularValue += specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(viewLightVec, viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
                     }
                     // src.push("}");
                 }
