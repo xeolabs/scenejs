@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"flags",
+                id:"myFlags",
+                flags:{
+                    picking:true
+                },
+
+                nodes:[
+                    {
+                        type:"name",
+                        name:"myTeapot",
+                        nodes:[
+                            {
+                                type:"geometry",
+                                plugin:"teapot"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:10
+    });
+
+    scene.on("pick",
+            function (hit) {
+                alert(JSON.stringify(hit));
+            });
+
+    var flags = scene.getNode("myFlags");
+
+    setInterval(
+            function () {
+                flags.setPicking(!flags.getPicking());
+            },
+            2000);
+
+</script>
+</body>
+</html>

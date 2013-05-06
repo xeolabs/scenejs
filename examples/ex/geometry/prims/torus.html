@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+
+<script src="../../../../build/latest/scenejs.js"></script>
+
+<script src="../../../../build/latest/extras/controls/orbit.js"></script>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            // Override default material to make torus blue
+            {
+                type:"material",
+                color:{ r:0.5, g:0.5, b:0.6 },
+                nodes:[
+
+                    // Torus showing default property values
+                    {
+                        type:"geometry",
+                        source:{
+                            type:"torus",
+                            radius:1.0,
+                            tube:0.30,
+                            segmentsR:60,
+                            segmentsT:40,
+                            arc:Math.PI * 2
+                        }
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:5
+    });
+
+</script>
+</body>
+</html>

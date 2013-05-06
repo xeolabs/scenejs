@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Texture Animation</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../../build/latest/scenejs.js"></script>
+    <script src="../../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+
+        nodes:[
+
+            // Override SceneJS' default lights to define dull ambient light
+            // to accentuate our glow map
+            {
+                type:"lights",
+                lights:[
+                    {
+                        mode:"ambient",
+                        color:{ r:0.2, g:0.2, b:0.2 },
+                        diffuse:true,
+                        specular:false
+                    }
+                ],
+
+                nodes:[
+                    {
+                        type:"lookAt",
+                        eye:{ z:5 },
+
+                        nodes:[
+                            {
+                                type:"material",
+                                color:{ r:1.0, g:0.3, b:0.3 },
+                                emit:1.0,
+                                nodes:[
+                                    {
+                                        type:"texture",
+                                        id:"theTexture",
+                                        layers:[
+                                            {
+                                                src:"../../../textures/weirdGlowMap.jpg",
+                                                applyTo:"emit"
+                                            }
+                                        ],
+                                        nodes:[
+                                            {
+                                                type:"geometry",
+                                                source:{
+                                                    type:"torus",
+                                                    radius:1.0,
+                                                    tube:0.3,
+                                                    segmentsR:60,
+                                                    segmentsT:40,
+                                                    arc:Math.PI * 2
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:5
+    });
+
+</script>
+</body>
+</html>

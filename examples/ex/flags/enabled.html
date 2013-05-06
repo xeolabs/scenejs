@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Demonstrates how to control the visibility of geometry.
+    //
+    // The 'enabled' flag of the flags node in the example below will
+    // govern whether or not geometry in its subgraph is visible.
+    //
+    // As we periodically toggle the flag, watch the geometry
+    // appear and disappear accordingly.
+    //
+    // The geometry will be visible by default when no flags node
+    // is present, or if the 'enabled' flag is not specified and
+    // defaults to true.
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"flags",
+                id:"myFlags",
+                flags:{
+                    enabled:true
+                },
+
+                nodes:[
+                    {
+                        type:"material",
+                        color:{ r:0.5, g:0.5, b:0.6 },
+                        nodes:[
+                            {
+                                type:"geometry",
+                                plugin:"teapot"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:10
+    });
+
+    var flags = scene.getNode("myFlags");
+
+    setInterval(
+            function () {
+                flags.setEnabled(!flags.getEnabled());
+            },
+            1000);
+
+</script>
+</body>
+</html>

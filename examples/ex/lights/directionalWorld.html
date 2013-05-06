@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"lights",
+                lights:[
+
+                    // This directional light is in World-space, meaning that
+                    // it will move relative to our changing viewpoint, as if it
+                    // were a fixture in the scene.
+                    {
+                        mode:"dir",
+                        color:{ r:1.0, g:1.0, b:1.0 },
+                        diffuse:true,
+                        specular:true,
+                        dir:{ x:1.0, y:-0.5, z:-1.0 },
+                        space:"world"
+                    }
+                ],
+                nodes:[
+                    {
+                        type:"material",
+                        color:{ r:0.5, g:0.5, b:0.6 },
+                        specularColor:{ r:1.0, g:1.0, b:1.0 },
+                        specular:1.0,
+                        shine:70.0,
+                        emit:0,
+                        alpha:1.0,
+
+                        nodes:[
+                            {
+                                type:"geometry",
+                                plugin:"teapot"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:10
+    });
+
+</script>
+</body>
+</html>

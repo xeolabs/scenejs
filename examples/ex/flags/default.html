@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Scene showing default flags properties
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"flags",
+                flags:{
+                    picking:true, // Picking enabled
+                    enabled:true, // Geometries visible
+                    transparent:false, // Transparency - works in conjunction with material alpha
+                    backfaces:true, // Show backfaces
+                    frontface:"ccw", // Default vertex winding for front faces
+                    backfaceLighting:true, // Shading enabled for backfaces
+                    backfaceTexturing:true, // Texturing enabled for backfaces
+                    specular:true, // Specular lighting enabled
+                    ambient:true               // Ambient lighting enabled
+                },
+
+                nodes:[
+                    {
+                        type:"geometry",
+                        plugin:"teapot"
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:10
+    });
+
+</script>
+</body>
+</html>

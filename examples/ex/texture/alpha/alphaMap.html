@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Texture Animation</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../../build/latest/scenejs.js"></script>
+    <script src="../../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Outer green box with alpha map
+            {
+                type:"flags",
+                flags:{
+                    transparent:true
+                },
+                nodes:[
+                    {
+                        type:"material",
+                        color:{
+                            r:0.5, g:1, b:0.5
+                        },
+                        alpha:1.0,
+                        nodes:[
+                            {
+                                type:"texture",
+                                id:"theTexture",
+                                layers:[
+                                    {
+                                        src:"../../../textures/leavesAlphaMap.jpg",
+                                        applyTo:"alpha"
+                                    }
+                                ],
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        source:{
+                                            type:"box"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // Inner blue sphere
+            {
+                type:"scale",
+                x:0.3,
+                y:0.3,
+                z:0.3,
+                nodes:[
+                    {
+                        type:"material",
+                        color:{
+                            r:0.3, g:0.3, b:1
+                        },
+                        nodes:[
+                            {
+                                type:"geometry",
+                                source:{
+                                    type:"sphere"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:5
+    });
+
+
+</script>
+</body>
+</html>

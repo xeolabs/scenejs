@@ -7,10 +7,7 @@
 
     <style>
         body {
-            background-color: #000000;
-            margin: 0px;
-            overflow: auto;
-            height: 100%;
+            margin: 0;
             -moz-user-select: -moz-none;
             -khtml-user-select: none;
             -webkit-user-select: none;
@@ -21,7 +18,7 @@
 
     <script src="../../../build/latest/scenejs.js"></script>
 
-    <script src="../../libs/example-support-utils.js"></script>
+    <script src="../../../build/latest/extras/controls/orbit.js"></script>
 
     <style type="text/css">
 
@@ -112,89 +109,57 @@
                 var scene = SceneJS.createScene({
                     nodes:[
                         {
-                            type:"lookAt",
-                            eye:{ z:-35.0},
-
+                            type:"translate",
+                            x:-10.0,
+                            id:"teapot1",
                             nodes:[
                                 {
-                                    type:"rotate",
-                                    id:"yaw",
-                                    angle:0.0,
-                                    y:1.0,
-
+                                    type:"material",
+                                    color:{ r:1.0, g:0.4, b:0.4 },
                                     nodes:[
                                         {
-                                            type:"rotate",
-                                            id:"pitch",
-                                            angle:-40.0,
-                                            x:1.0,
-
-                                            nodes:[
-                                                {
-                                                    type:"translate",
-                                                    x:-10.0,
-                                                    id:"teapot1",
-
-                                                    nodes:[
-                                                        {
-                                                            type:"material",
-                                                            baseColor:{ r:1.0, g:0.4, b:0.4 },
-
-                                                            nodes:[
-                                                                {
-                                                                    type:"geometry",
-                                                                    source:{
-                                                                        type:"teapot"
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-
-                                                {
-                                                    type:"translate",
-                                                    z:-10.0,
-                                                    id:"teapot2",
-
-                                                    nodes:[
-                                                        {
-                                                            type:"material",
-                                                            baseColor:{ r:0.4, g:1.0, b:0.4 },
-
-                                                            nodes:[
-                                                                {
-                                                                    type:"geometry",
-                                                                    source:{
-                                                                        type:"teapot"
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    type:"translate",
-                                                    z:10.0,
-                                                    id:"teapot3",
-
-                                                    nodes:[
-                                                        {
-                                                            type:"material",
-                                                            baseColor:{ r:0.4, g:0.4, b:1.0 },
-
-                                                            nodes:[
-                                                                {
-                                                                    type:"geometry",
-                                                                    source:{
-                                                                        type:"teapot"
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
+                                            type:"geometry",
+                                            source:{
+                                                type:"teapot"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            type:"translate",
+                            z:-10.0,
+                            id:"teapot2",
+                            nodes:[
+                                {
+                                    type:"material",
+                                    color:{ r:0.4, g:1.0, b:0.4 },
+                                    nodes:[
+                                        {
+                                            type:"geometry",
+                                            source:{
+                                                type:"teapot"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            type:"translate",
+                            z:10.0,
+                            id:"teapot3",
+                            nodes:[
+                                {
+                                    type:"material",
+                                    color:{ r:0.4, g:0.4, b:1.0 },
+                                    nodes:[
+                                        {
+                                            type:"geometry",
+                                            source:{
+                                                type:"teapot"
+                                            }
                                         }
                                     ]
                                 }
@@ -203,45 +168,38 @@
                     ]
                 });
 
-                scene.findNode("teapot1").on(
-                        "rendered",
-                        function (event) {
-                            var params = event.params;
+                scene.getNode("teapot1").on("rendered", function (event) {
+                    var params = event.params;
+                    updateLabelPos(
+                            "teapot1",
+                            params.getCanvasPos(),
+                            params.getProjPos(),
+                            params.getCameraPos(),
+                            params.getViewPos(),
+                            params.getWorldPos());
+                });
 
-                            updateLabelPos(
-                                    "teapot1",
-                                    params.getCanvasPos(),
-                                    params.getProjPos(),
-                                    params.getCameraPos(),
-                                    params.getViewPos(),
-                                    params.getWorldPos());
-                        });
+                scene.getNode("teapot2").on("rendered", function (event) {
+                    var params = event.params;
+                    updateLabelPos(
+                            "teapot2",
+                            params.getCanvasPos(),
+                            params.getProjPos(),
+                            params.getCameraPos(),
+                            params.getViewPos(),
+                            params.getWorldPos());
+                });
 
-                scene.findNode("teapot2").on(
-                        "rendered",
-                        function (event) {
-                            var params = event.params;
-                            updateLabelPos(
-                                    "teapot2",
-                                    params.getCanvasPos(),
-                                    params.getProjPos(),
-                                    params.getCameraPos(),
-                                    params.getViewPos(),
-                                    params.getWorldPos());
-                        });
-
-                scene.findNode("teapot3").on(
-                        "rendered",
-                        function (event) {
-                            var params = event.params;
-                            updateLabelPos(
-                                    "teapot3",
-                                    params.getCanvasPos(),
-                                    params.getProjPos(),
-                                    params.getCameraPos(),
-                                    params.getViewPos(),
-                                    params.getWorldPos());
-                        });
+                scene.getNode("teapot3").on("rendered", function (event) {
+                    var params = event.params;
+                    updateLabelPos(
+                            "teapot3",
+                            params.getCanvasPos(),
+                            params.getProjPos(),
+                            params.getCameraPos(),
+                            params.getViewPos(),
+                            params.getWorldPos());
+                });
 
                 function updateLabelPos(elementId, canvasPos, projPos, cameraPos, viewPos, worldPos) {
 
@@ -269,7 +227,11 @@
                     return Math.round(v * 10) / 10;
                 }
 
-                mouseOrbitUtility(scene);
+                new SceneJS.OrbitControls(scene, {
+                    yaw:30,
+                    pitch:-30,
+                    zoom:-35
+                });
 
             })
     ;

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #info {
+            position: absolute;
+            top: 200px;
+            width: 100%;
+            color: #ffffff;
+            padding: 5px;
+            font-family: Monospace;
+            font-size: 18px;
+            text-align: center;
+            background: black;
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Shows each pick hit -->
+<div id="info">Click on an object to ray-pick it
+</div>
+
+<script src="../../../build/latest/scenejs.js"></script>
+<script src="../../../build/latest/extras/controls/orbit.js"></script>
+
+<script>
+
+    // Create scene graph
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            // Pickable objects
+            {
+                type:"node",
+                nodes:createObjects()
+            },
+            // We'll create little spheres here to indicate where the ray-pick intersects occur
+            // That's done by the showHit() function defined lower down
+            {
+                type:"node",
+                id:"intersectIndicators"
+            }
+        ]
+    });
+
+    // Creates random sphere objects for us to pick
+
+    function createObjects() {
+        var nodes = [];
+        for (var i = 0; i < 1000; i++) {
+            nodes.push({
+                type:"name",
+                name:"object" + i,
+                nodes:[
+                    {
+                        type:"translate",
+                        x:(Math.random() * 40) - 20,
+                        y:(Math.random() * 40) - 20,
+                        z:(Math.random() * 40) - 20,
+                        nodes:[
+                            {
+                                type:"material",
+                                id:"object" + i + "-material",
+                                emit:0,
+                                color:{ r:0.5, g:0.5, b:0.6 },
+                                specularColor:{ r:0.9, g:0.9, b:0.9 },
+                                specular:1.0,
+                                shine:70.0,
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        source:{
+                                            type:"sphere"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            });
+        }
+        return nodes;
+    }
+
+    // Pick hit handler
+    // 1. Highlights picked object,
+    // 2. Shows pick info
+    // 3. Creates red sphere showing 3D ray intersection
+    //
+    var info = document.getElementById("info");
+
+    scene.on("pick",
+            function (hit) {
+                scene.getNode(hit.name + "-material").setColor({r:0.7, g:0.7, b:0.5});
+                info.innerHTML = "Pick hit: " + JSON.stringify(hit);
+                showHit(hit);
+            });
+
+    // Creates little red sphere at each given ray pick hit
+
+    function showHit(hit) {
+        scene.getNode("intersectIndicators")
+                .addNode({
+                    type:"material",
+                    color:{ r:1, g:0.3, b:0.3 },
+                    nodes:[
+                        {
+                            type:"translate",
+                            x:hit.worldPos[0],
+                            y:hit.worldPos[1],
+                            z:hit.worldPos[2],
+                            nodes:[
+                                {
+                                    type:"scale",
+                                    x:0.2,
+                                    y:0.2,
+                                    z:0.2,
+                                    nodes:[
+                                        {
+                                            type:"geometry",
+                                            source:{
+                                                type:"sphere"
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                });
+    }
+
+    // Mouse event handling to do a pick on each mouse click
+
+    var canvas = scene.getCanvas();
+
+    canvas.addEventListener('mousedown', mouseDown, true);
+    canvas.addEventListener('mouseup', mouseUp, true);
+    canvas.addEventListener('touchstart', touchStart, true);
+    canvas.addEventListener('touchend', touchEnd, true);
+
+    var lastX;
+    var lastY;
+    var dragging;
+
+    function mouseDown(event) {
+        lastX = event.clientX;
+        lastY = event.clientY;
+        dragging = true;
+    }
+
+    function touchStart(event) {
+        lastX = event.targetTouches[0].clientX;
+        lastY = event.targetTouches[0].clientY;
+        dragging = true;
+    }
+
+    function mouseUp(event) {
+        if (dragging && event.clientX == lastX && event.clientY == lastY) {
+            pick(event.clientX, event.clientY);
+        }
+        dragging = false;
+    }
+
+    function touchEnd(event) {
+        if (dragging && event.targetTouches[0].clientX == lastX && event.targetTouches[0].clientY == lastY) {
+            pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
+        }
+        dragging = false;
+    }
+
+    function pick(canvasX, canvasY) {
+        scene.pick(canvasX, canvasY, { rayPick:true });
+    }
+
+    // Helper to orbit lookat with mouse
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:60
+    });
+
+
+</script>
+</body>
+</html>

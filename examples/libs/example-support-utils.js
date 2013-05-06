@@ -1,12 +1,8 @@
-function mouseOrbitUtility(scene) {
+function mouseOrbitUtility_OLD(scene) {
 
-
-// Get handles to scene nodes
-
+    var canvas = scene.getCanvas();
     var yawNode = scene.getNode("yaw");
     var pitchNode = scene.getNode("pitch");
-
-// Rotate with mouse drags
 
     var lastX;
     var lastY;
@@ -28,11 +24,17 @@ function mouseOrbitUtility(scene) {
         dragging = true;
     }
 
-    function mouseUp() {
+    function mouseUp(event) {
+        if (lastX == event.clientX && lastY == event.clientY) {
+            //  scene.pick(lastX, lastY);
+        }
         dragging = false;
     }
 
-    function touchEnd() {
+    function touchEnd(event) {
+        if (lastX == event.clientX && lastY == event.clientY) {
+            //   scene.pick(lastX, lastY);
+        }
         dragging = false;
     }
 
@@ -62,22 +64,36 @@ function mouseOrbitUtility(scene) {
         }
     }
 
-    document.body.addEventListener('mousedown', mouseDown, true);
-    document.body.addEventListener('mousemove', mouseMove, true);
-    document.body.addEventListener('mouseup', mouseUp, true);
-    document.body.addEventListener('touchstart', touchStart, true);
-    document.body.addEventListener('touchmove', touchMove, true);
-    document.body.addEventListener('touchend', touchEnd, true);
+    canvas.addEventListener('mousedown', mouseDown, true);
+    canvas.addEventListener('mousemove', mouseMove, true);
+    canvas.addEventListener('mouseup', mouseUp, true);
+    canvas.addEventListener('touchstart', touchStart, true);
+    canvas.addEventListener('touchmove', touchMove, true);
+    canvas.addEventListener('touchend', touchEnd, true);
 }
 
 
-function mousePanLookatUtility(scene) {
+function new SceneJS.OrbitControl(scene); {
 
 // Get handles to scene nodes
 
-    var lookatNode = scene.getNode("lookat");
+    var lookatNode;
 
-// Pan with mouse drags
+    scene.eachNode(
+        function () {
+            if (this.get("type") == "lookAt") {
+                lookatNode = this;
+                return true;
+            }
+        });
+
+    if (!lookatNode) {
+        lookatNode = scene.insertNode({
+            type:"lookAt"
+        });
+    }
+
+    // Pan with mouse drags
 
     var lastX;
     var lastY;
@@ -123,22 +139,24 @@ function mousePanLookatUtility(scene) {
     function actionMove(posX, posY) {
         if (dragging) {
 
-            xeye -= (posX - lastX) * 0.5;
-            yeye -= (posY - lastY) * 0.5;
+            xeye -= (posX - lastX) * 0.1;
+            yeye -= (posY - lastY) * 0.1;
 
             lastX = posX;
             lastY = posY;
 
             lookatNode.set({
-                eye:{ x:xeye, y:yeye }
+                eye:{ x:xeye, y:yeye, z:xeye + 5 }
+//                ,
+//                look:{ x:xeye, y:yeye, z: xeye }
             });
         }
     }
 
-    document.body.addEventListener('mousedown', mouseDown, true);
-    document.body.addEventListener('mousemove', mouseMove, true);
-    document.body.addEventListener('mouseup', mouseUp, true);
-    document.body.addEventListener('touchstart', touchStart, true);
-    document.body.addEventListener('touchmove', touchMove, true);
-    document.body.addEventListener('touchend', touchEnd, true);
+    canvas.addEventListener('mousedown', mouseDown, true);
+    canvas.addEventListener('mousemove', mouseMove, true);
+    canvas.addEventListener('mouseup', mouseUp, true);
+    canvas.addEventListener('touchstart', touchStart, true);
+    canvas.addEventListener('touchmove', touchMove, true);
+    canvas.addEventListener('touchend', touchEnd, true);
 }

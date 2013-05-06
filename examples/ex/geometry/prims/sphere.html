@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+
+<script src="../../../../build/latest/scenejs.js"></script>
+
+<script src="../../../../build/latest/extras/controls/orbit.js"></script>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            // Override default material to make sphere blue
+            {
+                type:"material",
+                color:{ r:0.5, g:0.5, b:0.6 },
+                nodes:[
+
+                    // Sphere showing default property values
+                    {
+                        type:"geometry",
+                        source:{
+                            type:"sphere",
+                            latudeBands:20,
+                            longitudeBands:30,
+                            radius:1
+                        }
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:5
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    // When culling backfaces, SceneJS uses the vertex winding order of each geometry
+    // face to determine whether the face is oriented away from the eye (and should
+    // be culled) or oriented towards the eye (and should be rendered).
+    //
+    // The flags node's 'frontface' attribute is used to specify the winding order
+    // direction for geometries within its subgraph.
+    //
+    // This flags attribute only takes effect when the 'backfaces' flag is set false,
+    // which enables backface culling for the subgraph's geometries.
+    //
+    // In this example we're toggling the 'frontface' attribute back and forth between
+    // "ccw" and "cw", which toggles the winding order.
+    //
+    // The winding order will be counter-clockwise by default when no flags node
+    // is present, or if the 'frontface' attribute is not specified and
+    // defaults to "ccw".
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"flags",
+                id:"myFlags",
+                flags:{
+                    backfaces:false, // Default value, enables backface culling
+                    frontface:"ccw" // Default value, culls faces with clockwise vertex winding order
+                },
+
+                nodes:[
+                    {
+                        type:"geometry",
+                        plugin:"teapot"
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:10
+    });
+
+    var flags = scene.getNode("myFlags");
+    var counterClockwise = true;
+
+    setInterval(
+            function () {
+                flags.setFrontface(counterClockwise ? "ccw" : "cw"); // Toggle
+                counterClockwise = !counterClockwise;
+            },
+            1000);
+
+</script>
+</body>
+</html>

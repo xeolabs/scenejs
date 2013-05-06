@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../../build/latest/scenejs.js"></script>
+    <script src="../../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"texture",
+                id:"theTexture",
+                layers:[
+                    {
+                        src:"../../../textures/superman.jpg",
+                        wrapS:"repeat",
+                        wrapT:"repeat",
+                        blendFactor:1.0
+                    },
+                    {
+                        src:"../../../textures/general-zod.jpg",
+                        wrapS:"repeat",
+                        wrapT:"repeat",
+                        blendFactor:1.0,
+
+                        /* Texture rotation angle in degrees
+                         */
+                        rotate:{
+                            z:0.0
+                        },
+
+                        /* Texture translation offset
+                         */
+                        translate:{
+                            x:0,
+                            y:0
+                        },
+
+                        /* Texture scale factors
+                         */
+                        scale:{
+                            x:1.0,
+                            y:1.0
+                        }
+                    }
+                ],
+                nodes:[
+                    {
+                        type:"geometry",
+                        source:{
+                            type:"box"
+                        }
+                    }
+                ]
+            }
+        ]
+    });
+
+    var textureNode = scene.getNode("theTexture");
+
+    var texAngle = 0.0;
+    var texScale = 1.0;
+
+    var timeLast = (new Date()).getTime();
+
+    scene.on("tick",
+            function () {
+
+                /* Animate scale, rotate and blendFactor of second texture layer
+                 */
+                textureNode.setLayers({
+
+                    "1":{ // Index layer #1, which contains General Zod image
+
+                        scale:{ // Scaling factor for geometry UV coordinates
+                            x:texScale,
+                            y:texScale
+                        },
+
+                        rotate:{ // Rotate geometry UV coordinates about axis perpendicular to each face
+                            z:texAngle
+                        },
+
+                        blendFactor:Math.abs(Math.sin(texAngle * 0.01))
+                    }
+                });
+
+                texAngle += 0.4;
+                texScale = (texScale + 0.01) % 10.0;
+            });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:5
+    });
+
+</script>
+</body>
+</html>

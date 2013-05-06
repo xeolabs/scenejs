@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Demonstrates how to enable and disable backface lighting for geometry.
+    //
+    // With SceneJS' default lighting in effect, the 'backfaceLighting' flag
+    // of the flags node in the example below will govern whether or not backface
+    // lighting is applied to the geometry in its subgraph.
+    //
+    // As we periodically toggle the flag, watch the backface lighting
+    // will appear and disappear on the geometry accordingly.
+    //
+    // This feature is used when we want to give the illusion of solidity
+    // on objects that are clipped such that we can see their interior faces.
+    //
+    // Backface lighting will be enabled by default when no flags node
+    // is present, or if the 'backfaceLighting' flag is not specified and
+    // defaults to true.
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"flags",
+                id:"myFlags",
+                flags:{
+                    backfaceLighting:true // Default value
+                },
+
+                nodes:[
+                    {
+                        type:"material",
+                        color:{ r:0.4, g:0.5, b:0.4 },
+                        alpha:0.8,
+
+                        nodes:[
+                            {
+                                type:"geometry",
+                                source:{
+                                    type:"teapot"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:30,
+        zoom:10
+    });
+
+    var flags = scene.getNode("myFlags");
+
+    setInterval(
+            function () {
+                flags.setBackfaceLighting(!flags.getBackfaceLighting());
+            },
+            1000);
+
+</script>
+</body>
+</html>

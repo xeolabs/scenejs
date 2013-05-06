@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Texture Animation</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../../build/latest/scenejs.js"></script>
+    <script src="../../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+
+        nodes:[
+
+            // Override SceneJS' default lights to define dull ambient light
+            // to accentuate our glow map
+            {
+                type:"lights",
+                lights:[
+                    {
+                        mode:"ambient",
+                        color:{ r:0.7, g:0.7, b:0.8 },
+                        diffuse:true,
+                        specular:false
+                    },
+                    {
+                        mode:"dir",
+                        color:{ r:1.0, g:1.0, b:1.0 },
+                        diffuse:true,
+                        specular:true,
+                        dir:{ x:-0.4, y:0.0, z:0.5 },
+                        space:"world"
+                    }
+                ],
+
+                nodes:[
+
+                    {
+                        type:"texture",
+                        id:"theTexture",
+                        layers:[
+                            {
+                                source:{
+                                    type:"video",
+                                    src:"../../../movies/bumpMap.ogg"
+                                },
+                                wrapS:"repeat",
+                                wrapT:"repeat",
+                                applyTo:"normals"
+                            }
+                        ],
+                        nodes:[
+                            {
+                                type:"geometry",
+                                source:{
+                                    type:"box"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:5
+    });
+
+</script>
+</body>
+</html>

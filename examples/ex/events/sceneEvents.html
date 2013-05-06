@@ -19,55 +19,22 @@
 
 <script src="../../../build/latest/scenejs.js"></script>
 
-<script src="../../libs/example-support-utils.js"></script>
+<script src="../../../build/latest/extras/controls/orbit.js"></script>
 
 <script>
 
     var scene = SceneJS.createScene({
         nodes:[
             {
-                type:"lookAt",
-                eye:{ z:10 },
+                type:"material",
+                color:{ r:0.5, g:0.5, b:0.6 },
+
                 nodes:[
                     {
-                        id:"pitch",
-                        type:"rotate",
-                        angle:0.0,
-                        x:1.0,
-
-                        nodes:[
-                            {
-                                id:"yaw",
-                                type:"rotate",
-                                angle:0.0,
-                                y:1.0,
-
-                                nodes:[
-                                    {
-                                        type:"material",
-                                        emit:0,
-                                        baseColor:{ r:0.5, g:0.5, b:0.6 },
-                                        specularColor:{ r:0.9, g:0.9, b:0.9 },
-                                        specular:1.0,
-                                        shine:70.0,
-
-                                        nodes:[
-                                            {
-                                                type:"geometry",
-                                                source:{
-                                                    type:"torus",
-                                                    radius:1.5,
-                                                    tube:0.5,
-                                                    segmentsR:60,
-                                                    segmentsT:40,
-                                                    arc:Math.PI * 2
-                                                }
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
+                        type:"geometry",
+                        source:{
+                            type:"torus"
+                        }
                     }
                 ]
             }
@@ -78,7 +45,7 @@
     // Subscribe and unsubscribe to an event.
     //----------------------------------------
 
-    var idle = scene.on("idle",
+    var idle = scene.on("tick",
             function (params) {
 
                 // Fired on each render loop, regardless of whether or not a new view is rendered.
@@ -88,11 +55,11 @@
                 var sceneId = params.sceneId;
 
                 //  alert("Scene 'idle' event fired");
-                
+
                 // Unsubscribe
                 scene.off(idle);
 
-            });    
+            });
 
     var rendered = scene.on("rendered",
             function (params) {
@@ -116,7 +83,7 @@
                 // ID of the scene
                 var sceneId = params.sceneId;
 
-                  alert("Scene 'destroyed' event fired");
+                alert("Scene 'destroyed' event fired");
 
                 // Unsubscribe
                 scene.off(destroyed);
@@ -142,7 +109,11 @@
             });
 
 
-    mouseOrbitUtility(scene);
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:10
+    });
 
 </script>
 </body>

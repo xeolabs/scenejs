@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"material",
+                color:{ r:0.3, g:0.3, b:0.9 },
+                nodes:[
+
+                    /*------------------------------------------------------
+                     * The morphGeometry
+                     *
+                     * We could morph everything on the geometry except
+                     * of course for the indices array. In this example, we're
+                     * just morphing the positions and normals between two
+                     * targets.
+                     *
+                     * The 'factor' attribute takes a value from 0.0 to 1.0
+                     * to interpolate between the first and last target.
+                     *
+                     * We'll animate that as we run the scene to drive the
+                     * morphing.
+                     *----------------------------------------------------*/
+                    {
+                        type:"morphGeometry",
+                        id:"myMorph",
+
+                        /* Start at first target
+                         */
+                        factor:0.0,
+
+                        keys:[0, 2],
+
+                        /* Minimum of two morph targets required
+                         */
+                        targets:[
+
+                            /* Target 1
+                             */
+                            {
+                                positions:[ 5, 5, 0, -5, 5, 0, -5, -5, 0, 5, -5, 0 ],
+                                normals:[-1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0 ]
+                            },
+
+                            /* Target 2
+                             */
+                            {
+                                positions:[ 0, 5, 5, 0, 5, -5, 0, -5, -5, 0, -5, 5 ],
+                                normals:[ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ]
+                            }
+                        ],
+
+                        nodes:[
+
+                            /*----------------------------------------------
+                             * The geometry we're morphing.
+                             *
+                             * Note that the positions and normals are
+                             * omitted because those are specified on the
+                             * morphGeometry.
+                             *
+                             * We're not morphing the UV coords, so we'll
+                             * specify them on the geometry.
+                             *
+                             * We can have multiple geometries in a
+                             * morphGeometry, perhaps to divide up the
+                             * positions among separate indices to apply
+                             * multiple materials to the mesh - see the
+                             * multi-materials demo for more info on that.
+                             *
+                             * So the geometry can of course be nested within
+                             * whatever other nodes we wish, except for
+                             * another morphGeometry, because that would
+                             * override the morphGeometry we just defined.
+                             *---------------------------------------------*/
+
+                            {
+                                type:"geometry",
+
+                                primitive:"triangles",
+
+                                indices:[ 0, 1, 2, 0, 2, 3 ],
+                                uv:[1, 1, 0, 1, 0, 0, 1, 0]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    var morph = scene.getNode("myMorph");
+
+    var factor = 0;
+    var factorInc = 0.01;
+
+    scene.on("tick",
+            function () {
+                if (factor >= 1.0) {
+                    factorInc *= -1;
+                } else if (factor < -1) {
+                    factorInc *= -1;
+                }
+                factor += factorInc;
+                morph.setFactor(factor);
+            });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:10
+    });
+
+</script>
+</body>
+</html>

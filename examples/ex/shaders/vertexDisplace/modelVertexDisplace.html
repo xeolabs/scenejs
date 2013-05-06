@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../../build/latest/scenejs.js"></script>
+    <script src="../../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+
+        nodes:[
+            {
+                type:"material",
+                color:{ r:0.5, g:0.5, b:0.6 },
+
+                nodes:[
+                    {
+                        type:"shader",
+                        id:"myShader",
+
+                        shaders:[
+
+                            // Vertex shader
+                            {
+                                stage:"vertex",
+
+                                // GLSL fragment with custom function (which is pinched
+                                // from the custom shader demo for GLGE - http://www.glge.com)
+
+                                code:"uniform float time;\n\
+                                      vec4 myModelPosFunc(vec4 pos){\n\
+                                      pos.x=pos.x+sin(pos.x*5.0+time+10.0)*0.1;\n\
+                                      pos.y=pos.y+sin(pos.y*5.0+time+10.0)*0.1;\n\
+                                      pos.z=pos.z+sin(pos.z*5.0+time+10.0)*0.1;\n\
+                                      return pos;\n\
+                                }\n",
+
+                                /* Bind our custom function to a SceneJS vertex shader hook
+                                 */
+                                hooks:{
+                                    modelPos:"myModelPosFunc"
+                                }
+                            }
+                        ],
+
+                        // Optional initial values for uniforms within our GLSL:
+                        params:{
+                            time:0.5
+                        },
+
+                        // This teapot will enjoy our custom shader injection:
+                        nodes:[
+                            {
+                                type:"translate",
+                                y:-1,
+
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        plugin:"teapot"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    var shader = scene.findNode("myShader");
+    var time = 0;
+
+    scene.on("tick",
+            function () {
+                shader.setParams({
+                    time:time
+                });
+                time += 0.1;
+            });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:10
+    });
+
+</script>
+</body>
+</html>

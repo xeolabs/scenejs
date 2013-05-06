@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"lookAt",
+                id: "lookat",
+                eye:{ x:0.0, y:0.0, z:10 },
+                nodes:[
+
+                    // A box tagged "rectangular"
+                    {
+                        type:"tag",
+                        tag:"rectangular",
+
+                        nodes:[
+                            {
+                                type:"translate",
+                                x:-10,
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        source:{
+                                            type:"box"
+                                        }
+
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    // A sphere tagged "spherical"
+                    {
+                        type:"tag",
+                        tag:"spherical",
+
+                        nodes:[
+                            {
+                                type:"translate",
+                                x:0,
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        source:{
+                                            type:"sphere"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    // A teapot tagged "teapotty"
+                    {
+                        type:"tag",
+                        tag:"teapotty",
+
+                        nodes:[
+                            {
+                                type:"translate",
+                                x:10,
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        source:{
+                                            type:"teapot"
+                                        }
+
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    // Another teapot tagged "teapotty"
+                    {
+                        type:"tag",
+                        tag:"teapots",
+
+                        nodes:[
+                            {
+                                type:"translate",
+                                x:20,
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        source:{
+                                            type:"teapot"
+                                        }
+
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    scene.start();
+
+    // Enable objects that are tagged "spherical" or "teapotty"
+    scene.set("tagMask", "(spherical|teapotty)");
+
+    mousePanLookatUtility(scene);
+
+</script>
+</body>
+</html>

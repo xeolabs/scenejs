@@ -1,10 +1,66 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-        "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
-    <title>Examples</title>
+    <title>SceneHub - Intro</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <script src="libs/jquery-1.8.3.min.js"></script>
+    <script src="../../examplejs/api/v0/tweakjs.js"></script>
+
 </head>
 <body>
-TODO
+
+<style>
+    html, body {
+        height: 100%;
+    }
+
+    body {
+        margin: 0px;
+        overflow: hidden;
+    }
+</style>
+
+<script>
+
+    jQuery(document).ready(
+            function ($) {
+
+                // Load examples index
+                $.getJSON("ex/index.json",
+                        function (index) {
+
+                            var href = window.location.href;
+
+                            // Create examples browser
+                            var tweakjs = new TweakJS({
+                                title:"SceneJS",
+                                caption:"examples",
+                                editor:"htmleditor",
+                                index:index,
+
+                                // file:///home/lindsay/xeolabs/projects/scenehub/scenehub-pages/examples.html
+                                pageBase:href.substring(0, href.lastIndexOf("/")) + "/ex/",
+                                //pageBase:"/home/lindsay/xeolabs/projects/scenehub/scenehub-pages/examples/",
+
+                                // Initially selected page
+                                page:null,
+
+                                // Initially selected tags
+                                tags:{
+                                    basic:true
+                                }
+                            });
+
+                            // Listen for home link click
+                            tweakjs.once("home",
+                                    function () {
+                                        window.location = "http://scenejs.org"
+                                    });
+                        });
+            });
+</script>
 </body>
 </html>

@@ -32,7 +32,7 @@
 <span class='line'> 25</span> </span><span class="WHIT">    </span><span class="NAME">this.events</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">SceneJS_eventManager</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 26</span> 
 <span class='line'> 27</span> </span><span class="WHIT">    </span><span class="NAME">this.events.createEvent</span><span class="PUNC">(</span><span class="STRN">"started"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
-<span class='line'> 28</span> </span><span class="WHIT">    </span><span class="NAME">this.events.createEvent</span><span class="PUNC">(</span><span class="STRN">"idle"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 28</span> </span><span class="WHIT">    </span><span class="NAME">this.events.createEvent</span><span class="PUNC">(</span><span class="STRN">"tick"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 29</span> </span><span class="WHIT">    </span><span class="NAME">this.events.createEvent</span><span class="PUNC">(</span><span class="STRN">"rendered"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 30</span> </span><span class="WHIT">    </span><span class="NAME">this.events.createEvent</span><span class="PUNC">(</span><span class="STRN">"sleep"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'> 31</span> </span><span class="WHIT">    </span><span class="NAME">this.events.createEvent</span><span class="PUNC">(</span><span class="STRN">"stopped"</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
@@ -291,7 +291,7 @@
 <span class='line'>284</span> </span><span class="COMM">//            sceneId: this.id</span><span class="WHIT">
 <span class='line'>285</span> </span><span class="COMM">//        };</span><span class="WHIT">
 <span class='line'>286</span> </span><span class="COMM">//</span><span class="WHIT">
-<span class='line'>287</span> </span><span class="WHIT">        </span><span class="COMM">//self.events.fireEvent("idle", eventParams);</span><span class="WHIT">
+<span class='line'>287</span> </span><span class="WHIT">        </span><span class="COMM">//self.events.fireEvent("tick", eventParams);</span><span class="WHIT">
 <span class='line'>288</span> 
 <span class='line'>289</span> </span><span class="WHIT">        </span><span class="NAME">this.display.render</span><span class="PUNC">(</span><span class="NAME">params</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>290</span> 
@@ -334,7 +334,7 @@
 <span class='line'>327</span> 
 <span class='line'>328</span> </span><span class="WHIT">            </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">self.running</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="PUNC">!</span><span class="NAME">self.paused</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">  </span><span class="COMM">// idleFunc may have paused scene</span><span class="WHIT">
 <span class='line'>329</span> 
-<span class='line'>330</span> </span><span class="WHIT">                </span><span class="NAME">self.events.fireEvent</span><span class="PUNC">(</span><span class="STRN">"idle"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">idleEventParams</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>330</span> </span><span class="WHIT">                </span><span class="NAME">self.events.fireEvent</span><span class="PUNC">(</span><span class="STRN">"tick"</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">idleEventParams</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
 <span class='line'>331</span> 
 <span class='line'>332</span> </span><span class="WHIT">                </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">cfg.idleFunc</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
 <span class='line'>333</span> </span><span class="WHIT">                    </span><span class="NAME">cfg.idleFunc</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">

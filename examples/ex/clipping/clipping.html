@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Clip Planes</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+
+        body {
+            background-color: #000000;
+            margin: 0px;
+            overflow: auto;
+            height: 100%;
+        }
+
+        #info {
+            position: absolute;
+            top: 0px;
+            width: 100%;
+            color: #ffffff;
+            padding: 5px;
+            font-family: Monospace;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        #theCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        a {
+            color: #ffffff;
+        }
+
+        a:hover {
+            color: #0080ff;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container"></div>
+<div id="info">
+    <a href="http://github.com/xeolabs/scenejs" target="_blank">SceneJS V3</a> - Clip Planes Example.<br/>
+</div>
+
+<canvas id="theCanvas"></canvas>
+
+<!-- SceneJS engine -->
+
+<script src="../build/scenejs.js"></script>
+
+<!-- Plugins for "teapot" geometry source type -->
+
+<script src="../plugins/geometry/scenejs.teapot.js"></script>
+
+<script>
+
+SceneJS.createScene({
+
+    type:"scene",
+
+    /* ID that we'll access the scene by when we want to render it
+     */
+    id:"theScene",
+
+    /* Bind scene to a WebGL canvas:
+     */
+    canvasId:"theCanvas",
+
+    nodes:[
+
+
+        /* Viewing transform specifies eye position, looking
+         * at the origin by default
+         */
+        {
+            type:"lookAt",
+            eye:{ x:0.0, y:10.0, z:-15 },
+            look:{ y:1.0 },
+            up:{ y:1.0 },
+
+            nodes:[
+
+                /* Camera describes the projection
+                 */
+                {
+                    type:"camera",
+                    optics:{
+                        type:"perspective",
+                        fovy:25.0,
+                        aspect:1.47,
+                        near:0.10,
+                        far:300.0
+                    },
+
+                    nodes:[
+
+
+                        /* A lights node inserts  point lights into the world-space.
+                         * You can have many of these, nested within modelling transforms
+                         * if you want to move them around.
+                         */
+                        {
+                            type:"lights",
+                            lights:[
+                                {
+                                    mode:"dir",
+                                    color:{ r:1.0, g:1.0, b:1.0 },
+                                    diffuse:true,
+                                    specular:true,
+                                    dir:{ x:1.0, y:-0.5, z:-1.0 },
+                                    space:"world"
+                                },
+
+                                {
+                                    mode:"dir",
+                                    color:{ r:1.0, g:1.0, b:0.8 },
+                                    diffuse:true,
+                                    specular:false,
+                                    dir:{ x:0.0, y:-0.5, z:-1.0 },
+                                    space:"world"
+                                }
+                            ],
+
+                            nodes:[
+
+
+                                /* Next, modelling transforms to orient our teapot. See how these have IDs,
+                                 * so we can access them to set their angle attributes.
+                                 */
+                                {
+                                    type:"rotate",
+                                    id:"pitch",
+                                    angle:0.0,
+                                    x:1.0,
+
+                                    nodes:[
+                                        {
+                                            type:"rotate",
+                                            id:"yaw",
+                                            angle:0.0,
+                                            y:1.0,
+
+                                            nodes:[
+
+                                                /* Specify the amounts of ambient, diffuse and specular
+                                                 * lights our teapot reflects
+                                                 */
+                                                {
+                                                    type:"material",
+                                                    emit:0,
+                                                    color:{ r:0.3, g:0.3, b:0.9 },
+                                                    specularColor:{ r:0.9, g:0.9, b:0.9 },
+                                                    specular:0.9,
+                                                    shine:100.0,
+
+                                                    nodes:[
+
+                                                        /* Clipping plane
+                                                         */
+                                                        {
+                                                            type:"clips",
+                                                            clips:[
+                                                                {
+                                                                    mode:"inside",
+                                                                    a:{ x:-4, y:-2, z:-10 },
+                                                                    b:{ x:0, y:0, z:10 },
+                                                                    c:{ x:0, y:2, z:-10 }
+                                                                }
+//                                                        ,
+//                                                        {
+//                                                            mode:"outside",
+//                                                            a:{ x:-4, y:-2, z:-10 },
+//                                                            b:{ x:0, y:0, z:10 },
+//                                                            c:{ x:0, y:2, z:-10 }
+//                                                        }
+                                                            ],
+
+                                                            nodes:[
+
+                                                                /* Teapot's geometry
+                                                                 */
+                                                                {
+                                                                    type:"scale",
+                                                                    x:1.0,
+                                                                    y:1.0,
+                                                                    z:1.0,
+
+                                                                    nodes:[
+                                                                        {
+                                                                            type:"geometry",
+
+                                                                            source:{
+                                                                                type:"teapot"
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
+
+/* Get handles to some nodes
+ */
+var scene = SceneJS.scene("theScene");
+var yawNode = scene.findNode("yaw");
+var pitchNode = scene.findNode("pitch");
+var lookAtNode = scene.findNode("theLookAt");
+
+/* As mouse drags, we'll update the rotate nodes
+ */
+
+var lastX;
+var lastY;
+var dragging = false;
+
+var newInput = false;
+var yaw = 0;
+var pitch = 0;
+
+var canvas = document.getElementById("theCanvas");
+
+function mouseDown(event) {
+    lastX = event.clientX;
+    lastY = event.clientY;
+    dragging = true;
+}
+
+function touchStart(event) {
+    lastX = event.targetTouches[0].clientX;
+    lastY = event.targetTouches[0].clientY;
+    dragging = true;
+}
+
+function mouseUp() {
+    dragging = false;
+}
+
+function touchEnd() {
+    dragging = false;
+}
+
+function mouseMove(event) {
+    var posX = event.clientX;
+    var posY = event.clientY;
+    actionMove(posX, posY);
+}
+
+function touchMove(event) {
+    var posX = event.targetTouches[0].clientX;
+    var posY = event.targetTouches[0].clientY;
+    actionMove(posX, posY);
+}
+
+function actionMove(posX, posY) {
+    if (dragging) {
+
+        yaw += (posX - lastX) * 0.5;
+        pitch += (posY - lastY) * 0.5;
+
+        lastX = posX;
+        lastY = posY;
+
+        yawNode.set("angle", yaw);
+        pitchNode.set("angle", pitch);
+    }
+}
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+canvas.addEventListener('touchstart', touchStart, true);
+canvas.addEventListener('touchmove', touchMove, true);
+canvas.addEventListener('touchend', touchEnd, true);
+
+scene.start();
+
+</script>
+</body>
+</html>

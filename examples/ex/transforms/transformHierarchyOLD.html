@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+
+<script src="../../../build/latest/scenejs.js"></script>
+
+<script src="../../../build/latest/extras/controls/orbit.js"></script>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"lookAt",
+                eye:{ z:15 },
+                nodes:[
+                    {
+                        id:"pitch",
+                        type:"rotate",
+                        angle:30.0,
+                        x:1.0,
+
+                        nodes:[
+                            {
+                                id:"yaw",
+                                type:"rotate",
+                                angle:-30.0,
+                                y:1.0,
+
+                                nodes:[
+                                    // Black sphere
+                                    {
+                                        type:"translate",
+                                        y:3.2,
+                                        nodes:[
+                                            {
+                                                type:"scale",
+                                                x:2.0, y:0.5, z:2.0,
+                                                nodes:[
+                                                    {
+                                                        type:"material",
+                                                        color:{ r:0.0, g:0.0, b:0.0 },
+                                                        specularColor:{r:1, g:1, b:1 },
+
+                                                        nodes:[
+                                                            {
+                                                                type:"geometry",
+                                                                source:{
+                                                                    type:"sphere"
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    // Blue torus
+                                    {
+                                        type:"translate",
+                                        y:1.0,
+                                        nodes:[
+                                            {
+                                                type:"rotate",
+                                                x:1, angle:90,
+                                                nodes:[
+                                                    {
+                                                        type:"scale",
+                                                        x:0.6, y:0.6, z:0.6,
+                                                        nodes:[
+                                                            {
+                                                                type:"material",
+                                                                color:{ r:0.5, g:0.5, b:0.6 },
+
+                                                                nodes:[
+                                                                    {
+                                                                        type:"geometry",
+                                                                        source:{
+                                                                            type:"torus"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    // Pink torus
+                                    {
+                                        type:"translate",
+                                        y:0.5,
+                                        nodes:[
+                                            {
+                                                type:"rotate",
+                                                x:1, angle:90,
+                                                nodes:[
+                                                    {
+                                                        type:"scale",
+                                                        x:0.7, y:0.7, z:0.7,
+                                                        nodes:[
+                                                            {
+                                                                type:"material",
+                                                                color:{ r:0.7, g:0.5, b:0.5 },
+
+                                                                nodes:[
+                                                                    {
+                                                                        type:"geometry",
+                                                                        source:{
+                                                                            type:"torus"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    // Green torus
+                                    {
+                                        type:"translate",
+                                        y:0,
+                                        nodes:[
+                                            {
+                                                type:"rotate",
+                                                x:1, angle:90,
+                                                nodes:[
+                                                    {
+                                                        type:"scale",
+                                                        x:0.8, y:0.8, z:0.8,
+                                                        nodes:[
+                                                            {
+                                                                type:"material",
+                                                                color:{ r:0.5, g:0.7, b:0.5 },
+
+                                                                nodes:[
+                                                                    {
+                                                                        type:"geometry",
+                                                                        source:{
+                                                                            type:"torus"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+
+                                    // Yellow torus
+                                    {
+                                        type:"translate",
+                                        y:-0.6,
+                                        nodes:[
+                                            {
+                                                type:"rotate",
+                                                x:1, angle:90,
+                                                nodes:[
+                                                    {
+                                                        type:"scale",
+                                                        x:0.9, y:0.9, z:0.9,
+                                                        nodes:[
+                                                            {
+                                                                type:"material",
+                                                                color:{ r:0.7, g:0.7, b:0.5 },
+
+                                                                nodes:[
+                                                                    {
+                                                                        type:"geometry",
+                                                                        source:{
+                                                                            type:"torus"
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene);
+
+</script>
+</body>
+</html>

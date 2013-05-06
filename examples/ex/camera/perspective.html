@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"lookAt",
+                eye:{ z:5 },
+                nodes:[
+
+                    // The camera node in this scene has the same properties
+                    // as the one that SceneJS provides by default
+
+                    {
+                        type:"camera",
+                        optics:{
+                            type:"perspective",
+                            fovy:45.0,
+                            aspect:1.0,
+                            near:0.1,
+                            far:5000.0
+                        },
+
+                        nodes:[
+                            {
+                                type:"geometry",
+                                plugin:"teapot"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:15
+    });
+
+
+</script>
+</body>
+</html>
