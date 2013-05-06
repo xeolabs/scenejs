@@ -10945,7 +10945,7 @@ new (function() {
  */
 new (function () {
 
-    var imageBasePath = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
+    var imageBasePath = window.location.hostname + window.location.path;
 
     /**
      * The default state core singleton for {@link SceneJS.Texture} nodes
