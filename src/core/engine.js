@@ -308,17 +308,25 @@ SceneJS_Engine.prototype.start = function(cfg) {
 
         this.sceneDirty = true;
 
-        var idleEventParams = {
-            sceneId: this.id
+        var tick = {
+            sceneId: this.id,
+            startTime: (new Date()).getTime()
         };
 
-        self.events.fireEvent("started", idleEventParams);
+        self.events.fireEvent("started", tick);
+
+        var time = (new Date()).getTime();
 
         window[fnName] = function() {
 
             if (self.running && !self.paused) {  // idleFunc may have paused scene
 
-                self.events.fireEvent("tick", idleEventParams);
+                tick.prevTime = time;
+                time = (new Date()).getTime();
+                tick.time = time;
+
+
+                self.events.fireEvent("tick", tick);
 
                 if (!self.running) { // idleFunc may have destroyed scene
                     return;
@@ -330,14 +338,14 @@ SceneJS_Engine.prototype.start = function(cfg) {
 
                     self.display.render();
 
-                    self.events.fireEvent("rendered", idleEventParams);
+                    self.events.fireEvent("rendered", tick);
 
                     window.requestAnimationFrame(window[fnName]);
 
                 } else {
 
                     if (!sleeping) {
-                        self.events.fireEvent("sleep", idleEventParams);
+                        self.events.fireEvent("sleep", tick);
                     }
 
                     sleeping = true;

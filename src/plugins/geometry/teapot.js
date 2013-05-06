@@ -45,7 +45,7 @@ SceneJS.Plugins.addPlugin(
             };
         };
 
-        function buildTeapot(configs) {
+        function buildTeapot(cfg) {
             var positions = [
                 [-3.000000, 1.650000, 0.000000],
                 [-2.987110, 1.650000, -0.098438],
@@ -5780,6 +5780,7 @@ SceneJS.Plugins.addPlugin(
                 [1401, 1422, 1418]
             ];
 
+
             var calculateNormals = function (positions, indices) {
                 var nvecs = new Array(positions.length);
 
@@ -5835,11 +5836,24 @@ SceneJS.Plugins.addPlugin(
                 return result;
             };
 
+
+            function reverse(ar) {
+                var result = [];
+                for (var i = 0; i < ar.length; i++) {
+                    var temp = [];
+                    for (var j = ar[i].length - 1; j >= 0; j--) {
+                        temp.push(ar[i][j]);
+                    }
+                    result.push(temp);
+                }
+                return result;
+            }
+
             return {
-                coreId:"teapot",
-                primitive:"triangles",
+                coreId:"teapot_" + (cfg.wire ? "wire" : "_solid"),
+                primitive:cfg.wire ? "lines" : "triangles",
                 positions:new Float32Array(flatten(positions, 3)),
-                indices:new Uint16Array(flatten(indices, 3)),
+                indices:new Uint16Array(flatten(reverse(indices))),
                 normals:new Float32Array(flatten(calculateNormals(positions, indices), 3))
             };
         }

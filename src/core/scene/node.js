@@ -430,47 +430,35 @@ SceneJS.Node.prototype.insertNode = function(node, i) {
     if (!node) {
         throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Node#insertNode - node argument is undefined");
+                "SceneJS.Node#insertNode - node argument is undefined");
     }
 
-    if (!node._compile) {
-        node = this._engine.createNode(node);
+    if (!node._compile) { // JSON node definition
+        node = this._engine.createNode(node); // Create node
     }
 
     if (!node._compile) {
         throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Node#insertNode - node argument is not a Node or subclass!");
+                "SceneJS.Node#insertNode - node argument is not a SceneJS.Node");
     }
 
     if (node.parent != null) {
         throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Node#insertNode - node argument is still attached to another parent!");
+                "SceneJS.Node#insertNode - node argument is still attached to another parent");
     }
 
-    if (i == undefined || i == null) {
+    if (i === undefined || i === null) {
 
-        /* Insert node above nodes when no index given
-         */
-        var nodes = this.disconnectNodes();
-
-        /* Move nodes to right-most leaf of inserted graph
-         */
-        var leaf = node;
-        while (leaf.getNumNodes() > 0) {
-            leaf = leaf.getLastNode();
-        }
-
-        leaf.addNodes(nodes);
-
+        node.addNodes(this.disconnectNodes());
         this.addNode(node);
 
     } else if (i < 0) {
 
         throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Node#insertNode - node index out of range: -1");
+                "SceneJS.Node#insertNode - node index out of range: -1");
 
     } else if (i >= this.nodes.length) {
         this.nodes.push(node);

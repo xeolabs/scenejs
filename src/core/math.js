@@ -1187,7 +1187,7 @@ var SceneJS_math_scalingMat4s = function(s) {
  * Default lookat properties - eye at 0,0,1, looking at 0,0,0, up vector pointing up Y-axis
  */
 var SceneJS_math_LOOKAT_OBJ = {
-    eye:    {x: 0, y:0, z:1.0 },
+    eye:    {x: 0, y:0, z:10.0 },
     look:   {x:0, y:0, z:0.0 },
     up:     {x:0, y:1, z:0.0 }
 };
@@ -1196,7 +1196,7 @@ var SceneJS_math_LOOKAT_OBJ = {
  * Default lookat properties in array form - eye at 0,0,1, looking at 0,0,0, up vector pointing up Y-axis
  */
 var SceneJS_math_LOOKAT_ARRAYS = {
-    eye:    [0, 0, 1.0],
+    eye:    [0, 0, 10.0],
     look:   [0, 0, 0.0 ],
     up:     [0, 1, 0.0 ]
 };

@@ -2,7 +2,7 @@
  * @class Manages creation, sharing and recycle of {@link SceneJS_ProgramSource} instances
  * @private
  */
-var SceneJS_ProgramSourceFactory = new (function() {
+var SceneJS_ProgramSourceFactory = new (function () {
 
     this._sourceCache = {}; // Source codes are shared across all scenes
 
@@ -10,7 +10,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
     /**
      * Get sourcecode for a program to render the given states
      */
-    this.getSource = function(hash, states) {
+    this.getSource = function (hash, states) {
 
         var source = this._sourceCache[hash];
         if (source) {
@@ -32,7 +32,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
     /**
      * Releases program source code
      */
-    this.putSource = function(hash) {
+    this.putSource = function (hash) {
         var source = this._sourceCache[hash];
         if (source) {
             if (--source.useCount == 0) {
@@ -41,7 +41,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
         }
     };
 
-    this._composePickingVertexShader = function(states) {
+    this._composePickingVertexShader = function (states) {
 
         var customShaders = states.shader.shaders || {};
 
@@ -164,7 +164,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
      * Composes a fragment shader script for rendering mode in current scene state
      * @private
      */
-    this._composePickingFragmentShader = function(states) {
+    this._composePickingFragmentShader = function (states) {
 
         var customShaders = states.shader.shaders || {};
         var customFragmentShader = customShaders.fragment || {};
@@ -295,7 +295,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
      *
      *==================================================================================================================*/
 
-    this._isTexturing = function(states) {
+    this._isTexturing = function (states) {
         if (states.texture.layers && states.texture.layers.length > 0) {
             if (states.geometry.uvBuf || states.geometry.uvBuf2) {
                 return true;
@@ -307,7 +307,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
         return false;
     };
 
-    this._hasNormals = function(states) {
+    this._hasNormals = function (states) {
         if (states.geometry.normalBuf) {
             return true;
         }
@@ -317,7 +317,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
         return false;
     };
 
-    this._composeRenderingVertexShader = function(states) {
+    this._composeRenderingVertexShader = function (states) {
 
         var customShaders = states.shader.shaders || {};
 
@@ -476,7 +476,6 @@ var SceneJS_ProgramSourceFactory = new (function() {
             src.push("vec4 viewVertex  = SCENEJS_uVMatrix * worldVertex; ");
         }
 
-
         if (vertexHooks.viewPos) {
             src.push("viewVertex=" + vertexHooks.viewPos + "(viewVertex);");    // Vertex hook function
         }
@@ -580,7 +579,7 @@ var SceneJS_ProgramSourceFactory = new (function() {
      * Rendering Fragment shader
      *---------------------------------------------------------------------------------------------------------------*/
 
-    this._composeRenderingFragmentShader = function(states) {
+    this._composeRenderingFragmentShader = function (states) {
 
         var customShaders = states.shader.shaders || {};
 
@@ -712,6 +711,10 @@ var SceneJS_ProgramSourceFactory = new (function() {
                 src.push("    }");
             }
             src.push("}");
+        }
+
+        if (texturing && states.geometry.uvBuf && fragmentHooks.texturePos) {
+            src.push(fragmentHooks.texturePos + "(SCENEJS_vUVCoord);");
         }
 
         if (fragmentHooks.worldPos) {

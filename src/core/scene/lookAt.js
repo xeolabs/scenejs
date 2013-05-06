@@ -1,36 +1,32 @@
-(function() {
+(function () {
 
-    var defaultMatrix = SceneJS_math_identityMat4();
+    var defaultMatrix = SceneJS_math_lookAtMat4c(0, 0, 10, 0, 0, 0, 0, 1, 0);
     var defaultMat = new Float32Array(defaultMatrix);
-
-    var normalMat = SceneJS_math_transposeMat4(
-            SceneJS_math_inverseMat4(
-                    SceneJS_math_identityMat4(),
-                    SceneJS_math_mat4()));
+    var normalMat = SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(defaultMat, SceneJS_math_mat4()));
     var defaultNormalMat = new Float32Array(normalMat);
 
     /**
-     * The default state core singleton for {@link SceneJS.LookAt} nodes
+     * The default state core singleton for {@link SceneJS.Lookat} nodes
      */
     var defaultCore = {
-        type: "lookAt",
-        stateId: SceneJS._baseStateId++,
-        matrix: defaultMatrix,
-        mat : defaultMat,
-        normalMatrix: normalMat,
-        normalMat : defaultNormalMat,
-        lookAt: SceneJS_math_LOOKAT_ARRAYS
+        type:"lookAt",
+        stateId:SceneJS._baseStateId++,
+        matrix:defaultMatrix,
+        mat:defaultMat,
+        normalMatrix:normalMat,
+        normalMat:defaultNormalMat,
+        lookAt:SceneJS_math_LOOKAT_ARRAYS
     };
 
     var coreStack = [];
     var stackLen = 0;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function(params) {
-                params.engine.display.viewTransform = defaultCore;
-                stackLen = 0;
-            });
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.viewTransform = defaultCore;
+            stackLen = 0;
+        });
 
     /**
      * @class Scene graph node which defines the viewing transform for the {@link SceneJS.Geometry}s within its subgraph
@@ -38,19 +34,19 @@
      */
     SceneJS.Lookat = SceneJS_NodeFactory.createNodeType("lookAt");
 
-    SceneJS.Lookat.prototype._init = function(params) {
+    SceneJS.Lookat.prototype._init = function (params) {
 
         this._mat = null;
 
         this._xf = {
-            type: "lookat"
+            type:"lookat"
         };
 
         if (this._core.useCount == 1) { // This node is the resource definer
 
             this._core.eyeX = 0;
             this._core.eyeY = 0;
-            this._core.eyeZ = 1.0;
+            this._core.eyeZ = 10.0;
 
             this._core.lookX = 0;
             this._core.lookY = 0;
@@ -61,9 +57,9 @@
             this._core.upZ = 0;
 
             if (!params.eye && !params.look && !params.up) {
-                this.setEye({x: 0, y: 0, z: 1.0 });
-                this.setLook({x: 0, y: 0, z: 0 });
-                this.setUp({x: 0, y: 1.0, z: 0 });
+                this.setEye({x:0, y:0, z:10.0 });
+                this.setLook({x:0, y:0, z:0 });
+                this.setUp({x:0, y:1.0, z:0 });
             } else {
                 this.setEye(params.eye);
                 this.setLook(params.look);
@@ -72,23 +68,23 @@
 
             var core = this._core;
 
-            this._core.rebuild = function() {
+            this._core.rebuild = function () {
 
                 core.matrix = SceneJS_math_lookAtMat4c(
-                        core.eyeX, core.eyeY, core.eyeZ,
-                        core.lookX, core.lookY, core.lookZ,
-                        core.upX, core.upY, core.upZ);
+                    core.eyeX, core.eyeY, core.eyeZ,
+                    core.lookX, core.lookY, core.lookZ,
+                    core.upX, core.upY, core.upZ);
 
                 core.lookAt = {
-                    eye: [core.eyeX, core.eyeY, core.eyeZ ],
-                    look: [core.lookX, core.lookY, core.lookZ ],
-                    up:  [core.upX, core.upY, core.upZ ]
+                    eye:[core.eyeX, core.eyeY, core.eyeZ ],
+                    look:[core.lookX, core.lookY, core.lookZ ],
+                    up:[core.upX, core.upY, core.upZ ]
                 };
 
                 if (!core.mat) { // Lazy-create arrays
                     core.mat = new Float32Array(core.matrix);
                     core.normalMat = new Float32Array(
-                            SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
+                        SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
 
                 } else { // Insert into arrays
                     core.mat.set(core.matrix);
@@ -102,7 +98,7 @@
         }
     };
 
-    SceneJS.Lookat.prototype.setEye = function(eye) {
+    SceneJS.Lookat.prototype.setEye = function (eye) {
 
         eye = eye || {};
 
@@ -124,7 +120,7 @@
         return this;
     };
 
-    SceneJS.Lookat.prototype.incEye = function(eye) {
+    SceneJS.Lookat.prototype.incEye = function (eye) {
         eye = eye || {};
         this._core.eyeX += (eye.x != undefined && eye.x != null) ? eye.x : 0;
         this._core.eyeY += (eye.y != undefined && eye.y != null) ? eye.y : 0;
@@ -134,57 +130,57 @@
         return this;
     };
 
-    SceneJS.Lookat.prototype.setEyeX = function(x) {
+    SceneJS.Lookat.prototype.setEyeX = function (x) {
         this._core.eyeX = x || 0;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.setEyeY = function(y) {
+    SceneJS.Lookat.prototype.setEyeY = function (y) {
         this._core.eyeY = y || 0;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.setEyeZ = function(z) {
+    SceneJS.Lookat.prototype.setEyeZ = function (z) {
         this._core.eyeZ = z || 0;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.incEyeX = function(x) {
+    SceneJS.Lookat.prototype.incEyeX = function (x) {
         this._core.eyeX += x;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.incEyeY = function(y) {
+    SceneJS.Lookat.prototype.incEyeY = function (y) {
         this._core.eyeY += y;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.incEyeZ = function(z) {
+    SceneJS.Lookat.prototype.incEyeZ = function (z) {
         this._core.eyeZ += z;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.getEye = function() {
+    SceneJS.Lookat.prototype.getEye = function () {
         return {
-            x: this._core.eyeX,
-            y: this._core.eyeY,
-            z: this._core.eyeZ
+            x:this._core.eyeX,
+            y:this._core.eyeY,
+            z:this._core.eyeZ
         };
     };
 
-    SceneJS.Lookat.prototype.setLook = function(look) {
+    SceneJS.Lookat.prototype.setLook = function (look) {
         look = look || {};
 
         if (look.x != undefined && look.x != null) {
@@ -204,7 +200,7 @@
         return this;
     };
 
-    SceneJS.Lookat.prototype.incLook = function(look) {
+    SceneJS.Lookat.prototype.incLook = function (look) {
         look = look || {};
         this._core.lookX += (look.x != undefined && look.x != null) ? look.x : 0;
         this._core.lookY += (look.y != undefined && look.y != null) ? look.y : 0;
@@ -214,57 +210,57 @@
         return this;
     };
 
-    SceneJS.Lookat.prototype.setLookX = function(x) {
+    SceneJS.Lookat.prototype.setLookX = function (x) {
         this._core.lookX = x || 0;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.setLookY = function(y) {
+    SceneJS.Lookat.prototype.setLookY = function (y) {
         this._core.lookY = y || 0;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.setLookZ = function(z) {
+    SceneJS.Lookat.prototype.setLookZ = function (z) {
         this._core.lookZ = z || 0;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.incLookX = function(x) {
+    SceneJS.Lookat.prototype.incLookX = function (x) {
         this._core.lookX += x;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.incLookY = function(y) {
+    SceneJS.Lookat.prototype.incLookY = function (y) {
         this._core.lookY += y;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.incLookZ = function(z) {
+    SceneJS.Lookat.prototype.incLookZ = function (z) {
         this._core.lookZ += z;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.getLook = function() {
+    SceneJS.Lookat.prototype.getLook = function () {
         return {
-            x: this._core.lookX,
-            y: this._core.lookY,
-            z: this._core.lookZ
+            x:this._core.lookX,
+            y:this._core.lookY,
+            z:this._core.lookZ
         };
     };
 
-    SceneJS.Lookat.prototype.setUp = function(up) {
+    SceneJS.Lookat.prototype.setUp = function (up) {
         up = up || {};
 
         if (up.x != undefined && up.x != null) {
@@ -285,7 +281,7 @@
         return this;
     };
 
-    SceneJS.Lookat.prototype.incUp = function(up) {
+    SceneJS.Lookat.prototype.incUp = function (up) {
         up = up || {};
         this._core.upX += (up.x != undefined && up.x != null) ? up.x : 0;
         this._core.upY += (up.y != undefined && up.y != null) ? up.y : 0;
@@ -295,53 +291,53 @@
         return this;
     };
 
-    SceneJS.Lookat.prototype.setUpX = function(x) {
+    SceneJS.Lookat.prototype.setUpX = function (x) {
         this._core.upX = x || 0;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.setUpY = function(y) {
+    SceneJS.Lookat.prototype.setUpY = function (y) {
         this._core.upY = y || 0;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.setUpZ = function(z) {
+    SceneJS.Lookat.prototype.setUpZ = function (z) {
         this._core.upZ = z || 0;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.incUpX = function(x) {
+    SceneJS.Lookat.prototype.incUpX = function (x) {
         this._core.upX += x;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.incUpY = function(y) {
+    SceneJS.Lookat.prototype.incUpY = function (y) {
         this._core.upY += y;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.incUpZ = function(z) {
+    SceneJS.Lookat.prototype.incUpZ = function (z) {
         this._core.upZ += z;
         this._core.dirty = true;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Lookat.prototype.getUp = function() {
+    SceneJS.Lookat.prototype.getUp = function () {
         return {
-            x: this._core.upX,
-            y: this._core.upY,
-            z: this._core.upZ
+            x:this._core.upX,
+            y:this._core.upY,
+            z:this._core.upZ
         };
     };
 
@@ -349,7 +345,7 @@
      * Returns a copy of the matrix as a 1D array of 16 elements
      * @returns {Number[16]}
      */
-    SceneJS.Lookat.prototype.getMatrix = function() {
+    SceneJS.Lookat.prototype.getMatrix = function () {
 
         if (this._core.dirty) {
             this._core.rebuild();
@@ -358,27 +354,27 @@
         return  this._mat.slice(0);
     };
 
-    SceneJS.Lookat.prototype.getAttributes = function() {
+    SceneJS.Lookat.prototype.getAttributes = function () {
         return {
-            look: {
-                x: this._core.lookX,
-                y: this._core.lookY,
-                z: this._core.lookZ
+            look:{
+                x:this._core.lookX,
+                y:this._core.lookY,
+                z:this._core.lookZ
             },
-            eye: {
-                x: this._core.eyeX,
-                y: this._core.eyeY,
-                z: this._core.eyeZ
+            eye:{
+                x:this._core.eyeX,
+                y:this._core.eyeY,
+                z:this._core.eyeZ
             },
-            up: {
-                x: this._core.upX,
-                y: this._core.upY,
-                z: this._core.upZ
+            up:{
+                x:this._core.upX,
+                y:this._core.upY,
+                z:this._core.upZ
             }
         };
     };
 
-    SceneJS.Lookat.prototype._compile = function() {
+    SceneJS.Lookat.prototype._compile = function () {
         this._engine.display.viewTransform = coreStack[stackLen++] = this._core;
         this._compileNodes();
         this._engine.display.viewTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;

@@ -248,6 +248,7 @@
 
     var distDir = "build/latest";
     var distPluginDir = distDir + "/plugins";
+    var distExtrasDir = distDir + "/extras";
 
     // Create sub directory for build version
 
@@ -258,7 +259,9 @@
                 function () {
 
                     // Deep-copy an existing directory
-                    wrench.copyDirSyncRecursive("plugins", distPluginDir);
+                    wrench.copyDirSyncRecursive("src/plugins", distPluginDir);
+
+                    wrench.copyDirSyncRecursive("src/extras", distExtrasDir);
 
                     if (fileList.length > 0) {
                         sys.print("Writing built library: scenejs.js\n");

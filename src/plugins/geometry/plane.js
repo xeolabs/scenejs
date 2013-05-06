@@ -58,7 +58,7 @@ SceneJS.Plugins.addPlugin(
             var widthSegments = cfg.widthSegments || 1;
             var heightSegments = cfg.heightSegments || 1;
 
-            var coreId = "plane_" + width + "_" + height + "_" + widthSegments + "_" + heightSegments;
+            var coreId = "plane_" + (cfg.wire == true ? "wire_" : "") + height + "_" + widthSegments + "_" + heightSegments;
 
             var ix, iz;
             var halfWidth = width / 2;
@@ -140,7 +140,7 @@ SceneJS.Plugins.addPlugin(
             }
 
             return {
-                primitive:"triangles",
+                primitive:cfg.wire ? "lines" : "triangles",
                 coreId:coreId,
                 positions:new Float32Array(positions),
                 normals:new Float32Array(normals),

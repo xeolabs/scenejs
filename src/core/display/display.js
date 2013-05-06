@@ -846,7 +846,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     frameCtx.uvBuf = false;
     frameCtx.uvBuf2 = false;
     frameCtx.colorBuf = false;
-    frameCtx.backfaces = false;
+    frameCtx.backfaces = true;
     frameCtx.frontface = "ccw";
     frameCtx.pick = !!pick;
 
@@ -857,7 +857,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     gl.lineWidth(1);
     gl.frontFace(gl.CCW);
-    //   gl.disable(gl.CULL_FACE);
+    gl.disable(gl.CULL_FACE);
 
     if (pick) { // Pick
 
@@ -895,7 +895,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     if (frameCtx.framebuf) {                                                 // Unbind remaining frame buffer
         gl.finish();
-        frameCtx.framebuf.unbind();
+        // frameCtx.framebuf.unbind();
     }
 
     if (frameCtx.renderer) {                           // Forget last call-time renderer properties

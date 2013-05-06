@@ -13,6 +13,9 @@ SceneJS.Plugins.addPlugin(
 
     new (function () {
 
+        // Letter stroke data, initialised below
+        var letters;
+
         this.getSource = function () {
 
             var created;
@@ -71,7 +74,7 @@ SceneJS.Plugins.addPlugin(
 
                 for (var i = 0; i < len; i++) {
 
-                    c = this._letters[str.charAt(i)];
+                    c = letters[str.charAt(i)];
 
                     if (c == '\n') {
                         //alert("newline");
@@ -134,9 +137,7 @@ SceneJS.Plugins.addPlugin(
             };
         }
 
-        ;
-
-        this._letters = {
+        letters = {
             ' ':{ width:16, points:[] },
             '!':{ width:10, points:[
                 [5, 21],

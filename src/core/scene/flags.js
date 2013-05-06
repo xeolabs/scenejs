@@ -245,6 +245,19 @@
         return this._core.backfaceTexturing;
     };
 
+    SceneJS.Flags.prototype.setSpecular = function(specular) {
+        specular = !!specular;
+        if (this._core.specular != specular) {
+            this._core.specular = specular;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getSpecular = function() {
+        return this._core.specular;
+    };
+    
     SceneJS.Flags.prototype.setAmbient = function(ambient) {
         ambient = !!ambient;
         if (this._core.ambient != ambient) {

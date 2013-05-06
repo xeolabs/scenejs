@@ -111,8 +111,8 @@ SceneJS.Plugins.addPlugin(
             }
 
             return {
-                primitive : "triangles",
-                coreId : "sphere_" + radius + "_" + longitudeBands + "_" + latitudeBands,
+                primitive:cfg.wire ? "lines" : "triangles",
+                coreId : "sphere_" + (cfg.wire ? "wire" : "_solid") + radius + "_" + longitudeBands + "_" + latitudeBands,
                 positions : new Float32Array(positions),
                 normals: new Float32Array(normals),
                 uv : new Float32Array(uvs),

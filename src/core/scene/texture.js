@@ -81,7 +81,8 @@ new (function () {
 
                 if (layerParams.applyTo) {
 
-                    if (layerParams.applyTo != "baseColor" && // Colour map
+                    if (layerParams.applyTo != "baseColor" && // Colour map (deprecated)
+                        layerParams.applyTo != "color" && // Colour map
                         layerParams.applyTo != "specular" && // Specular map
                         layerParams.applyTo != "emit" && // Emission map
                         layerParams.applyTo != "alpha" && // Alpha map
@@ -90,7 +91,7 @@ new (function () {
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + " applyTo value is unsupported - " +
-                                "should be either 'baseColor', 'specular' or 'normals'");
+                                "should be either 'color', 'baseColor', 'specular' or 'normals'");
                     }
                 }
 
@@ -103,6 +104,10 @@ new (function () {
                             "texture layer " + i + " blendMode value is unsupported - " +
                                 "should be either 'add' or 'multiply'");
                     }
+                }
+
+                if (layerParams.applyTo == "color") {
+                    layerParams.applyTo = "baseColor";
                 }
 
                 var layer = SceneJS._apply(layerParams, {
@@ -215,7 +220,7 @@ new (function () {
              */
             var image = new Image();
 
-            image.onload = function() {
+            image.onload = function () {
                 var texture = gl.createTexture();
                 gl.bindTexture(gl.TEXTURE_2D, texture);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self._ensureImageSizePowerOfTwo(image));

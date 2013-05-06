@@ -48,11 +48,11 @@ SceneJS.Plugins.addPlugin(
         function build(cfg) {
 
             var radius = cfg.radius || 1;
-            var tube = cfg.tube || 0.5;
-            var segmentsR = cfg.segmentsR || 8;
-            var segmentsT = cfg.segmentsT || 6;
+            var tube = cfg.tube || 0.3;
+            var segmentsR = cfg.segmentsR || 32;
+            var segmentsT = cfg.segmentsT || 24;
             var arc = cfg.arc || Math.PI * 2;
-            var coreId = "torus_" + radius + "_" + tube + "_" + segmentsR + "_" + segmentsT + "_" + arc;
+            var coreId = "torus_" + (cfg.wire == true ? "wire_" : "") + radius + "_" + tube + "_" + segmentsR + "_" + segmentsT + "_" + arc;
 
             var positions = [];
             var normals = [];
@@ -121,7 +121,7 @@ SceneJS.Plugins.addPlugin(
             }
 
             return {
-                primitive:"triangles",
+                primitive:cfg.wire ? "lines" : "triangles",
                 coreId:coreId,
                 positions:new Float32Array(positions),
                 normals:new Float32Array(normals),

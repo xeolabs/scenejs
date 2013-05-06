@@ -184,3 +184,9 @@ SceneJS.subscribe = SceneJS.addListener = SceneJS.onEvent = SceneJS.bind;
 
 SceneJS.unsubscribe = SceneJS.unEvent;
 
+
+SceneJS.on = SceneJS.onEvent;
+SceneJS.off = SceneJS.unEvent;
+
+
+

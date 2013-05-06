@@ -3,9 +3,9 @@
  */
 SceneJS_ChunkFactory.createChunkType({
 
-    type: "flags",
+    type:"flags",
 
-    build : function() {
+    build:function () {
 
         var draw = this.program.draw;
 
@@ -20,7 +20,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._uClippingPick = pick.getUniformLocation("SCENEJS_uClipping");
     },
 
-    drawAndPick : function(ctx) {
+    drawAndPick:function (ctx) {
 
         var gl = this.program.gl;
 
@@ -37,14 +37,14 @@ SceneJS_ChunkFactory.createChunkType({
 
         var frontface = this.core.frontface;
 
-//        if (ctx.frontface != frontface) {
-//            if (frontface == "ccw") {
-//                gl.frontFace(gl.CCW);
-//            } else {
-//                gl.frontFace(gl.CW);
-//            }
-//            ctx.frontface = frontface;
-//        }
+        if (ctx.frontface != frontface) {
+            if (frontface == "ccw") {
+                gl.frontFace(gl.CCW);
+            } else {
+                gl.frontFace(gl.CW);
+            }
+            ctx.frontface = frontface;
+        }
 
         if (ctx.pick) {
             gl.uniform1i(this._uClippingPick, this.core.clipping);

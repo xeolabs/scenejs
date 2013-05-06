@@ -23,7 +23,6 @@ var SceneJS = new (function () {
      * @param {String} json JSON scene description
      * @param {*} options Optional options
      * @param {Boolean} options.simulateWebGLContextLost Set true to enable simulation of lost WebGL context (has performance impact)
-     * @param {Function} options.idleFunc Callback called on each animation frame, which happens periodically, regardless of whether anything needs to be rendered or not
      * @returns {SceneJS.Scene} New scene
      */
     this.createScene = function (json, options) {
