@@ -10945,6 +10945,8 @@ new (function() {
  */
 new (function () {
 
+    var imageBasePath = window.location.href.substring(0, window.location.href.lastIndexOf("/"));
+
     /**
      * The default state core singleton for {@link SceneJS.Texture} nodes
      */
@@ -11174,7 +11176,11 @@ new (function () {
                 image.src = src;
             } else { // Image file
                 image.crossOrigin = "Anonymous";
-                image.src = src;
+                if (src.indexOf("http") == 0 && src.indexOf("file") == 0) {
+                    image.src = src;
+                } else {
+                    image.src = imageBasePath + "/" + src;
+                }
             }
         }
     };
