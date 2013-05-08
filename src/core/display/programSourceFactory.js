@@ -366,10 +366,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     src.push("uniform vec3 SCENEJS_uLightDir" + i + ";");
                 }
                 if (light.mode == "point") {
-                    src.push("uniform vec4 SCENEJS_uLightPos" + i + ";");
+                    src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
                 if (light.mode == "spot") {
-                    src.push("uniform vec4 SCENEJS_uLightPos" + i + ";");
+                    src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
 
                 /* Vector from vertex to light, packaged with the pre-computed length of that vector
@@ -888,31 +888,33 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "point") {
 
-                    src.push("dotN = max(dot(viewNormalVec, viewLightVec) ,0.0);");
+                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
 
                     src.push("lightDist = SCENEJS_vViewLightVecAndDist" + i + ".w;");
 
-                    src.push("  attenuation = 1.0 / (" +
+                    src.push("attenuation = 1.0 - (" +
                         "  SCENEJS_uLightAttenuation" + i + "[0] + " +
                         "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
                         "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
 
                     if (light.diffuse) {
-                        src.push("  lightValue += dotN *  SCENEJS_uLightColor" + i + " * attenuation;");
+                        src.push("  lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
                     }
 
                     if (light.specular) {
-                        src.push("if (SCENEJS_uSpecularLighting) specularValue += attenuation * specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+                        src.push("if (SCENEJS_uSpecularLighting) {");
+                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
+                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
+                        src.push("}");
                     }
                     //src.push("}");
                 }
 
                 if (light.mode == "dir") {
 
-                    src.push("dotN = max(dot(viewNormalVec,viewLightVec),0.0);");
+                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
@@ -920,8 +922,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     }
 
                     if (light.specular) {
-                        src.push("if (SCENEJS_uSpecularLighting) specularValue += specularColor * SCENEJS_uLightColor" + i +
+                        src.push("if (SCENEJS_uSpecularLighting) {");
+                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
                             " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+                        src.push("}");
                     }
                     // src.push("}");
                 }

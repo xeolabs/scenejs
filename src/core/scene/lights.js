@@ -20,7 +20,7 @@
                 color:[1.0, 1.0, 1.0 ],
                 diffuse:true,
                 specular:true,
-                dir:[-0.5,-0.5, -1.0 ],
+                dir:[-0.5, -0.5, -1.0 ],
                 space:"world"
             },
             {
@@ -140,9 +140,11 @@
         light.specular = (mode == "ambient") ? false : ((cfg.specular != undefined) ? cfg.specular : true);
         light.pos = cfg.pos ? [ pos.x || 0, pos.y || 0, pos.z || 0 ] : undefined;
         light.dir = cfg.dir ? [dir.x || 0, dir.y || 0, dir.z || 0] : undefined;
-        light.constantAttenuation = (cfg.constantAttenuation != undefined) ? cfg.constantAttenuation : 1.0;
-        light.linearAttenuation = (cfg.linearAttenuation || 0.0);
-        light.quadraticAttenuation = (cfg.quadraticAttenuation || 0.0);
+        light.attenuation = [
+            cfg.constantAttenuation != undefined ? cfg.constantAttenuation : 0.0,
+            cfg.linearAttenuation || 0.0,
+            cfg.quadraticAttenuation || 0.0
+        ];
 
         var space = cfg.space;
 

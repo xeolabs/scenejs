@@ -36,6 +36,7 @@ SceneJS_ChunkFactory.createChunkType({
                     this._uLightColor[i] = program.draw.getUniformLocation("SCENEJS_uLightColor" + i);
                     this._uLightPos[i] = program.draw.getUniformLocation("SCENEJS_uLightPos" + i);
                     this._uLightDir[i] = null;
+                    this._uLightAttenuation[i] = program.draw.getUniformLocation("SCENEJS_uLightAttenuation" + i);
                     break;
             }
         }
@@ -67,6 +68,10 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (this._uLightPos[i]) {
                     gl.uniform3fv(this._uLightPos[i], light.pos);
+
+                    if (this._uLightAttenuation[i]) {
+                        gl.uniform3fv(this._uLightAttenuation[i], light.attenuation);
+                    }
                 }
 
                 if (this._uLightDir[i]) {
