@@ -8436,7 +8436,7 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
                 color:[1.0, 1.0, 1.0 ],
                 diffuse:true,
                 specular:true,
-                dir:[-0.5,-0.5, -1.0 ],
+                dir:[-0.5, -0.5, -1.0 ],
                 space:"world"
             },
             {
@@ -8556,9 +8556,11 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         light.specular = (mode == "ambient") ? false : ((cfg.specular != undefined) ? cfg.specular : true);
         light.pos = cfg.pos ? [ pos.x || 0, pos.y || 0, pos.z || 0 ] : undefined;
         light.dir = cfg.dir ? [dir.x || 0, dir.y || 0, dir.z || 0] : undefined;
-        light.constantAttenuation = (cfg.constantAttenuation != undefined) ? cfg.constantAttenuation : 1.0;
-        light.linearAttenuation = (cfg.linearAttenuation || 0.0);
-        light.quadraticAttenuation = (cfg.quadraticAttenuation || 0.0);
+        light.attenuation = [
+            cfg.constantAttenuation != undefined ? cfg.constantAttenuation : 0.0,
+            cfg.linearAttenuation || 0.0,
+            cfg.quadraticAttenuation || 0.0
+        ];
 
         var space = cfg.space;
 
@@ -9125,28 +9127,28 @@ new (function () {
         this._engine.display.material = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();new (function() {
+})();new (function () {
 
     /**
      * The default state core singleton for {@link SceneJS.MorphGeometry} nodes
      */
     var defaultCore = {
-        type: "morphGeometry",
-        stateId: SceneJS._baseStateId++,
-        hash: "",
+        type:"morphGeometry",
+        stateId:SceneJS._baseStateId++,
+        hash:"",
         //         empty: true,
-        morph: null
+        morph:null
     };
 
     var coreStack = [];
     var stackLen = 0;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function(params) {
-                params.engine.display.morphGeometry = defaultCore;
-                stackLen = 0;
-            });
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.morphGeometry = defaultCore;
+            stackLen = 0;
+        });
 
     /**
      * @class Scene graph node which defines morphing behaviour for the {@link SceneJS.Geometry}s within its subgraph
@@ -9154,7 +9156,7 @@ new (function () {
      */
     SceneJS.MorphGeometry = SceneJS_NodeFactory.createNodeType("morphGeometry");
 
-    SceneJS.MorphGeometry.prototype._init = function(params) {
+    SceneJS.MorphGeometry.prototype._init = function (params) {
 
         if (this._core.useCount == 1) { // This node defines the resource
 
@@ -9169,82 +9171,86 @@ new (function () {
 
                 if (!params.source.type) {
                     throw SceneJS_error.fatalError(
-                            SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                            "morphGeometry config expected: source.type");
-                }
-
-                var sourceService = SceneJS.Plugins.getPlugin(SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN, this._sourceConfigs.type);
-
-                if (!sourceService) {
-                    throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "morphGeometry: no support for source type '" + this._sourceConfigs.type + "' - need to include plugin for this source type, " +
-                            "or install a custom source service with SceneJS.Plugins.addPlugin(SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN, '" + this._sourceConfigs.type + "', <your service>).");
-                }
-
-                if (!sourceService.getSource) {
-                    throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "morphGeometry: 'getSource' method not found on MorphGeoFactoryService (SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN)");
-                }
-
-                this._source = sourceService.getSource();
-
-                if (!this._source.onUpdate) {
-                    throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "morphGeometry: 'onUpdate' method not found on source provided by plugin type '" + params.source.type + "'");
+                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                        "morphGeometry config expected: source.type");
                 }
 
                 var self = this;
 
-                this._source.onCreate(// Get notification when factory creates the morph
-                        function(data) {
+                SceneJS.Plugins.getPlugin(
+                    "morphGeometry",
+                    this._sourceConfigs.type,
+                    function (sourceService) {
 
-                            self._buildNodeCore(data);
+                        if (!sourceService) {
+                            throw SceneJS_error.fatalError(
+                                SceneJS.errors.PLUGIN_INVALID,
+                                "morphGeometry: no support for source type '" + self._sourceConfigs.type + "' - need to include plugin for self source type, " +
+                                    "or install a custom source service with SceneJS.Plugins.addPlugin(SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN, '" + self._sourceConfigs.type + "', <your service>).");
+                        }
 
-                            self._core._loading = false;
-                            self._fireEvent("loaded");
+                        if (!sourceService.getSource) {
+                            throw SceneJS_error.fatalError(
+                                SceneJS.errors.PLUGIN_INVALID,
+                                "morphGeometry: 'getSource' method not found on MorphGeoFactoryService (SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN)");
+                        }
 
-                            self._engine.branchDirty(this); // TODO
-                        });
+                        self._source = sourceService.getSource();
 
-                if (this._source.onUpdate) {
-                    this._source.onUpdate(// Reload factory updates to the morph
-                            function(data) {
+                        if (!self._source.onUpdate) {
+                            throw SceneJS_error.fatalError(
+                                SceneJS.errors.PLUGIN_INVALID,
+                                "morphGeometry: 'onUpdate' method not found on source provided by plugin type '" + params.source.type + "'");
+                        }
 
-                                if (data.targets) {
+                        self._source.onCreate(// Get notification when factory creates the morph
+                            function (data) {
 
-                                    var dataTargets = data.targets;
-                                    var dataTarget;
-                                    var index;
-                                    var morphTargets = self._core.targets;
-                                    var morphTarget;
+                                self._buildNodeCore(data);
 
-                                    for (var i = 0, len = dataTargets.length; i < len; i++) {
-                                        dataTarget = dataTargets[i];
-                                        index = dataTarget.targetIndex;
-                                        morphTarget = morphTargets[index];
+                                self._core._loading = false;
+                                self._fireEvent("loaded");
 
-                                        if (dataTarget.positions && morphTarget.vertexBuf) {
-                                            morphTarget.vertexBuf.bind();
-                                            morphTarget.vertexBuf.setData(dataTarget.positions, 0);
+                                self._engine.branchDirty(self); // TODO
+                            });
+
+                        if (self._source.onUpdate) {
+                            self._source.onUpdate(// Reload factory updates to the morph
+                                function (data) {
+
+                                    if (data.targets) {
+
+                                        var dataTargets = data.targets;
+                                        var dataTarget;
+                                        var index;
+                                        var morphTargets = self._core.targets;
+                                        var morphTarget;
+
+                                        for (var i = 0, len = dataTargets.length; i < len; i++) {
+                                            dataTarget = dataTargets[i];
+                                            index = dataTarget.targetIndex;
+                                            morphTarget = morphTargets[index];
+
+                                            if (dataTarget.positions && morphTarget.vertexBuf) {
+                                                morphTarget.vertexBuf.bind();
+                                                morphTarget.vertexBuf.setData(dataTarget.positions, 0);
+                                            }
                                         }
                                     }
-                                }
 
-                                // TODO: factory can update factor?
-                                // this.setFactor(params.factor);
+                                    // TODO: factory can update factor?
+                                    // self.setFactor(params.factor);
 
-                                self._display.imageDirty = true;
-                            });
-                }
+                                    self._display.imageDirty = true;
+                                });
+                        }
 
-                this._core._loading = true;
+                        self._core._loading = true;
 
-                this._fireEvent("loading");
+                        self._fireEvent("loading");
 
-                this._source.setConfigs(this._sourceConfigs);
+                        self._source.setConfigs(self._sourceConfigs);
+                    });
 
             } else if (params.create instanceof Function) {
 
@@ -9263,7 +9269,7 @@ new (function () {
                 this._buildNodeCore(params);
             }
 
-            this._core.webglRestored = function() {
+            this._core.webglRestored = function () {
                 //self._buildNodeCore(self._engine.canvas.gl, self._core);
             };
 
@@ -9275,20 +9281,20 @@ new (function () {
         this._core.clamp = !!params.clamp;
     };
 
-    SceneJS.MorphGeometry.prototype._buildNodeCore = function(data) {
+    SceneJS.MorphGeometry.prototype._buildNodeCore = function (data) {
 
         var targetsData = data.targets || [];
         if (targetsData.length < 2) {
             throw SceneJS_error.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "morphGeometry node should have at least two targets");
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "morphGeometry node should have at least two targets");
         }
 
         var keysData = data.keys || [];
         if (keysData.length != targetsData.length) {
             throw SceneJS_error.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "morphGeometry node mismatch in number of keys and targets");
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "morphGeometry node mismatch in number of keys and targets");
         }
 
         var core = this._core;
@@ -9338,33 +9344,33 @@ new (function () {
                 arry = targetData.positions || positions;
                 if (arry) {
                     target.vertexBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER,
-                            (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
-                            arry.length, 3, usage);
+                        (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
+                        arry.length, 3, usage);
                     positions = arry;
                 }
 
                 arry = targetData.normals || normals;
                 if (arry) {
                     target.normalBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER,
-                            (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
-                            arry.length,
-                            3, usage);
+                        (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
+                        arry.length,
+                        3, usage);
                     normals = arry;
                 }
 
                 arry = targetData.uv || uv;
                 if (arry) {
                     target.uvBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER,
-                            (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
-                            arry.length, 2, usage);
+                        (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
+                        arry.length, 2, usage);
                     uv = arry;
                 }
 
                 arry = targetData.uv2 || uv2;
                 if (arry) {
                     target.uvBuf2 = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER,
-                            (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
-                            arry.length, 2, usage);
+                        (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
+                        arry.length, 2, usage);
                     uv2 = arry;
                 }
 
@@ -9394,12 +9400,12 @@ new (function () {
             }
 
             throw SceneJS_error.fatalError(
-                    SceneJS.errors.ERROR,
-                    "Failed to allocate VBO(s) for morphGeometry: " + e);
+                SceneJS.errors.ERROR,
+                "Failed to allocate VBO(s) for morphGeometry: " + e);
         }
     };
 
-    SceneJS.MorphGeometry.prototype.setSource = function(sourceConfigs) {
+    SceneJS.MorphGeometry.prototype.setSource = function (sourceConfigs) {
         this._sourceConfigs = sourceConfigs;
         var source = this._source;
         if (source) {
@@ -9407,11 +9413,11 @@ new (function () {
         }
     };
 
-    SceneJS.MorphGeometry.prototype.getSource = function() {
+    SceneJS.MorphGeometry.prototype.getSource = function () {
         return this._sourceConfigs;
     };
 
-    SceneJS.MorphGeometry.prototype.setFactor = function(factor) {
+    SceneJS.MorphGeometry.prototype.setFactor = function (factor) {
         factor = factor || 0.0;
 
         var core = this._core;
@@ -9448,11 +9454,11 @@ new (function () {
         this._engine.display.imageDirty = true;
     };
 
-    SceneJS.MorphGeometry.prototype.getFactor = function() {
+    SceneJS.MorphGeometry.prototype.getFactor = function () {
         return this._core.factor;
     };
 
-    SceneJS.MorphGeometry.prototype._compile = function() {
+    SceneJS.MorphGeometry.prototype._compile = function () {
 
         if (!this._core.hash) {
             this._makeHash();
@@ -9463,7 +9469,7 @@ new (function () {
         this._engine.display.morphGeometry = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-    SceneJS.MorphGeometry.prototype._makeHash = function() {
+    SceneJS.MorphGeometry.prototype._makeHash = function () {
         var core = this._core;
         if (core.targets.length > 0) {
             var target0 = core.targets[0];  // All targets have same arrays
@@ -9480,7 +9486,7 @@ new (function () {
         }
     };
 
-    SceneJS.MorphGeometry.prototype._destroy = function() {
+    SceneJS.MorphGeometry.prototype._destroy = function () {
         if (this._core.useCount == 1) { // Destroy core if no other references
             if (document.getElementById(this._engine.canvas.canvasId)) { // Context won't exist if canvas has disappeared
                 var core = this._core;
@@ -10504,6 +10510,7 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     var result = this._engine.pick(canvasX, canvasY, options);
     if (result) {
         this._engine.events.fireEvent("pick", result);
+        return result;
     }
 };
 
@@ -11176,11 +11183,7 @@ new (function () {
                 image.src = src;
             } else { // Image file
                 image.crossOrigin = "Anonymous";
-                if (src.indexOf("http") == 0 && src.indexOf("file") == 0) {
-                    image.src = src;
-                } else {
-                    image.src = imageBasePath + "/" + src;
-                }
+                image.src = src;
             }
         }
     };
@@ -13570,10 +13573,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     src.push("uniform vec3 SCENEJS_uLightDir" + i + ";");
                 }
                 if (light.mode == "point") {
-                    src.push("uniform vec4 SCENEJS_uLightPos" + i + ";");
+                    src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
                 if (light.mode == "spot") {
-                    src.push("uniform vec4 SCENEJS_uLightPos" + i + ";");
+                    src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
 
                 /* Vector from vertex to light, packaged with the pre-computed length of that vector
@@ -14092,31 +14095,33 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "point") {
 
-                    src.push("dotN = max(dot(viewNormalVec, viewLightVec) ,0.0);");
+                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
 
                     src.push("lightDist = SCENEJS_vViewLightVecAndDist" + i + ".w;");
 
-                    src.push("  attenuation = 1.0 / (" +
+                    src.push("attenuation = 1.0 - (" +
                         "  SCENEJS_uLightAttenuation" + i + "[0] + " +
                         "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
                         "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
 
                     if (light.diffuse) {
-                        src.push("  lightValue += dotN *  SCENEJS_uLightColor" + i + " * attenuation;");
+                        src.push("  lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
                     }
 
                     if (light.specular) {
-                        src.push("if (SCENEJS_uSpecularLighting) specularValue += attenuation * specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+                        src.push("if (SCENEJS_uSpecularLighting) {");
+                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
+                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
+                        src.push("}");
                     }
                     //src.push("}");
                 }
 
                 if (light.mode == "dir") {
 
-                    src.push("dotN = max(dot(viewNormalVec,viewLightVec),0.0);");
+                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
@@ -14124,8 +14129,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     }
 
                     if (light.specular) {
-                        src.push("if (SCENEJS_uSpecularLighting) specularValue += specularColor * SCENEJS_uLightColor" + i +
+                        src.push("if (SCENEJS_uSpecularLighting) {");
+                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
                             " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+                        src.push("}");
                     }
                     // src.push("}");
                 }
@@ -15101,6 +15108,7 @@ SceneJS_ChunkFactory.createChunkType({
                     this._uLightColor[i] = program.draw.getUniformLocation("SCENEJS_uLightColor" + i);
                     this._uLightPos[i] = program.draw.getUniformLocation("SCENEJS_uLightPos" + i);
                     this._uLightDir[i] = null;
+                    this._uLightAttenuation[i] = program.draw.getUniformLocation("SCENEJS_uLightAttenuation" + i);
                     break;
             }
         }
@@ -15132,6 +15140,10 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (this._uLightPos[i]) {
                     gl.uniform3fv(this._uLightPos[i], light.pos);
+
+                    if (this._uLightAttenuation[i]) {
+                        gl.uniform3fv(this._uLightAttenuation[i], light.attenuation);
+                    }
                 }
 
                 if (this._uLightDir[i]) {
