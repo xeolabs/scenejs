@@ -14,8 +14,8 @@
         }
     </style>
 
-    <script src="../../../build/latest/scenejs.js"></script>
-    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+    <script src="../../../../build/latest/scenejs.js"></script>
+    <script src="../../../../build/latest/extras/controls/orbit.js"></script>
 </head>
 <body>
 
@@ -35,7 +35,7 @@
                         color:{ r:1.0, g:1.0, b:1.0 },
                         diffuse:true,
                         specular:true,
-                        dir:{ x:1.0, y:-0.5, z:-1.0 },
+                        dir:{ x:0.5, y:-0.5, z:-1.0 },
                         space:"world"
                     }
                 ],
@@ -51,8 +51,19 @@
 
                         nodes:[
                             {
-                                type:"geometry",
-                                plugin:"teapot"
+                                type:"texture",
+                                layers:[
+                                    {
+                                        uri:"../../textures/general-zod.jpg"
+                                    }
+                                ],
+
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        plugin:"box"
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -64,7 +75,7 @@
     new SceneJS.OrbitControls(scene, {
         yaw:30,
         pitch:-30,
-        zoom:10
+        zoom:5
     });
 
 </script>

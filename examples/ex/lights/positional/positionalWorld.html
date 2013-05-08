@@ -14,8 +14,8 @@
         }
     </style>
 
-    <script src="../../../build/latest/scenejs.js"></script>
-    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+    <script src="../../../../build/latest/scenejs.js"></script>
+    <script src="../../../../build/latest/extras/controls/orbit.js"></script>
 </head>
 <body>
 
@@ -26,15 +26,26 @@
             {
                 type:"lights",
                 lights:[
+
+                    // This positional light is in World-space, meaning that
+                    // it will move relative to our changing viewpoint, as if it
+                    // were a fixture in the scene.
                     {
-                        mode:"ambient",
-                        color:{ r:0.6, g:0.6, b:1.0 }
+                        mode:"point",
+                        color:{ r:1.0, g:1.0, b:1.0 },
+                        diffuse:true,
+                        specular:true,
+                        pos:{ x:100.0, y:-50.0, z:100.0 },
+                        constantAttenuation:0.2, // [0..1]
+                        linearAttenuation:0, // [0..1]
+                        quadraticAttenuation:0, // [0..1]
+                        space:"world"
                     }
                 ],
                 nodes:[
                     {
                         type:"material",
-                        color:{ r:1.0, g:0.5, b:0.6 },
+                        color:{ r:0.5, g:0.5, b:0.6 },
                         specularColor:{ r:1.0, g:1.0, b:1.0 },
                         specular:1.0,
                         shine:70.0,
