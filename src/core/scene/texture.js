@@ -235,11 +235,7 @@ new (function () {
                 image.src = src;
             } else { // Image file
                 image.crossOrigin = "Anonymous";
-                if (src.indexOf("http") == 0 && src.indexOf("file") == 0) {
-                    image.src = src;
-                } else {
-                    image.src = imageBasePath + "/" + src;
-                }
+                image.src = src;
             }
         }
     };
