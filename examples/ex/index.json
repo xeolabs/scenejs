@@ -26,14 +26,8 @@
     {
         "title":"Flags",
         "tags":["flags"],
-        "tip":"Working with the flags node",
+        "tip":"The scene graph 'flags' node is used to configure appearance and functionality for scene sub-graphs. It's commonly used to toggle things like visibility and other aspects of appearance, without having to update     the individual nodes within the sub-graphs.",
         "nodes":[
-            {
-                "title":"Defaults",
-                "tags":["defaults"],
-                "nodes":[
-                ]
-            },
             {
                 "title":"Toggling flags",
                 "tags":[],
@@ -100,10 +94,10 @@
     {
         "title":"Geometry",
         "tags":["nodes", "geometry"],
-        "tip":"Working with geometry",
+        "tip":"The scene graph 'geometry' node is the principle node type in SceneJS",
         "nodes":[
             {
-                "title":"Core Primitives",
+                "title":"Bundled Primitives",
                 "tip":"Creating primitives using the bundled core geometry plugins",
                 "tags":["prims", "plugin"],
                 "nodes":[
@@ -146,15 +140,21 @@
                 ]
             },
             {
-                "title":"Custom",
-                "tip":"Defining custom geometry",
+                "title":"Defining geometry",
+                "tip":"Defining geometry",
                 "tags":["custom"],
                 "nodes":[
                     {
-                        "title":"Define custom geometry",
-                        "path":"geometry/custom.html",
+                        "title":"Triangles",
+                        "path":"geometry/customTriangleMesh.html",
                         "tags":[]
                     },
+                    {
+                        "title":"Lines",
+                        "path":"geometry/customLineSegments.html",
+                        "tags":[]
+                    },
+
                     {
                         "title":"Vertex coloring",
                         "path":"geometry/vertexColors.html",
@@ -201,12 +201,12 @@
         ]
     },
     {
-        "title":"lighting",
+        "title":"Lighting",
         "tags":["lighting"],
         "tip":"Working with light sources",
         "nodes":[
             {
-                "title":"ambientLight",
+                "title":"Ambient",
                 "tip":"Defining an ambient light source",
                 "tags":["ambientLight"],
                 "nodes":[
@@ -220,22 +220,39 @@
             {
                 "title":"Directional",
                 "tip":"Defining directional light sources",
-                "tags":["directional"],
+                "tags":["directionalLight"],
                 "nodes":[
                     {
                         "title":"Directional lights in View space",
-                        "path":"lights/directionalView.html",
+                        "path":"lights/directional/directionalView.html",
                         "tags":["viewSpace", "specularLight"]
                     },
                     {
                         "title":"Directional lights in World space",
-                        "path":"lights/directionalWorld.html",
+                        "path":"lights/directional/directionalWorld.html",
                         "tags":["worldSpace", "specularLight", "diffuseLight"]
                     },
                     {
                         "title":"Directional lights in World space with color map",
-                        "path":"lights/directionalWorldWithColorMap.html",
+                        "path":"lights/directional/directionalWorldWithColorMap.html",
                         "tags":["worldSpace", "texturing", "specularLight", "diffuseLight"]
+                    }
+                ]
+            },
+            {
+                "title":"Positional",
+                "tip":"Defining positional light sources",
+                "tags":["positionalLight"],
+                "nodes":[
+                    {
+                        "title":"Positional lights in View space",
+                        "path":"lights/positional/positionalView.html",
+                        "tags":["viewSpace", "specularLight"]
+                    },
+                    {
+                        "title":"Positional lights in World space",
+                        "path":"lights/positional/positionalWorld.html",
+                        "tags":["worldSpace", "specularLight", "diffuseLight"]
                     }
                 ]
             }
@@ -247,28 +264,27 @@
         "tags":["camera"],
         "nodes":[
             {
-                "title":"Perspective",
-                "tip":"Working with perspective cameras",
-                "tags":["perspective"],
+                "title":"Projections",
+                "tip":"Working with camera projection types",
+                "tags":["projection"],
                 "nodes":[
                     {
                         "title":"Perspective camera",
                         "tip":"Defining a perspective camera",
-                        "tags":[],
+                        "tags":["perspective"],
                         "path":"camera/perspective.html"
-                    }
-                ]
-            },
-            {
-                "title":"Orthographic",
-                "tip":"Working with orthographic cameras",
-                "tags":["ortho"],
-                "nodes":[
+                    },
                     {
                         "title":"Orthographic camera",
                         "tip":"Defining an orthographic camera",
-                        "tags":[],
-                        "path":"camera/ortho.html.html"
+                        "tags":["orthographic"],
+                        "path":"camera/ortho.html"
+                    },
+                    {
+                        "title":"Frustum camera",
+                        "tip":"Defining a camera via frustum extents",
+                        "tags":["frustum"],
+                        "path":"camera/frustum.html"
                     }
                 ]
             }

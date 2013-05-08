@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+
+    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"material",
+                color:{ r:0.6, g:0.6, b:0.9 },
+                emit:1.0,
+                nodes:[
+
+                    /* Geometry node which defines our point cloud
+                     */
+                    {
+
+                        type:"geometry",
+
+                        /* Optional coreID, must be unique among all
+                         * geometries - if another geometry has already
+                         * been defined with that core ID, then that
+                         * geometry will be instanced here in place of
+                         * this one, and this geometry definition will be
+                         * ignored.
+                         */
+                        coreId:"my-geometry",
+
+                        /* The primitive type - allowed values are
+                         * "points", "lines", "line-loop", "line-strip",
+                         * "triangles", "triangle-strip" and "triangle-fan".
+                         *
+                         * Try setting this config to these different
+                         * types, it's quite freaky.
+                         *
+                         * See the OpenGL/WebGL specification docs for
+                         * how the coordinate arrays are supposed to be laid out
+                         * for them.
+                         */
+                        primitive:"points",
+
+                        /* The vertices - eight for our cube, each
+                         * one spanning three array elements for X,Y and Z
+                         */
+                        positions:createPoints(2000),
+
+                        /* Indices - these organise the
+                         * positions into geometric primitives in accordance
+                         * with the "primitive" parameter,
+                         * in this case an index for each point.
+                         */
+                        indices:createIndices(2000)
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Helper func to create random positions
+    function createPoints(n) {
+        var p = [];
+        for (var i = 0; i < n; i++) {
+            p.push(Math.random() * 2.0, Math.random() * 2.0, Math.random() * 2.0);
+        }
+        return p;
+    }
+
+    // Helper func to create
+    function createIndices(n) {
+        n = n / 3;
+        var p = [];
+        for (var i = 0; i < n; i++) {
+            p.push(i);
+        }
+        return p;
+    }
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:5
+    });
+
+</script>
+</body>
+</html>
