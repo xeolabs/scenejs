@@ -6923,44 +6923,12 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
      */
     SceneJS.Camera = SceneJS_NodeFactory.createNodeType("camera");
 
-
     SceneJS.Camera.prototype._init = function (params) {
         if (this._core.useCount == 1) {
             this.setOptics(params.optics); // Can be undefined
         }
         var self = this;
-//        addEvent(window, "resize", function () {
-//            if (self._resized()) {
-//                self._rebuild();
-//                self._engine.display.imageDirty = true;
-//            }
-//        });
     };
-
-//    function addEvent(elem, type, eventHandle) {
-//        if (elem == null || elem == undefined) return;
-//        if (elem.addEventListener) {
-//            elem.addEventListener(type, eventHandle, false);
-//        } else if (elem.attachEvent) {
-//            elem.attachEvent("on" + type, eventHandle);
-//        } else {
-//            elem["on" + type] = eventHandle;
-//        }
-//    }
-
-//    SceneJS.Camera.prototype._resized = function () {
-//        var canvas = this._engine.canvas.canvas;
-//        var canvasBody = canvas.parent();
-//        var width = canvasBody.width();
-//        var height = canvasBody.height();
-//        var optics = this._core.optics;
-//        if (optics.type == "perspective") {
-//            optics.aspect = width / height;
-//            return true;
-//        }
-//        return false;
-//    };
-
 
     SceneJS.Camera.prototype.setOptics = function (optics) {
         var core = this._core;
@@ -7261,7 +7229,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         }
 
         if (flags.frontface != undefined) {
-            core.frontface = !!flags.frontface;
+            core.frontface = flags.frontface;
             this._engine.display.imageDirty = true;
         }
 
@@ -7312,7 +7280,9 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             backfaces: core.backfaces,
             frontface: core.frontface,
             specular: core.specular,
-            ambient: core.ambient
+            ambient: core.ambient,
+            backfaceLighting: core.backfaceLighting,
+            backfaceTexturing: core.backfaceTexturing
         };
     };
 
@@ -8506,32 +8476,15 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
             this._core.lights = this._core.lights || [];
 
             for (var i = 0, len = lights.length; i < len; i++) {
-                this._setLight(i, lights[i]);
+                this._initLight(i, lights[i]);
             }
         }
     };
 
-    SceneJS.Lights.prototype.setLights = function (lights) {
-        var indexNum;
-        for (var index in lights) {
-            if (lights.hasOwnProperty(index)) {
-                if (index != undefined || index != null) {
-                    indexNum = parseInt(index);
-                    if (indexNum < 0 || indexNum >= this._core.lights.length) {
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                            "Invalid argument to set 'lights': index out of range (" + this._core.lights.length + " lights defined)");
-                    }
-                    this._setLight(indexNum, lights[index] || {});
-                }
-            }
-        }
-        this._engine.display.imageDirty = true;
-    };
+    SceneJS.Lights.prototype._initLight = function (index, cfg) {
 
-    SceneJS.Lights.prototype._setLight = function (index, cfg) {
-
-        var light = this._core.lights[index] || (this._core.lights[index] = []);
+        var light = [];
+        this._core.lights[index] = light;
 
         var mode = cfg.mode || "dir";
         if (mode != "dir" && mode != "point" && mode != "ambient") {
@@ -8576,6 +8529,111 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         }
 
         light.space = space;
+
+        this._core.hash = null;
+    };
+
+
+    SceneJS.Lights.prototype.setLights = function (lights) {
+        var indexNum;
+        for (var index in lights) {
+            if (lights.hasOwnProperty(index)) {
+                if (index != undefined || index != null) {
+                    indexNum = parseInt(index);
+                    if (indexNum < 0 || indexNum >= this._core.lights.length) {
+                        throw SceneJS_error.fatalError(
+                            SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                            "Invalid argument to set 'lights': index out of range (" + this._core.lights.length + " lights defined)");
+                    }
+                    this._setLight(indexNum, lights[index] || {});
+                }
+            }
+        }
+        this._engine.branchDirty(this); // Schedule recompilation of this subgraph
+    };
+
+    SceneJS.Lights.prototype._setLight = function (index, cfg) {
+
+        var light = this._core.lights[index];
+
+        // Impact of light update
+        var imageDirty = false; // Redraw display list?
+        var branchDirty = false; // Recompile scene branch?
+
+        if (cfg.mode && cfg.mode != light.mode) {
+            var mode = cfg.mode;
+            if (mode != "dir" && mode != "point" && mode != "ambient") {
+                throw SceneJS_error.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Light mode not supported - should be 'dir' or 'point' or 'ambient'");
+            }
+            light.mode = mode;
+            light.diffuse = (mode == "ambient") ? true : ((cfg.diffuse != undefined) ? cfg.diffuse : true);
+            light.specular = (mode == "ambient") ? false : ((cfg.specular != undefined) ? cfg.specular : true);
+            branchDirty = true;
+        }
+
+        if (cfg.color) {
+            var color = cfg.color;
+            light.color = [
+                color.r != undefined ? color.r : 1.0,
+                color.g != undefined ? color.g : 1.0,
+                color.b != undefined ? color.b : 1.0
+            ];
+            imageDirty = true;
+        }
+
+        var pos = cfg.pos;
+        if (pos) {
+            light.pos = [ pos.x || 0, pos.y || 0, pos.z || 0 ];
+            imageDirty = true;
+        }
+
+        var dir = cfg.dir;
+        if (dir) {
+            light.dir = [dir.x || 0, dir.y || 0, dir.z || 0];
+            imageDirty = true;
+        }
+
+        if (cfg.constantAttenuation != undefined) {
+            light.attenuation[0] = cfg.constantAttenuation;
+            imageDirty = true;
+        }
+        if (cfg.linearAttenuation != undefined) {
+            light.attenuation[1] = cfg.linearAttenuation;
+            imageDirty = true;
+        }
+        if (cfg.quadraticAttenuation != undefined) {
+            light.attenuation[2] = cfg.quadraticAttenuation;
+            imageDirty = true;
+        }
+
+        if (cfg.space && cfg.space != light.space) {
+            var space = cfg.space;
+            if (space != "view" && space != "world") {
+                throw SceneJS_error.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
+            }
+            light.space = space;
+            this._core.hash = null;
+            branchDirty = true;
+        }
+
+        if (cfg.specular != light.specular) {
+            light.specular = cfg.specular;
+            branchDirty = true;
+        }
+        if (cfg.diffuse != light.diffuse) {
+            light.diffuse = cfg.diffuse;
+            branchDirty = true;
+        }
+
+        if (branchDirty) {
+            this._engine.branchDirty(this); // Schedule recompilation of this subgraph
+        } else if (imageDirty) {
+            this._engine.display.imageDirty = true;
+        }
 
         this._core.hash = null;
     };
@@ -12309,7 +12367,7 @@ var SceneJS_modelXFormStack = new (function () {
  *
  * <ol>
  * <li>Create or update {@link SceneJS_Object}s during scene compilation</li>
- * <li>Organise the {@link SceneJS_Object} into an <b>object list</b></li>
+ * <li>Organize the {@link SceneJS_Object}s into an <b>object list</b></li>
  * <li>Determine the GL state sort order for the object list</li>
  * <li>State sort the object list</li>
  * <li>Create a <b>draw list</b> containing {@link SceneJS_Chunk}s belonging to the {@link SceneJS_Object}s in the object list</li>
