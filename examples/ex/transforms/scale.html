@@ -23,17 +23,18 @@
 
     var scene = SceneJS.createScene({
         nodes:[
+            // Override default material to make teapot blue
             {
-                type:"flags",
-                id:"myFlags",
-                flags:{
-                    picking:true
-                },
-
+                type:"material",
+                color:{ r:0.5, g:0.5, b:0.6 },
                 nodes:[
                     {
-                        type:"name",
-                        name:"myTeapot",
+                        type:"scale",
+                        id:"myScale",
+                        x:0,
+                        y:0,
+                        z:0,
+
                         nodes:[
                             {
                                 type:"geometry",
@@ -46,24 +47,27 @@
         ]
     });
 
+    var scale = scene.getNode("myScale");
+
+    var x = 0;
+    var xInc = 0.02;
+
+    scene.on("tick",
+            function () {
+                if (x >= 1.5) {
+                    xInc *= -1;
+                } else if (x < 0) {
+                    xInc *= -1;
+                }
+                x += xInc;
+                scale.set({ x: x, y: 1, z: 1 });
+            });
+
     new SceneJS.OrbitControls(scene, {
         yaw:30,
         pitch:-30,
         zoom:10
     });
-
-    scene.on("pick",
-            function (hit) {
-                alert(JSON.stringify(hit));
-            });
-
-    var flags = scene.getNode("myFlags");
-
-    setInterval(
-            function () {
-                flags.setPicking(!flags.getPicking());
-            },
-            2000);
 
 </script>
 </body>

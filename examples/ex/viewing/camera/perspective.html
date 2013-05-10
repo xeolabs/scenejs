@@ -14,8 +14,8 @@
         }
     </style>
 
-    <script src="../../../build/latest/scenejs.js"></script>
-    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+    <script src="../../../../build/latest/scenejs.js"></script>
+    <script src="../../../../build/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
@@ -23,16 +23,18 @@
 
     var scene = SceneJS.createScene({
         nodes:[
+
+            // The camera node in this scene has the same properties
+            // as the one that SceneJS provides by default
+
             {
-                type:"camera",
+                type:"node",
                 optics:{
-                    type:"frustum",
-                    left:-0.5,
-                    bottom:-0.5,
+                    type:"ortho",
+                    fovy:45.0,
+                    aspect:1.0,
                     near:0.1,
-                    right:0.5,
-                    top:0.5,
-                    far:1000
+                    far:5000.0
                 },
 
                 nodes:[
@@ -48,8 +50,9 @@
     new SceneJS.OrbitControls(scene, {
         yaw:30,
         pitch:-30,
-        zoom:5
+        zoom:15
     });
+
 
 </script>
 </body>

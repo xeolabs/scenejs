@@ -1,91 +1,76 @@
 [
     {
-        "title":"Events",
-        "tags":["events"],
-        "tip":"Working with SceneJS events",
+        "title":"Transformation",
+        "tip":"Defining transforms",
+        "tags":[],
         "nodes":[
             {
-                "title":"Subscribing to events",
-                "tags":[],
-                "tip":"Listening to events fired by SceneJS",
+                "title":"Viewing",
+                "tip":"Working with camera projection types",
+                "tags":["lookat"],
                 "nodes":[
                     {
-                        "title":"Subscribe to scene events",
-                        "tags":["scene"],
-                        "path":"events/sceneEvents.html"
-                    },
-                    {
-                        "title":"Subscribe to 3D position of a geometry",
-                        "tags":["geometry"],
-                        "path":"events/nodeRenderedEvent.html"
+                        "title":"Basic viewing transform",
+                        "tip":"Defining a basic viewing transform",
+                        "tags":[],
+                        "path":"viewing/lookat/lookat.html"
                     }
                 ]
-            }
-        ]
-    },
-    {
-        "title":"Flags",
-        "tags":["flags"],
-        "tip":"The scene graph 'flags' node is used to configure appearance and functionality for scene sub-graphs. It's commonly used to toggle things like visibility and other aspects of appearance, without having to update     the individual nodes within the sub-graphs.",
-        "nodes":[
+            },
             {
-                "title":"Toggling flags",
-                "tags":[],
-                "tip":"Toggling modes for sub-nodes using a parent flags node",
+                "title":"Projection",
+                "tip":"Working with camera projection types",
+                "tags":["camera"],
                 "nodes":[
                     {
-                        "title":"Toggle visibility",
-                        "tags":["visibility"],
-                        "tip":"Using a flags node to toggle visibility of child geometries",
-                        "path":"flags/enabled.html"
+                        "title":"Perspective camera",
+                        "tip":"Defining a perspective camera",
+                        "tags":["perspective"],
+                        "path":"viewing/camera/perspective.html"
                     },
                     {
-                        "title":"Toggle pickability",
-                        "tags":["picking"],
-                        "tip":"Using a flags node to toggle ability to pick child geometries",
-                        "path":"flags/picking.html"
+                        "title":"Orthographic camera",
+                        "tip":"Defining an orthographic camera",
+                        "tags":["orthographic"],
+                        "path":"viewing/camera/ortho.html"
                     },
                     {
-                        "title":"Toggle transparency",
-                        "tags":["transparency"],
-                        "tip":"Using a flags node to toggle transparency of child geometries",
-                        "path":"flags/transparent.html"
+                        "title":"Frustum camera",
+                        "tip":"Defining a camera via frustum extents",
+                        "tags":["frustum"],
+                        "path":"viewing/camera/frustum.html"
+                    }
+                ]
+            },
+            {
+                "title":"Modelling",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Rotate",
+                        "path":"transforms/rotate.html",
+                        "tags":["rotate"]
                     },
                     {
-                        "title":"Toggle backfaces",
-                        "tags":["backfaces"],
-                        "tip":"Using a flags node to toggle visibility of backfaces on child geometries",
-                        "path":"flags/backfaces.html"
+                        "title":"Translate",
+                        "path":"transforms/translate.html",
+                        "tags":["translate"]
                     },
                     {
-                        "title":"Toggle front face winding order",
-                        "tags":["backfaces"],
-                        "tip":"Using a flags node to set winding order of front faces on child geometries",
-                        "path":"flags/frontface.html"
+                        "title":"Scale",
+                        "path":"transforms/scale.html",
+                        "tags":["scale"]
                     },
                     {
-                        "title":"Toggle backface lighting",
-                        "tags":["backfaces", "lighting"],
-                        "tip":"Using a flags node to toggle lighting of faces on child geometries",
-                        "path":"flags/backfaceLighting.html"
+                        "title":"Matrix",
+                        "path":"transforms/matrix.html",
+                        "tags":["matrix"]
                     },
                     {
-                        "title":"Toggle backface texturing",
-                        "tags":["backfaces", "texturing"],
-                        "tip":"Using a flags node to toggle lighting of back faces of child geometries",
-                        "path":"flags/backfaceTexturing.html"
-                    },
-                    {
-                        "title":"Toggle specularity",
-                        "tags":["specularLight"],
-                        "tip":"Using a flags node to toggle specular lighting of child geometries",
-                        "path":"flags/specular.html"
-                    },
-                    {
-                        "title":"Toggle ambient lighting",
-                        "tags":["lighting"],
-                        "tip":"Toggle ambient lighting of child geometries",
-                        "path":"flags/ambient.html"
+                        "title":"Transform hierarchy",
+                        "path":"transforms/transformHierarchy.html",
+                        "tags":[]
                     }
                 ]
             }
@@ -97,7 +82,7 @@
         "tip":"The scene graph 'geometry' node is the principle node type in SceneJS",
         "nodes":[
             {
-                "title":"Bundled Primitives",
+                "title":"Primitives",
                 "tip":"Creating primitives using the bundled core geometry plugins",
                 "tags":["prims", "plugin"],
                 "nodes":[
@@ -140,8 +125,8 @@
                 ]
             },
             {
-                "title":"Defining geometry",
-                "tip":"Defining geometry",
+                "title":"Custom",
+                "tip":"Defining custom Geometry",
                 "tags":["custom"],
                 "nodes":[
                     {
@@ -168,6 +153,18 @@
                 ]
             },
             {
+                "title":"Text",
+                "tip":"Creating text using the vector text core plugin",
+                "tags":["vectorText"],
+                "nodes":[
+                    {
+                        "title":"Vector text",
+                        "path":"geometry/vectorText.html",
+                        "tags":[]
+                    }
+                ]
+            },
+            {
                 "title":"Optimization",
                 "tip":"Supported geometry optimization techniques",
                 "tags":["optimization"],
@@ -182,28 +179,9 @@
         ]
     },
     {
-        "title":"Text",
-        "tip":"Working with text",
-        "tags":["nodes", "geometry", "text"],
-        "nodes":[
-            {
-                "title":"Vector text",
-                "tip":"Creating text using the vector text core plugin",
-                "tags":["vectorText"],
-                "nodes":[
-                    {
-                        "title":"Vector text",
-                        "path":"geometry/vectorText.html",
-                        "tags":[]
-                    }
-                ]
-            }
-        ]
-    },
-    {
         "title":"Lighting",
-        "tags":["lighting"],
-        "tip":"Working with light sources",
+        "tags":["lighting", "materials"],
+        "tip":"Working with lights and materials",
         "nodes":[
             {
                 "title":"Ambient",
@@ -212,7 +190,7 @@
                 "nodes":[
                     {
                         "title":"Ambient light",
-                        "path":"lights/ambient.html",
+                        "path":"lights/ambient/ambient.html",
                         "tags":["ambientLight"]
                     }
                 ]
@@ -225,7 +203,7 @@
                     {
                         "title":"Directional lights in View space",
                         "path":"lights/directional/directionalView.html",
-                        "tags":["viewSpace", "specularLight"]
+                        "tags":["viewSpace", "specularLight", "diffuseLight"]
                     },
                     {
                         "title":"Directional lights in World space",
@@ -240,18 +218,18 @@
                 ]
             },
             {
-                "title":"Positional",
-                "tip":"Defining positional light sources",
-                "tags":["positionalLight"],
+                "title":"Point",
+                "tip":"Defining point light sources",
+                "tags":["pointLight"],
                 "nodes":[
                     {
-                        "title":"Positional lights in View space",
-                        "path":"lights/positional/positionalView.html",
-                        "tags":["viewSpace", "specularLight"]
+                        "title":"Point lights in View space",
+                        "path":"lights/point/pointView.html",
+                        "tags":["viewSpace", "specularLight", "diffuseLight"]
                     },
                     {
-                        "title":"Positional lights in World space",
-                        "path":"lights/positional/positionalWorld.html",
+                        "title":"Point lights in World space",
+                        "path":"lights/point/pointWorld.html",
                         "tags":["worldSpace", "specularLight", "diffuseLight"]
                     }
                 ]
@@ -259,39 +237,7 @@
         ]
     },
     {
-        "title":"Camera",
-        "tip":"Working with cameras",
-        "tags":["camera"],
-        "nodes":[
-            {
-                "title":"Projections",
-                "tip":"Working with camera projection types",
-                "tags":["projection"],
-                "nodes":[
-                    {
-                        "title":"Perspective camera",
-                        "tip":"Defining a perspective camera",
-                        "tags":["perspective"],
-                        "path":"camera/perspective.html"
-                    },
-                    {
-                        "title":"Orthographic camera",
-                        "tip":"Defining an orthographic camera",
-                        "tags":["orthographic"],
-                        "path":"camera/ortho.html"
-                    },
-                    {
-                        "title":"Frustum camera",
-                        "tip":"Defining a camera via frustum extents",
-                        "tags":["frustum"],
-                        "path":"camera/frustum.html"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"texturing",
+        "title":"Texturing",
         "tip":"Working with texture maps",
         "tags":["texturing"],
         "nodes":[
@@ -481,11 +427,7 @@
                     }
                 ]
             },
-            {
-                "title":"Render-to-texture",
-                "tags":["render"],
-                "path":"texture/renderToTexture.html"
-            },
+
             {
                 "title":"Optimization",
                 "tip":"Supported texture optimization techniques",
@@ -501,62 +443,7 @@
         ]
     },
     {
-        "title":"Layers",
-        "tip":"",
-        "tags":["layer"],
-        "nodes":[
-            {
-                "title":"Transparency",
-                "tip":"",
-                "tags":[],
-                "nodes":[
-                    {
-                        "title":"Transparency sorting",
-                        "path":"layers/alphaSort.html",
-                        "tags":["transparency"]
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"Modelling transform",
-        "tip":"",
-        "tags":["transform"],
-        "nodes":[
-            {
-                "title":"Transform hierarchy",
-                "tip":"Defining hierarchies of modelling transform",
-                "tags":["hierarchy"],
-                "nodes":[
-                    {
-                        "title":"Static transform hierarchy",
-                        "path":"transforms/transformHierarchy.html",
-                        "tags":[]
-                    },
-                    {
-                        "title":"Dynamic transform hierarchy",
-                        "path":"transforms/dynamicTransformHierarchy.html",
-                        "tags":[]
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"Tags",
-        "tip":"",
-        "tags":["tag"],
-        "nodes":[
-            {
-                "title":"Render masking",
-                "path":"tags/renderMasking.html",
-                "tags":[]
-            }
-        ]
-    },
-    {
-        "title":"Custom shaders",
+        "title":"Custom Shaders",
         "tip":"",
         "tags":["shader"],
         "nodes":[
@@ -612,24 +499,123 @@
         ]
     },
     {
-        "title":"Miscellaneous",
-        "tip":"",
-        "tags":["misc"],
+        "title":"Events",
+        "tags":["events"],
+        "tip":"Working with SceneJS events",
         "nodes":[
             {
-                "title":"WebGL",
-                "tip":"",
-                "tags":["webgl"],
+                "title":"Subscribing",
+                "tags":[],
+                "tip":"Listening to events fired by SceneJS",
                 "nodes":[
                     {
-                        "title":"Lost WebGL context recovery",
-                        "path":"misc/webglContextRestore.html",
-                        "tags":["webglContextLost"]
+                        "title":"Subscribe to scene events",
+                        "tags":["scene"],
+                        "path":"events/sceneEvents.html"
+                    },
+                    {
+                        "title":"Subscribe to 3D position of a geometry",
+                        "tags":["geometry"],
+                        "path":"events/nodeRenderedEvent.html"
                     }
                 ]
             }
         ]
     },
+    {
+        "title":"Rendering Control",
+        "tags":[],
+        "tip":"The scene graph 'flags' node is used to configure appearance and functionality for scene sub-graphs. It's commonly used to toggle things like visibility and other aspects of appearance, without having to update     the individual nodes within the sub-graphs.",
+        "nodes":[
+            {
+                "title":"Flags",
+                "tags":[],
+                "tip":"Toggling modes for sub-nodes using a parent flags node",
+                "nodes":[
+                    {
+                        "title":"Toggle visibility",
+                        "tags":["visibility"],
+                        "tip":"Using a flags node to toggle visibility of child geometries",
+                        "path":"flags/enabled.html"
+                    },
+                    {
+                        "title":"Toggle pickability",
+                        "tags":["picking"],
+                        "tip":"Using a flags node to toggle ability to pick child geometries",
+                        "path":"flags/picking.html"
+                    },
+                    {
+                        "title":"Toggle transparency",
+                        "tags":["transparency"],
+                        "tip":"Using a flags node to toggle transparency of child geometries",
+                        "path":"flags/transparent.html"
+                    },
+                    {
+                        "title":"Toggle backfaces",
+                        "tags":["backfaces"],
+                        "tip":"Using a flags node to toggle visibility of backfaces on child geometries",
+                        "path":"flags/backfaces.html"
+                    },
+                    {
+                        "title":"Toggle front face winding order",
+                        "tags":["backfaces"],
+                        "tip":"Using a flags node to set winding order of front faces on child geometries",
+                        "path":"flags/frontface.html"
+                    },
+                    {
+                        "title":"Toggle backface lighting",
+                        "tags":["backfaces", "lighting"],
+                        "tip":"Using a flags node to toggle lighting of faces on child geometries",
+                        "path":"flags/backfaceLighting.html"
+                    },
+                    {
+                        "title":"Toggle backface texturing",
+                        "tags":["backfaces", "texturing"],
+                        "tip":"Using a flags node to toggle lighting of back faces of child geometries",
+                        "path":"flags/backfaceTexturing.html"
+                    },
+                    {
+                        "title":"Toggle specularity",
+                        "tags":["specularLight"],
+                        "tip":"Using a flags node to toggle specular lighting of child geometries",
+                        "path":"flags/specular.html"
+                    },
+                    {
+                        "title":"Toggle ambient lighting",
+                        "tags":["lighting"],
+                        "tip":"Toggle ambient lighting of child geometries",
+                        "path":"flags/ambient.html"
+                    }
+                ]
+            },
+            {
+                "title":"Layers",
+                "tip":"",
+                "tags":["layer"],
+                "nodes":[
+                    {
+                        "title":"Transparency sorting",
+                        "path":"layers/alphaSort.html",
+                        "tags":["transparency"]
+                    }
+                ]
+            },
+            {
+                "title":"Tags",
+                "tip":"",
+                "tags":["tag"],
+                "nodes":[
+                    {
+                        "title":"Render masking",
+                        "path":"tags/renderMasking.html",
+                        "tags":[]
+                    }
+                ]
+            }
+        ]
+    },
+
+
     {
         "title":"Interaction",
         "tip":"",
@@ -654,28 +640,27 @@
             }
         ]
     },
-
     {
-        "title":"Scene",
+        "title":"Miscellaneous",
         "tip":"",
-        "tags":["scene"],
+        "tags":["misc"],
         "nodes":[
             {
-                "title":"Defaults",
-                "tip":"Shows default scene state provided by SceneJS",
-                "tags":["default"],
+                "title":"WebGL",
+                "tip":"",
+                "tags":["webgl"],
                 "nodes":[
                     {
-                        "title":"Default scene state",
-                        "path":"scene/default.html",
-                        "tags":[]
+                        "title":"Lost WebGL context recovery",
+                        "path":"misc/webglContextRestore.html",
+                        "tags":["webglContextLost"]
                     }
                 ]
             }
         ]
     },
     {
-        "title":"Fun examples",
+        "title":"Fun Examples",
         "tip":"",
         "tags":["fun"],
         "nodes":[
@@ -687,7 +672,7 @@
                     {
                         "title":"Tron Tank",
                         "path":"fun/tronTank.html",
-                        "editor": false,
+                        "editor":false,
                         "tags":["collada", "animation"]
                     },
 

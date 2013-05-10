@@ -15,7 +15,7 @@
     </style>
 
     <script src="../../../build/latest/scenejs.js"></script>
-    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+    <script src="../../../build/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
@@ -40,26 +40,70 @@
 
     var scene = SceneJS.createScene({
         nodes:[
+
+            // Override SceneJS' default lights to make specular reflection look nice
+            // for this example
             {
-                type:"flags",
-                id:"myFlags",
-                flags:{
-                    specular:true // (default is true)
-                },
+                type:"lights",
+                lights:[
+                    {
+                        mode:"ambient",
+                        color:{ r:0.7, g:0.7, b:0.8 },
+                        diffuse:true,
+                        specular:false
+                    },
+                    {
+                        mode:"dir",
+                        color:{ r:0.5, g:0.5, b:1.0 },
+                        diffuse:true,
+                        specular:true,
+                        dir:{ x:0.5, y:0.5, z:-1.0 },
+                        space:"view"
+                    }
+                ],
 
                 nodes:[
 
-                    // Materials have specularity by default, so we'll just
-                    // override the material's diffuse color to make our
-                    // geometry something other than the boring default white
+                    // Our flags can be anywhere above the geometry
+                    // we want to toggle specularity for
                     {
-                        type:"material",
-                        color:{ r:0.4, g:0.5, b:0.4 },
+                        type:"flags",
+                        id:"myFlags",
+                        flags:{
+                            specular:true // (default is true)
+                        },
 
                         nodes:[
+
+                            // Some specular material
                             {
-                                type:"geometry",
-                                plugin:"torus"
+                                type:"material",
+                                color:{ r:0.5, g:0.5, b:0.6 },
+                                specularColor:{ r:0.7, g:0.7, b:0.8 },
+                                specular:1.0,
+                                shine:5.0,
+
+                                nodes:[
+
+                                    // A specular map for completeness
+                                    {
+                                        type:"texture",
+                                        id:"theTexture",
+                                        layers:[
+                                            {
+                                                src:"../../textures/crossGridSpecularMap.jpg",
+                                                applyTo:"specular",
+                                                blendMode:"multiply"
+                                            }
+                                        ],
+                                        nodes:[
+                                            {
+                                                type:"geometry",
+                                                plugin:"torus"
+                                            }
+                                        ]
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -71,7 +115,7 @@
     new SceneJS.OrbitControls(scene, {
         yaw:30,
         pitch:-30,
-        zoom:10
+        zoom:5
     });
 
     var flags = scene.getNode("myFlags");

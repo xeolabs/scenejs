@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Basic Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../../build/latest/scenejs.js"></script>
+    <script src="../../../../build/latest/extras/orbitControl.js"></script>
+    <script src="../../../libs/dat.gui.min.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"camera",
+                id: "myCamera",
+                optics:{
+                    type:"frustum",
+                    left:-0.5,
+                    bottom:-0.5,
+                    near:0.1,
+                    right:0.5,
+                    top:0.5,
+                    far:1000
+                },
+
+                nodes:[
+                    {
+                        type:"geometry",
+                        plugin:"teapot"
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:5
+    });
+
+
+    //--------------------------------------------------------------------
+    // Hook up a GUI
+    // http://workshop.chromeexperiments.com/examples/gui/#1--Basic-Usage
+    //--------------------------------------------------------------------
+
+    var camera = scene.getNode("myCamera");
+
+    var Menu = function () {
+
+        var optics = camera.getOptics();
+
+        this["optics.left"] = optics.left;
+        this["optics.bottom"] = optics.bottom;
+        this["optics.near"] = optics.near;
+        this["optics.right"] = optics.right;
+        this["optics.top"] = optics.top;
+        this["optics.far"] = optics.far;
+
+        var self = this;
+
+        var update = function () {
+            camera.setOptics({
+                left:self["optics.left"],
+                bottom:self["optics.bottom"],
+                near:self["optics.near"],
+                right:self["optics.right"],
+                top:self["optics.top"],
+                far:self["optics.far"]
+            });
+            requestAnimationFrame(update);
+        };
+        update();
+    };
+
+    var gui = new dat.GUI();
+    var folder = gui.addFolder("Frustum camera '" + camera.getId() + "'");
+    var menu = new Menu();
+    folder.add(menu, 'optics.left', -5.0, 5.0);
+    folder.add(menu, 'optics.bottom', -5.0, 5.0);
+    folder.add(menu, 'optics.near', -5.0, 5.0);
+    folder.add(menu, 'optics.right', -5.0, 5.0);
+    folder.add(menu, 'optics.top', -5.0, 5.0);
+    folder.add(menu, 'optics.far', 0.0, 10000.0);
+    folder.open();
+
+</script>
+</body>
+</html>

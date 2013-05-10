@@ -15,7 +15,8 @@
     </style>
 
     <script src="../../../build/latest/scenejs.js"></script>
-    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+    <script src="../../../build/latest/extras/orbitControl.js"></script>
+    <script src="../../../build/latest/extras/gui.js"></script>
 </head>
 <body>
 
@@ -32,6 +33,7 @@
         nodes:[
             {
                 type:"lookAt",
+                id: "myLookat",
                 eye:{ x:0, y:0, z:-10 },
                 look:{ x:0, y:0, z:0 },
                 up:{ x:0, y:1, z:0 },
@@ -39,6 +41,7 @@
                 nodes:[
                     {
                         type:"camera",
+                        id: "myCamera",
                         optics:{
                             type:"perspective",
                             fovy:45.0,
@@ -50,6 +53,7 @@
                         nodes:[
                             {
                                 type:"lights",
+                                id: "myLights",
                                 lights:[
                                     {
                                         mode:"ambient",
@@ -78,6 +82,7 @@
                                 nodes:[
                                     {
                                         type:"material",
+                                        id: "myMaterial",
                                         color:{ r:1.0, g:1.0, b:1.0 },
                                         specularColor:{ r:1.0, g:1.0, b:1.0 },
                                         specular:1.0,
@@ -87,6 +92,7 @@
                                         nodes:[
                                             {
                                                 type:"flags",
+                                                id: "myFlags",
                                                 flags:{
                                                     picking:true, // Picking enabled
                                                     enabled:true, // Geometries visible
@@ -117,7 +123,11 @@
         ]
     });
 
-    new SceneJS.OrbitControls(scene);
+    // Simple GUI for playing around
+    new SceneJS.GUI(scene, ["myLookat", "myCamera",  "myMaterial", "myFlags"]);
+
+    // Mouse camera
+    //new SceneJS.OrbitControls(scene);
 
 </script>
 </body>

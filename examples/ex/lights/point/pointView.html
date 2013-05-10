@@ -15,7 +15,9 @@
     </style>
 
     <script src="../../../../build/latest/scenejs.js"></script>
-    <script src="../../../../build/latest/extras/controls/orbit.js"></script>
+    <script src="../../../../build/latest/extras/orbitControl.js"></script>
+    <script src="../../../../build/latest/extras/gui.js"></script>
+
 </head>
 <body>
 
@@ -25,6 +27,7 @@
         nodes:[
             {
                 type:"lights",
+                id:"myLights", // So we can reference this lights node
                 lights:[
 
                     // This positional light is in View-space, meaning that
@@ -47,6 +50,7 @@
                 nodes:[
                     {
                         type:"material",
+                        id:"myMaterial",
                         color:{ r:0.5, g:0.5, b:0.6 },
                         specularColor:{ r:1.0, g:1.0, b:1.0 },
                         specular:1.0,
@@ -66,6 +70,10 @@
         ]
     });
 
+    // Simple GUI for playing around
+    new SceneJS.GUI(scene, ["myLights", "myMaterial"]);
+
+    // Mouse camera orbit control
     new SceneJS.OrbitControls(scene, {
         yaw:30,
         pitch:-30,

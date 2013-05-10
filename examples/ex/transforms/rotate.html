@@ -15,7 +15,7 @@
     </style>
 
     <script src="../../../build/latest/scenejs.js"></script>
-    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+    <script src="../../../build/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
@@ -23,24 +23,16 @@
 
     var scene = SceneJS.createScene({
         nodes:[
+            // Override default material to make teapot blue
             {
-                type:"lookAt",
-                eye:{ z:5 },
+                type:"material",
+                color:{ r:0.5, g:0.5, b:0.6 },
                 nodes:[
-
-                    // The camera node in this scene has the same properties
-                    // as the one that SceneJS provides by default, and is defined
-                    // here to show what those are.
-
                     {
-                        type:"camera",
-                        optics:{
-                            type:"perspective",
-                            fovy:45.0,
-                            aspect:1.0,
-                            near:0.1,
-                            far:5000.0
-                        },
+                        type:"rotate",
+                        id:"myRotate",
+                        x:0, y:-1,z:0,  // Axis of rotation
+                        angle:90.0,
 
                         nodes:[
                             {
@@ -54,10 +46,20 @@
         ]
     });
 
+    var rotate = scene.getNode("myRotate");
+
+    scene.on("tick",
+            function () {
+                var angle = rotate.getAngle();
+                angle += 0.5;
+                rotate.setAngle(angle);
+            });
+
+
     new SceneJS.OrbitControls(scene, {
         yaw:30,
         pitch:-30,
-        zoom:5
+        zoom:10
     });
 
 </script>

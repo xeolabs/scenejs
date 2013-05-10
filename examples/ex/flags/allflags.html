@@ -15,7 +15,8 @@
     </style>
 
     <script src="../../../build/latest/scenejs.js"></script>
-    <script src="../../../build/latest/extras/controls/orbit.js"></script>
+    <script src="../../../build/latest/extras/orbitControl.js"></script>
+    <script src="../../../build/latest/extras/gui.js"></script>
 </head>
 <body>
 
@@ -27,6 +28,7 @@
         nodes:[
             {
                 type:"flags",
+                id:"myFlags",
                 flags:{
                     picking:true, // Picking enabled
                     enabled:true, // Geometries visible
@@ -41,13 +43,28 @@
 
                 nodes:[
                     {
-                        type:"geometry",
-                        plugin:"teapot"
+                        type:"material",
+                        color:{ r:1.0, g:1.0, b:1.0 },
+                        specularColor:{ r:1.0, g:1.0, b:1.0 },
+                        specular:1.0,
+                        shine:70.0,
+                        emit:0,
+                        alpha: 0.5,
+
+                        nodes:[
+                            {
+                                type:"geometry",
+                                plugin:"teapot"
+                            }
+                        ]
                     }
                 ]
             }
         ]
     });
+
+    // Simple GUI for playing around
+    new SceneJS.GUI(scene, ["myFlags"]);
 
     new SceneJS.OrbitControls(scene, {
         yaw:30,

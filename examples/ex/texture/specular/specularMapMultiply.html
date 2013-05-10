@@ -15,7 +15,7 @@
     </style>
 
     <script src="../../../../build/latest/scenejs.js"></script>
-    <script src="../../../../build/latest/extras/controls/orbit.js"></script>
+    <script src="../../../../build/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
@@ -42,7 +42,7 @@
                         diffuse:true,
                         specular:true,
                         dir:{ x:0.5, y:0.5, z:-1.0 },
-                        space: "view"
+                        space:"view"
                     }
                 ],
 
@@ -53,41 +53,33 @@
 
                         nodes:[
                             {
-                                type:"flags",
-                                flags:{
-                                    transparent:true
-                                },
+                                type:"material",
+                                color:{ r:0.5, g:0.5, b:0.6 },
+                                specularColor:{ r:0.7, g:0.7, b:0.8 },
+                                specular:1.0,
+                                shine:5.0,
                                 nodes:[
                                     {
-                                        type:"material",
-                                        color:{ r:0.5, g:0.5, b:0.6 },
-                                        specularColor:{ r:0.7, g:0.7, b:0.8 },
-                                        specular:1.0,
-                                        shine:5.0,
+                                        type:"texture",
+                                        id:"theTexture",
+                                        layers:[
+                                            {
+                                                src:"../../../textures/crossGridSpecularMap.jpg",
+                                                applyTo:"specular",
+                                                blendMode:"multiply"
+                                            }
+                                        ],
                                         nodes:[
                                             {
-                                                type:"texture",
-                                                id:"theTexture",
-                                                layers:[
-                                                    {
-                                                        src:"../../../textures/crossGridSpecularMap.jpg",
-                                                        applyTo:"specular",
-                                                        blendMode:"multiply"
-                                                    }
-                                                ],
-                                                nodes:[
-                                                    {
-                                                        type:"geometry",
-                                                        source:{
-                                                            type:"torus",
-                                                            radius:1.0,
-                                                            tube:0.3,
-                                                            segmentsR:60,
-                                                            segmentsT:40,
-                                                            arc:Math.PI * 2
-                                                        }
-                                                    }
-                                                ]
+                                                type:"geometry",
+                                                source:{
+                                                    type:"torus",
+                                                    radius:1.0,
+                                                    tube:0.3,
+                                                    segmentsR:60,
+                                                    segmentsT:40,
+                                                    arc:Math.PI * 2
+                                                }
                                             }
                                         ]
                                     }

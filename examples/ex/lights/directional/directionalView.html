@@ -14,8 +14,9 @@
         }
     </style>
 
+    <script src="../../../libs/dat.gui.min.js"></script>
     <script src="../../../../build/latest/scenejs.js"></script>
-    <script src="../../../../build/latest/extras/controls/orbit.js"></script>
+    <script src="../../../../build/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
@@ -25,6 +26,7 @@
         nodes:[
             {
                 type:"lights",
+                id:"myLights", // So we can reference this lights node
                 lights:[
 
                     // This directional light is in View-space, meaning that
@@ -62,6 +64,74 @@
             }
         ]
     });
+
+    var lights = scene.getNode("myLights");
+
+    // GUI
+
+    var Menu = function () {
+
+        this.message = "Positional light";
+
+        this["dir.x"] = 5.0;
+        this["dir.y"] = -5.0;
+        this["dir.z"] = -5.0;
+
+        this["color.r"] = 1.0;
+        this["color.g"] = 1.0;
+        this["color.b"] = 1.0;
+
+        this.specular = true;
+        this.diffuse = true;
+
+        var self = this;
+
+        var update = function () {
+
+            lights.setLights({
+                "0":{
+                    dir:{
+                        x:self["dir.x"],
+                        y:self["dir.y"],
+                        z:self["dir.z"]
+                    },
+
+                    color:{
+                        r:self["color.r"],
+                        g:self["color.g"],
+                        b:self["color.b"]
+                    },
+                    specular:self.specular,
+                    diffuse:self.diffuse
+                }
+            });
+
+            requestAnimationFrame(update);
+        };
+
+        update();
+    };
+
+    var gui = new dat.GUI();
+
+    var menu = new Menu();
+
+    var direction = gui.addFolder('Direction');
+    direction.add(menu, 'dir.x', -10.0, 10.0);
+    direction.add(menu, 'dir.y', -10.0, 10.0);
+    direction.add(menu, 'dir.z', -10.0, 10.0);
+    direction.open();
+
+    var color = gui.addFolder('Color');
+    color.add(menu, 'color.r', 0.0, 1.0);
+    color.add(menu, 'color.g', 0.0, 1.0);
+    color.add(menu, 'color.b', 0.0, 1.0);
+    color.open();
+
+    var contributions = gui.addFolder('Contributions');
+    contributions.add(menu, 'specular');
+    contributions.add(menu, 'diffuse');
+    contributions.open();
 
     new SceneJS.OrbitControls(scene, {
         yaw:30,
