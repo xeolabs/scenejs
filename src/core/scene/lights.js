@@ -90,32 +90,15 @@
             this._core.lights = this._core.lights || [];
 
             for (var i = 0, len = lights.length; i < len; i++) {
-                this._setLight(i, lights[i]);
+                this._initLight(i, lights[i]);
             }
         }
     };
 
-    SceneJS.Lights.prototype.setLights = function (lights) {
-        var indexNum;
-        for (var index in lights) {
-            if (lights.hasOwnProperty(index)) {
-                if (index != undefined || index != null) {
-                    indexNum = parseInt(index);
-                    if (indexNum < 0 || indexNum >= this._core.lights.length) {
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                            "Invalid argument to set 'lights': index out of range (" + this._core.lights.length + " lights defined)");
-                    }
-                    this._setLight(indexNum, lights[index] || {});
-                }
-            }
-        }
-        this._engine.display.imageDirty = true;
-    };
+    SceneJS.Lights.prototype._initLight = function (index, cfg) {
 
-    SceneJS.Lights.prototype._setLight = function (index, cfg) {
-
-        var light = this._core.lights[index] || (this._core.lights[index] = []);
+        var light = [];
+        this._core.lights[index] = light;
 
         var mode = cfg.mode || "dir";
         if (mode != "dir" && mode != "point" && mode != "ambient") {
@@ -160,6 +143,111 @@
         }
 
         light.space = space;
+
+        this._core.hash = null;
+    };
+
+
+    SceneJS.Lights.prototype.setLights = function (lights) {
+        var indexNum;
+        for (var index in lights) {
+            if (lights.hasOwnProperty(index)) {
+                if (index != undefined || index != null) {
+                    indexNum = parseInt(index);
+                    if (indexNum < 0 || indexNum >= this._core.lights.length) {
+                        throw SceneJS_error.fatalError(
+                            SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                            "Invalid argument to set 'lights': index out of range (" + this._core.lights.length + " lights defined)");
+                    }
+                    this._setLight(indexNum, lights[index] || {});
+                }
+            }
+        }
+        this._engine.branchDirty(this); // Schedule recompilation of this subgraph
+    };
+
+    SceneJS.Lights.prototype._setLight = function (index, cfg) {
+
+        var light = this._core.lights[index];
+
+        // Impact of light update
+        var imageDirty = false; // Redraw display list?
+        var branchDirty = false; // Recompile scene branch?
+
+        if (cfg.mode && cfg.mode != light.mode) {
+            var mode = cfg.mode;
+            if (mode != "dir" && mode != "point" && mode != "ambient") {
+                throw SceneJS_error.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "Light mode not supported - should be 'dir' or 'point' or 'ambient'");
+            }
+            light.mode = mode;
+            light.diffuse = (mode == "ambient") ? true : ((cfg.diffuse != undefined) ? cfg.diffuse : true);
+            light.specular = (mode == "ambient") ? false : ((cfg.specular != undefined) ? cfg.specular : true);
+            branchDirty = true;
+        }
+
+        if (cfg.color) {
+            var color = cfg.color;
+            light.color = [
+                color.r != undefined ? color.r : 1.0,
+                color.g != undefined ? color.g : 1.0,
+                color.b != undefined ? color.b : 1.0
+            ];
+            imageDirty = true;
+        }
+
+        var pos = cfg.pos;
+        if (pos) {
+            light.pos = [ pos.x || 0, pos.y || 0, pos.z || 0 ];
+            imageDirty = true;
+        }
+
+        var dir = cfg.dir;
+        if (dir) {
+            light.dir = [dir.x || 0, dir.y || 0, dir.z || 0];
+            imageDirty = true;
+        }
+
+        if (cfg.constantAttenuation != undefined) {
+            light.attenuation[0] = cfg.constantAttenuation;
+            imageDirty = true;
+        }
+        if (cfg.linearAttenuation != undefined) {
+            light.attenuation[1] = cfg.linearAttenuation;
+            imageDirty = true;
+        }
+        if (cfg.quadraticAttenuation != undefined) {
+            light.attenuation[2] = cfg.quadraticAttenuation;
+            imageDirty = true;
+        }
+
+        if (cfg.space && cfg.space != light.space) {
+            var space = cfg.space;
+            if (space != "view" && space != "world") {
+                throw SceneJS_error.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
+            }
+            light.space = space;
+            this._core.hash = null;
+            branchDirty = true;
+        }
+
+        if (cfg.specular != light.specular) {
+            light.specular = cfg.specular;
+            branchDirty = true;
+        }
+        if (cfg.diffuse != light.diffuse) {
+            light.diffuse = cfg.diffuse;
+            branchDirty = true;
+        }
+
+        if (branchDirty) {
+            this._engine.branchDirty(this); // Schedule recompilation of this subgraph
+        } else if (imageDirty) {
+            this._engine.display.imageDirty = true;
+        }
 
         this._core.hash = null;
     };
