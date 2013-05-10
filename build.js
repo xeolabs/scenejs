@@ -261,7 +261,12 @@
                     // Deep-copy an existing directory
                     wrench.copyDirSyncRecursive("src/plugins", distPluginDir);
 
-                    wrench.copyDirSyncRecursive("src/extras", distExtrasDir);
+
+                    fs.writeFileSync(distExtrasDir + "/orbitControl.js", fs.readFileSync("src/extras/orbitControl.js"));
+                    fs.writeFileSync(distExtrasDir + "/pickControl.js", fs.readFileSync("src/extras/pickControl.js"));
+
+
+                    fs.writeFileSync(distExtrasDir + "/gui.js", fs.readFileSync("src/extras/gui/dat.gui.min.js") + fs.readFileSync("src/extras/gui/gui.js"));
 
                     if (fileList.length > 0) {
                         sys.print("Writing built library: scenejs.js\n");
