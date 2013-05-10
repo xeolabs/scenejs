@@ -87,7 +87,7 @@
         }
 
         if (flags.frontface != undefined) {
-            core.frontface = !!flags.frontface;
+            core.frontface = flags.frontface;
             this._engine.display.imageDirty = true;
         }
 
@@ -138,7 +138,9 @@
             backfaces: core.backfaces,
             frontface: core.frontface,
             specular: core.specular,
-            ambient: core.ambient
+            ambient: core.ambient,
+            backfaceLighting: core.backfaceLighting,
+            backfaceTexturing: core.backfaceTexturing
         };
     };
 
