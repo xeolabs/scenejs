@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
     <script src="libs/jquery-1.8.3.min.js"></script>
-    <script src="../../examplejs/api/v0/tweakjs.js"></script>
-    <!--<script src="http://xeolabs.github.io/examplejs/api/v0/tweakjs.js"></script>-->
+    <!--<script src="../../examplejs/api/v0/tweakjs.js"></script>-->
+    <script src="http://xeolabs.github.io/examplejs/api/v0/tweakjs.js"></script>
 
 </head>
 <body>
@@ -37,14 +37,18 @@
 
                             // Create examples browser
                             var tweakjs = new TweakJS({
+
                                 title:"SceneJS",
                                 caption:"Examples",
+
+                                // Use built-in code viewer
                                 editor:"html",
+
+                                // JSON examples index
                                 index:index,
 
-                                // file:///home/lindsay/xeolabs/projects/scenehub/scenehub-pages/examples.html
+                                // Location of example pages
                                 pageBase:href.substring(0, href.lastIndexOf("/")) + "/ex/",
-                                //pageBase:"/home/lindsay/xeolabs/projects/scenehub/scenehub-pages/examples/",
 
                                 // Initially selected page
                                 page:null,
@@ -54,6 +58,7 @@
 
                                 },
 
+                                // Initially show code
                                 showCode: true
                             });
 
