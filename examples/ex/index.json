@@ -7,7 +7,7 @@
             {
                 "title":"Viewing",
                 "tip":"Working with camera projection types",
-                "tags":["lookat"],
+                "tags":["viewTransform"],
                 "nodes":[
                     {
                         "title":"Basic viewing transform",
@@ -20,24 +20,24 @@
             {
                 "title":"Projection",
                 "tip":"Working with camera projection types",
-                "tags":["camera"],
+                "tags":["projectionTransform"],
                 "nodes":[
                     {
                         "title":"Perspective camera",
                         "tip":"Defining a perspective camera",
-                        "tags":["perspective"],
+                        "tags":[],
                         "path":"viewing/camera/perspective.html"
                     },
                     {
                         "title":"Orthographic camera",
                         "tip":"Defining an orthographic camera",
-                        "tags":["orthographic"],
+                        "tags":[],
                         "path":"viewing/camera/ortho.html"
                     },
                     {
                         "title":"Frustum camera",
                         "tip":"Defining a camera via frustum extents",
-                        "tags":["frustum"],
+                        "tags":[],
                         "path":"viewing/camera/frustum.html"
                     }
                 ]
@@ -45,27 +45,27 @@
             {
                 "title":"Modelling",
                 "tip":"",
-                "tags":[],
+                "tags":["modelTransform"],
                 "nodes":[
                     {
                         "title":"Rotate",
                         "path":"transforms/rotate.html",
-                        "tags":["rotate"]
+                        "tags":[]
                     },
                     {
                         "title":"Translate",
                         "path":"transforms/translate.html",
-                        "tags":["translate"]
+                        "tags":[]
                     },
                     {
                         "title":"Scale",
                         "path":"transforms/scale.html",
-                        "tags":["scale"]
+                        "tags":[]
                     },
                     {
                         "title":"Matrix",
                         "path":"transforms/matrix.html",
-                        "tags":["matrix"]
+                        "tags":[]
                     },
                     {
                         "title":"Transform hierarchy",
@@ -78,56 +78,56 @@
     },
     {
         "title":"Geometry",
-        "tags":["nodes", "geometry"],
+        "tags":["geometry"],
         "tip":"The scene graph 'geometry' node is the principle node type in SceneJS",
         "nodes":[
             {
                 "title":"Primitives",
                 "tip":"Creating primitives using the bundled core geometry plugins",
-                "tags":["prims", "plugin"],
+                "tags":["prims", "plugins"],
                 "nodes":[
                     {
                         "title":"Plane",
                         "tip":"Creating a solid plane geometry using the plane primitive plugin",
                         "path":"geometry/prims/plane.html",
-                        "tags":["plane"]
+                        "tags":[]
                     },
                     {
                         "title":"Box",
                         "path":"geometry/prims/box.html",
                         "tip":"Creating a solid box geometry using the box primitive plugin",
-                        "tags":["box"]
+                        "tags":[]
                     },
                     {
                         "title":"Sphere",
                         "path":"geometry/prims/sphere.html",
                         "tip":"Creating a solid sphere geometry using the sphere primitive plugin",
-                        "tags":["sphere"]
+                        "tags":[]
                     },
                     {
                         "title":"Torus",
                         "tip":"Creating a solid torus geometry using the torus primitive plugin",
                         "path":"geometry/prims/torus.html",
-                        "tags":["torus"]
+                        "tags":[]
                     },
                     {
                         "title":"Teapot",
                         "tip":"Creating a solid teapot geometry using the teapot primitive plugin",
                         "path":"geometry/prims/teapot.html",
-                        "tags":["teapot"]
+                        "tags":[]
                     },
                     {
                         "title":"Wireframe torus",
                         "tip":"Creating a wireframe torus geometry using the torus primitive plugin",
                         "path":"geometry/prims/wireframeTorus.html",
-                        "tags":["torus", "wireframe"]
+                        "tags":[]
                     }
                 ]
             },
             {
                 "title":"Custom",
                 "tip":"Defining custom Geometry",
-                "tags":["custom"],
+                "tags":[],
                 "nodes":[
                     {
                         "title":"Triangles",
@@ -148,14 +148,14 @@
                     {
                         "title":"Custom geometry plugin",
                         "path":"geometry/plugin.html",
-                        "tags":["plugin", "custom", "animation"]
+                        "tags":["plugins"]
                     }
                 ]
             },
             {
                 "title":"Text",
                 "tip":"Creating text using the vector text core plugin",
-                "tags":["vectorText"],
+                "tags":["text"],
                 "nodes":[
                     {
                         "title":"Vector text",
@@ -172,7 +172,7 @@
                     {
                         "title":"Vertex sharing",
                         "path":"geometry/vertexSharing.html",
-                        "tags":["optimization"]
+                        "tags":[]
                     }
                 ]
             }
@@ -203,17 +203,17 @@
                     {
                         "title":"Directional lights in View space",
                         "path":"lights/directional/directionalView.html",
-                        "tags":["viewSpace", "specularLight", "diffuseLight"]
+                        "tags":["specularLight", "diffuseLight"]
                     },
                     {
                         "title":"Directional lights in World space",
                         "path":"lights/directional/directionalWorld.html",
-                        "tags":["worldSpace", "specularLight", "diffuseLight"]
+                        "tags":["specularLight", "diffuseLight"]
                     },
                     {
                         "title":"Directional lights in World space with color map",
                         "path":"lights/directional/directionalWorldWithColorMap.html",
-                        "tags":["worldSpace", "texturing", "specularLight", "diffuseLight"]
+                        "tags":["texturing", "specularLight", "diffuseLight"]
                     }
                 ]
             },
@@ -225,12 +225,12 @@
                     {
                         "title":"Point lights in View space",
                         "path":"lights/point/pointView.html",
-                        "tags":["viewSpace", "specularLight", "diffuseLight"]
+                        "tags":["specularLight", "diffuseLight"]
                     },
                     {
                         "title":"Point lights in World space",
                         "path":"lights/point/pointWorld.html",
-                        "tags":["worldSpace", "specularLight", "diffuseLight"]
+                        "tags":["specularLight", "diffuseLight"]
                     }
                 ]
             }
@@ -249,25 +249,25 @@
                     {
                         "title":"Color map",
                         "tip":"Defining a color map using all defaults",
-                        "tags":["colorMap"],
+                        "tags":[],
                         "path":"texture/color/colorMap.html"
                     },
                     {
                         "title":"Color map blend add",
                         "tip":"Defining a color map that adds to the target material color",
-                        "tags":["colorMap"],
+                        "tags":[],
                         "path":"texture/color/colorMapAdd.html"
                     },
                     {
                         "title":"Color map blend multiply",
                         "tip":"Defining a color map that multiplies the target material color",
-                        "tags":["colorMap"],
+                        "tags":[],
                         "path":"texture/color/colorMapMultiply.html"
                     },
                     {
                         "title":"Video color map",
                         "tip":"Video texture with all defaults",
-                        "tags":["animation", "videoTexture"],
+                        "tags":["videoTexture"],
                         "path":"texture/video/videoColorMap.html"
                     }
                 ]
@@ -298,7 +298,7 @@
                     {
                         "title":"Video bump map",
                         "tip":"Video texture applied to target geometry normals",
-                        "tags":["animation", "videoTexture"],
+                        "tags":["videoTexture"],
                         "path":"texture/video/videoBumpMap.html"
                     }
                 ]
@@ -317,19 +317,19 @@
                     {
                         "title":"Alpha map blend add",
                         "tip":"Defining an alpha map that adds to the target material opacity (alpha)",
-                        "tags":["alphaMap"],
+                        "tags":[],
                         "path":"texture/alpha/alphaMapAdd.html"
                     },
                     {
                         "title":"Alpha map blend multiply",
                         "tip":"Defining an alpha map that multiplies with the target material opacity (alpha)",
-                        "tags":["alphaMap"],
+                        "tags":[],
                         "path":"texture/alpha/alphaMapMultiply.html"
                     },
                     {
                         "title":"Video alpha map",
                         "tip":"Video texture applied to target material opacity (alpha)",
-                        "tags":["animation", "videoTexture"],
+                        "tags":["videoTexture"],
                         "path":"texture/video/videoAlphaMap.html"
                     }
                 ]
@@ -360,7 +360,7 @@
                     {
                         "title":"Video specular map",
                         "tip":"Video texture applied to target material specularity",
-                        "tags":["animation", "videoTexture"],
+                        "tags":["videoTexture"],
                         "path":"texture/video/videoSpecularMap.html"
                     }
                 ]
@@ -397,7 +397,7 @@
                     {
                         "title":"Video glow map",
                         "tip":"Video texture applied to target material emissivity",
-                        "tags":["animation", "videoTexture"],
+                        "tags":["videoTexture"],
                         "path":"texture/video/videoGlowMap.html"
                     }
                 ]
@@ -416,13 +416,13 @@
                     {
                         "title":"Layered color maps with animation",
                         "tip":"Animating a color map's transform and blend factors",
-                        "tags":["animation", "colorMap"],
+                        "tags":["colorMap"],
                         "path":"texture/color/colorMapAnimation.html"
                     },
                     {
                         "title":"Layered color, alpha, specular and glow maps",
                         "tip":"Planet Earth with alpha-mapped clouds, color-mapped land, specular-mapped sea and glow-mapped city lights",
-                        "tags":["alphaMap", "specularMap", "colorMap", "glowMap", "animation"],
+                        "tags":["alphaMap", "specularMap", "colorMap", "glowMap"],
                         "path":"texture/multi/multitexture.html"
                     }
                 ]
@@ -445,54 +445,66 @@
     {
         "title":"Custom Shaders",
         "tip":"",
-        "tags":["shader"],
+        "tags":[],
         "nodes":[
             {
-                "title":"Vertex displacement",
+                "title":"Vertex shader",
                 "tip":"",
-                "tags":["vertexDisplacement"],
+                "tags":["vertexShader"],
                 "nodes":[
                     {
                         "title":"Vertex displacement - Model space",
-                        "path":"shaders/vertexDisplace/modelVertexDisplace.html",
-                        "tags":["custom", "vertexDisplacement", "animation"]
+                        "path":"shaders/vertex/modelVertexDisplace.html",
+                        "tags":[]
                     },
                     {
                         "title":"Vertex displacement - World space",
-                        "path":"shaders/vertexDisplace/worldVertexDisplace.html",
-                        "tags":["custom", "vertexDisplacement", "animation"]
+                        "path":"shaders/vertex/worldVertexDisplace.html",
+                        "tags":[]
                     },
                     {
                         "title":"Vertex displacement - View space",
-                        "path":"shaders/vertexDisplace/viewVertexDisplace.html",
-                        "tags":["custom", "vertexDisplacement", "animation"]
+                        "path":"shaders/vertex/viewVertexDisplace.html",
+                        "tags":[]
                     }
                 ]
             },
             {
-                "title":"Pixel color",
+                "title":"Fragment shader",
                 "tip":"",
-                "tags":["vertexDisplacement"],
+                "tags":["fragmentShader"],
                 "nodes":[
                     {
                         "title":"Pixel color",
-                        "path":"shaders/pixelColor/pixelColor.html",
-                        "tags":["custom"]
+                        "path":"shaders/fragment/pixelColor.html",
+                        "tags":[]
                     },
                     {
-                        "title":"Glass surface",
-                        "path":"shaders/pixelColor/xray.html",
-                        "tags":["custom", "glass"]
+                        "title":"X-Ray",
+                        "path":"shaders/fragment/xray.html",
+                        "tags":[]
                     },
                     {
                         "title":"CRT scanlines",
-                        "path":"shaders/pixelColor/scanline.html",
-                        "tags":["custom"]
+                        "path":"shaders/fragment/scanline.html",
+                        "tags":[]
                     },
                     {
                         "title":"Pixels",
-                        "path":"shaders/pixelColor/pixels.html",
-                        "tags":["custom"]
+                        "path":"shaders/fragment/pixels.html",
+                        "tags":[]
+                    }
+                ]
+            },
+            {
+                "title":"Per-object shader params",
+                "tip":"",
+                "tags":["shaderParams"],
+                "nodes":[
+                    {
+                        "title":"Shader params",
+                        "path":"shaders/params/shaderParams.html",
+                        "tags":[]
                     }
                 ]
             }
@@ -510,12 +522,12 @@
                 "nodes":[
                     {
                         "title":"Subscribe to scene events",
-                        "tags":["scene"],
+                        "tags":[],
                         "path":"events/sceneEvents.html"
                     },
                     {
                         "title":"Subscribe to 3D position of a geometry",
-                        "tags":["geometry"],
+                        "tags":[],
                         "path":"events/nodeRenderedEvent.html"
                     }
                 ]
@@ -534,7 +546,7 @@
                 "nodes":[
                     {
                         "title":"Toggle visibility",
-                        "tags":["visibility"],
+                        "tags":[],
                         "tip":"Using a flags node to toggle visibility of child geometries",
                         "path":"flags/enabled.html"
                     },
@@ -552,25 +564,25 @@
                     },
                     {
                         "title":"Toggle backfaces",
-                        "tags":["backfaces"],
+                        "tags":[],
                         "tip":"Using a flags node to toggle visibility of backfaces on child geometries",
                         "path":"flags/backfaces.html"
                     },
                     {
                         "title":"Toggle front face winding order",
-                        "tags":["backfaces"],
+                        "tags":[],
                         "tip":"Using a flags node to set winding order of front faces on child geometries",
                         "path":"flags/frontface.html"
                     },
                     {
                         "title":"Toggle backface lighting",
-                        "tags":["backfaces", "lighting"],
+                        "tags":["lighting"],
                         "tip":"Using a flags node to toggle lighting of faces on child geometries",
                         "path":"flags/backfaceLighting.html"
                     },
                     {
                         "title":"Toggle backface texturing",
-                        "tags":["backfaces", "texturing"],
+                        "tags":["texturing"],
                         "tip":"Using a flags node to toggle lighting of back faces of child geometries",
                         "path":"flags/backfaceTexturing.html"
                     },
@@ -582,7 +594,7 @@
                     },
                     {
                         "title":"Toggle ambient lighting",
-                        "tags":["lighting"],
+                        "tags":["ambientLight"],
                         "tip":"Toggle ambient lighting of child geometries",
                         "path":"flags/ambient.html"
                     }
@@ -591,7 +603,7 @@
             {
                 "title":"Layers",
                 "tip":"",
-                "tags":["layer"],
+                "tags":["renderMasking"],
                 "nodes":[
                     {
                         "title":"Transparency sorting",
@@ -603,7 +615,7 @@
             {
                 "title":"Tags",
                 "tip":"",
-                "tags":["tag"],
+                "tags":["renderMasking"],
                 "nodes":[
                     {
                         "title":"Render masking",
@@ -619,7 +631,7 @@
     {
         "title":"Interaction",
         "tip":"",
-        "tags":["interaction"],
+        "tags":[],
         "nodes":[
             {
                 "title":"Picking",
@@ -634,7 +646,7 @@
                     {
                         "title":"Ray-pick objects with mouse",
                         "path":"picking/rayPicking.html",
-                        "tags":["rayPick"]
+                        "tags":[]
                     }
                 ]
             }
@@ -643,12 +655,12 @@
     {
         "title":"Miscellaneous",
         "tip":"",
-        "tags":["misc"],
+        "tags":[],
         "nodes":[
             {
                 "title":"WebGL",
                 "tip":"",
-                "tags":["webgl"],
+                "tags":[],
                 "nodes":[
                     {
                         "title":"Lost WebGL context recovery",
@@ -660,12 +672,12 @@
         ]
     },
     {
-        "title":"Fun Examples",
+        "title":"Demos",
         "tip":"",
-        "tags":["fun"],
+        "tags":["demos"],
         "nodes":[
             {
-                "title":"Vehicles",
+                "title":"Fun",
                 "tip":"",
                 "tags":[],
                 "nodes":[
@@ -673,18 +685,18 @@
                         "title":"Tron Tank",
                         "path":"fun/tronTank.html",
                         "editor":false,
-                        "tags":["collada", "animation"]
+                        "tags":[]
                     },
 
                     {
                         "title":"Bubbles",
                         "path":"fun/bubbles.html",
-                        "tags":["shader", "animation", "transform"]
+                        "tags":["fragmentShader", "modelTransform"]
                     },
                     {
                         "title":"Clouds",
                         "path":"fun/clouds.html",
-                        "tags":[]
+                        "tags":["alphaMap"]
                     }
                 ]
             }

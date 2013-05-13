@@ -106,17 +106,35 @@
         ]
     });
 
-    var shader = scene.findNode("myShader");
-    var time = 0;
+//    // DAT GUI menu
+//
+//    var shader = scene.findNode("myShader");
+//
+//    var Menu = function () {
+//        this.xrayEnabled = true;
+//        this.xrayOpacity = 0.3;
+//        this.xrayColor = true;
+//        var self = this;
+//        var update = function () {
+//            shader.setParams({
+//                xrayEnabled:self.xrayEnabled,
+//                xrayOpacity:self.xrayOpacity,
+//                xrayColor:self.xrayColor
+//            });
+//            requestAnimationFrame(update);
+//        };
+//        update();
+//    };
+//
+//    var gui = new dat.GUI();
+//    var menu = new Menu();
+//    var direction = gui.addFolder('Shader Params');
+//    direction.add(menu, 'xrayEnabled');
+//    direction.add(menu, 'xrayOpacity', 0.0, 1.0);
+//    direction.add(menu, 'xrayColor');
+//    direction.open();
 
-    scene.on("tick",
-            function () {
-                shader.setParams({
-                    time:time,
-                    time2:time
-                });
-                time += 0.1;
-            });
+    // Mouse camera orbit
 
     new SceneJS.OrbitControls(scene, {
         yaw:30,
