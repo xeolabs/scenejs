@@ -3,47 +3,47 @@ arcticulated and pickable objects as required for high-detail visualisation appl
 
 ## Downloads
 
-You can hotlink to these binaries and they will dynamically [load plugins on demand](plugin-system) from this repository as required.
-
 ### Latest Build
+
+You can hotlink to these binaries and they will dynamically load SceneJS plugins on-demand from this repository as
+required (see [Plugins section](#plugin-system) below for more info on plugins).
 
 * **[scenejs.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
 * **[scenejs.min.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.min.js)**
 
+### Extras
+
+Also hotlinkable are a bunch of helper utilities:
+
+* **[OrbitControl](http://xeolabs.github.com/scenejs/build/latest/extras/orbitControl.html)** -
+Mouse camera orbit helper
+* **[PickControl](http://xeolabs.github.com/scenejs/build/latest/extras/pickControl.html)** -
+Scene picking helper
+
 ## Documentation
 
 * **[Examples](http://xeolabs.github.com/scenejs/examples/index.html)** -
-Live examples are now the canonical documentation.
+Live examples are now the main usage documentation. In the examples page, select topic tags and you'll get a list of examples
+   that have those tags. Most of them are not particularly exciting, but aim to show particular use cases. Many of them do
+   the same things, but in slightly different ways. [Log an issue](https://github.com/xeolabs/scenejs/issues) if there's something missing there.
 
 * **[Class Docs](http://xeolabs.github.com/scenejs/docs/index.html)** -
 Documentation in progress for the SceneJS class API, which is the core implementation beneath the JSON API. You can use this
 to build scenes programmatically, instead of declaratively with JSON as shown in the examples. You would also use this API when
    when manipulating nodes (even they were defined with JSON).
 
-## What's New in V3
-
-Though V2 was released a year prior, V3 has since been under active development in the context of several
-apps currently in production. V3 has some major enhancements, including:
-
-* many more defaults, resulting in simpler scene definitions
-* seamless recovery from lost WebGL context
-* an architecture review followed by an 80% rewrite
-* lots of JS object pooling, to minimise the impact of garbage collection on FPS
-* a swish new plugin system
-
-Check out the [examples](http://xeolabs.github.com/scenejs/examples/index.html) for more info.
-
 ## Plugin System
 
-SceneJS now uses plugins for non-core things like geometry primitives (box, teapot, text etc.) and fancy texture functionality
-(video etc).
+SceneJS now uses plugins for non-core things like geometry primitives (box, teapot, text etc.), fancy texture functionality
+(video etc) and so on.
 
-Plugins are used from within node definitions, such as in this geometry node for example:
+Plugins are used from within node definitions, as shown below:
 
 ```javascript
  myNode.addNode({
     type:"geometry",
-    plugin:{
+    id: "myGeometry",
+    source:{
         type:"sphere",
         latitudeBands : 30,
         longitudeBands : 30,
@@ -52,21 +52,23 @@ Plugins are used from within node definitions, such as in this geometry node for
  });
 ```
 
-When SceneJS creates this node, it's going to dynamically load a plugin from [./build/latest/plugins/geometry/sphere.js](build/latest/plugins/geometry/sphere.js),
- which is a factory that creates sphere primitives.
+This geometry node will create its sphere geometry with the help of the ["sphere" plugin](./build/latest/plugins/geometry/sphere.js).
+Geometry (and texture) plugins function as factories, hence the "source" attribute on the geometry node definition.
 
- By default, SceneJS is hardwired to download plugins from [a directory in this repository](build/latest/plugins). This means you can
+By default, SceneJS is hardwired to automatically download plugins from [a directory in this repository](build/latest/plugins). This means you can
  just hotlink to the SceneJS core library downloads and they will download the plugins automatically as you need them. That's
  nice for putting SceneJS examples on code sharing sites like jsFiddle.
 
- However, if you'd rather load them off your own server, grab a copy of the plugins and configure SceneJS to load them
-   from there:
+If you'd rather serve the plugins yourself, instead of relying on the avialability of this repo, then grab a copy of the
+plugins and configure SceneJS to load them from your location:
 
  ```javascript
  SceneJS.configure({
      pluginPath: "./foo/myPluginsDir"
  });
  ```
+
+
 
 
 
