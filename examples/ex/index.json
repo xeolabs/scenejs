@@ -672,9 +672,29 @@
         ]
     },
     {
+        "title":"Configuration",
+        "tip":"",
+        "tags":["configuration"],
+        "nodes":[
+            {
+                "title":"Configuring paths",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Configure path to plugins",
+                        "path":"configuration/paths/pluginPath.html",
+                        "tags":["plugins"]
+                    }
+                ]
+            }
+
+        ]
+    },
+    {
         "title":"Demos",
         "tip":"",
-        "tags":["demos"],
+        "tags":["demos" ],
         "nodes":[
             {
                 "title":"Fun",
