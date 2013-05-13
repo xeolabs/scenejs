@@ -6018,7 +6018,8 @@ SceneJS.Node.prototype.addNode = function(node) {
 
     if (!node._compile) {
         if (typeof node == "string") {
-            var gotNode = this._engine.nodes.items[node];
+
+            var gotNode = this.engine.findNode(node);
             if (!gotNode) {
                 throw SceneJS_error.fatalError(
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
@@ -6927,7 +6928,6 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         if (this._core.useCount == 1) {
             this.setOptics(params.optics); // Can be undefined
         }
-        var self = this;
     };
 
     SceneJS.Camera.prototype.setOptics = function (optics) {
@@ -7440,9 +7440,11 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
      * The default state core singleton for {@link SceneJS.Framebuf} nodes
      */
     var defaultCore = {
+
         type: "framebuf",
         stateId: SceneJS._baseStateId++,
         empty: true,
+
         framebuf: null
     };
 
@@ -7461,10 +7463,14 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
     SceneJS_events.addListener(// Reallocate VBOs when context restored after loss
             SceneJS_events.WEBGL_CONTEXT_RESTORED,
             function() {
+
                 var node;
+
                 for (var nodeId in nodeCoreMap) {
                     if (nodeCoreMap.hasOwnProperty(nodeId)) {
+
                         node = nodeCoreMap[nodeId];
+
                         if (!node._core._loading) {
                             node._buildNodeCore();
                         }
@@ -7486,7 +7492,9 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
     SceneJS.Framebuf = SceneJS_NodeFactory.createNodeType("framebuf");
 
     SceneJS.Framebuf.prototype._init = function() {
+
         nodeCoreMap[this._core.coreId] = this; // Register for core rebuild on WEBGL_CONTEXT_RESTORED
+
         this._buildNodeCore();
     };
 
@@ -7596,11 +7604,14 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             /** Gets the texture from this image buffer
              */
             getTexture: function() {
+
                 return {
+
                     bind: function(unit) {
                         gl.activeTexture(gl["TEXTURE" + unit]);
                         gl.bindTexture(gl.TEXTURE_2D, texture);
                     },
+
                     unbind : function(unit) {
                         gl.activeTexture(gl["TEXTURE" + unit]);
                         gl.bindTexture(gl.TEXTURE_2D, null);
@@ -7621,6 +7632,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             //destroyFrameBuffer(this._buf);
         }
     };
+
 
 })();new (function () {
 
@@ -12367,7 +12379,7 @@ var SceneJS_modelXFormStack = new (function () {
  *
  * <ol>
  * <li>Create or update {@link SceneJS_Object}s during scene compilation</li>
- * <li>Organize the {@link SceneJS_Object}s into an <b>object list</b></li>
+ * <li>Organise the {@link SceneJS_Object} into an <b>object list</b></li>
  * <li>Determine the GL state sort order for the object list</li>
  * <li>State sort the object list</li>
  * <li>Create a <b>draw list</b> containing {@link SceneJS_Chunk}s belonging to the {@link SceneJS_Object}s in the object list</li>
@@ -15018,7 +15030,7 @@ SceneJS_ChunkFactory.createChunkType({
 
             this.program.gl.finish(); // Force framebuf to complete
 
-            //ctx.framebuf.unbind();
+            ctx.framebuf.unbind();
         }
 
         var framebuf = this.core.framebuf;

@@ -387,7 +387,8 @@ SceneJS.Node.prototype.addNode = function(node) {
 
     if (!node._compile) {
         if (typeof node == "string") {
-            var gotNode = this._engine.nodes.items[node];
+
+            var gotNode = this.engine.findNode(node);
             if (!gotNode) {
                 throw SceneJS_error.fatalError(
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
