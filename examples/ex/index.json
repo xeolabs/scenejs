@@ -391,7 +391,7 @@
                     {
                         "title":"Glow map with vertex displacement",
                         "tip":"Defining a glow map with a vertex displacement shader for a cool wobbling-glowing effect",
-                        "tags":["vertexDisplacement"],
+                        "tags":["vertexDisplacement", "vertexShader"],
                         "path":"texture/glow/glowMapWithVertexDisplace.html"
                     },
                     {
@@ -455,17 +455,22 @@
                     {
                         "title":"Vertex displacement - Model space",
                         "path":"shaders/vertex/modelVertexDisplace.html",
-                        "tags":[]
+                        "tags":["vertexDisplacement"]
                     },
                     {
                         "title":"Vertex displacement - World space",
                         "path":"shaders/vertex/worldVertexDisplace.html",
-                        "tags":[]
+                        "tags":["vertexDisplacement"]
                     },
                     {
                         "title":"Vertex displacement - View space",
                         "path":"shaders/vertex/viewVertexDisplace.html",
-                        "tags":[]
+                        "tags":["vertexDisplacement"]
+                    },
+                    {
+                        "title":"Sky box",
+                        "path":"shaders/vertex/skybox.html",
+                        "tags":["skybox"]
                     }
                 ]
             },
@@ -703,19 +708,19 @@
                 "nodes":[
                     {
                         "title":"Tron Tank",
-                        "path":"fun/tronTank.html",
+                        "path":"demos/tronTank.html",
                         "editor":false,
                         "tags":[]
                     },
 
                     {
                         "title":"Bubbles",
-                        "path":"fun/bubbles.html",
+                        "path":"demos/bubbles.html",
                         "tags":["fragmentShader", "modelTransform"]
                     },
                     {
                         "title":"Clouds",
-                        "path":"fun/clouds.html",
+                        "path":"demos/clouds.html",
                         "tags":["alphaMap"]
                     }
                 ]

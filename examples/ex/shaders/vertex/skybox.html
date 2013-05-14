@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../../build/latest/scenejs.js"></script>
+    <script src="../../../../build/latest/extras/orbitControl.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Torus and ground
+
+            {
+                type:"lights",
+                lights:[
+                    {
+                        mode:"ambient",
+                        color:{ r:1.0, g:1.0, b:1.0 },
+                        diffuse:true
+                    },
+                    {
+                        mode:"dir",
+                        color:{r:1.0, g:1.0, b:1.0 },
+                        diffuse:true,
+                        specular:true,
+                        dir:{ x:0.5, y:-1.0, z:-0.6 }
+                    },
+                    {
+                        mode:"dir",
+                        color:{r:1.0, g:1.0, b:1.0 },
+                        diffuse:true,
+                        specular:true,
+                        dir:{ r:-1.0, g:0.0, b:0.0 }
+                    }
+                ],
+                nodes:[
+
+                    // Torus
+
+                    {
+                        type:"material",
+                        color:{ r:0.5, g:0.5, b:0.6 },
+                        nodes:[
+                            {
+                                type:"translate",
+                                y:1.5,
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        source:{
+                                            type:"torus"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    // Ground
+
+                    {
+                        type:"material",
+                        baseColor:{ r:0.3, g:0.3, b:0.3 },
+                        emit:0,
+                        nodes:[
+                            {
+                                type:"scale",
+                                x:500,
+                                y:.5,
+                                z:500,
+                                nodes:[
+                                    {
+                                        type:"rotate",
+                                        x:1,
+                                        angle:90,
+                                        nodes:[
+                                            {
+                                                type:"geometry",
+                                                source:{
+                                                    type:"plane",
+                                                    wire:true,
+                                                    widthSegments:200,
+                                                    heightSegments:200
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // Sky box
+
+            {
+                type:"shader",
+                shaders:[
+                    {
+                        stage:"vertex",
+                        code:[
+                            "mat4 myViewMatrix(mat4 m) {",
+                            "   m[3][0] =m[3][1] = m[3][2] = 0.0;",
+                            "return m;",
+                            "}"
+                        ],
+                        hooks:{
+                            viewMatrix:"myViewMatrix"
+                        }
+                    }
+                ],
+                nodes:[
+                    {
+                        type:"material",
+                        baseColor:{ r:1, g:1, b:1  },
+                        emit:0.0,
+                        nodes:[
+                            {
+                                type:"texture",
+                                layers:[
+                                    {
+                                        src:"../../../textures/clouds-box.jpg",
+                                        blendMode:"multiply"
+                                    }
+                                ],
+                                nodes:[
+                                    {
+                                        type:"scale",
+                                        x:1000,
+                                        y:1000,
+                                        z:1000,
+                                        nodes:[
+                                            {
+                                                type:"geometry",
+                                                source:{
+                                                    type:"skybox"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:30,
+        zoom:10
+    });
+
+</script>
+</body>
+</html>
