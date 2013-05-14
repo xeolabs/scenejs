@@ -44,6 +44,8 @@ new (function () {
                  * Build node core (possibly asynchronously) using a factory object
                  *--------------------------------------------------------------------------------------------------*/
 
+                this._core._loading = true;
+
                 if (!this._sourceConfigs.type) {
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
@@ -201,8 +203,6 @@ new (function () {
                                     self._engine.display.imageDirty = true;
                                 });
                         }
-
-                        self._core._loading = true;
 
                         self._fireEvent("loading");
 
@@ -565,7 +565,7 @@ new (function () {
 
     SceneJS.Geometry.prototype._compile = function () {
 
-        if (this._core._loading) {
+        if (this._core._loading) { // TODO: Breaks with asynch loaded cores - this node needs to recompile when target core is loaded
             this._compileNodes();
             return;
         }

@@ -337,7 +337,7 @@
             {
                 "title":"Specular mapping",
                 "tip":"Application of texture to surface specularity",
-                "tags":["specularMap"],
+                "tags":["specularMap", "specularLight"],
                 "nodes":[
                     {
                         "title":"Specular map",
@@ -366,7 +366,7 @@
                 ]
             },
             {
-                "title":"Glow mapping",
+                "title":"Emission mapping",
                 "tip":"Application of texture to surface glow",
                 "tags":["glowMap"],
                 "nodes":[
@@ -422,7 +422,7 @@
                     {
                         "title":"Layered color, alpha, specular and glow maps",
                         "tip":"Planet Earth with alpha-mapped clouds, color-mapped land, specular-mapped sea and glow-mapped city lights",
-                        "tags":["alphaMap", "specularMap", "colorMap", "glowMap"],
+                        "tags":["alphaMap", "specularMap", "specularLight", "colorMap", "glowMap"],
                         "path":"texture/multi/multitexture.html"
                     }
                 ]
@@ -631,7 +631,26 @@
             }
         ]
     },
+    {
+        "title":"Node Cores",
+        "tip":"",
+        "tags":["nodeCores"],
+        "nodes":[
+            {
+                "title":"Sharing node cores",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Shared geometry, texture and material cores",
+                        "path":"nodeCores/sharing/sharedNodes.html",
+                        "tags":["geometry", "material", "texture"]
+                    }
+                ]
+            }
 
+        ]
+    },
 
     {
         "title":"Interaction",

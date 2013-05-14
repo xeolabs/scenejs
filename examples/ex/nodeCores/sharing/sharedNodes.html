@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../../../../build/latest/scenejs.js"></script>
+
+<script src="../../../../build/latest/extras/orbitControl.js"></script>
+
+<script>
+
+    // Demonstrates sharing of various types of node core.
+    //
+    // Node core sharing is a technique learned from OpenSG in which many nodes
+    // can share the same state through references to a shared object.
+    //
+    // Aside from the obvious reuse benefit, cores can provide a significant
+    // performance boost because SceneJS is then able to sort state in the draw
+    // list into runs that use the same cores, thus reducing state changes on the GPU.
+    //
+    // They are also great for pushing efficient state updates to multiple
+    // nodes at the same time, ie. through a shared core.
+    //
+    // More info here: https://github.com/xeolabs/scenejs/wiki/Node-Cores
+    //
+
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Library of nodes whose cores we'll share
+            {
+                type:"library",
+                nodes:[
+
+                    // Red material
+                    {
+                        type:"material",
+                        color:{ r:0.6, g:0.6, b:0.9 },
+                        coreId:"myMaterial"
+                    },
+
+                    // Red material
+                    {
+                        type:"material",
+                        color:{ r:0.9, g:0.6, b:0.6 },
+                        coreId:"myOtherMaterial"
+                    },
+
+                    // Texture
+                    {
+                        type:"texture",
+                        layers:[
+                            {
+                                src:"../../../textures/BrickWall.jpg",
+                                scale:{
+                                    x:.2,
+                                    y:.2
+                                }
+                            }
+                        ],
+                        coreId:"myTexture"
+                    },
+
+                    // Box geometry
+                    {
+                        type:"geometry",
+                        primitive:"triangles",
+                        positions:[
+                            5, 5, 5, -5, 5, 5, -5, -5, 5, 5, -5, 5,
+                            5, 5, 5, 5, -5, 5, 5, -5, -5, 5, 5, -5,
+                            5, 5, 5, 5, 5, -5, -5, 5, -5, -5, 5, 5,
+                            -5, 5, 5, -5, 5, -5, -5, -5, -5, -5, -5, 5,
+                            -5, -5, -5, 5, -5, -5, 5, -5, 5, -5, -5, 5,
+                            5, -5, -5, -5, -5, -5, -5, 5, -5, 5, 5, -5
+                        ],
+                        normals:[
+                            0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+                            1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+                            0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+                            -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
+                            0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+                            0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1
+                        ],
+                        uv:[
+                            5, 5, 0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 5, 0, 5, 5,
+                            5, 0, 5, 5, 0, 5, 0, 0, 5, 5, 0, 5, 0, 0, 5, 0,
+                            0, 0, 5, 0, 5, 5, 0, 5, 0, 0, 5, 0, 5, 5, 0, 5
+                        ],
+                        indices:[
+                            0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15,
+                            16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23
+
+                        ],
+                        coreId:"myGeometry"
+                    }
+                ]
+            },
+
+            // Instances of those cores
+
+            // First object, uses the blue material, the texture and the box geometry
+            {
+                type:"translate",
+                x:-6,
+                nodes:[
+                    {
+                        type:"material",
+                        coreId:"myMaterial",
+                        nodes:[
+                            {
+                                type:"texture",
+                                coreId:"myTexture",
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        coreId:"myGeometry"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // First object, uses the red material and the box geometry
+            {
+                type:"translate",
+                x:6,
+                nodes:[
+                    {
+                        type:"material",
+                        coreId:"myOtherMaterial",
+                        nodes:[
+                            {
+                                type:"geometry",
+                                coreId:"myGeometry"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:30
+    });
+
+</script>
+</body>
+</html>
