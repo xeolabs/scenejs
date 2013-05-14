@@ -76,7 +76,14 @@ plugins and configure SceneJS to load them from your location:
  });
  ```
 
+## Building
 
+SceneJS requires nodejs. To build, simply:
+
+```cd src```
+```node build.js```
+
+Then the binaries will appear in ```./build```.
 
 
 
