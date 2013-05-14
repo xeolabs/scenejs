@@ -80,7 +80,6 @@ plugins and configure SceneJS to load them from your location:
 
 SceneJS requires nodejs. To build, simply:
 
-```cd src```
 ```node build.js```
 
 Then the binaries will appear in ```./build```.
