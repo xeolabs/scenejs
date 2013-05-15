@@ -52,7 +52,7 @@
                     {
                         type:"material",
                         color:{ r:0.4, g:0.5, b:0.4 },
-                        alpha:0.6, // 60% opacity while transparent flag is true (default is 1.0)
+                        alpha:0.4, // 60% opacity while transparent flag is true (default is 1.0)
 
                         nodes:[
                             {
@@ -60,6 +60,33 @@
                                 source:{
                                     type:"teapot"
                                 }
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // Opaque sphere inside teapot
+
+            {
+                type:"material",
+                color:{ r:0.8, g:0.5, b:0.5 },
+                nodes:[
+                    {
+                        type:"translate",
+                        y:1,
+                        nodes:[
+                            {
+                                type:"scale",
+                                x:0.2,
+                                y:0.2,
+                                z:0.2,
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        plugin:"sphere"
+                                    }
+                                ]
                             }
                         ]
                     }
