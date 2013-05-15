@@ -389,12 +389,6 @@
                         "path":"texture/glow/glowMapMultiply.html"
                     },
                     {
-                        "title":"Glow map with vertex displacement",
-                        "tip":"Defining a glow map with a vertex displacement shader for a cool wobbling-glowing effect",
-                        "tags":["vertexDisplacement", "vertexShader"],
-                        "path":"texture/glow/glowMapWithVertexDisplace.html"
-                    },
-                    {
                         "title":"Video glow map",
                         "tip":"Video texture applied to target material emissivity",
                         "tags":["videoTexture"],
