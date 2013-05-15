@@ -21,20 +21,20 @@
 
 <script>
 
-    // Demonstrates how to enable and disable specular lighting for geometry.
+    // Demonstrates how to enable and disable diffuse lighting for geometry.
     //
-    // Specularity is governed by light nodes working in conjunction with
-    // specular surface color defined by material nodes.
+    // Diffuse lighting is governed by light nodes working in conjunction with
+    // diffuse surface color ('baseColor') defined by material nodes.
     //
-    // With SceneJS' default lighting in effect, the 'specular' attribute
-    // of the flags node in the example below will govern whether or not specular
+    // With SceneJS' default lighting in effect, the 'diffuse' attribute
+    // of the flags node in the example below will govern whether or not diffuse
     // light is applied to the geometry in its subgraph.
     //
-    // As we periodically toggle the attribute, watch the specular highlights
+    // As we periodically toggle the attribute, watch the diffuse light
     // appear and disappear on the geometry accordingly.
     //
-    // Specular lighting will be enabled by default when no flags node
-    // is present, or if the 'specular' flag is not specified and
+    // Diffuse lighting will be enabled by default when no flags node
+    // is present, or if the 'diffuse' flag is not specified and
     // defaults to true.
     //
 
@@ -65,17 +65,17 @@
                 nodes:[
 
                     // Our flags can be anywhere above the geometry
-                    // we want to toggle specularity for
+                    // we want to toggle diffuse lighting for
                     {
                         type:"flags",
                         id:"myFlags",
                         flags:{
-                            specular:true // (default is true)
+                            diffuse:true // (default is true)
                         },
 
                         nodes:[
 
-                            // Some specular material
+                            // Some diffuse and specular material
                             {
                                 type:"material",
                                 color:{ r:0.5, g:0.5, b:0.6 },
@@ -122,7 +122,7 @@
 
     setInterval(
             function () {
-                flags.setSpecular(!flags.getSpecular());
+                flags.setDiffuse(!flags.getDiffuse());
             },
             1000);
 

@@ -645,6 +645,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform bool  SCENEJS_uSpecularLighting;");
         src.push("uniform bool  SCENEJS_uClipping;");
         src.push("uniform bool  SCENEJS_uAmbient;");
+        src.push("uniform bool  SCENEJS_uDiffuse;");
 
         /* True when rendering transparency
          */
@@ -900,7 +901,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
 
                     if (light.diffuse) {
-                        src.push("  lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
+                        src.push("if (SCENEJS_uDiffuse) {");
+                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
+                        src.push("}");
                     }
 
                     if (light.specular) {
@@ -918,7 +921,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                     //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
-                        src.push("lightValue += dotN * SCENEJS_uLightColor" + i + ";");
+                        src.push("if (SCENEJS_uDiffuse) {");
+                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
+                        src.push("}");
                     }
 
                     if (light.specular) {

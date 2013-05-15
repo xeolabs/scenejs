@@ -1,7 +1,7 @@
 var wireGrid = {
     id:"grid-floor",
     type:"material",
-    baseColor:{ r:0.9, g:0.9, b:1.0 },
+    baseColor:{ r:0.3, g:0.3, b:0.3 },
     emit:1,
     nodes:[
         {

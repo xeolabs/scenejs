@@ -16,6 +16,7 @@
         frontface: "ccw",           // Default vertex winding for front face
         backfaceLighting: true,     // Shading enabled for backfaces
         backfaceTexturing: true,    // Texturing enabled for backfaces
+        diffuse: true,              // Diffuse lighting enabled
         specular: true,             // Specular lighting enabled
         ambient: true               // Ambient lighting enabled
     };
@@ -48,6 +49,7 @@
             this._core.frontface = "ccw";        // Default vertex winding for front face
             this._core.backfaceLighting = true;  // Shading enabled for backfaces
             this._core.backfaceTexturing = true; // Texturing enabled for backfaces
+            this._core.diffuse = true;           // Diffuse lighting enabled by default
             this._core.specular = true;          // Specular lighting enabled by default
             this._core.ambient = true;           // Ambient lighting enabled by default
 
@@ -101,6 +103,11 @@
             this._engine.display.imageDirty = true;
         }
 
+        if (flags.diffuse != undefined) {
+            core.diffuse = !!flags.diffuse;
+            this._engine.display.imageDirty = true;
+        }
+
         if (flags.specular != undefined) {
             core.specular = !!flags.specular;
             this._engine.display.imageDirty = true;
@@ -137,6 +144,7 @@
             transparent: core.transparent,
             backfaces: core.backfaces,
             frontface: core.frontface,
+            diffuse: core.diffuse,
             specular: core.specular,
             ambient: core.ambient,
             backfaceLighting: core.backfaceLighting,
@@ -245,6 +253,19 @@
 
     SceneJS.Flags.prototype.getBackfaceTexturing = function() {
         return this._core.backfaceTexturing;
+    };
+
+    SceneJS.Flags.prototype.setDiffuse = function(diffuse) {
+        diffuse = !!diffuse;
+        if (this._core.diffuse != diffuse) {
+            this._core.diffuse = diffuse;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getDiffuse = function() {
+        return this._core.diffuse;
     };
 
     SceneJS.Flags.prototype.setSpecular = function(specular) {

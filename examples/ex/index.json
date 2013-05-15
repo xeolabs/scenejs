@@ -546,7 +546,7 @@
         "nodes":[
             {
                 "title":"Flags",
-                "tags":[],
+                "tags":["flags"],
                 "tip":"Toggling modes for sub-nodes using a parent flags node",
                 "nodes":[
                     {
@@ -592,7 +592,13 @@
                         "path":"flags/backfaceTexturing.html"
                     },
                     {
-                        "title":"Toggle specularity",
+                        "title":"Toggle diffuse lighting",
+                        "tags":["diffuseLight"],
+                        "tip":"Using a flags node to toggle diffuse lighting of child geometries",
+                        "path":"flags/diffuse.html"
+                    },
+                    {
+                        "title":"Toggle specular lighting",
                         "tags":["specularLight"],
                         "tip":"Using a flags node to toggle specular lighting of child geometries",
                         "path":"flags/specular.html"
@@ -736,11 +742,6 @@
                         "title":"Bubbles",
                         "path":"demos/bubbles.html",
                         "tags":["fragmentShader", "modelTransform"]
-                    },
-                    {
-                        "title":"Clouds",
-                        "path":"demos/clouds.html",
-                        "tags":["alphaMap"]
                     }
                 ]
             }

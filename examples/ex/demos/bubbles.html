@@ -62,7 +62,7 @@ function createScene() {
                             {
                                 id:"grid-floor",
                                 type:"material",
-                                baseColor:{ r:0.9, g:0.9, b:1.0 },
+                                baseColor:{ r:0.3, g:0.3, b:0.3 },
                                 emit:1,
                                 nodes:[
                                     {
@@ -82,9 +82,9 @@ function createScene() {
                                         nodes:[
                                             {
                                                 type:"scale",
-                                                x:1000,
+                                                x:2000,
                                                 y:.5,
-                                                z:1000,
+                                                z:2000,
                                                 nodes:[
                                                     {
                                                         type:"rotate",
@@ -209,6 +209,68 @@ function createScene() {
                                             }
                                         ]
 
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    // Sky box
+                    {
+                        type:"shader",
+                        shaders:[
+                            {
+                                stage:"vertex",
+                                code:[
+                                    "mat4 myViewMatrix(mat4 m) {",
+                                    "   m[3][0] =m[3][1] = m[3][2] = 0.0;",
+                                    "return m;",
+                                    "}"
+                                ],
+                                hooks:{
+                                    viewMatrix:"myViewMatrix"
+                                }
+                            }
+                        ],
+                        nodes:[
+                            {
+                                type:"flags",
+                                flags:{
+                                    specular:false,
+                                    diffuse:false,
+                                    ambient:false
+                                },
+                                nodes:[
+                                    {
+                                        type:"material",
+                                        baseColor:{ r:0, g:0, b:0  },
+                                        emit:0.0,
+                                        nodes:[
+                                            {
+                                                type:"texture",
+                                                layers:[
+                                                    {
+                                                        src:"../../textures/clouds-box.jpg",
+                                                        blendMode:"add"
+                                                    }
+                                                ],
+                                                nodes:[
+                                                    {
+                                                        type:"scale",
+                                                        x:1000,
+                                                        y:1000,
+                                                        z:1000,
+                                                        nodes:[
+                                                            {
+                                                                type:"geometry",
+                                                                source:{
+                                                                    type:"skybox"
+                                                                }
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
                                     }
                                 ]
                             }

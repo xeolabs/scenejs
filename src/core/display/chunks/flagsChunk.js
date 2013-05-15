@@ -14,6 +14,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._uSpecularLightingDraw = draw.getUniformLocation("SCENEJS_uSpecularLighting");
         this._uClippingDraw = draw.getUniformLocation("SCENEJS_uClipping");
         this._uAmbientDraw = draw.getUniformLocation("SCENEJS_uAmbient");
+        this._uDiffuseDraw = draw.getUniformLocation("SCENEJS_uDiffuse");
 
         var pick = this.program.pick;
 
@@ -55,6 +56,7 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniform1i(this._uSpecularLightingDraw, this.core.specular);
             gl.uniform1i(this._uClippingDraw, this.core.clipping);
             gl.uniform1i(this._uAmbientDraw, this.core.ambient);
+            gl.uniform1i(this._uDiffuseDraw, this.core.diffuse);
         }
     }
 });

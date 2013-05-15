@@ -128,30 +128,40 @@
                 ],
                 nodes:[
                     {
-                        type:"material",
-                        baseColor:{ r:1, g:1, b:1  },
-                        emit:0.0,
+                        type:"flags",
+                        flags:{
+                            specular:false,
+                            diffuse:false,
+                            ambient:false
+                        },
                         nodes:[
                             {
-                                type:"texture",
-                                layers:[
-                                    {
-                                        src:"../../../textures/clouds-box.jpg",
-                                        blendMode:"multiply"
-                                    }
-                                ],
+                                type:"material",
+                                baseColor:{ r:1, g:1, b:1  },
+                                emit:0.0,
                                 nodes:[
                                     {
-                                        type:"scale",
-                                        x:1000,
-                                        y:1000,
-                                        z:1000,
+                                        type:"texture",
+                                        layers:[
+                                            {
+                                                src:"../../../textures/clouds-box.jpg",
+                                                blendMode:"multiply"
+                                            }
+                                        ],
                                         nodes:[
                                             {
-                                                type:"geometry",
-                                                source:{
-                                                    type:"skybox"
-                                                }
+                                                type:"scale",
+                                                x:1000,
+                                                y:1000,
+                                                z:1000,
+                                                nodes:[
+                                                    {
+                                                        type:"geometry",
+                                                        source:{
+                                                            type:"skybox"
+                                                        }
+                                                    }
+                                                ]
                                             }
                                         ]
                                     }

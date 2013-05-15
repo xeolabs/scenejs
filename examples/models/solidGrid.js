@@ -8,7 +8,7 @@ var solidGrid = {
             type:"node",
             layers:[
                 {
-                    uri:"../../textures/grid.jpg",
+                    uri:"../../../textures/grid.jpg",
                     wrapS:"repeat",
                     wrapT:"repeat",
 

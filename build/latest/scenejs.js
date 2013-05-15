@@ -7158,6 +7158,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         frontface: "ccw",           // Default vertex winding for front face
         backfaceLighting: true,     // Shading enabled for backfaces
         backfaceTexturing: true,    // Texturing enabled for backfaces
+        diffuse: true,              // Diffuse lighting enabled
         specular: true,             // Specular lighting enabled
         ambient: true               // Ambient lighting enabled
     };
@@ -7190,6 +7191,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             this._core.frontface = "ccw";        // Default vertex winding for front face
             this._core.backfaceLighting = true;  // Shading enabled for backfaces
             this._core.backfaceTexturing = true; // Texturing enabled for backfaces
+            this._core.diffuse = true;           // Diffuse lighting enabled by default
             this._core.specular = true;          // Specular lighting enabled by default
             this._core.ambient = true;           // Ambient lighting enabled by default
 
@@ -7243,6 +7245,11 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             this._engine.display.imageDirty = true;
         }
 
+        if (flags.diffuse != undefined) {
+            core.diffuse = !!flags.diffuse;
+            this._engine.display.imageDirty = true;
+        }
+
         if (flags.specular != undefined) {
             core.specular = !!flags.specular;
             this._engine.display.imageDirty = true;
@@ -7279,6 +7286,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
             transparent: core.transparent,
             backfaces: core.backfaces,
             frontface: core.frontface,
+            diffuse: core.diffuse,
             specular: core.specular,
             ambient: core.ambient,
             backfaceLighting: core.backfaceLighting,
@@ -7387,6 +7395,19 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
 
     SceneJS.Flags.prototype.getBackfaceTexturing = function() {
         return this._core.backfaceTexturing;
+    };
+
+    SceneJS.Flags.prototype.setDiffuse = function(diffuse) {
+        diffuse = !!diffuse;
+        if (this._core.diffuse != diffuse) {
+            this._core.diffuse = diffuse;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getDiffuse = function() {
+        return this._core.diffuse;
     };
 
     SceneJS.Flags.prototype.setSpecular = function(specular) {
@@ -7680,6 +7701,8 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
                  * Build node core (possibly asynchronously) using a factory object
                  *--------------------------------------------------------------------------------------------------*/
 
+                this._core._loading = true;
+
                 if (!this._sourceConfigs.type) {
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
@@ -7837,8 +7860,6 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
                                     self._engine.display.imageDirty = true;
                                 });
                         }
-
-                        self._core._loading = true;
 
                         self._fireEvent("loading");
 
@@ -8201,7 +8222,7 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
 
     SceneJS.Geometry.prototype._compile = function () {
 
-        if (this._core._loading) {
+        if (this._core._loading) { // TODO: Breaks with asynch loaded cores - this node needs to recompile when target core is loaded
             this._compileNodes();
             return;
         }
@@ -13922,6 +13943,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform bool  SCENEJS_uSpecularLighting;");
         src.push("uniform bool  SCENEJS_uClipping;");
         src.push("uniform bool  SCENEJS_uAmbient;");
+        src.push("uniform bool  SCENEJS_uDiffuse;");
 
         /* True when rendering transparency
          */
@@ -14177,7 +14199,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
 
                     if (light.diffuse) {
-                        src.push("  lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
+                        src.push("if (SCENEJS_uDiffuse) {");
+                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
+                        src.push("}");
                     }
 
                     if (light.specular) {
@@ -14195,7 +14219,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                     //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
-                        src.push("lightValue += dotN * SCENEJS_uLightColor" + i + ";");
+                        src.push("if (SCENEJS_uDiffuse) {");
+                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
+                        src.push("}");
                     }
 
                     if (light.specular) {
@@ -14971,6 +14997,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._uSpecularLightingDraw = draw.getUniformLocation("SCENEJS_uSpecularLighting");
         this._uClippingDraw = draw.getUniformLocation("SCENEJS_uClipping");
         this._uAmbientDraw = draw.getUniformLocation("SCENEJS_uAmbient");
+        this._uDiffuseDraw = draw.getUniformLocation("SCENEJS_uDiffuse");
 
         var pick = this.program.pick;
 
@@ -15012,6 +15039,7 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniform1i(this._uSpecularLightingDraw, this.core.specular);
             gl.uniform1i(this._uClippingDraw, this.core.clipping);
             gl.uniform1i(this._uAmbientDraw, this.core.ambient);
+            gl.uniform1i(this._uDiffuseDraw, this.core.diffuse);
         }
     }
 });/**
