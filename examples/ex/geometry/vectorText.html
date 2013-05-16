@@ -4,6 +4,15 @@
     <title>SceneJS Example</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -23,13 +32,20 @@
                 emit:1,
                 nodes:[
 
-                    // A line of vector text
                     {
-                        type:"geometry",
-                        source:{
-                            type:"vectorText",
-                            text:"One line of vector text, please."
-                        }
+                        type:"translate",
+                        x:-10,
+                        nodes:[
+
+                            // A line of vector text
+                            {
+                                type:"geometry",
+                                source:{
+                                    type:"vectorText",
+                                    text:"One line of vector text, please."
+                                }
+                            }
+                        ]
                     }
                 ]
             }

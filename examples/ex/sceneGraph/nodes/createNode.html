@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../../../../build/latest/scenejs.js"></script>
+
+<script src="../../../../build/latest/extras/orbitControl.js"></script>
+
+<script>
+
+    // Demonstrates creating nodes individually
+
+    var scene = SceneJS.createScene();
+
+    // Create blue torus
+
+    var material = scene.addNode({
+        type:"material",
+        color:{ r:0.2, g:0.2, b:0.6 }
+    });
+
+    var translate = material.addNode({
+        type:"translate",
+        x:-4
+    });
+
+    var geometry = translate.addNode({
+        type:"geometry",
+        source:{
+            type:"torus"
+        }
+    });
+
+    // Create red torus
+
+    var material2 = scene.addNode({
+        type:"material",
+        color:{ r:0.6, g:0.2, b:0.2 }
+    });
+
+    // This time we'll add a subgraph of nodes
+
+    material.addNode({
+        type:"translate",
+        x:4,
+        nodes:[
+            {
+                type:"geometry",
+                source:{
+                    type:"torus"
+                }
+            }
+        ]
+    });
+
+    // Mouse orbit helper
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:5
+    });
+
+</script>
+</body>
+</html>

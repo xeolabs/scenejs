@@ -21,6 +21,14 @@
 
 <script>
 
+    // A tag node associates a tag string with its subgraph, and only allows the geometries within the
+    // subgraph to render when its tag matches a regular expression set on the scene root.
+    //
+    // As shown in this example, you can do things like wrap all sphere geometries with a 'spherical' tag,
+    // wrap all boxes with a 'rectangular' tag, and wrap teapots with a 'teapotty' tag. Then when we set a
+    // regex like 'spherical|teapotty' on the scene root, only the spheres and teapots will render, while
+    // boxes will be "masked".
+
     var scene = SceneJS.createScene({
         nodes:[
             {
@@ -120,12 +128,14 @@
         ]
     });
 
-    scene.start();
-
     // Enable objects that are tagged "spherical" or "teapotty"
     scene.set("tagMask", "(spherical|teapotty)");
 
-    mousePanLookatUtility(scene);
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:10
+    });
 
 </script>
 </body>

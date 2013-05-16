@@ -153,6 +153,18 @@
                 ]
             },
             {
+                "title":"Animation",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Vertex morphing",
+                        "path":"geometry/morphing.html",
+                        "tags":["morphing"]
+                    }
+                ]
+            },
+            {
                 "title":"Text",
                 "tip":"Creating text using the vector text core plugin",
                 "tags":["text"],
@@ -418,6 +430,12 @@
                         "tip":"Planet Earth with alpha-mapped clouds, color-mapped land, specular-mapped sea and glow-mapped city lights",
                         "tags":["alphaMap", "specularMap", "specularLight", "colorMap", "glowMap"],
                         "path":"texture/multi/multitexture.html"
+                    },
+                    {
+                        "title":"Color maps on separate UV layers",
+                        "tip":"",
+                        "tags":["colorMap", "uvLayers"],
+                        "path":"texture/uvLayers/uvLayers.html"
                     }
                 ]
             },
@@ -631,6 +649,32 @@
             }
         ]
     },
+
+    {
+        "title":"Scene Graph",
+        "tip":"",
+        "tags":["sceneGraph"],
+        "nodes":[
+            {
+                "title":"Managing nodes",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Create nodes",
+                        "path":"sceneGraph/nodes/createNodes.html",
+                        "tags":["nodes"]
+                    },
+                    {
+                        "title":"Replace leaf node",
+                        "path":"sceneGraph/nodes/replaceLeaf.html",
+                        "tags":["nodes"]
+                    }
+                ]
+            }
+
+        ]
+    },
     {
         "title":"Node Cores",
         "tip":"",
@@ -644,7 +688,7 @@
                     {
                         "title":"Shared geometry, texture and material cores",
                         "path":"nodeCores/sharing/sharedNodes.html",
-                        "tags":["geometry", "material", "texture"]
+                        "tags":["nodes", "geometry", "material", "texture"]
                     }
                 ]
             }
