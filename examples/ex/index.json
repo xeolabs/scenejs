@@ -674,10 +674,10 @@
     {
         "title":"Integration",
         "tip":"",
-        "tags":["integration"],
+        "tags":[],
         "nodes":[
             {
-                "title":"DOM Integration",
+                "title":"Page Integration",
                 "tip":"",
                 "tags":[],
                 "nodes":[
@@ -685,6 +685,11 @@
                         "title":"Using an external Canvas",
                         "path":"scene/integration/externalCanvas.html",
                         "tags":["canvas"]
+                    },
+                    {
+                        "title":"Multiple scenes on same page",
+                        "path":"scene/multipleScenes/multipleScenes.html",
+                        "tags":["multipleScenes"]
                     }
                 ]
             }
