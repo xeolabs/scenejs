@@ -946,9 +946,7 @@ var SceneJS = new (function () {
      */
     this.createScene = function (json, options) {
 
-        if (!json) {
-            throw SceneJS_error.fatalError("param 'json' is null or undefined");
-        }
+       json = json || {};
 
         if (json.id) {
             if (this._engines[json.id]) {
