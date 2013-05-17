@@ -649,32 +649,10 @@
             }
         ]
     },
-
     {
-        "title":"Scene Graph",
+        "title":"Scenes",
         "tip":"",
-        "tags":["sceneGraph"],
-        "nodes":[
-            {
-                "title":"Managing nodes",
-                "tip":"",
-                "tags":[],
-                "nodes":[
-                    {
-                        "title":"Create nodes",
-                        "path":"sceneGraph/nodes/createNodes.html",
-                        "tags":["nodes"]
-                    }
-                ]
-            }
-
-        ]
-    },
-
-    {
-        "title":"Integration",
-        "tip":"",
-        "tags":[],
+        "tags":["scene"],
         "nodes":[
             {
                 "title":"Page Integration",
@@ -693,18 +671,29 @@
                     }
                 ]
             }
-
         ]
     },
     {
-        "title":"Node Cores",
+        "title":"Nodes",
         "tip":"",
-        "tags":["nodeCores"],
+        "tags":["nodes"],
         "nodes":[
+            {
+                "title":"Connectivity",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Create nodes",
+                        "path":"scene/nodes/createNodes.html",
+                        "tags":[]
+                    }
+                ]
+            },
             {
                 "title":"Sharing node cores",
                 "tip":"",
-                "tags":[],
+                "tags":["nodeCores"],
                 "nodes":[
                     {
                         "title":"Shared geometry, texture and material cores",
@@ -713,10 +702,8 @@
                     }
                 ]
             }
-
         ]
     },
-
     {
         "title":"Interaction",
         "tip":"",
@@ -742,25 +729,6 @@
         ]
     },
     {
-        "title":"Miscellaneous",
-        "tip":"",
-        "tags":[],
-        "nodes":[
-            {
-                "title":"WebGL",
-                "tip":"",
-                "tags":[],
-                "nodes":[
-                    {
-                        "title":"Lost WebGL context recovery",
-                        "path":"misc/webglContextRestore.html",
-                        "tags":["webglContextLost"]
-                    }
-                ]
-            }
-        ]
-    },
-    {
         "title":"Configuration",
         "tip":"",
         "tags":["configuration"],
@@ -778,6 +746,25 @@
                 ]
             }
 
+        ]
+    },
+    {
+        "title":"Miscellaneous",
+        "tip":"",
+        "tags":[],
+        "nodes":[
+            {
+                "title":"WebGL",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Lost WebGL context recovery",
+                        "path":"misc/webglContextRestore.html",
+                        "tags":["webglContextLost"]
+                    }
+                ]
+            }
         ]
     },
     {
