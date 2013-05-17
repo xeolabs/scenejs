@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
     <script src="libs/jquery-1.8.3.min.js"></script>
-    <script src="../../examplejs/api/v0/tweakjs.js"></script>
-    <!--<script src="http://xeolabs.github.io/examplejs/api/v0/tweakjs.js"></script>-->
+    <!--<script src="../../examplejs/api/v0/tweakjs.js"></script>-->
+    <script src="http://xeolabs.github.io/examplejs/api/v0/tweakjs.js"></script>
 
 </head>
 <body>
@@ -53,10 +53,10 @@
                                 pageBase:href.substring(0, href.lastIndexOf("/")) + "/ex/",
 
                                 // Initially selected tags
-                                tags: getURLTags(),
+                                tags:getURLTags(),
 
                                 // Initially selected page
-                                page:getSearchParams().page,
+                                page:getURLPage(),
 
                                 // Initially hide code
                                 showCode:false
@@ -81,6 +81,11 @@
             }
         }
         return tags;
+    }
+
+    function getURLPage() {
+        var params = getSearchParams();
+        return params.page;
     }
 
     function getSearchParams() {
