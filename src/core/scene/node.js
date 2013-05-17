@@ -265,7 +265,7 @@ SceneJS.Node.prototype.removeNode = function(node) {
 
     if (!node._compile) {
         if (typeof node == "string") {
-            var gotNode = this._engine.nodes.items[node];
+            var gotNode = this._engine.findNode(node);
             if (!gotNode) {
                 throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_NOT_FOUND,

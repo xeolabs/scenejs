@@ -225,7 +225,7 @@
                     {
                         "title":"Directional lights in World space with color map",
                         "path":"lights/directional/directionalWorldWithColorMap.html",
-                        "tags":["texturing", "specularLight", "diffuseLight"]
+                        "tags":["texture", "specularLight", "diffuseLight"]
                     }
                 ]
             },
@@ -249,9 +249,9 @@
         ]
     },
     {
-        "title":"Texturing",
+        "title":"texture",
         "tip":"Working with texture maps",
-        "tags":["texturing"],
+        "tags":["texture"],
         "nodes":[
             {
                 "title":"Color mapping",
@@ -599,7 +599,7 @@
                     },
                     {
                         "title":"Toggle backface texturing",
-                        "tags":["texturing"],
+                        "tags":["texture"],
                         "tip":"Using a flags node to toggle lighting of back faces of child geometries",
                         "path":"flags/backfaceTexturing.html"
                     },
@@ -663,11 +663,6 @@
                     {
                         "title":"Create nodes",
                         "path":"sceneGraph/nodes/createNodes.html",
-                        "tags":["nodes"]
-                    },
-                    {
-                        "title":"Replace leaf node",
-                        "path":"sceneGraph/nodes/replaceLeaf.html",
                         "tags":["nodes"]
                     }
                 ]
