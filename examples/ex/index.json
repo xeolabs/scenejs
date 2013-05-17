@@ -70,7 +70,8 @@
                     {
                         "title":"Transform hierarchy",
                         "path":"transforms/transformHierarchy.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"transformHierarchy"
                     }
                 ]
             }
@@ -148,7 +149,8 @@
                     {
                         "title":"Custom geometry plugin",
                         "path":"geometry/plugin.html",
-                        "tags":["plugins"]
+                        "tags":["plugins"],
+                        "id":"createPlugin"
                     }
                 ]
             },
@@ -172,7 +174,8 @@
                     {
                         "title":"Vector text",
                         "path":"geometry/vectorText.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"vectorText"
                     }
                 ]
             },
@@ -184,7 +187,8 @@
                     {
                         "title":"Vertex sharing",
                         "path":"geometry/vertexSharing.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"vertexSharing"
                     }
                 ]
             }
@@ -262,7 +266,8 @@
                         "title":"Color map",
                         "tip":"Defining a color map using all defaults",
                         "tags":[],
-                        "path":"texture/color/colorMap.html"
+                        "path":"texture/color/colorMap.html",
+                        "id":"colorMap"
                     },
                     {
                         "title":"Color map blend add",
@@ -280,7 +285,8 @@
                         "title":"Video color map",
                         "tip":"Video texture with all defaults",
                         "tags":["videoTexture"],
-                        "path":"texture/video/videoColorMap.html"
+                        "path":"texture/video/videoColorMap.html",
+                        "id":"videoTexture"
                     }
                 ]
             },
@@ -293,7 +299,8 @@
                         "title":"Bump map",
                         "tip":"Defining a bump map using all defaults",
                         "tags":[],
-                        "path":"texture/bump/bumpMap.html"
+                        "path":"texture/bump/bumpMap.html",
+                        "id":"bumpMap"
                     },
                     {
                         "title":"Bump map blend add",
@@ -324,7 +331,8 @@
                         "title":"Alpha map",
                         "tip":"Defining an alpha map using all defaults",
                         "tags":[],
-                        "path":"texture/alpha/alphaMap.html"
+                        "path":"texture/alpha/alphaMap.html",
+                        "id":"alphaMap"
                     },
                     {
                         "title":"Alpha map blend add",
@@ -355,7 +363,8 @@
                         "title":"Specular map",
                         "tip":"Defining a specular map using all defaults",
                         "tags":[],
-                        "path":"texture/specular/specularMap.html"
+                        "path":"texture/specular/specularMap.html",
+                        "id":"specularMap"
                     },
                     {
                         "title":"Specular map blend add",
@@ -386,7 +395,8 @@
                         "title":"Glow map",
                         "tip":"Defining a glow map using all defaults",
                         "tags":[],
-                        "path":"texture/glow/glowMap.html"
+                        "path":"texture/glow/glowMap.html",
+                        "id":"glowMap"
                     },
                     {
                         "title":"Glow map blend add",
@@ -429,13 +439,15 @@
                         "title":"Layered color, alpha, specular and glow maps",
                         "tip":"Planet Earth with alpha-mapped clouds, color-mapped land, specular-mapped sea and glow-mapped city lights",
                         "tags":["alphaMap", "specularMap", "specularLight", "colorMap", "glowMap"],
-                        "path":"texture/multi/multitexture.html"
+                        "path":"texture/multi/multitexture.html",
+                        "id":"multitexturing"
                     },
                     {
                         "title":"Color maps on separate UV layers",
                         "tip":"",
                         "tags":["colorMap", "uvLayers"],
-                        "path":"texture/uvLayers/uvLayers.html"
+                        "path":"texture/uvLayers/uvLayers.html",
+                        "id":"uvLayers"
                     }
                 ]
             },
@@ -448,7 +460,8 @@
                     {
                         "title":"Texture atlas",
                         "tags":["textureAtlas"],
-                        "path":"texture/textureAtlas.html"
+                        "path":"texture/textureAtlas.html",
+                        "id":"textureAtlas"
                     }
                 ]
             }
@@ -467,7 +480,8 @@
                     {
                         "title":"Vertex displacement - Model space",
                         "path":"shaders/vertex/modelVertexDisplace.html",
-                        "tags":["vertexDisplacement"]
+                        "tags":["vertexDisplacement"],
+                        "id":"vertexDisplaceShader"
                     },
                     {
                         "title":"Vertex displacement - World space",
@@ -499,7 +513,8 @@
                     {
                         "title":"X-Ray",
                         "path":"shaders/fragment/xray.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"xrayShader"
                     },
                     {
                         "title":"CRT scanlines",
@@ -667,7 +682,8 @@
                     {
                         "title":"Multiple scenes on same page",
                         "path":"scene/multipleScenes/multipleScenes.html",
-                        "tags":["multipleScenes"]
+                        "tags":["multipleScenes"],
+                        "id":"multipleScenes"
                     }
                 ]
             }
@@ -698,7 +714,8 @@
                     {
                         "title":"Shared geometry, texture and material cores",
                         "path":"nodeCores/sharing/sharedNodes.html",
-                        "tags":["nodes", "geometry", "material", "texture"]
+                        "tags":["nodes", "geometry", "material", "texture"],
+                        "id":"sharedNodeCores"
                     }
                 ]
             }
@@ -717,12 +734,14 @@
                     {
                         "title":"Pick objects with mouse",
                         "path":"picking/picking.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"picking"
                     },
                     {
                         "title":"Ray-pick objects with mouse",
                         "path":"picking/rayPicking.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"rayPicking"
                     }
                 ]
             }
@@ -741,7 +760,8 @@
                     {
                         "title":"Configure path to plugins",
                         "path":"configuration/paths/pluginPath.html",
-                        "tags":["plugins"]
+                        "tags":["plugins"],
+                        "id":"pluginPathConfig"
                     }
                 ]
             }
@@ -761,7 +781,8 @@
                     {
                         "title":"Lost WebGL context recovery",
                         "path":"misc/webglContextRestore.html",
-                        "tags":["webglContextLost"]
+                        "tags":["webglContextLost"],
+                        "id":"webglContextLost"
                     }
                 ]
             }
@@ -781,13 +802,15 @@
                         "title":"Tron Tank",
                         "path":"demos/tronTank.html",
                         "editor":false,
-                        "tags":[]
+                        "tags":[],
+                        "id":"tronTank"
                     },
 
                     {
                         "title":"Bubbles",
                         "path":"demos/bubbles.html",
-                        "tags":["fragmentShader", "modelTransform"]
+                        "tags":["fragmentShader", "modelTransform"],
+                        "id":"bubbles"
                     }
                 ]
             }
