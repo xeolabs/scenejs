@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../../../../build/latest/scenejs.js"></script>
+
+<script src="../../../../build/latest/extras/orbitControl.js"></script>
+
+<canvas id="myCanvas" width="600px" height="600px"></canvas>
+
+<script>
+
+    // Demonstrates how to create a scene that will render to an externally-created
+    // canvas element, as opposed to relying on the scene to create its own default canvas
+
+    var scene = SceneJS.createScene({
+
+        // Link to our canvas element
+        canvasId:"myCanvas",
+
+        nodes:[
+            {
+                type:"material",
+                color:{ r:0.5, g:0.5, b:0.6 },
+                nodes:[
+                    {
+                        type:"geometry",
+                        source:{
+                            type:"torus"
+                        }
+                    }
+                ]
+            }
+        ]
+    });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:5
+    });
+
+</script>
+</body>
+</html>

@@ -670,6 +670,27 @@
 
         ]
     },
+
+    {
+        "title":"Integration",
+        "tip":"",
+        "tags":["integration"],
+        "nodes":[
+            {
+                "title":"DOM Integration",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Using an external Canvas",
+                        "path":"scene/integration/externalCanvas.html",
+                        "tags":["canvas"]
+                    }
+                ]
+            }
+
+        ]
+    },
     {
         "title":"Node Cores",
         "tip":"",
