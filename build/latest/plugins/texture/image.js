@@ -5,57 +5,34 @@ SceneJS.Plugins.addPlugin(
 
     new (function () {
 
-        var sourceService = this;
-
         this.getSource = function (params) {
 
             var gl = params.gl;
-            var configs = {};
             var texture = gl.createTexture();
-            var updated;
+            var publish;
 
             return {
-
-                getTexture:function () {
-                    return texture;
+                subscribe:function (fn) {
+                    publish = fn;
                 },
-
-                onUpdate:function (fn) {
-                    updated = fn;
-                },
-
-                setConfigs:function (cfg) {
-
+                configure:function (cfg) {
                     if (!cfg.src) {
                         throw "Parameter expected: 'src'";
                     }
-
-                    configs = cfg;
-
                     var image = new Image();
                     image.crossOrigin = "anonymous";
-
                     image.onload = function () {
-
                         gl.bindTexture(gl.TEXTURE_2D, texture);
-
                         var potImage = ensureImageSizePowerOfTwo(image); // WebGL hates NPOT images
-
                         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, potImage);
-
-                        if (updated) {
-                            updated();
+                        if (publish) {
+                            publish(texture);
                         }
                     };
-
-                    image.src = configs.src;
+                    image.src = cfg.src;
                 },
 
-                getConfigs:function () {
-                    return configs;
-                },
-
-                destroy:function () {
+                destroy:function () { // TODO
                 }
             };
         };

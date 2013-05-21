@@ -166,6 +166,7 @@
             "src/core/scene/translate.js",
             "src/core/scene/scale.js",
             "src/core/scene/modelXFormStack.js",
+         //   "src/core/scene/object.js",
 
             "src/core/display/display.js",
             "src/core/display/programSourceFactory.js",

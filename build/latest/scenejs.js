@@ -11237,10 +11237,10 @@ new (function () {
                     source.subscribe(// Get notification whenever source updates the texture
                         (function () {
                             var loaded = false;
-                            return function () {
+                            return function (texture) {
                                 if (!loaded) { // Texture first initialised - create layer
                                     loaded = true;
-                                    self._setLayerTexture(gl, layer, source.getTexture());
+                                    self._setLayerTexture(gl, layer, texture);
 
                                 } else { // Texture updated - layer already has the handle to it, so just signal a redraw
                                     self._engine.display.imageDirty = true;
@@ -12387,99 +12387,7 @@ var SceneJS_modelXFormStack = new (function () {
     };
 
 })();
-(function () {
-
-    // Supported sub-node types for a SceneJS.Object
-    // Params for types not listed here are ignored.
-    var types = [
-        "lookAt",
-        "lights",
-        "translate",
-        "rotate",
-        "scale",
-        "flags",
-        "material",
-        "layer",
-        "tag",
-        "shader",
-        "xform",
-        "matrix",
-        "clips",
-        "geometry"
-    ];
-
-    /**
-     * @class Scene graph convenience node which defines an object complete with transform, material, geometry etc,
-     * @extends SceneJS.Node
-     */
-    SceneJS.Object = SceneJS_NodeFactory.createNodeType("object");
-
-    SceneJS.Object.prototype._init = function (params) {
-
-        this._nodes = {};
-
-        var nodeArgs = [];
-        var geometry = null;
-        var type;
-        var attr;
-        for (var i = 0, len = types.length; i < len; i++) {
-            type = types[i];
-            if (params.hasOwnProperty(type)) {
-                attr = params[type];
-                if (attr) {
-                    if (type == "geometry") {
-                        geometry = attr; // Geometry must be leaf
-                    } else {
-                        nodeArgs.push([type, attr]);
-                    }
-                }
-            }
-        }
-
-        if (geometry) {
-            nodeArgs.push(["geometry", geometry]);
-        }
-
-        nodeArgs[nodeArgs.length - 1].nodes = params.nodes;
-
-        params.nodes = [];
-
-        for (var i = 0, len = nodeArgs.length; i < len; i++) {
-            this._addNode(nodeArgs[i][0], nodeArgs[i][1]);
-        }
-    };
-
-    SceneJS.Object.prototype._addNode = function (type, params) {
-        this[type] =
-            this._leaf =
-                this._nodes[type] =
-                    (this._leaf || this).addNode(
-                        SceneJS._apply(params, {
-                            type:type
-                        }));
-    };
-
-    /**
-     * Sets attributes on nodes within this object
-     * @param params
-     */
-    SceneJS.Object.prototype.set = function (params) {
-        var node;
-        for (var type in params) {
-            if (params.hasOwnProperty(type)) {
-                node = this._nodes[type];
-                if (node) {
-                    node.set(params[type]);
-                }
-            }
-        }
-    };
-
-    SceneJS.Object.prototype._compile = function () {
-        this._compileNodes();
-    };
-
-})();/**
+/**
  * @class Renders and picks a {@link SceneJS.Scene}
  * @private
  *
@@ -13768,7 +13676,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 /* Vector from vertex to light, packaged with the pre-computed length of that vector
                  */
                 src.push("varying vec4 SCENEJS_vViewLightVecAndDist" + i + ";");    // varying for fragment lighting
-                //i++;
             }
         }
 

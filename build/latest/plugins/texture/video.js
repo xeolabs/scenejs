@@ -7,28 +7,20 @@ SceneJS.Plugins.addPlugin(
 
         this.getSource = function (params) {
 
-            var gl = params.gl;
-            var configs = {};
-
-            var updated;
+            var gl = params.gl;      
+            var publish;
             var video;
-
             var texture = gl.createTexture();
 
             return {
 
-                getTexture:function () {
-                    return texture;
-                },
-
-                onUpdate:function (fn) {
-                    updated = fn;
+                subscribe:function (fn) {
+                    publish = fn;
                 },
 
                 setConfigs:function (cfg) {
 
                     if (cfg.src) {
-
 
                         var canvas = document.createElement("canvas");
                         document.getElementsByTagName("body")[0].appendChild(canvas);
@@ -92,28 +84,18 @@ SceneJS.Plugins.addPlugin(
                                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                                 gl.generateMipmap(gl.TEXTURE_2D);
-
-
-                                if (updated) {
-                                    updated();
+                                if (publish) {
+                                    publish(texture);
                                 }
                             }
-
                             window.requestAnimationFrame(updateTexture);
                         };
 
                         window.requestAnimationFrame(updateTexture);// TODO: synch with render loop
                     }
-
-                    configs = cfg;
-                },
-
-                getConfigs:function () {
-                    return configs;
                 },
 
                 destroy:function () {
-
                     // TODO: destroy any existing video
                 }
             };

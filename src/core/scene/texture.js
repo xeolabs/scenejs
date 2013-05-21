@@ -200,10 +200,10 @@ new (function () {
                     source.subscribe(// Get notification whenever source updates the texture
                         (function () {
                             var loaded = false;
-                            return function () {
+                            return function (texture) {
                                 if (!loaded) { // Texture first initialised - create layer
                                     loaded = true;
-                                    self._setLayerTexture(gl, layer, source.getTexture());
+                                    self._setLayerTexture(gl, layer, texture);
 
                                 } else { // Texture updated - layer already has the handle to it, so just signal a redraw
                                     self._engine.display.imageDirty = true;
