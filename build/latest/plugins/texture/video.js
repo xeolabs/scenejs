@@ -18,7 +18,7 @@ SceneJS.Plugins.addPlugin(
                     publish = fn;
                 },
 
-                setConfigs:function (cfg) {
+                configure:function (cfg) {
 
                     if (cfg.src) {
 
