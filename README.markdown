@@ -1,6 +1,12 @@
 **SceneJS 3.0** is an open-source 3D engine on WebGL that's geared towards rendering large numbers of individually
 arcticulated and pickable objects as required for high-detail visualisation applications.
 
+* [Downloads](#downloads)
+* [Documentation](#documentation)
+* [Features](#features)
+* [Plugin System](#plugin-system)
+* [Building](#building)
+
 ## Downloads
 
 ### Latest Build
@@ -15,9 +21,9 @@ required (see [Plugins section](#plugin-system) below for more info on plugins).
 
 Also hotlinkable are a bunch of helper utilities:
 
-* **[OrbitControl](http://xeolabs.github.com/scenejs/build/latest/extras/orbitControl.html)** -
+* **[OrbitControl](http://xeolabs.github.com/scenejs/build/latest/extras/orbitControl.js)** -
 Mouse camera orbit helper
-* **[PickControl](http://xeolabs.github.com/scenejs/build/latest/extras/pickControl.html)** -
+* **[PickControl](http://xeolabs.github.com/scenejs/build/latest/extras/pickControl.js)** -
 Scene picking helper
 
 ## Documentation
@@ -27,18 +33,12 @@ Live examples are now the main usage documentation. In the examples page, select
    that have those tags. Most of them are not particularly exciting, but aim to show particular use cases. Many of them do
    the same things, but in slightly different ways. [Log an issue](https://github.com/xeolabs/scenejs/issues) if there's something missing there.
 
-Some examples for various topic tags:
-* [optimization](http://xeolabs.github.com/scenejs/examples/index.html?tags=optimization) - Optimization
-* [texturing](http://xeolabs.github.com/scenejs/examples/index.html?tags=texturing) - Texturing
-* [lighting](http://xeolabs.github.com/scenejs/examples/index.html?tags=lighting) - Lighting
-* [geometry](http://xeolabs.github.com/scenejs/examples/index.html?tags=geometry) - Geometry
-* [modelTransform, viewTransform, projectionTransform](http://xeolabs.github.com/scenejs/examples/index.html?tags=modelTransform,viewTransform,projectionTransform) - Transformation
-
-
 * **[Class Docs](http://xeolabs.github.com/scenejs/docs/index.html)** -
 Documentation in progress for the SceneJS class API, which is the core implementation beneath the JSON API. You can use this
 to build scenes programmatically, instead of declaratively with JSON as shown in the examples. You would also use this API when
    when manipulating nodes (even they were defined with JSON).
+
+## Features
 
 ## Plugin System
 
