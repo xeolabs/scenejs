@@ -60,42 +60,38 @@ new (function () {
                         if (!plugin.getSource) {
                             throw SceneJS_error.fatalError(
                                 SceneJS.errors.PLUGIN_INVALID,
-                                "geometry: 'getSource' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'.");
+                                "geometry: 'getSource' method missing on plugin for geometry source type '" + self._sourceConfigs.type + "'.");
                         }
 
                         self._source = plugin.getSource();
 
-                        if (!self._source.onUpdate) {
+                        if (!self._source.subscribe) {
                             throw SceneJS_error.fatalError(
                                 SceneJS.errors.PLUGIN_INVALID,
-                                "geometry: 'onUpdate' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'");
+                                "geometry: 'subscribe' method missing on plugin for geometry source type '" + self._sourceConfigs.type + "'");
                         }
 
-                        self._source.onCreate(// Get notification when source creates the geometry
+                        var created = false;
+
+                        self._source.subscribe(// Get notification when source configurees the geometry
                             function (data) { // Data contains both typed arrays and primitive name
 
-                                if (options) { // HACK - should apply this on GPU
-                                    data.positions = data.positions
-                                        ? new Float32Array((options.scale || options.origin)
-                                        ? self._applyOptions(data.positions, options)
-                                        : data.positions) : undefined;
-                                }
+                                if (!created) {
+                                    if (options) { // HACK - should apply this on GPU
+                                        data.positions = data.positions
+                                            ? new Float32Array((options.scale || options.origin)
+                                            ? self._applyOptions(data.positions, options)
+                                            : data.positions) : undefined;
+                                    }
+                                    self._initNodeCore(data);
+                                    SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
+                                    self._core._loading = false;
+                                    self._fireEvent("loaded");
+                                    self._engine.display.imageDirty = true;
+                                    self._engine.branchDirty(self); // TODO
+                                    created = true;
 
-                                self._initNodeCore(data);
-
-                                SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
-
-                                self._core._loading = false;
-                                self._fireEvent("loaded");
-
-                                self._engine.display.imageDirty = true;
-
-                                self._engine.branchDirty(self); // TODO
-                            });
-
-                        if (self._source.onUpdate) {
-                            self._source.onUpdate(// Reload core arrays from factory updates to the geometry
-                                function (data) {
+                                } else {
 
                                     var core = self._core;
 
@@ -201,12 +197,15 @@ new (function () {
                                     }
 
                                     self._engine.display.imageDirty = true;
-                                });
-                        }
+                                }
+                            }
+                        );
 
                         self._fireEvent("loading");
 
-                        self._source.setConfigs(self._sourceConfigs);
+                        if (self._source.configure) {
+                            self._source.configure(self._sourceConfigs);
+                        }
                     });
 
             } else {
@@ -419,8 +418,8 @@ new (function () {
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
         this._sourceConfigs = sourceConfigs;
         var source = this._source;
-        if (source) {
-            source.setConfigs(sourceConfigs);
+        if (source && source.configure) {
+            source.configure(sourceConfigs);
         }
     };
 
@@ -685,4 +684,5 @@ new (function () {
         }
     };
 
-})();
+})
+    ();

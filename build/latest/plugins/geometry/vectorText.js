@@ -13,41 +13,22 @@ SceneJS.Plugins.addPlugin(
 
     new (function () {
 
-        // Letter stroke data, initialised below
-        var letters;
-
         this.getSource = function () {
-
-            var created;
-            var updated;
-
-            var configs = {};
-
+            var publish;
             return {
-
-                onCreate:function (fn) {
-                    created = fn;
+                subscribe:function (fn) {
+                    publish = fn;
                 },
-
-                onUpdate:function (fn) {
-                    updated = fn;
-                },
-
-                setConfigs:function (cfg) {
-                    configs = cfg;
-                    created(getGeometry(cfg));
-                },
-
-                getConfigs:function () {
-                    return configs;
-                },
-
-                destroy:function () {
+                configure:function (cfg) {
+                    publish(build(cfg));
                 }
             };
         };
 
-        function getGeometry(cfg) {
+        // Letter stroke data, initialised below
+        var letters;
+
+        function build(cfg) {
 
             var positions = [];
             var indices = [];

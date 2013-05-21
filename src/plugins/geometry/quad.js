@@ -14,32 +14,13 @@ SceneJS.Plugins.addPlugin(
     new (function () {
 
         this.getSource = function () {
-
-            var created;
-            var updated;
-
-            var configs = {};
-
+            var publish;
             return {
-
-                onCreate:function (fn) {
-                    created = fn;
+                subscribe:function (fn) {
+                    publish = fn;
                 },
-
-                onUpdate:function (fn) {
-                    updated = fn;
-                },
-
-                setConfigs:function (cfg) {
-                    configs = cfg;
-                    created(build(cfg));
-                },
-
-                getConfigs:function () {
-                    return configs;
-                },
-
-                destroy:function () {
+                configure:function (cfg) {
+                    publish(build(cfg));
                 }
             };
         };
@@ -53,7 +34,7 @@ SceneJS.Plugins.addPlugin(
 
             return {
                 primitive:cfg.wire ? "lines" : "triangles",
-                coreId:"quad"+ (cfg.wire ? "wire" : "_solid"),
+                coreId:"quad" + (cfg.wire ? "wire" : "_solid"),
                 positions:new Float32Array(positions),
                 normals:new Float32Array(normals),
                 uv:new Float32Array(uv),

@@ -191,13 +191,13 @@ new (function () {
 
                     var source = plugin.getSource({ gl:gl });
 
-                    if (!source.onUpdate) {
+                    if (!source.subscribe) {
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.PLUGIN_INVALID,
-                            "texture: 'onUpdate' method missing on plugin for texture source type '" + sourceConfigs.type + "'");
+                            "texture: 'subscribe' method missing on plugin for texture source type '" + sourceConfigs.type + "'");
                     }
 
-                    source.onUpdate(// Get notification whenever source updates the texture
+                    source.subscribe(// Get notification whenever source updates the texture
                         (function () {
                             var loaded = false;
                             return function () {
@@ -211,7 +211,9 @@ new (function () {
                             };
                         })());
 
-                    source.setConfigs(sourceConfigs); // Configure the source, which may cause it to update the texture
+                    if (source.configure) {
+                        source.configure(sourceConfigs); // Configure the source, which may cause it to update the texture
+                    }
 
                     layer._source = source;
                 });
@@ -384,8 +386,8 @@ new (function () {
 
         if (cfg.source) {
             var source = layer._source;
-            if (source) {
-                source.setConfigs(cfg.source);
+            if (source && source.configure) {
+                source.configure(cfg.source);
             }
         }
 

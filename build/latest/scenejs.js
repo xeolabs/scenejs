@@ -7715,42 +7715,38 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
                         if (!plugin.getSource) {
                             throw SceneJS_error.fatalError(
                                 SceneJS.errors.PLUGIN_INVALID,
-                                "geometry: 'getSource' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'.");
+                                "geometry: 'getSource' method missing on plugin for geometry source type '" + self._sourceConfigs.type + "'.");
                         }
 
                         self._source = plugin.getSource();
 
-                        if (!self._source.onUpdate) {
+                        if (!self._source.subscribe) {
                             throw SceneJS_error.fatalError(
                                 SceneJS.errors.PLUGIN_INVALID,
-                                "geometry: 'onUpdate' method missing on plugin for geometry source type '" + this._sourceConfigs.type + "'");
+                                "geometry: 'subscribe' method missing on plugin for geometry source type '" + self._sourceConfigs.type + "'");
                         }
 
-                        self._source.onCreate(// Get notification when source creates the geometry
+                        var created = false;
+
+                        self._source.subscribe(// Get notification when source configurees the geometry
                             function (data) { // Data contains both typed arrays and primitive name
 
-                                if (options) { // HACK - should apply this on GPU
-                                    data.positions = data.positions
-                                        ? new Float32Array((options.scale || options.origin)
-                                        ? self._applyOptions(data.positions, options)
-                                        : data.positions) : undefined;
-                                }
+                                if (!created) {
+                                    if (options) { // HACK - should apply this on GPU
+                                        data.positions = data.positions
+                                            ? new Float32Array((options.scale || options.origin)
+                                            ? self._applyOptions(data.positions, options)
+                                            : data.positions) : undefined;
+                                    }
+                                    self._initNodeCore(data);
+                                    SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
+                                    self._core._loading = false;
+                                    self._fireEvent("loaded");
+                                    self._engine.display.imageDirty = true;
+                                    self._engine.branchDirty(self); // TODO
+                                    created = true;
 
-                                self._initNodeCore(data);
-
-                                SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
-
-                                self._core._loading = false;
-                                self._fireEvent("loaded");
-
-                                self._engine.display.imageDirty = true;
-
-                                self._engine.branchDirty(self); // TODO
-                            });
-
-                        if (self._source.onUpdate) {
-                            self._source.onUpdate(// Reload core arrays from factory updates to the geometry
-                                function (data) {
+                                } else {
 
                                     var core = self._core;
 
@@ -7856,12 +7852,15 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
                                     }
 
                                     self._engine.display.imageDirty = true;
-                                });
-                        }
+                                }
+                            }
+                        );
 
                         self._fireEvent("loading");
 
-                        self._source.setConfigs(self._sourceConfigs);
+                        if (self._source.configure) {
+                            self._source.configure(self._sourceConfigs);
+                        }
                     });
 
             } else {
@@ -8074,8 +8073,8 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
         this._sourceConfigs = sourceConfigs;
         var source = this._source;
-        if (source) {
-            source.setConfigs(sourceConfigs);
+        if (source && source.configure) {
+            source.configure(sourceConfigs);
         }
     };
 
@@ -8340,7 +8339,8 @@ SceneJS_NodeFactory.prototype.putNode = function(node) {
         }
     };
 
-})();(function() {
+})
+    ();(function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Layer} nodes
@@ -11228,13 +11228,13 @@ new (function () {
 
                     var source = plugin.getSource({ gl:gl });
 
-                    if (!source.onUpdate) {
+                    if (!source.subscribe) {
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.PLUGIN_INVALID,
-                            "texture: 'onUpdate' method missing on plugin for texture source type '" + sourceConfigs.type + "'");
+                            "texture: 'subscribe' method missing on plugin for texture source type '" + sourceConfigs.type + "'");
                     }
 
-                    source.onUpdate(// Get notification whenever source updates the texture
+                    source.subscribe(// Get notification whenever source updates the texture
                         (function () {
                             var loaded = false;
                             return function () {
@@ -11248,7 +11248,9 @@ new (function () {
                             };
                         })());
 
-                    source.setConfigs(sourceConfigs); // Configure the source, which may cause it to update the texture
+                    if (source.configure) {
+                        source.configure(sourceConfigs); // Configure the source, which may cause it to update the texture
+                    }
 
                     layer._source = source;
                 });
@@ -11421,8 +11423,8 @@ new (function () {
 
         if (cfg.source) {
             var source = layer._source;
-            if (source) {
-                source.setConfigs(cfg.source);
+            if (source && source.configure) {
+                source.configure(cfg.source);
             }
         }
 
@@ -12385,7 +12387,99 @@ var SceneJS_modelXFormStack = new (function () {
     };
 
 })();
-/**
+(function () {
+
+    // Supported sub-node types for a SceneJS.Object
+    // Params for types not listed here are ignored.
+    var types = [
+        "lookAt",
+        "lights",
+        "translate",
+        "rotate",
+        "scale",
+        "flags",
+        "material",
+        "layer",
+        "tag",
+        "shader",
+        "xform",
+        "matrix",
+        "clips",
+        "geometry"
+    ];
+
+    /**
+     * @class Scene graph convenience node which defines an object complete with transform, material, geometry etc,
+     * @extends SceneJS.Node
+     */
+    SceneJS.Object = SceneJS_NodeFactory.createNodeType("object");
+
+    SceneJS.Object.prototype._init = function (params) {
+
+        this._nodes = {};
+
+        var nodeArgs = [];
+        var geometry = null;
+        var type;
+        var attr;
+        for (var i = 0, len = types.length; i < len; i++) {
+            type = types[i];
+            if (params.hasOwnProperty(type)) {
+                attr = params[type];
+                if (attr) {
+                    if (type == "geometry") {
+                        geometry = attr; // Geometry must be leaf
+                    } else {
+                        nodeArgs.push([type, attr]);
+                    }
+                }
+            }
+        }
+
+        if (geometry) {
+            nodeArgs.push(["geometry", geometry]);
+        }
+
+        nodeArgs[nodeArgs.length - 1].nodes = params.nodes;
+
+        params.nodes = [];
+
+        for (var i = 0, len = nodeArgs.length; i < len; i++) {
+            this._addNode(nodeArgs[i][0], nodeArgs[i][1]);
+        }
+    };
+
+    SceneJS.Object.prototype._addNode = function (type, params) {
+        this[type] =
+            this._leaf =
+                this._nodes[type] =
+                    (this._leaf || this).addNode(
+                        SceneJS._apply(params, {
+                            type:type
+                        }));
+    };
+
+    /**
+     * Sets attributes on nodes within this object
+     * @param params
+     */
+    SceneJS.Object.prototype.set = function (params) {
+        var node;
+        for (var type in params) {
+            if (params.hasOwnProperty(type)) {
+                node = this._nodes[type];
+                if (node) {
+                    node.set(params[type]);
+                }
+            }
+        }
+    };
+
+    SceneJS.Object.prototype._compile = function () {
+        this._compileNodes();
+    };
+
+})();/**
  * @class Renders and picks a {@link SceneJS.Scene}
  * @private
  *

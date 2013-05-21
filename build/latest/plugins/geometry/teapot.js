@@ -14,38 +14,18 @@ SceneJS.Plugins.addPlugin(
     new (function () {
 
         this.getSource = function () {
-
-            var created;
-            var updated;
-            var cachedTeapot;  // All teapots are the same, so just reuse the same data
-
-            var configs = {};
-
+            var publish;
             return {
-
-                onCreate:function (fn) {
-                    created = fn;
+                subscribe:function (fn) {
+                    publish = fn;
                 },
-
-                onUpdate:function (fn) {
-                    updated = fn;
-                },
-
-                setConfigs:function (cfg) {
-                    configs = cfg;
-                    created(cachedTeapot || (cachedTeapot = buildTeapot(cfg)));
-                },
-
-                getConfigs:function () {
-                    return configs;
-                },
-
-                destroy:function () {
+                configure:function (cfg) {
+                    publish(build(cfg));
                 }
             };
         };
 
-        function buildTeapot(cfg) {
+        function build(cfg) {
             var positions = [
                 [-3.000000, 1.650000, 0.000000],
                 [-2.987110, 1.650000, -0.098438],

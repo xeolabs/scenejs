@@ -14,50 +14,18 @@ SceneJS.Plugins.addPlugin(
     new (function() {
 
         this.getSource = function () {
-
-            var created;
-            var updated;
-
-            var wasCreated = false;
-
-            var configs = {};
-
+            var publish;
             return {
-
-                onCreate : function(fn) {
-                    created = fn;
+                subscribe:function (fn) {
+                    publish = fn;
                 },
-
-                onUpdate : function(fn) {
-                    updated = fn;
-                },
-
-                setConfigs : function(cfg) {
-
-                    configs = cfg;
-
-                    if (!wasCreated) {
-
-                        created(buildSphere(cfg));
-
-                        wasCreated = true;
-
-                    } else {
-
-                        updated(buildSphere(cfg));
-                    }
-                },
-
-                getConfigs : function() {
-                    return configs;
-                },
-
-                destroy : function() {
+                configure:function (cfg) {
+                    publish(build(cfg));
                 }
             };
         };
 
-        function buildSphere(cfg) {
+        function build(cfg) {
 
             // Thanks awfully to: http://learningwebgl.com/cookbook/index.php/How_to_draw_a_sphere
 

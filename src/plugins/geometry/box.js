@@ -14,37 +14,18 @@ SceneJS.Plugins.addPlugin(
     new (function () {
 
         this.getSource = function () {
-
-            var created;
-            var updated;
-
-            var configs = {};
-
+            var publish;
             return {
-
-                onCreate:function (fn) {
-                    created = fn;
+                subscribe:function (fn) {
+                    publish = fn;
                 },
-
-                onUpdate:function (fn) {
-                    updated = fn;
-                },
-
-                setConfigs:function (cfg) {
-                    configs = cfg;
-                    created(buildBox(cfg));
-                },
-
-                getConfigs:function () {
-                    return configs;
-                },
-
-                destroy:function () {
+                configure:function (cfg) {
+                    publish(build(cfg));
                 }
             };
         };
 
-        function buildBox(cfg) {
+        function build(cfg) {
 
             var x = cfg.xSize || 1;
             var y = cfg.ySize || 1;

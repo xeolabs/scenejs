@@ -10,37 +10,13 @@ SceneJS.Plugins.addPlugin(
     new (function () {
 
         this.getSource = function () {
-
-            var created;
-            var updated;
-            var wasCreated = false;
-            var configs = {};
-
+            var publish;
             return {
-
-                onCreate:function (fn) {
-                    created = fn;
+                subscribe:function (fn) {
+                    publish = fn;
                 },
-
-                onUpdate:function (fn) {
-                    updated = fn;
-                },
-
-                setConfigs:function (cfg) {
-                    configs = cfg;
-                    if (!wasCreated) {
-                        created(build(cfg));
-                        wasCreated = true;
-                    } else {
-                        updated(build(cfg));
-                    }
-                },
-
-                getConfigs:function () {
-                    return configs;
-                },
-
-                destroy:function () {
+                configure:function (cfg) {
+                    publish(build(cfg));
                 }
             };
         };
@@ -129,8 +105,6 @@ SceneJS.Plugins.addPlugin(
                 indices:new Uint16Array(indices)
             };
         }
-
-        // Vector math functions
 
         function normalize(v, dest) {
             var f = 1.0 / len(v);
