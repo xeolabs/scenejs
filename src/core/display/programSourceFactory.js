@@ -360,21 +360,26 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("varying   vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
             src.push("varying   vec3 SCENEJS_vViewNormal;");    // Output view-space vertex normal
 
+            var lighti = 0;
             for (var i = 0; i < states.lights.lights.length; i++) {
                 var light = states.lights.lights[i];
+                if (light.mode == "ambient") {
+                    continue;
+                }
                 if (light.mode == "dir") {
-                    src.push("uniform vec3 SCENEJS_uLightDir" + i + ";");
+                    src.push("uniform vec3 SCENEJS_uLightDir" + lighti + ";");
                 }
                 if (light.mode == "point") {
-                    src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
+                    src.push("uniform vec3 SCENEJS_uLightPos" + lighti + ";");
                 }
                 if (light.mode == "spot") {
-                    src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
+                    src.push("uniform vec3 SCENEJS_uLightPos" + lighti + ";");
                 }
 
                 /* Vector from vertex to light, packaged with the pre-computed length of that vector
                  */
-                src.push("varying vec4 SCENEJS_vViewLightVecAndDist" + i + ";");    // varying for fragment lighting
+                src.push("varying vec4 SCENEJS_vViewLightVecAndDist" + lighti + ";");    // varying for fragment lighting
+                lighti++;
             }
         }
 
@@ -508,9 +513,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         src.push("  vec3 tmpVec3;");
         if (normals) {
+            var lighti = 0;
             for (var i = 0; i < states.lights.lights.length; i++) {
 
                 light = states.lights.lights[i];
+
+                if (light.mode == "ambient") {
+                    continue;
+                }
 
                 if (light.mode == "dir") {
 
@@ -520,13 +530,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                         /* World space light - transform vector to View space
                          */
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(-normalize((SCENEJS_uVMatrix * vec4(SCENEJS_uLightDir" + i + ", 0.0)).xyz), 0.0);");
+                        src.push("SCENEJS_vViewLightVecAndDist" + lighti + " = vec4(-normalize((SCENEJS_uVMatrix * vec4(SCENEJS_uLightDir" + lighti + ", 0.0)).xyz), 0.0);");
 
                     } else {
 
                         /* View space light
                          */
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(-normalize(SCENEJS_uLightDir" + i + "), 0.0);");
+                        src.push("SCENEJS_vViewLightVecAndDist" + lighti + " = vec4(-normalize(SCENEJS_uLightDir" + lighti + "), 0.0);");
                     }
                 }
 
@@ -538,17 +548,19 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                         /* World space light - transform position to View space
                          */
-                        src.push("tmpVec3 = ((SCENEJS_uVMatrix * vec4(SCENEJS_uLightPos" + i + ", 1.0)).xyz - worldVertex.xyz);");
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(normalize(tmpVec3), length(tmpVec3));");
+                        src.push("tmpVec3 = ((SCENEJS_uVMatrix * vec4(SCENEJS_uLightPos" + lighti + ", 1.0)).xyz - worldVertex.xyz);");
+                        src.push("SCENEJS_vViewLightVecAndDist" + lighti + " = vec4(normalize(tmpVec3), length(tmpVec3));");
 
                     } else {
 
                         /* View space light
                          */
-                        src.push("tmpVec3 = (SCENEJS_uLightPos" + i + ".xyz - worldVertex.xyz);");
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(normalize(tmpVec3), length(tmpVec3));");
+                        src.push("tmpVec3 = (SCENEJS_uLightPos" + lighti + ".xyz - worldVertex.xyz);");
+                        src.push("SCENEJS_vViewLightVecAndDist" + lighti + " = vec4(normalize(tmpVec3), length(tmpVec3));");
                     }
                 }
+
+                lighti++;
             }
         }
 
@@ -677,13 +689,18 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
 
             var light;
+            var lighti = 0;
             for (var i = 0; i < states.lights.lights.length; i++) {
                 light = states.lights.lights[i];
-                src.push("uniform vec3  SCENEJS_uLightColor" + i + ";");
-                if (light.mode == "point") {
-                    src.push("uniform vec3  SCENEJS_uLightAttenuation" + i + ";");
+                if (light.mode == "ambient") {
+                    continue;
                 }
-                src.push("varying vec4  SCENEJS_vViewLightVecAndDist" + i + ";");         // Vector from light to vertex
+                src.push("uniform vec3  SCENEJS_uLightColor" + lighti + ";");
+                if (light.mode == "point") {
+                    src.push("uniform vec3  SCENEJS_uLightAttenuation" + lighti + ";");
+                }
+                src.push("varying vec4  SCENEJS_vViewLightVecAndDist" + lighti + ";");         // Vector from light to vertex
+                lighti++;
             }
         }
 
@@ -881,11 +898,16 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("  float   lightDist;");
 
             var light;
+            var lighti = 0;
 
             for (var i = 0, len = states.lights.lights.length; i < len; i++) {
                 light = states.lights.lights[i];
 
-                src.push("viewLightVec = SCENEJS_vViewLightVecAndDist" + i + ".xyz;");
+                if (light.mode == "ambient") {
+                    continue;
+                }
+
+                src.push("viewLightVec = SCENEJS_vViewLightVecAndDist" + lighti + ".xyz;");
 
                 if (light.mode == "point") {
 
@@ -893,22 +915,22 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                     //src.push("if (dotN > 0.0) {");
 
-                    src.push("lightDist = SCENEJS_vViewLightVecAndDist" + i + ".w;");
+                    src.push("lightDist = SCENEJS_vViewLightVecAndDist" + lighti + ".w;");
 
                     src.push("attenuation = 1.0 - (" +
-                        "  SCENEJS_uLightAttenuation" + i + "[0] + " +
-                        "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
-                        "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
+                        "  SCENEJS_uLightAttenuation" + lighti + "[0] + " +
+                        "  SCENEJS_uLightAttenuation" + lighti + "[1] * lightDist + " +
+                        "  SCENEJS_uLightAttenuation" + lighti + "[2] * lightDist * lightDist);");
 
                     if (light.diffuse) {
                         src.push("if (SCENEJS_uDiffuse) {");
-                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
+                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + lighti + " * attenuation;");
                         src.push("}");
                     }
 
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
-                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
+                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + lighti +
                             " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
                         src.push("}");
                     }
@@ -922,18 +944,19 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
                         src.push("if (SCENEJS_uDiffuse) {");
-                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
+                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + lighti + ";");
                         src.push("}");
                     }
 
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
-                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
+                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + lighti +
                             " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
                         src.push("}");
                     }
                     // src.push("}");
                 }
+                lighti++;
             }
 
             src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * color.rgb), alpha);");
