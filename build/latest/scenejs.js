@@ -9340,7 +9340,7 @@ new (function () {
 
                         self._fireEvent("loading");
 
-                        self._source.setConfigs(self._sourceConfigs);
+                        self._source.configure(self._sourceConfigs);
                     });
 
             } else if (params.create instanceof Function) {
@@ -9500,7 +9500,7 @@ new (function () {
         this._sourceConfigs = sourceConfigs;
         var source = this._source;
         if (source) {
-            source.setConfigs(sourceConfigs);
+            source.configure(sourceConfigs);
         }
     };
 
