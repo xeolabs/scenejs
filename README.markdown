@@ -1,3 +1,5 @@
+## SceneJS 3.0
+
 **SceneJS 3.0** is an open-source 3D engine on WebGL that's geared towards rendering large numbers of individually
 arcticulated and pickable objects as required for high-detail visualisation applications.
 
@@ -48,73 +50,67 @@ to build scenes programmatically, instead of declaratively with JSON as shown in
 
 ### API
 
-* **[JSON API](https://github.com/xeolabs/scenejs/wiki/JSON-API)** - SceneJS provides an almost pure JSON-based
-API that plays well with the rest of the application stack. JSON content is nice to export, store in a database
-(like CouchDB), transport across a network, transform, and read by humans.
+* **JSON API - Build scenes quickly on a declarative JSON-based API that plays well with the rest of the application stack.
+JSON is nice to export, database, transmit, transform and read.
 
-* **[Plugins](https://github.com/xeolabs/scenejs/wiki/Service-Container)** - Customise key functionality by plugging
-your own strategies into the Inversion-of-Control container. Great for implementing your own compressed/obfuscated content loading strategies.
-* **[Messaging System](https://github.com/xeolabs/scenejs/wiki/Messaging System)** - Create and update your scene graphs
-remotely using the Messaging System
+* **[Plugins](#plugins)** - Extend texture and geometry functionality through plugins, eg. to create primitives, load
+compressed texture formats, and so on. All the geometry primitives, such as 'teapot' and 'sphere', are now plugins.
+Plugins are unobtrusive, and are kept in a directory from where SceneJS loads them as required.
 
-### Functionality
+* **[Custom Shaders](https://github.com/xeolabs/scenejs/wiki/shader)** - Although SceneJS generates shaders automatically,
+you can modify the shaders by injecting custom functions into them
 
-* **Generated Shaders** - SceneJS automatically generates the shaders required to render the scene objects. For each
-geometry, SceneJS composes a shader program from the nodes that are defined above it in the scene graph, reusing shaders
-wherever possible.
+* **[Color](https://github.com/xeolabs/scenejs/wiki/texture), [Alpha](https://github.com/xeolabs/scenejs/wiki/texture),
+[Specular](https://github.com/xeolabs/scenejs/wiki/texture), [Glow](https://github.com/xeolabs/scenejs/wiki/texture)
+ and [Bump](https://github.com/xeolabs/scenejs/wiki/texture) Maps**
 
-* **[Custom Shaders](https://github.com/xeolabs/scenejs/wiki/shader)** - For custom effects, define your own GLSL
-shader nodes within your scene graph, or hook custom functions into SceneJS' automatically generated shaders. All
-parameterisable via the JSON API.
+* **[Multitexturing](https://github.com/xeolabs/scenejs/wiki/texture)** - Layer multiple textures onto the same geometry
 
-* **[Geometry Morphing](https://github.com/xeolabs/scenejs/wiki/morphGeometry)** - SceneJS allows you to define key
-frames for morphing of positions, normals, colors, and/or UV coordinates of geometry. As many frames may be defined
-as your video RAM will contain.
+* **[Texture Animation](https://github.com/xeolabs/scenejs/wiki/texture)** - Animate textures by rotating, scaling,
+translating and blending them.
 
-* **[Multitexturing](https://github.com/xeolabs/scenejs/wiki/texture)** - Layer multiple textures to combine colour,
-specular, glow, transparency and bump maps.
+* **[Video Texture](https://github.com/xeolabs/scenejs/wiki/video)** - Stream a texture from video in real time.
 
-* **[Texture Animation](https://github.com/xeolabs/scenejs/wiki/texture)** - Rotate, scale, translate, blending
+* **[Geometry Morphing](https://github.com/xeolabs/scenejs/wiki/morphGeometry)** - Animate geometry by interpolating its
+positions, normals, colors and UVs within keyframes.
 
-* **[Video Textures](https://github.com/xeolabs/scenejs/wiki/video)** - Movie files can be applied as textures -
- useful for complex animated textures, animated bump maps, moving clouds etc.
+* **[Layers](https://github.com/xeolabs/scenejs/wiki/layer)** - Control rendering order of scene nodes by prioritizing them
+in layers, which is useful for transparency sorting.
 
-* **[Layer Bins](https://github.com/xeolabs/scenejs/wiki/layer)** - Scene nodes can be organised into ordered layer
-bins to control their rendering order. This is useful for doing transparency correctly; when we have multiple transparent
-objects in a scene, we can assign them to ordered layers to ensure that they are alpha-blended in the correct order,
-ensuring that the pixels of far objects exist in the framebuffer ready for near objects to blend with.
+* **[Transform Hierachies](https://github.com/xeolabs/scenejs/wiki/layer)** - Articulate your scenes using hierarchies of
+modelling transform nodes, a staple feature in scene graph APIs.
 
-* **[Multiple Scenes](https://github.com/xeolabs/scenejs/wiki/)** - Multiple scene graphs can be created within the same
-JavaScript runtime environment, allowing us to update them concurrently and share JSON content between them.
-
-..and more..
-
-### Efficiency
-
-* **GPU Optimisation** - to reduce work done by the CPU within the render loop, SceneJS dynamically recompiles the
-scene graph to a lean internal draw list, which is state-sorted to minimise the work done by the GPU. By ordering the
-objects by shader, texture, VBOs etc. it can avoid redundantly re-binding state to the GPU. Though SceneJS does a pretty
-good job of sorting, if you program your scene to share plenty of state between your objects, you can achieve some very
-fast results.
+* **[Multiple Scenes](https://github.com/xeolabs/scenejs/wiki/)** - Run multiple scenes simultaneously in the same page
 
 * **[Shared Node Cores](https://github.com/xeolabs/scenejs/wiki/Node-Cores)** - Traditionally, re-use within a scene
 graph is done by attaching nodes to multiple parents. For dynamically updated scenes this can have a performance impact
 when the engine must process multiple parent paths, so SceneJS takes an alternative approach with "node cores", a concept
 borrowed from OpenSG.
 
-* **[Fast Picking](https://github.com/xeolabs/scenejs/wiki/name)** - SceneJS optimises picking for fast mouseover effects
-such as highlight and tooltips, which are also common requirements in visualisation systems. It does this by retaining
-pick buffers for re-reading, rewriting them only when the view changes.
+* **GPU Optimisation** - to reduce work done by the CPU within the render loop, SceneJS dynamically recompiles the
+scene graph to a lean internal draw list, which is state-sorted to minimise the work done by the GPU. By ordering the
+objects by shader, texture, VBOs etc. it can avoid redundantly re-binding state to the GPU. Though SceneJS does a pretty
+good job of sorting, if you program your scene to share plenty of state between your objects then you can achieve some very
+fast results.
+
+* **[Automatic Lost WebGL Context Recovery](http://xeolabs.github.io/scenejs/examples/index.html?page=webglContextLost) -
+SceneJS seamlessly recovers from Lost WebGL Context errors, which occur when the OS or browser resets
+WebGL to regain control after a mishap. When a new context becomes available, SceneJS instanly rebuilds all its WebGL resources
+from state held in the scene graph without reloading anything off the server.
+
+* **[Sensible Defaults](https://github.com/xeolabs/scenejs/wiki/shader)** - SceneJS now provides defaults for all scene state, such
+ as camera, lights and material, in a configuration that's ready to render whatever geometry you drop into the scene. That means you
+ can create a more minimal scene definition, which turned out to be handy for creating clearer examples.
 
 ## Plugin System
 
-SceneJS now uses plugins for non-core things like geometry primitives (box, teapot, text etc.), fancy texture functionality
-(video etc) and so on.
+As mentioned above, SceneJS now uses plugins for things like primitives (box, teapot, text etc.) and fancy
+texture loading (video etc).
 
-Plugins are used from within node definitions, as shown below:
+Plugins are used from within node definitions, as shown in this example for geometry:
 
 ```javascript
- myNode.addNode({
+var myGeometry = myNode.addNode({
     type:"geometry",
     id: "myGeometry",
     source:{
@@ -127,7 +123,69 @@ Plugins are used from within node definitions, as shown below:
 ```
 
 This geometry node will create its sphere geometry with the help of the ["sphere" plugin](./build/latest/plugins/geometry/sphere.js).
-Geometry (and texture) plugins function as factories, hence the "source" attribute on the geometry node definition.
+
+Essentially, the plugin's code looks like the listing below. The plugin provides geometry factory objects, each with
+a ```configure``` method to configure the sphere shape and a ```subscribe``` method to collect created geometry data.
+
+```javascript
+SceneJS.Plugins.addPlugin(
+
+    "geometry", // Node type
+    "sphere", // Plugin type
+
+    new (function () {
+
+        this.getSource = function () {
+
+            var publish;
+
+            return {
+
+                subscribe:function (fn) {
+                    publish = fn;
+                },
+
+                configure:function (cfg) {
+                    publish(build(cfg));
+                }
+            };
+        };
+
+        function build(cfg) {
+
+            var latitudeBands = cfg.latitudeBands || 30;
+            var longitudeBands = cfg.longitudeBands || 30;
+            var radius = cfg.radius || 2;
+
+            var positions = [/*...*/];
+            var normals =  [/*...*/];
+            var uv =  [/*...*/];
+            var indices =  [/*...*/];
+
+            return {
+                primitive:"triangles",
+                positions:new Float32Array(positions),
+                normals:new Float32Array(normals),
+                uv:new Float32Array(uv),
+                indices:new Uint16Array(indices)
+            };
+        }
+
+    })());
+```
+
+Then you can reconfigure the geometry at any time using setter methods on the node as shown below. Note however that we
+can't reconfigure the plugin type we're using for our node.
+
+```javascript
+// Reconfigure our sphere like this - make it bigger and smoother:
+myGeometry.setSource({ latitudeBands : 60, longitudeBands : 60, radius : 3 });
+
+// ..or do the same using the generic attribute setter:
+myGeometry.set({ source:{ latitudeBands : 60, longitudeBands : 60, radius : 3 } });
+myGeometry.set("source", { latitudeBands : 60, longitudeBands : 60, radius : 3 });
+```
+
 
 By default, SceneJS is hardwired to automatically download plugins from [a directory in this repository](build/latest/plugins). This means you can
  just hotlink to the SceneJS core library downloads and they will download the plugins automatically as you need them. That's
