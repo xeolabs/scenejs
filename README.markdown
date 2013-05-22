@@ -53,36 +53,47 @@ to build scenes programmatically, instead of declaratively with JSON as shown in
 * **JSON API - Build scenes quickly on a declarative JSON-based API that plays well with the rest of the application stack.
 JSON is nice to export, database, transmit, transform and read.
 
-* **[Plugins](#plugins)** - Extend texture and geometry functionality through plugins, eg. to create primitives, load
+* **[Plugins](http://xeolabs.github.io/scenejs/examples/index.html?page=pluginPullStream)** - Extend texture and geometry functionality through plugins, eg. to create primitives, load
 compressed texture formats, and so on. All the geometry primitives, such as 'teapot' and 'sphere', are now plugins.
-Plugins are unobtrusive, and are kept in a directory from where SceneJS loads them as required.
+Plugins are unobtrusive, and are kept in a directory from where SceneJS loads them as required. Read more in the [plugins](#plugins) section below.
 
-* **[Custom Shaders](https://github.com/xeolabs/scenejs/wiki/shader)** - Although SceneJS generates shaders automatically,
+* **[Vertex](http://xeolabs.github.io/scenejs/examples/index.html?page=vertexDisplaceShader)** and
+**[Fragment](http://xeolabs.github.io/scenejs/examples/index.html?page=xrayShader)** Shader Customization- Although SceneJS generates shaders automatically,
 you can modify the shaders by injecting custom functions into them
 
-* **[Color](https://github.com/xeolabs/scenejs/wiki/texture), [Alpha](https://github.com/xeolabs/scenejs/wiki/texture),
-[Specular](https://github.com/xeolabs/scenejs/wiki/texture), [Glow](https://github.com/xeolabs/scenejs/wiki/texture)
- and [Bump](https://github.com/xeolabs/scenejs/wiki/texture) Maps**
+* **[Color](http://xeolabs.github.io/scenejs/examples/index.html?page=colorMap), [Alpha](http://xeolabs.github.io/scenejs/examples/index.html?page=alphaMap),
+[Specular](http://xeolabs.github.io/scenejs/examples/index.html?page=specularMap), [Glow](http://xeolabs.github.io/scenejs/examples/index.html?page=glowMap)**
+ and **[Bump](http://xeolabs.github.io/scenejs/examples/index.html?page=bumpMap) Maps**
 
-* **[Multitexturing](https://github.com/xeolabs/scenejs/wiki/texture)** - Layer multiple textures onto the same geometry
+* **[Multitexturing](http://xeolabs.github.io/scenejs/examples/index.html?page=multitexturing)** - Layer multiple textures onto the same geometry
 
-* **[Texture Animation](https://github.com/xeolabs/scenejs/wiki/texture)** - Animate textures by rotating, scaling,
+* **[Texture Atlasses](http://xeolabs.github.io/scenejs/examples/index.html?page=textureAtlas)** -  Define a large texture
+containing an "atlas" of sub-textures to use individually on many geometries, each of which have UV coordinates that map
+to a different region of the texture. In a scene where there are many small textures, this has the benefit of reducing
+state changes on the graphics hardware by binding once, instead of for each individual texture..
+
+* **[Texture Animation](http://xeolabs.github.io/scenejs/examples/index.html?page=colorMapAnimation)** - Animate textures by rotating, scaling,
 translating and blending them.
 
-* **[Video Texture](https://github.com/xeolabs/scenejs/wiki/video)** - Stream a texture from video in real time.
+* **Video Streaming to **[Color](http://xeolabs.github.io/scenejs/examples/index.html?page=videoColorMap), [Alpha](http://xeolabs.github.io/scenejs/examples/index.html?page=videoAlphaMap),
+[Specular](http://xeolabs.github.io/scenejs/examples/index.html?page=videoSpecularMap), [Glow](http://xeolabs.github.io/scenejs/examples/index.html?page=videoGlowMap)**
+ and **[Bump](http://xeolabs.github.io/scenejs/examples/index.html?page=videoBumpMap) Maps** - Stream a video into a texture in real time.
 
-* **[Geometry Morphing](https://github.com/xeolabs/scenejs/wiki/morphGeometry)** - Animate geometry by interpolating its
+* **[Geometry Morphing](http://xeolabs.github.io/scenejs/examples/index.html?page=geometryMorphing)** - Animate geometry by interpolating its
 positions, normals, colors and UVs within keyframes.
 
-* **[Layers](https://github.com/xeolabs/scenejs/wiki/layer)** - Control rendering order of scene nodes by prioritizing them
+* **[Geometry Vertex Sharing](http://xeolabs.github.io/scenejs/examples/index.html?page=vertexSharing)** - Animate geometry by interpolating its
+positions, normals, colors and UVs within keyframes.
+
+* **[Layers](http://xeolabs.github.io/scenejs/examples/index.html?page=transparencySorting)** - Control rendering order of scene nodes by prioritizing them
 in layers, which is useful for transparency sorting.
 
-* **[Transform Hierachies](https://github.com/xeolabs/scenejs/wiki/layer)** - Articulate your scenes using hierarchies of
+* **[Transform Hierachies](http://xeolabs.github.io/scenejs/examples/index.html?page=transformHierarchy)** - Articulate your scenes using hierarchies of
 modelling transform nodes, a staple feature in scene graph APIs.
 
-* **[Multiple Scenes](https://github.com/xeolabs/scenejs/wiki/)** - Run multiple scenes simultaneously in the same page
+* **[Multiple Scenes](http://xeolabs.github.io/scenejs/examples/index.html?page=multipleScenes)** - Run multiple scenes simultaneously in the same page
 
-* **[Shared Node Cores](https://github.com/xeolabs/scenejs/wiki/Node-Cores)** - Traditionally, re-use within a scene
+* **[Shared Node Cores](http://xeolabs.github.io/scenejs/examples/index.html?page=sharedNodeCores)** - Traditionally, re-use within a scene
 graph is done by attaching nodes to multiple parents. For dynamically updated scenes this can have a performance impact
 when the engine must process multiple parent paths, so SceneJS takes an alternative approach with "node cores", a concept
 borrowed from OpenSG.
@@ -93,12 +104,12 @@ objects by shader, texture, VBOs etc. it can avoid redundantly re-binding state 
 good job of sorting, if you program your scene to share plenty of state between your objects then you can achieve some very
 fast results.
 
-* **[Automatic Lost WebGL Context Recovery](http://xeolabs.github.io/scenejs/examples/index.html?page=webglContextLost) -
+* **[Automatic Lost WebGL Context Recovery](http://xeolabs.github.io/scenejs/examples/index.html?page=webglContextLost)** -
 SceneJS seamlessly recovers from Lost WebGL Context errors, which occur when the OS or browser resets
 WebGL to regain control after a mishap. When a new context becomes available, SceneJS instanly rebuilds all its WebGL resources
 from state held in the scene graph without reloading anything off the server.
 
-* **[Sensible Defaults](https://github.com/xeolabs/scenejs/wiki/shader)** - SceneJS now provides defaults for all scene state, such
+* Sensible Defaults - SceneJS now provides defaults for all scene state, such
  as camera, lights and material, in a configuration that's ready to render whatever geometry you drop into the scene. That means you
  can create a more minimal scene definition, which turned out to be handy for creating clearer examples.
 
@@ -134,17 +145,12 @@ SceneJS.Plugins.addPlugin(
     "sphere", // Plugin type
 
     new (function () {
-
         this.getSource = function () {
-
             var publish;
-
             return {
-
                 subscribe:function (fn) {
                     publish = fn;
                 },
-
                 configure:function (cfg) {
                     publish(build(cfg));
                 }
