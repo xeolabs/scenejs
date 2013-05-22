@@ -45,13 +45,14 @@ Scene picking helper
 ## Features
 
 #### Flexibility
-
 * **Declarative JSON API** - Build scenes quickly on a declarative JSON-based API that plays well with the rest of the application stack.
 JSON is nice to export, database, transmit, transform and read.
 * **Sensible Defaults** - SceneJS now provides defaults for all scene state, such
  as camera, lights and material, in a configuration that's ready to render whatever geometry you drop into the scene. That means you
  can create a more minimal scene definition, which turned out to be handy for creating clearer examples.
 * **[Multiple Scenes](http://xeolabs.github.io/scenejs/examples/index.html?page=multipleScenes)** - Run multiple scenes simultaneously in the same page
+
+#### Texturing
 * **[Color](http://xeolabs.github.io/scenejs/examples/index.html?page=colorMap), [Alpha](http://xeolabs.github.io/scenejs/examples/index.html?page=alphaMap),
 [Specular](http://xeolabs.github.io/scenejs/examples/index.html?page=specularMap), [Glow](http://xeolabs.github.io/scenejs/examples/index.html?page=glowMap)**
  and **[Bump](http://xeolabs.github.io/scenejs/examples/index.html?page=bumpMap) Maps**
@@ -61,12 +62,16 @@ translating and blending them.
 * **Video Streaming to [Color](http://xeolabs.github.io/scenejs/examples/index.html?page=videoColorMap), [Alpha](http://xeolabs.github.io/scenejs/examples/index.html?page=videoAlphaMap),
 [Specular](http://xeolabs.github.io/scenejs/examples/index.html?page=videoSpecularMap), [Glow](http://xeolabs.github.io/scenejs/examples/index.html?page=videoGlowMap)**
  and **[Bump](http://xeolabs.github.io/scenejs/examples/index.html?page=videoBumpMap) Maps** - Stream a video into a texture in real time.
+
+#### Geometry
 * **[Geometry Morphing](http://xeolabs.github.io/scenejs/examples/index.html?page=geometryMorphing)** - Animate geometry by interpolating its
 positions, normals, colors and UVs within keyframes.
 * **[Transform Hierachies](http://xeolabs.github.io/scenejs/examples/index.html?page=transformHierarchy)** - Articulate your scenes using hierarchies of
 modelling transform nodes, a staple feature in scene graph APIs.
 * **[Layers](http://xeolabs.github.io/scenejs/examples/index.html?page=transparencySorting)** - Control rendering order of scene nodes by prioritizing them
 in layers, which is useful for transparency sorting.
+
+#### Extensibility
 * **[Plugins](http://xeolabs.github.io/scenejs/examples/index.html?page=pluginPullStream)** - Extend texture and geometry functionality through plugins, eg. to create primitives, load
 compressed texture formats, and so on. All the geometry primitives, such as 'teapot' and 'sphere', are now plugins.
 Plugins are unobtrusive, and are kept in a directory from where SceneJS loads them as required. Read more in the [plugins](#plugins) section below.
