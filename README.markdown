@@ -4,8 +4,7 @@
 arcticulated and pickable objects as required for high-detail visualisation applications.
 
 * [Downloads](#downloads)
-* [Documentation](#documentation)
-* [Links](#links)
+* [Resources](#resources)
 * [Features](#features)
 * [Plugin System](#plugin-system)
 * [Building](#building)
@@ -25,35 +24,31 @@ Mouse camera orbit helper
 * **[PickControl](http://xeolabs.github.com/scenejs/build/latest/extras/pickControl.js)** -
 Scene picking helper
 
-## Links
+## Resources
 
  * [SceneJS.org](http://scenejs.org)
  * [Sourcecode](https://github.com/xeolabs/scenejs)
+ * [Examples](http://xeolabs.github.com/scenejs/examples/index.html) - Live examples are now the main usage documentation. In the examples page, select topic tags and you'll get a list of examples
+    that have those tags. Most of them are not particularly exciting, but aim to show particular use cases. Many of them do
+    the same things, but in slightly different ways. [Log an issue](https://github.com/xeolabs/scenejs/issues) if there's something missing there.
+ * [Class Docs](http://xeolabs.github.com/scenejs/docs/index.html) - Documentation in progress for the SceneJS class API, which is the core implementation beneath the JSON API. You can use this
+to build scenes programmatically, instead of declaratively with JSON as shown in the examples. You would also use this API when
+   when manipulating nodes (even they were defined with JSON).
  * [License](http://scenejs.org/license/index.html)
  * [Facebook](http://www.facebook.com/group.php?gid=350488973712)
  * [Twitter](http://twitter.com/xeolabs)
  * [Issues](https://github.com/xeolabs/scenejs/issues?sort=created&direction=desc&state=open)
 
-## Documentation
 
-* **[Examples](http://xeolabs.github.com/scenejs/examples/index.html)** -
-Live examples are now the main usage documentation. In the examples page, select topic tags and you'll get a list of examples
-   that have those tags. Most of them are not particularly exciting, but aim to show particular use cases. Many of them do
-   the same things, but in slightly different ways. [Log an issue](https://github.com/xeolabs/scenejs/issues) if there's something missing there.
-
-* **[Class Docs](http://xeolabs.github.com/scenejs/docs/index.html)** -
-Documentation in progress for the SceneJS class API, which is the core implementation beneath the JSON API. You can use this
-to build scenes programmatically, instead of declaratively with JSON as shown in the examples. You would also use this API when
-   when manipulating nodes (even they were defined with JSON).
 
 ## Features
 
-### Flexibility
+#### Flexibility
 
-* **JSON API - Build scenes quickly on a declarative JSON-based API that plays well with the rest of the application stack.
+* **Declarative JSON API** - Build scenes quickly on a declarative JSON-based API that plays well with the rest of the application stack.
 JSON is nice to export, database, transmit, transform and read.
 
-* Sensible Defaults - SceneJS now provides defaults for all scene state, such
+* **Sensible Defaults** - SceneJS now provides defaults for all scene state, such
  as camera, lights and material, in a configuration that's ready to render whatever geometry you drop into the scene. That means you
  can create a more minimal scene definition, which turned out to be handy for creating clearer examples.
 
@@ -79,23 +74,21 @@ translating and blending them.
 * **[Geometry Morphing](http://xeolabs.github.io/scenejs/examples/index.html?page=geometryMorphing)** - Animate geometry by interpolating its
 positions, normals, colors and UVs within keyframes.
 
-* **[Layers](http://xeolabs.github.io/scenejs/examples/index.html?page=transparencySorting)** - Control rendering order of scene nodes by prioritizing them
-in layers, which is useful for transparency sorting.
-
 * **[Transform Hierachies](http://xeolabs.github.io/scenejs/examples/index.html?page=transformHierarchy)** - Articulate your scenes using hierarchies of
 modelling transform nodes, a staple feature in scene graph APIs.
 
-#### Shading
-
-* **[Vertex](http://xeolabs.github.io/scenejs/examples/index.html?page=vertexDisplaceShader)** and
-**[Fragment](http://xeolabs.github.io/scenejs/examples/index.html?page=xrayShader)** Shader Customization- Although SceneJS generates shaders automatically,
-you can modify the shaders by injecting custom functions into them
+* **[Layers](http://xeolabs.github.io/scenejs/examples/index.html?page=transparencySorting)** - Control rendering order of scene nodes by prioritizing them
+in layers, which is useful for transparency sorting.
 
 #### Extensible
 
 * **[Plugins](http://xeolabs.github.io/scenejs/examples/index.html?page=pluginPullStream)** - Extend texture and geometry functionality through plugins, eg. to create primitives, load
 compressed texture formats, and so on. All the geometry primitives, such as 'teapot' and 'sphere', are now plugins.
 Plugins are unobtrusive, and are kept in a directory from where SceneJS loads them as required. Read more in the [plugins](#plugins) section below.
+
+* **[Vertex](http://xeolabs.github.io/scenejs/examples/index.html?page=vertexDisplaceShader)** and
+**[Fragment](http://xeolabs.github.io/scenejs/examples/index.html?page=xrayShader)** Shader Customization - Although SceneJS generates shaders automatically,
+you can modify the shaders by injecting custom functions into them
 
 #### Optimized
 
