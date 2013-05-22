@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Scenejs - Intro</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <link href="css/styles.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="lib/nivo-slider/nivo-slider.css" type="text/css" media="screen"/>
+
+    <script type="text/javascript" src="lib/jquery/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="lib/jquery/jquery.jtemplates.js"></script>
+    <script type="text/javascript" src="lib/nivo-slider/jquery.nivo.slider.pack.js"></script>
+
+    <link href="css/prettify.css" rel="stylesheet"/>
+    <script src="lib/prettify.js"></script>
+
+
+    <style>
+        p.sectionHeading {
+            font-weight: bold;
+            font-size: 20px;
+            padding-bottom: 20px;
+            padding-top: 15px;
+        }
+
+        p.bulletHeading {
+            font-weight: bold;
+            padding-top: 0px;
+            padding-bottom: 5px;
+        }
+
+        p.bullet {
+            padding-top: 0;
+            padding-bottom: 5px;
+            margin-top: 0px;
+            /*line-height: 20px;*/
+            /*color: #2a2a2a;            */
+        }
+
+        p {
+            padding-top: 0;
+
+            margin-top: 0px;
+            line-height: 20px;
+            color: #2a2a2a;
+            /*font: 400 14px/1.4 "Open Sans", sans-serif;*/
+        }
+
+        .col {
+            background-repeat: no-repeat;
+            background-color: white;
+        }
+
+        .left {
+            float: left;
+            width: 30%;
+            padding: 10px;
+        }
+
+        .right {
+            float: left;
+            width: 65%;
+            padding-left: 25px;
+            padding-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="top">
+    <div class="links"><a href="examples.html">Examples</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+            href="https://github.com/xeolabs/scenejs#downloads">Downloads</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+            href="https://github.com/xeolabs/scenejs/issues">Issues</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+            href="https://github.com/xeolabs/scenejs/tree/V3.0/licenses">License</a></div>
+</div>
+
+<div id="header">
+    <div class="inner">
+        <div id="slider-wrapper">
+            <div id="slider" class="nivoSlider">
+                <a href="http://scenejs.org/dist/v2.0.0/extr/examples/tron-tank/index.html"><img
+                        src="images/tron-tank.jpg"
+                        alt=""
+                        title="#trontank"/></a>
+                <a href="http://www.biodigital.com/biodigital-human.html"><img
+                        src="images/human-xray.jpg" alt="" title="#human"/></a>
+                <a href="http://www.biodigital.com/biodigital-human.html"><img
+                        src="images/human.jpg" alt="" title="#human"/></a>
+                <a href="http://scenejs.org/dist/v2.0.0/extr/examples/texture-layers/index.html"><img
+                        src="images/earth2.jpg" alt="" title="#earth"/></a>
+                <a href="http://scenejs.org/dist/v2.0.0/extr/examples/seymour-plane/index.html"><img
+                        src="images/seymour-plane2.jpg" alt="" title="#seymour"/></a>
+            </div>
+            <div id="trontank" class="nivo-html-caption">
+                <p>Tank Program from the 1982 Disney motion picture Tron - <a
+                        href="http://scenejs.org/dist/v2.0.0/extr/examples/tron-tank/index.html">Live
+                    demo&nbsp;&gt;&gt;</a>
+            </div>
+            <div id="human-xray" class="nivo-html-caption">
+                <p>BioDigital Human - A Web-based atlas of human anatomy and conditions - <a
+                        href="http://www.biodigital.com/biodigital-human.html">Try it now&nbsp;&gt;&gt;</a>
+            </div>
+            <div id="human" class="nivo-html-caption">
+                <p>BioDigital Human - A Web-based atlas of human anatomy and conditions - <a
+                        href="http://www.biodigital.com/biodigital-human.html">Try it now&nbsp;&gt;&gt;</a>
+            </div>
+            <div id="earth" class="nivo-html-caption">
+                <p>Earth rendered with colour, specular, glow and alpha maps - <a
+                        href="http://scenejs.org/dist/v2.0.0/extr/examples/texture-layers/index.html">Live demo&nbsp;&gt;&gt;</a>
+            </div>
+            <div id="seymour" class="nivo-html-caption">
+                <p>Seymour Plane parsed from COLLADA - <a
+                        href="http://scenejs.org/dist/v2.0.0/extr/examples/seymour-plane/index.html">Live
+                    demo&nbsp;&gt;&gt;</a>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div id="container">
+    <div style="width:100%;">
+        <div class="col left">
+            <ul id="featureList">
+
+            </ul>
+        </div>
+        <div class="col right">
+            <p class="sectionHeading">Quick Start</p>
+
+            <p>First, include our <a href="build/latest/scenejs.js">JavaScript
+                library</a> in the &lt;head&gt; tag of your web app:
+            </p>
+
+            <pre>&lt;script src="http://xeolabs.github.com/scenejs/build/latest/scenejs.js"&gt;&lt;/script&gt;</pre>
+            <p>Then build a scene. We're going to build an articulated object hierarchy using three types of asset:
+                a scene <a
+                        href="https://github.com/scenehub/scenehub-assets/blob/master/assets/object/skies/clouds.json"
+                        target="other">object</a>, a <a
+                        href="https://github.com/scenehub/scenehub-assets/blob/master/assets/geometry/prims/box.json"
+                        target="other">geometry</a> and a surface <a
+                        href="https://github.com/scenehub/scenehub-assets/blob/master/assets/appearance/heroes/superman.json"
+                        target="other">appearance</a>: </p>
+
+        <pre class="prettyprint lang-javascript">
+var scene = SceneJS.createScene({
+    nodes:[
+        {
+            type:"material",
+            baseColor: { r: 0.3, g: 0.3, b: 0.1 },
+
+            nodes:[
+                {
+                    type: "rotate",
+                    id: "myRotate",
+                    y: 1.0,
+                    angle: 0,
+
+                    nodes: [
+                        {
+                            type:"geometry",
+                            source:{
+                                type:"teapot"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+});
+</pre>
+            <p>And voilà, one blue teapot:</p><br>
+            <a href="./editor/index.html#B/hVRdb5swFH0Ov+KOvRAtDammSZNLK03b1O2pk9aXadqDAzfgBmxkm7Y06n/fNQYCzapZUfx1OPf63I/kzZebz7e/fnyFwlblVRAkfk4K5NlVADSSCi2HtODaoL0MG7s7+xj2V8a2Jfq1G1uVtXAYt+MxT/e5Vo3MzlJVKs3g7a4bFyfQiutcSAab0yt1j3pXqgcGhcgylHPEs3co7j3yOyssbZLYz8EiWCQm1aK2YHR6GRbW1iyOTYoSi2a7zoV1k1DjUcxrEd9vjpA7ExKfJyGVYi9TkLiXD5r0l4Nn3eKeaxhI4BIkPsBPt/3WbKPlRTDHEGA0mGrkFjtsdPC4lFeoOTvqjC2yAzyxs/PNphfieeWxanuHqTXs9wiOY/gujeUyReBQiq3muu1xEHEw+3arHpfAZdZJrkWGIKwhl3iJI808yo3Bm46BhWYv0KzTUjWZCVczVMfA4ACPDMjVzQraYfHkF87vxWKhlaVHO6QDrMiX3H3YXY8BX02fdE3pVfeveMVHq7k0peN1tKTVlOLfWo2DLPj30UuFzCFHRVVBujmVeF0j115QQzViTr4/LQk3RMYgNE2NuuLyhVQTYa97WyystajMmqLzOvjT6AsLC9SKQvEfCz4oLibnm1Xr/igYp+IM42VonqYBej+k33TMT/4E83O/fx5qgIRWMlqCMO41GVhFKWosStgpDRn3nUjmaAjXVwuWWKG0Zj0w3Bb0Of1sgeA0cwn+wFtHRtWUeZqdVtVYg/7Tjm5N9sM+FSbawa6RqRVkNBoOl2NcXeV2ElDljp3ryGZFup8wRMtJQgxka0qcaJonR6F7cb2Bd2Rh/WEiqpNuvqKZamim+tAcx77l+xX1L9ft/wI="
+               target="other"> <img
+                    style="display: block; margin-left: auto; margin-right: auto;" src="images/superman-demo.jpg"/></a>
+
+            <p>Now let's start the teapot spinning:</p>
+<pre class="prettyprint lang-javascript">
+var angle = 0;
+var myRotate = scene.getNode("myRotate");
+
+scene.on("tick",
+    function() {
+        myRotate.setAngle(angle += 0.5);
+    });
+        </pre>
+            <p>
+                <a href="./editor/index.html#B/hVRdb5swFH0Ov+KOvRAtDammSZNLK03b1O2pk9aXadqDAzfgBmxkm7Y06n/fNQYCzapZUfx1OPf63I/kzZebz7e/fnyFwlblVRAkfk4K5NlVADSSCi2HtODaoL0MG7s7+xj2V8a2Jfq1G1uVtXAYt+MxT/e5Vo3MzlJVKs3g7a4bFyfQiutcSAab0yt1j3pXqgcGhcgylHPEs3co7j3yOyssbZLYz8EiWCQm1aK2YHR6GRbW1iyOTYoSi2a7zoV1k1DjUcxrEd9vjpA7ExKfJyGVYi9TkLiXD5r0l4Nn3eKeaxhI4BIkPsBPt/3WbKPlRTDHEGA0mGrkFjtsdPC4lFeoOTvqjC2yAzyxs/PNphfieeWxanuHqTXs9wiOY/gujeUyReBQiq3muu1xEHEw+3arHpfAZdZJrkWGIKwhl3iJI808yo3Bm46BhWYv0KzTUjWZCVczVMfA4ACPDMjVzQraYfHkF87vxWKhlaVHO6QDrMiX3H3YXY8BX02fdE3pVfeveMVHq7k0peN1tKTVlOLfWo2DLPj30UuFzCFHRVVBujmVeF0j115QQzViTr4/LQk3RMYgNE2NuuLyhVQTYa97WyystajMmqLzOvjT6AsLC9SKQvEfCz4oLibnm1Xr/igYp+IM42VonqYBej+k33TMT/4E83O/fx5qgIRWMlqCMO41GVhFKWosStgpDRn3nUjmaAjXVwuWWKG0Zj0w3Bb0Of1sgeA0cwn+wFtHRtWUeZqdVtVYg/7Tjm5N9sM+FSbawa6RqRVkNBoOl2NcXeV2ElDljp3ryGZFup8wRMtJQgxka0qcaJonR6F7cb2Bd2Rh/WEiqpNuvqKZamim+tAcx77l+xX1L9ft/wI="
+                   target="other">Run this example</a></p>
+        </div>
+    </div>
+</div>
+
+
+<br>
+<a href="https://github.com/scenejs" target="_blank"><img
+        style="position: absolute; top: 0; left: 0; border: 0;"
+        src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
+
+<script>
+
+    jQuery(document).ready(
+            function ($) {
+                addFeatures();
+                addPrettify();
+                addSlider();
+            });
+
+    function addFeatures() {
+        $.ajax({
+            type:'GET',
+            url:'examples/features.json',
+            dataType:'json',
+            success:function (features) {
+
+                var featureList = $('#featureList');
+
+                var category;
+                var categoryElem;
+                var subCategoryElem;
+                var featureElem;
+                var subSection;
+                var subCategory;
+                var feature;
+
+                var li;
+
+                for (var categoryName in features) {
+                    if (features.hasOwnProperty(categoryName)) {
+
+                        category = features[categoryName];
+
+                        categoryElem = $('<li/>')
+                                .addClass('feature-category')
+                                .text(category.title)
+                                .appendTo(featureList);
+
+                        for (var i = 0, len = category.nodes.length; i < len; i++) {
+                            subCategory = category.nodes[i];
+                            subCategoryElem = $('<ul/>')
+                                    .addClass('feature-subcategory')
+                                    .text(subCategory.title + ": ")
+                                    .appendTo(categoryElem);
+
+                            var nodes = subCategory.nodes;
+                            if (nodes) {
+                                for (var j = 0, lenj = subCategory.nodes.length; j < lenj; j++) {
+                                    feature = subCategory.nodes[j];
+                                    featureElem = $('<a/>')
+                                            .addClass('feature-feature')
+                                            .attr('href', 'examples.html?page=' + feature.page)
+                                            .text(feature.title)
+                                            .appendTo(subCategoryElem);
+                                    if (j < lenj - 2) {
+                                        $('<span/>')
+                                                .text(", ")
+                                                .appendTo(featureElem);
+                                    } else if (j < lenj - 1) {
+                                        $('<span/>')
+                                                .text(" and ")
+                                                .appendTo(featureElem);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function addPrettify() {
+        var els = document.querySelectorAll('pre');
+        for (var i = 0, el; el = els[i]; i++) {
+            if (!el.classList.contains('noprettyprint')) {
+                el.classList.add('prettyprint');
+            }
+        }
+        var el = document.createElement('script');
+        el.type = 'text/javascript';
+        el.src = 'lib/prettify.js';
+        el.onload = function () {
+            prettyPrint();
+        };
+        document.body.appendChild(el);
+    }
+
+    function addSlider() {
+        $('#slider').nivoSlider({  controlNav:false, pauseTime:7000 });
+    }
+
+</script>
+</body>
+</html>

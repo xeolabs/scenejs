@@ -26,15 +26,18 @@
 
 <script>
 
+// Tron Tank Demo
+// Demonstrates lighting, shader customization, view and modelling transforms, texturing,
+// materials and geometry
+
 var scene = SceneJS.createScene({
 
     nodes:[
 
-    /**
-     * View transform - we've given it a globally-unique ID
-     * so we can look it up and update it's properties from
-     * mouse input.
-     */
+        // View transform - we've given it a globally-unique ID
+        // so we can look it up and update it's properties from
+        // mouse input.
+
         {
             type:"lookAt",
             id:"theLookAt",
@@ -70,13 +73,10 @@ var scene = SceneJS.createScene({
 
                     nodes:[
 
-                        /* Integrate our JSON Tron Tank model, which is defined in tron-tank-model.js
-                         * and loaded via a <script> tag in index.html.
-                         *
-                         * Various nodes (ie. rotate and translate) within the model have been assigned IDs,
-                         * allowing us to locate them and set their properties, in order to move the tank
-                         * around, rotate its cannon etc.
-                         */
+                        // Shader node, injects a custom function into the SceneJS fragment shader
+                        // to apply a cool animated CRT scan line effect to the tank, giving the
+                        // impression of it materializing into existence on the Game Grid
+                        //
                         {
                             type:"shader",
                             id:"myShader",
@@ -103,21 +103,23 @@ var scene = SceneJS.createScene({
                                 lineSpace:8
                             },
 
-                            // This teapot will enjoy our custom shader injection:
+                            // Integrate our tank, defined in tank.js
                             nodes:[
                                 tankJSON
                             ]
                         },
 
-                        /* Integrate our grid floor, which is defined in grid-floor.js
-                         * and loaded via a <script> tag in index.html.
-                         */
+                        // Integrate our grid floor, defined in wireGrid.js
                         wireGrid
                     ]
                 },
 
                 // Sky box
 
+                // Shader node, injects custom function into the vertex shader
+                // to intercept the View matrix and remove translation terms from it.
+                // This anchors the sky box, preventing it from translating
+                // as we move the eye position.
                 {
                     type:"shader",
                     shaders:[
@@ -129,6 +131,7 @@ var scene = SceneJS.createScene({
                                 "return m;",
                                 "}"
                             ],
+                            // Bind our injected functions to SceneJS hook points
                             hooks:{
                                 viewMatrix:"myViewMatrix"
                             }

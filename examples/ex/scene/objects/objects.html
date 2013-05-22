@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../../../../build/latest/scenejs.js"></script>
+
+<script src="../../../../build/latest/extras/orbitControl.js"></script>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"object",
+                id:"object1",
+                translate:{ x:-2 },
+                scale:{ x:1.5, y: 1, z: 1 },
+                rotate:{ angle:0, x:0, y:1, z:0 },
+                material:{ baseColor:{ r:1, g:0, b:0 } },
+                nodes:[
+                    {
+                        type:"object",
+                        geometry:{
+                            source:{
+                                type:"torus"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                type:"object",
+                translate:{ x:2 },
+                scale:{x: 1,y:1.5, Z: 1 },
+                material:{ baseColor:{ r:0, g:0, b:1 } },
+                nodes:[
+                    {
+                        type:"object",
+                        geometry:{
+                            source:{
+                                type:"torus"
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    });
+
+    var object1 = scene.getNode("object1");
+var a = 0;
+    scene.on("tick",
+            function () {
+                object1.rotate.setAngle(a+=0.5);
+            });
+
+    new SceneJS.OrbitControls(scene, {
+        yaw:30,
+        pitch:-30,
+        zoom:5
+    });
+
+</script>
+</body>
+</html>

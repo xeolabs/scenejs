@@ -57,7 +57,10 @@ function createScene() {
                         ],
 
                         nodes:[
-                            // Wire grid
+
+                            //--------------------------------------------------------------------------------
+                            // Wire grid floor
+                            //--------------------------------------------------------------------------------
 
                             {
                                 id:"grid-floor",
@@ -66,42 +69,26 @@ function createScene() {
                                 emit:1,
                                 nodes:[
                                     {
-                                        type:"shader",
-                                        shaders:[
-                                            {
-                                                stage:"vertex",
-                                                code:"vec4 myModelPosFunc(vec4 pos){\n\
-                        pos.z=pos.z+sin(pos.x*0.5 + pos.y*0.5)*5.0;\n\
-                        return pos;\n\
-                       }\n",
-                                                hooks:{
-                                                    modelPos:"myModelPosFunc"
-                                                }
-                                            }
-                                        ],
+                                        type:"scale",
+                                        x:2000,
+                                        y:.5,
+                                        z:2000,
                                         nodes:[
                                             {
-                                                type:"scale",
-                                                x:2000,
-                                                y:.5,
-                                                z:2000,
+                                                type:"rotate",
+                                                x:1,
+                                                angle:90,
                                                 nodes:[
+
+                                                    // Wireframe grid plane
                                                     {
-                                                        type:"rotate",
-                                                        x:1,
-                                                        angle:90,
-                                                        nodes:[
-                                                            {
-                                                                type:"geometry",
-                                                                source:{
-                                                                    //type:"box"
-                                                                    type:"plane",
-                                                                    wire:true,
-                                                                    widthSegments:200,
-                                                                    heightSegments:200
-                                                                }
-                                                            }
-                                                        ]
+                                                        type:"geometry",
+                                                        source:{
+                                                            type:"plane",
+                                                            wire:true,
+                                                            widthSegments:200,
+                                                            heightSegments:200
+                                                        }
                                                     }
                                                 ]
                                             }
@@ -110,70 +97,66 @@ function createScene() {
                                 ]
                             },
 
+                            //--------------------------------------------------------------------------------
                             // Bubbles
+                            //--------------------------------------------------------------------------------
 
+                            // Shader node, injects custom functions into the SceneJS fragment shader
+                            // for a cool X-Ray transparency effect
                             {
                                 type:"shader",
                                 id:"myShader",
 
                                 "shaders":[
 
-                                    // Xray
+                                    // We'll just customize the fragment shader
                                     {
                                         "stage":"fragment",
                                         "code":[
-                                            "uniform bool   xrayEnabled;",
+
+                                            // Input for this shader - the degree of opacity from [0..1]
                                             "uniform float  xrayOpacity;",
-                                            "uniform bool   xrayColor;",
-                                            "uniform bool   highlightEnabled;",
 
-                                            "vec3           myworldNormal = vec3(0.0, 0.0,  1.0);",
-                                            "vec3           myworldEyeVec = vec3(0.0, 0.0, -1.0);",
-
+                                            // User-injected function to intercept the World-space fragment normal
+                                            "vec3 myworldNormal = vec3(0.0, 0.0,  1.0);",
                                             "void myWorldNormalFunc(vec3 vec) {",
                                             "   myworldNormal = vec;",
                                             "}",
 
+                                            // User-injected function to intercept the World-space fragment-eye vector
+                                            "vec3 myworldEyeVec = vec3(0.0, 0.0, -1.0);",
                                             "void myWorldEyeVecFunc(vec3 vec) {",
                                             "   myworldEyeVec = vec;",
                                             "}",
 
+                                            // User-injected function to alter the alpha of the outgoing fragment color,
+                                            // in proportion to the angle between the fragment normal and the
+                                            // fragment-eye vector
                                             "vec4 myPixelColorFunc(vec4 color) {",
-                                            "   if (highlightEnabled) {",
-                                            "       float intensity = 0.3 * color.r + 0.59 * color.g + 0.11 * color.b;",
-                                            "       color = vec4((intensity * -0.1) + color.rgb * (1.0 + 0.1), 1.0);",
-                                            "       color.r = clamp(color.r * 1.5, 0.3, 1.0);",
-                                            "       color.g = clamp(color.g * 1.5, 0.3, 1.0);",
-                                            "       color.b = color.b * 0.5;",
-                                            "   }",
-
-                                            "   if (xrayEnabled && xrayOpacity < 1.0) {",
-                                            "       if (xrayColor) {",
-                                            "           color.a = (xrayOpacity + 0.9 - abs(dot(myworldNormal, myworldEyeVec)));",
-                                            "       } else {",
-                                            "           color = vec4(0.2, 0.2, 0.3, (xrayOpacity + 0.9 - abs(dot(myworldNormal, myworldEyeVec))));",
-                                            "       }",
-                                            "   }",
-
+                                            "   color.a = (xrayOpacity + 0.9 - abs(dot(myworldNormal, myworldEyeVec)));",
                                             "   return color;",
                                             "}"
                                         ],
 
-                                        "hooks":{
-                                            "worldNormal":"myWorldNormalFunc",
-                                            "worldEyeVec":"myWorldEyeVecFunc",
-                                            "pixelColor":"myPixelColorFunc"
+                                        // Bind our injected functions to SceneJS hook points
+                                        hooks:{
+                                            worldNormal:"myWorldNormalFunc",
+                                            worldEyeVec:"myWorldEyeVecFunc",
+                                            pixelColor:"myPixelColorFunc"
                                         }
                                     }
                                 ],
 
+                                // Provide optional initial value for our input uniform
                                 params:{
-                                    xrayEnabled:true,
-                                    xrayOpacity:0.3,
-                                    xrayColor:true
+                                    xrayOpacity:0.3
                                 },
 
                                 nodes:[
+
+                                    // Disable backfaces (they look ugly with transparency)
+                                    // Enable transparency (causing geometries to go into
+                                    // the renderer's transparency bin)
                                     {
                                         type:"flags",
                                         flags:{
@@ -181,6 +164,8 @@ function createScene() {
                                             backfaces:false
                                         },
                                         nodes:[
+
+                                            // Oily texture
                                             {
                                                 type:"texture",
                                                 layers:[
@@ -190,6 +175,8 @@ function createScene() {
                                                     }
                                                 ],
                                                 nodes:[
+
+                                                    // Bluish color
                                                     {
                                                         type:"material",
                                                         coreId:"bubble",
@@ -199,6 +186,8 @@ function createScene() {
                                                         specular:1.0,
                                                         shine:10.0,
                                                         nodes:[
+
+                                                            // The bubbles go here
                                                             {
                                                                 type:"node",
                                                                 id:"content"
@@ -214,7 +203,15 @@ function createScene() {
                             }
                         ]
                     },
+
+                    //--------------------------------------------------------------------------------
                     // Sky box
+                    //--------------------------------------------------------------------------------
+
+                    // Shader node, injects custom function into the vertex shader
+                    // to intercept the View matrix and remove translation terms from it.
+                    // This anchors the sky box, preventing it from translating
+                    // as we move the eye position.
                     {
                         type:"shader",
                         shaders:[
@@ -226,12 +223,15 @@ function createScene() {
                                     "return m;",
                                     "}"
                                 ],
+                                // Bind our injected functions to SceneJS hook points
                                 hooks:{
                                     viewMatrix:"myViewMatrix"
                                 }
                             }
                         ],
                         nodes:[
+
+                            // Disable lighting for the sky box
                             {
                                 type:"flags",
                                 flags:{
@@ -240,11 +240,13 @@ function createScene() {
                                     ambient:false
                                 },
                                 nodes:[
+
                                     {
                                         type:"material",
                                         baseColor:{ r:0, g:0, b:0  },
                                         emit:0.0,
                                         nodes:[
+                                            // Clouds texture
                                             {
                                                 type:"texture",
                                                 layers:[
@@ -260,6 +262,7 @@ function createScene() {
                                                         y:1000,
                                                         z:1000,
                                                         nodes:[
+                                                            // Sky box geometry
                                                             {
                                                                 type:"geometry",
                                                                 source:{

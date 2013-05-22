@@ -13,7 +13,8 @@
                         "title":"Basic viewing transform",
                         "tip":"Defining a basic viewing transform",
                         "tags":[],
-                        "path":"viewing/lookat/lookat.html"
+                        "path":"viewing/lookat/lookat.html",
+                        "id":"viewTransform"
                     }
                 ]
             },
@@ -26,19 +27,22 @@
                         "title":"Perspective camera",
                         "tip":"Defining a perspective camera",
                         "tags":[],
-                        "path":"viewing/camera/perspective.html"
+                        "path":"viewing/camera/perspective.html",
+                        "id":"perspectiveProjection"
                     },
                     {
                         "title":"Orthographic camera",
                         "tip":"Defining an orthographic camera",
                         "tags":[],
-                        "path":"viewing/camera/ortho.html"
+                        "path":"viewing/camera/ortho.html",
+                        "id":"orthoProjection"
                     },
                     {
                         "title":"Frustum camera",
                         "tip":"Defining a camera via frustum extents",
                         "tags":[],
-                        "path":"viewing/camera/frustum.html"
+                        "path":"viewing/camera/frustum.html",
+                        "id":"frustumProjection"
                     }
                 ]
             },
@@ -50,22 +54,26 @@
                     {
                         "title":"Rotate",
                         "path":"transforms/rotate.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"rotateTransform"
                     },
                     {
                         "title":"Translate",
                         "path":"transforms/translate.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"translateTransform"
                     },
                     {
                         "title":"Scale",
                         "path":"transforms/scale.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"scaleTransform"
                     },
                     {
                         "title":"Matrix",
                         "path":"transforms/matrix.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"matrixTransform"
                     },
                     {
                         "title":"Transform hierarchy",
@@ -91,31 +99,36 @@
                         "title":"Plane",
                         "tip":"Creating a solid plane geometry using the plane primitive plugin",
                         "path":"geometry/prims/plane.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"planePrim"
                     },
                     {
                         "title":"Box",
                         "path":"geometry/prims/box.html",
                         "tip":"Creating a solid box geometry using the box primitive plugin",
-                        "tags":[]
+                        "tags":[],
+                        "id":"boxPrim"
                     },
                     {
                         "title":"Sphere",
                         "path":"geometry/prims/sphere.html",
                         "tip":"Creating a solid sphere geometry using the sphere primitive plugin",
-                        "tags":[]
+                        "tags":[],
+                        "id":"spherePrim"
                     },
                     {
                         "title":"Torus",
                         "tip":"Creating a solid torus geometry using the torus primitive plugin",
                         "path":"geometry/prims/torus.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"torusPrim"
                     },
                     {
                         "title":"Teapot",
                         "tip":"Creating a solid teapot geometry using the teapot primitive plugin",
                         "path":"geometry/prims/teapot.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"teapotPrim"
                     },
                     {
                         "title":"Wireframe torus",
@@ -133,36 +146,53 @@
                     {
                         "title":"Triangles",
                         "path":"geometry/customTriangleMesh.html",
-                        "tags":[]
+                        "tags":[],
+                        "id": "customTriangles"
                     },
                     {
                         "title":"Lines",
                         "path":"geometry/customLineSegments.html",
-                        "tags":[]
+                        "tags":[],
+                        "id": "customLines"
                     },
 
                     {
-                        "title":"Vertex coloring",
+                        "title":"Vertex colors",
                         "path":"geometry/vertexColors.html",
-                        "tags":["vertexColoring"]
+                        "tags":["vertexColoring"],
+                        "id": "customVertexColors"
+                    }
+                ]
+            },
+            {
+                "title":"Plugins",
+                "tip":"Defining geometry plugins",
+                "tags":["plugins"],
+                "nodes":[
+                    {
+                        "title":"Custom geometry pull plugin",
+                        "path":"geometry/plugins/pluginPullStream.html",
+                        "tags":["plugins"],
+                        "id":"geometryPluginPullStream"
                     },
                     {
-                        "title":"Custom geometry plugin",
-                        "path":"geometry/plugin.html",
+                        "title":"Custom geometry push plugin",
+                        "path":"geometry/plugins/pluginPushStream.html",
                         "tags":["plugins"],
-                        "id":"createPlugin"
+                        "id":"geometryPluginPushStream"
                     }
                 ]
             },
             {
                 "title":"Animation",
                 "tip":"",
-                "tags":[],
+                "tags":["animation"],
                 "nodes":[
                     {
                         "title":"Vertex morphing",
                         "path":"geometry/morphing.html",
-                        "tags":["morphing"]
+                        "tags":["morphing"],
+                        "id":"geometryMorphing"
                     }
                 ]
             },
@@ -286,7 +316,7 @@
                         "tip":"Video texture with all defaults",
                         "tags":["videoTexture"],
                         "path":"texture/video/videoColorMap.html",
-                        "id":"videoTexture"
+                        "id":"videoColorMap"
                     }
                 ]
             },
@@ -318,7 +348,8 @@
                         "title":"Video bump map",
                         "tip":"Video texture applied to target geometry normals",
                         "tags":["videoTexture"],
-                        "path":"texture/video/videoBumpMap.html"
+                        "path":"texture/video/videoBumpMap.html",
+                        "id":"videoBumpMap"
                     }
                 ]
             },
@@ -350,7 +381,8 @@
                         "title":"Video alpha map",
                         "tip":"Video texture applied to target material opacity (alpha)",
                         "tags":["videoTexture"],
-                        "path":"texture/video/videoAlphaMap.html"
+                        "path":"texture/video/videoAlphaMap.html",
+                        "id":"videoAlphaMap"
                     }
                 ]
             },
@@ -382,7 +414,8 @@
                         "title":"Video specular map",
                         "tip":"Video texture applied to target material specularity",
                         "tags":["videoTexture"],
-                        "path":"texture/video/videoSpecularMap.html"
+                        "path":"texture/video/videoSpecularMap.html",
+                        "id":"videoSpecularMap"
                     }
                 ]
             },
@@ -414,7 +447,8 @@
                         "title":"Video glow map",
                         "tip":"Video texture applied to target material emissivity",
                         "tags":["videoTexture"],
-                        "path":"texture/video/videoGlowMap.html"
+                        "path":"texture/video/videoGlowMap.html",
+                        "id":"videoGlowMap"
                     }
                 ]
             },
@@ -433,7 +467,8 @@
                         "title":"Layered color maps with animation",
                         "tip":"Animating a color map's transform and blend factors",
                         "tags":["colorMap"],
-                        "path":"texture/color/colorMapAnimation.html"
+                        "path":"texture/color/colorMapAnimation.html",
+                        "id":"colorMapAnimation"
                     },
                     {
                         "title":"Layered color, alpha, specular and glow maps",
@@ -646,7 +681,8 @@
                     {
                         "title":"Transparency sorting",
                         "path":"layers/alphaSort.html",
-                        "tags":["transparency"]
+                        "tags":["transparency"],
+                        "id":"transparencySorting"
                     }
                 ]
             },
@@ -713,9 +749,22 @@
                 "nodes":[
                     {
                         "title":"Shared geometry, texture and material cores",
-                        "path":"nodeCores/sharing/sharedNodes.html",
+                        "path":"scene/nodeCores/sharedNodeCores.html",
                         "tags":["nodes", "geometry", "material", "texture"],
                         "id":"sharedNodeCores"
+                    }
+                ]
+            },
+            {
+                "title":"Objects",
+                "tip":"",
+                "tags":["objects"],
+                "nodes":[
+                    {
+                        "title":"Object graph",
+                        "path":"scene/objects/objects.html",
+                        "tags":[],
+                        "id":"objects"
                     }
                 ]
             }
@@ -802,14 +851,14 @@
                         "title":"Tron Tank",
                         "path":"demos/tronTank.html",
                         "editor":false,
-                        "tags":[],
+                        "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "viewTransform"],
                         "id":"tronTank"
                     },
 
                     {
                         "title":"Bubbles",
                         "path":"demos/bubbles.html",
-                        "tags":["fragmentShader", "modelTransform"],
+                        "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "picking"],
                         "id":"bubbles"
                     }
                 ]
