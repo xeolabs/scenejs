@@ -1,58 +1,52 @@
 ## SceneJS 3.0
 
 **SceneJS 3.0** is an open-source 3D engine on WebGL that's geared towards rendering large numbers of individually
-arcticulated and pickable objects as required for high-detail visualisation applications.
+articulated and pickable objects as required for high-detail visualisation applications.
+
+![Tron Tank Demo](http://scenejs.org/images/tron-tank.jpg)
 
 ## Table of Contents
-
 * [Downloads](#downloads)
 * [Resources](#resources)
 * [Features](#features)
- * [Flexibility](#)
- * [Texture](#)
- * [Geometry](#)
- * [Extending SceneJS](#)
- * [Optimization](#)
 * [Plugin System](#plugin-system)
 * [Building](#building)
 
 ## Downloads
-
-You can hotlink to these binaries and they will dynamically load SceneJS plugins on-demand from this repository as
-required (see [Plugins section](#plugin-system) below for more info on plugins).
-
+Hotlink to these binaries and they will dynamically load SceneJS plugins on-demand from this repository as
+required (see [Plugins System](#plugin-system) below for more info on plugins).
 * **[scenejs.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
 * **[scenejs.min.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.min.js)**
 
 Also hotlinkable are a bunch of helper utilities:
-
 * **[OrbitControl](http://xeolabs.github.com/scenejs/build/latest/extras/orbitControl.js)** -
 Mouse camera orbit helper
 * **[PickControl](http://xeolabs.github.com/scenejs/build/latest/extras/pickControl.js)** -
 Scene picking helper
 
 ## Resources
-
  * [SceneJS.org](http://scenejs.org)
- * [Sourcecode](https://github.com/xeolabs/scenejs)
  * [Examples](http://xeolabs.github.com/scenejs/examples/index.html)
+ * [Sourcecode](https://github.com/xeolabs/scenejs)
  * [Class Docs](http://xeolabs.github.com/scenejs/docs/index.html)
  * [License](http://scenejs.org/license/index.html)
  * [Facebook](http://www.facebook.com/group.php?gid=350488973712)
- * [Twitter](http://twitter.com/xeolabs)
  * [Issues](https://github.com/xeolabs/scenejs/issues?sort=created&direction=desc&state=open)
 
 ## Features
-
-#### Flexibility
+#### Convenience
 * **Declarative JSON API** - Build scenes quickly on a declarative JSON-based API that plays well with the rest of the application stack.
 JSON is nice to export, database, transmit, transform and read.
 * **Sensible Defaults** - SceneJS now provides defaults for all scene state, such
  as camera, lights and material, in a configuration that's ready to render whatever geometry you drop into the scene. That means you
  can create a more minimal scene definition, which turned out to be handy for creating clearer examples.
 * **[Multiple Scenes](http://xeolabs.github.io/scenejs/examples/index.html?page=multipleScenes)** - Run multiple scenes simultaneously in the same page
+* **[Automatic Lost WebGL Context Recovery](http://xeolabs.github.io/scenejs/examples/index.html?page=webglContextLost)** -
+SceneJS seamlessly recovers from Lost WebGL Context errors, which occur when the OS or browser resets
+WebGL to regain control after a mishap. When a new context becomes available, SceneJS instanly rebuilds all its WebGL resources
+from state held in the scene graph without reloading anything off the server.
 
-#### Texturing
+#### Texture
 * **[Color](http://xeolabs.github.io/scenejs/examples/index.html?page=colorMap), [Alpha](http://xeolabs.github.io/scenejs/examples/index.html?page=alphaMap),
 [Specular](http://xeolabs.github.io/scenejs/examples/index.html?page=specularMap), [Glow](http://xeolabs.github.io/scenejs/examples/index.html?page=glowMap)**
  and **[Bump](http://xeolabs.github.io/scenejs/examples/index.html?page=bumpMap) Maps**
@@ -78,10 +72,12 @@ Plugins are unobtrusive, and are kept in a directory from where SceneJS loads th
 * **[Vertex](http://xeolabs.github.io/scenejs/examples/index.html?page=vertexDisplaceShader)** and
 **[Fragment](http://xeolabs.github.io/scenejs/examples/index.html?page=xrayShader)** Shader Customization - Although SceneJS generates shaders automatically,
 you can modify the shaders by injecting custom functions into them
+
+#### Performance
 * **[Texture Atlasses](http://xeolabs.github.io/scenejs/examples/index.html?page=textureAtlas)** -  Define a large texture
-containing an "atlas" of sub-textures to use individually on many geometries, each of which have UV coordinates that map
-to a different region of the texture. In a scene where there are many small textures, this has the benefit of reducing
-state changes on the graphics hardware by binding once, instead of for each individual texture..
+ containing an "atlas" of sub-textures to use individually on many geometries, each of which have UV coordinates that map
+ to a different region of the texture. In a scene where there are many small textures, this has the benefit of reducing
+ state changes on the graphics hardware by binding once, instead of for each individual texture..
 * **[Geometry Vertex Sharing](http://xeolabs.github.io/scenejs/examples/index.html?page=vertexSharing)** - Animate geometry by interpolating its
 positions, normals, colors and UVs within keyframes.
 * **[Shared Node Cores](http://xeolabs.github.io/scenejs/examples/index.html?page=sharedNodeCores)** - Traditionally, re-use within a scene
@@ -93,13 +89,8 @@ scene graph to a lean internal draw list, which is state-sorted to minimise the 
 objects by shader, texture, VBOs etc. it can avoid redundantly re-binding state to the GPU. Though SceneJS does a pretty
 good job of sorting, if you program your scene to share plenty of state between your objects then you can achieve some very
 fast results.
-* **[Automatic Lost WebGL Context Recovery](http://xeolabs.github.io/scenejs/examples/index.html?page=webglContextLost)** -
-SceneJS seamlessly recovers from Lost WebGL Context errors, which occur when the OS or browser resets
-WebGL to regain control after a mishap. When a new context becomes available, SceneJS instanly rebuilds all its WebGL resources
-from state held in the scene graph without reloading anything off the server.
 
 ## Plugin System
-
 As mentioned above, SceneJS now uses plugins for things like primitives (box, teapot, text etc.) and fancy
 texture loading (video etc).
 
@@ -177,7 +168,6 @@ myGeometry.set({ source:{ latitudeBands : 60, longitudeBands : 60, radius : 3 } 
 myGeometry.set("source", { latitudeBands : 60, longitudeBands : 60, radius : 3 });
 ```
 
-
 By default, SceneJS is hardwired to automatically download plugins from [a directory in this repository](build/latest/plugins). This means you can
  just hotlink to the SceneJS core library downloads and they will download the plugins automatically as you need them. That's
  nice for putting SceneJS examples on code sharing sites like jsFiddle.
@@ -192,11 +182,8 @@ plugins and configure SceneJS to load them from your location:
  ```
 
 ## Building
-
 SceneJS requires nodejs. To build, simply:
-
 ```node build.js```
-
 Then the binaries will appear in ```./build```.
 
 
