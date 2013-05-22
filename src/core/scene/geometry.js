@@ -651,7 +651,7 @@ new (function () {
 
             this._destroyNodeCore();
 
-            if (this._source) {
+            if (this._source && this._source.destroy) {
                 this._source.destroy();
             }
         }
