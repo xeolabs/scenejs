@@ -3,9 +3,16 @@
 **SceneJS 3.0** is an open-source 3D engine on WebGL that's geared towards rendering large numbers of individually
 arcticulated and pickable objects as required for high-detail visualisation applications.
 
+## Table of Contents
+
 * [Downloads](#downloads)
 * [Resources](#resources)
 * [Features](#features)
+ * [Flexibility](#)
+ * [Texture](#)
+ * [Geometry](#)
+ * [Extending SceneJS](#)
+ * [Optimization](#)
 * [Plugin System](#plugin-system)
 * [Building](#building)
 
@@ -54,7 +61,7 @@ JSON is nice to export, database, transmit, transform and read.
 
 * **[Multiple Scenes](http://xeolabs.github.io/scenejs/examples/index.html?page=multipleScenes)** - Run multiple scenes simultaneously in the same page
 
-#### Texture
+#### Flexible Texturing
 
 * **[Color](http://xeolabs.github.io/scenejs/examples/index.html?page=colorMap), [Alpha](http://xeolabs.github.io/scenejs/examples/index.html?page=alphaMap),
 [Specular](http://xeolabs.github.io/scenejs/examples/index.html?page=specularMap), [Glow](http://xeolabs.github.io/scenejs/examples/index.html?page=glowMap)**
@@ -80,7 +87,7 @@ modelling transform nodes, a staple feature in scene graph APIs.
 * **[Layers](http://xeolabs.github.io/scenejs/examples/index.html?page=transparencySorting)** - Control rendering order of scene nodes by prioritizing them
 in layers, which is useful for transparency sorting.
 
-#### Extensible
+#### Extending SceneJS
 
 * **[Plugins](http://xeolabs.github.io/scenejs/examples/index.html?page=pluginPullStream)** - Extend texture and geometry functionality through plugins, eg. to create primitives, load
 compressed texture formats, and so on. All the geometry primitives, such as 'teapot' and 'sphere', are now plugins.
@@ -90,7 +97,7 @@ Plugins are unobtrusive, and are kept in a directory from where SceneJS loads th
 **[Fragment](http://xeolabs.github.io/scenejs/examples/index.html?page=xrayShader)** Shader Customization - Although SceneJS generates shaders automatically,
 you can modify the shaders by injecting custom functions into them
 
-#### Optimized
+#### Optimization
 
 * **[Texture Atlasses](http://xeolabs.github.io/scenejs/examples/index.html?page=textureAtlas)** -  Define a large texture
 containing an "atlas" of sub-textures to use individually on many geometries, each of which have UV coordinates that map
