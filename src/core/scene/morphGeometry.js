@@ -68,26 +68,28 @@ new (function () {
 
                         self._source = sourceService.getSource();
 
-                        if (!self._source.onUpdate) {
+                        if (!self._source.subscribe) {
                             throw SceneJS_error.fatalError(
                                 SceneJS.errors.PLUGIN_INVALID,
-                                "morphGeometry: 'onUpdate' method not found on source provided by plugin type '" + params.source.type + "'");
+                                "morphGeometry: 'subscribe' method not found on source provided by plugin type '" + params.source.type + "'");
                         }
 
-                        self._source.onCreate(// Get notification when factory creates the morph
+                        var created = false;
+
+                        self._source.subscribe(// Get notification when factory creates the morph
                             function (data) {
 
-                                self._buildNodeCore(data);
+                                if (!created) {
+                                    self._buildNodeCore(data);
 
-                                self._core._loading = false;
-                                self._fireEvent("loaded");
+                                    self._core._loading = false;
+                                    self._fireEvent("loaded");
 
-                                self._engine.branchDirty(self); // TODO
-                            });
+                                    self._engine.branchDirty(self); // TODO
 
-                        if (self._source.onUpdate) {
-                            self._source.onUpdate(// Reload factory updates to the morph
-                                function (data) {
+                                    created = true;
+
+                                } else {
 
                                     if (data.targets) {
 
@@ -113,8 +115,8 @@ new (function () {
                                     // self.setFactor(params.factor);
 
                                     self._display.imageDirty = true;
-                                });
-                        }
+                                }
+                            });
 
                         self._core._loading = true;
 
