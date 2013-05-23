@@ -139,7 +139,7 @@ var scene = SceneJS.createScene({
     nodes:[
         {
             type:"material",
-            baseColor: { r: 0.3, g: 0.3, b: 0.1 },
+            color: { r: 0.3, g: 0.3, b: 1.0 },
 
             nodes:[
                 {
@@ -165,8 +165,8 @@ var scene = SceneJS.createScene({
             <p>And voilà, one blue teapot:</p><br>
             <a href="examples.html?page=firstExample"
                target="other"> <img
-                    style="display: block; margin-left: auto; margin-right: auto;" src="images/firstExample.jpg"/></a>
-
+                    style="display: block; margin-left: auto; margin-right: auto;" src="images/firstExample.png"/></a>
+<br>
             <p>Now let's start the teapot spinning:</p>
 <pre class="prettyprint lang-javascript">
 var angle = 0;
@@ -186,7 +186,7 @@ scene.on("tick",
 
 
 <br>
-<a href="https://github.com/scenejs" target="_blank"><img
+<a href="https://github.com/xeolabs/scenejs" target="_blank"><img
         style="position: absolute; top: 0; left: 0; border: 0;"
         src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
 
@@ -235,7 +235,6 @@ scene.on("tick",
                             subCategory = category.nodes[i];
                             subCategoryElem = $('<li/>')
                                     .addClass('feature-subcategory')
-//                                    .text(subCategory.title + ": ")
                                     .appendTo(ul);
 
                             var nodes = subCategory.nodes;

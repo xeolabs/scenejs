@@ -3,7 +3,6 @@
         "title":"Lights",
         "nodes":[
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Ambient",
@@ -25,7 +24,6 @@
         "title":"Cameras",
         "nodes":[
             {
-                "title":"Cameras",
                 "nodes":[
                     {
                         "title":"Orthographic",
@@ -47,7 +45,6 @@
         "title":"Geometry",
         "nodes":[
             {
-                "title":"Custom",
                 "nodes":[
                     {
                         "title":"Triangles",
@@ -64,7 +61,6 @@
                 ]
             },
             {
-                "title":"Primitives",
                 "nodes":[
                     {
                         "title":"Plane",
@@ -89,7 +85,6 @@
                 ]
             },
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Vector text",
@@ -98,7 +93,6 @@
                 ]
             },
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Vertex coloring",
@@ -107,7 +101,6 @@
                 ]
             },
             {
-                "title":"Plugins",
                 "nodes":[
                     {
                         "title":"Geometry plugin API",
@@ -121,7 +114,6 @@
         "title":"Texture",
         "nodes":[
             {
-                "title":"Texture maps",
                 "nodes":[
                     {
                         "title":"Color map",
@@ -142,7 +134,6 @@
                 ]
             },
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Multitexturing",
@@ -151,7 +142,6 @@
                 ]
             },
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"UV layers",
@@ -160,7 +150,6 @@
                 ]
             },
             {
-                "title":"Animation",
                 "nodes":[
                     {
                         "title":"Texture animation",
@@ -169,7 +158,6 @@
                 ]
             },
             {
-                "title":"Video texture",
                 "nodes":[
                     {
                         "title":"Video texture",
@@ -178,7 +166,6 @@
                 ]
             },
             {
-                "title":"Plugins",
                 "nodes":[
                     {
                         "title":"Texture plugin API",
@@ -195,7 +182,6 @@
         "title":"Effects",
         "nodes":[
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Custom fragment shaders",
@@ -204,7 +190,6 @@
                 ]
             },
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Custom vertex shaders",
@@ -213,7 +198,6 @@
                 ]
             },
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Transparency sorting",
@@ -227,7 +211,6 @@
         "title":"Interaction",
         "nodes":[
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Picking",
@@ -236,7 +219,6 @@
                 ]
             },
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Ray picking",
@@ -250,7 +232,6 @@
         "title":"Scenes",
         "nodes":[
             {
-                "title":"Modelling",
                 "nodes":[
                     {
                         "title":"Transform hierarchies",
@@ -259,7 +240,6 @@
                 ]
             },
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Multiple scenes",
@@ -267,9 +247,7 @@
                     }
                 ]
             },
-
             {
-                "title":"WebGL",
                 "nodes":[
                     {
                         "title":"WebGLContextLost recovery",
@@ -283,7 +261,6 @@
         "title":"Optimization",
         "nodes":[
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Instancing",
@@ -292,7 +269,6 @@
                 ]
             },
             {
-                "title":"",
                 "nodes":[
                     {
                         "title":"Vertex sharing",
@@ -301,7 +277,6 @@
                 ]
             },
             {
-                "title":"Optimization",
                 "nodes":[
                     {
                         "title":"Texture atlases",
