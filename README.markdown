@@ -12,8 +12,9 @@ articulated and pickable objects as required for high-detail visualisation appli
 * [Building](#building)
 
 ## Downloads
-Hotlink to these binaries and they will dynamically load SceneJS plugins on-demand from this repository as
-required (see [Plugins System](#plugin-system) below for more info on plugins).
+Hotlink to these binaries and they'll dynamically load SceneJS plugins on-demand from this repository as
+required. That's OK for playing around, but for production you'll probably want to serve the plugins yourself -
+see [Plugin System](#plugin-system) below for more info.
 * **[scenejs.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
 * **[scenejs.min.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.min.js)**
 
@@ -114,7 +115,8 @@ By default, SceneJS is hardwired to automatically download plugins from [a direc
  just hotlink to the SceneJS core library downloads and they will download the plugins automatically as you need them. That's
  nice for putting SceneJS examples on code sharing sites like jsFiddle.
 
-If you'd rather serve the plugins yourself, instead of relying on the avialability of this repo, then grab a copy of the
+### Serving plugins yourself
+If you'd rather serve the plugins yourself, instead of relying on the availability of this repository, then grab a copy of the
 plugins and configure SceneJS to load them from your location:
 
  ```javascript
