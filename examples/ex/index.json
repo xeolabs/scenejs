@@ -155,7 +155,6 @@
                         "tags":[],
                         "id": "customLines"
                     },
-
                     {
                         "title":"Vertex colors",
                         "path":"geometry/vertexColors.html",
@@ -237,7 +236,7 @@
                     {
                         "title":"Ambient light",
                         "path":"lights/ambient/ambient.html",
-                        "tags":["ambientLight"]
+                        "id":"ambientLight"
                     }
                 ]
             },
@@ -254,7 +253,8 @@
                     {
                         "title":"Directional lights in World space",
                         "path":"lights/directional/directionalWorld.html",
-                        "tags":["specularLight", "diffuseLight"]
+                        "tags":["specularLight", "diffuseLight"],
+                        "id":"directionalWorldLight"
                     },
                     {
                         "title":"Directional lights in World space with color map",
@@ -276,7 +276,8 @@
                     {
                         "title":"Point lights in World space",
                         "path":"lights/point/pointWorld.html",
-                        "tags":["specularLight", "diffuseLight"]
+                        "tags":["specularLight", "diffuseLight"],
+                        "id":"pointWorldLight"
                     }
                 ]
             }
@@ -847,6 +848,13 @@
                 "tip":"",
                 "tags":[],
                 "nodes":[
+                    {
+                        "title":"First Example",
+                        "path":"demos/firstExample.html",
+                        "editor":false,
+                        "tags":[],
+                        "id":"firstExample"
+                    },
                     {
                         "title":"Tron Tank",
                         "path":"demos/tronTank.html",

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../build/latest/scenejs.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"material",
+                baseColor:{ r:0.3, g:0.3, b:0.1 },
+
+                nodes:[
+                    {
+                        type:"rotate",
+                        id:"myRotate",
+                        y:1.0,
+                        angle:0,
+
+                        nodes:[
+                            {
+                                type:"geometry",
+                                source:{
+                                    type:"teapot"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    var angle = 0;
+    var myRotate = scene.getNode("myRotate");
+
+    scene.on("tick",
+            function () {
+                myRotate.setAngle(angle += 0.5);
+            });
+
+</script>
+</body>
+</html>

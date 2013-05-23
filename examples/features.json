@@ -1,64 +1,43 @@
 [
     {
-        "title":"Texture",
+        "title":"Lights",
         "nodes":[
             {
-                "title":"Texture Maps",
+                "title":"",
                 "nodes":[
                     {
-                        "title":"color",
-                        "page":"colorMap"
+                        "title":"Ambient",
+                        "page":"ambientLight"
                     },
                     {
-                        "title":"alpha",
-                        "page":"alphaMap"
+                        "title":"Directional",
+                        "page":"directionalWorldLight"
                     },
                     {
-                        "title":"specular",
-                        "page":"specularMap"
-                    },
-                    {
-                        "title":"bump",
-                        "page":"bumpMap"
+                        "title":"Point",
+                        "page":"pointWorldLight"
                     }
                 ]
-            },
+            }
+        ]
+    },
+    {
+        "title":"Cameras",
+        "nodes":[
             {
-                "title":"Optimization",
+                "title":"Cameras",
                 "nodes":[
                     {
-                        "title":"texture atlases",
-                        "page":"textureAtlas"
-                    }
-                ]
-            },
-            {
-                "title":"Animation",
-                "nodes":[
-                    {
-                        "title":"layer animation",
-                        "page":"colorMapAnimation"
-                    }
-                ]
-            },
-            {
-                "title":"Video Texture",
-                "nodes":[
-                    {
-                        "title":"color",
-                        "page":"videoColorMap"
+                        "title":"Orthographic",
+                        "page":"orthoProjection"
                     },
                     {
-                        "title":"alpha",
-                        "page":"videoAlphaMap"
+                        "title":"Perspective",
+                        "page":"perspectiveProjection"
                     },
                     {
-                        "title":"specular",
-                        "page":"specularMap"
-                    },
-                    {
-                        "title":"bump",
-                        "page":"bumpMap"
+                        "title":"Frustum",
+                        "page":"frustumProjection"
                     }
                 ]
             }
@@ -68,66 +47,265 @@
         "title":"Geometry",
         "nodes":[
             {
+                "title":"Custom",
+                "nodes":[
+                    {
+                        "title":"Triangles",
+                        "page":"customTriangles"
+                    },
+                    {
+                        "title":"Lines",
+                        "page":"customLines"
+                    },
+                    {
+                        "title":"Points",
+                        "page":"customPoints"
+                    }
+                ]
+            },
+            {
                 "title":"Primitives",
                 "nodes":[
                     {
-                        "title":"plane",
+                        "title":"Plane",
                         "page":"planePrim"
                     },
                     {
-                        "title":"box",
+                        "title":"Box",
                         "page":"boxPrim"
                     },
                     {
-                        "title":"sphere",
+                        "title":"Sphere",
                         "page":"spherePrim"
                     },
                     {
-                        "title":"torus",
+                        "title":"Torus",
                         "page":"torusPrim"
                     },
                     {
-                        "title":"teapot",
+                        "title":"Teapot",
                         "page":"teapotPrim"
+                    }
+                ]
+            },
+            {
+                "title":"",
+                "nodes":[
+                    {
+                        "title":"Vector text",
+                        "page":"vectorText"
+                    }
+                ]
+            },
+            {
+                "title":"",
+                "nodes":[
+                    {
+                        "title":"Vertex coloring",
+                        "page":"customVertexColors"
+                    }
+                ]
+            },
+            {
+                "title":"Plugins",
+                "nodes":[
+                    {
+                        "title":"Geometry plugin API",
+                        "page":"geometryPluginPullStream"
                     }
                 ]
             }
         ]
     },
     {
-        "title":"Transformation",
+        "title":"Texture",
         "nodes":[
             {
-                "title":"Cameras",
+                "title":"Texture maps",
                 "nodes":[
                     {
-                        "title":"ortho",
-                        "page":"orthoProjection"
+                        "title":"Color map",
+                        "page":"colorMap"
                     },
                     {
-                        "title":"perspective",
-                        "page":"perspectiveProjection"
+                        "title":"Alpha map",
+                        "page":"alphaMap"
                     },
                     {
-                        "title":"frustum",
-                        "page":"frustumProjection"
+                        "title":"Specular map",
+                        "page":"specularMap"
+                    },
+                    {
+                        "title":"Bump map",
+                        "page":"bumpMap"
                     }
                 ]
             },
             {
+                "title":"",
+                "nodes":[
+                    {
+                        "title":"Multitexturing",
+                        "page":"multitexturing"
+                    }
+                ]
+            },
+            {
+                "title":"",
+                "nodes":[
+                    {
+                        "title":"UV layers",
+                        "page":"uvLayers"
+                    }
+                ]
+            },
+            {
+                "title":"Animation",
+                "nodes":[
+                    {
+                        "title":"Texture animation",
+                        "page":"colorMapAnimation"
+                    }
+                ]
+            },
+            {
+                "title":"Video texture",
+                "nodes":[
+                    {
+                        "title":"Video texture",
+                        "page":"videoColorMap"
+                    }
+                ]
+            },
+            {
+                "title":"Plugins",
+                "nodes":[
+                    {
+                        "title":"Texture plugin API",
+                        "page":"texturePlugin"
+                    }
+                ]
+            }
+        ]
+    },
+
+
+
+    {
+        "title":"Effects",
+        "nodes":[
+            {
+                "title":"",
+                "nodes":[
+                    {
+                        "title":"Custom fragment shaders",
+                        "page":"xrayShader"
+                    }
+                ]
+            },
+            {
+                "title":"",
+                "nodes":[
+                    {
+                        "title":"Custom vertex shaders",
+                        "page":"vertexDisplaceShader"
+                    }
+                ]
+            },
+            {
+                "title":"",
+                "nodes":[
+                    {
+                        "title":"Transparency sorting",
+                        "page":"transparencySorting"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Interaction",
+        "nodes":[
+            {
+                "title":"",
+                "nodes":[
+                    {
+                        "title":"Picking",
+                        "page":"picking"
+                    }
+                ]
+            },
+            {
+                "title":"",
+                "nodes":[
+                    {
+                        "title":"Ray picking",
+                        "page":"rayPicking"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Scenes",
+        "nodes":[
+            {
                 "title":"Modelling",
                 "nodes":[
                     {
-                        "title":"rotate",
-                        "page":"rotateTransform"
-                    },
+                        "title":"Transform hierarchies",
+                        "page":"transformHierarchy"
+                    }
+                ]
+            },
+            {
+                "title":"",
+                "nodes":[
                     {
-                        "title":"perspective",
-                        "page":"perspectiveProjection"
-                    },
+                        "title":"Multiple scenes",
+                        "page":"multipleScenes"
+                    }
+                ]
+            },
+
+            {
+                "title":"WebGL",
+                "nodes":[
                     {
-                        "title":"frustum",
-                        "page":"frustumProjection"
+                        "title":"WebGLContextLost recovery",
+                        "page":"webglContextLost"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Optimization",
+        "nodes":[
+            {
+                "title":"",
+                "nodes":[
+                    {
+                        "title":"Instancing",
+                        "page":"sharedNodeCores"
+                    }
+                ]
+            },
+            {
+                "title":"",
+                "nodes":[
+                    {
+                        "title":"Vertex sharing",
+                        "page":"vertexSharing"
+                    }
+                ]
+            },
+            {
+                "title":"Optimization",
+                "nodes":[
+                    {
+                        "title":"Texture atlases",
+                        "page":"textureAtlas"
                     }
                 ]
             }
