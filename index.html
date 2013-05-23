@@ -83,23 +83,25 @@
         <ul class="bxslider">
             <li>
                 <a href="http://www.biodigital.com/biodigital-human.html">
-                    <img src="images/human-xray.jpg" alt="" title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>
+                    <img src="images/human-xray.jpg" alt=""
+                         title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>
                 </a>
             </li>
             <li>
                 <a href="http://www.biodigital.com/biodigital-human.html">
-                    <img src="images/human.jpg" alt="" title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>
+                    <img src="images/human.jpg" alt=""
+                         title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>
                 </a>
             </li>
             <!--<li>-->
-                <!--<a href="http://www.biodigital.com/biodigital-human.html">-->
-                    <!--<img src="images/bdhuman-skin.png" alt="" title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>-->
-                <!--</a>-->
+            <!--<a href="http://www.biodigital.com/biodigital-human.html">-->
+            <!--<img src="images/bdhuman-skin.png" alt="" title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>-->
+            <!--</a>-->
             <!--</li>-->
             <!--<li>-->
-                <!--<a href="http://www.biodigital.com/biodigital-human.html">-->
-                    <!--<img src="images/bdhuman-macular-degen.png" alt="" title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>-->
-                <!--</a>-->
+            <!--<a href="http://www.biodigital.com/biodigital-human.html">-->
+            <!--<img src="images/bdhuman-macular-degen.png" alt="" title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>-->
+            <!--</a>-->
             <!--</li>-->
             <li>
                 <a href="examples.html?page=multitexturing"><img
@@ -107,20 +109,25 @@
             </li>
             <li>
                 <a href="examples.html?page=tronTank"><img
-                        src="images/tron-tank.jpg" alt="" title="Tank Program from the 1982 Disney motion picture Tron"/></a>
+                        src="images/tron-tank.jpg" alt=""
+                        title="Tank Program from the 1982 Disney motion picture Tron"/></a>
             </li>
         </ul>
-
-        <br>
-
     </div>
 </div>
+
+<div id="intro">
+    <!--<p>A JSON-based scene graph engine on WebGL</p>-->
+    <p><span class="bold">SceneJS</span> is an open-source 3D engine for JavaScript which provides a JSON-based scene
+        graph API on WebGL. SceneJS specialises in efficient rendering of large numbers
+        of objects as required by high-detail model-viewing and visualisation apps.</p>
 </div>
 
 <div id="container">
     <div style="width:100%;">
         <div class="col left">
             <p class="sectionHeading">Features</p>
+
             <div id="featureList">
 
             </div>
@@ -167,7 +174,8 @@ var scene = SceneJS.createScene({
             <a href="examples.html?page=firstExample"
                target="other"> <img
                     style="display: block; margin-left: auto; margin-right: auto;" src="images/firstExample.png"/></a>
-<br>
+            <br>
+
             <p>Now let's start the teapot spinning:</p>
 <pre class="prettyprint lang-javascript">
 var angle = 0;
@@ -280,13 +288,15 @@ scene.on("tick",
 
     function addSlider() {
         $('.bxslider').bxSlider({
-            mode:'horizontal',
+            mode:'fade',
+            pause:6000,
             useCSS:false,
             infiniteLoop:true,
             hideControlOnEnd:true,
             speed:1000,
-            captions: true,
-            auto: true
+            captions:true,
+            auto:true,
+            pager:false
         });
     }
 
