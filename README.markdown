@@ -61,10 +61,11 @@ var myGeometry = myNode.addNode({
  });
 ```
 
-This geometry node will create its sphere geometry with the help of the ["sphere" plugin](./build/latest/plugins/geometry/sphere.js).
+This ```geometry``` node will create its sphere geometry with the help of the [sphere](./build/latest/plugins/geometry/sphere.js) plugin.
 
 Essentially, the plugin's code looks like the listing below. The plugin provides geometry factory objects (called "sources"), each with
-a ```configure``` method to configure the sphere shape and a ```subscribe``` method to collect the generated geometry data.
+a ```configure``` method to configure the sphere shape and a ```subscribe``` method to collect the generated geometry data. SceneJS plugins
+are generally data sources.
 
 ```javascript
 SceneJS.Plugins.addPlugin(
