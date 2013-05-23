@@ -315,7 +315,7 @@
                     {
                         "title":"Video color map",
                         "tip":"Video texture with all defaults",
-                        "tags":["videoTexture"],
+                        "tags":["videoTexture", "animation"],
                         "path":"texture/video/videoColorMap.html",
                         "id":"videoColorMap"
                     }
@@ -348,7 +348,7 @@
                     {
                         "title":"Video bump map",
                         "tip":"Video texture applied to target geometry normals",
-                        "tags":["videoTexture"],
+                        "tags":["videoTexture", "animation"],
                         "path":"texture/video/videoBumpMap.html",
                         "id":"videoBumpMap"
                     }
@@ -381,7 +381,7 @@
                     {
                         "title":"Video alpha map",
                         "tip":"Video texture applied to target material opacity (alpha)",
-                        "tags":["videoTexture"],
+                        "tags":["videoTexture", "animation"],
                         "path":"texture/video/videoAlphaMap.html",
                         "id":"videoAlphaMap"
                     }
@@ -414,7 +414,7 @@
                     {
                         "title":"Video specular map",
                         "tip":"Video texture applied to target material specularity",
-                        "tags":["videoTexture"],
+                        "tags":["videoTexture", "animation"],
                         "path":"texture/video/videoSpecularMap.html",
                         "id":"videoSpecularMap"
                     }
@@ -447,7 +447,7 @@
                     {
                         "title":"Video glow map",
                         "tip":"Video texture applied to target material emissivity",
-                        "tags":["videoTexture"],
+                        "tags":["videoTexture", "animation"],
                         "path":"texture/video/videoGlowMap.html",
                         "id":"videoGlowMap"
                     }
@@ -467,7 +467,7 @@
                     {
                         "title":"Layered color maps with animation",
                         "tip":"Animating a color map's transform and blend factors",
-                        "tags":["colorMap"],
+                        "tags":["colorMap", "animation"],
                         "path":"texture/color/colorMapAnimation.html",
                         "id":"colorMapAnimation"
                     },
@@ -516,18 +516,18 @@
                     {
                         "title":"Vertex displacement - Model space",
                         "path":"shaders/vertex/modelVertexDisplace.html",
-                        "tags":["vertexDisplacement"],
+                        "tags":["vertexDisplacement", "animation"],
                         "id":"vertexDisplaceShader"
                     },
                     {
                         "title":"Vertex displacement - World space",
                         "path":"shaders/vertex/worldVertexDisplace.html",
-                        "tags":["vertexDisplacement"]
+                        "tags":["vertexDisplacement", "animation"]
                     },
                     {
                         "title":"Vertex displacement - View space",
                         "path":"shaders/vertex/viewVertexDisplace.html",
-                        "tags":["vertexDisplacement"]
+                        "tags":["vertexDisplacement", "animation"]
                     },
                     {
                         "title":"Sky box",
@@ -755,19 +755,6 @@
                         "id":"sharedNodeCores"
                     }
                 ]
-            },
-            {
-                "title":"Objects",
-                "tip":"",
-                "tags":["objects"],
-                "nodes":[
-                    {
-                        "title":"Object graph",
-                        "path":"scene/objects/objects.html",
-                        "tags":[],
-                        "id":"objects"
-                    }
-                ]
             }
         ]
     },
@@ -849,24 +836,24 @@
                 "tags":[],
                 "nodes":[
                     {
-                        "title":"First Example",
+                        "title":"Spinning Teapot",
                         "path":"demos/firstExample.html",
                         "editor":false,
-                        "tags":[],
+                        "tags":["animation"],
                         "id":"firstExample"
                     },
                     {
                         "title":"Tron Tank",
                         "path":"demos/tronTank.html",
                         "editor":false,
-                        "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "viewTransform"],
+                        "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "viewTransform", "animation"],
                         "id":"tronTank"
                     },
 
                     {
                         "title":"Bubbles",
                         "path":"demos/bubbles.html",
-                        "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "picking"],
+                        "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "picking", "animation"],
                         "id":"bubbles"
                     }
                 ]
