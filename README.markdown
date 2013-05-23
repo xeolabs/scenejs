@@ -29,7 +29,7 @@ Scene picking helper
 
 ## Resources
  * [SceneJS.org](http://scenejs.org)
- * [Examples](http://xeolabs.github.com/scenejs/examples/index.html)
+ * [Examples](http://xeolabs.github.com/scenejs/examples.html)
  * [Sourcecode](https://github.com/xeolabs/scenejs)
  * [Class Docs](http://xeolabs.github.com/scenejs/docs/index.html)
  * [License](http://scenejs.org/license/index.html)

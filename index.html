@@ -121,9 +121,9 @@
     <div style="width:100%;">
         <div class="col left">
             <p class="sectionHeading">Features</p>
-            <ul id="featureList">
+            <div id="featureList">
 
-            </ul>
+            </div>
         </div>
         <div class="col right">
             <p class="sectionHeading">Quick Start</p>
@@ -224,19 +224,16 @@ scene.on("tick",
 
                         category = features[categoryName];
 
-                        categoryElem = $('<li/>')
+                        categoryElem = $('<h3/>')
                                 .addClass('feature-category')
                                 .text(category.title)
                                 .appendTo(featureList);
 
-                        var ul = $('<ul/>')
-                                .appendTo(categoryElem);
-
                         for (var i = 0, len = category.nodes.length; i < len; i++) {
                             subCategory = category.nodes[i];
-                            subCategoryElem = $('<li/>')
+                            subCategoryElem = $('<div/>')
                                     .addClass('feature-subcategory')
-                                    .appendTo(ul);
+                                    .appendTo(featureList);
 
                             var nodes = subCategory.nodes;
                             if (nodes) {

@@ -50,7 +50,7 @@ body {
 }
 
 #top .links a {
-    font: 20px Helvetica, arial, freesans, clean, sans-serif !important;
+    font: 18px Helvetica, arial, freesans, clean, sans-serif !important;
 }
 
 #header {
@@ -421,8 +421,6 @@ p:first-child {
 h1, h2, h3 {
     font-family: 'Arial';
     font-weight: bold;
-    -webkit-transform-origin: 0% 100%;
-    text-shadow: 0 0 5px #114166;
 }
 
 h1 {
@@ -504,16 +502,16 @@ h3.subtitle {
 .current h3.subtitle {
 }
 
-h3 {
-    font-size: 20px;
-    line-height: 1.2;
-    font-weight: bold;
-    color: #333;
-    padding: 0;
-    margin: 0;
-    padding-right: 40px;
-    padding-top: 30px;
-}
+/*h3 {*/
+    /*font-size: 20px;*/
+    /*line-height: 1.2;*/
+    /*font-weight: bold;*/
+    /*color: #333;*/
+    /*padding: 0;*/
+    /*margin: 0;*/
+    /*padding-right: 40px;*/
+    /*padding-top: 30px;*/
+/*}*/
 
 .logo {
     font-family: 'Arial';
@@ -581,14 +579,34 @@ li::before {
 }
 
 
-li.feature-category {
-   margin-top: 1.0em !important;
-    margin-bottom: 1.0em !important;
+h3.feature-category {
+    font-family: 'Helvetica';
+    /*margin-top: 1.0em !important;*/
+    /*margin-bottom: 1.0em !important;*/
+    /*font-size: 14px;*/
+    /*font-weight: bold;*/
+    /*color: #8F3434;*/
+
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: bold;
+    color: #8F3434;
+    padding: 0;
+    margin: 0;
+    padding-left: 0px;
+    padding-right: 40px;
+    padding-top: 14px;
+    padding-bottom: 4px;
 }
 
-li.feature-subcategory {
+.feature-subcategory {
+    font-family: 'Helvetica';
     margin-top: 0.2em !important;
     margin-bottom: 0.2em !important;
+    font-size: 14px;
+    font-weight: normal;
+    padding-left: 22px;
+    background: url("../images/bullet-point.png") no-repeat 8px 2px !important;
 }
 
 pre {
