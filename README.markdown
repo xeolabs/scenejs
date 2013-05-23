@@ -9,6 +9,9 @@ articulated and pickable objects as required for high-detail visualisation appli
 * [Downloads](#downloads)
 * [Resources](#resources)
 * [Plugin System](#plugin-system)
+ * [Geometry Plugins](#geometry-plugins)
+ * [Texture Plugins](#texture-plugins)
+ * [Serving plugins yourself](#serving-plugins-yourself)
 * [Building](#building)
 
 ## Downloads
@@ -139,8 +142,9 @@ var myTexture = myNode.addNode({
  });
 ```
 
-This layer uses the [image plugin](build/latest/plugins/texture/image.js), which simply fetches an image file and
-tweaks its dimensions to be a power-of-two (as currently required by WebGL):
+This layer uses the [image plugin](build/latest/plugins/texture/image.js), which is shown below. This plugin simply
+fetches an image file and tweaks its dimensions to be a power-of-two, as currently required by WebGL. It's actually
+redundant because SceneJS does that anyway, but it makes a nice example:
 
 ```javascript
 SceneJS.Plugins.addPlugin(
@@ -208,7 +212,7 @@ SceneJS.Plugins.addPlugin(
     })());
 ```
 
-Then you can reconfigure the texture at any time through the node:
+Then you can reconfigure the texture at any time through the ```texture``` node:
 
 ```javascript
 // Load a different image:
@@ -217,6 +221,7 @@ myGeometry.setLayers({
         src: "someOtherImage.jpg"
      }
 });
+```
 
 ### Serving plugins yourself
 If you'd rather serve the plugins yourself, instead of relying on the availability of this repository, then copy the
