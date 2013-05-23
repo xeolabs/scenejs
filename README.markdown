@@ -14,7 +14,7 @@ articulated and pickable objects as required for high-detail visualisation appli
 ## Downloads
 Hotlink to these binaries and they'll dynamically load SceneJS plugins on-demand from this repository as
 required. That's OK for playing around, but for production you'll probably want to serve the plugins yourself -
-see [Plugin System](#plugin-system) below for more info.
+see [Plugin System](#plugin-system) below for how to do that.
 * **[scenejs.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
 * **[scenejs.min.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.min.js)**
 
@@ -37,6 +37,12 @@ Scene picking helper
 As mentioned above, SceneJS now uses plugins for things like primitives (box, teapot, text etc.) and fancy
 texture loading (video etc).
 
+By default, SceneJS is hardwired to automatically download plugins from the [plugins directory](build/latest/plugins)
+in this repository. This means you can just hotlink to the SceneJS core library downloads and they will download the
+plugins automatically as you need them. That's nice for sharing SceneJS examples on jsFiddle etc, but in production
+you would want to [serve them youself](#serving-plugins-yourself).
+
+### Geometry Plugins
 Plugins are used from within node definitions, as shown in this example for geometry:
 
 ```javascript
@@ -54,8 +60,8 @@ var myGeometry = myNode.addNode({
 
 This geometry node will create its sphere geometry with the help of the ["sphere" plugin](./build/latest/plugins/geometry/sphere.js).
 
-Essentially, the plugin's code looks like the listing below. The plugin provides geometry factory objects, each with
-a ```configure``` method to configure the sphere shape and a ```subscribe``` method to collect created geometry data.
+Essentially, the plugin's code looks like the listing below. The plugin provides geometry factory objects (called "sources"), each with
+a ```configure``` method to configure the sphere shape and a ```subscribe``` method to collect the generated geometry data.
 
 ```javascript
 SceneJS.Plugins.addPlugin(
@@ -100,7 +106,7 @@ SceneJS.Plugins.addPlugin(
 ```
 
 Then you can reconfigure the geometry at any time using setter methods on the node as shown below. Note however that we
-can't reconfigure the plugin type we're using for our node.
+can't reconfigure the plugin ```type```.
 
 ```javascript
 // Reconfigure our sphere like this - make it bigger and smoother:
@@ -111,13 +117,110 @@ myGeometry.set({ source:{ latitudeBands : 60, longitudeBands : 60, radius : 3 } 
 myGeometry.set("source", { latitudeBands : 60, longitudeBands : 60, radius : 3 });
 ```
 
-By default, SceneJS is hardwired to automatically download plugins from [a directory in this repository](build/latest/plugins). This means you can
- just hotlink to the SceneJS core library downloads and they will download the plugins automatically as you need them. That's
- nice for putting SceneJS examples on code sharing sites like jsFiddle.
+### Texture Plugins
+
+Texture ```layers``` can load their textures via plugins, as shown on this example ```texture``` node:
+
+```javascript
+var myTexture = myNode.addNode({
+    type:"texture",
+    id: "myTexture",
+    layers: [
+        {
+            source:{
+                type:"image",
+                src: "someImage.jpg"
+            }
+        }
+    ],
+    nodes: [
+        //...
+    ]
+ });
+```
+
+This layer uses the [image plugin](build/latest/plugins/texture/image.js), which simply fetches an image file and
+tweaks its dimensions to be a power-of-two (as currently required by WebGL):
+
+```javascript
+SceneJS.Plugins.addPlugin(
+
+    "texture",
+    "image",
+
+    new (function () {
+
+        this.getSource = function (params) {
+
+            var gl = params.gl;
+            var texture = gl.createTexture();
+            var publish;
+
+            return {
+                subscribe:function (fn) {
+                    publish = fn;
+                },
+                configure:function (cfg) {
+                    if (!cfg.src) {
+                        throw "Parameter expected: 'src'";
+                    }
+                    var image = new Image();
+                    image.crossOrigin = "anonymous";
+                    image.onload = function () {
+                        gl.bindTexture(gl.TEXTURE_2D, texture);
+                        var potImage = ensureImageSizePowerOfTwo(image); // WebGL hates NPOT images
+                        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, potImage);
+                        if (publish) {
+                            publish(texture);
+                        }
+                    };
+                    image.src = cfg.src;
+                }
+            };
+        };
+
+        function ensureImageSizePowerOfTwo(image) {
+            if (!isPowerOfTwo(image.width) || !isPowerOfTwo(image.height)) {
+                var canvas = document.createElement("canvas");
+                canvas.width = nextHighestPowerOfTwo(image.width);
+                canvas.height = nextHighestPowerOfTwo(image.height);
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(image,
+                    0, 0, image.width, image.height,
+                    0, 0, canvas.width, canvas.height);
+                image = canvas;
+            }
+            return image;
+        }
+
+        function isPowerOfTwo(x) {
+            return (x & (x - 1)) == 0;
+        }
+
+        function nextHighestPowerOfTwo(x) {
+            --x;
+            for (var i = 1; i < 32; i <<= 1) {
+                x = x | x >> i;
+            }
+            return x + 1;
+        }
+
+    })());
+```
+
+Then you can reconfigure the texture at any time through the node:
+
+```javascript
+// Load a different image:
+myGeometry.setLayers({
+    "0": {
+        src: "someOtherImage.jpg"
+     }
+});
 
 ### Serving plugins yourself
-If you'd rather serve the plugins yourself, instead of relying on the availability of this repository, then grab a copy of the
-plugins and configure SceneJS to load them from your location:
+If you'd rather serve the plugins yourself, instead of relying on the availability of this repository, then copy the
+[plugins directory](build/latest/plugins) to your server and configure SceneJS to load them from there:
 
  ```javascript
  SceneJS.configure({
