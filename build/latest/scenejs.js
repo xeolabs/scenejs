@@ -18,7 +18,7 @@
 WebGLDebugUtils = function() {
 
 /**
- * Wrapped logging function.
+ *  Wrapped logging function.
  * @param {string} msg Message to log.
  */
 var log = function(msg) {
