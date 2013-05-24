@@ -39,11 +39,17 @@
 
                     // Periodically push new geometry from this source
 
-                    var randomFactor = 0;
+                    var factor = 0;
+                    var factorInc = 0.01;
 
                     function generate() {
-                        randomFactor += 0.01;
-                        publish(createGeometry(randomFactor));
+                        if (factor >= 1.0) {
+                            factorInc *= -1;
+                        } else if (factor < -1) {
+                            factorInc *= -1;
+                        }
+                        factor += factorInc;
+                        publish(createGeometry(factor));
                         requestAnimationFrame(generate);
                     }
 

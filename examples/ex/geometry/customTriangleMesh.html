@@ -42,37 +42,22 @@ var scene = SceneJS.createScene({
 
             nodes:[
 
-                /* Geometry node which defines our custom object, a simple cube.
-                 */
+                // Geometry node which defines our custom object, a simple cube.
                 {
 
                     type:"geometry",
 
-                    /* Optional coreID, must be unique among all
-                     * geometries - if another geometry has already
-                     * been defined with that core ID, then that
-                     * geometry will be instanced here in place of
-                     * this one, and this geometry definition will be
-                     * ignored.
-                     */
-                    coreId:"my-geometry",
-
-                    /* The primitive type - allowed values are
-                     * "points", "lines", "line-loop", "line-strip",
-                     * "triangles", "triangle-strip" and "triangle-fan".
-                     *
-                     * Try setting this config to these different
-                     * types, it's quite freaky.
-                     *
-                     * See the OpenGL/WebGL specification docs for
-                     * how the coordinate arrays are supposed to be laid out
-                     * for them.
-                     */
+                    // The primitive type - allowed values are
+                     // "points", "lines", "line-loop", "line-strip",
+                     // "triangles", "triangle-strip" and "triangle-fan".
+                     //
+                     // See the OpenGL/WebGL specification docs for
+                     // how the coordinate arrays are supposed to be laid out
+                     // for them.
                     primitive:"triangles",
 
-                    /* The vertices - eight for our cube, each
-                     * one spanning three array elements for X,Y and Z
-                     */
+                    // The vertices - eight for our cube, each
+                     // one spanning three array elements for X,Y and Z
                     positions:[
 
                         /* v0-v1-v2-v3 front

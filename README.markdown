@@ -8,7 +8,7 @@ articulated and pickable objects as required for high-detail visualisation appli
 ## Table of Contents
 * [Downloads](#downloads)
 * [Resources](#resources)
-* [Plugin System](#plugin-system)
+* [Plugin API](#plugin-api)
  * [Geometry Plugins](#geometry-plugins)
  * [Texture Plugins](#texture-plugins)
  * [Serving plugins yourself](#serving-plugins-yourself)
@@ -17,7 +17,7 @@ articulated and pickable objects as required for high-detail visualisation appli
 ## Downloads
 Hotlink to these binaries and they'll dynamically load SceneJS plugins on-demand from this repository as
 required. That's OK for playing around, but for production you'll probably want to serve the plugins yourself -
-see [Plugin System](#plugin-system) below for how to do that.
+see [Plugin API](#plugin-api) below for how to do that.
 * **[scenejs.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
 * **[scenejs.min.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.min.js)**
 
@@ -36,7 +36,7 @@ Scene picking helper
  * [Facebook Page](http://www.facebook.com/group.php?gid=350488973712)
  * [Issues](https://github.com/xeolabs/scenejs/issues?sort=created&direction=desc&state=open)
 
-## Plugin System
+## Plugin API
 As mentioned above, SceneJS now uses plugins for things like primitives (box, teapot, text etc.) and fancy
 texture loading (video etc).
 

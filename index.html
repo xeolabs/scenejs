@@ -21,7 +21,14 @@
         p.sectionHeading {
             font-weight: bold;
             font-size: 20px;
-            padding-bottom: 20px;
+            padding-bottom: 0;
+            padding-top: 15px;
+        }
+
+        p.quickStart {
+            font-weight: bold;
+            font-size: 30px;
+            padding-bottom: 0;
             padding-top: 15px;
         }
 
@@ -57,6 +64,7 @@
             float: left;
             width: 30%;
             padding: 10px;
+            padding-left: 0;
         }
 
         .right {
@@ -64,6 +72,7 @@
             width: 65%;
             padding-left: 25px;
             padding-top: 10px;
+            padding-right: 0;
         }
 
     </style>
@@ -83,34 +92,48 @@
         <ul class="bxslider">
             <li>
                 <a href="http://www.biodigital.com/biodigital-human.html">
-                    <img src="images/human-xray.jpg" alt=""
-                         title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>
+                    <img src="images/human.jpg" alt=""
+                         title="BioDigital Human: A Web-based atlas of human anatomy and conditions"/>
+                </a>
+            </li>
+            <li>
+                <a href="examples.html?page=tronTank"><img
+                        src="images/tronTank.jpg" alt=""
+                        title="SceneJS Example: Tank Program from the 1982 Disney motion picture Tron"/></a>
+            </li>
+            <li>
+                <a href="http://codepen.io/xeolabs/pen/sixmc"><img
+                        src="images/procedural-city.jpg" alt=""
+                        title="xeoEngine (discontinued experiment): Procedurally-Generated City"/></a>
+            </li>
+            <li>
+                <a href="http://bimsurfer.org">
+                    <img src="images/bimSurfer.jpg" alt=""
+                         title="BIMSurfer - Open-Source IFC Viewer"/>
                 </a>
             </li>
             <li>
                 <a href="http://www.biodigital.com/biodigital-human.html">
-                    <img src="images/human.jpg" alt=""
-                         title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>
+                    <img src="images/bdhuman-skin.png" alt=""
+                         title="BioDigital Human: Skin Cross-Section"/>
                 </a>
             </li>
-            <!--<li>-->
-            <!--<a href="http://www.biodigital.com/biodigital-human.html">-->
-            <!--<img src="images/bdhuman-skin.png" alt="" title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>-->
-            <!--</a>-->
-            <!--</li>-->
-            <!--<li>-->
-            <!--<a href="http://www.biodigital.com/biodigital-human.html">-->
-            <!--<img src="images/bdhuman-macular-degen.png" alt="" title="BioDigital Human - A Web-based atlas of human anatomy and conditions"/>-->
-            <!--</a>-->
-            <!--</li>-->
             <li>
-                <a href="examples.html?page=multitexturing"><img
-                        src="images/earth.jpg" alt="" title="Earth rendered with color, specular, alpha and glow maps"/></a>
+                <a href="http://www.biodigital.com/biodigital-human.html">
+                    <img src="images/salmonella.png" alt=""
+                         title="BioDigital Human: Salmonella Bacterium"/>
+                </a>
             </li>
             <li>
-                <a href="examples.html?page=tronTank"><img
-                        src="images/tron-tank.jpg" alt=""
-                        title="Tank Program from the 1982 Disney motion picture Tron"/></a>
+                <a href="examples.html?page=bubbles">
+                    <img src="images/bubbles.jpg" alt=""
+                         title="SceneJS Examples: Bubbles using a custom fragment shader"/>
+                </a>
+            </li>
+            <li>
+                <a href="examples.html?page=multitexturing"><img
+                        src="images/earth.jpg" alt=""
+                        title="SceneJS Example: Earth rendered with color, specular, alpha and glow maps"/></a>
             </li>
         </ul>
     </div>
@@ -118,9 +141,9 @@
 
 <div id="intro">
     <!--<p>A JSON-based scene graph engine on WebGL</p>-->
-    <p><span class="bold">SceneJS</span> is an open-source 3D engine for JavaScript which provides a JSON-based scene
-        graph API on WebGL. SceneJS specialises in efficient rendering of large numbers
-        of objects as required by high-detail model-viewing and visualisation apps.</p>
+    <p><span class="strong">SceneJS</span> is an open-source 3D engine for JavaScript that provides a JSON-based scene
+        graph API on WebGL, geared for efficient rendering of large numbers
+        of objects for high-detail visualisation.</p>
 </div>
 
 <div id="container">
@@ -133,7 +156,7 @@
             </div>
         </div>
         <div class="col right">
-            <p class="sectionHeading">Quick Start</p>
+            <p class="sectionHeading quickStart">Quick Start</p>
 
             <p>First, include the <a href="build/latest/scenejs.js">SceneJS
                 library</a> in the &lt;head&gt; tag of your web page:
@@ -189,12 +212,29 @@ scene.on("tick",
             <p>
                 <a href="examples.html?page=firstExample"
                    target="other">Run this example</a></p>
+
+            <p class="sectionHeading">Plugins</p>
+
+            <p>To keep the core library small, SceneJS dynamically loads it's non-core functionality from a directory of
+                plugins. In the example above, the <code>geometry</code> node created its mesh using a <a
+                        href="build/latest/plugins/geometry/teapot.js">teapot</a> plugin, which SceneJS
+                loaded on-demand from <a href="build/latest/plugins">the plugins directory</a> within its repository on
+                GitHub.</p>
+
+            <p>If you'd rather serve the plugins yourself, then just copy that directory to your server and configure
+                SceneJS to load them from there, like this:</p>
+
+            <pre class="prettyprint lang-javascript">SceneJS.configure({
+    pluginPath: "./foo/myPluginsDir"
+});
+            </pre>
+
+            <p>Want to write your own plugins? Excellent, please read more about the plugin API <a
+                    href="https://github.com/xeolabs/scenejs#plugin-api">here</a>.</p>
         </div>
     </div>
 </div>
 
-
-<br>
 <a href="https://github.com/xeolabs/scenejs" target="_blank"><img
         style="position: absolute; top: 0; left: 0; border: 0;"
         src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>

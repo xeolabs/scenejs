@@ -23,20 +23,23 @@
 
 <script>
 
-    // Demonstrates sharing of various types of node core.
+    // Demonstrates scene node instancing.
     //
-    // Node core sharing is a technique learned from OpenSG in which many nodes
-    // can share the same state through references to a shared object.
+    // SceneJS uses an instancing technique called "node core sharing", taken from OpenSG, 
+    // in which multiple nodes of the same type can share the same state through a shared core object.
     //
-    // Aside from the obvious reuse benefit, cores can provide a significant
-    // performance boost because SceneJS is then able to sort state in the draw
-    // list into runs that use the same cores, thus reducing state changes on the GPU.
+    // This is supported for almost all scene node types, but for this demo we'll
+    // just instance geometry, material and texture nodes.
     //
-    // They are also great for pushing efficient state updates to multiple
-    // nodes at the same time, ie. through a shared core.
+    // Aside from the obvious reuse benefit, node cores can provide a significant performance
+    // boost because SceneJS is able to sort the draw list into runs that take state from the
+    // same node cores, thus reducing GPU state changes.
+    //
+    // Node cores are also great for pushing efficient state updates to multiple
+    // nodes at the same time, ie. through the shared core objects.
     //
     // More info here: https://github.com/xeolabs/scenejs/wiki/Node-Cores
-    //
+
 
     var scene = SceneJS.createScene({
         nodes:[
@@ -112,7 +115,7 @@
 
             // Instances of those cores
 
-            // First object, uses the blue material, the texture and the box geometry
+            // First object, uses the blue material, the texture, and the box geometry
             {
                 type:"translate",
                 x:-6,
@@ -136,7 +139,7 @@
                 ]
             },
 
-            // First object, uses the red material and the box geometry
+            // Second object, uses the red material and the box geometry
             {
                 type:"translate",
                 x:6,

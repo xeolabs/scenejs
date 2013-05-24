@@ -744,13 +744,13 @@
                 ]
             },
             {
-                "title":"Sharing node cores",
+                "title":"Instancing",
                 "tip":"",
-                "tags":["nodeCores"],
+                "tags":["instancing"],
                 "nodes":[
                     {
-                        "title":"Shared geometry, texture and material cores",
-                        "path":"scene/nodeCores/sharedNodeCores.html",
+                        "title":"Instancing geometry, texture and material",
+                        "path":"scene/instancing/sharedNodeCores.html",
                         "tags":["nodes", "geometry", "material", "texture"],
                         "id":"sharedNodeCores"
                     }
