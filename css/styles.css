@@ -96,10 +96,10 @@ body {
 #intro p {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 18px;
-    line-height: 1.5em;
+    line-height: 1.5em !important;
     font-weight: bold;
     text-align: left;
-    text-shadow: 0 0 5px #c8c8c8;
+    text-shadow: 0 0 2px #c8c8c8;
     color: #676767;
     /*text-transform: uppercase;*/
 }
@@ -115,8 +115,15 @@ body {
     /*text-transform: uppercase;*/
 }
 
-#intro span {
+#intro .strong {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.5em;
     font-weight: bold;
+    text-align: left;
+    text-shadow: 0 0 5px #c8c8c8;
+    color: #091967;
+    /*text-transform: uppercase;*/
 }
 
 #container {
@@ -451,7 +458,7 @@ p {
 
     color: #333;
 
-    line-height: 190%;
+    line-height: 1.4em !important;
     font: 14px Helvetica, arial, freesans, sans-serif;
 }
 

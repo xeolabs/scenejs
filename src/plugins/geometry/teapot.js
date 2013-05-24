@@ -4,7 +4,6 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://scenejs.org/license
  * Copyright 2010, Lindsay Kay
- *
  */
 SceneJS.Plugins.addPlugin(
 
@@ -13,12 +12,32 @@ SceneJS.Plugins.addPlugin(
 
     new (function () {
 
+        // Geometry and texture plugins return a factory object (AKA "source") which
+        // creates data for their subscriber nodes.
+        //
         this.getSource = function () {
             var publish;
             return {
-                subscribe:function (fn) {
-                    publish = fn;
+
+                // Through this method, the geometry node subscribes to the mesh data created by this source.
+                //
+                // BTW, although not done by this plugin, some plugins may dynamically update the mesh data,
+                // ie. to push new mesh data into the geometry node. In that case, the callback will be called
+                // each time some new mesh data is available.
+                //
+                subscribe:function (callback) {
+                    publish = callback;
                 },
+
+                // Through this method, the geometry node (re)configures the source. In this example that
+                // causes a new mesh to be generated and published.
+                //
+                // This method is also called as a result of updating the geometry's 'source' attribute, eg:
+                //
+                //      myGeometry.setSource({
+                //          // ..new configuration properties for plugin..
+                //      });
+                //
                 configure:function (cfg) {
                     publish(build(cfg));
                 }
