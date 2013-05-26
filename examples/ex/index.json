@@ -849,7 +849,13 @@
                         "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "viewTransform", "animation"],
                         "id":"tronTank"
                     },
-
+                    {
+                        "title":"Procedural City",
+                        "path":"demos/city.html",
+                        "editor":false,
+                        "tags":[],
+                        "id":"city"
+                    },
                     {
                         "title":"Bubbles",
                         "path":"demos/bubbles.html",
