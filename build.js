@@ -247,7 +247,7 @@
         output.push(fs.readFileSync(fileList[i]));
     }
 
-    var distDir = "build/latest";
+    var distDir = "api/latest";
     var distPluginDir = distDir + "/plugins";
     var distExtrasDir = distDir + "/extras";
 
@@ -271,8 +271,8 @@
 
                     if (fileList.length > 0) {
                         sys.print("Writing built library: scenejs.js\n");
-                        output.push('SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/build/latest/plugins" });');
-//                        output.push('SceneJS.configure({ pluginPath: "/home/lindsay/xeolabs/projects/scenejs3.0/build/latest/plugins"});');
+                        output.push('SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/api/latest/plugins" });');
+//                        output.push('SceneJS.configure({ pluginPath: "/home/lindsay/xeolabs/projects/scenejs3.0/api/latest/plugins"});');
                         output = output.join("");
                         fs.writeFileSync(distDir + "/scenejs.js", output);
 

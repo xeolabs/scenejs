@@ -1,6 +1,5 @@
 /*
  * Based on PlaneGeometry by Mr. Doob
- *
  */
 SceneJS.Plugins.addPlugin(
 

@@ -18,13 +18,13 @@ articulated and pickable objects as required for high-detail visualisation appli
 Hotlink to these binaries and they'll dynamically load SceneJS plugins on-demand from this repository as
 required. That's OK for playing around, but for production you'll probably want to serve the plugins yourself -
 see [Plugin API](#plugin-api) below for how to do that.
-* **[scenejs.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.js)**
-* **[scenejs.min.js](http://xeolabs.github.com/scenejs/build/latest/scenejs.min.js)**
+* **[scenejs.js](http://xeolabs.github.com/scenejs/api/latest/scenejs.js)**
+* **[scenejs.min.js](http://xeolabs.github.com/scenejs/api/latest/scenejs.min.js)**
 
 Also hotlinkable are a bunch of helper utilities:
-* **[OrbitControl](http://xeolabs.github.com/scenejs/build/latest/extras/orbitControl.js)** -
+* **[OrbitControl](http://xeolabs.github.com/scenejs/api/latest/extras/orbitControl.js)** -
 Mouse camera orbit helper
-* **[PickControl](http://xeolabs.github.com/scenejs/build/latest/extras/pickControl.js)** -
+* **[PickControl](http://xeolabs.github.com/scenejs/api/latest/extras/pickControl.js)** -
 Scene picking helper
 
 ## Resources
@@ -61,7 +61,7 @@ var myGeometry = myNode.addNode({
  });
 ```
 
-This ```geometry``` node will create its sphere geometry with the help of the [sphere](./build/latest/plugins/geometry/sphere.js) plugin.
+This ```geometry``` node will create its sphere geometry with the help of the [sphere](./api/latest/plugins/geometry/sphere.js) plugin.
 
 Essentially, the plugin's code looks like the listing below. The plugin provides geometry factory objects (called "sources"), each with
 a ```configure``` method to configure the sphere shape and a ```subscribe``` method to collect the generated geometry data. SceneJS plugins
