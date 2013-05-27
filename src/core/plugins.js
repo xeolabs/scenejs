@@ -38,8 +38,14 @@ SceneJS.Plugins = new (function () {
         if (!pluginPath) {
             throw "no pluginPath config"; // Build script error - should create this config
         }
-        loadScript(pluginPath + "/" + nodeType + "/" + pluginType + ".js",
+        var pluginFilePath = pluginPath + "/" + nodeType + "/" + pluginType + ".js";
+        loadScript(pluginFilePath,
             function () {
+                var plugin = self._nodePlugins[nodeType][pluginType];
+                if (!plugin) {
+                    // Plugin was not registered correctly
+                    throw "Problem in plugin file '" + pluginFilePath + "': call to addPlugin(nodeType, pluginType, ..) : either or both args have incorrect value";
+                }
                 ok(self._nodePlugins[nodeType][pluginType]);
             });
     };
