@@ -72,8 +72,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("varying   vec3 SCENEJS_vViewNormal;");   // Output world-space vertex normal
         }
 
-        src.push("varying vec4 SCENEJS_vModelVertex;");
-
         // if (clipping || fragmentHooks.worldPosClip) {
         src.push("varying vec4 SCENEJS_vWorldVertex;");
         // }
@@ -102,8 +100,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (normals) {
             src.push("  vec4 modelNormal = vec4(SCENEJS_aNormal, 0.0); ");
         }
-
-        src.push("  SCENEJS_vModelVertex = tmpVertex; ");
 
         if (vertexHooks.modelPos) {
             src.push("tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
@@ -186,7 +182,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("  return res;");
         src.push("}");
 
-        src.push("varying vec4 SCENEJS_vModelVertex;");
+
         src.push("varying vec4 SCENEJS_vWorldVertex;");
         src.push("varying vec4 SCENEJS_vViewVertex;");                  // View-space vertex
         src.push("varying vec4 SCENEJS_vProjVertex;");
