@@ -169,7 +169,7 @@
                 "nodes":[
                     {
                         "title":"Texture plugin API",
-                        "page":"texturePlugin"
+                        "page":"videoAlphaMap"
                     }
                 ]
             }
