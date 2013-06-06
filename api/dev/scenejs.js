@@ -14159,7 +14159,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("void main(void) {");
 
         src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
-        src.push("  float   emit    = SCENEJS_uMaterialEmit;");
 
         /*-----------------------------------------------------------------------------------
          * Logic - Clipping
