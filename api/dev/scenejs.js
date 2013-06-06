@@ -14243,98 +14243,98 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         var layer;
-        if (texturing) {
-
-            if (normals) {
-          //      src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
-            }
-
-            src.push("  vec4    texturePos;");
-            src.push("  vec2    textureCoord=vec2(0.0,0.0);");
-
-            for (var i = 0, len = states.texture.layers.length; i < len; i++) {
-                layer = states.texture.layers[i];
-
-                /* Texture input
-                 */
-                if (layer.applyFrom == "normal" && normals) {
-                    if (states.geometry.normalBuf) {
-                        src.push("texturePos=vec4(viewNormalVec.xyz, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture layer applyFrom='normal' but geo has no normal vectors");
-                        continue;
-                    }
-                }
-                if (layer.applyFrom == "uv") {
-                    if (states.geometry.uvBuf) {
-                        src.push("texturePos = vec4(SCENEJS_vUVCoord.s, SCENEJS_vUVCoord.t, 1.0, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
-                        continue;
-                    }
-                }
-                if (layer.applyFrom == "uv2") {
-                    if (states.geometry.uvBuf2) {
-                        src.push("texturePos = vec4(SCENEJS_vUVCoord2.s, SCENEJS_vUVCoord2.t, 1.0, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
-                        continue;
-                    }
-                }
-
-                /* Texture matrix
-                 */
-                if (layer.matrix) {
-                    src.push("textureCoord=(SCENEJS_uLayer" + i + "Matrix * texturePos).xy;");
-                } else {
-                    src.push("textureCoord=texturePos.xy;");
-                }
-
-                /* Alpha from Texture
-                 * */
-                if (layer.applyTo == "alpha") {
-                    if (layer.blendMode == "multiply") {
-                        src.push("alpha = alpha * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
-                    } else if (layer.blendMode == "add") {
-                        src.push("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
-                    }
-                }
-
-                /* Texture output
-                 */
-                if (layer.applyTo == "baseColor") {
-                    if (layer.blendMode == "multiply") {
-                        src.push("color = color * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
-                    } else {
-                        src.push("color = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * color) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
-                    }
-                }
-
-                if (layer.applyTo == "emit") {
-                    if (layer.blendMode == "multiply") {
-                        src.push("emit  = emit * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    } else {
-                        src.push("emit = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * emit) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    }
-                }
-
-                if (layer.applyTo == "specular" && normals) {
-                    if (layer.blendMode == "multiply") {
-                        src.push("specular  = specular * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    } else {
-                        src.push("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    }
-                }
-
-                if (layer.applyTo == "normals" && normals) {
-                    src.push("vec3 bump = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
-                    src.push("viewNormalVec *= -bump;");
-                }
-            }
-            if (normals) {
-         //       src.push("}");
-            }
-        }
+//        if (texturing) {
+//
+//            if (normals) {
+//          //      src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
+//            }
+//
+//            src.push("  vec4    texturePos;");
+//            src.push("  vec2    textureCoord=vec2(0.0,0.0);");
+//
+//            for (var i = 0, len = states.texture.layers.length; i < len; i++) {
+//                layer = states.texture.layers[i];
+//
+//                /* Texture input
+//                 */
+//                if (layer.applyFrom == "normal" && normals) {
+//                    if (states.geometry.normalBuf) {
+//                        src.push("texturePos=vec4(viewNormalVec.xyz, 1.0);");
+//                    } else {
+//                        SceneJS.log.warn("Texture layer applyFrom='normal' but geo has no normal vectors");
+//                        continue;
+//                    }
+//                }
+//                if (layer.applyFrom == "uv") {
+//                    if (states.geometry.uvBuf) {
+//                        src.push("texturePos = vec4(SCENEJS_vUVCoord.s, SCENEJS_vUVCoord.t, 1.0, 1.0);");
+//                    } else {
+//                        SceneJS.log.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
+//                        continue;
+//                    }
+//                }
+//                if (layer.applyFrom == "uv2") {
+//                    if (states.geometry.uvBuf2) {
+//                        src.push("texturePos = vec4(SCENEJS_vUVCoord2.s, SCENEJS_vUVCoord2.t, 1.0, 1.0);");
+//                    } else {
+//                        SceneJS.log.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
+//                        continue;
+//                    }
+//                }
+//
+//                /* Texture matrix
+//                 */
+//                if (layer.matrix) {
+//                    src.push("textureCoord=(SCENEJS_uLayer" + i + "Matrix * texturePos).xy;");
+//                } else {
+//                    src.push("textureCoord=texturePos.xy;");
+//                }
+//
+//                /* Alpha from Texture
+//                 * */
+//                if (layer.applyTo == "alpha") {
+//                    if (layer.blendMode == "multiply") {
+//                        src.push("alpha = alpha * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+//                    } else if (layer.blendMode == "add") {
+//                        src.push("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+//                    }
+//                }
+//
+//                /* Texture output
+//                 */
+//                if (layer.applyTo == "baseColor") {
+//                    if (layer.blendMode == "multiply") {
+//                        src.push("color = color * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+//                    } else {
+//                        src.push("color = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * color) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+//                    }
+//                }
+//
+//                if (layer.applyTo == "emit") {
+//                    if (layer.blendMode == "multiply") {
+//                        src.push("emit  = emit * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+//                    } else {
+//                        src.push("emit = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * emit) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+//                    }
+//                }
+//
+//                if (layer.applyTo == "specular" && normals) {
+//                    if (layer.blendMode == "multiply") {
+//                        src.push("specular  = specular * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+//                    } else {
+//                        src.push("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+//                    }
+//                }
+//
+//                if (layer.applyTo == "normals" && normals) {
+//                    src.push("vec3 bump = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
+//                    src.push("viewNormalVec *= -bump;");
+//                }
+//            }
+//            if (normals) {
+//         //       src.push("}");
+//            }
+//        }
 //
 //        src.push("  vec4    fragColor;");
 //
