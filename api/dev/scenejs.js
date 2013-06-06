@@ -14373,16 +14373,16 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
 
                     if (light.diffuse) {
-                        src.push("if (SCENEJS_uDiffuse) {");
+                    //    src.push("if (SCENEJS_uDiffuse) {");
                         src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
-                        src.push("}");
+                    //    src.push("}");
                     }
 
                     if (light.specular) {
-                        src.push("if (SCENEJS_uSpecularLighting) {");
+                    //    src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
                             " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
-                        src.push("}");
+                    //    src.push("}");
                     }
                     //src.push("}");
                 }
@@ -14393,16 +14393,16 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                     //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
-                        src.push("if (SCENEJS_uDiffuse) {");
+                  //      src.push("if (SCENEJS_uDiffuse) {");
                         src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
-                        src.push("}");
+                   //     src.push("}");
                     }
 
                     if (light.specular) {
-                        src.push("if (SCENEJS_uSpecularLighting) {");
+                   //     src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
                             " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
-                        src.push("}");
+                   //     src.push("}");
                     }
                     // src.push("}");
                 }
