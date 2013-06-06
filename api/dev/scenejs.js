@@ -13459,10 +13459,6 @@ SceneJS_Display.prototype.destroy = function () {
     this._programFactory.destroy();
 };
 
-/**
- * @class Manages creation, sharing and recycle of {@link SceneJS_ProgramSource} instances
- * @private
- */
 var SceneJS_ProgramSourceFactory = new (function() {
 
     this._sourceCache = {}; // Source codes are shared across all scenes
