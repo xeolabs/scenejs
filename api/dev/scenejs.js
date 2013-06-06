@@ -14166,7 +14166,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
          *----------------------------------------------------------------------------------*/
 
         if (clipping) {
-            src.push("if (SCENEJS_uClipping) {");
+         //   src.push("if (SCENEJS_uClipping) {");
             src.push("  float   dist;");
             for (var i = 0; i < states.clips.clips.length; i++) {
                 src.push("    if (SCENEJS_uClipMode" + i + " != 0.0) {");
@@ -14179,7 +14179,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 src.push("        }");
                 src.push("    }");
             }
-            src.push("}");
+          //  src.push("}");
         }
 
         if (texturing && states.geometry.uvBuf && fragmentHooks.texturePos) {
@@ -14246,7 +14246,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (texturing) {
 
             if (normals) {
-                src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
+          //      src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
             }
 
             src.push("  vec4    texturePos;");
@@ -14332,7 +14332,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
             }
             if (normals) {
-                src.push("}");
+         //       src.push("}");
             }
         }
 
