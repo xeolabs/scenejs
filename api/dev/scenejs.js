@@ -14206,17 +14206,17 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push(fragmentHooks.viewNormal + "(SCENEJS_vViewNormal);");
         }
 
-        if (states.geometry.colorBuf) {
-            src.push("  vec3    color   = SCENEJS_vColor.rgb;");
-        } else {
-            src.push("  vec3    color   = SCENEJS_uMaterialBaseColor;")
-        }
-
-        src.push("  float alpha         = SCENEJS_uMaterialAlpha;");
-        src.push("  float emit          = SCENEJS_uMaterialEmit;");
-        src.push("  float specular      = SCENEJS_uMaterialSpecular;");
-        src.push("  vec3  specularColor = SCENEJS_uMaterialSpecularColor;");
-        src.push("  float shine         = SCENEJS_uMaterialShine;");
+//        if (states.geometry.colorBuf) {
+//            src.push("  vec3    color   = SCENEJS_vColor.rgb;");
+//        } else {
+//            src.push("  vec3    color   = SCENEJS_uMaterialBaseColor;")
+//        }
+//
+//        src.push("  float alpha         = SCENEJS_uMaterialAlpha;");
+//        src.push("  float emit          = SCENEJS_uMaterialEmit;");
+//        src.push("  float specular      = SCENEJS_uMaterialSpecular;");
+//        src.push("  vec3  specularColor = SCENEJS_uMaterialSpecularColor;");
+//        src.push("  float shine         = SCENEJS_uMaterialShine;");
 
 //        if (fragmentHooks.materialBaseColor) {
 //            src.push("color=" + fragmentHooks.materialBaseColor + "(color);");
