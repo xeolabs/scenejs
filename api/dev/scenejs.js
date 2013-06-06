@@ -14131,28 +14131,26 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
-        src.push("  float   emit    = SCENEJS_uMaterialEmit;");
 
         src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
 
         if (normals) {
 
-            src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
-            src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
-
-            var light;
-            for (var i = 0; i < states.lights.lights.length; i++) {
-                light = states.lights.lights[i];
-                if (light.mode == "ambient") {
-                    continue;
-                }
-                src.push("uniform vec3  SCENEJS_uLightColor" + i + ";");
-                if (light.mode == "point") {
-                    src.push("uniform vec3  SCENEJS_uLightAttenuation" + i + ";");
-                }
-                src.push("varying vec4  SCENEJS_vViewLightVecAndDist" + i + ";");         // Vector from light to vertex
-            }
+//            src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
+//            src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
+//
+//            var light;
+//            for (var i = 0; i < states.lights.lights.length; i++) {
+//                light = states.lights.lights[i];
+//                if (light.mode == "ambient") {
+//                    continue;
+//                }
+//                src.push("uniform vec3  SCENEJS_uLightColor" + i + ";");
+//                if (light.mode == "point") {
+//                    src.push("uniform vec3  SCENEJS_uLightAttenuation" + i + ";");
+//                }
+//                src.push("varying vec4  SCENEJS_vViewLightVecAndDist" + i + ";");         // Vector from light to vertex
+//            }
         }
 
         if (customFragmentShader.code) {
@@ -14160,6 +14158,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         src.push("void main(void) {");
+
+        src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
+        src.push("  float   emit    = SCENEJS_uMaterialEmit;");
 
         /*-----------------------------------------------------------------------------------
          * Logic - Clipping
