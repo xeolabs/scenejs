@@ -14335,97 +14335,97 @@ var SceneJS_ProgramSourceFactory = new (function () {
          //       src.push("}");
             }
         }
-
-        src.push("  vec4    fragColor;");
-
-        if (normals) {
-
-        //    src.push("if (SCENEJS_uBackfaceLighting || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
-
-            src.push("  vec3    lightValue      = vec3(0.0, 0.0, 0.0);");
-            src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
-            src.push("  vec3    viewLightVec;");
-            src.push("  float   dotN;");
-            src.push("  float   lightDist;");
-
-            var light;
-
-            for (var i = 0, len = states.lights.lights.length; i < len; i++) {
-                light = states.lights.lights[i];
-
-                if (light.mode == "ambient") {
-                    continue;
-                }
-
-                src.push("viewLightVec = SCENEJS_vViewLightVecAndDist" + i + ".xyz;");
-
-                if (light.mode == "point") {
-
-                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
-
-                    //src.push("if (dotN > 0.0) {");
-
-                    src.push("lightDist = SCENEJS_vViewLightVecAndDist" + i + ".w;");
-
-                    src.push("attenuation = 1.0 - (" +
-                        "  SCENEJS_uLightAttenuation" + i + "[0] + " +
-                        "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
-                        "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
-
-                    if (light.diffuse) {
-                    //    src.push("if (SCENEJS_uDiffuse) {");
-                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
-                    //    src.push("}");
-                    }
-
-                    if (light.specular) {
-                    //    src.push("if (SCENEJS_uSpecularLighting) {");
-                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
-                    //    src.push("}");
-                    }
-                    //src.push("}");
-                }
-
-                if (light.mode == "dir") {
-
-                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
-
-                    //src.push("if (dotN > 0.0) {");
-                    if (light.diffuse) {
-                  //      src.push("if (SCENEJS_uDiffuse) {");
-                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
-                   //     src.push("}");
-                    }
-
-                    if (light.specular) {
-                   //     src.push("if (SCENEJS_uSpecularLighting) {");
-                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
-                   //     src.push("}");
-                    }
-                    // src.push("}");
-                }
-            }
-
-            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * color.rgb), alpha);");
-//            src.push("   } else {");
-//            src.push("      fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
-//            src.push("   }");
-
-        } else { // No normals
-            src.push("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
-        }
-
-        if (fragmentHooks.pixelColor) {
-            src.push("fragColor=" + fragmentHooks.pixelColor + "(fragColor);");
-        }
-
-        if (false && debugCfg.whitewash === true) {
+//
+//        src.push("  vec4    fragColor;");
+//
+//        if (normals) {
+//
+//        //    src.push("if (SCENEJS_uBackfaceLighting || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
+//
+//            src.push("  vec3    lightValue      = vec3(0.0, 0.0, 0.0);");
+//            src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
+//            src.push("  vec3    viewLightVec;");
+//            src.push("  float   dotN;");
+//            src.push("  float   lightDist;");
+//
+//            var light;
+//
+//            for (var i = 0, len = states.lights.lights.length; i < len; i++) {
+//                light = states.lights.lights[i];
+//
+//                if (light.mode == "ambient") {
+//                    continue;
+//                }
+//
+//                src.push("viewLightVec = SCENEJS_vViewLightVecAndDist" + i + ".xyz;");
+//
+//                if (light.mode == "point") {
+//
+//                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
+//
+//                    //src.push("if (dotN > 0.0) {");
+//
+//                    src.push("lightDist = SCENEJS_vViewLightVecAndDist" + i + ".w;");
+//
+//                    src.push("attenuation = 1.0 - (" +
+//                        "  SCENEJS_uLightAttenuation" + i + "[0] + " +
+//                        "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
+//                        "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
+//
+//                    if (light.diffuse) {
+//                    //    src.push("if (SCENEJS_uDiffuse) {");
+//                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
+//                    //    src.push("}");
+//                    }
+//
+//                    if (light.specular) {
+//                    //    src.push("if (SCENEJS_uSpecularLighting) {");
+//                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
+//                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
+//                    //    src.push("}");
+//                    }
+//                    //src.push("}");
+//                }
+//
+//                if (light.mode == "dir") {
+//
+//                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
+//
+//                    //src.push("if (dotN > 0.0) {");
+//                    if (light.diffuse) {
+//                  //      src.push("if (SCENEJS_uDiffuse) {");
+//                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
+//                   //     src.push("}");
+//                    }
+//
+//                    if (light.specular) {
+//                   //     src.push("if (SCENEJS_uSpecularLighting) {");
+//                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
+//                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+//                   //     src.push("}");
+//                    }
+//                    // src.push("}");
+//                }
+//            }
+//
+//            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * color.rgb), alpha);");
+////            src.push("   } else {");
+////            src.push("      fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
+////            src.push("   }");
+//
+//        } else { // No normals
+//            src.push("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
+//        }
+//
+//        if (fragmentHooks.pixelColor) {
+//            src.push("fragColor=" + fragmentHooks.pixelColor + "(fragColor);");
+//        }
+//
+//        if (false && debugCfg.whitewash === true) {
             src.push("    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
-        } else {
-            src.push("    gl_FragColor = fragColor;");
-        }
+//        } else {
+//            src.push("    gl_FragColor = fragColor;");
+//        }
         src.push("}");
 
         return src;
