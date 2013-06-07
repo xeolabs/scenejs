@@ -670,9 +670,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
-        src.push("  float   emit    = SCENEJS_uMaterialEmit;");
-
         src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
 
         if (normals) {
@@ -699,6 +696,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         src.push("void main(void) {");
+
+        src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
 
         /*-----------------------------------------------------------------------------------
          * Logic - Clipping
