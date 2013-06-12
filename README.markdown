@@ -228,101 +228,148 @@ myGeometry.setLayers({
 Non-core node types are provided as a special type of plugin. This is a powerful extension mechanism that allows you to create your
 own high-level scene components that just slot straight into the graph as nodes which you can access as usual via the JSON API.
 
-Shown below is the [redTeapot plugin](build/latest/plugins/node/demos/redTeapot.js), which defines a scene node type that is a
-red teapot which can be translated and scaled. This node type exposes setters to update the position and scale of the teapot.
+In this section I'll show you how to define a custom node type as a plugin, and how to use the node type within a scene graph.
+
+#### Configure SceneJS Plugin Path
+
+Before we do anything, let's ensure that SceneJS is configured with a path to a directory where it can find plugins.
+This is the configuration that it has by default, so that it can grab plugins from its repository for easy demonstration:
 
 ```javascript
-SceneJS.Types.addType("demos/redTeapot", {
-
-    // Constructor
-    init:function (params) {
-
-        this._translate = this.addNode({
-            type:"translate"
-        });
-
-        this._scale = this._translate.addNode({
-            type:"scale",
-            x:1, y:1, z:1,
-            nodes:[
-                {
-                    type:"material",
-                    color:{ r:1.0, g:0.6, b:0.6 },
-                    nodes:[
-                        {
-                            type:"geometry",
-                            source:{
-                                type:"teapot"
-                            }
-                        }
-                    ]
-                }
-            ]
-        });
-
-        if (params.pos) {
-            this.setPos(params.pos);
-        }
-
-        if (params.size) {
-            this.setSize(params.size);
-        }
-    },
-
-    // Setter for teapot position
-    setPos:function (pos) {
-        this._translate.setXYZ(pos);
-    },
-
-    // Setter for teapot scale
-    setSize:function (size) {
-        this._scale.setXYZ(size);
-    }
-});
+SceneJS.configure({
+     pluginPath: "http://scenejs.org/api/latest/plugins"
+ });
 ```
 
-The scene below contains an instance of our "redTeapot" node. See how we just reference the type
-with ```type:"demos/redTeapot"```, which causes SceneJS to dynamically load the plugin script shown above,
- which installs the node type into SceneJS when it executes.
+#### Defining a Custom Node Type
+
+A class definition for a custom node type is provided to SceneJS as plugin script which it will dynamically load on-demand as soon as you try to instantiate it within your scene graph.
+
+As shown in the trivial example below, custom nodes generally work as facades that create additional nodes within their subgraphs, while providing accessor methods which usually get or set state on those nodes:
+
+```javascript
+SceneJS.Types.addType("demos/color", {
+
+        // Constructor
+        // The params are the attributes which are specified
+        // for instances of this node type within scene definitions
+        init:function (params) {
+
+            this._material = this.addNode({
+                type:"material",
+
+                // Custom node types are responsible for
+                // attaching any child nodes that are
+                // specified in their 'nodes' properties
+                nodes:params.nodes
+            });
+
+            // Set initial color, if provided
+            if (params.color) {
+                this.setColor(params.color);
+            }
+        },
+
+        // Setter on node to set its color
+        setColor:function (color) {
+            this._material.setColor(color);
+        },
+
+        // Getter on node to get its color
+        getColor:function () {
+            return this._material.getColor();
+        },
+
+        // Node destructor, not actually needed for this
+        // example. Use these to clean up any resources
+        // created by the node.
+        //
+        // Note that when the node is destroyed, SceneJS
+        // will automatically destroy any child nodes
+        // of our node, so there's no need to destroy them
+        // manually with a destructor.
+        destroy:function () {
+        }
+    });
+```
+
+Our plugin is deployed within the default SceneJS plugins directory, at this location:
+
+[http://scenejs.org/api/latest/plugins/node/demos/color.js](http://scenejs.org/api/latest/plugins/node/demos/color.js)
+
+Note that the plugin script installs the custom node type as "demos/color", and see how that type name maps to the script's location
+within the ```http://scenejs.org/api/latest/plugins/node``` directory.
+
+#### Instantiating the Node Type
+
+Now let's create a scene that includes an instance of our custom node type:
 
 ```javascript
 var scene = SceneJS.createScene({
         nodes:[
             {
-                type:"rotate",
-                y: 1,
-                angle: 45,
+                type:"lookAt",
+                eye:{ x:8, y:8, z:8 },
+
                 nodes:[
 
-                    // Instance our custom node type
-                    // The optional size and pos attributes are fed into the node's setters
+                    // Node type defined by plugin
+                    // http://scenejs.org/api/latest/plugins/node/demos/color.js
                     {
-                        type:"demos/redTeapot",
-                        id:"myRedTeapot",
-                        size:{
-                            x:0.4,
-                            y:1.0,
-                            z:0.5
-                        },
-                        pos:{
-                            x:-1
-                        }
+                        type:"demos/color",
+                        id: "myColor",
+                        color: { r: 1, g: 0.3, b: 0.3 },
+
+                        // Child nodes specified for custom nodes are
+                        // expected to be created within the custom
+                        // types' constructors (see this in the custom
+                        // node type's constructor above)
+                        nodes:[
+
+                            // Geometry using a plugin loaded from
+                            // /geometry/teapot
+                            {
+                                type:"geometry",
+                                source:{
+                                    type:"teapot"
+                                }
+                            }
+                        ]
                     }
                 ]
             }
         ]
     });
-
-// Subscribe to the redTeapot - the plugin which defines the redTeapot node
-// may still be loading, so we get the node instance asynchronously
-
-scene.on("nodes.myRedTeapot",
-    function(redTeapot) {
-
-          // Call a setter on our node (see the setter definitions in the plugin script above)
-          redTeapot.setSize({ x: 1.2 });
-    });
 ```
+When SceneJS parses that instance of our ```demos/color``` node type, it's going to dynamically load our plugin script,
+which will install the plugin type, which SceneJS will then instantiate to create the node.
+
+See how in the scene we are providing a child geometry for our node. Within its constructor (the ```init``` method in
+the node type definition plugin above) the custom node type is responsible for inserting  specified child node(s) into
+the subgraph it creates under itself. That's because only the node type knows exactly where the child nodes should be located within its subgraph.
+
+#### Accessing the Node Instance
+Now lets get the node instance and use one of its accessor methods to periodically switch its color property.
+
+Note that since our node originates from a plugin that will be loaded on-demand, we need to get the node asynchronously
+using a callback (instead of synchronously, like we can with instances of core node types):
+
+```javascript
+scene.getNode("myColor",
+            function(myColor) {
+
+                setInterval(function() {
+
+                    myColor.setColor({
+                        r: Math.random(),
+                        g: Math.random(),
+                        b: Math.random()
+                    });
+                }, 1000);
+            });
+```
+
+See that setColor method, which is defined by our node type?
 
 
 ### Serving plugins yourself
