@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body>
+
+<script src="../../../../api/latest/scenejs.js"></script>
+
+<script>
+
+    // Demo of the "camera/orbit", "sky/clouds", "ground/grid" and "buildings/building" custom node types
+
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Node type defined by plugin in <plugins>/node/camera/orbit.js
+            {
+                type:"camera/orbit",
+                yaw:340,
+                pitch:-20,
+                zoom:350,
+                zoomSensitivity:10.0,
+                eye:{ y:0 },
+                look:{ y:0 },
+
+                nodes:[
+
+                    // Node type defined by plugin in <plugins>/node/sky/clouds.js
+                    {
+                        type:"sky/clouds"
+                    },
+
+                    // Node type defined by plugin in <plugins>/node/ground/grid.js
+                    {
+                        type:"ground/grid",
+                        size:{ x:1000, z:1000 },
+                        xSegments:200,
+                        zSegments:200
+                    },
+
+                    getBuildings()
+                ]
+            }
+        ]
+    });
+
+
+    function getBuildings() {
+        var buildings = [];
+        for (var x = -300; x < 300; x += 50) {
+            for (var z = -300; z < 300; z += 50) {
+
+                // Node type defined by plugin in <plugins>/node/buildings/building.js
+                buildings.push({
+                    type:"buildings/building",
+                    pos:{ x:x, y:0, z:z }
+                });
+            }
+        }
+
+        // Group the buildings under a node
+        return {
+            type:"node",
+            nodes:buildings
+        };
+    }
+
+</script>
+</body>
+</html>

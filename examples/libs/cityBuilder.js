@@ -159,8 +159,8 @@ var CityBuilder = function (cfg) {
                         b:1.0
                     },
                     specularColor:[ 1.0, 1.0, 1.0 ],
-                    specular:5.4,
-                    shine:20.0
+                    specular:1.0,
+                    shine:5.0
                 },
 
                 texture:{
@@ -170,6 +170,17 @@ var CityBuilder = function (cfg) {
                         {
                             src:cfg.texturePath + "/HighRiseGlass.jpg",
                             applyTo:"baseColor",
+                            blendMode:"multiply",
+                            wrapS:"repeat",
+                            wrapT:"repeat",
+                            scale:{
+                                x:0.25,
+                                y:0.2
+                            }
+                        },
+                        {
+                            src:cfg.texturePath + "/HighRiseGlassSpecular.jpg",
+                            applyTo:"specular",
                             blendMode:"multiply",
                             wrapS:"repeat",
                             wrapT:"repeat",

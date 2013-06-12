@@ -21,6 +21,13 @@
 
 <script>
 
+// Vertex Sharing is a performance optimization technique in which a parent geometry node defines vertices (consisting
+// of arrays of positions, normal vectors and UV coordinates) that are inherited by child geometry nodes, which supply
+// their own index arrays pointing into different portions of the vertices. The parent VBOs are then bound once across
+// the draw calls for all the children. Each child geometry can be wrapped by different texture or materials etc.
+// This is efficient to render as long as each child geometry inherits a similar combination of states and thus avoids
+// needing to switch shaders (SceneJS will generate a separate shader for each unique state combination).
+
 var scene = SceneJS.createScene({
     nodes:[
 

@@ -284,7 +284,7 @@
         ]
     },
     {
-        "title":"texture",
+        "title":"Texture",
         "tip":"Working with texture maps",
         "tags":["texture"],
         "nodes":[
@@ -744,7 +744,7 @@
                 ]
             },
             {
-                "title":"Instancing",
+                "title":"Core Sharing",
                 "tip":"",
                 "tags":["instancing"],
                 "nodes":[
@@ -753,6 +753,57 @@
                         "path":"scene/instancing/sharedNodeCores.html",
                         "tags":["nodes", "geometry", "material", "texture"],
                         "id":"sharedNodeCores"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Custom Node Types",
+        "tip":"",
+        "tags":["nodes", "plugins"],
+        "nodes":[
+            {
+                "title":"Defining and using custom node types",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Define mew node type",
+                        "path":"customNodes/defining/inlineCustomNodeDef.html",
+                        "tags":[],
+                        "id":"inlineCustomNodeDef"
+                    },
+                    {
+                        "title":"Define new node type w/autonomous behaviour",
+                        "path":"customNodes/defining/animatedInlineCustomNodeDef.html",
+                        "tags":["animation"],
+                        "id":"animatedInlineCustomNodeDef"
+                    }
+                ]
+            },
+            {
+                "title":"Using node type plugins",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Mouse camera orbit",
+                        "path":"customNodes/bundled/cameraOrbit.html",
+                        "tags":[],
+                        "id":"customNodesCameraOrbit"
+                    },
+                    {
+                        "title":"Sky, grid and teapot demo",
+                        "path":"customNodes/bundled/skyGridAndTeapot.html",
+                        "tags":[],
+                        "id":"customNodesSkyGridAndTeapot"
+                    },
+                    {
+                        "title":"Tron Tank",
+                        "path":"customNodes/bundled/tank.html",
+                        "tags":[],
+                        "id":"customNodesTank"
                     }
                 ]
             }

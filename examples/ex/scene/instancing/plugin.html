@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../../../../api/latest/scenejs.js"></script>
+
+<script src="../../../../api/latest/extras/orbitControl.js"></script>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setDebugConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"material",
+                color:{ r:0.6, g:0.6, b:0.9 },
+                nodes:[
+                    {
+                        type:"sky/clouds"
+                    },
+                    {
+                        type:"ground/grid"
+                    },
+                    // red teapot
+                    {
+                        type:"demos/redTeapot",
+                        id:"myRedTeapot",
+                        size:{
+                            x:0.4,
+                            y:1.0,
+                            z:0.5
+                        },
+                        pos:{
+                            x:10
+                        }
+                    },
+                    // Spinning teapot, wrapped in a translation
+                    {
+                        type:"translate",
+                        x:-5, y:20,
+                        nodes:[
+                            {
+                                type:"demos/spinningTeapot",
+                                size:{
+                                    x:0.4,
+                                    y:1.0,
+                                    z:0.5
+                                },
+                                pos:{
+                                    x:-1
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        type:"buildings/building",
+                        pos:{ x:0, y:0, z:-100 }
+                    }
+                    ,
+                    {
+                        type:"buildings/building",
+                        pos:{ x:50, y:0, z:-100 }
+                    },
+                    {
+                        type:"vehicles/tank",
+                        pos:{
+                            x:0,
+                            y:0,
+                            z:0
+                        },
+                        dir:45,
+                        gunDir:-34
+                    },
+                    {
+                        type:"vehicles/tank",
+                        pos:{
+                            x:20,
+                            y:0,
+                            z:0
+                        },
+                        dir:5,
+                        gunDir:104
+                    },
+                    {
+                        type:"vehicles/tank",
+                        pos:{
+                            x:-20,
+                            y:0,
+                            z:0
+                        },
+                        dir:5,
+                        gunDir:-104
+                    }
+                ]
+            }
+        ]
+    });
+
+    scene.on("nodes.myRedTeapot",
+            function (redTeapot) {
+
+
+                var x = 0;
+                var xInc = 0.02;
+
+//                scene.on("tick",
+//                        function () {
+//                            if (x >= 1.5) {
+//                                xInc *= -1;
+//                            } else if (x < 0) {
+//                                xInc *= -1;
+//                            }
+//                            x += xInc;
+//                            redTeapot.setSize({ x:x, y:1, z:1 });
+//                        });
+            });
+
+
+    setTimeout(function () {
+        new SceneJS.OrbitControls(scene, {
+            yaw:-100,
+            pitch:-10,
+            zoom:60,
+            zoomSensitivity:10.0,
+            eye:{ y:40 },
+            look:{ y:00 }
+        });
+    }, 5000);
+
+</script>
+</body>
+</html>

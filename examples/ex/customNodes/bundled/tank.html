@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../../../../api/latest/scenejs.js"></script>
+
+<script src="../../../libs/dat.gui.min.js"></script>
+
+<script>
+
+    // Demo of the custom "vehicles/tank" node
+    // This node type creates a Tank vehicle from the 1982 Disney motion picture Tron
+    // This node has setter methods for tank position and direction, along with the gun direction
+    // This node type is defined by a plugin in <plugins>/node/vehicles/tank.js
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"lookAt",
+                eye:{ x:25, y:20, z:-25 },
+
+                nodes:[
+
+                    // Node type defined by plugin in <plugins>/node/vehicles/tank.js
+                    {
+                        type:"vehicles/tank",
+                        id:"myTank",
+                        pos:{
+                            x:0,
+                            y:0,
+                            z:0
+                        },
+                        dir:0,
+                        gunDir:0
+                    }
+                ]
+            }
+        ]
+    });
+
+    // The plugin for the tank node type is being loaded dynamically,
+    // so we have to get the node asynchronously
+    scene.getNode("myTank",
+            function (tank) {
+
+                // DAT GUI menu
+                // We'll just control the tank direction and gun direction to show the idea
+                // Check out the tank node plugin source for the rest of the methods
+
+                var Menu = function () {
+
+                    this.dir = tank.getDir();
+                    this.gunDir = tank.getGunDir();
+
+                    var self = this;
+
+                    var update = function () {
+
+                        tank.setDir(self.dir);
+                        tank.setGunDir(self.gunDir);
+
+                        requestAnimationFrame(update);
+                    };
+
+                    update();
+                };
+
+                var gui = new dat.GUI();
+                var menu = new Menu();
+                var direction = gui.addFolder("Properties of the 'vehicles/tank' node");
+
+                direction.add(menu, 'dir', 0.0, 360.0);
+                direction.add(menu, 'gunDir', 0.0, 360.0);
+
+                direction.open();
+            });
+
+</script>
+</body>
+</html>

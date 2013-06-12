@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../../../../api/latest/scenejs.js"></script>
+
+<script>
+
+    // Demo of the custom "demos/color" node type, which sets the diffuse color of objects in its subgraph
+    // This node type is defined by a plugin in <plugins>/node/demos/color.js
+
+    // Create scene containing our custom node types
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"lookAt",
+                eye:{ x:8, y:8, z:8 },
+
+                nodes:[
+
+                    // Node type defined by plugin <pluginsPath>/node/demos/color.js
+                    {
+                        type:"demos/color",
+                        id: "myColor",
+                        color: { r: 1, g: 0.3, b: 0.3 },
+
+                        nodes:[
+
+                            // Geometry using a plugin loaded from <plugins>/geometry/teapot
+                            {
+                                type:"geometry",
+                                source:{
+                                    type:"teapot"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Get our node and periodically set a random color on it
+    scene.getNode("myColor",
+            function(myColor) {
+                setInterval(function() {
+                    myColor.setColor({
+                        r: Math.random(),
+                        g: Math.random(),
+                        b: Math.random()
+                    });
+                }, 1000);
+            });
+
+</script>
+</body>
+</html>

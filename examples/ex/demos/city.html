@@ -18,126 +18,64 @@
 <body>
 
 <script src="../../../api/latest/scenejs.js"></script>
-<script src="../../../api/latest/extras/orbitControl.js"></script>
-
-<script src="../../models/wireGrid.js"></script>
-<script src="../../libs/cityBuilder.js"></script>
-
 
 <script>
 
-    var cityBuilder = new CityBuilder({
-        texturePath:"../../textures/city"
-    });
-
-    // Point SceneJS to the bundled plugins
-    SceneJS.setDebugConfigs({
-        pluginPath:"../../../api/latest/plugins"
-    });
-
     var scene = SceneJS.createScene({
         nodes:[
-            wireGrid,
-            {
-                type:"node",
-                id:"cityGoesHere"
-            },
 
-            //--------------------------------------------------------------------------------
-            // Sky box
-            //--------------------------------------------------------------------------------
-
-            // Shader node, injects custom function into the vertex shader
-            // to intercept the View matrix and remove translation terms from it.
-            // This anchors the sky box, preventing it from translating
-            // as we move the eye position.
+            // Node type defined by plugin in <plugins>/node/camera/orbit.js
             {
-                type:"shader",
-                shaders:[
-                    {
-                        stage:"vertex",
-                        code:[
-                            "mat4 myViewMatrix(mat4 m) {",
-                            "   m[3][0] =m[3][1] = m[3][2] = 0.0;",
-                            "return m;",
-                            "}"
-                        ],
-                        // Bind our injected functions to SceneJS hook points
-                        hooks:{
-                            viewMatrix:"myViewMatrix"
-                        }
-                    }
-                ],
+                type:"camera/orbit",
+                yaw:-100,
+                pitch:-10,
+                zoom:500,
+                zoomSensitivity:10.0,
+                eye:{ y:40 },
+                look:{ y:40 },
+
                 nodes:[
-
-                    // Disable lighting for the sky box
                     {
-                        type:"flags",
-                        flags:{
-                            specular:false,
-                            diffuse:false,
-                            ambient:false
-                        },
+                        type:"lights",
+                        lights:[
+                            {
+                                mode:"ambient",
+                                color:{ r:0.5, g:0.5, b:0.6 }
+                            },
+                            {
+                                mode:"dir",
+                                color:{ r:1.0, g:1.0, b:1.0 },
+                                diffuse:true,
+                                specular:true,
+                                dir:{ x:0.5, y:0.0, z:-1.0 },
+                                space:"view"
+                            }
+                        ],
+
                         nodes:[
 
+                            // Node type defined by plugin in <plugins>/node/sky/clouds.js
                             {
-                                type:"material",
-                                color:{ r:0, g:0, b:0  },
-                                emit:0.0,
-                                nodes:[
-                                    // Clouds texture
-                                    {
-                                        type:"texture",
-                                        layers:[
-                                            {
-                                                src:"../../textures/clouds-box.jpg",
-                                                blendMode:"add"
-                                            }
-                                        ],
-                                        nodes:[
-                                            {
-                                                type:"scale",
-                                                x:1000,
-                                                y:1000,
-                                                z:1000,
-                                                nodes:[
-                                                    // Sky box geometry
-                                                    {
-                                                        type:"geometry",
-                                                        source:{
-                                                            type:"skybox"
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
+                                type:"sky/clouds"
+                            },
+
+                            // Node type defined by plugin in <plugins>/node/ground/grid.js
+                            {
+                                type:"ground/grid",
+                                size:{ x:10000, z:10000 },
+                                xSegments:100,
+                                zSegments:100
+                            },
+
+                            // Node type defined by plugin in <plugins>/node/buildings/city.js
+                            {
+                                type:"buildings/city"
                             }
                         ]
                     }
                 ]
             }
         ]
-    });
-
-    cityBuilder.build(
-            scene.getNode("cityGoesHere"), {
-                xPos:0,
-                zPos:0,
-                xBuildings:15,
-                zBuildings:15,
-                xWidth:800,
-                zWidth:800
-            });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:-100,
-        pitch:-10,
-        zoom:400,
-        zoomSensitivity:5.0,
-        eye:{ y:40 },
-        look:{ y:40 }
     });
 
 </script>

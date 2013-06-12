@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../../../../api/latest/scenejs.js"></script>
+
+<script>
+
+    // Demo of the custom "effects/wobble" node type
+    // This node type causes objects in its subgraph to wobble
+    // This node type is defined by a plugin in <plugins>/node/effects/wobble.js
+
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"lookAt",
+                eye:{ x:8, y:8, z:8 },
+
+                nodes:[
+                    {
+                        type:"material",
+                        color:{ r:0.3, g:0.3, b:1.0 },
+
+                        nodes:[
+
+                            // Node type defined by plugin in <plugins>/node/effects/wobble.js
+                            {
+                                type:"effects/wobble",
+
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        source:{
+                                            type:"teapot"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>
