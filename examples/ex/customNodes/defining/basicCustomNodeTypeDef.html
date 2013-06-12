@@ -50,6 +50,8 @@
     // plugin script, so that we can show the node type API.
 
 
+    // Define a new node type:
+
     SceneJS.Types.addType("myColorNodeType", {
 
         init:function (params) {
@@ -87,7 +89,7 @@
         }
     });
 
-    // Create a scene that uses our color node
+    // Create a scene
 
     var scene = SceneJS.createScene({
         nodes:[
@@ -97,7 +99,7 @@
 
                 nodes:[
 
-                    // Node type defined by plugin <pluginsPath>/node/demos/color.js
+                    // Instantiate our new node type:
                     {
                         type:"myColorNodeType",
                         id: "myColor",
@@ -134,7 +136,7 @@
                         g: Math.random(),
                         b: Math.random()
                     });
-                }, 1000);
+                }, 2000);
             });
 
 </script>
