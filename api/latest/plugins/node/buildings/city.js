@@ -7,6 +7,7 @@ SceneJS.Types.addType("buildings/city", {
             for (var z = -300; z < 300; z += 50) {
                 this.addNode({
                     type:"buildings/building",
+                    buildingType: Math.floor(Math.random() * 3), // Three building types
                     pos:{
                         x:x,
                         y:0,
