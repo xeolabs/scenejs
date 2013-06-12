@@ -23,20 +23,18 @@
 
 <script>
 
-    // Demo of the custom "vehicles/tank" node
-    // This node type creates a Tank vehicle from the 1982 Disney motion picture Tron
-    // This node has setter methods for tank position and direction, along with the gun direction
-    // This node type is defined by a plugin in <plugins>/node/vehicles/tank.js
+    // Demo of the custom "vehicles/tank" node, which creates
+    // a Tank vehicle from the 1982 Disney motion picture 'Tron'
 
     var scene = SceneJS.createScene({
         nodes:[
             {
                 type:"lookAt",
-                eye:{ x:25, y:20, z:-25 },
+                eye:{ x:0, y:20, z:-25 },
 
                 nodes:[
 
-                    // Node type defined by plugin in <plugins>/node/vehicles/tank.js
+                    // Node type defined by plugin in http://scenejs.org/api/latest/plugins/node/vehicles/tank.js
                     {
                         type:"vehicles/tank",
                         id:"myTank",
