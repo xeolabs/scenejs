@@ -1201,13 +1201,17 @@ SceneJS_eventManager.prototype.unEvent = function (handlerId) {
  */
 SceneJS.Plugins = new (function () {
 
-    this._nodePlugins = {};
+    // Plugin map for each node type
+    var nodePlugins = {};
+
+    // Subscribers to plugins
+    var pluginSubs = {};
 
     /**
      * Installs a plugin into SceneJS
      */
     this.addPlugin = function (nodeType, pluginType, plugin) {
-        var plugins = this._nodePlugins[nodeType] || (this._nodePlugins[nodeType] = {});
+        var plugins = nodePlugins[nodeType] || (nodePlugins[nodeType] = {});
         plugins[pluginType] = plugin;
     };
 
@@ -1215,7 +1219,7 @@ SceneJS.Plugins = new (function () {
      * Tests if given plugin is installed
      */
     this.hasPlugin = function (nodeType, pluginType) {
-        var plugins = this._nodePlugins[nodeType];
+        var plugins = nodePlugins[nodeType];
         return (plugins && !!plugins[pluginType]);
     };
 
@@ -1223,14 +1227,20 @@ SceneJS.Plugins = new (function () {
      * Returns installed plugin of given type and ID
      */
     this.getPlugin = function (nodeType, pluginType, ok) {
-        var plugins = this._nodePlugins[nodeType];
+        var plugins = nodePlugins[nodeType];
         if (plugins) {
             var plugin = plugins[pluginType];
             if (plugin) {
                 ok(plugin);
+                return;
             }
         }
-        // lazy-load
+        var subId = nodeType + pluginType;
+        var subs = pluginSubs[subId] || (pluginSubs[subId] = []);
+        subs.push(ok);
+        if (subs.length > 1) { // Not first sub
+            return;
+        }        
         var self = this;
         var pluginPath = SceneJS_debugModule.configs.pluginPath;
         if (!pluginPath) {
@@ -1239,12 +1249,15 @@ SceneJS.Plugins = new (function () {
         var pluginFilePath = pluginPath + "/" + nodeType + "/" + pluginType + ".js";
         loadScript(pluginFilePath,
             function () {
-                var plugin = self._nodePlugins[nodeType][pluginType];
+                var plugin = nodePlugins[nodeType][pluginType];
                 if (!plugin) {
                     // Plugin was not registered correctly
                     throw "Problem in plugin file '" + pluginFilePath + "': call to addPlugin(nodeType, pluginType, ..) : either or both args have incorrect value";
                 }
-                ok(self._nodePlugins[nodeType][pluginType]);
+                while (subs.length > 0) {
+                    subs.pop()(plugin);
+                }
+                delete pluginSubs[subId];
             });
     };
 
@@ -1396,15 +1409,6 @@ SceneJS.bind = function (name, func) {
         case "error" :
 
             return SceneJS_events.addListener(SceneJS_events.ERROR, func);
-            break;
-
-        case "nodeCreated" :
-
-            return SceneJS_events.addListener(
-                SceneJS_events.NODE_CREATED,
-                function (params) {
-                    func(params);
-                });
             break;
 
         case "reset" :
@@ -1651,44 +1655,39 @@ var SceneJS_Engine = function(json, options) {
      * The current scene graph status
      */
     this.sceneStatus = {
-        nodes: {},          // Status for each node 
-        numLoading: 0       // Number of loads currently in progress
+        nodes:{}, // Status for each node
+        numLoading:0       // Number of loads currently in progress
     };
-
-    /**
-     * The engine's scene graph
-     * @type SceneJS.Scene
-     */
-    this.scene = this.createNode(json); // Scene back-references this engine, so is defined after other engine members
 
     var self = this;
 
+
+    // Create scene root first, then create its subnodes
+    // This way nodes can access the scene in their constructors
+    var nodes = json.nodes;
+    json.nodes = null;
+    this.scene = this.createNode(json); // Create scene root
+    json.nodes = nodes;
+    this.scene.addNodes(nodes); // then create sub-nodes
+
     this.canvas.canvas.addEventListener(// WebGL context lost
-            "webglcontextlost",
-            function(event) {
-
-                event.preventDefault();
-
-                SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_LOST, { scene: self.scene });
-
-            },
-            false);
+        "webglcontextlost",
+        function (event) {
+            event.preventDefault();
+            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_LOST, { scene:self.scene });
+        },
+        false);
 
     this.canvas.canvas.addEventListener(// WebGL context recovered
-            "webglcontextrestored",
-            function(event) {
-
-                event.preventDefault();
-
-                self.canvas.initWebGL();
-
-                self._coreFactory.webglRestored();  // Reallocate WebGL resources for node state cores
-
-                self.display.webglRestored(); // Reallocate shaders and re-cache shader var locations for display state chunks
-
-                SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_RESTORED, { scene: self.scene });
-            },
-            false);
+        "webglcontextrestored",
+        function (event) {
+            event.preventDefault();
+            self.canvas.initWebGL();
+            self._coreFactory.webglRestored();  // Reallocate WebGL resources for node state cores
+            self.display.webglRestored(); // Reallocate shaders and re-cache shader var locations for display state chunks
+            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_RESTORED, { scene:self.scene });
+        },
+        false);
 };
 
 
@@ -1696,48 +1695,67 @@ var SceneJS_Engine = function(json, options) {
  * Simulate a lost WebGL context.
  * Only works if the simulateWebGLContextLost was given as an option to the engine's constructor.
  */
-SceneJS_Engine.prototype.loseWebGLContext = function() {
+SceneJS_Engine.prototype.loseWebGLContext = function () {
     this.canvas.loseWebGLContext();
+};
+
+/**
+ * Gets/loads the given node type
+ *
+ * @param {String} type Node type name
+ * @param {Function(Function)} ok Callback fired when type loaded, returns the type constructor
+ */
+SceneJS_Engine.prototype.getNodeType = function (type, ok) {
+    SceneJS_NodeFactory.getNodeType(type, ok);
+};
+
+/**
+ * Returns true if the given node type is currently loaded (ie. load not required)
+ * @param type
+ */
+SceneJS_Engine.prototype.hasNodeType = function (type) {
+    return !!SceneJS_NodeFactory.nodeTypes[type];
 };
 
 /**
  * Recursively parse the given JSON scene graph representation and return a scene (sub)graph.
  *
  * @param {Object} json JSON definition of a scene graph or subgraph
- * @returns {SceneJS.Node} Root of the new (sub)graph
+ * @param {Function} ok Callback fired when node created, with the node as argument
  */
-SceneJS_Engine.prototype.createNode = function(json) {
+SceneJS_Engine.prototype.createNode = function (json, ok) {
 
     json.type = json.type || "node"; // Nodes are SceneJS.Node type by default
-
     var core = this._coreFactory.getCore(json.type, json.coreId); // Create or share a core
+    var self = this;
 
-    var node;
+    return this._nodeFactory.getNode(
+        this, json, core,
+        function (node) {
 
-    //try {
-    node = this._nodeFactory.getNode(this, json, core);
-
-    SceneJS_events.fireEvent(SceneJS_events.NODE_CREATED, {
-        sceneId: this.id, // Engine ID is same as scene ID
-        nodeId: node.nodeId
-    });
-
-
-    //    } catch (e) {
-    //
-    //        this._coreFactory.putCore(core); // Clean up after node create failed
-    //
-    //        throw e;
-    //    }
-
-    if (json.nodes) {
-
-        for (var i = 0, len = json.nodes.length; i < len; i++) { // Create sub-nodes
-            node.addNode(this.createNode(json.nodes[i]));
-        }
-    }
-
-    return node;
+            // Create child nodes
+            if (!node._fromPlugin && json.nodes) {
+                var numNodes = 0;
+                for (var i = 0, len = json.nodes.length; i < len; i++) {
+                    self.createNode(
+                        json.nodes[i],
+                        function (childNode) {
+                            node.addNode(childNode);
+                            if (++numNodes == len) {
+                                if (ok) {
+                                    ok(node);
+                                }
+                                self.scene._publish("nodes/" + node.id, node);
+                            }
+                        });
+                }
+            } else {
+                if (ok) {
+                    ok(node);
+                    self.scene._publish("nodes/" + node.id, node);
+                }
+            }
+        });
 };
 
 /**
@@ -1861,7 +1879,7 @@ SceneJS_Engine.prototype.renderFrame = function(params) {
  * @params cfg.frameFunc {Function} Callback to call after a render is done to update the scene image
  * @params cfg.sleepFunc {Function}
  */
-SceneJS_Engine.prototype.start = function(cfg) {
+SceneJS_Engine.prototype.start = function (cfg) {
 
     if (!this.running) {
 
@@ -1878,15 +1896,17 @@ SceneJS_Engine.prototype.start = function(cfg) {
         this.sceneDirty = true;
 
         var tick = {
-            sceneId: this.id,
-            startTime: (new Date()).getTime()
+            sceneId:this.id,
+            startTime:(new Date()).getTime()
         };
 
         self.events.fireEvent("started", tick);
 
         var time = (new Date()).getTime();
 
-        window[fnName] = function() {
+        var scene = this.scene;
+
+        window[fnName] = function () {
 
             if (self.running && !self.paused) {  // idleFunc may have paused scene
 
@@ -1895,7 +1915,7 @@ SceneJS_Engine.prototype.start = function(cfg) {
                 tick.time = time;
 
 
-                self.events.fireEvent("tick", tick);
+                scene._publish("tick", tick);
 
                 if (!self.running) { // idleFunc may have destroyed scene
                     return;
@@ -1907,14 +1927,14 @@ SceneJS_Engine.prototype.start = function(cfg) {
 
                     self.display.render();
 
-                    self.events.fireEvent("rendered", tick);
+                    scene._publish("rendered", tick);
 
                     window.requestAnimationFrame(window[fnName]);
 
                 } else {
 
                     if (!sleeping) {
-                        self.events.fireEvent("sleep", tick);
+                        scene._publish("sleep", tick);
                     }
 
                     sleeping = true;
@@ -2021,7 +2041,7 @@ SceneJS_Engine.prototype.stop = function() {
 
         window["__scenejs_sceneLoop" + this.id] = null;
 
-        this.events.fireEvent("stopped", { sceneId: this.id });
+     //   this.events.fireEvent("stopped", { sceneId: this.id });
     }
 };
 
@@ -2073,7 +2093,7 @@ SceneJS_Engine.prototype.destroy = function() {
 
     this.destroyed = true;
 
-    this.events.fireEvent("destroyed", { sceneId: this.id });
+   // this.events.fireEvent("destroyed", { sceneId: this.id });
 };
 
 /*---------------------------------------------------------------------------------------------------------------------
@@ -2102,10 +2122,10 @@ if (! self.Int32Array) {
         window.requestAnimationFrame = function(callback, element) {
             var currTime = new Date().getTime();
             var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            var id = window.setTimeout(function() {
-                callback(currTime + timeToCall);
-            },
-                    timeToCall);
+            var id = window.setTimeout(function () {
+                    callback(currTime + timeToCall);
+                },
+                timeToCall);
             lastTime = currTime + timeToCall;
             return id;
         };
@@ -5636,7 +5656,7 @@ SceneJS_CoreFactory.prototype.webglRestored = function () {
 /**
  * @class The basic scene graph node type
  */
-SceneJS.Node = function () {
+SceneJS.Node = function() {
 };
 
 /**
@@ -5700,6 +5720,12 @@ SceneJS.Node.prototype._construct = function (engine, core, cfg, nodeId) {
      */
     this.nodes = [];
 
+    // Pub/sub support
+    this._handleMap = new SceneJS_Map(); // Subscription handle pool
+    this._topicSubs = {}; // A [handle -> callback] map for each topic name
+    this._handleTopics = {}; // Maps handles to topic names
+    this._topicPubs = {}; // Maps topics to publications
+
     /**
      *
      */
@@ -5721,60 +5747,111 @@ SceneJS.Node.prototype._construct = function (engine, core, cfg, nodeId) {
     this.branchDirty = false;
 
     if (this._init) {
-
-        // This is a node subtype
         this._init(cfg);
+    }
+};
 
-    } else {
-
-        var params = cfg;
-
-        // This is a basic node type
-        this._sourceConfigs = null;
-        this._source = null;
-        if (params.plugin) {
-            this._sourceConfigs = SceneJS._apply({ type:params.plugin }, params);
-        } else if (params.source) {
-            this._sourceConfigs = params.source;
-        }
-        if (this._sourceConfigs) {
-            this._core._loading = true;
-            if (!this._sourceConfigs.type) {
-                throw SceneJS_error.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "asset node config expected: source.type");
+/**
+ * Publishes to a topic on this node.
+ *
+ * Immediately notifies existing subscriptions to that topic, retains the publication to give to
+ * any subsequent notifications on that topic as they are made.
+ *
+ * @param topic Publication topic
+ * @param pub The publication
+ * @private
+ */
+SceneJS.Node.prototype._publish = function (topic, pub) {
+    this._topicPubs[topic] = pub; // Save notification
+    var subsForTopic = this._topicSubs[topic];
+    if (subsForTopic) { // Notify subscriptions
+        for (var handle in subsForTopic) {
+            if (subsForTopic.hasOwnProperty(handle)) {
+                subsForTopic[handle].call(this, pub);
             }
-            var self = this;
-            SceneJS.Plugins.getPlugin(
-                "node",
-                this._sourceConfigs.type,
-                function (plugin) {
-                    if (!plugin.getSource) {
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "node: 'getSource' method missing on plugin for node source type '" + self._sourceConfigs.type + "'.");
-                    }
-                    self._source = plugin.getSource();
-                    if (!self._source.subscribe) {
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "node: 'subscribe' method missing on plugin for node source type '" + self._sourceConfigs.type + "'");
-                    }
-                    self._source.subscribe(
-                        function (data) {
-                            self.addNode(data);
-                            self._engine.branchDirty(self); // Schedule compilation of new node
-                        }
-                    );
-                    self._fireEvent("loading");
-                    if (self._source.configure) {
-                        self._source.configure(self._sourceConfigs);
-                    }
-                });
         }
     }
 };
 
+/**
+ * Removes a topic publication
+ *
+ * Immediately notifies existing subscriptions to that topic, sending them each a null publication.
+ *
+ * @param topic Publication topic
+ * @private
+ */
+SceneJS.Node.prototype._unpublish = function (topic) {
+    var subsForTopic = this._topicSubs[topic];
+    if (subsForTopic) { // Notify subscriptions
+        for (var handle in subsForTopic) {
+            if (subsForTopic.hasOwnProperty(handle)) {
+                subsForTopic[handle].call(this, null);
+            }
+        }
+    }
+    delete this._topicPubs[topic];
+};
+
+
+/**
+ * Listen for data changes at a particular location on this node
+ *
+ * <p>Your callback will be triggered for
+ * the initial data and again whenever the data changes. Use {@link #off} to stop receiving updates.</p>
+ *
+ * <p>The callback is be called with this node as scope.</p>
+ *
+ * @param {String} location Publication location
+ * @param {Function(data)} callback Called when fresh data is available at the location
+ * @return {String} Handle to the subscription, which may be used to unsubscribe with {@link #off}.
+ */
+SceneJS.Node.prototype.on = function (topic, callback) {
+    var subsForTopic = this._topicSubs[topic];
+    if (!subsForTopic) {
+        subsForTopic = {};
+        this._topicSubs[topic] = subsForTopic;
+    }
+    var handle = this._handleMap.addItem(); // Create unique handle
+    subsForTopic[handle] = callback;
+    this._handleTopics[handle] = topic;
+    var pub = this._topicPubs[topic];
+    if (pub) { // A publication exists, notify callback immediately
+        callback.call(this, pub);
+    }
+    return handle;
+};
+
+/**
+ * Unsubscribes from a publication on this node that was previously made with {@link #on}.
+ * @param handle Publication handle
+ */
+SceneJS.Node.prototype.off = function (handle) {
+    var topic = this._handleTopics[handle];
+    if (topic) {
+        delete this._handleTopics[handle];
+        var topicSubs = this._topicSubs[topic];
+        if (topicSubs) {
+            delete topicSubs[handle];
+        }
+        this._handleMap.removeItem(handle); // Release handle
+    }
+};
+
+/**
+ * Listens for exactly one data update at the specified location on this node, and then stops listening.
+ * <p>This is equivalent to calling {@link #on}, and then calling {@link #off} inside the callback function.</p>
+ * @param {String} location Data location to listen to
+ * @param {Function(data)} callback Called when fresh data is available at the location
+ */
+SceneJS.Node.prototype.once = function (topic, callback) {
+    var self = this;
+    var sub = this.on(topic,
+        function (pub) {
+            self.off(sub);
+            callback(pub);
+        });
+};
 
 /**
  * Returns this node's {@link SceneJS.Scene}
@@ -5782,7 +5859,6 @@ SceneJS.Node.prototype._construct = function (engine, core, cfg, nodeId) {
 SceneJS.Node.prototype.getScene = function () {
     return this._engine.scene;
 };
-
 
 /**
  * Returns the ID of this node's core
@@ -6037,7 +6113,7 @@ SceneJS.Node.prototype.splice = function () {
 
 /** Appends multiple child nodes
  */
-SceneJS.Node.prototype.addNodes = function (nodes) {
+SceneJS.Node.prototype.addNodes = function (nodes, ok) {
 
     if (!nodes) {
         throw SceneJS_error.fatalError(
@@ -6047,22 +6123,47 @@ SceneJS.Node.prototype.addNodes = function (nodes) {
 
     var node;
     var result = [];
+    var numNodes = nodes.length;
 
     for (var i = nodes.length - 1; i >= 0; i--) {
+        var nodeAttr = nodes[i];
+        if (nodeAttr.type == "node" || this._engine.hasNodeType(nodeAttr.type)) {
 
-        node = this.addNode(nodes[i]);
+            // Add loaded node type synchronously
 
-        result[i] = node;
+            node = this.addNode(nodeAttr);
+            result[i] = node;
+            if (--numNodes == 0) {
+                if (ok) {
+                    ok(nodes);
+                }
+                return nodes;
+            }
+        } else {
 
-        this._engine.branchDirty(node); // Schedule compilation of new node
+            // Load node type and instantiate it asynchronously
+
+            var self = this;
+            (function () {
+                var nodei = i;
+                self.addNode(nodeAttr,
+                    function (node) {
+                        result[nodei] = node;
+                        if (--numNodes == 0) {
+                            if (ok) {
+                                ok(nodes);
+                            }
+                        }
+                    });
+            })();
+        }
     }
-
-    return result;
+    return null;
 };
 
 /** Appends a child node
  */
-SceneJS.Node.prototype.addNode = function (node) {
+SceneJS.Node.prototype.addNode = function (node, ok) {
 
     if (!node) {
         throw SceneJS_error.fatalError(
@@ -6070,40 +6171,81 @@ SceneJS.Node.prototype.addNode = function (node) {
             "Node#addNode - node argument is undefined");
     }
 
-    if (!node._compile) {
-        if (typeof node == "string") {
-
-            var gotNode = this._engine.findNode(node);
-            if (!gotNode) {
-                throw SceneJS_error.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "Node#addNode - node not found: '" + node + "'");
-            }
-            node = gotNode;
-        } else {
-            node = this._engine.createNode(node);
+    // Graft node object
+    if (node._compile) {
+        if (node.parent != null) {
+            throw SceneJS_error.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Node#addNode - node argument is still attached to another parent");
         }
+        this.nodes.push(node);
+        node.parent = this;
+        this._engine.branchDirty(node);
+        if (ok) {
+            ok(node);
+        }
+        return node;
     }
 
-    if (!node._compile) {
-        throw SceneJS_error.fatalError(
-            SceneJS.errors.ILLEGAL_NODE_CONFIG,
-            "Node#addNode - node argument is not a Node or subclass");
+    // Graft node object by ID reference
+    if (typeof node == "string") {
+        var gotNode = this._engine.findNode(node);
+        if (!gotNode) {
+            throw SceneJS_error.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Node#addNode - node not found: '" + node + "'");
+        }
+        node = gotNode;
+        if (node.parent != null) {
+            throw SceneJS_error.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Node#addNode - node argument is still attached to another parent");
+        }
+        this.nodes.push(node);
+        node.parent = this;
+        this._engine.branchDirty(node);
+        if (ok) {
+            ok(node);
+        }
+        return node;
     }
 
-    if (node.parent != null) {
-        throw SceneJS_error.fatalError(
-            SceneJS.errors.ILLEGAL_NODE_CONFIG,
-            "Node#addNode - node argument is still attached to another parent");
+    // Create node
+    if (node.type == "node" || this._engine.hasNodeType(node.type)) {
+
+        // Root node's type is already loaded, so we are able
+        // to create the root synchronously. When the caller
+        // is creating a core node type, then by this contract
+        // it can rely on the return value
+
+        node = this._engine.createNode(node);
+        this.nodes.push(node);
+        node.parent = this;
+        this._engine.branchDirty(node);
+        if (ok) {
+            ok(node);
+        }
+        return node;
+
+    } else {
+
+        // Otherwise the root node's type needs to be loaded,
+        // so we need to create it asynchronously. By this contract,
+        // the Caller would not rely on synchronous creation of
+        // non-core types.
+
+        var self = this;
+        this._engine.createNode(node,
+            function (node) {
+                self.nodes.push(node);
+                node.parent = self;
+                self._engine.branchDirty(node);
+                if (ok) {
+                    ok(node);
+                }
+            });
+        return null;
     }
-
-    this.nodes.push(node);
-
-    node.parent = this;
-
-    this._engine.branchDirty(node);
-
-    return node;
 };
 
 /** Inserts a subgraph into child nodes
@@ -6136,7 +6278,6 @@ SceneJS.Node.prototype.insertNode = function (node, i) {
     }
 
     if (i === undefined || i === null) {
-
         node.addNodes(this.disconnectNodes());
         this.addNode(node);
 
@@ -6701,59 +6842,6 @@ SceneJS.Node.prototype.bind = function (name, handler) {
 };
 
 /**
- * Alias for #bind
- * @param type
- * @param callback
- * @return {*|String}
- */
-SceneJS.Node.prototype.on = SceneJS.Node.prototype.bind;
-
-/** Unbinds a listener for an event on the selected node
- *
- * @param {String} name Event name
- * @param {Function} handler Event handler
- */
-SceneJS.Node.prototype.unbind = function (name, handler) {
-    if (!name) {
-        throw "SceneJS.Node.bind param 'name' null or undefined";
-    }
-    if (typeof name != "string") {
-        throw "SceneJS.Node.bind param 'name' should be a string";
-    }
-    if (!handler) {
-        throw "SceneJS.Node.bind param 'handler' null or undefined";
-    }
-    if (typeof handler != "function") {
-        throw "SceneJS.Node.bind param 'handler' should be a function";
-    }
-
-    this.removeListener(name, handler);
-
-    this._engine.branchDirty(this);
-};
-
-/**
- * Alias for #unbind
- * @param type
- * @param callback
- * @return {*|String}
- */
-SceneJS.Node.prototype.off = SceneJS.Node.prototype.unbind;
-
-/**
- * Subscribe to one occurrence of an event. This is equivalent to calling #off in the
- * callback given to #on.
- */
-SceneJS.Node.prototype.once = function (type, callback) {
-    var self = this;
-    var handle = this.on(type,
-        function (params) {
-            self._engine.events.unEvent(handle);
-            callback(params);
-        });
-};
-
-/**
  * Returns an object containing the attributes that were given when creating the node. Obviously, the map will have
  * the current values, plus any attributes that were later added through set/add methods on the node
  *
@@ -6818,6 +6906,9 @@ SceneJS.Node.prototype.destroy = function () {
             }
         }
 
+        // Remove publication
+        this._engine.scene._unpublish("nodes/" + this.id);
+
         /* Recusrsively destroy child nodes without
          * bothering to remove them from their parents
          */
@@ -6856,9 +6947,13 @@ SceneJS.Node.prototype._doDestroy = function () {
  * @class Manages creation, recycle and destruction of {@link SceneJS.Node} instances
  * @private
  */
-var SceneJS_NodeFactory = function() {
+var SceneJS_NodeFactory = function () {
 
+    // Nodes created by this factory
     this.nodes = new SceneJS_Map({});
+
+    // Subscribers waiting for node types
+    this._subs = {};
 };
 
 /**
@@ -6871,68 +6966,117 @@ SceneJS_NodeFactory.nodeTypes = {};    // Supported node classes, installed by #
 /**
  * Creates a node class for instantiation by this factory
  *
- * @param {String} nodeTypeName Name of type, eg. "rotate"
+ * @param {String} typeName Name of type, eg. "rotate"
  * @param {String} coreTypeName Optional name of core type for the node, eg. "xform" - defaults to type name of node
  * @returns The new node class
  */
-SceneJS_NodeFactory.createNodeType = function(nodeTypeName, coreTypeName) {
-
-    var nodeType = function() { // Create the class
+SceneJS_NodeFactory.createNodeType = function (typeName, coreTypeName) {
+    if (SceneJS_NodeFactory.nodeTypes[typeName]) {
+        throw "Node type already defined: " + typeName;
+    }
+    var nodeType = function () { // Create the class
         SceneJS.Node.apply(this, arguments);
-        this.type = nodeTypeName;
+        this.type = typeName;
     };
-
     nodeType.prototype = new SceneJS.Node();            // Inherit from base class
     nodeType.prototype.constructor = nodeType;
-
-    SceneJS_NodeFactory.nodeTypes[nodeTypeName] = nodeType;
-
+    SceneJS_NodeFactory.nodeTypes[typeName] = nodeType;
     return nodeType;
 };
 
 /**
  *
  */
-SceneJS_NodeFactory.prototype.getNode = function(engine, json, core) {
-
+SceneJS_NodeFactory.prototype.getNode = function (engine, json, core, ok) {
     json.type = json.type || "node"; // Nodes are SceneJS.Node type by default
-
     var nodeType;
-
     if (json.type == "node") {
-
         nodeType = SceneJS.Node;
-
     } else {
-
         nodeType = SceneJS_NodeFactory.nodeTypes[json.type];
-
-        if (!nodeType) {
-            throw SceneJS_error.fatalError("node type not supported: '" + json.type + "'");
-        }
     }
+    if (nodeType) {
+        return this._createNode(nodeType, engine, json, core, ok);
+    } else {
+        var self = this;
+        this.getType(json.type,
+            function (nodeType) {
+                self._createNode(nodeType, engine, json, core, ok);
+            });
+    }
+};
 
+SceneJS_NodeFactory.prototype._createNode = function (nodeType, engine, json, core, ok) {
     var node = new nodeType();
-
     var id = json.id || json.nodeId; // 'id' and 'nodeId' are aliases
-
     if (id) {
         this.nodes.addItem(id, node);
-
     } else {
         id = this.nodes.addItem(node);
     }
-
     node._construct(engine, core, json, id); // Instantiate node
-
+    if (ok) {
+        ok(node);
+    }
     return node;
+};
+
+/**
+ * Returns installed type of given type and ID
+ */
+SceneJS_NodeFactory.prototype.getType = function (typeName, ok) {
+    var type = SceneJS_NodeFactory.nodeTypes[typeName];
+    if (type) {
+        ok(type);
+        return;
+    }
+    var subs = this._subs[typeName] || (this._subs[typeName] = []);
+    subs.push(ok);
+    if (subs.length > 1) { // Not first sub
+        return;
+    }
+    var self = this;
+    var typePath = SceneJS_debugModule.configs.pluginPath;
+    if (!typePath) {
+        throw "no typePath config"; // Build script error - should create this config
+    }
+    this._loadScript(typePath + "/node/" + typeName + ".js",
+        function () {
+            var type = SceneJS_NodeFactory.nodeTypes[typeName]; // Type has installed itself
+            if (!type) {
+                throw "Node type plugin did not install itself correctly";
+            }
+            while (subs.length > 0) {
+                subs.pop()(type);
+            }
+            delete subs[typeName];
+        });
+};
+
+SceneJS_NodeFactory.prototype._loadScript = function (url, ok) {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    if (script.readyState) {  //IE
+        script.onreadystatechange = function () {
+            if (script.readyState == "loaded" ||
+                script.readyState == "complete") {
+                script.onreadystatechange = null;
+                ok();
+            }
+        };
+    } else {  //Others
+        script.onload = function () {
+            ok();
+        };
+    }
+    script.src = url;
+    document.getElementsByTagName("head")[0].appendChild(script);
 };
 
 /**
  * Releases a node back to this factory
  */
-SceneJS_NodeFactory.prototype.putNode = function(node) {
-
+SceneJS_NodeFactory.prototype.putNode = function (node) {
     this.nodes.removeItem(node.id);
 };
 (function () {
@@ -10503,60 +10647,6 @@ SceneJS.Scene.prototype._init = function (params) {
     this._tagSelector = null;
 };
 
-/**
- * Subscribes to an event on this scene
- *
- * @param {String} type Event type
- * @param {Function} callback Callback that will be called with the event parameters
- * @return {String} handle Handle to the subcription
- * @deprecated
- */
-SceneJS.Scene.prototype.onEvent = function (type, callback) {
-    return this._engine.events.onEvent(type, callback);
-};
-
-/**
- * Alias for #onEvent
- * @param type
- * @param callback
- * @return {*|String}
- */
-SceneJS.Scene.prototype.on = function (type, callback) {
-    return this._engine.events.onEvent(type, callback);
-};
-
-/**
- * Unsubscribes to an event previously subscribed to on scene
- *
- * @param {String} handle Subscription handle
- * @deprecated
- */
-SceneJS.Scene.prototype.unEvent = function (handle) {
-    this._engine.events.unEvent(handle);
-};
-
-/**
- * Alias for #unEvent
- *
- * @param {String} handle Subscription handle
- */
-SceneJS.Scene.prototype.off = function (handle) {
-    this._engine.events.unEvent(handle);
-};
-
-/**
- * Subscribe to one occurrence of an event. This is equivalent to calling #off in the
- * callback given to #on.
- */
-SceneJS.Scene.prototype.once = function (type, callback) {
-    var self = this;
-    var handle = this._engine.events.onEvent(type,
-        function (params) {
-            self._engine.events.unEvent(handle);
-            callback(params);
-        });
-};
-
 
 /**
  * Simulate a lost WebGL context for testing purposes.
@@ -10692,6 +10782,7 @@ SceneJS.Scene.prototype.stop = function () {
 };
 
 /** Determines if node exists in this scene
+ * @deprecated
  */
 SceneJS.Scene.prototype.containsNode = function (nodeId) {
     return !!this._engine.findNode(nodeId);
@@ -10710,18 +10801,34 @@ SceneJS.Scene.prototype.findNodes = function (nodeIdRegex) {
 /**
  * Finds the node with the given ID in this scene
  * @deprecated
+ * @param {String} nodeId Node ID
+ * @param {Function} callback Callback through which we'll get the node asynchronously if it's being instantiated on-demand from a node type plugin
  * @return {SceneJS.Node} The node if found, else null
  */
-SceneJS.Scene.prototype.findNode = function (nodeId) {
-    return this._engine.findNode(nodeId);
+SceneJS.Scene.prototype.findNode = function (nodeId, callback) {
+    return this.getNode(nodeId, callback);
 };
 
 /**
  * @function Finds the node with the given ID in this scene
+ * @param {String} nodeId Node ID
+ * @param {Function} callback Callback through which we'll get the node asynchronously if it's being instantiated on-demand from a node type plugin
  * @return {SceneJS.Node} The node if found, else null
  */
-SceneJS.Scene.prototype.getNode = function (nodeId) {
-    return this._engine.findNode(nodeId);
+SceneJS.Scene.prototype.getNode = function (nodeId, callback) {
+    var node = this._engine.findNode(nodeId);
+    if (node) {
+        if (callback) {
+            callback(node);
+        }
+        return node;
+    } else {
+        if (!callback) {
+            return null;
+        }
+        // Subscribe to instantiation of node from plugin
+        this.once("nodes/" + nodeId,  callback);
+    }
 };
 
 /**
@@ -12446,6 +12553,54 @@ var SceneJS_modelXFormStack = new (function () {
 
 })();
 /**
+ * Container for custom node types
+ */
+SceneJS.Types = new (function () {
+
+    /**
+     * Installs a node type
+     * @param typeName
+     * @param methods
+     */
+    this.addType = function (typeName, methods) {
+        var type = SceneJS_NodeFactory.createNodeType(typeName, methods);
+        var method;
+        for (var methodName in methods) {
+            if (methods.hasOwnProperty(methodName)) {
+                method = methods[methodName];
+                switch (methodName) {
+                    case "init":
+                        (function () {
+                            var _method = methods[methodName];
+                            type.prototype._init = function (params) {
+                                _method.call(this, params);
+                            };
+
+                            // Mark node type as a plugin
+                            type.prototype._fromPlugin = true;
+                        })();
+                        break;
+                    case "destroy":
+                        type.prototype._destroy = method;
+                        break;
+                    default:
+                        type.prototype[methodName] = method;
+                }
+            }
+        }
+    };
+
+    /**
+     * Tests if given node type is installed
+     * @param typeName
+     * @param methods
+     */
+    this.hasType = function (typeName) {
+        return !!SceneJS_NodeFactory.nodeTypes[typeName];
+    };
+})();
+
+/**
  * @class Renders and picks a {@link SceneJS.Scene}
  * @private
  *
@@ -13302,7 +13457,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
     gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
-    gl.lineWidth(1);
+    gl.lineWidth(2);
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);
 
@@ -14026,9 +14181,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
-        src.push("  float   emit    = SCENEJS_uMaterialEmit;");
-
         src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
 
         if (normals) {
@@ -14055,6 +14207,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         src.push("void main(void) {");
+
+        src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
 
         /*-----------------------------------------------------------------------------------
          * Logic - Clipping
