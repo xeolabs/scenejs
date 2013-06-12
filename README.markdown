@@ -11,9 +11,9 @@ articulated and pickable objects as required for high-detail visualisation appli
 * [Plugin API](#plugin-api)
  * [Geometry Plugins](#geometry-plugins)
  * [Texture Plugins](#texture-plugins)
- * [Custom Node Types](#custom-node-types)
  * [Serving plugins yourself](#serving-plugins-yourself)
-* [Building](#building)
+* [Custom Node Types](#custom-node-types)
+* [Building](#building-scenejs)
 
 ## Downloads
 Hotlink to these binaries and they'll dynamically load SceneJS plugins on-demand from this repository as
@@ -224,13 +224,23 @@ myGeometry.setLayers({
 });
 ```
 
-### Custom Node Types
-Non-core node types are provided as a special type of plugin. This is a powerful extension mechanism that allows you to create your
+### Serving plugins yourself
+If you'd rather serve the plugins yourself, instead of relying on the availability of this repository, then copy the
+[plugins directory](build/latest/plugins) to your server and configure SceneJS to load them from there:
+
+ ```javascript
+ SceneJS.configure({
+     pluginPath: "./foo/myPluginsDir"
+ });
+ ```
+
+## Custom Node Types
+Non-core node types are provided as a special type of plugin. This is a powerful extension mechanism which allows you to create your
 own high-level scene components that just slot straight into the graph as nodes which you can access as usual via the JSON API.
 
 In this section I'll show you how to define a custom node type as a plugin, and how to use the node type within a scene graph.
 
-#### Configure SceneJS Plugin Path
+### Configure SceneJS Plugin Path
 
 Before we do anything, let's ensure that SceneJS is configured with a path to a directory where it can find plugins.
 This is the configuration that it has by default, so that it can grab plugins from its repository for easy demonstration:
@@ -241,7 +251,7 @@ SceneJS.configure({
  });
 ```
 
-#### Defining a Custom Node Type
+### Defining a Custom Node Type
 
 A class definition for a custom node type is provided to SceneJS as plugin script which it will dynamically load on-demand as soon as you try to instantiate it within your scene graph.
 
@@ -300,7 +310,7 @@ Our plugin is deployed within the default SceneJS plugins directory, at this loc
 Note that the plugin script installs the custom node type as "demos/color", and see how that type name maps to the script's location
 within the ```http://scenejs.org/api/latest/plugins/node``` directory.
 
-#### Instantiating the Node Type
+### Instantiating the Node Type
 
 Now let's create a scene that includes an instance of our custom node type:
 
@@ -348,7 +358,7 @@ See how in the scene we are providing a child geometry for our node. Within its 
 the node type definition plugin above) the custom node type is responsible for inserting  specified child node(s) into
 the subgraph it creates under itself. That's because only the node type knows exactly where the child nodes should be located within its subgraph.
 
-#### Accessing the Node Instance
+### Accessing the Node Instance
 Now lets get the node instance and use one of its accessor methods to periodically switch its color property.
 
 Note that since our node originates from a plugin that will be loaded on-demand, we need to get the node asynchronously
@@ -372,17 +382,7 @@ scene.getNode("myColor",
 See that setColor method, which is defined by our node type?
 
 
-### Serving plugins yourself
-If you'd rather serve the plugins yourself, instead of relying on the availability of this repository, then copy the
-[plugins directory](build/latest/plugins) to your server and configure SceneJS to load them from there:
-
- ```javascript
- SceneJS.configure({
-     pluginPath: "./foo/myPluginsDir"
- });
- ```
-
-## Building
+## Building SceneJS
 SceneJS requires nodejs. To build, simply:
 ```node build.js```
 Then the binaries will appear in ```./build```.
