@@ -111,53 +111,56 @@
                         coreId:"myGeometry"
                     }
                 ]
-            },
-
-            // Instances of those cores
-
-            // First object, uses the blue material, the texture, and the box geometry
-            {
-                type:"translate",
-                x:-6,
-                nodes:[
-                    {
-                        type:"material",
-                        coreId:"myMaterial",
-                        nodes:[
-                            {
-                                type:"texture",
-                                coreId:"myTexture",
-                                nodes:[
-                                    {
-                                        type:"geometry",
-                                        coreId:"myGeometry"
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-
-            // Second object, uses the red material and the box geometry
-            {
-                type:"translate",
-                x:6,
-                nodes:[
-                    {
-                        type:"material",
-                        coreId:"myOtherMaterial",
-                        nodes:[
-                            {
-                                type:"geometry",
-                                coreId:"myGeometry"
-                            }
-                        ]
-                    }
-                ]
             }
         ]
     });
+
+    // Now instance those cores
+
+    scene.addNodes([
+
+        // First object, uses the blue material, the texture, and the box geometry
+        {
+            type:"translate",
+            x:-6,
+            nodes:[
+                {
+                    type:"material",
+                    coreId:"myMaterial",
+                    nodes:[
+                        {
+                            type:"texture",
+                            coreId:"myTexture",
+                            nodes:[
+                                {
+                                    type:"geometry",
+                                    coreId:"myGeometry"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+
+        // Second object, uses the red material and the box geometry
+        {
+            type:"translate",
+            x:6,
+            nodes:[
+                {
+                    type:"material",
+                    coreId:"myOtherMaterial",
+                    nodes:[
+                        {
+                            type:"geometry",
+                            coreId:"myGeometry"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]);
 
 
     new SceneJS.OrbitControls(scene, {
