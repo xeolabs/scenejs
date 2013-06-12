@@ -176,8 +176,6 @@
         ]
     },
 
-
-
     {
         "title":"Effects",
         "nodes":[
@@ -252,6 +250,19 @@
                     {
                         "title":"WebGLContextLost recovery",
                         "page":"webglContextLost"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Extensibility",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":"Custom Node Types",
+                        "page":"basicCustomNodeDef"
                     }
                 ]
             }
