@@ -82,44 +82,39 @@ var SceneJS_Engine = function(json, options) {
      * The current scene graph status
      */
     this.sceneStatus = {
-        nodes: {},          // Status for each node 
-        numLoading: 0       // Number of loads currently in progress
+        nodes:{}, // Status for each node
+        numLoading:0       // Number of loads currently in progress
     };
-
-    /**
-     * The engine's scene graph
-     * @type SceneJS.Scene
-     */
-    this.scene = this.createNode(json); // Scene back-references this engine, so is defined after other engine members
 
     var self = this;
 
+
+    // Create scene root first, then create its subnodes
+    // This way nodes can access the scene in their constructors
+    var nodes = json.nodes;
+    json.nodes = null;
+    this.scene = this.createNode(json); // Create scene root
+    json.nodes = nodes;
+    this.scene.addNodes(nodes); // then create sub-nodes
+
     this.canvas.canvas.addEventListener(// WebGL context lost
-            "webglcontextlost",
-            function(event) {
-
-                event.preventDefault();
-
-                SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_LOST, { scene: self.scene });
-
-            },
-            false);
+        "webglcontextlost",
+        function (event) {
+            event.preventDefault();
+            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_LOST, { scene:self.scene });
+        },
+        false);
 
     this.canvas.canvas.addEventListener(// WebGL context recovered
-            "webglcontextrestored",
-            function(event) {
-
-                event.preventDefault();
-
-                self.canvas.initWebGL();
-
-                self._coreFactory.webglRestored();  // Reallocate WebGL resources for node state cores
-
-                self.display.webglRestored(); // Reallocate shaders and re-cache shader var locations for display state chunks
-
-                SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_RESTORED, { scene: self.scene });
-            },
-            false);
+        "webglcontextrestored",
+        function (event) {
+            event.preventDefault();
+            self.canvas.initWebGL();
+            self._coreFactory.webglRestored();  // Reallocate WebGL resources for node state cores
+            self.display.webglRestored(); // Reallocate shaders and re-cache shader var locations for display state chunks
+            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_RESTORED, { scene:self.scene });
+        },
+        false);
 };
 
 
@@ -127,48 +122,67 @@ var SceneJS_Engine = function(json, options) {
  * Simulate a lost WebGL context.
  * Only works if the simulateWebGLContextLost was given as an option to the engine's constructor.
  */
-SceneJS_Engine.prototype.loseWebGLContext = function() {
+SceneJS_Engine.prototype.loseWebGLContext = function () {
     this.canvas.loseWebGLContext();
+};
+
+/**
+ * Gets/loads the given node type
+ *
+ * @param {String} type Node type name
+ * @param {Function(Function)} ok Callback fired when type loaded, returns the type constructor
+ */
+SceneJS_Engine.prototype.getNodeType = function (type, ok) {
+    SceneJS_NodeFactory.getNodeType(type, ok);
+};
+
+/**
+ * Returns true if the given node type is currently loaded (ie. load not required)
+ * @param type
+ */
+SceneJS_Engine.prototype.hasNodeType = function (type) {
+    return !!SceneJS_NodeFactory.nodeTypes[type];
 };
 
 /**
  * Recursively parse the given JSON scene graph representation and return a scene (sub)graph.
  *
  * @param {Object} json JSON definition of a scene graph or subgraph
- * @returns {SceneJS.Node} Root of the new (sub)graph
+ * @param {Function} ok Callback fired when node created, with the node as argument
  */
-SceneJS_Engine.prototype.createNode = function(json) {
+SceneJS_Engine.prototype.createNode = function (json, ok) {
 
     json.type = json.type || "node"; // Nodes are SceneJS.Node type by default
-
     var core = this._coreFactory.getCore(json.type, json.coreId); // Create or share a core
+    var self = this;
 
-    var node;
+    return this._nodeFactory.getNode(
+        this, json, core,
+        function (node) {
 
-    //try {
-    node = this._nodeFactory.getNode(this, json, core);
-
-    SceneJS_events.fireEvent(SceneJS_events.NODE_CREATED, {
-        sceneId: this.id, // Engine ID is same as scene ID
-        nodeId: node.nodeId
-    });
-
-
-    //    } catch (e) {
-    //
-    //        this._coreFactory.putCore(core); // Clean up after node create failed
-    //
-    //        throw e;
-    //    }
-
-    if (json.nodes) {
-
-        for (var i = 0, len = json.nodes.length; i < len; i++) { // Create sub-nodes
-            node.addNode(this.createNode(json.nodes[i]));
-        }
-    }
-
-    return node;
+            // Create child nodes
+            if (!node._fromPlugin && json.nodes) {
+                var numNodes = 0;
+                for (var i = 0, len = json.nodes.length; i < len; i++) {
+                    self.createNode(
+                        json.nodes[i],
+                        function (childNode) {
+                            node.addNode(childNode);
+                            if (++numNodes == len) {
+                                if (ok) {
+                                    ok(node);
+                                }
+                                self.scene._publish("nodes/" + node.id, node);
+                            }
+                        });
+                }
+            } else {
+                if (ok) {
+                    ok(node);
+                    self.scene._publish("nodes/" + node.id, node);
+                }
+            }
+        });
 };
 
 /**
@@ -292,7 +306,7 @@ SceneJS_Engine.prototype.renderFrame = function(params) {
  * @params cfg.frameFunc {Function} Callback to call after a render is done to update the scene image
  * @params cfg.sleepFunc {Function}
  */
-SceneJS_Engine.prototype.start = function(cfg) {
+SceneJS_Engine.prototype.start = function (cfg) {
 
     if (!this.running) {
 
@@ -309,15 +323,17 @@ SceneJS_Engine.prototype.start = function(cfg) {
         this.sceneDirty = true;
 
         var tick = {
-            sceneId: this.id,
-            startTime: (new Date()).getTime()
+            sceneId:this.id,
+            startTime:(new Date()).getTime()
         };
 
         self.events.fireEvent("started", tick);
 
         var time = (new Date()).getTime();
 
-        window[fnName] = function() {
+        var scene = this.scene;
+
+        window[fnName] = function () {
 
             if (self.running && !self.paused) {  // idleFunc may have paused scene
 
@@ -326,7 +342,7 @@ SceneJS_Engine.prototype.start = function(cfg) {
                 tick.time = time;
 
 
-                self.events.fireEvent("tick", tick);
+                scene._publish("tick", tick);
 
                 if (!self.running) { // idleFunc may have destroyed scene
                     return;
@@ -338,14 +354,14 @@ SceneJS_Engine.prototype.start = function(cfg) {
 
                     self.display.render();
 
-                    self.events.fireEvent("rendered", tick);
+                    scene._publish("rendered", tick);
 
                     window.requestAnimationFrame(window[fnName]);
 
                 } else {
 
                     if (!sleeping) {
-                        self.events.fireEvent("sleep", tick);
+                        scene._publish("sleep", tick);
                     }
 
                     sleeping = true;
@@ -452,7 +468,7 @@ SceneJS_Engine.prototype.stop = function() {
 
         window["__scenejs_sceneLoop" + this.id] = null;
 
-        this.events.fireEvent("stopped", { sceneId: this.id });
+     //   this.events.fireEvent("stopped", { sceneId: this.id });
     }
 };
 
@@ -504,7 +520,7 @@ SceneJS_Engine.prototype.destroy = function() {
 
     this.destroyed = true;
 
-    this.events.fireEvent("destroyed", { sceneId: this.id });
+   // this.events.fireEvent("destroyed", { sceneId: this.id });
 };
 
 /*---------------------------------------------------------------------------------------------------------------------
@@ -533,10 +549,10 @@ if (! self.Int32Array) {
         window.requestAnimationFrame = function(callback, element) {
             var currTime = new Date().getTime();
             var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            var id = window.setTimeout(function() {
-                callback(currTime + timeToCall);
-            },
-                    timeToCall);
+            var id = window.setTimeout(function () {
+                    callback(currTime + timeToCall);
+                },
+                timeToCall);
             lastTime = currTime + timeToCall;
             return id;
         };

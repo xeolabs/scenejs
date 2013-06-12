@@ -121,7 +121,11 @@
 
             "licenses/license-header.js",
 
+            // Integrated 3rd party libs
+
             "src/core/webgl-debug-utils.js",
+
+            // Utilities
 
             "src/core/map.js",
             "src/core/scenejs.js",
@@ -136,6 +140,8 @@
             "src/core/math.js",
             "src/core/webgl.js",
             "src/core/status.js",
+
+            // Scene graph classes
 
             "src/core/scene/nodeEvents.js",
             "src/core/scene/core.js",
@@ -166,7 +172,9 @@
             "src/core/scene/translate.js",
             "src/core/scene/scale.js",
             "src/core/scene/modelXFormStack.js",
-         //   "src/core/scene/object.js",
+            "src/core/nodeTypes.js",
+
+            // Display list classes
 
             "src/core/display/display.js",
             "src/core/display/programSourceFactory.js",
@@ -176,6 +184,8 @@
             "src/core/display/objectFactory.js",
             "src/core/display/object.js",
             "src/core/display/renderContext.js",
+
+            // Display list state chunks
 
             "src/core/display/chunks/chunk.js",
             "src/core/display/chunks/chunkFactory.js",
@@ -206,7 +216,6 @@
     };
 
     sys.print("Generating file list\n");
-
 
     var getFileList = function (list, all) {
 
@@ -247,7 +256,9 @@
         output.push(fs.readFileSync(fileList[i]));
     }
 
-    var distDir = "api/latest";
+    var productionBuild = true;
+
+    var distDir = "api/" + (productionBuild ? "latest" : "dev");
     var distPluginDir = distDir + "/plugins";
     var distExtrasDir = distDir + "/extras";
 
@@ -260,19 +271,22 @@
                 function () {
 
                     // Deep-copy an existing directory
+
+                    sys.print("Distributing plugins to: " + distPluginDir + "\n");
                     wrench.copyDirSyncRecursive("src/plugins", distPluginDir);
 
+                    sys.print("Distributing extras to: " + distPluginDir + "\n");
+//                    wrench.copyDirSyncRecursive("src/extras", distExtrasDir);
 
                     fs.writeFileSync(distExtrasDir + "/orbitControl.js", fs.readFileSync("src/extras/orbitControl.js"));
                     fs.writeFileSync(distExtrasDir + "/pickControl.js", fs.readFileSync("src/extras/pickControl.js"));
-
-
                     fs.writeFileSync(distExtrasDir + "/gui.js", fs.readFileSync("src/extras/gui/dat.gui.min.js") + fs.readFileSync("src/extras/gui/gui.js"));
 
                     if (fileList.length > 0) {
-                        sys.print("Writing built library: scenejs.js\n");
-                        output.push('SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/api/latest/plugins" });');
-//                        output.push('SceneJS.configure({ pluginPath: "/home/lindsay/xeolabs/projects/scenejs3.0/api/latest/plugins"});');
+                        sys.print("Writing core library to: " +  distDir + "/scenejs.js\n");
+
+                        output.push('SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/' + distDir + '/plugins" });');
+//                       output.push('SceneJS.configure({ pluginPath: "/home/lindsay/xeolabs/projects/scenejs3.0/api/latest/plugins"});');
                         output = output.join("");
                         fs.writeFileSync(distDir + "/scenejs.js", output);
 

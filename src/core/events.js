@@ -128,15 +128,6 @@ SceneJS.bind = function (name, func) {
             return SceneJS_events.addListener(SceneJS_events.ERROR, func);
             break;
 
-        case "nodeCreated" :
-
-            return SceneJS_events.addListener(
-                SceneJS_events.NODE_CREATED,
-                function (params) {
-                    func(params);
-                });
-            break;
-
         case "reset" :
 
             return SceneJS_events.addListener(

@@ -19,7 +19,6 @@ Hotlink to these binaries and they'll dynamically load SceneJS plugins on-demand
 required. That's OK for playing around, but for production you'll probably want to serve the plugins yourself -
 see [Plugin API](#plugin-api) below for how to do that.
 * **[scenejs.js](http://xeolabs.github.com/scenejs/api/latest/scenejs.js)**
-* **[scenejs.min.js](http://xeolabs.github.com/scenejs/api/latest/scenejs.min.js)**
 
 Also hotlinkable are a bunch of helper utilities:
 * **[OrbitControl](http://xeolabs.github.com/scenejs/api/latest/extras/orbitControl.js)** -
@@ -223,6 +222,108 @@ myGeometry.setLayers({
      }
 });
 ```
+
+### Custom Node Types
+Non-core node types are provided as plugins. This is a powerful extension mechanism that allows you to create your
+own high-level scene components that just slot straight into the graph as nodes which you can access as usual via the JSON API.
+
+Shown below is the [redTeapot plugin](build/latest/plugins/node/demos/redTeapot.js), which defines a scene node type that is a
+red teapot which can be translated and scaled. This node type exposes setters to update the position and scale of the teapot.
+
+```javascript
+SceneJS.Types.addType("demos/redTeapot", {
+
+    // Constructor
+    init:function (params) {
+
+        this._translate = this.addNode({
+            type:"translate"
+        });
+
+        this._scale = this._translate.addNode({
+            type:"scale",
+            x:1, y:1, z:1,
+            nodes:[
+                {
+                    type:"material",
+                    color:{ r:1.0, g:0.6, b:0.6 },
+                    nodes:[
+                        {
+                            type:"geometry",
+                            source:{
+                                type:"teapot"
+                            }
+                        }
+                    ]
+                }
+            ]
+        });
+
+        if (params.pos) {
+            this.setPos(params.pos);
+        }
+
+        if (params.size) {
+            this.setSize(params.size);
+        }
+    },
+
+    // Setter for teapot position
+    setPos:function (pos) {
+        this._translate.setXYZ(pos);
+    },
+
+    // Setter for teapot scale
+    setSize:function (size) {
+        this._scale.setXYZ(size);
+    }
+});
+```
+
+The scene below contains an instance of our "redTeapot" node. See how we just reference the type
+with ```type:"demos/redTeapot"```, which causes SceneJS to dynamically load the plugin script shown above,
+ which installs the node type into SceneJS when it executes.
+
+```javascript
+var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"rotate",
+                y: 1,
+                angle: 45,
+                nodes:[
+
+                    // Instance our custom node type
+                    // The optional size and pos attributes are fed into the node's setters
+                    {
+                        type:"demos/redTeapot",
+                        id:"myRedTeapot",
+                        size:{
+                            x:0.4,
+                            y:1.0,
+                            z:0.5
+                        },
+                        pos:{
+                            x:-1
+                        }
+                    }
+                ]
+            }
+        ]
+    });
+
+// Subscribe to the redTeapot - the plugin which defines the redTeapot node
+// may still be loading, so we get the node instance asynchronously
+
+scene.on("nodes.myRedTeapot",
+    function(redTeapot) {
+
+          // Call a setter on our node (see the setter definitions in the plugin script above)
+          redTeapot.setSize({ x: 1.2 });
+    });
+```
+
+
 
 ### Serving plugins yourself
 If you'd rather serve the plugins yourself, instead of relying on the availability of this repository, then copy the

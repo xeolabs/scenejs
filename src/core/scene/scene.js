@@ -15,60 +15,6 @@ SceneJS.Scene.prototype._init = function (params) {
     this._tagSelector = null;
 };
 
-/**
- * Subscribes to an event on this scene
- *
- * @param {String} type Event type
- * @param {Function} callback Callback that will be called with the event parameters
- * @return {String} handle Handle to the subcription
- * @deprecated
- */
-SceneJS.Scene.prototype.onEvent = function (type, callback) {
-    return this._engine.events.onEvent(type, callback);
-};
-
-/**
- * Alias for #onEvent
- * @param type
- * @param callback
- * @return {*|String}
- */
-SceneJS.Scene.prototype.on = function (type, callback) {
-    return this._engine.events.onEvent(type, callback);
-};
-
-/**
- * Unsubscribes to an event previously subscribed to on scene
- *
- * @param {String} handle Subscription handle
- * @deprecated
- */
-SceneJS.Scene.prototype.unEvent = function (handle) {
-    this._engine.events.unEvent(handle);
-};
-
-/**
- * Alias for #unEvent
- *
- * @param {String} handle Subscription handle
- */
-SceneJS.Scene.prototype.off = function (handle) {
-    this._engine.events.unEvent(handle);
-};
-
-/**
- * Subscribe to one occurrence of an event. This is equivalent to calling #off in the
- * callback given to #on.
- */
-SceneJS.Scene.prototype.once = function (type, callback) {
-    var self = this;
-    var handle = this._engine.events.onEvent(type,
-        function (params) {
-            self._engine.events.unEvent(handle);
-            callback(params);
-        });
-};
-
 
 /**
  * Simulate a lost WebGL context for testing purposes.
@@ -204,6 +150,7 @@ SceneJS.Scene.prototype.stop = function () {
 };
 
 /** Determines if node exists in this scene
+ * @deprecated
  */
 SceneJS.Scene.prototype.containsNode = function (nodeId) {
     return !!this._engine.findNode(nodeId);
@@ -222,18 +169,34 @@ SceneJS.Scene.prototype.findNodes = function (nodeIdRegex) {
 /**
  * Finds the node with the given ID in this scene
  * @deprecated
+ * @param {String} nodeId Node ID
+ * @param {Function} callback Callback through which we'll get the node asynchronously if it's being instantiated on-demand from a node type plugin
  * @return {SceneJS.Node} The node if found, else null
  */
-SceneJS.Scene.prototype.findNode = function (nodeId) {
-    return this._engine.findNode(nodeId);
+SceneJS.Scene.prototype.findNode = function (nodeId, callback) {
+    return this.getNode(nodeId, callback);
 };
 
 /**
  * @function Finds the node with the given ID in this scene
+ * @param {String} nodeId Node ID
+ * @param {Function} callback Callback through which we'll get the node asynchronously if it's being instantiated on-demand from a node type plugin
  * @return {SceneJS.Node} The node if found, else null
  */
-SceneJS.Scene.prototype.getNode = function (nodeId) {
-    return this._engine.findNode(nodeId);
+SceneJS.Scene.prototype.getNode = function (nodeId, callback) {
+    var node = this._engine.findNode(nodeId);
+    if (node) {
+        if (callback) {
+            callback(node);
+        }
+        return node;
+    } else {
+        if (!callback) {
+            return null;
+        }
+        // Subscribe to instantiation of node from plugin
+        this.once("nodes/" + nodeId,  callback);
+    }
 };
 
 /**

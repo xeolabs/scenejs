@@ -3,13 +3,17 @@
  */
 SceneJS.Plugins = new (function () {
 
-    this._nodePlugins = {};
+    // Plugin map for each node type
+    var nodePlugins = {};
+
+    // Subscribers to plugins
+    var pluginSubs = {};
 
     /**
      * Installs a plugin into SceneJS
      */
     this.addPlugin = function (nodeType, pluginType, plugin) {
-        var plugins = this._nodePlugins[nodeType] || (this._nodePlugins[nodeType] = {});
+        var plugins = nodePlugins[nodeType] || (nodePlugins[nodeType] = {});
         plugins[pluginType] = plugin;
     };
 
@@ -17,7 +21,7 @@ SceneJS.Plugins = new (function () {
      * Tests if given plugin is installed
      */
     this.hasPlugin = function (nodeType, pluginType) {
-        var plugins = this._nodePlugins[nodeType];
+        var plugins = nodePlugins[nodeType];
         return (plugins && !!plugins[pluginType]);
     };
 
@@ -25,14 +29,20 @@ SceneJS.Plugins = new (function () {
      * Returns installed plugin of given type and ID
      */
     this.getPlugin = function (nodeType, pluginType, ok) {
-        var plugins = this._nodePlugins[nodeType];
+        var plugins = nodePlugins[nodeType];
         if (plugins) {
             var plugin = plugins[pluginType];
             if (plugin) {
                 ok(plugin);
+                return;
             }
         }
-        // lazy-load
+        var subId = nodeType + pluginType;
+        var subs = pluginSubs[subId] || (pluginSubs[subId] = []);
+        subs.push(ok);
+        if (subs.length > 1) { // Not first sub
+            return;
+        }        
         var self = this;
         var pluginPath = SceneJS_debugModule.configs.pluginPath;
         if (!pluginPath) {
@@ -41,12 +51,15 @@ SceneJS.Plugins = new (function () {
         var pluginFilePath = pluginPath + "/" + nodeType + "/" + pluginType + ".js";
         loadScript(pluginFilePath,
             function () {
-                var plugin = self._nodePlugins[nodeType][pluginType];
+                var plugin = nodePlugins[nodeType][pluginType];
                 if (!plugin) {
                     // Plugin was not registered correctly
                     throw "Problem in plugin file '" + pluginFilePath + "': call to addPlugin(nodeType, pluginType, ..) : either or both args have incorrect value";
                 }
-                ok(self._nodePlugins[nodeType][pluginType]);
+                while (subs.length > 0) {
+                    subs.pop()(plugin);
+                }
+                delete pluginSubs[subId];
             });
     };
 
