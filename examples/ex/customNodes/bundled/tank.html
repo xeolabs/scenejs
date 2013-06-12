@@ -19,22 +19,42 @@
 
 <script src="../../../../api/latest/scenejs.js"></script>
 
-<script src="../../../libs/dat.gui.min.js"></script>
-
 <script>
 
-    // Demo of the custom "vehicles/tank" node, which creates
-    // a Tank vehicle from the 1982 Disney motion picture 'Tron'
+    // Demo of the SceneJS "sky/clouds", "ground/grid" and "vehicles/tank" custom node types
 
     var scene = SceneJS.createScene({
         nodes:[
             {
                 type:"lookAt",
-                eye:{ x:-10, y:20, z:-25 },
+                id:"myCamera",
+                eye:{
+                    x:30,
+                    y:30
+                },
 
                 nodes:[
 
-                    // Node type defined by plugin in http://scenejs.org/api/latest/plugins/node/vehicles/tank.js
+                    // Node type defined by plugin in
+                    // http://scenejs.org/api/latest/plugins/node/sky/clouds.js
+                    {
+                        type:"sky/clouds"
+                    },
+
+                    // Node type defined by plugin in
+                    // http://scenejs.org/api/latest/plugins/node/ground/grid.js
+                    {
+                        type:"ground/grid",
+                        size:{
+                            x:1000,
+                            z:1000
+                        },
+                        xSegments:200,
+                        zSegments:200
+                    },
+
+                    // Node type defined by plugin in
+                    // http://scenejs.org/api/latest/plugins/node/vehicles/tank.js
                     {
                         type:"vehicles/tank",
                         id:"myTank",
@@ -51,42 +71,25 @@
         ]
     });
 
-    // The plugin for the tank node type is being loaded dynamically,
-    // so we have to get the node asynchronously
-    scene.getNode("myTank",
-            function (tank) {
-
-                // DAT GUI menu
-                // We'll just control the tank direction and gun direction to show the idea
-                // Check out the tank node plugin source for the rest of the methods
-
-                var Menu = function () {
-
-                    this.dir = tank.getDir();
-                    this.gunDir = tank.getGunDir();
-
-                    var self = this;
-
-                    var update = function () {
-
-                        tank.setDir(self.dir);
-                        tank.setGunDir(self.gunDir);
-
-                        requestAnimationFrame(update);
-                    };
-
-                    update();
-                };
-
-                var gui = new dat.GUI();
-                var menu = new Menu();
-                var direction = gui.addFolder("Properties of the 'vehicles/tank' node");
-
-                direction.add(menu, 'dir', 0.0, 360.0);
-                direction.add(menu, 'gunDir', 0.0, 360.0);
-
-                direction.open();
+    scene.getNode("myCamera", function (myCamera) {
+        var z = 60;
+        scene.on("tick", function () {
+            myCamera.setLook({
+                z:z
             });
+            z -= 0.3;
+        });
+    });
+
+    scene.getNode("myTank", function (myTank) {
+        var z = 60;
+        scene.on("tick", function () {
+            myTank.setPos({
+                z:z
+            });
+            z -= 0.23;
+        });
+    });
 
 </script>
 </body>
