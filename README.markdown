@@ -238,18 +238,9 @@ If you'd rather serve the plugins yourself, instead of relying on the availabili
 Non-core node types are provided as a special type of plugin. This is a powerful extension mechanism which allows you to create your
 own high-level scene components that just slot straight into the graph as nodes which you can access as usual via the JSON API.
 
-In this section I'll show you how to define a custom node type as a plugin, and how to use the node type within a scene graph.
+In this section we'll see how to define a custom node type as a plugin, and how to use the node type within a scene graph.
 
-### Configure SceneJS Plugin Path
-
-Before we do anything, let's ensure that SceneJS is configured with a path to a directory where it can find plugins.
-This is the configuration that it has by default, so that it can grab plugins from its repository for easy demonstration:
-
-```javascript
-SceneJS.configure({
-     pluginPath: "http://scenejs.org/api/latest/plugins"
- });
-```
+The examples page also has [several examples](http://scenejs.org/examples.html?tags=customNodes) of custom node type definition and use.
 
 ### Defining a Custom Node Type
 
@@ -303,7 +294,7 @@ SceneJS.Types.addType("demos/color", {
     });
 ```
 
-Our plugin is deployed within the default SceneJS plugins directory, at this location:
+This plugin happens to be deployed within the default SceneJS plugins directory, at this location:
 
 [http://scenejs.org/api/latest/plugins/node/demos/color.js](http://scenejs.org/api/latest/plugins/node/demos/color.js)
 
@@ -312,7 +303,15 @@ within the ```http://scenejs.org/api/latest/plugins/node``` directory.
 
 ### Instantiating the Node Type
 
-Now let's create a scene that includes an instance of our custom node type:
+Let's assume that we've configured SceneJS to find our plugin (this is the default configuration BTW):
+
+```javascript
+SceneJS.configure({
+     pluginPath: "http://scenejs.org/api/latest/plugins"
+ });
+```
+
+Now we can create a scene that includes an instance of our custom node type.
 
 ```javascript
 var scene = SceneJS.createScene({
