@@ -26,7 +26,7 @@
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Node type defined by plugin in <plugins>/node/camera/orbit.js
+            // Mouse-orbited camera, defined by plugin in http://scenejs.org/api/latest/plugins/node/camera/orbit.js
             {
                 type:"camera/orbit",
                 yaw:340,
@@ -38,12 +38,12 @@
 
                 nodes:[
 
-                    // Node type defined by plugin in <plugins>/node/sky/clouds.js
+                    // Cloudy skybox, defined by plugin in http://scenejs.org/api/latest/plugins/node/sky/clouds.js
                     {
                         type:"sky/clouds"
                     },
 
-                    // Node type defined by plugin in <plugins>/node/ground/grid.js
+                    // Grid ground plane, defined by plugin in http://scenejs.org/api/latest/plugins/node/ground/grid.js
                     {
                         type:"ground/grid",
                         size:{ x:1000, z:1000 },
@@ -51,9 +51,10 @@
                         zSegments:200
                     },
 
-                    // Node type defined by plugin in <plugins>/node/demos/redTeapot.js
+                    // Red teapot, defined by plugin in http://scenejs.org/api/latest/plugins/node/demos/redTeapot.js
                     {
                         type:"demos/redTeapot",
+                        id:"myTeapot",
                         pos:{ x:0, y:0, z:0 },
                         size:{ x:1.0, y:1.0, z:1.0 }
                     }
@@ -61,6 +62,26 @@
             }
         ]
     });
+
+    // Get the teapot and animate its position on the X-axis
+
+    scene.getNode("myTeapot",
+            function (myTeapot) {
+
+                var x = 0;
+                var inc = 0.07;
+
+                scene.on("tick",
+                        function () {
+
+                            myTeapot.setPos({ x: x });
+
+                            if (x < -10 || x > 10) {
+                                inc = -inc;
+                            }
+                            x += inc;
+                        });
+            });
 
 
 </script>
