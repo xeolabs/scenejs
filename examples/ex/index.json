@@ -761,7 +761,7 @@
     {
         "title":"Custom Node Types",
         "tip":"",
-        "tags":["nodes", "plugins"],
+        "tags":["nodes", "plugins", "customNodes"],
         "nodes":[
             {
                 "title":"Defining and using custom node types",
