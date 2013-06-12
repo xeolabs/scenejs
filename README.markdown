@@ -303,7 +303,8 @@ within the ```http://scenejs.org/api/latest/plugins/node``` directory.
 
 ### Instantiating the Node Type
 
-Let's assume that we've configured SceneJS to find our plugin (this is the default configuration BTW):
+Let's assume that we've configured SceneJS to find our plugin (this is the default configuration by the way, so don't
+bother doing this if you're hotlinking to the SceneJS lib and just want to use the plugins from this repo):
 
 ```javascript
 SceneJS.configure({
