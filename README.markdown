@@ -11,6 +11,7 @@ articulated and pickable objects as required for high-detail visualisation appli
 * [Plugin API](#plugin-api)
  * [Geometry Plugins](#geometry-plugins)
  * [Texture Plugins](#texture-plugins)
+ * [Custom Node Types](#custom-node-types)
  * [Serving plugins yourself](#serving-plugins-yourself)
 * [Building](#building)
 
@@ -224,7 +225,7 @@ myGeometry.setLayers({
 ```
 
 ### Custom Node Types
-Non-core node types are provided as plugins. This is a powerful extension mechanism that allows you to create your
+Non-core node types are provided as a special type of plugin. This is a powerful extension mechanism that allows you to create your
 own high-level scene components that just slot straight into the graph as nodes which you can access as usual via the JSON API.
 
 Shown below is the [redTeapot plugin](build/latest/plugins/node/demos/redTeapot.js), which defines a scene node type that is a
@@ -322,7 +323,6 @@ scene.on("nodes.myRedTeapot",
           redTeapot.setSize({ x: 1.2 });
     });
 ```
-
 
 
 ### Serving plugins yourself
