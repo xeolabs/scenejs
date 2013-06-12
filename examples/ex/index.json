@@ -770,15 +770,21 @@
                 "nodes":[
                     {
                         "title":"Define a new node type",
+                        "path":"customNodes/defining/basicCustomNodeTypeDef.html",
+                        "tags":[],
+                        "id":"basicCustomNodeDef"
+                    },
+                    {
+                        "title":"A more complex new node type example",
                         "path":"customNodes/defining/inlineCustomNodeTypeDef.html",
                         "tags":[],
-                        "id":"inlineCustomNodeDef"
+                        "id":"anotherCustomNodeDef"
                     },
                     {
                         "title":"Define new node type w/autonomous behaviour",
                         "path":"customNodes/defining/animatedInlineCustomNodeTypeDef.html",
                         "tags":["animation"],
-                        "id":"animatedInlineCustomNodeDef"
+                        "id":"animatedCustomNodeDef"
                     }
                 ]
             },

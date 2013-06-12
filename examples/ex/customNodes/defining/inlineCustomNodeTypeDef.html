@@ -91,27 +91,21 @@
             }
         },
 
-        /**
-         * Sets the teapot position
-         */
+        // Sets the teapot position
         setPos:function (pos) {
             this._translate.setXYZ(pos);
         },
 
-        /**
-         * Sets the teapot size
-         */
+        // Sets the teapot size
         setSize:function (size) {
             this._scale.setXYZ(size);
         },
 
-        /**
-         * Node destructor, not actually needed for this example.
-         * Use these to clean up any resources created by the node.
-         *
-         * Note that when the node is destroyed, SceneJS will automatically destroy any child nodes
-         * it has created, so there's no need to destroy them manually with a destructor.
-         */
+        // Node destructor, not actually needed for this example.
+        // Use these to clean up any resources created by the node.
+        //
+        // Note that when the node is destroyed, SceneJS will automatically destroy any child nodes
+        // it has created, so there's no need to destroy them manually with a destructor.
         destroy:function () {
         }
     });
@@ -134,7 +128,7 @@
                     z:0.5
                 },
                 pos:{
-                    y: 2
+                    y:2
                 }
             }
         ]
