@@ -769,14 +769,14 @@
                 "tags":[],
                 "nodes":[
                     {
-                        "title":"Define mew node type",
-                        "path":"customNodes/defining/inlineCustomNodeDef.html",
+                        "title":"Define a new node type",
+                        "path":"customNodes/defining/inlineCustomNodeTypeDef.html",
                         "tags":[],
                         "id":"inlineCustomNodeDef"
                     },
                     {
                         "title":"Define new node type w/autonomous behaviour",
-                        "path":"customNodes/defining/animatedInlineCustomNodeDef.html",
+                        "path":"customNodes/defining/animatedInlineCustomNodeTypeDef.html",
                         "tags":["animation"],
                         "id":"animatedInlineCustomNodeDef"
                     }
