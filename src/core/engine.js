@@ -4,7 +4,7 @@
  *
  * @private
  */
-var SceneJS_Engine = function(json, options) {
+var SceneJS_Engine = function (json, options) {
 
     json.type = "scene"; // The type property supplied by user on the root JSON node is ignored - would always be 'scene'
 
@@ -39,7 +39,7 @@ var SceneJS_Engine = function(json, options) {
      * @type SceneJS_Display
      */
     this.display = new SceneJS_Display({
-        canvas:  this.canvas
+        canvas:this.canvas
     });
 
     /**
@@ -94,8 +94,11 @@ var SceneJS_Engine = function(json, options) {
     var nodes = json.nodes;
     json.nodes = null;
     this.scene = this.createNode(json); // Create scene root
-    json.nodes = nodes;
-    this.scene.addNodes(nodes); // then create sub-nodes
+
+    if (nodes) {
+        json.nodes = nodes;
+        this.scene.addNodes(nodes); // then create sub-nodes
+    }
 
     this.canvas.canvas.addEventListener(// WebGL context lost
         "webglcontextlost",
@@ -189,7 +192,7 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
  * Finds the node with the given ID in this engine's scene graph
  * @return {SceneJS.Node} The node if found, else null
  */
-SceneJS_Engine.prototype.findNode = function(nodeId) {
+SceneJS_Engine.prototype.findNode = function (nodeId) {
     return this._nodeFactory.nodes.items[nodeId];
 };
 
@@ -197,7 +200,7 @@ SceneJS_Engine.prototype.findNode = function(nodeId) {
  * @param {String} nodeIdRegex Regular expression to match on node IDs
  * @return {[SceneJS.Node]} Array of nodes whose IDs match the given regex
  */
-SceneJS_Engine.prototype.findNodes = function(nodeIdRegex) {
+SceneJS_Engine.prototype.findNodes = function (nodeIdRegex) {
 
     var regex = new RegExp(nodeIdRegex);
     var nodes = [];
@@ -220,7 +223,7 @@ SceneJS_Engine.prototype.findNodes = function(nodeIdRegex) {
  *
  * @param {SceneJS.Node} node Root node of the subtree to recompile
  */
-SceneJS_Engine.prototype.branchDirty = function(node) {
+SceneJS_Engine.prototype.branchDirty = function (node) {
 
     if (this.sceneDirty) {
         return; // Whole scene will recompile anyway
@@ -243,9 +246,9 @@ SceneJS_Engine.prototype.branchDirty = function(node) {
 };
 
 
-SceneJS_Engine.prototype.nodeLoading = function(node) {
+SceneJS_Engine.prototype.nodeLoading = function (node) {
 
-    var nodeStatus = this.sceneStatus.nodes[node.id] || (this.sceneStatus.nodes[node.id] = { numLoading: 0 });
+    var nodeStatus = this.sceneStatus.nodes[node.id] || (this.sceneStatus.nodes[node.id] = { numLoading:0 });
 
     nodeStatus.numLoading++;
 
@@ -254,7 +257,7 @@ SceneJS_Engine.prototype.nodeLoading = function(node) {
     this.events.fireEvent("loading", this.sceneStatus);
 };
 
-SceneJS_Engine.prototype.nodeLoaded = function(node) {
+SceneJS_Engine.prototype.nodeLoaded = function (node) {
 
     var nodeStatus = this.sceneStatus.nodes[node.id];
 
@@ -281,7 +284,7 @@ SceneJS_Engine.prototype.nodeLoaded = function(node) {
  *
  * @param {{String:String}} params Rendering parameters
  */
-SceneJS_Engine.prototype.renderFrame = function(params) {
+SceneJS_Engine.prototype.renderFrame = function (params) {
 
     if (this._tryCompile() || (params && params.force)) { // Do any pending (re)compilations
 
@@ -394,14 +397,14 @@ SceneJS_Engine.prototype.start = function (cfg) {
  * @param options.rayPick Performs additional ray-intersect pick when true
  * @returns The pick record
  */
-SceneJS_Engine.prototype.pick = function(canvasX, canvasY, options) {
+SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
 
     this._tryCompile();  // Do any pending scene compilations
 
     var hit = this.display.pick({
-        canvasX : canvasX,
-        canvasY : canvasY,
-        rayPick: options ? options.rayPick : false
+        canvasX:canvasX,
+        canvasY:canvasY,
+        rayPick:options ? options.rayPick : false
     });
 
     if (hit) {
@@ -418,22 +421,22 @@ SceneJS_Engine.prototype.pick = function(canvasX, canvasY, options) {
  *
  * @returns {Boolean} True when any compilations or display rebuilds were done
  */
-SceneJS_Engine.prototype._tryCompile = function() {
+SceneJS_Engine.prototype._tryCompile = function () {
 
     if (this.display.imageDirty // Frame buffer needs redraw
-            || this.display.drawListDirty // Draw list needs rebuild
-            || this.display.stateSortDirty // Draw list needs to redetermine state order
-            || this.display.stateOrderDirty // Draw list needs state sort
-            || this.display.objectListDirty // Draw list needs to be rebuilt
-            || this._sceneBranchesDirty // One or more branches in scene graph need (re)compilation
-            || this.sceneDirty) { // Whole scene needs recompilation
+        || this.display.drawListDirty // Draw list needs rebuild
+        || this.display.stateSortDirty // Draw list needs to redetermine state order
+        || this.display.stateOrderDirty // Draw list needs state sort
+        || this.display.objectListDirty // Draw list needs to be rebuilt
+        || this._sceneBranchesDirty // One or more branches in scene graph need (re)compilation
+        || this.sceneDirty) { // Whole scene needs recompilation
 
         this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true
 
         if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
 
             SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
-                engine: this                                            // Compilation support modules get ready
+                engine:this                                            // Compilation support modules get ready
             });
 
             this.scene._compileNodes(); // Begin depth-first compilation descent into scene sub-nodes
@@ -452,14 +455,14 @@ SceneJS_Engine.prototype._tryCompile = function() {
  * Pauses/unpauses the render loop
  * @param {Boolean} doPause Pauses or unpauses the render loop
  */
-SceneJS_Engine.prototype.pause = function(doPause) {
+SceneJS_Engine.prototype.pause = function (doPause) {
     this.paused = doPause;
 };
 
 /**
  * Stops the render loop
  */
-SceneJS_Engine.prototype.stop = function() {
+SceneJS_Engine.prototype.stop = function () {
 
     if (this.running) {
 
@@ -468,7 +471,7 @@ SceneJS_Engine.prototype.stop = function() {
 
         window["__scenejs_sceneLoop" + this.id] = null;
 
-     //   this.events.fireEvent("stopped", { sceneId: this.id });
+        //   this.events.fireEvent("stopped", { sceneId: this.id });
     }
 };
 
@@ -477,7 +480,7 @@ SceneJS_Engine.prototype.stop = function() {
  *
  * @param {SceneJS.Node} node Node to destroy
  */
-SceneJS_Engine.prototype.destroyNode = function(node) {
+SceneJS_Engine.prototype.destroyNode = function (node) {
 
     /* The node is actually scheduled for lazy destruction within the next invocation of #_tryCompile
      */
@@ -497,7 +500,7 @@ SceneJS_Engine.prototype.destroyNode = function(node) {
  * Performs pending node destructions. When destroyed, each node and its core is released back to the
  * node and core pools for reuse, respectively.
  */
-SceneJS_Engine.prototype._doDestroyNodes = function() {
+SceneJS_Engine.prototype._doDestroyNodes = function () {
 
     var node;
 
@@ -516,18 +519,18 @@ SceneJS_Engine.prototype._doDestroyNodes = function() {
 /**
  * Destroys this engine
  */
-SceneJS_Engine.prototype.destroy = function() {
+SceneJS_Engine.prototype.destroy = function () {
 
     this.destroyed = true;
 
-   // this.events.fireEvent("destroyed", { sceneId: this.id });
+    // this.events.fireEvent("destroyed", { sceneId: this.id });
 };
 
 /*---------------------------------------------------------------------------------------------------------------------
  * JavaScript augmentations to support render loop
  *--------------------------------------------------------------------------------------------------------------------*/
 
-if (! self.Int32Array) {
+if (!self.Int32Array) {
     self.Int32Array = Array;
     self.Float32Array = Array;
 }
@@ -536,17 +539,17 @@ if (! self.Int32Array) {
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
 
-(function() {
+(function () {
     var lastTime = 0;
     var vendors = ['ms', 'moz', 'webkit', 'o'];
     for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
         window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
         window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame']
-                || window[vendors[x] + 'RequestCancelAnimationFrame'];
+            || window[vendors[x] + 'RequestCancelAnimationFrame'];
     }
 
     if (!window.requestAnimationFrame)
-        window.requestAnimationFrame = function(callback, element) {
+        window.requestAnimationFrame = function (callback, element) {
             var currTime = new Date().getTime();
             var timeToCall = Math.max(0, 16 - (currTime - lastTime));
             var id = window.setTimeout(function () {
@@ -558,7 +561,7 @@ if (! self.Int32Array) {
         };
 
     if (!window.cancelAnimationFrame)
-        window.cancelAnimationFrame = function(id) {
+        window.cancelAnimationFrame = function (id) {
             clearTimeout(id);
         };
 }());
