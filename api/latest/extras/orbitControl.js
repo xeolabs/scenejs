@@ -21,23 +21,23 @@ SceneJS.OrbitControls = function (scene, options) {
 
     var lookatNode;
 
-//    // Find lookat node
-//    scene.eachNode(
-//        function () {
-//            if (this.get("type") == "lookAt") {
-//                lookatNode = this;
-//                return true;
-//            }
-//        }, {
-//            depthFirst:true
-//        });
-//
-//    // Insert lookat node if not found
-//    if (!lookatNode) {
+    // Find lookat node
+    scene.eachNode(
+        function () {
+            if (this.get("type") == "lookAt") {
+                lookatNode = this;
+                return true;
+            }
+        }, {
+            depthFirst:true
+        });
+
+    // Insert lookat node if not found
+    if (!lookatNode) {
         lookatNode = scene.insertNode({
             type:"lookAt"
         });
-    //}
+    }
 
     var eye = options.eye || { x:0, y:0, z:0 };
     var look = options.look || { x:0, y:0, z:0};
