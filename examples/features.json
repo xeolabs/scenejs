@@ -262,7 +262,7 @@
                 "nodes":[
                     {
                         "title":"Custom Node Types",
-                        "page":"basicCustomNodeDef"
+                        "page":"customNodesTank"
                     }
                 ]
             }
