@@ -26,9 +26,13 @@
 
     var scene = SceneJS.createScene({
         nodes:[
+
+            // Node type defined by plugin in http://scenejs.org/api/latest/plugins/node/camera/orbit.js
             {
-                type:"lookAt",
-                eye:{ x:8, y:8, z:8 },
+                type:"camera/orbit",
+                yaw:-150,
+                pitch:-40,
+                zoom:40,
 
                 nodes:[
                     {
@@ -42,13 +46,19 @@
                                 type:"effects/wobble",
 
                                 nodes:[
+                                    // Node type defined by plugin in http://scenejs.org/api/latest/plugins/node/vehicles/tank.js
                                     {
-                                        type:"geometry",
-                                        source:{
-                                            type:"teapot"
-                                        }
+                                        type:"vehicles/tank"
                                     }
                                 ]
+                            },
+
+                            // Grid ground plane, defined by plugin in http://scenejs.org/api/latest/plugins/node/ground/grid.js
+                            {
+                                type:"ground/grid",
+                                size:{ x:1000, z:1000 },
+                                xSegments:200,
+                                zSegments:200
                             }
                         ]
                     }
