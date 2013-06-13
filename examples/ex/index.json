@@ -810,6 +810,18 @@
                         "path":"customNodes/bundled/tank.html",
                         "tags":[],
                         "id":"customNodesTank"
+                    },
+                    {
+                        "title":"Wobble effect",
+                        "path":"customNodes/bundled/wobble.html",
+                        "tags":[],
+                        "id":"customNodesWobble"
+                    },
+                    {
+                        "title":"X-Ray effect",
+                        "path":"customNodes/bundled/xray.html",
+                        "tags":[],
+                        "id":"customNodesXRay"
                     }
                 ]
             }

@@ -24,8 +24,7 @@
 <script>
 
     // Demo of the custom "effects/xray" node type
-    // This node type givess objects in its subgraph a glass-like transparency
-    // This node type is defined by a plugin in <plugins>/node/effects/xray.js
+    // This node type gives objects in its subgraph a glass-like transparency
 
     var scene = SceneJS.createScene({
         nodes:[
@@ -39,7 +38,8 @@
                         type:"material",
                         color:{ r:0.3, g:0.3, b:1.0 },
                         nodes:[
-                            // Node type defined by plugin in <plugins>/node/effects/xray.js
+
+                            // Node type defined by plugin in http://scenejs.org/api/latest/plugins/node/effects/wobble.js
                             {
                                 type:"effects/xray",
                                 id:"myXRay",
