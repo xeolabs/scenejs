@@ -36,11 +36,9 @@ function createScene() {
             {
                 type:"camera/orbit",
                 yaw:340,
-                pitch:-15,
-                zoom:500,
-                zoomSensitivity:10.0,
-                eye:{ y:0 },
-                look:{ y:0 },
+                pitch:-10,
+                zoom:150,
+                zoomSensitivity: 15,
 
                 nodes:[
 
@@ -65,9 +63,15 @@ function createScene() {
 
                         nodes:[
 
-                            // Node type defined by plugin in <plugins>/node/ground/grid.js
                             {
-                                type:"ground/grid"
+                                type:"material",
+                                baseColor:{ r:0.7, g:0.7, b:0.7 },
+                                nodes:[
+                                    // Node type defined by plugin in <plugins>/node/ground/grid.js
+                                    {
+                                        type:"ground/grid"
+                                    }
+                                ]
                             },
 
                             // Node type defined by plugin in <plugins>/node/sky/clouds.js
