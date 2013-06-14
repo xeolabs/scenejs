@@ -13,19 +13,18 @@ articulated and pickable objects as required for high-detail visualisation appli
  * [Texture Plugins](#texture-plugins)
  * [Serving plugins yourself](#serving-plugins-yourself)
 * [Custom Node Types](#custom-node-types)
+ * [Defining a Custom Node Type](#defining-a-custom-node-type)
+ * [Using a Custom Node Type](#using-a-custom-node-type)
 * [Building](#building-scenejs)
 
 ## Downloads
-Hotlink to these binaries and they'll dynamically load SceneJS plugins on-demand from this repository as
-required. That's OK for playing around, but for production you'll probably want to serve the plugins yourself -
-see [Plugin API](#plugin-api) below for how to do that.
+Get started fast by hotlinking to the latest library build:
 * **[scenejs.js](http://xeolabs.github.com/scenejs/api/latest/scenejs.js)**
 
-Also hotlinkable are a bunch of helper utilities:
-* **[OrbitControl](http://xeolabs.github.com/scenejs/api/latest/extras/orbitControl.js)** -
-Mouse camera orbit helper
-* **[PickControl](http://xeolabs.github.com/scenejs/api/latest/extras/pickControl.js)** -
-Scene picking helper
+SceneJS uses plugins for many features, dynamically loading those as you need them. By default, the library will
+load plugins from this repository. That's OK for playing around, but for production you'll probably want to serve the
+plugins yourself - see the [Plugin API](#plugin-api) section below for how to do that.
+
 
 ## Resources
  * [SceneJS.org](http://scenejs.org)
@@ -301,7 +300,7 @@ This plugin happens to be deployed within the default SceneJS plugins directory,
 Note that the plugin script installs the custom node type as "demos/color", and see how that type name maps to the script's location
 within the ```http://scenejs.org/api/latest/plugins/node``` directory.
 
-### Instantiating the Node Type
+### Using a Custom Node Type
 
 Let's assume that we've configured SceneJS to find our plugin (this is the default configuration by the way, so don't
 bother doing this if you're hotlinking to the SceneJS lib and just want to use the plugins from this repo):
@@ -358,7 +357,6 @@ See how in the scene we are providing a child geometry for our node. Within its 
 the node type definition plugin above) the custom node type is responsible for inserting  specified child node(s) into
 the subgraph it creates under itself. That's because only the node type knows exactly where the child nodes should be located within its subgraph.
 
-### Accessing the Node Instance
 Now lets get the node instance and use one of its accessor methods to periodically switch its color property.
 
 Note that since our node originates from a plugin that will be loaded on-demand, we need to get the node asynchronously
