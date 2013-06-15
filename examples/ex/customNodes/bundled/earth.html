@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body>
+
+<script src="../../../../api/latest/scenejs.js"></script>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setDebugConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Demo of the "camera/orbit" and "space/planets/earth" custom node types
+
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Custom lighting to simulate the Sun
+            {
+                type:"lights",
+                lights:[
+                    {
+                        mode:"dir",
+                        color:{ r:1.0, g:1.0, b:1.0 },
+                        diffuse:true,
+                        specular:true,
+                        dir:{ x:-0.5, y:-0.5, z:-0.75 }
+                    }
+                ],
+                nodes:[
+
+                    // Node type defined by plugin in http://scenejs.org/api/latest/plugins/node/camera/orbit.js
+                    {
+                        type:"camera/orbit",
+                        yaw:340,
+                        pitch:-20,
+                        zoom:15,
+                        zoomSensitivity:10.0,
+                        eye:{ y:0 },
+                        look:{ y:0 },
+
+                        nodes:[
+
+                            // Node type defined by plugin in http://scenejs.org/api/latest/plugins/node/space/planets/earth.js
+                            {
+                                type:"space/planets/earth"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

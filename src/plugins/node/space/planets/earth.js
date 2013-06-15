@@ -153,8 +153,8 @@ SceneJS.Types.addType("space/planets/earth", {
 
         this._tick = this.getScene().on("tick",
             function () {
-                earthAngle.setAngle(earthRotate);
-                cloudsAngle.setAngle(cloudsRotate);
+                earthRotate.setAngle(earthAngle);
+                cloudsRotate.setAngle(cloudsAngle);
 
                 earthAngle -= 0.02;
                 cloudsAngle -= 0.01;
