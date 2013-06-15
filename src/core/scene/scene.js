@@ -114,7 +114,7 @@ SceneJS.Scene.prototype.isRunning = function () {
 SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     var result = this._engine.pick(canvasX, canvasY, options);
     if (result) {
-        this._engine.events.fireEvent("pick", result);
+        this._publish("pick", result);
         return result;
     }
 };

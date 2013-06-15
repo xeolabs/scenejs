@@ -1483,6 +1483,10 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
         newdiv.style.width = "100%";
         newdiv.style.padding = "0";
         newdiv.style.margin = "0";
+        newdiv.style.left = "0";
+        newdiv.style.top = "0";
+        newdiv.style.position = "absolute";
+        newdiv.style["z-index"] = "10000";
         newdiv.innerHTML += '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
         body.appendChild(newdiv);
     }
@@ -10749,7 +10753,7 @@ SceneJS.Scene.prototype.isRunning = function () {
 SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     var result = this._engine.pick(canvasX, canvasY, options);
     if (result) {
-        this._engine.events.fireEvent("pick", result);
+        this._publish("pick", result);
         return result;
     }
 };
