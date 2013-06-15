@@ -110,6 +110,13 @@
                         "id":"boxPrim"
                     },
                     {
+                        "title":"Boundary",
+                        "path":"geometry/prims/boundary.js",
+                        "tip":"Creating a boundary box geometry using the boundary primitive plugin",
+                        "tags":[],
+                        "id":"boundaryPrim"
+                    },
+                    {
                         "title":"Sphere",
                         "path":"geometry/prims/sphere.html",
                         "tip":"Creating a solid sphere geometry using the sphere primitive plugin",
