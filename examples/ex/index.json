@@ -812,7 +812,7 @@
                         "id":"customNodesTank"
                     },
                     {
-                        "title":"PlanetEarth",
+                        "title":"Planet Earth",
                         "path":"customNodes/bundled/earth.html",
                         "tags":[],
                         "id":"customNodesEarth"
@@ -828,6 +828,12 @@
                         "path":"customNodes/bundled/xray.html",
                         "tags":[],
                         "id":"customNodesXRay"
+                    },
+                    {
+                        "title":"CRT scanline effect",
+                        "path":"customNodes/bundled/crt.html",
+                        "tags":[],
+                        "id":"customNodesCRT"
                     }
                 ]
             }
