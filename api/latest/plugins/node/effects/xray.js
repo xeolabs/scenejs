@@ -4,7 +4,6 @@ SceneJS.Types.addType("effects/xray", {
 
         this._shader = this.addNode({
             type:"shader",
-            id:"myShader",
 
             shaders:[
                 {
