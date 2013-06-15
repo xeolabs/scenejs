@@ -812,6 +812,12 @@
                         "id":"customNodesTank"
                     },
                     {
+                        "title":"PlanetEarth",
+                        "path":"customNodes/bundled/earth.html",
+                        "tags":[],
+                        "id":"customNodesEarth"
+                    },
+                    {
                         "title":"Wobble effect",
                         "path":"customNodes/bundled/wobble.html",
                         "tags":[],
