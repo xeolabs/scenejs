@@ -31,6 +31,12 @@ SceneJS.Types.addType("object", {
             });
         }
 
+        if (params.matrix) {
+            this.matrix = node = node.addNode({
+                type:"matrix"
+            });
+        }
+
         if (params.material) {
             this.material = node = node.addNode({
                 type:"material",
