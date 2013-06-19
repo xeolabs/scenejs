@@ -40,35 +40,28 @@
 
                 nodes:[
                     {
-                        type:"lookAt",
-                        eye:{ z:5 },
-
+                        type:"material",
+                        color:{ r:1.0, g:1.0, b:1.0 },
+                        emit:1.0,
                         nodes:[
                             {
-                                type:"material",
-                                color:{ r:1.0, g:1.0, b:1.0 },
-                                emit:1.0,
+                                type:"texture",
+                                id:"theTexture",
+                                layers:[
+                                    {
+                                        source:{
+                                            type:"video",
+                                            src:"../../../movies/testVideo.ogv"
+                                        },
+                                        applyTo:"emit"
+                                    }
+                                ],
                                 nodes:[
                                     {
-                                        type:"texture",
-                                        id:"theTexture",
-                                        layers:[
-                                            {
-                                                source:{
-                                                    type:"video",
-                                                    src:"../../../movies/testVideo.ogv"
-                                                },
-                                                applyTo:"emit"
-                                            }
-                                        ],
-                                        nodes:[
-                                            {
-                                                type:"geometry",
-                                                source:{
-                                                    type:"box"
-                                                }
-                                            }
-                                        ]
+                                        type:"geometry",
+                                        source:{
+                                            type:"box"
+                                        }
                                     }
                                 ]
                             }

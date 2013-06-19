@@ -42,49 +42,42 @@
                         diffuse:true,
                         specular:true,
                         dir:{ x:0.5, y:0.5, z:-1.0 },
-                        space: "view"
+                        space:"view"
                     }
                 ],
 
                 nodes:[
                     {
-                        type:"lookAt",
-                        eye:{ z:5 },
-
+                        type:"flags",
+                        flags:{
+                            transparent:true
+                        },
                         nodes:[
                             {
-                                type:"flags",
-                                flags:{
-                                    transparent:true
-                                },
+                                type:"material",
+                                color:{ r:0.5, g:0.5, b:0.6 },
+                                specularColor:{ r:0.7, g:0.7, b:0.8 },
+                                specular:10.0,
+                                shine:5.0,
                                 nodes:[
                                     {
-                                        type:"material",
-                                        color:{ r:0.5, g:0.5, b:0.6 },
-                                        specularColor:{ r:0.7, g:0.7, b:0.8 },
-                                        specular:10.0,
-                                        shine:5.0,
+                                        type:"texture",
+                                        id:"theTexture",
+                                        layers:[
+                                            {
+                                                source:{
+                                                    type:"video",
+                                                    src:"../../../movies/testVideo.ogv"
+                                                },
+                                                applyTo:"specular"
+                                            }
+                                        ],
                                         nodes:[
                                             {
-                                                type:"texture",
-                                                id:"theTexture",
-                                                layers:[
-                                                    {
-                                                        source:{
-                                                            type:"video",
-                                                            src:"../../../movies/testVideo.ogv"
-                                                        },
-                                                        applyTo:"specular"
-                                                    }
-                                                ],
-                                                nodes:[
-                                                    {
-                                                        type:"geometry",
-                                                        source:{
-                                                            type:"box"
-                                                        }
-                                                    }
-                                                ]
+                                                type:"geometry",
+                                                source:{
+                                                    type:"box"
+                                                }
                                             }
                                         ]
                                     }
