@@ -160,9 +160,11 @@ new (function () {
 
     SceneJS.Texture.prototype._loadLayerTexture = function (gl, layer) {
 
-        SceneJS_sceneStatusModule.nodeLoading(this);
+//        SceneJS_sceneStatusModule.nodeLoading(this);
+//
+//        this._engine.nodeLoading(this);
 
-        this._engine.nodeLoading(this);
+        var taskId = this._engine.activity.taskStarted("loading texture");
 
         this._fireEvent("loading");
 
@@ -204,6 +206,7 @@ new (function () {
                                 if (!loaded) { // Texture first initialised - create layer
                                     loaded = true;
                                     self._setLayerTexture(gl, layer, texture);
+                                    self._engine.activity.taskFinished(taskId);
 
                                 } else { // Texture updated - layer already has the handle to it, so just signal a redraw
                                     self._engine.display.imageDirty = true;
@@ -229,6 +232,7 @@ new (function () {
                 gl.bindTexture(gl.TEXTURE_2D, texture);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self._ensureImageSizePowerOfTwo(image));
                 self._setLayerTexture(gl, layer, texture);
+                self._engine.activity.taskFinished(taskId);
             };
 
             var src = layer.uri || layer.src;
@@ -295,11 +299,9 @@ new (function () {
             update:null
         });
 
-        SceneJS_sceneStatusModule.nodeLoaded(this);
-
-        this._engine.nodeLoaded(this);
-
-        this._fireEvent("loaded");
+//        this._engine.nodeLoaded(this);
+//
+//        this._fireEvent("loaded");
 
         if (this.destroyed) { // Node was destroyed while loading
             layer.texture.destroy();

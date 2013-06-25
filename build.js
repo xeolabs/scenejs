@@ -123,7 +123,7 @@
 
             // Integrated 3rd party libs
 
-            "src/core/webgl-debug-utils.js",
+         //   "src/lib/require.js",
 
             // Utilities
 
@@ -133,6 +133,7 @@
             "src/core/plugins.js",
             "src/core/events.js",
             "src/core/canvas.js",
+            "src/core/activity.js",
             "src/core/engine.js",
             "src/core/errors.js",
             "src/core/config.js",

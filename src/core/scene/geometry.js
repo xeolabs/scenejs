@@ -22,6 +22,8 @@ new (function () {
 
         if (this._core.useCount == 1) { // This node defines the core
 
+            var taskId;
+
             var options = {
                 origin:params.origin,
                 scale:params.scale
@@ -51,6 +53,8 @@ new (function () {
                         SceneJS.errors.ILLEGAL_NODE_CONFIG,
                         "geometry config expected: source.type");
                 }
+
+                taskId = self._engine.activity.taskStarted("loading geometry");
 
                 SceneJS.Plugins.getPlugin(
                     "geometry",
@@ -86,10 +90,12 @@ new (function () {
                                     self._initNodeCore(data);
                                     SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
                                     self._core._loading = false;
-                                    self._fireEvent("loaded");
+                                    //self._fireEvent("loaded");
                                     self._engine.display.imageDirty = true;
                                     self._engine.branchDirty(self); // TODO
                                     created = true;
+
+                                    self._engine.activity.taskFinished(taskId);
 
                                 } else {
 
@@ -200,8 +206,6 @@ new (function () {
                                 }
                             }
                         );
-
-                        self._fireEvent("loading");
 
                         if (self._source.configure) {
                             self._source.configure(self._sourceConfigs);

@@ -20,6 +20,11 @@ var SceneJS_Engine = function (json, options) {
     this.canvas = new SceneJS_Canvas(this.id, json.canvasId, json.contextAttr, options);
 
     /**
+     * Engine activity monitor
+     */
+    this.activity = new SceneJS_Activity(this.id, options);
+
+    /**
      * Manages firing of and subscription to events
      */
     this.events = new SceneJS_eventManager();
@@ -83,7 +88,7 @@ var SceneJS_Engine = function (json, options) {
      */
     this.sceneStatus = {
         nodes:{}, // Status for each node
-        numLoading:0       // Number of loads currently in progress
+        numLoading:0  // Number of loads currently in progress
     };
 
     var self = this;
@@ -159,6 +164,11 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
     var core = this._coreFactory.getCore(json.type, json.coreId); // Create or share a core
     var self = this;
 
+    // Track task if we're loading the type
+    var taskId = !SceneJS_NodeFactory.nodeTypes[json.type]
+        ? this.activity.taskStarted("loading node type")
+        : null;
+
     return this._nodeFactory.getNode(
         this, json, core,
         function (node) {
@@ -172,6 +182,9 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
                         function (childNode) {
                             node.addNode(childNode);
                             if (++numNodes == len) {
+                                if (taskId) {
+                                    self.activity.taskFinished(taskId);
+                                }
                                 if (ok) {
                                     ok(node);
                                 }
@@ -180,6 +193,9 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
                         });
                 }
             } else {
+                if (taskId) {
+                    self.activity.taskFinished(taskId);
+                }
                 if (ok) {
                     ok(node);
                     self.scene._publish("nodes/" + node.id, node);
@@ -255,6 +271,8 @@ SceneJS_Engine.prototype.nodeLoading = function (node) {
     this.sceneStatus.numLoading++;
 
     this.events.fireEvent("loading", this.sceneStatus);
+
+    this.scene._publish("loadStatus", this.sceneStatus);
 };
 
 SceneJS_Engine.prototype.nodeLoaded = function (node) {
@@ -274,6 +292,8 @@ SceneJS_Engine.prototype.nodeLoaded = function (node) {
     }
 
     this.events.fireEvent("loaded", this.sceneStatus);
+
+    this.scene._publish("loadStatus", this.sceneStatus);
 };
 
 
@@ -344,7 +364,6 @@ SceneJS_Engine.prototype.start = function (cfg) {
                 time = (new Date()).getTime();
                 tick.time = time;
 
-
                 scene._publish("tick", tick);
 
                 if (!self.running) { // idleFunc may have destroyed scene
@@ -376,8 +395,6 @@ SceneJS_Engine.prototype.start = function (cfg) {
                 window.requestAnimationFrame(window[fnName]);
             }
         };
-
-        this._startCfg = cfg;
 
         window.requestAnimationFrame(window[fnName]);
     }

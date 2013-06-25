@@ -23,7 +23,7 @@ SceneJS.Plugins.addPlugin(
 
             var latitudeBands = cfg.latitudeBands || 30;
             var longitudeBands = cfg.longitudeBands || 30;
-            var radius = cfg.radius || 2;
+            var radius = cfg.radius || 1;
 
             var positions = [];
             var normals = [];
