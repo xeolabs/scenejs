@@ -58,14 +58,16 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var src = [
             "precision mediump float;",
             "attribute vec3 SCENEJS_aVertex;",
-            "attribute vec3 SCENEJS_aNormal;",
-
             "uniform mat4 SCENEJS_uMMatrix;",
             "uniform mat4 SCENEJS_uMNMatrix;",
             "uniform mat4 SCENEJS_uVMatrix;",
             "uniform mat4 SCENEJS_uVNMatrix;",
             "uniform mat4 SCENEJS_uPMatrix;"
         ];
+
+        if (normals) {
+            src.push("attribute vec3 SCENEJS_aNormal;");
+        }
 
         if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
             src.push("varying   vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal

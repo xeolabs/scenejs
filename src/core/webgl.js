@@ -146,9 +146,11 @@ var SceneJS_webgl_ProgramSampler = function (gl, program, name, type, size, loca
  */
 var SceneJS_webgl_ProgramAttribute = function (gl, program, name, type, size, location) {
     this.bindFloatArrayBuffer = function (buffer) {
-        buffer.bind();
-        gl.enableVertexAttribArray(location);
-        gl.vertexAttribPointer(location, buffer.itemSize, gl.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
+        if (buffer) {
+            buffer.bind();
+            gl.enableVertexAttribArray(location);
+            gl.vertexAttribPointer(location, buffer.itemSize, gl.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
+        }
     };
 
 };
