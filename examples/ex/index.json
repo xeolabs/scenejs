@@ -167,6 +167,12 @@
                         "path":"geometry/vertexColors.html",
                         "tags":["vertexColoring"],
                         "id": "customVertexColors"
+                    },
+                    {
+                        "title":"Using typed arrays",
+                        "path":"geometry/customTriangleMeshTypedArrays.html",
+                        "tags":[],
+                        "id": "customTrianglesTypedArrays"
                     }
                 ]
             },
@@ -199,6 +205,12 @@
                         "path":"geometry/morphing.html",
                         "tags":["morphing"],
                         "id":"geometryMorphing"
+                    },
+                    {
+                        "title":"Vertex morphing with typed arrays",
+                        "path":"geometry/morphingTypedArrays.html",
+                        "tags":["morphing"],
+                        "id":"geometryMorphingTypedArrays"
                     }
                 ]
             },
