@@ -21,12 +21,7 @@
     var FLAGS = {
 
         all:{
-            core:true,
-            box:true,
-            //quad:true,
-            sphere:true,
-            teapot:true,
-            vectorText:true
+            core:true
         },
 
         scripts:{
@@ -35,11 +30,6 @@
 
         docs:{
             core:false,
-            box:false,
-            quad:false,
-            sphere:false,
-            teapot:false,
-            vectorText:false,
             documents:true
         },
 
@@ -57,7 +47,7 @@
             sys.print('SceneJS Build Script\n');
             sys.print('Usage:\n');
             sys.print('build [type] [options]\n');
-            sys.print('eg building scripts without collada support,\n build SCRIPTS --without-collada\n');
+            sys.print('eg building scripts without documentation,\n build SCRIPTS --without-documents\n');
             sys.print('\n');
             sys.print('Types:\n');
             sys.print('all - (DEFAULT) build all options\n');
@@ -89,7 +79,6 @@
             if (FLAGS[TYPE]) FLAGS = FLAGS[TYPE];
             FLAGS[val.substr(7)] = true;
         }
-
     });
 
     //if type not set then use default
@@ -121,11 +110,21 @@
 
             "licenses/license-header.js",
 
+            //--------------------------------------------------------------------
             // Integrated 3rd party libs
+            //--------------------------------------------------------------------
 
-         //   "src/lib/require.js",
+            // RequireJS supports dynamic loading of dependencies by plugins
 
-            // Utilities
+//            "src/lib/require.js",
+
+            "src/lib/webgl-debug-utils.js",
+
+            //--------------------------------------------------------------------
+            // SceneJS
+            //--------------------------------------------------------------------
+
+            // Core
 
             "src/core/map.js",
             "src/core/scenejs.js",
@@ -211,25 +210,9 @@
         ]
     };
 
-    var DEPENDS = {
-        "src/core/math.js":[],
-        "src/core/scenejs.js":[]
-    };
-
     sys.print("Generating file list\n");
 
     var getFileList = function (list, all) {
-
-        var addDepends = function (file, list) {
-            if (DEPENDS[file]) {
-                for (var i = 0; i < DEPENDS[file].length; i++) {
-                    addDepends(DEPENDS[file][i], list);
-                    if (list.indexOf(DEPENDS[file][i]) < 0) {
-                        list.push(DEPENDS[file][i]);
-                    }
-                }
-            }
-        };
 
         if (!list) {
             list = [];
@@ -238,7 +221,6 @@
         for (var flag in FLAGS) {
             if ((FLAGS[flag] || all) && FILES[flag]) {
                 for (var i = 0; i < FILES[flag].length; i++) {
-                    addDepends(FILES[flag][i], list);
                     if (list.indexOf(FILES[flag][i]) < 0) {
                         list.push(FILES[flag][i]);
                     }
