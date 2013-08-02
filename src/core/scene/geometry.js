@@ -26,7 +26,8 @@ new (function () {
 
             var options = {
                 origin:params.origin,
-                scale:params.scale
+                scale:params.scale,
+                autoNormals:params.normals == "auto"
             };
 
             var self = this;
@@ -87,7 +88,7 @@ new (function () {
                                             ? self._applyOptions(data.positions, options)
                                             : data.positions) : undefined;
                                     }
-                                    self._initNodeCore(data);
+                                    self._initNodeCore(data, options);
                                     SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
                                     self._core._loading = false;
                                     //self._fireEvent("loaded");
@@ -238,13 +239,28 @@ new (function () {
 
         this._core.primitive = this._getPrimitiveType(data.primitive || "triangles");
 
+        var normals;
+
+        if (data.normals) {
+            if (data.normals == "auto") {
+                if (data.positions && data.indices) {
+                    // Auto normal generation
+                    normals = this._buildNormals(data.positions, data.indices);
+                } else {
+                    // TODO: log warning?
+                }
+            } else {
+                normals = data.normals;
+            }
+        }
+
         this._core.arrays = {
             positions:data.positions
                 ? new Float32Array((options.scale || options.origin)
                 ? this._applyOptions(data.positions, options)
                 : data.positions) : undefined,
 
-            normals:data.normals ? new Float32Array(data.normals) : undefined,
+            normals:normals ? new Float32Array(normals) : undefined,
             uv:data.uv ? new Float32Array(data.uv) : undefined,
             uv2:data.uv2 ? new Float32Array(data.uv2) : undefined,
             colors:data.colors ? new Float32Array(data.colors) : undefined,
@@ -417,6 +433,62 @@ new (function () {
             array[i] = items[j];
         }
 
+    };
+
+    /** (re)builds normal vectors from vertices
+     * @private
+     */
+    SceneJS.Geometry.prototype._buildNormals = function (positions, indices) {
+
+        var nvecs = new Array(positions.length / 3);
+        var j0;
+        var j1;
+        var j2;
+        var v1;
+        var v2;
+        var v3;
+
+        for (var i = 0, len = indices.length - 2; i < len; i += 3) {
+            j0 = indices[i + 0];
+            j1 = indices[i + 1];
+            j2 = indices[i + 2];
+
+            v1 = [positions[j0 * 3 + 0], positions[j0 * 3 + 1], positions[j0 * 3 + 2]];
+            v2 = [positions[j1 * 3 + 0], positions[j1 * 3 + 1], positions[j1 * 3 + 2]];
+            v3 = [positions[j2 * 3 + 0], positions[j2 * 3 + 1], positions[j2 * 3 + 2]];
+
+            v2 = SceneJS_math_subVec4(v2, v1, [0, 0, 0, 0]);
+            v3 = SceneJS_math_subVec4(v3, v1, [0, 0, 0, 0]);
+
+            var n = SceneJS_math_normalizeVec4(SceneJS_math_cross3Vec4(v2, v3, [0, 0, 0, 0]), [0, 0, 0, 0]);
+
+            if (!nvecs[j0]) nvecs[j0] = [];
+            if (!nvecs[j1]) nvecs[j1] = [];
+            if (!nvecs[j2]) nvecs[j2] = [];
+
+            nvecs[j0].push(n);
+            nvecs[j1].push(n);
+            nvecs[j2].push(n);
+        }
+
+        var normals = new Array(positions.length);
+
+        // now go through and average out everything
+        for (var i = 0, len = nvecs.length; i < len; i++) {
+            var count = nvecs[i].length;
+            var x = 0;
+            var y = 0;
+            var z = 0;
+            for (var j = 0; j < count; j++) {
+                x += nvecs[i][j][0];
+                y += nvecs[i][j][1];
+                z += nvecs[i][j][2];
+            }
+            normals[i * 3 + 0] = -(x / count);
+            normals[i * 3 + 1] = -(y / count);
+            normals[i * 3 + 2] = (z / count);
+        }
+        return normals;
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {

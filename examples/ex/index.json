@@ -173,6 +173,12 @@
                         "path":"geometry/customTriangleMeshTypedArrays.html",
                         "tags":[],
                         "id": "customTrianglesTypedArrays"
+                    },
+                    {
+                        "title":"Automatically generated normals",
+                        "path":"geometry/autoNormals.html",
+                        "tags":[],
+                        "id": "autoNormals"
                     }
                 ]
             },

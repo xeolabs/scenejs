@@ -103,6 +103,14 @@
             {
                 "nodes":[
                     {
+                        "title":"Automatic normals",
+                        "page":"autoNormals"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
                         "title":"Geometry plugin API",
                         "page":"geometryPluginPullStream"
                     }
