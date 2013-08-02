@@ -5595,7 +5595,7 @@ var SceneJS_nodeEventsModule = new (function() {
             var fn = node.__fireRenderedEvent;
             if (!fn) {
                 fn = node.__fireRenderedEvent = function (params) {
-                    node._fireEvent("rendered", params);
+                    node._publish("rendered", params);
                 };
             }
 
@@ -8491,8 +8491,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
                 y += nvecs[i][j][1];
                 z += nvecs[i][j][2];
             }
-            normals[i * 3 + 0] = -(x / count);
-            normals[i * 3 + 1] = -(y / count);
+            normals[i * 3 + 0] = (x / count);
+            normals[i * 3 + 1] = (y / count);
             normals[i * 3 + 2] = (z / count);
         }
         return normals;
