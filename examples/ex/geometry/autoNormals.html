@@ -33,7 +33,7 @@
     // SceneJS does not calculate the normals for vertices along a seam using the vertices
     // on the other side of the seam.
     //
-    // This should be quite suitable for heightmaps however,
+    // This should be quite suitable for heightmaps however.
 
     var meshData = createMeshData({
         width:5,
@@ -64,8 +64,8 @@
 
     new SceneJS.OrbitControls(scene, {
         yaw:30,
-        pitch:-30,
-        zoom:5
+        pitch:30,
+        zoom:10
     });
 
     // Creates a wavey mesh, minus the normal vectors, which we'll get SceneJS to generate for us
