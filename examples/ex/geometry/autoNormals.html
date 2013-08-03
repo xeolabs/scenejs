@@ -16,8 +16,6 @@
 
     <script src="../../../api/latest/scenejs.js"></script>
 
-    <script src="../../../api/latest/extras/orbitControl.js"></script>
-
 </head>
 <body>
 
@@ -44,28 +42,39 @@
 
     var scene = SceneJS.createScene({
         nodes:[
+
+            // Orbiting camera node, defined by plugin in
+            // http://scenejs.org/api/latest/plugins/node/camera/orbit.js
             {
-                type:"material",
-                color:{ r:0.5, g:0.5, b:0.6 },
+                type:"camera/orbit",
+                yaw:40,
+                pitch:-20,
+                zoom:10,
+                zoomSensitivity:1.0,
 
                 nodes:[
+
+                    // Blue color
                     {
-                        type:"geometry",
-                        primitive:"triangles",
-                        positions:meshData.positions,
-                        uv:meshData.uv,
-                        indices:meshData.indices,
-                        normals:"auto"  // <---------- Automatically creates normals
+                        type:"material",
+                        color:{ r:0.5, g:0.5, b:0.6 },
+
+                        nodes:[
+
+                            // Geometry node with automatic normals
+                            {
+                                type:"geometry",
+                                primitive:"triangles",
+                                positions:meshData.positions,
+                                uv:meshData.uv,
+                                indices:meshData.indices,
+                                normals:"auto"  // <---------- Automatically creates normals
+                            }
+                        ]
                     }
                 ]
             }
         ]
-    });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:30,
-        zoom:10
     });
 
     // Creates a wavey mesh, minus the normal vectors, which we'll get SceneJS to generate for us
