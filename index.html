@@ -141,11 +141,11 @@
                         src="images/earth.jpg" alt=""
                         title="SceneJS Example: Earth rendered with color, specular, alpha and glow maps"/></a>
             </li>
-            <li>
-                <a href="http://openglinsights.com/"><img
-                        src="images/openGLInsights.jpg" alt=""
-                        title="SceneJS: A WebGL-Based Scene Graph Engine - OpenGL Insights 2012"/></a>
-            </li>
+            <!--<li>-->
+                <!--<a href="http://openglinsights.com/"><img-->
+                        <!--src="images/openGLInsights.jpg" alt=""-->
+                        <!--title="SceneJS: A WebGL-Based Scene Graph Engine - OpenGL Insights 2012"/></a>-->
+            <!--</li>-->
         </ul>
     </div>
 </div>
@@ -192,10 +192,7 @@ var scene = SceneJS.createScene({
 
                     nodes: [
                         {
-                            type:"geometry",
-                            source:{
-                                type:"teapot"
-                            }
+                            type:"prims/teapot"
                         }
                     ]
                 }
@@ -212,13 +209,15 @@ var scene = SceneJS.createScene({
 
             <p>Now let's start the teapot spinning:</p>
 <pre class="prettyprint lang-javascript">
-var angle = 0;
-var myRotate = scene.getNode("myRotate");
+scene.getNode("myRotate", function(myRotate) {
 
-scene.on("tick",
-    function() {
-        myRotate.setAngle(angle += 0.5);
-    });
+    var angle = 0;
+
+    scene.on("tick",
+        function() {
+            myRotate.setAngle(angle += 0.5);
+        });
+});
         </pre>
             <p>
                 <a href="examples.html?page=firstExample"
@@ -235,7 +234,7 @@ scene.on("tick",
             <p>If you'd rather serve the plugins yourself, then just copy that directory to your server and configure
                 SceneJS to load them from there, like this:</p>
 
-            <pre class="prettyprint lang-javascript">SceneJS.configure({
+            <pre class="prettyprint lang-javascript">SceneJS.setConfigs({
     pluginPath: "./foo/myPluginsDir"
 });
             </pre>
