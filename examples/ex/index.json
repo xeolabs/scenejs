@@ -582,12 +582,6 @@
                         "path":"shaders/fragment/pixels.html",
                         "tags":[],
                         "id":"pixellateShader"
-                    },
-                    {
-                        "title":"Fog",
-                        "path":"shaders/fragment/fog.html",
-                        "tags":[],
-                        "id":"fogShader"
                     }
                 ]
             },
@@ -861,6 +855,12 @@
                         "path":"customNodes/bundled/crt.html",
                         "tags":[],
                         "id":"customNodesCRT"
+                    },
+                    {
+                        "title":"Fog effect",
+                        "path":"customNodes/bundled/fog.html",
+                        "tags":[],
+                        "id":"customNodesFog"
                     }
                 ]
             },
