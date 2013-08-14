@@ -231,7 +231,7 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
 
     this.valid = (gl.getProgramParameter(handle, gl.LINK_STATUS) != 0);
 
-    var debugCfg = SceneJS_debugModule.getConfigs("shading");
+    var debugCfg = SceneJS_configsModule.getConfigs("shading");
     if (debugCfg.validate !== false) {
         gl.validateProgram(handle);
         this.valid = this.valid && (gl.getProgramParameter(handle, gl.VALIDATE_STATUS) != 0);

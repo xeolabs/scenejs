@@ -15,7 +15,7 @@
     </style>
 
     <script src="../../../api/latest/scenejs.js"></script>
-    <script src="../../../api/latest/extras/orbitControl.js"></script>
+
 </head>
 <body>
 
@@ -39,99 +39,117 @@
     // transparency enabled, render the next two boxes, rendering the outermost box last.
     //
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Layer priority -1
-            // Inner opaque blue box
-            // Rendered first
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"layer",
-                priority:-1,
-                nodes:[
-                    {
-                        type:"material",
-                        color:{ r:0.2, g:0.2, b:1.0 },
-                        nodes:[
-                            {
-                                type:"scale",
-                                x:3,
-                                y:3,
-                                z:3,
-                                nodes:[
-                                    {
-                                        type:"geometry",
-                                        source:{
-                                            type:"box"
-                                        }
-                                    }
-
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-
-            // Layer priority 0
-            // Middle transparent red box
-            //  See how we cull backfaces because we can't control the order in which faces
-            // render. We don't want front faces rendering before back faces, which would
-            // cause the back faces to be rejected by the depth buffer and deny the
-            // opportunity to blend the faces - easy fix is just to not render the backfaces.
-            {
-                type:"flags",
-                flags:{
-                    transparent:true,
-                    backfaces:false    // Hide backfaces
-                },
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:42,
+                zoomSensitivity:5,
 
                 nodes:[
+
+                    // Layer priority -1
+                    // Inner opaque blue box
+                    // Rendered first
                     {
-                        type:"material",
-                        color:{ r:1.0, g:0.2, b:0.2 },
-                        alpha:0.2,
+                        type:"layer",
+                        priority:-1,
                         nodes:[
                             {
-                                type:"scale",
-                                x:6, y:6, z:6,
+                                type:"material",
+                                color:{ r:0.2, g:0.2, b:1.0 },
                                 nodes:[
                                     {
-                                        type:"geometry",
-                                        source:{
-                                            type:"box"
-                                        }
+                                        type:"scale",
+                                        x:3,
+                                        y:3,
+                                        z:3,
+                                        nodes:[
+
+                                            // Box primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                            {
+                                                type:"prims/box"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
                         ]
                     },
 
-                    // Layer priority 1
-                    // Outer transparent green cube
-                    // Rendered last
-
+                    // Layer priority 0
+                    // Middle transparent red box
+                    //  See how we cull backfaces because we can't control the order in which faces
+                    // render. We don't want front faces rendering before back faces, which would
+                    // cause the back faces to be rejected by the depth buffer and deny the
+                    // opportunity to blend the faces - easy fix is just to not render the backfaces.
                     {
-                        type:"layer",
-                        priority:1,
+                        type:"flags",
+                        flags:{
+                            transparent:true,
+                            backfaces:false    // Hide backfaces
+                        },
+
                         nodes:[
                             {
                                 type:"material",
-                                color:{ r:0.2, g:1.0, b:0.2 },
+                                color:{ r:1.0, g:0.2, b:0.2 },
                                 alpha:0.2,
                                 nodes:[
                                     {
                                         type:"scale",
-                                        x:9,
-                                        y:9,
-                                        z:9,
+                                        x:6, y:6, z:6,
+                                        nodes:[
 
+                                            // Box primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                            {
+                                                type:"prims/box"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+
+                            // Layer priority 1
+                            // Outer transparent green cube
+                            // Rendered last
+
+                            {
+                                type:"layer",
+                                priority:1,
+                                nodes:[
+                                    {
+                                        type:"material",
+                                        color:{ r:0.2, g:1.0, b:0.2 },
+                                        alpha:0.2,
                                         nodes:[
                                             {
-                                                type:"geometry",
-                                                source:{
-                                                    type:"box"
-                                                }
+                                                type:"scale",
+                                                x:9,
+                                                y:9,
+                                                z:9,
+
+                                                nodes:[
+
+                                                    // Box primitive, implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                                    {
+                                                        type:"prims/box"
+                                                    }
+                                                ]
                                             }
                                         ]
                                     }
@@ -142,12 +160,6 @@
                 ]
             }
         ]
-    });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:42
     });
 
 </script>

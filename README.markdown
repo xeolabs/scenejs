@@ -1,6 +1,6 @@
-## SceneJS 3.0
+## SceneJS 3.1
 
-**SceneJS 3.0** is an open-source 3D engine on WebGL that's geared towards rendering large numbers of individually
+**SceneJS** is an open-source 3D engine on WebGL that's geared towards rendering large numbers of individually
 articulated and pickable objects as required for high-detail visualisation applications.
 
 ![Tron Tank Demo](http://scenejs.org/images/tron-tank.jpg)
@@ -381,9 +381,12 @@ See that setColor method, which is defined by our node type?
 
 
 ## Building SceneJS
-SceneJS requires nodejs. To build, simply:
+SceneJS requires nodejs and ncp. To build, simply:
+
+```npm install ncp```
 ```node build.js```
-Then the binaries will appear in ```./build```.
+
+Then the binaries will appear in ```./api```.
 
 
 

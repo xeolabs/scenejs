@@ -21,18 +21,21 @@
 
 <script>
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Node type defined by plugin in http://scenejs.org/api/latest/plugins/node/camera/orbit.js
+            // Mouse-orbited camera, implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
             {
-                type:"camera/orbit",
+                type:"cameras/orbit",
                 yaw:-100,
                 pitch:-10,
                 zoom:500,
                 zoomSensitivity:10.0,
-                eye:{ y:40 },
-                look:{ y:40 },
 
                 nodes:[
                     {
@@ -54,22 +57,48 @@
 
                         nodes:[
 
-                            // Node type defined by plugin in http://scenejs.org/api/latest/plugins/node/sky/clouds.js
+                            // Clouds skybox, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
                             {
-                                type:"sky/clouds"
+                                type:"skyboxes/clouds"
                             },
 
-                            // Node type defined by plugin in http://scenejs.org/api/latest/plugins/node/ground/grid.js
+                            // Fog effect, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/effects/fog.js
                             {
-                                type:"ground/grid",
-                                size:{ x:10000, z:10000 },
-                                xSegments:100,
-                                zSegments:100
-                            },
+                                type:"effects/fog",
+                                mode:"exp2", // Quadratic
+                                density:0.1, // Fog density
+                                start:30.0, // Near starting point
+                                end:800.0, // Far ending point
+                                color:{ r:1.0, g:1.0, b:0.8 }, // Yellowish fog color
 
-                            // Node type defined by plugin in http://scenejs.org/api/latest/plugins/node/buildings/city.js
-                            {
-                                type:"buildings/city"
+                                nodes:[
+                                    {
+                                        type:"material",
+                                        color:{ r:0.5, g:1.0, b:0.5 },
+                                        nodes:[
+
+                                            // Grid ground, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/object/ground/grid.js
+                                            {
+                                                type:"prims/grid",
+                                                size:{ x:10000, z:10000 },
+                                                width:10000,
+                                                height:10000,
+                                                widthSegments:100,
+                                                heightSegments:100
+                                            }
+                                        ]
+                                    },
+
+                                    // City, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/object/buildings/city.js
+                                    {
+                                        type:"objects/buildings/city",
+                                        width:600
+                                    }
+                                ]
                             }
                         ]
                     }

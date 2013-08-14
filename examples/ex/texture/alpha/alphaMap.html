@@ -14,73 +14,91 @@
         }
     </style>
 
-    <!--<script src="../../../../api/latest/scenejs.js"></script>-->
-    <!--<script src="../../../../api/latest/extras/orbitControl.js"></script>-->
-    <script src="http://xeolabs.github.io/scenejs/api/latest/scenejs.js"></script>
-    <script src="http://xeolabs.github.io/scenejs/api/latest/extras/orbitControl.js"></script>
+    <script src="../../../../api/latest/scenejs.js"></script>
+
 </head>
 <body>
 
 <script>
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Outer green box with alpha map
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"flags",
-                flags:{
-                    transparent:true
-                },
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:5,
+                zoomSensitivity:1.0,
+
                 nodes:[
+
+                    // Outer green box with alpha map
                     {
-                        type:"material",
-                        color:{
-                            r:0.5, g:1, b:0.5
+                        type:"flags",
+                        flags:{
+                            transparent:true
                         },
-                        alpha:1.0,
                         nodes:[
                             {
-                                type:"texture",
-                                id:"theTexture",
-                                layers:[
-                                    {
-                                        src:"../../../textures/leavesAlphaMap.jpg",
-                                        applyTo:"alpha"
-                                    }
-                                ],
+                                type:"material",
+                                color:{
+                                    r:0.5, g:1, b:0.5
+                                },
+                                alpha:1.0,
                                 nodes:[
+
+                                    // The alpha map
                                     {
-                                        type:"geometry",
-                                        source:{
-                                            type:"box"
-                                        }
+                                        type:"texture",
+                                        id:"theTexture",
+                                        layers:[
+                                            {
+                                                src:"../../../textures/leavesAlphaMap.jpg",
+                                                applyTo:"alpha"
+                                            }
+                                        ],
+                                        nodes:[
+
+                                            // Box primitive implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                            {
+                                                type:"prims/box"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
                         ]
-                    }
-                ]
-            },
+                    },
 
-            // Inner blue sphere
-            {
-                type:"scale",
-                x:0.3,
-                y:0.3,
-                z:0.3,
-                nodes:[
+                    // Inner blue sphere
                     {
-                        type:"material",
-                        color:{
-                            r:0.3, g:0.3, b:1
-                        },
+                        type:"scale",
+                        x:0.3,
+                        y:0.3,
+                        z:0.3,
                         nodes:[
                             {
-                                type:"geometry",
-                                source:{
-                                    type:"sphere"
-                                }
+                                type:"material",
+                                color:{
+                                    r:0.3, g:0.3, b:1
+                                },
+                                nodes:[
+
+                                    // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                    {
+                                        type:"prims/sphere"
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -88,13 +106,6 @@
             }
         ]
     });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:5
-    });
-
 
 </script>
 </body>

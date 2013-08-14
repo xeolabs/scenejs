@@ -9,42 +9,170 @@
  *
  * @private
  */
-var SceneJS_sceneStatusModule = new (function() {
+var SceneJS_sceneStatusModule = new (function () {
 
+    // Public activity summary
     this.sceneStatus = {};
+
+    // IDs of all tasks
+    var taskIds = new SceneJS_Map();
+    var tasks = {};
+
+    var sceneStates = {};
 
     var self = this;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_CREATED,
-            function(params) {
-                self.sceneStatus[params.engine.id] = {
-                    numLoading: 0
-                };
-            });
+        SceneJS_events.SCENE_DESTROYED,
+        function (params) {
+            var sceneId = params.engine.id;
+            delete self.sceneStatus[sceneId];
+            delete sceneStates[sceneId];
+        });
 
-    SceneJS_events.addListener(
-            SceneJS_events.SCENE_DESTROYED,
-            function(params) {
-                delete self.sceneStatus[params.engine.id];
-            });
+    /** Notifies that a node has begun loading some data
+     */
+    this.taskStarted = function (node, description) {
+        if (false === SceneJS_configsModule.configs.statusPopups) {
+            return -1;
+        }
+        var scene = node.getScene();
+        var sceneId = scene.getId();
+        var nodeId = node.getId();
+        var canvas = scene.getCanvas();
 
-    this.nodeLoading = function(node) {
+        var taskId = taskIds.addItem();
 
-        var status = self.sceneStatus[node._engine.id];
-
+        // Update public info
+        var status = this.sceneStatus[sceneId];
         if (!status) {
-            status = self.sceneStatus[node._engine.id] = {
-                numLoading: 0
+            status = this.sceneStatus[sceneId] = {
+                numLoading:0
             };
-
         }
         status.numLoading++;
+
+        // Track node
+        var sceneState = sceneStates[sceneId];
+        if (!sceneState) {
+            sceneState = sceneStates[sceneId] = {
+                sceneId:sceneId,
+                nodeStates:{},
+                scene:scene,
+                popupContainer:createPopupContainer(canvas),
+                descCounts:{}
+            };
+        }
+        var descCount = sceneState.descCounts[description];
+        if (descCount == undefined) {
+            descCount = sceneState.descCounts[description] = 0;
+        }
+        sceneState.descCounts[description]++;
+        var nodeState = sceneState.nodeStates[nodeId];
+        if (!nodeState) {
+            nodeState = sceneState.nodeStates[nodeId] = {
+                nodeId:nodeId,
+                numLoading:0,
+                tasks:{}
+            };
+        }
+        description = description + " " + sceneState.descCounts[description] + "...";
+        nodeState.numLoading++;
+        var task = {
+            sceneState:sceneState,
+            nodeState:nodeState,
+            description:description,
+            element:createPopup(sceneState.popupContainer, description)
+        };
+        nodeState.tasks[taskId] = task;
+        tasks[taskId] = task;
+        return taskId;
     };
 
-    this.nodeLoaded = function(node) {
-        this.sceneStatus[node._engine.id].numLoading--;
+    function createPopupContainer(canvas) {
+        var body = document.getElementsByTagName("body")[0];
+        var div = document.createElement('div');
+        var style = div.style;
+        style.position = "absolute";
+        style.width = "200px";
+        style.right = "10px";
+        style.top = "0";
+        style.padding = "10px";
+        style["z-index"] = "10000";
+        body.appendChild(div);
+        return div;
+    }
+
+    function createPopup(popupContainer, description) {
+        var div = document.createElement('div');
+        var style = div.style;
+        style["font-family"] = "Helvetica";
+        style["font-size"] = "14px";
+        style.padding = "5px";
+        style.margin = "4px";
+        style["padding-left"] = "12px";
+        style["border"] = "1px solid #000055";
+        style.color = "black";
+        style.background = "#AAAAAA";
+        style.opacity = "0.8";
+        style["border-radius"] = "3px";
+        style["-moz-border-radius"] = "3px";
+        style["box-shadow"] = "3px 3px 3px #444444";
+        div.innerHTML = description;
+        popupContainer.appendChild(div);
+        return div;
+    }
+
+    /** Notifies that a load has finished loading some data
+     */
+    this.taskFinished = function (taskId) {
+        if (taskId == -1) {
+            return;
+        }
+        var task = tasks[taskId];
+        if (!task) {
+            return;
+        }
+        var sceneState = task.sceneState;
+        this.sceneStatus[sceneState.sceneId].numLoading--;
+        dismissPopup(task.element);
+        var nodeState = task.nodeState;
+        nodeState.numLoading--;
+        delete nodeState.tasks[taskId];
+        if (nodeState.numLoading == 0) {
+            delete sceneState.nodeStates[nodeState.nodeId];
+        }
     };
 
+    function dismissPopup(element) {
+        element.style.background = "#AAFFAA";
+        var opacity = 0.8;
+        var interval = setInterval(function () {
+            if (opacity <= 0) {
+                element.parentNode.removeChild(element);
+                clearInterval(interval);
+            } else {
+                element.style.opacity = opacity;
+                opacity -= 0.1;
+            }
+        }, 100);
+    }
+
+    /** Notifies that a task has failed
+     */
+    this.taskFailed = function (taskId) {
+        if (taskId == -1) {
+            return;
+        }
+        var task = tasks[taskId];
+        if (!task) {
+            return;
+        }
+        failPopup(task.element);
+    };
+
+    function failPopup(element) {
+        element.style.background = "#FFAAAA";
+    }
 })();
 

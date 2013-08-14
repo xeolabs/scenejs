@@ -19,62 +19,74 @@
 
 <script src="../../../../api/latest/scenejs.js"></script>
 
-<script src="../../../../api/latest/extras/orbitControl.js"></script>
 
 <script>
 
     // Demonstrates creating nodes individually
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene();
 
-    // Create blue torus
+    // Add mouse-orbited camera, implemented by plugin at
+    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+    scene.addNode({
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:5,
+                zoomSensitivity:10.0
+            },
 
-    var material = scene.addNode({
-        type:"material",
-        color:{ r:0.2, g:0.2, b:0.6 }
-    });
+            // The 'cameras/orbit' node is instantiated from an asynchronously-loaded plugin,
+            // so we need to get the node instance via callback.
 
-    var translate = material.addNode({
-        type:"translate",
-        x:-4
-    });
+            function (cameraOrbit) {
 
-    var geometry = translate.addNode({
-        type:"geometry",
-        source:{
-            type:"torus"
-        }
-    });
+                // Create blue torus
 
-    // Create red torus
+                var material = cameraOrbit.addNode({
+                    type:"material",
+                    color:{ r:0.2, g:0.2, b:0.6 }
+                });
 
-    var material2 = scene.addNode({
-        type:"material",
-        color:{ r:0.6, g:0.2, b:0.2 }
-    });
+                var translate = material.addNode({
+                    type:"translate",
+                    x:-4
+                });
 
-    // This time we'll add a subgraph of nodes
+                var geometry = translate.addNode({
+                    type:"geometry",
+                    source:{
+                        type:"torus"
+                    }
+                });
 
-    material.addNode({
-        type:"translate",
-        x:4,
-        nodes:[
-            {
-                type:"geometry",
-                source:{
-                    type:"torus"
-                }
-            }
-        ]
-    });
+                // Create red torus
 
-    // Mouse orbit helper
+                var material2 = scene.addNode({
+                    type:"material",
+                    color:{ r:0.6, g:0.2, b:0.2 }
+                });
 
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:5
-    });
+                // This time we'll add a subgraph of nodes
+
+                material.addNode({
+                    type:"translate",
+                    x:4,
+                    nodes:[
+                        // Teapot primitive, implemented by plugin at
+                        // http://scenejs.org/api/latest/plugins/node/prims/torus.js
+                        {
+                            type:"prims/torus"
+                        }
+                    ]
+                });
+            });
 
 </script>
 </body>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body>
+
+<script src="../../../../api/latest/scenejs.js"></script>
+
+<script>
+
+    // Demo of the "skyboxes/cloudySea" skybox
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
+    SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:340,
+                pitch:-20,
+                zoom:15,
+                zoomSensitivity:10.0,
+
+                nodes:[
+
+                    // Cloudy sea skybox, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skyboxes/cloudySea.js
+                    {
+                        type:"skyboxes/cloudySea",
+                        size:5000 // Box half-size on each axis - default is 5000
+                    },
+
+                    {
+                        type:"material",
+                        color:{ r:0.4, g:0.4, b:0.9 },
+                        nodes:[
+
+                            // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            {
+                                type:"prims/teapot"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

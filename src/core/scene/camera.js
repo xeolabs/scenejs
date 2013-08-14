@@ -12,7 +12,7 @@
             45, // fovy
             1, // aspect
             0.1, // near
-            5000), // far
+            10000), // far
 
         //Default optical attributes for perspective projection
         optics:{
@@ -20,7 +20,7 @@
             fovy:45.0,
             aspect:1.0,
             near:0.1,
-            far:5000.0
+            far:10000.0
         }
     };
 
@@ -55,7 +55,7 @@
                 fovy:60.0,
                 aspect:1.0,
                 near:0.1,
-                far:5000.0
+                far:10000.0
             };
         } else {
             var type = optics.type || core.optics.type;
@@ -77,7 +77,7 @@
                     near:optics.near || 0.1,
                     right:optics.right || 1.00,
                     top:optics.top || 1.0,
-                    far:optics.far || 5000.0
+                    far:optics.far || 10000.0
                 };
             } else if (type == "perspective") {
                 core.optics = {
@@ -85,7 +85,7 @@
                     fovy:optics.fovy || 60.0,
                     aspect:optics.aspect == undefined ? 1.0 : optics.aspect,
                     near:optics.near || 0.1,
-                    far:optics.far || 5000.0
+                    far:optics.far || 10000.0
                 };
             } else if (!optics.type) {
                 throw SceneJS_error.fatalError(

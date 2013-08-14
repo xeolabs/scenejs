@@ -110,13 +110,6 @@
                         "id":"boxPrim"
                     },
                     {
-                        "title":"Boundary",
-                        "path":"geometry/prims/boundary.js",
-                        "tip":"Creating a boundary box geometry using the boundary primitive plugin",
-                        "tags":[],
-                        "id":"boundaryPrim"
-                    },
-                    {
                         "title":"Sphere",
                         "path":"geometry/prims/sphere.html",
                         "tip":"Creating a solid sphere geometry using the sphere primitive plugin",
@@ -569,7 +562,8 @@
                     {
                         "title":"Pixel color",
                         "path":"shaders/fragment/pixelColor.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"pixelColorShader"
                     },
                     {
                         "title":"X-Ray",
@@ -580,12 +574,20 @@
                     {
                         "title":"CRT scanlines",
                         "path":"shaders/fragment/scanline.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"crtShader"
                     },
                     {
                         "title":"Pixels",
                         "path":"shaders/fragment/pixels.html",
-                        "tags":[]
+                        "tags":[],
+                        "id":"pixellateShader"
+                    },
+                    {
+                        "title":"Fog",
+                        "path":"shaders/fragment/fog.html",
+                        "tags":[],
+                        "id":"fogShader"
                     }
                 ]
             },
@@ -861,6 +863,74 @@
                         "id":"customNodesCRT"
                     }
                 ]
+            },
+            {
+                "title":"Heightmaps",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Heightmap with custom texture and fog",
+                        "path":"customNodes/heightmaps/custom.html",
+                        "tags":["heightmaps"],
+                        "id":"customHeightmap"
+                    }
+                ]
+            },
+            {
+                "title":"Skyboxes",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Skybox with custom texture",
+                        "path":"customNodes/skyboxes/custom.html",
+                        "tags":["skyboxes"],
+                        "id":"customSkybox"
+                    },
+                    {
+                        "title":"Light Clouds",
+                        "path":"customNodes/skyboxes/clouds.html",
+                        "tags":["skyboxes"],
+                        "id":"cloudsSkybox"
+                    },
+                    {
+                        "title":"Cloudy Sea",
+                        "path":"customNodes/skyboxes/cloudySea.html",
+                        "tags":["skyboxes"],
+                        "id":"cloudySeaSkybox"
+                    },
+                    {
+                        "title":"Grimm Night",
+                        "path":"customNodes/skyboxes/grimmNight.html",
+                        "tags":["skyboxes"],
+                        "id":"grimmNightSkyBox"
+                    },
+                    {
+                        "title":"Interstellar Clouds",
+                        "path":"customNodes/skyboxes/interstellarClouds.html",
+                        "tags":["skyboxes"],
+                        "id":"interstellarCloudsSkyBox"
+                    },
+                    {
+                        "title":"Miramar Clouds",
+                        "path":"customNodes/skyboxes/miramarClouds.html",
+                        "tags":["skyboxes"],
+                        "id":"miramarCloudsSkyBox"
+                    },
+                    {
+                        "title":"Stormy Days Clouds",
+                        "path":"customNodes/skyboxes/stormyDaysClouds.html",
+                        "tags":["skyboxes"],
+                        "id":"stormyDaysCloudsSkyBox"
+                    },
+                    {
+                        "title":"Violent Days Clouds",
+                        "path":"customNodes/skyboxes/violentDaysClouds.html",
+                        "tags":["skyboxes"],
+                        "id":"violentDaysCloudsSkyBox"
+                    }
+                ]
             }
         ]
     },
@@ -905,6 +975,19 @@
                         "path":"configuration/paths/pluginPath.html",
                         "tags":["plugins"],
                         "id":"pluginPathConfig"
+                    }
+                ]
+            },
+            {
+                "title":"Configuring status popups",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Disable default status popups",
+                        "path":"configuration/statusPopups/statusPopups.html",
+                        "tags":[],
+                        "id":"statusPopupsConfig"
                     }
                 ]
             }

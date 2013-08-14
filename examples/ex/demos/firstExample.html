@@ -21,6 +21,12 @@
 
 <script>
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
+    // Define scene
     var scene = SceneJS.createScene({
         nodes:[
             {
@@ -41,11 +47,11 @@
                                 angle:0,
 
                                 nodes:[
+
+                                    // Teapot primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
                                     {
-                                        type:"geometry",
-                                        source:{
-                                            type:"teapot"
-                                        }
+                                        type:"prims/teapot"
                                     }
                                 ]
                             }
@@ -56,13 +62,17 @@
         ]
     });
 
-    var angle = 0;
-    var myRotate = scene.getNode("myRotate");
+    // On each frame, spin the teapot a little bit
 
-    scene.on("tick",
-            function () {
-                myRotate.setAngle(angle += 0.5);
-            });
+    scene.getNode("myRotate", function (myRotate) {
+
+        var angle = 0;
+
+        scene.on("tick",
+                function () {
+                    myRotate.setAngle(angle += 0.5);
+                });
+    });
 
 </script>
 </body>

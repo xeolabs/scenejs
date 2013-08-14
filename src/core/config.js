@@ -1,27 +1,21 @@
 /**
  * Backend that manages configurations.
  *
- * @class SceneJS_debugModule
+ * @class SceneJS_configsModule
  * @private
  */
-var SceneJS_debugModule = new (function() {
+var SceneJS_configsModule = new (function() {
 
     this.configs = {};
+    var subs = {};
 
-    this.getConfigs = function(path) {
-        if (!path) {
-            return this.configs;
-        } else {
-            var cfg = this.configs;
-            var parts = path.split(".");
-            for (var i = 0; cfg && i < parts.length; i++) {
-                cfg = cfg[parts[i]];
-            }
-            return cfg || {};
-        }
-    };
-
+    /**
+     * Set a config
+     * @param path
+     * @param data
+     */
     this.setConfigs = function(path, data) {
+        // Update configs
         if (!path) {
             this.configs = data;
         } else {
@@ -39,6 +33,42 @@ var SceneJS_debugModule = new (function() {
             }
             cfg[parts.length - 1] = data;
         }
+        // Notify subscribers
+        var list = subs[path || "_all"];
+        if (list) {
+            for (var i = 0, len = list.length; i < len; i++) {
+                list[i](cfg);
+            }
+        }
+    };
+
+    /**
+     * Get a config
+     * @param path
+     * @return {*}
+     */
+    this.getConfigs = function(path) {
+        if (!path) {
+            return this.configs;
+        } else {
+            var cfg = this.configs;
+            var parts = path.split(".");
+            for (var i = 0; cfg && i < parts.length; i++) {
+                cfg = cfg[parts[i]];
+            }
+            return cfg || {};
+        }
+    };
+
+    /**
+     * Subscribe to updates to a config
+     * @param path
+     * @param ok
+     */
+    this.on = function(path, ok) {
+        path = path || "_all";
+        (subs[path] || (subs[path] = [])).push(ok);
+        ok(this.getConfigs(path));
     };
 
 })();
@@ -47,9 +77,9 @@ var SceneJS_debugModule = new (function() {
  */
 SceneJS.configure = SceneJS.setConfigs = SceneJS.setDebugConfigs = function () {
     if (arguments.length == 1) {
-        SceneJS_debugModule.setConfigs(null, arguments[0]);
+        SceneJS_configsModule.setConfigs(null, arguments[0]);
     } else if (arguments.length == 2) {
-        SceneJS_debugModule.setConfigs(arguments[0], arguments[1]);
+        SceneJS_configsModule.setConfigs(arguments[0], arguments[1]);
     } else {
         throw SceneJS_error.fatalError("Illegal arguments given to SceneJS.setDebugs - should be either ({String}:name, {Object}:cfg) or ({Object}:cfg)");
     }
@@ -58,6 +88,6 @@ SceneJS.configure = SceneJS.setConfigs = SceneJS.setDebugConfigs = function () {
 /** Gets configurations
  */
 SceneJS.getConfigs = SceneJS.getDebugConfigs = function (path) {
-    return SceneJS_debugModule.getConfigs(path);
+    return SceneJS_configsModule.getConfigs(path);
 };
 

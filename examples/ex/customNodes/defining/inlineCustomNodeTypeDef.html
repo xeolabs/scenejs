@@ -19,8 +19,6 @@
 
 <script src="../../../../api/latest/scenejs.js"></script>
 
-<script src="../../../../api/latest/extras/orbitControl.js"></script>
-
 <script>
 
     // Non-core SceneJS node types are provided as plugins. This is a powerful extension mechanism that allows you to
@@ -52,7 +50,12 @@
     // plugin script, so that we can show the node type API.
 
 
-    //-------- Node type definition ------------------------------------------------------------------------------------
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Define our custom node type
 
     SceneJS.Types.addType("myTeapotNodeType", {
 
@@ -73,11 +76,10 @@
                         type:"material",
                         color:{ r:1.0, g:0.6, b:0.6 },
                         nodes:[
+
+                            // Node type implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
                             {
-                                type:"geometry",
-                                source:{
-                                    type:"teapot"
-                                }
+                                type:"prims/teapot"
                             }
                         ]
                     }
@@ -112,64 +114,62 @@
         }
     });
 
-
-    //-------- Scene graph definition ----------------------------------------------------------------------------------
-
     // Now we'll create a scene graph that contains an instance of our node type.
     // The attributes for the node are optional here - we can get the node
     // and also just set them via the node's setters.
 
     var scene = SceneJS.createScene({
         nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
             {
-                type:"myTeapotNodeType",
-                id:"myTeapotNode",
-                size:{
-                    x:0.4,
-                    y:1.0,
-                    z:0.5
-                },
-                pos:{
-                    y:2
-                }
+                type:"cameras/orbit",
+                yaw:-150,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:10.0,
+                eye:{ y:2 },
+                look:{ y:2 },
+
+                nodes:[
+
+                    // Instance of the custom node type we defined above
+                    {
+                        type:"myTeapotNodeType",
+                        id:"myTeapotNode",
+                        size:{
+                            x:0.4,
+                            y:1.0,
+                            z:0.5
+                        },
+                        pos:{
+                            y:2
+                        }
+                    }
+                ]
             }
         ]
     });
 
     // Now get the node and animate its size through one of its accessors.
     //
-    // Since our node type was defined inline within this page, SceneJS doesn't have to dynamically load it,
-    // so we can just synchronously get it and start calling it.
-    //
-    // Normally we would provide the node type as a plugin script, in  which case we would need to
-    // get the node instance asynchronously with a callback.. See other custom node examples for
-    // how that's done.
-    //
+    // See how we get the custom node asynchronously because the plugin for it will load asynchronously
 
-    var myTeapotNode = scene.getNode("myTeapotNode");
+    scene.getNode("myTeapotNode", function (myTeapotNode) {
 
-    var x = 0;
-    var xInc = 0.02;
+        var x = 0;
+        var xInc = 0.02;
 
-    scene.on("tick",
-            function () {
-                if (x >= 1.5) {
-                    xInc *= -1;
-                } else if (x < 0) {
-                    xInc *= -1;
-                }
-                x += xInc;
-                myTeapotNode.setSize({ x:x, y:1, z:1 });
-            });
-
-    // Camera orbit helper
-    new SceneJS.OrbitControls(scene, {
-        yaw:-100,
-        pitch:-10,
-        zoom:20,
-        zoomSensitivity:10.0,
-        eye:{ y:0 },
-        look:{ y:0 }
+        scene.on("tick",
+                function () {
+                    if (x >= 1.5) {
+                        xInc *= -1;
+                    } else if (x < 0) {
+                        xInc *= -1;
+                    }
+                    x += xInc;
+                    myTeapotNode.setSize({ x:x, y:1, z:1 });
+                });
     });
 
 </script>

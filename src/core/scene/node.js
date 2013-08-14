@@ -1,7 +1,7 @@
 /**
  * @class The basic scene graph node type
  */
-SceneJS.Node = function() {
+SceneJS.Node = function () {
 };
 
 /**
@@ -102,12 +102,16 @@ SceneJS.Node.prototype._construct = function (engine, core, cfg, nodeId) {
  * Immediately notifies existing subscriptions to that topic, retains the publication to give to
  * any subsequent notifications on that topic as they are made.
  *
- * @param topic Publication topic
- * @param pub The publication
+ * @param {String} topic Publication topic
+ * @param {Object} pub The publication
+ * @param {Boolean} [forget] When true, the publication will be sent to subscribers then forgotten, so that any
+ * subsequent subscribers will not receive it
  * @private
  */
-SceneJS.Node.prototype._publish = function (topic, pub) {
-    this._topicPubs[topic] = pub; // Save notification
+SceneJS.Node.prototype._publish = function (topic, pub, forget) {
+    if (!forget) {
+        this._topicPubs[topic] = pub; // Save notification
+    }
     var subsForTopic = this._topicSubs[topic];
     if (subsForTopic) { // Notify subscriptions
         for (var handle in subsForTopic) {
@@ -164,6 +168,11 @@ SceneJS.Node.prototype.on = function (topic, callback) {
     if (pub) { // A publication exists, notify callback immediately
         callback.call(this, pub);
     }
+    //else {
+    if (topic == "rendered") {
+        this._engine.branchDirty(this);
+    }
+    // }
     return handle;
 };
 
@@ -180,6 +189,9 @@ SceneJS.Node.prototype.off = function (handle) {
             delete topicSubs[handle];
         }
         this._handleMap.removeItem(handle); // Release handle
+        if (topic == "rendered") {
+            this._engine.branchDirty(this);
+        }
     }
 };
 
@@ -510,11 +522,7 @@ SceneJS.Node.prototype.addNodes = function (nodes, ok) {
  */
 SceneJS.Node.prototype.addNode = function (node, ok) {
 
-    if (!node) {
-        throw SceneJS_error.fatalError(
-            SceneJS.errors.ILLEGAL_NODE_CONFIG,
-            "Node#addNode - node argument is undefined");
-    }
+    node = node || {};
 
     // Graft node object
     if (node._compile) {
@@ -634,7 +642,6 @@ SceneJS.Node.prototype.insertNode = function (node, i) {
 
     } else if (i >= this.nodes.length) {
         this.nodes.push(node);
-
     } else {
         this.nodes.splice(i, 0, node);
     }
@@ -1202,9 +1209,9 @@ SceneJS.Node.prototype._compile = function () {
 
 SceneJS.Node.prototype._compileNodes = function () {
 
-    var renderListeners = this._listeners["rendered"];
+    var renderSubs = this._topicSubs["rendered"];
 
-    if (renderListeners) {
+    if (renderSubs) {
         SceneJS_nodeEventsModule.preVisitNode(this);
     }
 
@@ -1225,7 +1232,7 @@ SceneJS.Node.prototype._compileNodes = function () {
         }
     }
 
-    if (renderListeners) {
+    if (renderSubs) {
         SceneJS_nodeEventsModule.postVisitNode(this);
     }
 };
@@ -1238,6 +1245,8 @@ SceneJS.Node.prototype._compileNodes = function () {
 SceneJS.Node.prototype.destroy = function () {
 
     if (!this.destroyed) {
+
+        SceneJS_sceneStatusModule.nodeDestroyed(this);
 
         if (this.parent) {
 

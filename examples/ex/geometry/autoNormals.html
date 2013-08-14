@@ -33,6 +33,12 @@
     //
     // This should be quite suitable for heightmaps however.
 
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
     var meshData = createMeshData({
         width:5,
         height:5,
@@ -43,10 +49,10 @@
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Orbiting camera node, defined by plugin in
-            // http://scenejs.org/api/latest/plugins/node/camera/orbit.js
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"camera/orbit",
+                type:"cameras/orbit",
                 yaw:40,
                 pitch:-20,
                 zoom:10,
@@ -68,7 +74,9 @@
                                 positions:meshData.positions,
                                 uv:meshData.uv,
                                 indices:meshData.indices,
-                                normals:"auto"  // <---------- Automatically creates normals
+
+                                // Automatically create normals - only works with 'triangles' primitive
+                                normals:"auto"
                             }
                         ]
                     }

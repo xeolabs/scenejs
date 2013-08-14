@@ -12,13 +12,18 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
         // Automatic default canvas
         canvasId = "canvas-" + id;
         var body = document.getElementsByTagName("body")[0];
-        var newdiv = document.createElement('div');
-        newdiv.style.height = "100%";
-        newdiv.style.width = "100%";
-        newdiv.style.padding = "0";
-        newdiv.style.margin = "0";
-        newdiv.innerHTML += '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
-        body.appendChild(newdiv);
+        var div = document.createElement('div');
+        var style = div.style;
+        style.height = "100%";
+        style.width = "100%";
+        style.padding = "0";
+        style.margin = "0";
+        style.left = "0";
+        style.top = "0";
+        style.position = "absolute";
+        // style["z-index"] = "10000";
+        div.innerHTML += '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
+        body.appendChild(div);
     }
 
     // Bind to canvas
@@ -106,3 +111,5 @@ SceneJS_Canvas.prototype.loseWebGLContext = function () {
         this.canvas.loseContext();
     }
 };
+
+

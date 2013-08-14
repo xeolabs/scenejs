@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 
-
 /*
  SceneJS WebGL Scene Graph Engine
- Copyright (c) 2012, Lindsay Kay
+ Copyright (c) 2013, Lindsay Kay
+ lindsay.kay@xeolabs.com
  All rights reserved.
  */
 
 (function () {
 
-    var version = "3.0";
+    var version = "3.1";
 
-    var wrench = require('wrench');
+    var ncp = require('ncp').ncp;
     var sys = require('util');
     var fs = require('fs');
     var path = require('path');
@@ -86,24 +86,6 @@
         FLAGS = FLAGS[TYPE];
     }
 
-    //if this is just a help request then simply return here
-  //  if (isHelp) return;
-
-    // if (FLAGS.uglify) {
-    var jsp;
-    var pro;
-
-    try {
-        sys.print('UGLIFY starts\n');
-        jsp = require("./external/uglifyjs/lib/parse-js");
-        pro = require("./external/uglifyjs/lib/process");
-        sys.print('UGLIFY done\n');
-    } catch (e) {
-        FLAGS.uglify = false;
-        sys.print(">> ERROR: UglifyJS unavailable\n");
-    }
-    // }
-
     var FILES = {
 
         core:[
@@ -116,7 +98,7 @@
 
             // RequireJS supports dynamic loading of dependencies by plugins
 
-//            "src/lib/require.js",
+            //  "src/lib/require.js",
 
             "src/lib/webgl-debug-utils.js",
 
@@ -132,7 +114,6 @@
             "src/core/plugins.js",
             "src/core/events.js",
             "src/core/canvas.js",
-            "src/core/activity.js",
             "src/core/engine.js",
             "src/core/errors.js",
             "src/core/config.js",
@@ -253,83 +234,69 @@
             fs.mkdir(distPluginDir,
                 function () {
 
-                    // Deep-copy an existing directory
+                    fs.mkdir(distExtrasDir,
+                        function () {
 
-                    sys.print("Distributing plugins to: " + distPluginDir + "\n");
-                    wrench.copyDirSyncRecursive("src/plugins", distPluginDir);
+                            // Deep-copy an existing directory
 
-                    sys.print("Distributing extras to: " + distPluginDir + "\n");
-//                    wrench.copyDirSyncRecursive("src/extras", distExtrasDir);
+                            sys.print("Distributing plugins to: " + distPluginDir + "\n");
+                            ncp("src/plugins", distPluginDir, function (err) {
 
-                    fs.writeFileSync(distExtrasDir + "/orbitControl.js", fs.readFileSync("src/extras/orbitControl.js"));
-                    fs.writeFileSync(distExtrasDir + "/pickControl.js", fs.readFileSync("src/extras/pickControl.js"));
-                    fs.writeFileSync(distExtrasDir + "/gui.js", fs.readFileSync("src/extras/gui/dat.gui.min.js") + fs.readFileSync("src/extras/gui/gui.js"));
-
-                    if (fileList.length > 0) {
-                        sys.print("Writing core library to: " +  distDir + "/scenejs.js\n");
-
-                        output.push('SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/' + distDir + '/plugins" });');
-//                       output.push('SceneJS.configure({ pluginPath: "/home/lindsay/xeolabs/projects/scenejs3.0/api/latest/plugins"});');
-                        output = output.join("");
-                        fs.writeFileSync(distDir + "/scenejs.js", output);
-
-                        //        var match = output.match(/^\s*(\/\*[\s\S]+?\*\/)/);
-                        //        var license = match[0];
-                        //        license = license.replace(/^\s*\/\*/, '/*!');
-
-                        //if (FLAGS.uglify) {
-//                        sys.print("Parsing Javascript\n");
-//                        var ast = jsp.parse(output);
-//                        sys.print("Minifiying..\n");
-//                        ast = pro.ast_mangle(ast);
-//                        sys.print("Optimizing..\n");
-//                        ast = pro.ast_squeeze(ast);
-//                        sys.print("Generating minified code\n");
-//                        //var final_code = license + "\n" + pro.gen_code(ast);
-//                        var final_code = pro.gen_code(ast);
-//                        sys.print("Writing minimized javascript: " + distDir + "/scenejs.min.js\n");
-//                        fs.writeFileSync(distDir + "/scenejs.min.js", final_code);
-//                        //}
-                    }
-                    var files = getFileList([], true);
-
-
-                    if (FLAGS.documents) {
-
-                        if (files.length) {
-
-                            var spawn = require('child_process').spawn;
-                            var cmdStr = ["external/jsdoc-toolkit/app/run.js", "-a", "-d=docs",
-                                //"-p",
-                                "-t=external/jsdoc-toolkit/templates/jsdoc"].concat(files);
-
-                            sys.print("cmdStr + " + cmdStr);
-
-                            var cmd = spawn('node', cmdStr);
-
-                            sys.print("Generating Documents\n");
-                            cmd.stdout.on('data', function (data) {
-                                sys.print(data);
                             });
 
-                            // check exit-code
-                            cmd.on('exit', function (code) {
-                                if (code == 0) sys.print("Build Complete!\n");
-                                else sys.print("Build Complete! Exit with code: " + code + "\n");
+                            sys.print("Distributing extras to: " + distExtrasDir + "\n");
+                            ncp("src/extras", distExtrasDir, function (err) {
+
                             });
 
-                            // check for errors
-                            cmd.stderr.on('data', function (error) {
-                                if (/^execvp\(\)/.test(error.asciiSlice(0, error.length))) {
-                                    console.log('Failed to start child process.');
+                            fs.writeFileSync(distExtrasDir + "/gui.js", fs.readFileSync("src/extras/gui/dat.gui.min.js") + fs.readFileSync("src/extras/gui/gui.js"));
+
+                            if (fileList.length > 0) {
+                                sys.print("Writing core library to: " + distDir + "/scenejs.js\n");
+                                output.push('SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/' + distDir + '/plugins" });');
+                                output = output.join("");
+                                fs.writeFileSync(distDir + "/scenejs.js", output);
+                            }
+
+                            var files = getFileList([], true);
+
+                            if (FLAGS.documents) {
+
+                                if (files.length) {
+
+                                    var spawn = require('child_process').spawn;
+                                    var cmdStr = ["external/jsdoc-toolkit/app/run.js", "-a", "-d=docs",
+                                        //"-p",
+                                        "-t=external/jsdoc-toolkit/templates/jsdoc"].concat(files);
+
+                                    sys.print("cmdStr + " + cmdStr);
+
+                                    var cmd = spawn('node', cmdStr);
+
+                                    sys.print("Generating Documents\n");
+                                    cmd.stdout.on('data', function (data) {
+                                        sys.print(data);
+                                    });
+
+                                    // check exit-code
+                                    cmd.on('exit', function (code) {
+                                        if (code == 0) sys.print("Build Complete!\n");
+                                        else sys.print("Build Complete! Exit with code: " + code + "\n");
+                                    });
+
+                                    // check for errors
+                                    cmd.stderr.on('data', function (error) {
+                                        if (/^execvp\(\)/.test(error.asciiSlice(0, error.length))) {
+                                            console.log('Failed to start child process.');
+                                        }
+                                    });
+                                } else {
+                                    sys.print("Build Complete!\n");
                                 }
-                            });
-                        } else {
-                            sys.print("Build Complete!\n");
-                        }
-                    } else {
-                        sys.print("Build Complete!\n");
-                    }
+                            } else {
+                                sys.print("Build Complete!\n");
+                            }
+                        });
                 });
         });
 

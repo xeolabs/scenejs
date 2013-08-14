@@ -15,40 +15,54 @@
     </style>
 
     <script src="../../../../api/latest/scenejs.js"></script>
-    <script src="../../../../api/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
 <script>
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"camera",
-                optics:{
-                    type:"ortho",
-                    left:-5,
-                    bottom:-5,
-                    near:0.1,
-                    right:5.0,
-                    top:5.0,
-                    far:10000
-                },
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:5,
+                zoomSensitivity:1.0,
 
                 nodes:[
                     {
-                        type:"geometry",
-                        plugin:"teapot"
+                        type:"camera",
+                        optics:{
+                            type:"ortho",
+                            left:-5,
+                            bottom:-5,
+                            near:0.1,
+                            right:5.0,
+                            top:5.0,
+                            far:10000
+                        },
+
+                        nodes:[
+
+                            // Teapot primitive, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            {
+                                type:"prims/teapot"
+                            }
+                        ]
                     }
                 ]
             }
         ]
-    });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:5
     });
 
 </script>

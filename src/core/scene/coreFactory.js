@@ -103,6 +103,24 @@ SceneJS_CoreFactory.prototype.getCore = function (type, coreId) {
     return core;
 };
 
+
+/**
+ * Tests if a core of the given type and ID currently exists within this factory.
+ *
+ * @param {String} type Type name of core, e.g. "material", "texture"
+ * @param {String} coreId ID for the core, unique among all cores of the given type within this factory
+ * @returns {Boolean} True if the core exists
+ */
+SceneJS_CoreFactory.prototype.hasCore = function (type, coreId) {
+    // HACK - allows different types of node to have same type of core, eg. "rotate" and "translate" nodes can both have an "xform" core
+    var alias = SceneJS_CoreFactory.coreAliases[type];
+    if (alias) {
+        type = alias;
+    }
+    var cores = this._cores[type];
+    return cores && cores[coreId];
+};
+
 /**
  * Releases a state core back to this factory, destroying it if the core's use count is then zero.
  * @param {Core} core Core to release

@@ -24,6 +24,12 @@
     // Demo of the custom "demos/color" node type, which sets the diffuse color of objects in its subgraph
     // This node type is defined by a plugin in <plugins>/node/demos/color.js
 
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
     // Create scene containing our custom node types
     var scene = SceneJS.createScene({
         nodes:[
@@ -33,7 +39,8 @@
 
                 nodes:[
 
-                    // Node type defined by plugin <pluginsPath>/node/demos/color.js
+                    // Demo custom node,
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/demos/color.js
                     {
                         type:"demos/color",
                         id: "myColor",
@@ -41,12 +48,10 @@
 
                         nodes:[
 
-                            // Geometry using a plugin loaded from <plugins>/geometry/teapot
+                            // Teapot primitive,
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
                             {
-                                type:"geometry",
-                                source:{
-                                    type:"teapot"
-                                }
+                                type:"prims/teapot"
                             }
                         ]
                     }

@@ -30,6 +30,12 @@
 // Demonstrates lighting, shader customization, view and modelling transforms, texturing,
 // materials and geometry
 
+// Point SceneJS to the bundled plugins
+SceneJS.setConfigs({
+    pluginPath:"../../../api/latest/plugins"
+});
+
+// Create scene
 var scene = SceneJS.createScene({
 
     nodes:[
@@ -114,73 +120,9 @@ var scene = SceneJS.createScene({
                     ]
                 },
 
-                // Sky box
-
-                // Shader node, injects custom function into the vertex shader
-                // to intercept the View matrix and remove translation terms from it.
-                // This anchors the sky box, preventing it from translating
-                // as we move the eye position.
+                // Skybox with custom texture, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
                 {
-                    type:"shader",
-                    shaders:[
-                        {
-                            stage:"vertex",
-                            code:[
-                                "mat4 myViewMatrix(mat4 m) {",
-                                "   m[3][0] =m[3][1] = m[3][2] = 0.0;",
-                                "return m;",
-                                "}"
-                            ],
-                            // Bind our injected functions to SceneJS hook points
-                            hooks:{
-                                viewMatrix:"myViewMatrix"
-                            }
-                        }
-                    ],
-                    nodes:[
-                        {
-                            type:"flags",
-                            flags:{
-                                specular:false,
-                                diffuse:false,
-                                ambient:false
-                            },
-                            nodes:[
-                                {
-                                    type:"material",
-                                    color:{ r:1, g:1, b:1  },
-                                    emit:0.0,
-                                    nodes:[
-                                        {
-                                            type:"texture",
-                                            layers:[
-                                                {
-                                                    src:"../../textures/clouds-box.jpg",
-                                                    blendMode:"multiply"
-                                                }
-                                            ],
-                                            nodes:[
-                                                {
-                                                    type:"scale",
-                                                    x:1000,
-                                                    y:1000,
-                                                    z:1000,
-                                                    nodes:[
-                                                        {
-                                                            type:"geometry",
-                                                            source:{
-                                                                type:"skybox"
-                                                            }
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
+                    type:"skyboxes/clouds"
                 }
             ]
         }
@@ -375,16 +317,19 @@ scene.on("tick",
             }
         });
 
-var shader = scene.findNode("myShader");
-var lineSpace = 0;
+// Animate the scanline shader effect on the tank
+scene.getNode("myShader", function (myShader) {
 
-scene.on("tick",
-        function () {
-            shader.setParams({
-                lineSpace:lineSpace
+    var lineSpace = 0;
+
+    scene.on("tick",
+            function () {
+                myShader.setParams({
+                    lineSpace:lineSpace
+                });
+                lineSpace += 0.15;
             });
-            lineSpace += 0.15;
-        });
+});
 
 </script>
 </body>

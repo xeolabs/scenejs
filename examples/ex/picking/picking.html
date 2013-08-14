@@ -23,7 +23,8 @@
             font-size: 18px;
             text-align: center;
             background: black;
-            opacity: 0.4;
+            opacity: 0.6;
+            z-index: 100000;
         }
     </style>
 </head>
@@ -35,17 +36,29 @@
 
 <script src="../../../api/latest/scenejs.js"></script>
 
-<script src="../../../api/latest/extras/orbitControl.js"></script>
-
 <script>
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
 
-    // Create scene graph
-
+    // Create scene
     var scene = SceneJS.createScene({
+        nodes:[
 
-        // Pickable objects
-        nodes:createObjects()
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:60,
+                zoomSensitivity:10.0,
+
+                nodes:createObjects()
+            }
+        ]
     });
 
     // Creates random sphere objects for us to pick
@@ -65,18 +78,17 @@
                         nodes:[
                             {
                                 type:"material",
-                                id: "object" + i+ "-material",
+                                id:"object" + i + "-material",
                                 emit:0,
                                 color:{ r:0.5, g:0.5, b:0.6 },
                                 specularColor:{ r:0.9, g:0.9, b:0.9 },
                                 specular:1.0,
                                 shine:70.0,
                                 nodes:[
+
+                                    // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
                                     {
-                                        type:"geometry",
-                                        source:{
-                                            type:"sphere"
-                                        }
+                                        type:"prims/sphere"
                                     }
                                 ]
                             }
@@ -96,7 +108,7 @@
 
     scene.on("pick",
             function (hit) {
-                scene.getNode(hit.name+"-material").setColor({r:0.7, g:0.7, b:0.5});
+                scene.getNode(hit.name + "-material").setColor({r:0.7, g:0.7, b:0.5});
                 info.innerHTML = "Pick hit: " + JSON.stringify(hit);
             });
 
@@ -143,13 +155,6 @@
         scene.pick(canvasX, canvasY);
     }
 
-    // Helper to orbit lookat with mouse
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:60
-    });
 
 </script>
 </body>

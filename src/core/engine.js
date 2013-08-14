@@ -20,11 +20,6 @@ var SceneJS_Engine = function (json, options) {
     this.canvas = new SceneJS_Canvas(this.id, json.canvasId, json.contextAttr, options);
 
     /**
-     * Engine activity monitor
-     */
-    this.activity = new SceneJS_Activity(this.id, options);
-
-    /**
      * Manages firing of and subscription to events
      */
     this.events = new SceneJS_eventManager();
@@ -164,13 +159,10 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
     var core = this._coreFactory.getCore(json.type, json.coreId); // Create or share a core
     var self = this;
 
-    // Track task if we're loading the type
-    var taskId = !SceneJS_NodeFactory.nodeTypes[json.type]
-        ? this.activity.taskStarted("loading node type")
-        : null;
-
     return this._nodeFactory.getNode(
-        this, json, core,
+        this,
+        json,
+        core,
         function (node) {
 
             // Create child nodes
@@ -182,9 +174,6 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
                         function (childNode) {
                             node.addNode(childNode);
                             if (++numNodes == len) {
-                                if (taskId) {
-                                    self.activity.taskFinished(taskId);
-                                }
                                 if (ok) {
                                     ok(node);
                                 }
@@ -193,9 +182,6 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
                         });
                 }
             } else {
-                if (taskId) {
-                    self.activity.taskFinished(taskId);
-                }
                 if (ok) {
                     ok(node);
                     self.scene._publish("nodes/" + node.id, node);
@@ -235,6 +221,16 @@ SceneJS_Engine.prototype.findNodes = function (nodeIdRegex) {
 };
 
 /**
+ * Tests whether a core of the given ID exists for the given node type
+ * @param {String} type Node type
+ * @param {String} coreId
+ * @returns Boolean
+ */
+SceneJS_Engine.prototype.hasCore = function (type, coreId) {
+    return this._coreFactory.hasCore(type, coreId);
+};
+
+/**
  * Schedules the given subtree of this engine's {@link SceneJS.Scene} for recompilation
  *
  * @param {SceneJS.Node} node Root node of the subtree to recompile
@@ -261,40 +257,40 @@ SceneJS_Engine.prototype.branchDirty = function (node) {
     this._sceneBranchesDirty = true;
 };
 
-
-SceneJS_Engine.prototype.nodeLoading = function (node) {
-
-    var nodeStatus = this.sceneStatus.nodes[node.id] || (this.sceneStatus.nodes[node.id] = { numLoading:0 });
-
-    nodeStatus.numLoading++;
-
-    this.sceneStatus.numLoading++;
-
-    this.events.fireEvent("loading", this.sceneStatus);
-
-    this.scene._publish("loadStatus", this.sceneStatus);
-};
-
-SceneJS_Engine.prototype.nodeLoaded = function (node) {
-
-    var nodeStatus = this.sceneStatus.nodes[node.id];
-
-    if (!nodeStatus) {
-        return;
-    }
-
-    nodeStatus.numLoading--;
-
-    this.sceneStatus.numLoading--;
-
-    if (nodeStatus.numLoading == 0) {
-        delete this.sceneStatus.nodes[node.id];
-    }
-
-    this.events.fireEvent("loaded", this.sceneStatus);
-
-    this.scene._publish("loadStatus", this.sceneStatus);
-};
+//
+//SceneJS_Engine.prototype.nodeLoading = function (node) {
+//
+//    var nodeStatus = this.sceneStatus.nodes[node.id] || (this.sceneStatus.nodes[node.id] = { numLoading:0 });
+//
+//    nodeStatus.numLoading++;
+//
+//    this.sceneStatus.numLoading++;
+//
+//    this.events.fireEvent("loading", this.sceneStatus);
+//
+//    this.scene._publish("loadStatus", this.sceneStatus);
+//};
+//
+//SceneJS_Engine.prototype.nodeLoaded = function (node) {
+//
+//    var nodeStatus = this.sceneStatus.nodes[node.id];
+//
+//    if (!nodeStatus) {
+//        return;
+//    }
+//
+//    nodeStatus.numLoading--;
+//
+//    this.sceneStatus.numLoading--;
+//
+//    if (nodeStatus.numLoading == 0) {
+//        delete this.sceneStatus.nodes[node.id];
+//    }
+//
+//    this.events.fireEvent("loaded", this.sceneStatus);
+//
+//    this.scene._publish("loadStatus", this.sceneStatus);
+//};
 
 
 /**
@@ -423,11 +419,6 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
         canvasY:canvasY,
         rayPick:options ? options.rayPick : false
     });
-
-    if (hit) {
-        hit.canvasX = canvasX;
-        hit.canvasY = canvasY;
-    }
 
     return hit;
 };

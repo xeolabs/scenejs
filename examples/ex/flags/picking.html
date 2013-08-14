@@ -15,7 +15,6 @@
     </style>
 
     <script src="../../../api/latest/scenejs.js"></script>
-    <script src="../../../api/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
@@ -34,23 +33,44 @@
     // defaults to true. Note that a geometry is only pickable when
     // it is within the subtree of a 'name' node.
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
-            {
-                type:"flags",
-                id:"myFlags",
-                flags:{
-                    picking:true
-                },
 
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:5,
                 nodes:[
+
+                    // Flags node which enables or disables pickability of our teapot
                     {
-                        type:"name",
-                        name:"myTeapot",
+                        type:"flags",
+                        id:"myFlags",
+                        flags:{
+                            picking:true
+                        },
+
                         nodes:[
                             {
-                                type:"geometry",
-                                plugin:"teapot"
+                                type:"name",
+                                name:"myTeapot",
+                                nodes:[
+
+                                    // Teapot primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                    {
+                                        type:"prims/teapot"
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -59,24 +79,62 @@
         ]
     });
 
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:10
-    });
+    // Translate mouse click into pick
+
+    var canvas = scene.getCanvas();
+
+    canvas.addEventListener('mousedown', mouseDown, true);
+    canvas.addEventListener('mouseup', mouseUp, true);
+    canvas.addEventListener('touchstart', touchStart, true);
+    canvas.addEventListener('touchend', touchEnd, true);
+
+    var lastX;
+    var lastY;
+    var dragging;
+
+    function mouseDown(event) {
+        lastX = event.clientX;
+        lastY = event.clientY;
+        dragging = true;
+    }
+
+    function touchStart(event) {
+        lastX = event.targetTouches[0].clientX;
+        lastY = event.targetTouches[0].clientY;
+        dragging = true;
+    }
+
+    function mouseUp(event) {
+        if (dragging) {
+            scene.pick(event.clientX, event.clientY);
+        }
+        dragging = false;
+    }
+
+    function touchEnd() {
+        if (dragging) {
+            scene.pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
+        }
+        dragging = false;
+    }
+
+    // Handle pick event from scene
 
     scene.on("pick",
             function (hit) {
                 alert(JSON.stringify(hit));
             });
 
-    var flags = scene.getNode("myFlags");
+    // Flags node is within a custom node type, so will not exist until the plugin for that custom node has been loaded
+    // Therefore, we get the flags node asynchronously
 
-    setInterval(
-            function () {
-                flags.setPicking(!flags.getPicking());
-            },
-            2000);
+    scene.getNode("myFlags", function (myFlags) {
+        setInterval(
+                function () {
+                    myFlags.setPicking(!myFlags.getPicking());
+                },
+                5000);
+    });
 
 </script>
 </body>

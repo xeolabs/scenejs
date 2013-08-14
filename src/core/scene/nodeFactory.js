@@ -4,11 +4,10 @@
  */
 var SceneJS_NodeFactory = function () {
 
-    // Nodes created by this factory
+    /** Nodes created by this factory
+     * @type {SceneJS_Map}
+     */
     this.nodes = new SceneJS_Map({});
-
-    // Subscribers waiting for node types
-    this._subs = {};
 };
 
 /**
@@ -16,16 +15,24 @@ var SceneJS_NodeFactory = function () {
  *
  * @type {[SceneJS.Node]}
  */
-SceneJS_NodeFactory.nodeTypes = {};    // Supported node classes, installed by #createNodeType
+SceneJS_NodeFactory.nodeTypes = {};
+
+/**
+ * Subscribers waiting for node types
+ * @type {Object}
+ * @private
+ */
+SceneJS_NodeFactory._subs = {};
 
 /**
  * Creates a node class for instantiation by this factory
  *
  * @param {String} typeName Name of type, eg. "rotate"
  * @param {String} coreTypeName Optional name of core type for the node, eg. "xform" - defaults to type name of node
+ * @param {Function} [augment] Augments the basic node type with our custom node methods
  * @returns The new node class
  */
-SceneJS_NodeFactory.createNodeType = function (typeName, coreTypeName) {
+SceneJS_NodeFactory.createNodeType = function (typeName, coreTypeName, augment) {
     if (SceneJS_NodeFactory.nodeTypes[typeName]) {
         throw "Node type already defined: " + typeName;
     }
@@ -36,6 +43,23 @@ SceneJS_NodeFactory.createNodeType = function (typeName, coreTypeName) {
     nodeType.prototype = new SceneJS.Node();            // Inherit from base class
     nodeType.prototype.constructor = nodeType;
     SceneJS_NodeFactory.nodeTypes[typeName] = nodeType;
+
+    var type = SceneJS_NodeFactory.nodeTypes[typeName]; // Type has installed itself
+    if (!type) {
+        throw "Node type plugin did not install itself correctly";
+    }
+    // Augment the basic node type
+    if (augment) {
+        augment(nodeType);
+    }
+    // Notify subscribers waiting for the type
+    var subs = SceneJS_NodeFactory._subs[typeName];
+    if (subs) {
+        while (subs.length > 0) {
+            subs.pop()(type);
+        }
+        delete subs[typeName];
+    }
     return nodeType;
 };
 
@@ -54,7 +78,9 @@ SceneJS_NodeFactory.prototype.getNode = function (engine, json, core, ok) {
         return this._createNode(nodeType, engine, json, core, ok);
     } else {
         var self = this;
-        this.getType(json.type,
+        this._getType(
+            engine,
+            json.type,
             function (nodeType) {
                 self._createNode(nodeType, engine, json, core, ok);
             });
@@ -79,52 +105,37 @@ SceneJS_NodeFactory.prototype._createNode = function (nodeType, engine, json, co
 /**
  * Returns installed type of given type and ID
  */
-SceneJS_NodeFactory.prototype.getType = function (typeName, ok) {
+SceneJS_NodeFactory.prototype._getType = function (engine, typeName, ok) {
     var type = SceneJS_NodeFactory.nodeTypes[typeName];
     if (type) {
         ok(type);
         return;
     }
-    var subs = this._subs[typeName] || (this._subs[typeName] = []);
+    var subs = SceneJS_NodeFactory._subs[typeName] || (SceneJS_NodeFactory._subs[typeName] = []);
     subs.push(ok);
     if (subs.length > 1) { // Not first sub
         return;
     }
+    var taskId = SceneJS_sceneStatusModule.taskStarted(engine.scene, "Loading plugin");
+    subs.push(function () {
+        SceneJS_sceneStatusModule.taskFinished(taskId);
+    });
     var self = this;
-    var typePath = SceneJS_debugModule.configs.pluginPath;
+    var typePath = SceneJS_configsModule.configs.pluginPath;
     if (!typePath) {
         throw "no typePath config"; // Build script error - should create this config
     }
     this._loadScript(typePath + "/node/" + typeName + ".js",
         function () {
-            var type = SceneJS_NodeFactory.nodeTypes[typeName]; // Type has installed itself
-            if (!type) {
-                throw "Node type plugin did not install itself correctly";
-            }
-            while (subs.length > 0) {
-                subs.pop()(type);
-            }
-            delete subs[typeName];
+            SceneJS_sceneStatusModule.taskFailed(taskId);
         });
 };
 
-SceneJS_NodeFactory.prototype._loadScript = function (url, ok) {
+SceneJS_NodeFactory.prototype._loadScript = function (url, error) {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    if (script.readyState) {  //IE
-        script.onreadystatechange = function () {
-            if (script.readyState == "loaded" ||
-                script.readyState == "complete") {
-                script.onreadystatechange = null;
-                ok();
-            }
-        };
-    } else {  //Others
-        script.onload = function () {
-            ok();
-        };
-    }
     script.src = url;
+    script.onerror = error;
     document.getElementsByTagName("head")[0].appendChild(script);
 };
 

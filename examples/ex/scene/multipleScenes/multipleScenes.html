@@ -19,8 +19,6 @@
 
 <script src="../../../../api/latest/scenejs.js"></script>
 
-<script src="../../../../api/latest/extras/orbitControl.js"></script>
-
 <canvas id="myCanvas0" width="400px" height="400px"></canvas>
 <canvas id="myCanvas1" width="400px" height="400px"></canvas>
 <canvas id="myCanvas2" width="400px" height="400px"></canvas>
@@ -42,6 +40,11 @@
     // at 100% window size.
     //
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
     for (var i = 0; i < 5; i++) {
 
         var scene = SceneJS.createScene({
@@ -50,28 +53,35 @@
             canvasId:"myCanvas" + i,
 
             nodes:[
+
+                // Mouse-orbited camera, implemented by plugin at
+                // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
                 {
-                    type:"material",
-                    color:{ r:0.5, g:0.5, b:0.6 },
+                    type:"cameras/orbit",
+                    yaw:30,
+                    pitch:-30,
+                    zoom:5,
+                    zoomSensitivity:1.0,
                     nodes:[
                         {
-                            type:"geometry",
-                            source:{
+                            type:"material",
+                            color:{ r:0.5, g:0.5, b:0.6 },
+                            nodes:[
 
-                                // A different primitive for each scene
-                                type:["torus", "teapot", "box", "sphere"][i%4]
-                            }
+                                // A different primitive type for each scene
+                                {
+                                    type:[
+                                        "prims/torus", // http://scenejs.org/api/latest/plugins/node/prims/torus.js
+                                        "prims/teapot", // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                        "prims/box", // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                        "prims/sphere"  // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                    ][i % 4]
+                                }
+                            ]
                         }
                     ]
                 }
             ]
-        });
-
-        // Mouse orbit helper for each scene
-        new SceneJS.OrbitControls(scene, {
-            yaw:30,
-            pitch:-30,
-            zoom:5
         });
     }
 

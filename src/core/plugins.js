@@ -11,11 +11,59 @@ SceneJS.Plugins = new (function () {
 
     /**
      * Installs a plugin into SceneJS
+     * @param {String} nodeType Node type name
+     * @param {String} pluginType Plugin type name
+     * @param [{String}] deps List of URLs of JavaScript files that the plugin depends on
+     * @param {Function} plugin Plugin constructor
      */
-    this.addPlugin = function (nodeType, pluginType, plugin) {
+    this.addPlugin = function () {
+        var nodeType = arguments[0];
+        var pluginType = arguments[1];
+        var deps;
+        var plugin;
+        if (arguments.length == 4) {
+            deps = arguments[2];
+            plugin = arguments[3];
+        } else {
+            plugin = arguments[2];
+        }
+        addPlugin(nodeType, pluginType, deps, plugin);
+    };
+
+    function addPlugin(nodeType, pluginType, deps, plugin) {
         var plugins = nodePlugins[nodeType] || (nodePlugins[nodeType] = {});
         plugins[pluginType] = plugin;
-    };
+        // Load dependencies, if any
+        loadDeps(deps,
+            0,
+            function () {
+                // Notify and unsubscribe subscribers
+                var subId = nodeType + pluginType;
+                var subs = pluginSubs[subId] || (pluginSubs[subId] = []);
+                while (subs.length > 0) {
+                    subs.pop()(plugin);
+                }
+                delete pluginSubs[subId];
+            });
+    }
+
+    // Loads list of dependencies, synchronously and in order
+    function loadDeps(deps, i, ok) {
+        if (!deps || i >= deps.length) {
+            ok();
+            return;
+        }
+        var src = deps[i];
+        var pluginPath = SceneJS_configsModule.configs.pluginPath;
+        if (!pluginPath) {
+            throw "no pluginPath config"; // Build script error - should create this config
+        }
+        src = pluginPath + "/" + src;
+        loadScript(src,
+            function () {
+                loadDeps(deps, i + 1, ok);
+            });
+    }
 
     /**
      * Tests if given plugin is installed
@@ -42,28 +90,17 @@ SceneJS.Plugins = new (function () {
         subs.push(ok);
         if (subs.length > 1) { // Not first sub
             return;
-        }        
+        }
         var self = this;
-        var pluginPath = SceneJS_debugModule.configs.pluginPath;
+        var pluginPath = SceneJS_configsModule.configs.pluginPath;
         if (!pluginPath) {
             throw "no pluginPath config"; // Build script error - should create this config
         }
         var pluginFilePath = pluginPath + "/" + nodeType + "/" + pluginType + ".js";
-        loadScript(pluginFilePath,
-            function () {
-                var plugin = nodePlugins[nodeType][pluginType];
-                if (!plugin) {
-                    // Plugin was not registered correctly
-                    throw "Problem in plugin file '" + pluginFilePath + "': call to addPlugin(nodeType, pluginType, ..) : either or both args have incorrect value";
-                }
-                while (subs.length > 0) {
-                    subs.pop()(plugin);
-                }
-                delete pluginSubs[subId];
-            });
+        loadScript(pluginFilePath);
     };
 
-    function loadScript(url, ok) {
+    function loadScript(src, ok) {
         var script = document.createElement("script");
         script.type = "text/javascript";
         if (script.readyState) {  //IE
@@ -71,15 +108,19 @@ SceneJS.Plugins = new (function () {
                 if (script.readyState == "loaded" ||
                     script.readyState == "complete") {
                     script.onreadystatechange = null;
-                    ok();
+                    if (ok) {
+                        ok();
+                    }
                 }
             };
         } else {  //Others
             script.onload = function () {
-                ok();
+                if (ok) {
+                    ok();
+                }
             };
         }
-        script.src = url;
+        script.src = src;
         document.getElementsByTagName("head")[0].appendChild(script);
     }
 

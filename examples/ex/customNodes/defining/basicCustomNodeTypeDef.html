@@ -50,6 +50,13 @@
     // plugin script, so that we can show the node type API.
 
 
+    // Point SceneJS to the bundled plugins
+
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+
     // Define a new node type:
 
     SceneJS.Types.addType("myColorNodeType", {
@@ -89,7 +96,7 @@
         }
     });
 
-    // Create a scene
+    // Create a scene that contains an instance of our node type
 
     var scene = SceneJS.createScene({
         nodes:[
@@ -99,7 +106,7 @@
 
                 nodes:[
 
-                    // Instantiate our new node type:
+                    // Instance of our new node type:
                     {
                         type:"myColorNodeType",
                         id: "myColor",
@@ -109,12 +116,11 @@
                         // custom types' constructors (see this in the custom node type's constructor above)
                         nodes:[
 
-                            // Geometry using a plugin loaded from <plugins>/geometry/teapot
+
+                            // Teapot primitive,
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
                             {
-                                type:"geometry",
-                                source:{
-                                    type:"teapot"
-                                }
+                                type:"prims/teapot"
                             }
                         ]
                     }

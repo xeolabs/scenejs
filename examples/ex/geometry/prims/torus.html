@@ -19,39 +19,52 @@
 
 <script src="../../../../api/latest/scenejs.js"></script>
 
-<script src="../../../../api/latest/extras/orbitControl.js"></script>
-
 <script>
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
-            // Override default material to make torus blue
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"material",
-                color:{ r:0.5, g:0.5, b:0.6 },
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:5,
+                zoomSensitivity:10.0,
+
                 nodes:[
 
-                    // Torus showing default property values
+                    // Override default material to make torus blue
                     {
-                        type:"geometry",
-                        source:{
-                            type:"torus",
-                            radius:1.0,
-                            tube:0.30,
-                            segmentsR:60,
-                            segmentsT:40,
-                            arc:Math.PI * 2
-                        }
+                        type:"material",
+                        color:{ r:0.5, g:0.5, b:0.6 },
+                        nodes:[
+
+                            // Sphere geometry using plugin in http://scenejs.org/api/latest/plugins/geometry/torus.js
+                            // Shown here are the default properties for the torus
+                            {
+                                type:"geometry",
+                                source:{
+                                    type:"torus",
+                                    radius:1.0,
+                                    tube:0.30,
+                                    segmentsR:60,
+                                    segmentsT:40,
+                                    arc:Math.PI * 2
+                                }
+                            }
+                        ]
                     }
                 ]
             }
         ]
-    });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:5
     });
 
 </script>

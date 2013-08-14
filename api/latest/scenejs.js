@@ -983,12 +983,23 @@ var SceneJS = new (function () {
     };
 
     /**
-     * Gets an existing scene
+     * Gets an existing scene.
      *
-     * @param {String} sceneId ID of target scene
+     * When no scene ID is given, the first scene found is returned. This is a shorthand convenience for
+     * easy scripting when only one scene is defined.
+     *
+     * @param {String} [sceneId] ID of target scene
      * @returns {SceneJS.Scene} The selected scene
      */
     this.getScene = function (sceneId) {
+
+        if (!sceneId) {
+            for (var sceneId in this._engines) {
+                if (this._engines.hasOwnProperty(sceneId)) {
+                    return this._engines[sceneId].scene;
+                }
+            }
+        }
 
         var engine = this._engines[sceneId];
 
@@ -1248,7 +1259,7 @@ SceneJS.Plugins = new (function () {
             return;
         }
         var src = deps[i];
-        var pluginPath = SceneJS_debugModule.configs.pluginPath;
+        var pluginPath = SceneJS_configsModule.configs.pluginPath;
         if (!pluginPath) {
             throw "no pluginPath config"; // Build script error - should create this config
         }
@@ -1286,7 +1297,7 @@ SceneJS.Plugins = new (function () {
             return;
         }
         var self = this;
-        var pluginPath = SceneJS_debugModule.configs.pluginPath;
+        var pluginPath = SceneJS_configsModule.configs.pluginPath;
         if (!pluginPath) {
             throw "no pluginPath config"; // Build script error - should create this config
         }
@@ -1515,17 +1526,18 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
         // Automatic default canvas
         canvasId = "canvas-" + id;
         var body = document.getElementsByTagName("body")[0];
-        var newdiv = document.createElement('div');
-        newdiv.style.height = "100%";
-        newdiv.style.width = "100%";
-        newdiv.style.padding = "0";
-        newdiv.style.margin = "0";
-        newdiv.style.left = "0";
-        newdiv.style.top = "0";
-        newdiv.style.position = "absolute";
-        newdiv.style["z-index"] = "10000";
-        newdiv.innerHTML += '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
-        body.appendChild(newdiv);
+        var div = document.createElement('div');
+        var style = div.style;
+        style.height = "100%";
+        style.width = "100%";
+        style.padding = "0";
+        style.margin = "0";
+        style.left = "0";
+        style.top = "0";
+        style.position = "absolute";
+        // style["z-index"] = "10000";
+        div.innerHTML += '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
+        body.appendChild(div);
     }
 
     // Bind to canvas
@@ -1612,69 +1624,8 @@ SceneJS_Canvas.prototype.loseWebGLContext = function () {
     if (this.options.simulateWebGLContextLost) {
         this.canvas.loseContext();
     }
-};/**
- * Progress indicator widget
- */
-var SceneJS_Activity = function (id, options) {
-
-//    var body = document.getElementsByTagName("body")[0];
-//    var newdiv = document.createElement('div');
-//    newdiv.style.height = "10px";
-//    newdiv.style.width = "100px";
-//    newdiv.style.padding = "0";
-//    newdiv.style.margin = "0";
-//    newdiv.style.left = "0";
-//    newdiv.style.top = "0";
-//    newdiv.style.position = "absolute";
-//    newdiv.style["z-index"] = "11000";
-//    newdiv.color = "#00FF00";
-//    //newdiv.innerHTML += '<canvas id="' + canvasId + '" style="width: 100%; height: 100%; margin: 0; padding: 0;"></canvas>';
-//    body.appendChild(newdiv);
-
-    this.tasks = {};
-    this.numTasks = 0;
-
-    var tasks = new SceneJS_Map(this.tasks);
-
-    this.taskStarted = function () {
-        var taskId;
-        var description;
-        if (arguments.length == 2) {
-            taskId = arguments[0];
-            if (tasks.items[taskId]) {
-                return taskId;
-            }
-            description = arguments[1];
-            tasks.addItem(taskId, description);
-        } else {
-            description = arguments[0];
-            taskId = tasks.addItem(description);
-        }
-        //console.log("[STARTED ] " + taskId + ": " + description);
-        this.numTasks++;
-        return taskId;
-    };
-
-    this.taskFinished = function (taskId) {
-        var task = tasks.items[taskId];
-        if (!task) {
-            return;
-        }
-        tasks.removeItem(taskId);
-       // console.log("[FINISHED] " + taskId + ": " + task);
-        this.numTasks--;
-        if (this.numTasks == 0) {
-         //   console.log("No tasks running.");
-        }
-    };
-
-    function showActivity() {
-    }
-
-    function hideActivity() {
-    }
-
 };
+
 
 /**
  * @class A container for a scene graph and its display
@@ -1696,11 +1647,6 @@ var SceneJS_Engine = function (json, options) {
      * Canvas and GL context for this engine
      */
     this.canvas = new SceneJS_Canvas(this.id, json.canvasId, json.contextAttr, options);
-
-    /**
-     * Engine activity monitor
-     */
-    this.activity = new SceneJS_Activity(this.id, options);
 
     /**
      * Manages firing of and subscription to events
@@ -1842,13 +1788,10 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
     var core = this._coreFactory.getCore(json.type, json.coreId); // Create or share a core
     var self = this;
 
-    // Track task if we're loading the type
-    var taskId = !SceneJS_NodeFactory.nodeTypes[json.type]
-        ? this.activity.taskStarted("loading node type")
-        : null;
-
     return this._nodeFactory.getNode(
-        this, json, core,
+        this,
+        json,
+        core,
         function (node) {
 
             // Create child nodes
@@ -1860,9 +1803,6 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
                         function (childNode) {
                             node.addNode(childNode);
                             if (++numNodes == len) {
-                                if (taskId) {
-                                    self.activity.taskFinished(taskId);
-                                }
                                 if (ok) {
                                     ok(node);
                                 }
@@ -1871,9 +1811,6 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
                         });
                 }
             } else {
-                if (taskId) {
-                    self.activity.taskFinished(taskId);
-                }
                 if (ok) {
                     ok(node);
                     self.scene._publish("nodes/" + node.id, node);
@@ -1913,6 +1850,16 @@ SceneJS_Engine.prototype.findNodes = function (nodeIdRegex) {
 };
 
 /**
+ * Tests whether a core of the given ID exists for the given node type
+ * @param {String} type Node type
+ * @param {String} coreId
+ * @returns Boolean
+ */
+SceneJS_Engine.prototype.hasCore = function (type, coreId) {
+    return this._coreFactory.hasCore(type, coreId);
+};
+
+/**
  * Schedules the given subtree of this engine's {@link SceneJS.Scene} for recompilation
  *
  * @param {SceneJS.Node} node Root node of the subtree to recompile
@@ -1939,40 +1886,40 @@ SceneJS_Engine.prototype.branchDirty = function (node) {
     this._sceneBranchesDirty = true;
 };
 
-
-SceneJS_Engine.prototype.nodeLoading = function (node) {
-
-    var nodeStatus = this.sceneStatus.nodes[node.id] || (this.sceneStatus.nodes[node.id] = { numLoading:0 });
-
-    nodeStatus.numLoading++;
-
-    this.sceneStatus.numLoading++;
-
-    this.events.fireEvent("loading", this.sceneStatus);
-
-    this.scene._publish("loadStatus", this.sceneStatus);
-};
-
-SceneJS_Engine.prototype.nodeLoaded = function (node) {
-
-    var nodeStatus = this.sceneStatus.nodes[node.id];
-
-    if (!nodeStatus) {
-        return;
-    }
-
-    nodeStatus.numLoading--;
-
-    this.sceneStatus.numLoading--;
-
-    if (nodeStatus.numLoading == 0) {
-        delete this.sceneStatus.nodes[node.id];
-    }
-
-    this.events.fireEvent("loaded", this.sceneStatus);
-
-    this.scene._publish("loadStatus", this.sceneStatus);
-};
+//
+//SceneJS_Engine.prototype.nodeLoading = function (node) {
+//
+//    var nodeStatus = this.sceneStatus.nodes[node.id] || (this.sceneStatus.nodes[node.id] = { numLoading:0 });
+//
+//    nodeStatus.numLoading++;
+//
+//    this.sceneStatus.numLoading++;
+//
+//    this.events.fireEvent("loading", this.sceneStatus);
+//
+//    this.scene._publish("loadStatus", this.sceneStatus);
+//};
+//
+//SceneJS_Engine.prototype.nodeLoaded = function (node) {
+//
+//    var nodeStatus = this.sceneStatus.nodes[node.id];
+//
+//    if (!nodeStatus) {
+//        return;
+//    }
+//
+//    nodeStatus.numLoading--;
+//
+//    this.sceneStatus.numLoading--;
+//
+//    if (nodeStatus.numLoading == 0) {
+//        delete this.sceneStatus.nodes[node.id];
+//    }
+//
+//    this.events.fireEvent("loaded", this.sceneStatus);
+//
+//    this.scene._publish("loadStatus", this.sceneStatus);
+//};
 
 
 /**
@@ -2101,11 +2048,6 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
         canvasY:canvasY,
         rayPick:options ? options.rayPick : false
     });
-
-    if (hit) {
-        hit.canvasX = canvasX;
-        hit.canvasY = canvasY;
-    }
 
     return hit;
 };
@@ -2347,10 +2289,10 @@ SceneJS.errors._getErrorName = function(code) {
 /**
  * Backend that manages configurations.
  *
- * @class SceneJS_debugModule
+ * @class SceneJS_configsModule
  * @private
  */
-var SceneJS_debugModule = new (function() {
+var SceneJS_configsModule = new (function() {
 
     this.configs = {};
     var subs = {};
@@ -2423,9 +2365,9 @@ var SceneJS_debugModule = new (function() {
  */
 SceneJS.configure = SceneJS.setConfigs = SceneJS.setDebugConfigs = function () {
     if (arguments.length == 1) {
-        SceneJS_debugModule.setConfigs(null, arguments[0]);
+        SceneJS_configsModule.setConfigs(null, arguments[0]);
     } else if (arguments.length == 2) {
-        SceneJS_debugModule.setConfigs(arguments[0], arguments[1]);
+        SceneJS_configsModule.setConfigs(arguments[0], arguments[1]);
     } else {
         throw SceneJS_error.fatalError("Illegal arguments given to SceneJS.setDebugs - should be either ({String}:name, {Object}:cfg) or ({Object}:cfg)");
     }
@@ -2434,7 +2376,7 @@ SceneJS.configure = SceneJS.setConfigs = SceneJS.setDebugConfigs = function () {
 /** Gets configurations
  */
 SceneJS.getConfigs = SceneJS.getDebugConfigs = function (path) {
-    return SceneJS_debugModule.getConfigs(path);
+    return SceneJS_configsModule.getConfigs(path);
 };
 
 /**
@@ -4880,7 +4822,7 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
 
     this.valid = (gl.getProgramParameter(handle, gl.LINK_STATUS) != 0);
 
-    var debugCfg = SceneJS_debugModule.getConfigs("shading");
+    var debugCfg = SceneJS_configsModule.getConfigs("shading");
     if (debugCfg.validate !== false) {
         gl.validateProgram(handle);
         this.valid = this.valid && (gl.getProgramParameter(handle, gl.VALIDATE_STATUS) != 0);
@@ -5496,50 +5438,178 @@ var SceneJS_PickBufferOLD = function (cfg) {
  *
  * @private
  */
-var SceneJS_sceneStatusModule = new (function() {
+var SceneJS_sceneStatusModule = new (function () {
 
+    // Public activity summary
     this.sceneStatus = {};
+
+    // IDs of all tasks
+    var taskIds = new SceneJS_Map();
+    var tasks = {};
+
+    var sceneStates = {};
 
     var self = this;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_CREATED,
-            function(params) {
-                self.sceneStatus[params.engine.id] = {
-                    numLoading: 0
-                };
-            });
+        SceneJS_events.SCENE_DESTROYED,
+        function (params) {
+            var sceneId = params.engine.id;
+            delete self.sceneStatus[sceneId];
+            delete sceneStates[sceneId];
+        });
 
-    SceneJS_events.addListener(
-            SceneJS_events.SCENE_DESTROYED,
-            function(params) {
-                delete self.sceneStatus[params.engine.id];
-            });
+    /** Notifies that a node has begun loading some data
+     */
+    this.taskStarted = function (node, description) {
+        if (false === SceneJS_configsModule.configs.statusPopups) {
+            return -1;
+        }
+        var scene = node.getScene();
+        var sceneId = scene.getId();
+        var nodeId = node.getId();
+        var canvas = scene.getCanvas();
 
-    this.nodeLoading = function(node) {
+        var taskId = taskIds.addItem();
 
-        var status = self.sceneStatus[node._engine.id];
-
+        // Update public info
+        var status = this.sceneStatus[sceneId];
         if (!status) {
-            status = self.sceneStatus[node._engine.id] = {
-                numLoading: 0
+            status = this.sceneStatus[sceneId] = {
+                numLoading:0
             };
-
         }
         status.numLoading++;
+
+        // Track node
+        var sceneState = sceneStates[sceneId];
+        if (!sceneState) {
+            sceneState = sceneStates[sceneId] = {
+                sceneId:sceneId,
+                nodeStates:{},
+                scene:scene,
+                popupContainer:createPopupContainer(canvas),
+                descCounts:{}
+            };
+        }
+        var descCount = sceneState.descCounts[description];
+        if (descCount == undefined) {
+            descCount = sceneState.descCounts[description] = 0;
+        }
+        sceneState.descCounts[description]++;
+        var nodeState = sceneState.nodeStates[nodeId];
+        if (!nodeState) {
+            nodeState = sceneState.nodeStates[nodeId] = {
+                nodeId:nodeId,
+                numLoading:0,
+                tasks:{}
+            };
+        }
+        description = description + " " + sceneState.descCounts[description] + "...";
+        nodeState.numLoading++;
+        var task = {
+            sceneState:sceneState,
+            nodeState:nodeState,
+            description:description,
+            element:createPopup(sceneState.popupContainer, description)
+        };
+        nodeState.tasks[taskId] = task;
+        tasks[taskId] = task;
+        return taskId;
     };
 
-    this.nodeLoaded = function(node) {
-        this.sceneStatus[node._engine.id].numLoading--;
+    function createPopupContainer(canvas) {
+        var body = document.getElementsByTagName("body")[0];
+        var div = document.createElement('div');
+        var style = div.style;
+        style.position = "absolute";
+        style.width = "200px";
+        style.right = "10px";
+        style.top = "0";
+        style.padding = "10px";
+        style["z-index"] = "10000";
+        body.appendChild(div);
+        return div;
+    }
+
+    function createPopup(popupContainer, description) {
+        var div = document.createElement('div');
+        var style = div.style;
+        style["font-family"] = "Helvetica";
+        style["font-size"] = "14px";
+        style.padding = "5px";
+        style.margin = "4px";
+        style["padding-left"] = "12px";
+        style["border"] = "1px solid #000055";
+        style.color = "black";
+        style.background = "#AAAAAA";
+        style.opacity = "0.8";
+        style["border-radius"] = "3px";
+        style["-moz-border-radius"] = "3px";
+        style["box-shadow"] = "3px 3px 3px #444444";
+        div.innerHTML = description;
+        popupContainer.appendChild(div);
+        return div;
+    }
+
+    /** Notifies that a load has finished loading some data
+     */
+    this.taskFinished = function (taskId) {
+        if (taskId == -1) {
+            return;
+        }
+        var task = tasks[taskId];
+        if (!task) {
+            return;
+        }
+        var sceneState = task.sceneState;
+        this.sceneStatus[sceneState.sceneId].numLoading--;
+        dismissPopup(task.element);
+        var nodeState = task.nodeState;
+        nodeState.numLoading--;
+        delete nodeState.tasks[taskId];
+        if (nodeState.numLoading == 0) {
+            delete sceneState.nodeStates[nodeState.nodeId];
+        }
     };
 
+    function dismissPopup(element) {
+        element.style.background = "#AAFFAA";
+        var opacity = 0.8;
+        var interval = setInterval(function () {
+            if (opacity <= 0) {
+                element.parentNode.removeChild(element);
+                clearInterval(interval);
+            } else {
+                element.style.opacity = opacity;
+                opacity -= 0.1;
+            }
+        }, 100);
+    }
+
+    /** Notifies that a task has failed
+     */
+    this.taskFailed = function (taskId) {
+        if (taskId == -1) {
+            return;
+        }
+        var task = tasks[taskId];
+        if (!task) {
+            return;
+        }
+        failPopup(task.element);
+    };
+
+    function failPopup(element) {
+        element.style.background = "#FFAAAA";
+    }
 })();
 
 /**
  * Manages scene node event listeners
  * @private
  */
-var SceneJS_nodeEventsModule = new (function() {
+var SceneJS_nodeEventsModule = new (function () {
 
     var idStack = [];
     var listenerStack = [];
@@ -5547,65 +5617,57 @@ var SceneJS_nodeEventsModule = new (function() {
     var dirty;
 
     var defaultCore = {
-        type: "listeners",
-        stateId: SceneJS._baseStateId++,
-        empty: true,
-        listeners:  []
+        type:"listeners",
+        stateId:SceneJS._baseStateId++,
+        empty:true,
+        listeners:[]
     };
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function() {
-                stackLen = 0;
-                dirty = true;
-            });
+        SceneJS_events.SCENE_COMPILING,
+        function () {
+            stackLen = 0;
+            dirty = true;
+        });
 
     SceneJS_events.addListener(
-            SceneJS_events.OBJECT_COMPILING,
-            function(params) {
-
-                if (dirty) {
-
-                    if (stackLen > 0) {
-
-                        var core = {
-                            type: "listeners",
-                            stateId: idStack[stackLen - 1],
-                            listeners: listenerStack.slice(0, stackLen)
-                        };
-
-                        params.display.renderListeners = core;
-
-                    } else {
-
-                        params.display.renderListeners = defaultCore;
-                    }
-
-                    dirty = false;
+        SceneJS_events.OBJECT_COMPILING,
+        function (params) {
+            if (dirty) {
+                if (stackLen > 0) {
+                    var core = {
+                        type:"listeners",
+                        stateId:idStack[stackLen - 1],
+                        listeners:listenerStack.slice(0, stackLen)
+                    };
+                    params.display.renderListeners = core;
+                } else {
+                    params.display.renderListeners = defaultCore;
                 }
-            });
+                dirty = false;
+            }
+        });
 
-    this.preVisitNode = function(node) {
-
-        var listeners = node._listeners["rendered"];
-
-        if (listeners && listeners.length > 0) {
+    this.preVisitNode = function (node) {
+        var subs = node._topicSubs["rendered"];
+        if (subs) {
             idStack[stackLen] = node.id;
-
-            var fn = node.__fireRenderedEvent;
+            var fn = node.__publishRenderedEvent;
             if (!fn) {
-                fn = node.__fireRenderedEvent = function (params) {
-                    node._publish("rendered", params);
+                fn = node.__publishRenderedEvent = function (params) {
+                    // Don't retain
+                    node._publish("rendered", params, true);
                 };
             }
-
             listenerStack[stackLen] = fn;
             stackLen++;
             dirty = true;
+        } else {
+            node.__publishRenderedEvent = null;
         }
     };
 
-    this.postVisitNode = function(node) {
+    this.postVisitNode = function (node) {
         if (node.id == idStack[stackLen - 1]) {
             stackLen--;
             dirty = true;
@@ -5761,6 +5823,24 @@ SceneJS_CoreFactory.prototype.getCore = function (type, coreId) {
     return core;
 };
 
+
+/**
+ * Tests if a core of the given type and ID currently exists within this factory.
+ *
+ * @param {String} type Type name of core, e.g. "material", "texture"
+ * @param {String} coreId ID for the core, unique among all cores of the given type within this factory
+ * @returns {Boolean} True if the core exists
+ */
+SceneJS_CoreFactory.prototype.hasCore = function (type, coreId) {
+    // HACK - allows different types of node to have same type of core, eg. "rotate" and "translate" nodes can both have an "xform" core
+    var alias = SceneJS_CoreFactory.coreAliases[type];
+    if (alias) {
+        type = alias;
+    }
+    var cores = this._cores[type];
+    return cores && cores[coreId];
+};
+
 /**
  * Releases a state core back to this factory, destroying it if the core's use count is then zero.
  * @param {Core} core Core to release
@@ -5813,7 +5893,7 @@ SceneJS_CoreFactory.prototype.webglRestored = function () {
 /**
  * @class The basic scene graph node type
  */
-SceneJS.Node = function() {
+SceneJS.Node = function () {
 };
 
 /**
@@ -5914,12 +5994,16 @@ SceneJS.Node.prototype._construct = function (engine, core, cfg, nodeId) {
  * Immediately notifies existing subscriptions to that topic, retains the publication to give to
  * any subsequent notifications on that topic as they are made.
  *
- * @param topic Publication topic
- * @param pub The publication
+ * @param {String} topic Publication topic
+ * @param {Object} pub The publication
+ * @param {Boolean} [forget] When true, the publication will be sent to subscribers then forgotten, so that any
+ * subsequent subscribers will not receive it
  * @private
  */
-SceneJS.Node.prototype._publish = function (topic, pub) {
-    this._topicPubs[topic] = pub; // Save notification
+SceneJS.Node.prototype._publish = function (topic, pub, forget) {
+    if (!forget) {
+        this._topicPubs[topic] = pub; // Save notification
+    }
     var subsForTopic = this._topicSubs[topic];
     if (subsForTopic) { // Notify subscriptions
         for (var handle in subsForTopic) {
@@ -5976,6 +6060,11 @@ SceneJS.Node.prototype.on = function (topic, callback) {
     if (pub) { // A publication exists, notify callback immediately
         callback.call(this, pub);
     }
+    //else {
+    if (topic == "rendered") {
+        this._engine.branchDirty(this);
+    }
+    // }
     return handle;
 };
 
@@ -5992,6 +6081,9 @@ SceneJS.Node.prototype.off = function (handle) {
             delete topicSubs[handle];
         }
         this._handleMap.removeItem(handle); // Release handle
+        if (topic == "rendered") {
+            this._engine.branchDirty(this);
+        }
     }
 };
 
@@ -7009,9 +7101,9 @@ SceneJS.Node.prototype._compile = function () {
 
 SceneJS.Node.prototype._compileNodes = function () {
 
-    var renderListeners = this._listeners["rendered"];
+    var renderSubs = this._topicSubs["rendered"];
 
-    if (renderListeners) {
+    if (renderSubs) {
         SceneJS_nodeEventsModule.preVisitNode(this);
     }
 
@@ -7032,7 +7124,7 @@ SceneJS.Node.prototype._compileNodes = function () {
         }
     }
 
-    if (renderListeners) {
+    if (renderSubs) {
         SceneJS_nodeEventsModule.postVisitNode(this);
     }
 };
@@ -7045,6 +7137,8 @@ SceneJS.Node.prototype._compileNodes = function () {
 SceneJS.Node.prototype.destroy = function () {
 
     if (!this.destroyed) {
+
+        SceneJS_sceneStatusModule.nodeDestroyed(this);
 
         if (this.parent) {
 
@@ -7101,11 +7195,10 @@ SceneJS.Node.prototype._doDestroy = function () {
  */
 var SceneJS_NodeFactory = function () {
 
-    // Nodes created by this factory
+    /** Nodes created by this factory
+     * @type {SceneJS_Map}
+     */
     this.nodes = new SceneJS_Map({});
-
-    // Subscribers waiting for node types
-    this._subs = {};
 };
 
 /**
@@ -7113,16 +7206,24 @@ var SceneJS_NodeFactory = function () {
  *
  * @type {[SceneJS.Node]}
  */
-SceneJS_NodeFactory.nodeTypes = {};    // Supported node classes, installed by #createNodeType
+SceneJS_NodeFactory.nodeTypes = {};
+
+/**
+ * Subscribers waiting for node types
+ * @type {Object}
+ * @private
+ */
+SceneJS_NodeFactory._subs = {};
 
 /**
  * Creates a node class for instantiation by this factory
  *
  * @param {String} typeName Name of type, eg. "rotate"
  * @param {String} coreTypeName Optional name of core type for the node, eg. "xform" - defaults to type name of node
+ * @param {Function} [augment] Augments the basic node type with our custom node methods
  * @returns The new node class
  */
-SceneJS_NodeFactory.createNodeType = function (typeName, coreTypeName) {
+SceneJS_NodeFactory.createNodeType = function (typeName, coreTypeName, augment) {
     if (SceneJS_NodeFactory.nodeTypes[typeName]) {
         throw "Node type already defined: " + typeName;
     }
@@ -7133,6 +7234,23 @@ SceneJS_NodeFactory.createNodeType = function (typeName, coreTypeName) {
     nodeType.prototype = new SceneJS.Node();            // Inherit from base class
     nodeType.prototype.constructor = nodeType;
     SceneJS_NodeFactory.nodeTypes[typeName] = nodeType;
+
+    var type = SceneJS_NodeFactory.nodeTypes[typeName]; // Type has installed itself
+    if (!type) {
+        throw "Node type plugin did not install itself correctly";
+    }
+    // Augment the basic node type
+    if (augment) {
+        augment(nodeType);
+    }
+    // Notify subscribers waiting for the type
+    var subs = SceneJS_NodeFactory._subs[typeName];
+    if (subs) {
+        while (subs.length > 0) {
+            subs.pop()(type);
+        }
+        delete subs[typeName];
+    }
     return nodeType;
 };
 
@@ -7151,7 +7269,9 @@ SceneJS_NodeFactory.prototype.getNode = function (engine, json, core, ok) {
         return this._createNode(nodeType, engine, json, core, ok);
     } else {
         var self = this;
-        this.getType(json.type,
+        this._getType(
+            engine,
+            json.type,
             function (nodeType) {
                 self._createNode(nodeType, engine, json, core, ok);
             });
@@ -7176,52 +7296,37 @@ SceneJS_NodeFactory.prototype._createNode = function (nodeType, engine, json, co
 /**
  * Returns installed type of given type and ID
  */
-SceneJS_NodeFactory.prototype.getType = function (typeName, ok) {
+SceneJS_NodeFactory.prototype._getType = function (engine, typeName, ok) {
     var type = SceneJS_NodeFactory.nodeTypes[typeName];
     if (type) {
         ok(type);
         return;
     }
-    var subs = this._subs[typeName] || (this._subs[typeName] = []);
+    var subs = SceneJS_NodeFactory._subs[typeName] || (SceneJS_NodeFactory._subs[typeName] = []);
     subs.push(ok);
     if (subs.length > 1) { // Not first sub
         return;
     }
+    var taskId = SceneJS_sceneStatusModule.taskStarted(engine.scene, "Loading plugin");
+    subs.push(function () {
+        SceneJS_sceneStatusModule.taskFinished(taskId);
+    });
     var self = this;
-    var typePath = SceneJS_debugModule.configs.pluginPath;
+    var typePath = SceneJS_configsModule.configs.pluginPath;
     if (!typePath) {
         throw "no typePath config"; // Build script error - should create this config
     }
     this._loadScript(typePath + "/node/" + typeName + ".js",
         function () {
-            var type = SceneJS_NodeFactory.nodeTypes[typeName]; // Type has installed itself
-            if (!type) {
-                throw "Node type plugin did not install itself correctly";
-            }
-            while (subs.length > 0) {
-                subs.pop()(type);
-            }
-            delete subs[typeName];
+            SceneJS_sceneStatusModule.taskFailed(taskId);
         });
 };
 
-SceneJS_NodeFactory.prototype._loadScript = function (url, ok) {
+SceneJS_NodeFactory.prototype._loadScript = function (url, error) {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    if (script.readyState) {  //IE
-        script.onreadystatechange = function () {
-            if (script.readyState == "loaded" ||
-                script.readyState == "complete") {
-                script.onreadystatechange = null;
-                ok();
-            }
-        };
-    } else {  //Others
-        script.onload = function () {
-            ok();
-        };
-    }
     script.src = url;
+    script.onerror = error;
     document.getElementsByTagName("head")[0].appendChild(script);
 };
 
@@ -7245,7 +7350,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             45, // fovy
             1, // aspect
             0.1, // near
-            5000), // far
+            10000), // far
 
         //Default optical attributes for perspective projection
         optics:{
@@ -7253,7 +7358,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             fovy:45.0,
             aspect:1.0,
             near:0.1,
-            far:5000.0
+            far:10000.0
         }
     };
 
@@ -7288,7 +7393,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
                 fovy:60.0,
                 aspect:1.0,
                 near:0.1,
-                far:5000.0
+                far:10000.0
             };
         } else {
             var type = optics.type || core.optics.type;
@@ -7310,7 +7415,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
                     near:optics.near || 0.1,
                     right:optics.right || 1.00,
                     top:optics.top || 1.0,
-                    far:optics.far || 5000.0
+                    far:optics.far || 10000.0
                 };
             } else if (type == "perspective") {
                 core.optics = {
@@ -7318,7 +7423,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
                     fovy:optics.fovy || 60.0,
                     aspect:optics.aspect == undefined ? 1.0 : optics.aspect,
                     near:optics.near || 0.1,
-                    far:optics.far || 5000.0
+                    far:optics.far || 10000.0
                 };
             } else if (!optics.type) {
                 throw SceneJS_error.fatalError(
@@ -8062,8 +8167,6 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
                         "geometry config expected: source.type");
                 }
 
-                taskId = self._engine.activity.taskStarted("loading geometry");
-
                 SceneJS.Plugins.getPlugin(
                     "geometry",
                     this._sourceConfigs.type,
@@ -8102,9 +8205,6 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
                                     self._engine.display.imageDirty = true;
                                     self._engine.branchDirty(self); // TODO
                                     created = true;
-
-                                    self._engine.activity.taskFinished(taskId);
-
                                 } else {
 
                                     var core = self._core;
@@ -8249,7 +8349,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         var normals;
 
         if (data.normals) {
-            if (data.normals == "auto") {
+            if (data.normals == "auto" && data.primitive == "triangles") {
                 if (data.positions && data.indices) {
                     // Auto normal generation
                     normals = this._buildNormals(data.positions, data.indices);
@@ -8455,7 +8555,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         var v2;
         var v3;
 
-        for (var i = 0, len = indices.length - 2; i < len; i += 3) {
+        for (var i = 0, len = indices.length - 3; i < len; i += 3) {
             j0 = indices[i + 0];
             j1 = indices[i + 1];
             j2 = indices[i + 2];
@@ -10914,11 +11014,13 @@ SceneJS.Scene.prototype.getZBufferDepth = function () {
 
 /**
  * Sets a regular expression to select which of the scene subgraphs that are rooted by {@link SceneJS.Tag} nodes are included in scene renders
- * @param {String} tagMask Regular expression string to match on the tag attributes of {@link SceneJS.Tag} nodes
+ * @param {String} [tagMask] Regular expression string to match on the tag attributes of {@link SceneJS.Tag} nodes. Nothing is selected when this is omitted.
  * @see #getTagMask
  * @see SceneJS.Tag
  */
 SceneJS.Scene.prototype.setTagMask = function (tagMask) {
+
+    tagMask = tagMask || "XXXXXXXXXXXXXXXXXXXXXXXXXX"; // HACK to select nothing by default
 
     if (!this._tagSelector) {
         this._tagSelector = {};
@@ -10976,6 +11078,7 @@ SceneJS.Scene.prototype.isRunning = function () {
  */
 SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     var result = this._engine.pick(canvasX, canvasY, options);
+    this.renderFrame({force:true }); // HACK: canvas blanks after picking
     if (result) {
         this._publish("pick", result);
         return result;
@@ -11058,8 +11161,18 @@ SceneJS.Scene.prototype.getNode = function (nodeId, callback) {
             return null;
         }
         // Subscribe to instantiation of node from plugin
-        this.once("nodes/" + nodeId,  callback);
+        this.once("nodes/" + nodeId, callback);
     }
+};
+
+/**
+ * Tests whether a node core of the given ID exists for the given node type
+ * @param {String} type Node type
+ * @param {String} coreId
+ * @returns Boolean
+ */
+SceneJS.Scene.prototype.hasCore = function (type, coreId) {
+    return this._engine.hasCore(type, coreId);
 };
 
 /**
@@ -11074,14 +11187,18 @@ SceneJS.Scene.prototype.getNode = function (nodeId, callback) {
  * Otherwise, the status will be:
  *
  * {
- *      numLoading: Number // Number of asset loads (eg. texture, geometry stream etc.) currently in progress
+ *      numLoading: Total number of asset loads (eg. texture, geometry stream etc.) currently in progress for this scene
  * }
  *
  */
 SceneJS.Scene.prototype.getStatus = function () {
-    return (this._engine.destroyed)
-        ? { destroyed:true }
-        : SceneJS._shallowClone(SceneJS_sceneStatusModule.sceneStatus[this.id]);
+    var sceneStatus = SceneJS_sceneStatusModule.sceneStatus[this.id];
+    if (!sceneStatus) {
+        return {
+            destroyed:true
+        };
+    }
+    return SceneJS._shallowClone(sceneStatus);
 };
 new (function() {
 
@@ -11439,9 +11556,7 @@ new (function () {
 
     var imageBasePath = window.location.hostname + window.location.pathname;
 
-    /**
-     * The default state core singleton for {@link SceneJS.Texture} nodes
-     */
+    // The default state core singleton for {@link SceneJS.Texture} nodes
     var defaultCore = {
         type:"texture",
         stateId:SceneJS._baseStateId++,
@@ -11472,7 +11587,8 @@ new (function () {
             this._core.layers = [];
             this._core.params = {};
 
-            var waitForLoad = !!params.waitForLoad;
+            // By default, wait for texture to load before building subgraph
+            var waitForLoad = params.waitForLoad == undefined ? true : params.waitForLoad;
 
             if (!params.layers) {
                 throw SceneJS_error.fatalError(
@@ -11501,12 +11617,10 @@ new (function () {
                 }
 
                 if (layerParams.applyFrom) {
-
                     if (layerParams.applyFrom != "uv" &&
                         layerParams.applyFrom != "uv2" &&
                         layerParams.applyFrom != "normal" &&
                         layerParams.applyFrom != "geometry") {
-
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + "  applyFrom value is unsupported - " +
@@ -11515,14 +11629,12 @@ new (function () {
                 }
 
                 if (layerParams.applyTo) {
-
                     if (layerParams.applyTo != "baseColor" && // Colour map (deprecated)
                         layerParams.applyTo != "color" && // Colour map
                         layerParams.applyTo != "specular" && // Specular map
                         layerParams.applyTo != "emit" && // Emission map
                         layerParams.applyTo != "alpha" && // Alpha map
                         layerParams.applyTo != "normals") {
-
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + " applyTo value is unsupported - " +
@@ -11531,9 +11643,7 @@ new (function () {
                 }
 
                 if (layerParams.blendMode) {
-
                     if (layerParams.blendMode != "add" && layerParams.blendMode != "multiply") {
-
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + " blendMode value is unsupported - " +
@@ -11562,13 +11672,10 @@ new (function () {
                 this._setLayerTransform(layerParams, layer);
 
                 if (layer.framebuf) { // Create from a framebuf node preceeding this texture in the scene graph
-
                     var targetNode = this._engine.findNode(layer.framebuf);
-
                     if (targetNode && targetNode.type == "framebuf") {
                         layer.texture = targetNode._core.framebuf.getTexture(); // TODO: what happens when the framebuf is destroyed?
                     }
-
                 } else { // Create from texture node's layer configs
                     this._loadLayerTexture(gl, layer);
                 }
@@ -11576,9 +11683,7 @@ new (function () {
 
             var self = this;
 
-            /**
-             * WebGL restored handler - rebuilds the texture layers
-             */
+            // WebGL restored handler - rebuilds the texture layers
             this._core.webglRestored = function () {
 
                 var layers = self._core.layers;
@@ -11592,14 +11697,6 @@ new (function () {
     };
 
     SceneJS.Texture.prototype._loadLayerTexture = function (gl, layer) {
-
-//        SceneJS_sceneStatusModule.nodeLoading(this);
-//
-//        this._engine.nodeLoading(this);
-
-        var taskId = this._engine.activity.taskStarted("loading texture");
-
-        this._fireEvent("loading");
 
         var self = this;
 
@@ -11632,6 +11729,8 @@ new (function () {
                             "texture: 'subscribe' method missing on plugin for texture source type '" + sourceConfigs.type + "'");
                     }
 
+                    var taskId = SceneJS_sceneStatusModule.taskStarted(self, "Loading texture");
+
                     source.subscribe(// Get notification whenever source updates the texture
                         (function () {
                             var loaded = false;
@@ -11639,8 +11738,7 @@ new (function () {
                                 if (!loaded) { // Texture first initialised - create layer
                                     loaded = true;
                                     self._setLayerTexture(gl, layer, texture);
-                                    self._engine.activity.taskFinished(taskId);
-
+                                    SceneJS_sceneStatusModule.taskFinished(taskId);
                                 } else { // Texture updated - layer already has the handle to it, so just signal a redraw
                                     self._engine.display.imageDirty = true;
                                 }
@@ -11658,6 +11756,11 @@ new (function () {
 
             /* Load from URL
              */
+
+            var src = layer.uri || layer.src;
+
+            var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading texture");
+
             var image = new Image();
 
             image.onload = function () {
@@ -11665,10 +11768,12 @@ new (function () {
                 gl.bindTexture(gl.TEXTURE_2D, texture);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self._ensureImageSizePowerOfTwo(image));
                 self._setLayerTexture(gl, layer, texture);
-                self._engine.activity.taskFinished(taskId);
+                SceneJS_sceneStatusModule.taskFinished(taskId);
             };
 
-            var src = layer.uri || layer.src;
+            image.onerror = function () {
+                SceneJS_sceneStatusModule.taskFailed(taskId);
+            };
 
             if (src.indexOf("data") == 0) {  // Image data
                 image.src = src;
@@ -11731,10 +11836,6 @@ new (function () {
             sourceType:this._getGLOption("sourceType", gl, layer, gl.UNSIGNED_BYTE),
             update:null
         });
-
-//        this._engine.nodeLoaded(this);
-//
-//        this._fireEvent("loaded");
 
         if (this.destroyed) { // Node was destroyed while loading
             layer.texture.destroy();
@@ -11881,49 +11982,37 @@ new (function () {
     };
 
     SceneJS.Texture.prototype._compile = function () {
-
         if (!this._core.hash) {
             this._makeHash();
         }
-
         this._engine.display.texture = coreStack[stackLen++] = this._core;
         this._compileNodes();
         this._engine.display.texture = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
     SceneJS.Texture.prototype._makeHash = function () {
-
         var core = this._core;
         var hash;
-
         if (core.layers && core.layers.length > 0) {
-
             var layers = core.layers;
             var hashParts = [];
             var texLayer;
-
             for (var i = 0, len = layers.length; i < len; i++) {
-
                 texLayer = layers[i];
-
                 hashParts.push("/");
                 hashParts.push(texLayer.applyFrom);
                 hashParts.push("/");
                 hashParts.push(texLayer.applyTo);
                 hashParts.push("/");
                 hashParts.push(texLayer.blendMode);
-
                 if (texLayer.matrix) {
                     hashParts.push("/anim");
                 }
             }
-
             hash = hashParts.join("");
-
         } else {
             hash = "";
         }
-
         if (core.hash != hash) {
             core.hash = hash;
         }
@@ -12796,31 +12885,34 @@ SceneJS.Types = new (function () {
      * @param methods
      */
     this.addType = function (typeName, methods) {
-        var type = SceneJS_NodeFactory.createNodeType(typeName, methods);
-        var method;
-        for (var methodName in methods) {
-            if (methods.hasOwnProperty(methodName)) {
-                method = methods[methodName];
-                switch (methodName) {
-                    case "init":
-                        (function () {
-                            var _method = methods[methodName];
-                            type.prototype._init = function (params) {
-                                _method.call(this, params);
-                            };
+        SceneJS_NodeFactory.createNodeType(typeName, methods,
+            // Augments the basic node type with our custom type's methods
+            function (type) {
+                var method;
+                for (var methodName in methods) {
+                    if (methods.hasOwnProperty(methodName)) {
+                        method = methods[methodName];
+                        switch (methodName) {
+                            case "init":
+                                (function () {
+                                    var _method = methods[methodName];
+                                    type.prototype._init = function (params) {
+                                        _method.call(this, params);
+                                    };
 
-                            // Mark node type as a plugin
-                            type.prototype._fromPlugin = true;
-                        })();
-                        break;
-                    case "destroy":
-                        type.prototype._destroy = method;
-                        break;
-                    default:
-                        type.prototype[methodName] = method;
+                                    // Mark node type as a plugin
+                                    type.prototype._fromPlugin = true;
+                                })();
+                                break;
+                            case "destroy":
+                                type.prototype._destroy = method;
+                                break;
+                            default:
+                                type.prototype[methodName] = method;
+                        }
+                    }
                 }
-            }
-        }
+            });
     };
 
     /**

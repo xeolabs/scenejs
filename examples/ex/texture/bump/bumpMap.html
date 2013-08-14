@@ -21,57 +21,72 @@
 
 <script>
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Override SceneJS' default lights for optimal bump map effect
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"lights",
-                lights:[
-                    {
-                        mode:"ambient",
-                        color:{ r:0.7, g:0.7, b:0.8 },
-                        diffuse:true,
-                        specular:false
-                    },
-                    {
-                        mode:"dir",
-                        color:{ r:1.0, g:1.0, b:1.0 },
-                        diffuse:true,
-                        specular:true,
-                        dir:{ x:-0.4, y:0.0, z:0.5 },
-                        space:"world"
-                    }
-                ],
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:5,
+                zoomSensitivity:1.0,
+
                 nodes:[
+
+                    // Override SceneJS' default lights for optimal bump map effect
                     {
-                        type:"texture",
-                        layers:[
+                        type:"lights",
+                        lights:[
                             {
-                                uri:"../../../textures/normal_map.jpg",
-                                wrapS:"repeat",
-                                wrapT:"repeat",
-                                applyTo:"normals"
+                                mode:"ambient",
+                                color:{ r:0.7, g:0.7, b:0.8 },
+                                diffuse:true,
+                                specular:false
+                            },
+                            {
+                                mode:"dir",
+                                color:{ r:1.0, g:1.0, b:1.0 },
+                                diffuse:true,
+                                specular:true,
+                                dir:{ x:-0.4, y:0.0, z:0.5 },
+                                space:"world"
                             }
                         ],
                         nodes:[
+
+                            // The normal map
                             {
-                                type:"geometry",
-                                source:{
-                                    type:"box"
-                                }
+                                type:"texture",
+                                layers:[
+                                    {
+                                        uri:"../../../textures/normal_map.jpg",
+                                        wrapS:"repeat",
+                                        wrapT:"repeat",
+                                        applyTo:"normals"
+                                    }
+                                ],
+                                nodes:[
+
+                                    // Box primitive implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                    {
+                                        type:"prims/box"
+                                    }
+                                ]
                             }
                         ]
                     }
                 ]
             }
         ]
-    });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:5
     });
 
 

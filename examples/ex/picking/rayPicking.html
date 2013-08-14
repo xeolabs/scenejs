@@ -23,7 +23,8 @@
             font-size: 18px;
             text-align: center;
             background: black;
-            opacity: 0.4;
+            opacity: 0.6;
+            z-index: 100000;
         }
     </style>
 </head>
@@ -34,24 +35,41 @@
 </div>
 
 <script src="../../../api/latest/scenejs.js"></script>
-<script src="../../../api/latest/extras/orbitControl.js"></script>
 
 <script>
 
-    // Create scene graph
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
 
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
-            // Pickable objects
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"node",
-                nodes:createObjects()
-            },
-            // We'll create little spheres here to indicate where the ray-pick intersects occur
-            // That's done by the showHit() function defined lower down
-            {
-                type:"node",
-                id:"intersectIndicators"
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:60,
+                zoomSensitivity:10.0,
+                nodes:[
+
+                    // Pickable objects
+                    {
+                        type:"node",
+                        nodes:createObjects()
+                    },
+
+                    // We'll create little spheres here to indicate where the ray-pick intersects occur
+                    // That's done by the showHit() function defined lower down
+                    {
+                        type:"node",
+                        id:"intersectIndicators"
+                    }
+                ]
             }
         ]
     });
@@ -80,11 +98,11 @@
                                 specular:1.0,
                                 shine:70.0,
                                 nodes:[
+
+                                    // Sphere geometry node implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
                                     {
-                                        type:"geometry",
-                                        source:{
-                                            type:"sphere"
-                                        }
+                                        type:"prims/sphere"
                                     }
                                 ]
                             }
@@ -130,11 +148,10 @@
                                     y:0.2,
                                     z:0.2,
                                     nodes:[
+
+                                        // Sphere primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
                                         {
-                                            type:"geometry",
-                                            source:{
-                                                type:"sphere"
-                                            }
+                                            type:"prims/sphere"
                                         }
                                     ]
                                 }
@@ -186,15 +203,6 @@
     function pick(canvasX, canvasY) {
         scene.pick(canvasX, canvasY, { rayPick:true });
     }
-
-    // Helper to orbit lookat with mouse
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:60
-    });
-
 
 </script>
 </body>

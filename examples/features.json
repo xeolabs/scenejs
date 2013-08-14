@@ -185,7 +185,7 @@
     },
 
     {
-        "title":"Effects",
+        "title":"Effects, eg:",
         "nodes":[
             {
                 "nodes":[
@@ -235,7 +235,7 @@
         ]
     },
     {
-        "title":"Scenes",
+        "title":"Scene graph",
         "nodes":[
             {
                 "nodes":[
@@ -256,6 +256,14 @@
             {
                 "nodes":[
                     {
+                        "title":"Regex-selected object visibility",
+                        "page":"renderMasking"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
                         "title":"WebGLContextLost recovery",
                         "page":"webglContextLost"
                     }
@@ -264,13 +272,33 @@
         ]
     },
     {
-        "title":"Extensibility",
+        "title":"Custom node types, eg:",
         "nodes":[
             {
                 "nodes":[
                     {
-                        "title":"Custom Node Types",
+                        "title":"Skyboxes",
+                        "page":"customSkybox"
+                    },
+                    {
+                        "title":"Heightmaps",
+                        "page":"customHeightmap"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"Cities",
+                        "page":"city"
+                    },
+                    {
+                        "title":"Vehicles",
                         "page":"customNodesTank"
+                    },
+                    {
+                        "title":"Planets",
+                        "page":"customNodesEarth"
                     }
                 ]
             }

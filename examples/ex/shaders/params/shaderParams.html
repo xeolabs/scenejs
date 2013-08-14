@@ -9,8 +9,6 @@
 
 <script src="../../../../api/latest/scenejs.js"></script>
 
-<script src="../../../../api/latest/extras/orbitControl.js"></script>
-
 <script>
 
 // Demonstrates how to set the parameters on a custom shader on a per-object basis using shaderParams nodes.
@@ -24,76 +22,217 @@
 // We then cycle through the shaderParams nodes, periodically setting the 'enableScanline' param true for
 // each of those in turn.
 
+// Point SceneJS to the bundled plugins
+SceneJS.setConfigs({
+    pluginPath:"../../../../api/latest/plugins"
+});
+
+// Create scene
 var scene = SceneJS.createScene({
     nodes:[
 
-        // Wrap the torus stack in a custom shader
+        // Orbiting camera node, implemented by plugin at
+        // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
         {
-            type:"shader",
-            shaders:[
-
-                // Fragment shader
-                {
-                    stage:"fragment",
-                    code:[
-                        "uniform bool scanlineEnabled;",
-                        "vec4 myPixelColorFunc(vec4 color) {",
-                        "   if (!scanlineEnabled) {",
-                        "       return color;",
-                        "   }",
-                        "   float m = mod(gl_FragCoord.y, 4.0);",
-                        "   if (m < 1.5) {",
-                        "       color = vec4(0.0, 0.0, 0.0, 1.0);",
-                        "   } else if (m < 2.0) {",
-                        "       color = vec4(0.2, 0.2, 0.2, 1.0);",
-                        "   } else if (m < 2.5) {",
-                        "       color = vec4(0.2, 0.2, 0.2, 1.0);",
-                        "   }",
-                        "   return color;",
-                        "}"],
-                    hooks:{
-                        pixelColor:"myPixelColorFunc"
-                    }
-                },
-            ],
-
-            // Optional initial values for uniforms within our GLSL:
-            params:{
-                scanlineEnabled:false
-            },
+            type:"cameras/orbit",
+            yaw:-30,
+            pitch:-30,
+            zoom:-5,
+            zoomSensitivity:1.0,
 
             nodes:[
 
-                // Blue torus
+                // Wrap the torus stack in a custom shader
                 {
-                    type:"shaderParams",
-                    id:"blueTorusShading",
+                    type:"shader",
+                    shaders:[
+
+                        // Fragment shader
+                        {
+                            stage:"fragment",
+                            code:[
+                                "uniform bool scanlineEnabled;",
+                                "vec4 myPixelColorFunc(vec4 color) {",
+                                "   if (!scanlineEnabled) {",
+                                "       return color;",
+                                "   }",
+                                "   float m = mod(gl_FragCoord.y, 4.0);",
+                                "   if (m < 1.5) {",
+                                "       color = vec4(0.0, 0.0, 0.0, 1.0);",
+                                "   } else if (m < 2.0) {",
+                                "       color = vec4(0.2, 0.2, 0.2, 1.0);",
+                                "   } else if (m < 2.5) {",
+                                "       color = vec4(0.2, 0.2, 0.2, 1.0);",
+                                "   }",
+                                "   return color;",
+                                "}"],
+                            hooks:{
+                                pixelColor:"myPixelColorFunc"
+                            }
+                        }
+                    ],
+
+                    // Optional initial values for uniforms within our GLSL:
                     params:{
                         scanlineEnabled:false
                     },
+
                     nodes:[
+
+                        // Blue torus
                         {
-                            type:"translate",
-                            y:0.8, x:0.2, z:0.2,
+                            type:"shaderParams",
+                            id:"blueTorusShading",
+                            params:{
+                                scanlineEnabled:false
+                            },
                             nodes:[
                                 {
-                                    type:"rotate",
-                                    x:1, angle:90,
+                                    type:"translate",
+                                    y:0.8, x:0.2, z:0.2,
                                     nodes:[
                                         {
-                                            type:"scale",
-                                            x:0.6, y:0.6, z:0.6,
+                                            type:"rotate",
+                                            x:1, angle:90,
                                             nodes:[
                                                 {
-                                                    type:"material",
-                                                    color:{ r:0.5, g:0.5, b:0.6 },
-
+                                                    type:"scale",
+                                                    x:0.6, y:0.6, z:0.6,
                                                     nodes:[
                                                         {
-                                                            type:"geometry",
-                                                            source:{
-                                                                type:"torus"
-                                                            }
+                                                            type:"material",
+                                                            color:{ r:0.5, g:0.5, b:0.6 },
+
+                                                            nodes:[
+
+                                                                // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/torus.js
+                                                                {
+                                                                    type:"prims/torus"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+
+                        // Pink torus
+                        {
+                            type:"shaderParams",
+                            id:"pinkTorusShading",
+                            params:{
+                                scanlineEnabled:false
+                            },
+                            nodes:[
+                                {
+                                    type:"translate",
+                                    y:0.42, x:0.2, z:0.3,
+                                    nodes:[
+                                        {
+                                            type:"rotate",
+                                            x:1, angle:90,
+                                            nodes:[
+                                                {
+                                                    type:"scale",
+                                                    x:0.7, y:0.7, z:0.7,
+                                                    nodes:[
+                                                        {
+                                                            type:"material",
+                                                            color:{ r:0.7, g:0.5, b:0.5 },
+
+                                                            nodes:[
+
+                                                                // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/torus.js
+                                                                {
+                                                                    type:"prims/torus"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+
+                        // Green torus
+                        {
+                            type:"shaderParams",
+                            id:"greenTorusShading",
+                            params:{
+                                scanlineEnabled:false
+                            },
+                            nodes:[
+                                {
+                                    type:"translate",
+                                    y:-0.055,
+                                    nodes:[
+                                        {
+                                            type:"rotate",
+                                            x:1, angle:90,
+                                            nodes:[
+                                                {
+                                                    type:"scale",
+                                                    x:0.8, y:0.8, z:0.8,
+                                                    nodes:[
+                                                        {
+                                                            type:"material",
+                                                            color:{ r:0.5, g:0.7, b:0.5 },
+
+                                                            nodes:[
+
+                                                                // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/torus.js
+                                                                {
+                                                                    type:"prims/torus"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+
+                        // Yellow torus
+                        {
+                            type:"shaderParams",
+                            id:"yellowTorusShading",
+                            params:{
+                                scanlineEnabled:true
+                            },
+                            nodes:[
+                                {
+                                    type:"translate",
+                                    y:-0.6,
+                                    nodes:[
+                                        {
+                                            type:"rotate",
+                                            x:1, angle:90,
+                                            nodes:[
+                                                {
+                                                    type:"scale",
+                                                    x:0.9, y:0.9, z:0.9,
+                                                    nodes:[
+                                                        {
+                                                            type:"material",
+                                                            color:{ r:0.7, g:0.7, b:0.5 },
+
+                                                            nodes:[
+
+                                                                // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/torus.js
+                                                                {
+                                                                    type:"prims/torus"
+                                                                }
+                                                            ]
                                                         }
                                                     ]
                                                 }
@@ -105,157 +244,34 @@ var scene = SceneJS.createScene({
                         }
                     ]
                 },
-                // Pink torus
+                // End of shader
+
+                // Grid floor, not affected by our custom shader
+
                 {
-                    type:"shaderParams",
-                    id:"pinkTorusShading",
-                    params:{
-                        scanlineEnabled:false
-                    },
+                    type:"scale",
+                    x:1000, y:.5, z:1000,
                     nodes:[
                         {
-                            type:"translate",
-                            y:0.42, x:0.2, z:0.3,
+                            type:"rotate",
+                            x:1, angle:90,
                             nodes:[
                                 {
-                                    type:"rotate",
-                                    x:1, angle:90,
-                                    nodes:[
-                                        {
-                                            type:"scale",
-                                            x:0.7, y:0.7, z:0.7,
-                                            nodes:[
-                                                {
-                                                    type:"material",
-                                                    color:{ r:0.7, g:0.5, b:0.5 },
+                                    type:"material",
+                                    color:{ r:0.7, g:0.7, b:0.5 },
+                                    emit:1.0,
 
-                                                    nodes:[
-                                                        {
-                                                            type:"geometry",
-                                                            source:{
-                                                                type:"torus"
-                                                            }
-                                                        }
-                                                    ]
-                                                }
-                                            ]
+                                    nodes:[
+
+                                        // Plane primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/plane.js
+                                        {
+                                            type:"prims/plane",
+                                            width:100,
+                                            height:100,
+                                            widthSegments:20,
+                                            heightSegments:20
                                         }
                                     ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                // Green torus
-                {
-                    type:"shaderParams",
-                    id:"greenTorusShading",
-                    params:{
-                        scanlineEnabled:false
-                    },
-                    nodes:[
-                        {
-                            type:"translate",
-                            y:-0.055,
-                            nodes:[
-                                {
-                                    type:"rotate",
-                                    x:1, angle:90,
-                                    nodes:[
-                                        {
-                                            type:"scale",
-                                            x:0.8, y:0.8, z:0.8,
-                                            nodes:[
-                                                {
-                                                    type:"material",
-                                                    color:{ r:0.5, g:0.7, b:0.5 },
-
-                                                    nodes:[
-                                                        {
-                                                            type:"geometry",
-                                                            source:{
-                                                                type:"torus"
-                                                            }
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                },
-                // Yellow torus
-                {
-                    type:"shaderParams",
-                    id:"yellowTorusShading",
-                    params:{
-                        scanlineEnabled:true
-                    },
-                    nodes:[
-                        {
-                            type:"translate",
-                            y:-0.6,
-                            nodes:[
-                                {
-                                    type:"rotate",
-                                    x:1, angle:90,
-                                    nodes:[
-                                        {
-                                            type:"scale",
-                                            x:0.9, y:0.9, z:0.9,
-                                            nodes:[
-                                                {
-                                                    type:"material",
-                                                    color:{ r:0.7, g:0.7, b:0.5 },
-
-                                                    nodes:[
-                                                        {
-                                                            type:"geometry",
-                                                            source:{
-                                                                type:"torus"
-                                                            }
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        // End of shader
-
-        // Grid floor, not affected by our custom shader
-
-        {
-            type:"scale",
-            x:1000, y:.5, z:1000,
-            nodes:[
-                {
-                    type:"rotate",
-                    x:1, angle:90,
-                    nodes:[
-                        {
-                            type:"material",
-                            color:{ r:0.7, g:0.7, b:0.5 },
-                            emit:1.0,
-
-                            nodes:[
-                                {
-                                    type:"geometry",
-                                    source:{
-                                        type:"plane",
-                                        wire:true,
-                                        widthSegments:200,
-                                        heightSegments:200
-                                    }
                                 }
                             ]
                         }
@@ -267,13 +283,7 @@ var scene = SceneJS.createScene({
 });
 
 
-// Get shaderParams nodes
-var blueTorusShading = scene.getNode("blueTorusShading");
-var pinkTorusShading = scene.getNode("pinkTorusShading");
-var greenTorusShading = scene.getNode("greenTorusShading");
-var yellowTorusShading = scene.getNode("yellowTorusShading");
-
-// Cycle through them, setting params on each in turn to enable
+// Cycle through the shaderParams nodes, setting params on each in turn to enable
 // the shader it's child geometries
 
 var i = 0;
@@ -281,33 +291,42 @@ var i = 0;
 setInterval(
         function () {
 
-            blueTorusShading.setParams({
-                scanlineEnabled:i == 0
-            });
-            pinkTorusShading.setParams({
-                scanlineEnabled:i == 1
-            });
-            greenTorusShading.setParams({
-                scanlineEnabled:i == 2
-            });
-            yellowTorusShading.setParams({
-                scanlineEnabled:i == 3
-            });
+            // Note that for efficiency, you should get the nodes once and reuse their references,
+            // rather than continually getting them within the loop like this.
 
+            scene.getNode("blueTorusShading",
+                    function (blueTorusShading) {
+                        blueTorusShading.setParams({
+                            scanlineEnabled:i == 0
+                        });
+                    });
+
+            scene.getNode("pinkTorusShading",
+                    function (pinkTorusShading) {
+                        pinkTorusShading.setParams({
+                            scanlineEnabled:i == 1
+                        });
+                    });
+
+            scene.getNode("greenTorusShading",
+                    function (greenTorusShading) {
+                        greenTorusShading.setParams({
+                            scanlineEnabled:i == 2
+                        });
+                    });
+
+            scene.getNode("yellowTorusShading",
+                    function (yellowTorusShading) {
+                        yellowTorusShading.setParams({
+                            scanlineEnabled:i == 3
+                        });
+                    });
             i++;
             if (i > 3) {
                 i = 0;
             }
         },
         1000);
-
-
-// Mouse camera orbit helper
-new SceneJS.OrbitControls(scene, {
-    yaw:-30,
-    pitch:-30,
-    zoom:-5
-});
 
 </script>
 </body>

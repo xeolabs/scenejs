@@ -23,7 +23,8 @@
             font-size: 22px;
             text-align: left;
             background: black;
-            opacity: 0.4;
+            opacity: 0.6;
+            z-index: 100000;
         }
     </style>
 </head>
@@ -34,9 +35,13 @@
 
 <script src="../../../api/latest/scenejs.js"></script>
 
-<script src="../../../api/latest/extras/orbitControl.js"></script>
-
 <script>
+
+
+// Point SceneJS to the bundled plugins
+SceneJS.setConfigs({
+    pluginPath:"../../../api/latest/plugins"
+});
 
 // Create a scene with a bubble cloud, something dynamic to show
 // how context recovery is actually pretty quick
@@ -48,13 +53,22 @@ var bubbleNames;
 createScene();
 createBubbles();
 
+// Create scene
 function createScene() {
     scene = SceneJS.createScene({
                 nodes:[
+
+                    // Mouse-orbited camera, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
                     {
-                        type:"lookAt",
-                        eye:{ y:40 },
+                        type:"cameras/orbit",
+                        yaw:340,
+                        pitch:-10,
+                        zoom:150,
+                        zoomSensitivity:15,
                         nodes:[
+
+                            // Override default lights
                             {
                                 type:"lights",
                                 lights:[
@@ -76,8 +90,14 @@ function createScene() {
 
                                 nodes:[
 
-                                    // Wire grid
+                                    // Miramar Clouds Skybox, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/skyboxes/miramarClouds.js
+                                    {
+                                        type:"skyboxes/miramarClouds",
+                                        size:5000 // Box half-size on each axis - default is 5000
+                                    },
 
+                                    // Wire grid
                                     {
                                         id:"grid-floor",
                                         type:"material",
@@ -110,15 +130,16 @@ function createScene() {
                                                                 x:1,
                                                                 angle:90,
                                                                 nodes:[
+
+                                                                    // Plane primitive implemented by plugin at
+                                                                    // http://scenejs.org/api/latest/plugins/node/prims/plane.js
                                                                     {
-                                                                        type:"geometry",
-                                                                        source:{
-                                                                            //type:"box"
-                                                                            type:"plane",
-                                                                            wire:true,
-                                                                            widthSegments:200,
-                                                                            heightSegments:200
-                                                                        }
+                                                                        type:"prims/plane",
+                                                                        width:1,
+                                                                        height:1,
+                                                                        wire:true,
+                                                                        widthSegments:200,
+                                                                        heightSegments:200
                                                                     }
                                                                 ]
                                                             }
@@ -246,117 +267,122 @@ function createScene() {
 
 }
 
-// Creates cloud of animated bubbles
+// Bubble factory
 
 function createBubbles() {
+
     var num = 100;
-    var contentNode = scene.getNode("content");
-    bubbles = [];
-    bubbleNames = {};
-    var bubble;
 
-    for (var i = 0; i < num; i++) {
+    // Get content node asynch because it's a child of the 'cameras/orbit' node,
+    // which is loaded from a node type plugin
 
-        bubble = new (function () {
-
-            var scale = 0.2 + (Math.random() * 2);
-
-            this.reset = function () {
-                this.pos = {
-                    x:(Math.random() * 20) - 10,
-                    y:2,
-                    z:(Math.random() * 20) - 10
-                };
-                this.dir = {
-                    x:0,
-                    y:0.1 + Math.random() * 0.1,
-                    z:0
-                };
-                this.age = 0;
-                this.wobbleAge = 0;
-                this.lifeSpan = 10000 + Math.random() * 10000;
-                this.popped = false;
-            };
-
-            this.reset();
-
-            var name = "o" + i;
-            this.name = contentNode.addNode({
-                type:"name",
-                name:name
-            });
-            bubbleNames[name] = this;
-
-            this.translate = this.name.addNode({
-                type:"translate"
-            });
-            this.size = this.translate.addNode({
-                type:"scale",
-                x:scale,
-                y:scale,
-                z:scale
-            });
-            this.rotate = this.size.addNode({
-                type:"rotate",
-                x:Math.random() - 0.5,
-                y:Math.random() - 0.5,
-                z:Math.random() - 0.5,
-                angle:0
-            });
-            this.rotate.addNode({
-                type:"geometry",
-                //      coreId:"bubble", BROKEN
-                source:{
-                    type:"sphere"
-                }
-            });
-            this.angle = 0;
-            this.angleInc = Math.random() - 0.5;
-        })();
-
-        bubbles.push(bubble);
-    }
-
-    var t = (new Date()).getTime();
-    scene.on("tick",
-            function () {
-                var timeNow = (new Date()).getTime();
-                var timeSinceLast = timeNow - t;
+    scene.getNode("content",
+            function (contentNode) {
+                bubbles = [];
+                bubbleNames = {};
                 var bubble;
-                var pos;
+
                 for (var i = 0; i < num; i++) {
 
-                    bubble = bubbles[i];
+                    bubble = new (function () {
 
-                    if (bubble.popped) {
-                        bubble.reset();
+                        var scale = 0.2 + (Math.random() * 2);
 
-                    } else {
+                        this.reset = function () {
+                            this.pos = {
+                                x:(Math.random() * 20) - 10,
+                                y:2,
+                                z:(Math.random() * 20) - 10
+                            };
+                            this.dir = {
+                                x:0,
+                                y:0.1 + Math.random() * 0.1,
+                                z:0
+                            };
+                            this.age = 0;
+                            this.wobbleAge = 0;
+                            this.lifeSpan = 10000 + Math.random() * 10000;
+                            this.popped = false;
+                        };
 
-                        bubble.age += timeSinceLast;
+                        this.reset();
 
-                        pos = bubble.pos;
+                        var name = "o" + i;
+                        this.name = contentNode.addNode({
+                            type:"name",
+                            name:name
+                        });
+                        bubbleNames[name] = this;
 
-                        if (bubble.age > bubble.lifeSpan) {
-                            bubble.reset();
-                        } else {
-                            pos.x += bubble.dir.x;
-                            pos.y += bubble.dir.y;
-                            pos.z += bubble.dir.z;
-                        }
-                    }
+                        this.translate = this.name.addNode({
+                            type:"translate"
+                        });
+                        this.size = this.translate.addNode({
+                            type:"scale",
+                            x:scale,
+                            y:scale,
+                            z:scale
+                        });
+                        this.rotate = this.size.addNode({
+                            type:"rotate",
+                            x:Math.random() - 0.5,
+                            y:Math.random() - 0.5,
+                            z:Math.random() - 0.5,
+                            angle:0
+                        });
+                        this.rotate.addNode(
+                                // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                {
+                                    type:"prims/sphere"
+                                });
+                        this.angle = 0;
+                        this.angleInc = Math.random() - 0.5;
+                    })();
 
-                    bubble.translate.setXYZ(pos);
-
-                    if (++bubble.wobbleAge > 20 + (Math.random() * 10)) {
-                        bubble.dir.x += (Math.random() - 0.5) * 0.1;
-                        bubble.dir.z += (Math.random() - 0.5) * 0.1;
-                        bubble.wobbleAge = 0;
-                    }
-
-                    bubble.rotate.setAngle(bubble.angle += bubble.angleInc);
+                    bubbles.push(bubble);
                 }
-                t = timeNow;
+
+                var t = (new Date()).getTime();
+                scene.on("tick",
+                        function () {
+                            var timeNow = (new Date()).getTime();
+                            var timeSinceLast = timeNow - t;
+                            var bubble;
+                            var pos;
+                            for (var i = 0; i < num; i++) {
+
+                                bubble = bubbles[i];
+
+                                if (bubble.popped) {
+                                    bubble.reset();
+
+                                } else {
+
+                                    bubble.age += timeSinceLast;
+
+                                    pos = bubble.pos;
+
+                                    if (bubble.age > bubble.lifeSpan) {
+                                        bubble.reset();
+                                    } else {
+                                        pos.x += bubble.dir.x;
+                                        pos.y += bubble.dir.y;
+                                        pos.z += bubble.dir.z;
+                                    }
+                                }
+
+                                bubble.translate.setXYZ(pos);
+
+                                if (++bubble.wobbleAge > 20 + (Math.random() * 10)) {
+                                    bubble.dir.x += (Math.random() - 0.5) * 0.1;
+                                    bubble.dir.z += (Math.random() - 0.5) * 0.1;
+                                    bubble.wobbleAge = 0;
+                                }
+
+                                bubble.rotate.setAngle(bubble.angle += bubble.angleInc);
+                            }
+                            t = timeNow;
+                        });
             });
 }
 
@@ -394,17 +420,6 @@ window.setInterval(
                 countDown--;
             }
         }, 1000);
-
-
-// Mouse lookat orbit helper
-new SceneJS.OrbitControls(scene, {
-    yaw:30,
-    pitch:-30,
-    zoom:100,
-    zoomSensitivity:5.0,
-    eye:{ y:40 },
-    look:{ y:40 }
-});
 
 
 </script>

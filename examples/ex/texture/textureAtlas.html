@@ -15,7 +15,6 @@
     </style>
 
     <script src="../../../api/latest/scenejs.js"></script>
-    <script src="../../../api/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
@@ -29,78 +28,90 @@
     // texture once for all the geometries. Another important benefit of texture atlases is that they reduce the number
     // of HTTP requests for texture images.
 
-    var scene = SceneJS.createScene({
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
 
+    // Create scene
+    var scene = SceneJS.createScene({
         nodes:[
 
-            // Our texture atlas
-            // The atlas is the General Zod portrait and the brickwall pattern,
-            //arranged side-by-side within the same image file.
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"texture",
-                layers:[
-                    {
-                        uri:"../../textures/texture-atlas.jpg"
-                    }
-                ],
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:7,
+                zoomSensitivity:1.0,
 
                 nodes:[
 
-                    // Two quads - geometry nodes that define a four-sided polygon.
-                    //
-                    // These are arranged on the X-axis by a couple of translate
-                    // nodes.
-                    //
-                    // Each of the quads have different UV coordinates, causing
-                    // their verices to map to different regions within the texture.
-                    //
-                    // The first quad maps to GeneralZod, while second maps to
-                    // the brick wall.
-
-                    // 1. General Zod
+                    // Our texture atlas
+                    // The atlas is the General Zod portrait and the brickwall pattern,
+                    //arranged side-by-side within the same image file.
                     {
-                        type:"translate",
-                        x:1.5,
-
-                        nodes:[
+                        type:"texture",
+                        layers:[
                             {
-                                type:"geometry",
-                                positions:[ 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0 ],
-                                normals:[ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
-
-                                // UV coords map to left half of texture image
-                                uv:[ 1, 1, .5, 1, .5, 0, 1, 0 ],
-                                indices:[ 0, 1, 2, 0, 2, 3]
+                                uri:"../../textures/texture-atlas.jpg"
                             }
-                        ]
-                    },
-
-                    // 2. Brick wall
-                    {
-                        type:"translate",
-                        x:-1.5,
+                        ],
 
                         nodes:[
-                            {
-                                type:"geometry",
-                                positions:[ 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0 ],
-                                normals:[ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
 
-                                // UV coords map to right half of texture image
-                                uv:[ .5, 1, 0, 1, 0, 0, .5, 0 ],
-                                indices:[ 0, 1, 2, 0, 2, 3]
+                            // Two quads - geometry nodes that define a four-sided polygon.
+                            //
+                            // These are arranged on the X-axis by a couple of translate
+                            // nodes.
+                            //
+                            // Each of the quads have different UV coordinates, causing
+                            // their verices to map to different regions within the texture.
+                            //
+                            // The first quad maps to GeneralZod, while second maps to
+                            // the brick wall.
+
+                            // 1. General Zod
+                            {
+                                type:"translate",
+                                x:1.5,
+
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        positions:[ 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0 ],
+                                        normals:[ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
+
+                                        // UV coords map to left half of texture image
+                                        uv:[ 1, 1, .5, 1, .5, 0, 1, 0 ],
+                                        indices:[ 0, 1, 2, 0, 2, 3]
+                                    }
+                                ]
+                            },
+
+                            // 2. Brick wall
+                            {
+                                type:"translate",
+                                x:-1.5,
+
+                                nodes:[
+                                    {
+                                        type:"geometry",
+                                        positions:[ 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0 ],
+                                        normals:[ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
+
+                                        // UV coords map to right half of texture image
+                                        uv:[ .5, 1, 0, 1, 0, 0, .5, 0 ],
+                                        indices:[ 0, 1, 2, 0, 2, 3]
+                                    }
+                                ]
                             }
                         ]
                     }
                 ]
             }
         ]
-    });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:10
     });
 
 </script>

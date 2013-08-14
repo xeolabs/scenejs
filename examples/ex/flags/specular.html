@@ -15,7 +15,6 @@
     </style>
 
     <script src="../../../api/latest/scenejs.js"></script>
-    <script src="../../../api/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
@@ -38,8 +37,23 @@
     // defaults to true.
     //
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:5,
+                nodes:[
 
             // Override SceneJS' default lights to make specular reflection look nice
             // for this example
@@ -64,8 +78,7 @@
 
                 nodes:[
 
-                    // Our flags can be anywhere above the geometry
-                    // we want to toggle specularity for
+                    // Flags node which enables or disables specular light reflection on our teapot
                     {
                         type:"flags",
                         id:"myFlags",
@@ -97,9 +110,11 @@
                                             }
                                         ],
                                         nodes:[
+
+                                            // Teapot primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
                                             {
-                                                type:"geometry",
-                                                plugin:"torus"
+                                                type:"prims/teapot"
                                             }
                                         ]
                                     }
@@ -110,21 +125,18 @@
                 ]
             }
         ]
+            }
+                ]
     });
 
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:5
+    scene.getNode("myFlags", function (myFlags) {
+        setInterval(
+                function () {
+                    myFlags.setSpecular(!myFlags.getSpecular());
+                },
+                1000);
     });
 
-    var flags = scene.getNode("myFlags");
-
-    setInterval(
-            function () {
-                flags.setSpecular(!flags.getSpecular());
-            },
-            1000);
 
 </script>
 </body>

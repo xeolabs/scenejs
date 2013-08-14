@@ -19,7 +19,6 @@
 
 <script src="../../../../api/latest/scenejs.js"></script>
 
-<script src="../../../../api/latest/extras/orbitControl.js"></script>
 
 <script>
 
@@ -41,6 +40,12 @@
     // More info here: https://github.com/xeolabs/scenejs/wiki/Node-Cores
 
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
 
@@ -119,18 +124,48 @@
 
     scene.addNodes([
 
-        // First object, uses the blue material, the texture, and the box geometry
+        // Mouse-orbited camera, implemented by plugin at
+        // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
         {
-            type:"translate",
-            x:-6,
+            type:"cameras/orbit",
+            yaw:30,
+            pitch:-30,
+            zoom:30,
+            zoomSensitivity:10.0,
             nodes:[
+
+                // First object, uses the blue material, the texture, and the box geometry
                 {
-                    type:"material",
-                    coreId:"myMaterial",
+                    type:"translate",
+                    x:-6,
                     nodes:[
                         {
-                            type:"texture",
-                            coreId:"myTexture",
+                            type:"material",
+                            coreId:"myMaterial",
+                            nodes:[
+                                {
+                                    type:"texture",
+                                    coreId:"myTexture",
+                                    nodes:[
+                                        {
+                                            type:"geometry",
+                                            coreId:"myGeometry"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+
+                // Second object, uses the red material and the box geometry
+                {
+                    type:"translate",
+                    x:6,
+                    nodes:[
+                        {
+                            type:"material",
+                            coreId:"myOtherMaterial",
                             nodes:[
                                 {
                                     type:"geometry",
@@ -141,33 +176,8 @@
                     ]
                 }
             ]
-        },
-
-        // Second object, uses the red material and the box geometry
-        {
-            type:"translate",
-            x:6,
-            nodes:[
-                {
-                    type:"material",
-                    coreId:"myOtherMaterial",
-                    nodes:[
-                        {
-                            type:"geometry",
-                            coreId:"myGeometry"
-                        }
-                    ]
-                }
-            ]
         }
     ]);
-
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:30
-    });
 
 </script>
 </body>

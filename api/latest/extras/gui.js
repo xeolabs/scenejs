@@ -102,35 +102,33 @@ SceneJS.GUI = function (scene, nodeIds) {
     var gui = new dat.GUI();
 
     this.createMenu = function (nodeId) {
-        var node = scene.getNode(nodeId);
-        if (node) {
-            var type = node.getType();
-            switch (type) {
-                case "lookAt":
-                    lookat(node);
-                    break;
-                case "lights":
-                    pointLight(node, 0);
-                    break;
-                case "material":
-                    material(node);
-                    break;
-                case "rotate":
-                    rotate(node);
-                    break;
-                case "translate":
-                    translate(node);
-                    break;
-                case "flags":
-                    flags(node);
-                    break;
-                case "scale":
-                    scale(node);
-                    break;
-            }
-        } else {
-            console.error("[SceneJS.GUI] Node not found: " + nodeId);
-        }
+        var node = scene.getNode(nodeId,
+            function (node) {
+                var type = node.getType();
+                switch (type) {
+                    case "lookAt":
+                        lookat(node);
+                        break;
+                    case "lights":
+                        pointLight(node, 0);
+                        break;
+                    case "material":
+                        material(node);
+                        break;
+                    case "rotate":
+                        rotate(node);
+                        break;
+                    case "translate":
+                        translate(node);
+                        break;
+                    case "flags":
+                        flags(node);
+                        break;
+                    case "scale":
+                        scale(node);
+                        break;
+                }
+            });
     };
 
     if (nodeIds) {

@@ -19,8 +19,6 @@
 
 <script src="../../../../api/latest/scenejs.js"></script>
 
-<script src="../../../../api/latest/extras/orbitControl.js"></script>
-
 <script>
 
     // Non-core SceneJS node types are provided as plugins. This is a powerful extension mechanism that allows you to
@@ -51,7 +49,14 @@
     // In the example below, we'll define a custom node type inline within this page, instead of in a
     // plugin script, so that we can show the node type API.
 
-    //-------- Node type definition ------------------------------------------------------------------------------------
+
+    // Point SceneJS to the bundled plugins
+
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Define a new node type:
 
     SceneJS.Types.addType("spinningTeapot", {
 
@@ -65,15 +70,17 @@
                 y:1,
                 angle:0,
                 nodes:[
+
+                    // Green material
                     {
                         type:"material",
                         color:{ r:0.6, g:1.0, b:0.6 },
                         nodes:[
+
+                            // Teapot primitive,
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
                             {
-                                type:"geometry",
-                                source:{
-                                    type:"teapot"
-                                }
+                                type:"prims/teapot"
                             }
                         ]
                     }
@@ -107,29 +114,31 @@
         }
     });
 
-    //--------- Scene graph definition ---------------------------------------------------------------------------------
-
     // Now we'll create a scene graph that contains an instance of our node type.
     // The attributes for the node are optional here - we can get the node
     // and also just set them via the node's setters.
 
     var scene = SceneJS.createScene({
         nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
             {
-                type:"spinningTeapot",
-                spinRate:1.0
+                type:"cameras/orbit",
+                yaw:-100,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:10.0,
+
+                nodes:[
+
+                    // Instantiate the node type we defined above
+                    {
+                        type:"spinningTeapot",
+                        spinRate:1.0
+                    }
+                ]
             }
         ]
-    });
-
-    // Camera mouse orbit helper    
-    new SceneJS.OrbitControls(scene, {
-        yaw:-100,
-        pitch:-10,
-        zoom:20,
-        zoomSensitivity:10.0,
-        eye:{ y:0 },
-        look:{ y:0 }
     });
 
 </script>

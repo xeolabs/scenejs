@@ -21,37 +21,44 @@
 
 <script>
 
-    // Demo of the "camera/orbit", "sky/clouds" and "demos/redTeapot" custom node types
+    // Demo of the "cameras/orbit", "skyboxes/clouds" and "demos/redTeapot" custom node types
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
 
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Mouse-orbited camera, defined by plugin in http://scenejs.org/api/latest/plugins/node/camera/orbit.js
+            // Mouse-orbited camera,
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"camera/orbit",
+                type:"cameras/orbit",
                 yaw:340,
                 pitch:-20,
                 zoom:30,
                 zoomSensitivity:10.0,
-                eye:{ y:0 },
-                look:{ y:0 },
 
                 nodes:[
 
-                    // Cloudy skybox, defined by plugin in http://scenejs.org/api/latest/plugins/node/sky/clouds.js
+                    // Cloudy skybox,
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
                     {
-                        type:"sky/clouds"
+                        type:"skyboxes/cloudySea"
                     },
 
-                    // Grid ground plane, defined by plugin in http://scenejs.org/api/latest/plugins/node/ground/grid.js
+                    // Grid primitive,
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/grid.js
                     {
-                        type:"ground/grid",
+                        type:"prims/grid",
                         size:{ x:1000, z:1000 },
                         xSegments:200,
                         zSegments:200
                     },
 
-                    // Red teapot, defined by plugin in http://scenejs.org/api/latest/plugins/node/demos/redTeapot.js
+                    // Red teapot,
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/demos/redTeapot.js
                     {
                         type:"demos/redTeapot",
                         id:"myTeapot",

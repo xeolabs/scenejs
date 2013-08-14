@@ -21,6 +21,11 @@
 
 <script>
 
+// Point SceneJS to the bundled plugins
+SceneJS.setConfigs({
+    pluginPath:"../../../api/latest/plugins"
+});
+
 var scene;
 var bubbles;
 var bubbleNames;
@@ -32,13 +37,13 @@ function createScene() {
     scene = SceneJS.createScene({
         nodes:[
 
-            // Node type defined by plugin in <plugins>/node/camera/orbit.js
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"camera/orbit",
+                type:"cameras/orbit",
                 yaw:340,
                 pitch:-10,
                 zoom:150,
-                zoomSensitivity: 15,
+                zoomSensitivity:15,
 
                 nodes:[
 
@@ -62,21 +67,26 @@ function createScene() {
                         ],
 
                         nodes:[
-
                             {
                                 type:"material",
                                 baseColor:{ r:0.7, g:0.7, b:0.7 },
                                 nodes:[
-                                    // Node type defined by plugin in <plugins>/node/ground/grid.js
+
+                                    // Grid ground, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/prims/grid.js
                                     {
-                                        type:"ground/grid"
+                                        type:"prims/grid",
+                                        size:{ x:1000, z:1000 },
+                                        xSegments:200,
+                                        zSegments:200
                                     }
                                 ]
                             },
 
-                            // Node type defined by plugin in <plugins>/node/sky/clouds.js
+                            // Cloudy sea skybox, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/skyboxes/miramarClouds.js
                             {
-                                type:"sky/clouds"
+                                type:"skyboxes/cloudySea"
                             },
 
                             //--------------------------------------------------------------------------------
@@ -184,82 +194,6 @@ function createScene() {
                                 ]
                             }
                         ]
-                    },
-
-                    //--------------------------------------------------------------------------------
-                    // Sky box
-                    //--------------------------------------------------------------------------------
-
-                    // Shader node, injects custom function into the vertex shader
-                    // to intercept the View matrix and remove translation terms from it.
-                    // This anchors the sky box, preventing it from translating
-                    // as we move the eye position.
-                    {
-                        type:"shader",
-                        shaders:[
-                            {
-                                stage:"vertex",
-                                code:[
-                                    "mat4 myViewMatrix(mat4 m) {",
-                                    "   m[3][0] =m[3][1] = m[3][2] = 0.0;",
-                                    "return m;",
-                                    "}"
-                                ],
-                                // Bind our injected functions to SceneJS hook points
-                                hooks:{
-                                    viewMatrix:"myViewMatrix"
-                                }
-                            }
-                        ],
-                        nodes:[
-
-                            // Disable lighting for the sky box
-                            {
-                                type:"flags",
-                                flags:{
-                                    specular:false,
-                                    diffuse:false,
-                                    ambient:false
-                                },
-                                nodes:[
-
-                                    {
-                                        type:"material",
-                                        color:{ r:0, g:0, b:0  },
-                                        emit:0.0,
-                                        nodes:[
-                                            // Clouds texture
-                                            {
-                                                type:"texture",
-                                                layers:[
-                                                    {
-                                                        src:"../../textures/clouds-box.jpg",
-                                                        blendMode:"add"
-                                                    }
-                                                ],
-                                                nodes:[
-                                                    {
-                                                        type:"scale",
-                                                        x:1000,
-                                                        y:1000,
-                                                        z:1000,
-                                                        nodes:[
-                                                            // Sky box geometry
-                                                            {
-                                                                type:"geometry",
-                                                                source:{
-                                                                    type:"skybox"
-                                                                }
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
                     }
                 ]
             }
@@ -274,7 +208,7 @@ function createBubbles() {
 
     var num = 100;
 
-    // Get content node asynch because it's a child of the 'camera/orbit' node,
+    // Get content node asynch because it's a child of the 'cameras/orbit' node,
     // which is loaded from a node type plugin
 
     scene.getNode("content",
@@ -331,13 +265,11 @@ function createBubbles() {
                             z:Math.random() - 0.5,
                             angle:0
                         });
-                        this.rotate.addNode({
-                            type:"geometry",
-                            //      coreId:"bubble", BROKEN
-                            source:{
-                                type:"sphere"
-                            }
-                        });
+                        this.rotate.addNode(
+                                // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                {
+                                    type:"prims/sphere"
+                                });
                         this.angle = 0;
                         this.angleInc = Math.random() - 0.5;
                     })();

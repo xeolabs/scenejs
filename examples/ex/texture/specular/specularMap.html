@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>SceneJS V3 Texture Animation</title>
+    <title>SceneJS Example</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
@@ -15,43 +15,56 @@
     </style>
 
     <script src="../../../../api/latest/scenejs.js"></script>
-    <script src="../../../../api/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
 <script>
 
-    var scene = SceneJS.createScene({
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
         nodes:[
 
-            // Override SceneJS' default lights to make specular reflection look nice
-            // for this example
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"lights",
-                lights:[
-                    {
-                        mode:"ambient",
-                        color:{ r:0.7, g:0.7, b:0.8 },
-                        diffuse:true,
-                        specular:false
-                    },
-                    {
-                        mode:"dir",
-                        color:{ r:0.5, g:0.5, b:1.0 },
-                        diffuse:true,
-                        specular:true,
-                        dir:{ x:0.5, y:0.5, z:-1.0 },
-                        space:"view"
-                    }
-                ],
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:5,
+                zoomSensitivity:1.0,
 
                 nodes:[
+
+                    // Override SceneJS' default lights to make specular reflection look nice
+                    // for this example
                     {
-                        type:"lookAt",
-                        eye:{ z:5 },
+                        type:"lights",
+                        lights:[
+                            {
+                                mode:"ambient",
+                                color:{ r:0.7, g:0.7, b:0.8 },
+                                diffuse:true,
+                                specular:false
+                            },
+                            {
+                                mode:"dir",
+                                color:{ r:0.5, g:0.5, b:1.0 },
+                                diffuse:true,
+                                specular:true,
+                                dir:{ x:0.5, y:0.5, z:-1.0 },
+                                space:"view"
+                            }
+                        ],
 
                         nodes:[
+
+                            // Specular material
                             {
                                 type:"material",
                                 color:{ r:0.5, g:0.5, b:0.6 },
@@ -59,21 +72,23 @@
                                 specular:1.0,
                                 shine:5.0,
                                 nodes:[
+
+                                    // Specular map
                                     {
                                         type:"texture",
                                         id:"theTexture",
                                         layers:[
                                             {
                                                 src:"../../../textures/crossGridSpecularMap.jpg",
-                                                applyTo:"specular"
+                                                applyTo:"specular" // Apply to material's "specular" property
                                             }
                                         ],
                                         nodes:[
+
+                                            // Teapot primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/prims/torus.js
                                             {
-                                                type:"geometry",
-                                                source:{
-                                                    type:"torus"
-                                                }
+                                                type:"prims/torus"
                                             }
                                         ]
                                     }
@@ -84,12 +99,6 @@
                 ]
             }
         ]
-    });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:5
     });
 
 </script>

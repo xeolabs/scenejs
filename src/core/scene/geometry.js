@@ -55,8 +55,6 @@ new (function () {
                         "geometry config expected: source.type");
                 }
 
-                taskId = self._engine.activity.taskStarted("loading geometry");
-
                 SceneJS.Plugins.getPlugin(
                     "geometry",
                     this._sourceConfigs.type,
@@ -95,9 +93,6 @@ new (function () {
                                     self._engine.display.imageDirty = true;
                                     self._engine.branchDirty(self); // TODO
                                     created = true;
-
-                                    self._engine.activity.taskFinished(taskId);
-
                                 } else {
 
                                     var core = self._core;
@@ -242,7 +237,7 @@ new (function () {
         var normals;
 
         if (data.normals) {
-            if (data.normals == "auto") {
+            if (data.normals == "auto" && data.primitive == "triangles") {
                 if (data.positions && data.indices) {
                     // Auto normal generation
                     normals = this._buildNormals(data.positions, data.indices);
@@ -448,7 +443,7 @@ new (function () {
         var v2;
         var v3;
 
-        for (var i = 0, len = indices.length - 2; i < len; i += 3) {
+        for (var i = 0, len = indices.length - 3; i < len; i += 3) {
             j0 = indices[i + 0];
             j1 = indices[i + 1];
             j2 = indices[i + 2];

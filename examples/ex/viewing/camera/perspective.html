@@ -15,44 +15,56 @@
     </style>
 
     <script src="../../../../api/latest/scenejs.js"></script>
-    <script src="../../../../api/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
 <script>
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
 
-            // The camera node in this scene has the same properties
-            // as the one that SceneJS provides by default
-
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"camera",
-                optics:{
-                    type:"perspective",
-                    fovy:45.0,
-                    aspect:1.0,
-                    near:0.1,
-                    far:5000.0
-                },
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:15,
+                zoomSensitivity:1.0,
 
                 nodes:[
+
+                    // The camera node in this scene happens to have the same properties
+                    // as the one that SceneJS provides by default
                     {
-                        type:"geometry",
-                        plugin:"teapot"
+                        type:"camera",
+                        optics:{
+                            type:"perspective",
+                            fovy:45.0,
+                            aspect:1.0,
+                            near:0.1,
+                            far:5000.0
+                        },
+
+                        nodes:[
+
+                            // Teapot primitive, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            {
+                                type:"prims/teapot"
+                            }
+                        ]
                     }
                 ]
             }
         ]
     });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:15
-    });
-
 
 </script>
 </body>

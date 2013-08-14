@@ -51,11 +51,13 @@ SceneJS.Scene.prototype.getZBufferDepth = function () {
 
 /**
  * Sets a regular expression to select which of the scene subgraphs that are rooted by {@link SceneJS.Tag} nodes are included in scene renders
- * @param {String} tagMask Regular expression string to match on the tag attributes of {@link SceneJS.Tag} nodes
+ * @param {String} [tagMask] Regular expression string to match on the tag attributes of {@link SceneJS.Tag} nodes. Nothing is selected when this is omitted.
  * @see #getTagMask
  * @see SceneJS.Tag
  */
 SceneJS.Scene.prototype.setTagMask = function (tagMask) {
+
+    tagMask = tagMask || "XXXXXXXXXXXXXXXXXXXXXXXXXX"; // HACK to select nothing by default
 
     if (!this._tagSelector) {
         this._tagSelector = {};
@@ -113,6 +115,7 @@ SceneJS.Scene.prototype.isRunning = function () {
  */
 SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     var result = this._engine.pick(canvasX, canvasY, options);
+    this.renderFrame({force:true }); // HACK: canvas blanks after picking
     if (result) {
         this._publish("pick", result);
         return result;
@@ -195,8 +198,18 @@ SceneJS.Scene.prototype.getNode = function (nodeId, callback) {
             return null;
         }
         // Subscribe to instantiation of node from plugin
-        this.once("nodes/" + nodeId,  callback);
+        this.once("nodes/" + nodeId, callback);
     }
+};
+
+/**
+ * Tests whether a node core of the given ID exists for the given node type
+ * @param {String} type Node type
+ * @param {String} coreId
+ * @returns Boolean
+ */
+SceneJS.Scene.prototype.hasCore = function (type, coreId) {
+    return this._engine.hasCore(type, coreId);
 };
 
 /**
@@ -211,12 +224,16 @@ SceneJS.Scene.prototype.getNode = function (nodeId, callback) {
  * Otherwise, the status will be:
  *
  * {
- *      numLoading: Number // Number of asset loads (eg. texture, geometry stream etc.) currently in progress
+ *      numLoading: Total number of asset loads (eg. texture, geometry stream etc.) currently in progress for this scene
  * }
  *
  */
 SceneJS.Scene.prototype.getStatus = function () {
-    return (this._engine.destroyed)
-        ? { destroyed:true }
-        : SceneJS._shallowClone(SceneJS_sceneStatusModule.sceneStatus[this.id]);
+    var sceneStatus = SceneJS_sceneStatusModule.sceneStatus[this.id];
+    if (!sceneStatus) {
+        return {
+            destroyed:true
+        };
+    }
+    return SceneJS._shallowClone(sceneStatus);
 };

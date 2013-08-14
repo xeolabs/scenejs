@@ -15,34 +15,50 @@
     </style>
 
     <script src="../../../../api/latest/scenejs.js"></script>
-    <script src="../../../../api/latest/extras/orbitControl.js"></script>
 </head>
 <body>
 
 <script>
 
-    var scene = SceneJS.createScene({
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
 
+    // Create scene
+    var scene = SceneJS.createScene({
         nodes:[
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"material",
-                color:{ r:0.5, g:0.5, b:0.6 },
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:1.0,
 
                 nodes:[
                     {
-                        type:"shader",
-                        id:"myShader",
+                        type:"material",
+                        color:{ r:0.5, g:0.5, b:0.6 },
 
-                        shaders:[
-
-                            // Vertex shader
+                        nodes:[
                             {
-                                stage:"vertex",
+                                type:"shader",
+                                id:"myShader",
 
-                                // GLSL fragment with custom function (which is pinched
-                                // from the custom shader demo for GLGE - http://www.glge.com)
+                                shaders:[
 
-                                code:"uniform float time;\n\
+                                    // Shader node which injects a custom function into SceneJS'
+                                    // auto-generated vertex shader
+                                    {
+                                        stage:"vertex",
+
+                                        // GLSL with custom function (which is pinched
+                                        // from the custom shader demo for GLGE - http://www.glge.com)
+
+                                        code:"uniform float time;\n\
                                       vec4 myModelPosFunc(vec4 pos){\n\
                                       pos.x=pos.x+sin(pos.x*5.0+time+10.0)*0.1;\n\
                                       pos.y=pos.y+sin(pos.y*5.0+time+10.0)*0.1;\n\
@@ -50,29 +66,32 @@
                                       return pos;\n\
                                 }\n",
 
-                                /* Bind our custom function to a SceneJS vertex shader hook
-                                 */
-                                hooks:{
-                                    modelPos:"myModelPosFunc"
-                                }
-                            }
-                        ],
+                                        // Bind our custom function to hooks that
+                                        // SceneJS provides in its vertex shader
+                                        hooks:{
+                                            modelPos:"myModelPosFunc"
+                                        }
+                                    }
+                                ],
 
-                        // Optional initial values for uniforms within our GLSL:
-                        params:{
-                            time:0.5
-                        },
+                                // Optional initial values for uniforms within our GLSL
+                                params:{
+                                    time:0.5
+                                },
 
-                        // This teapot will enjoy our custom shader injection:
-                        nodes:[
-                            {
-                                type:"translate",
-                                y:-1,
-
+                                // This teapot will enjoy our custom shader injection:
                                 nodes:[
                                     {
-                                        type:"geometry",
-                                        plugin:"teapot"
+                                        type:"translate",
+                                        y:-1,
+
+                                        nodes:[
+
+                                            // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                            {
+                                                type:"prims/teapot"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -83,22 +102,18 @@
         ]
     });
 
-    var shader = scene.findNode("myShader");
-    var time = 0;
+    scene.findNode("myShader",
+            function (myShader) {
+                var time = 0;
 
-    scene.on("tick",
-            function () {
-                shader.setParams({
-                    time:time
-                });
-                time += 0.1;
+                scene.on("tick",
+                        function () {
+                            myShader.setParams({
+                                time:time
+                            });
+                            time += 0.1;
+                        });
             });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:10
-    });
 
 </script>
 </body>

@@ -16,44 +16,61 @@
 
     <script src="../../../api/latest/scenejs.js"></script>
 
-    <script src="../../../api/latest/extras/orbitControl.js"></script>
-
 </head>
 <body>
 
 <script>
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"material",
-                color:{ r:0.6, g:0.6, b:0.9 },
-                emit:1.0,
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:1.0,
+
                 nodes:[
-
-                    // Geometry node which defines our point cloud
                     {
+                        type:"material",
+                        color:{ r:0.6, g:0.6, b:0.9 },
+                        emit:1.0,
+                        nodes:[
 
-                        type:"geometry",
+                            // Geometry node which defines our point cloud
+                            {
 
-                        // The primitive type - allowed values are
-                        // "points", "lines", "line-loop", "line-strip",
-                        // "triangles", "triangle-strip" and "triangle-fan".
-                        //
-                        // See the OpenGL/WebGL specification docs for
-                        // how the coordinate arrays are supposed to be laid out
-                        // for them.
-                        primitive:"points",
+                                type:"geometry",
 
-                        // The vertices - eight for our cube, each
-                        // one spanning three array elements for X,Y and Z
-                        positions:createPoints(2000),
+                                // The primitive type - allowed values are
+                                // "points", "lines", "line-loop", "line-strip",
+                                // "triangles", "triangle-strip" and "triangle-fan".
+                                //
+                                // See the OpenGL/WebGL specification docs for
+                                // how the coordinate arrays are supposed to be laid out
+                                // for them.
+                                primitive:"points",
 
-                        // Indices - these organise the
-                        // positions into geometric primitives in accordance
-                        // with the "primitive" parameter,
-                        // in this case an index for each point.
-                        indices:createIndices(2000)
+                                // The vertices - eight for our cube, each
+                                // one spanning three array elements for X,Y and Z
+                                positions:createPoints(2000),
+
+                                // Indices - these organise the
+                                // positions into geometric primitives in accordance
+                                // with the "primitive" parameter,
+                                // in this case an index for each point.
+                                indices:createIndices(2000)
+                            }
+                        ]
                     }
                 ]
             }
@@ -78,12 +95,6 @@
         }
         return p;
     }
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:5
-    });
 
 </script>
 </body>

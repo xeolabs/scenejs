@@ -6,9 +6,7 @@ new (function () {
 
     var imageBasePath = window.location.hostname + window.location.pathname;
 
-    /**
-     * The default state core singleton for {@link SceneJS.Texture} nodes
-     */
+    // The default state core singleton for {@link SceneJS.Texture} nodes
     var defaultCore = {
         type:"texture",
         stateId:SceneJS._baseStateId++,
@@ -39,7 +37,8 @@ new (function () {
             this._core.layers = [];
             this._core.params = {};
 
-            var waitForLoad = !!params.waitForLoad;
+            // By default, wait for texture to load before building subgraph
+            var waitForLoad = params.waitForLoad == undefined ? true : params.waitForLoad;
 
             if (!params.layers) {
                 throw SceneJS_error.fatalError(
@@ -68,12 +67,10 @@ new (function () {
                 }
 
                 if (layerParams.applyFrom) {
-
                     if (layerParams.applyFrom != "uv" &&
                         layerParams.applyFrom != "uv2" &&
                         layerParams.applyFrom != "normal" &&
                         layerParams.applyFrom != "geometry") {
-
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + "  applyFrom value is unsupported - " +
@@ -82,14 +79,12 @@ new (function () {
                 }
 
                 if (layerParams.applyTo) {
-
                     if (layerParams.applyTo != "baseColor" && // Colour map (deprecated)
                         layerParams.applyTo != "color" && // Colour map
                         layerParams.applyTo != "specular" && // Specular map
                         layerParams.applyTo != "emit" && // Emission map
                         layerParams.applyTo != "alpha" && // Alpha map
                         layerParams.applyTo != "normals") {
-
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + " applyTo value is unsupported - " +
@@ -98,9 +93,7 @@ new (function () {
                 }
 
                 if (layerParams.blendMode) {
-
                     if (layerParams.blendMode != "add" && layerParams.blendMode != "multiply") {
-
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + " blendMode value is unsupported - " +
@@ -129,13 +122,10 @@ new (function () {
                 this._setLayerTransform(layerParams, layer);
 
                 if (layer.framebuf) { // Create from a framebuf node preceeding this texture in the scene graph
-
                     var targetNode = this._engine.findNode(layer.framebuf);
-
                     if (targetNode && targetNode.type == "framebuf") {
                         layer.texture = targetNode._core.framebuf.getTexture(); // TODO: what happens when the framebuf is destroyed?
                     }
-
                 } else { // Create from texture node's layer configs
                     this._loadLayerTexture(gl, layer);
                 }
@@ -143,9 +133,7 @@ new (function () {
 
             var self = this;
 
-            /**
-             * WebGL restored handler - rebuilds the texture layers
-             */
+            // WebGL restored handler - rebuilds the texture layers
             this._core.webglRestored = function () {
 
                 var layers = self._core.layers;
@@ -159,14 +147,6 @@ new (function () {
     };
 
     SceneJS.Texture.prototype._loadLayerTexture = function (gl, layer) {
-
-//        SceneJS_sceneStatusModule.nodeLoading(this);
-//
-//        this._engine.nodeLoading(this);
-
-        var taskId = this._engine.activity.taskStarted("loading texture");
-
-        this._fireEvent("loading");
 
         var self = this;
 
@@ -199,6 +179,8 @@ new (function () {
                             "texture: 'subscribe' method missing on plugin for texture source type '" + sourceConfigs.type + "'");
                     }
 
+                    var taskId = SceneJS_sceneStatusModule.taskStarted(self, "Loading texture");
+
                     source.subscribe(// Get notification whenever source updates the texture
                         (function () {
                             var loaded = false;
@@ -206,8 +188,7 @@ new (function () {
                                 if (!loaded) { // Texture first initialised - create layer
                                     loaded = true;
                                     self._setLayerTexture(gl, layer, texture);
-                                    self._engine.activity.taskFinished(taskId);
-
+                                    SceneJS_sceneStatusModule.taskFinished(taskId);
                                 } else { // Texture updated - layer already has the handle to it, so just signal a redraw
                                     self._engine.display.imageDirty = true;
                                 }
@@ -225,6 +206,11 @@ new (function () {
 
             /* Load from URL
              */
+
+            var src = layer.uri || layer.src;
+
+            var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading texture");
+
             var image = new Image();
 
             image.onload = function () {
@@ -232,10 +218,12 @@ new (function () {
                 gl.bindTexture(gl.TEXTURE_2D, texture);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self._ensureImageSizePowerOfTwo(image));
                 self._setLayerTexture(gl, layer, texture);
-                self._engine.activity.taskFinished(taskId);
+                SceneJS_sceneStatusModule.taskFinished(taskId);
             };
 
-            var src = layer.uri || layer.src;
+            image.onerror = function () {
+                SceneJS_sceneStatusModule.taskFailed(taskId);
+            };
 
             if (src.indexOf("data") == 0) {  // Image data
                 image.src = src;
@@ -298,10 +286,6 @@ new (function () {
             sourceType:this._getGLOption("sourceType", gl, layer, gl.UNSIGNED_BYTE),
             update:null
         });
-
-//        this._engine.nodeLoaded(this);
-//
-//        this._fireEvent("loaded");
 
         if (this.destroyed) { // Node was destroyed while loading
             layer.texture.destroy();
@@ -448,49 +432,37 @@ new (function () {
     };
 
     SceneJS.Texture.prototype._compile = function () {
-
         if (!this._core.hash) {
             this._makeHash();
         }
-
         this._engine.display.texture = coreStack[stackLen++] = this._core;
         this._compileNodes();
         this._engine.display.texture = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
     SceneJS.Texture.prototype._makeHash = function () {
-
         var core = this._core;
         var hash;
-
         if (core.layers && core.layers.length > 0) {
-
             var layers = core.layers;
             var hashParts = [];
             var texLayer;
-
             for (var i = 0, len = layers.length; i < len; i++) {
-
                 texLayer = layers[i];
-
                 hashParts.push("/");
                 hashParts.push(texLayer.applyFrom);
                 hashParts.push("/");
                 hashParts.push(texLayer.applyTo);
                 hashParts.push("/");
                 hashParts.push(texLayer.blendMode);
-
                 if (texLayer.matrix) {
                     hashParts.push("/anim");
                 }
             }
-
             hash = hashParts.join("");
-
         } else {
             hash = "";
         }
-
         if (core.hash != hash) {
             core.hash = hash;
         }

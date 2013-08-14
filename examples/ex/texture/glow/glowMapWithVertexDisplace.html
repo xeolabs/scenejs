@@ -15,72 +15,88 @@
     </style>
 
     <script src="../../../../api/latest/scenejs.js"></script>
-    <script src="../../../../api/latest/extras/orbitControl.js"></script>
+
 </head>
 <body>
 
 <script>
 
-    var scene = SceneJS.createScene({
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
 
+    // Create scene
+    var scene = SceneJS.createScene({
         nodes:[
 
-            // Override SceneJS' default lights to define dull ambient light
-            // to accentuate our glow map
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"lights",
-                lights:[
-                    {
-                        mode:"ambient",
-                        color:{ r:0.2, g:0.2, b:0.2 },
-                        diffuse:true,
-                        specular:false
-                    }
-                ],
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:5,
+                zoomSensitivity:1.0,
 
                 nodes:[
+
+                    // Override SceneJS' default lights to define dull ambient light
+                    // to accentuate our glow map
                     {
-                        type:"lookAt",
-                        eye:{ z:50 },
+                        type:"lights",
+                        lights:[
+                            {
+                                mode:"ambient",
+                                color:{ r:0.2, g:0.2, b:0.2 },
+                                diffuse:true,
+                                specular:false
+                            }
+                        ],
 
                         nodes:[
-
                             {
-                                type:"rotate",
-                                id:"pitch",
-                                angle:-30.0,
-                                x:1.0,
+                                type:"lookAt",
+                                eye:{ z:50 },
 
                                 nodes:[
+
                                     {
                                         type:"rotate",
-                                        id:"yaw",
+                                        id:"pitch",
                                         angle:-30.0,
-                                        y:1.0,
+                                        x:1.0,
 
                                         nodes:[
                                             {
-                                                type:"material",
-                                                color:{ r:1.0, g:1.0, b:1.0 },
-                                                emit:1.0,
+                                                type:"rotate",
+                                                id:"yaw",
+                                                angle:-30.0,
+                                                y:1.0,
+
                                                 nodes:[
                                                     {
-                                                        type:"texture",
-                                                        id:"theTexture",
-                                                        layers:[
-                                                            {
-                                                                src:"../../../textures/weirdGlowMap.jpg",
-                                                                applyTo:"emit"
-                                                            }
-                                                        ],
+                                                        type:"material",
+                                                        color:{ r:1.0, g:1.0, b:1.0 },
+                                                        emit:1.0,
                                                         nodes:[
                                                             {
-                                                                type:"shader",
-                                                                id:"myShader",
-                                                                shaders:[
+                                                                type:"texture",
+                                                                id:"theTexture",
+                                                                layers:[
                                                                     {
-                                                                        stage:"vertex",
-                                                                        code:"uniform float time;\n\
+                                                                        src:"../../../textures/weirdGlowMap.jpg",
+                                                                        applyTo:"emit"
+                                                                    }
+                                                                ],
+                                                                nodes:[
+                                                                    {
+                                                                        type:"shader",
+                                                                        id:"myShader",
+                                                                        shaders:[
+                                                                            {
+                                                                                stage:"vertex",
+                                                                                code:"uniform float time;\n\
                                                                         vec2 myUV;\n\
                                                                         void myUVFunc(vec2 uv){\n\
                                                                             myUV = uv;\n\
@@ -91,29 +107,19 @@
                                                                             pos.z += cos((myUV.x * 0.01 + time + 10.0) * 1.3) * 0.1;\n\
                                                                             return pos;\n\
                                                                         }\n",
-                                                                        hooks:{
-                                                                            texturePos:"myUVFunc",
-                                                                            worldPos:"myWorldPosFunc"
-                                                                        }
-                                                                    }
-                                                                ],
-                                                                params:{
-                                                                    time:0.5
-                                                                },
+                                                                                hooks:{
+                                                                                    texturePos:"myUVFunc",
+                                                                                    worldPos:"myWorldPosFunc"
+                                                                                }
+                                                                            }
+                                                                        ],
+                                                                        params:{
+                                                                            time:0.5
+                                                                        },
 
-                                                                nodes:createObjects()
-//                                                                    {
-//                                                                        type:"geometry",
-//                                                                        source:{
-//                                                                            type:"sphere",
-//                                                                            radius:1.0,
-//                                                                            tube:0.3,
-//                                                                            segmentsR:100,
-//                                                                            segmentsT:100,
-//                                                                            arc:Math.PI * 2
-//                                                                        }
-//                                                                    }
-                                                                //]
+                                                                        nodes:createObjects()//
+                                                                    }
+                                                                ]
                                                             }
                                                         ]
                                                     }
@@ -151,11 +157,10 @@
                                 specular:1.0,
                                 shine:70.0,
                                 nodes:[
+
+                                    // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
                                     {
-                                        type:"geometry",
-                                        source:{
-                                            type:"sphere"
-                                        }
+                                        type:"prims/sphere"
                                     }
                                 ]
                             }
@@ -167,23 +172,18 @@
         return nodes;
     }
 
-    var shader = scene.findNode("myShader");
-    var time = 0;
-
-    scene.on("tick",
-            function () {
-                shader.setParams({
-                    time:time,
-                    time2:time
-                });
-                time += 0.06;
+    scene.findNode("myShader",
+            function (myShader) {
+                var time = 0;
+                scene.on("tick",
+                        function () {
+                            myShader.setParams({
+                                time:time,
+                                time2:time
+                            });
+                            time += 0.06;
+                        });
             });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:5
-    });
 
 </script>
 </body>

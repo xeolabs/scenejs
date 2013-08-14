@@ -15,30 +15,51 @@
     </style>
 
     <script src="../../../api/latest/scenejs.js"></script>
-    <script src="../../../api/latest/extras/orbitControl.js"></script>
+
 </head>
 <body>
 
 <script>
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
-            // Override default material to make teapot blue
-            {
-                type:"material",
-                color:{ r:0.5, g:0.5, b:0.6 },
-                nodes:[
-                    {
-                        type:"translate",
-                        id:"myTranslate",
-                        x:0,
-                        y:0,
-                        z:0,
 
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:1.0,
+
+                nodes:[
+
+                    // Override default material to make teapot blue
+                    {
+                        type:"material",
+                        color:{ r:0.5, g:0.5, b:0.6 },
                         nodes:[
                             {
-                                type:"geometry",
-                                plugin:"teapot"
+                                type:"translate",
+                                id:"myTranslate",
+                                x:0,
+                                y:0,
+                                z:0,
+
+                                nodes:[
+
+                                    // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                    {
+                                        type:"prims/teapot"
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -47,27 +68,24 @@
         ]
     });
 
-    var translate = scene.getNode("myTranslate");
+    // get translate node and animate it
+    scene.getNode("myTranslate",
+            function (myTranslate) {
 
-    var x = 0;
-    var xInc = 0.05;
+                var x = 0;
+                var xInc = 0.05;
 
-    scene.on("tick",
-            function () {
-                if (x >= 1.0) {
-                    xInc *= -1;
-                } else if (x < -1) {
-                    xInc *= -1;
-                }
-                x += xInc;
-                translate.set({ x: x });
+                scene.on("tick",
+                        function () {
+                            if (x >= 1.0) {
+                                xInc *= -1;
+                            } else if (x < -1) {
+                                xInc *= -1;
+                            }
+                            x += xInc;
+                            myTranslate.set({ x:x });
+                        });
             });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:10
-    });
 
 </script>
 </body>

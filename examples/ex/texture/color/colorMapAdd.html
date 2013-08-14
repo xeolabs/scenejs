@@ -15,35 +15,58 @@
     </style>
 
     <script src="../../../../api/latest/scenejs.js"></script>
-    <script src="../../../../api/latest/extras/orbitControl.js"></script>
+
 </head>
 <body>
 
 <script>
 
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"material",
-                color:{
-                    r:1.0, g:0.5, b:0.5
-                },
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:5,
+                zoomSensitivity:1.0,
+
                 nodes:[
+
                     {
-                        type:"texture",
-                        layers:[
-                            {
-                                src:"../../../textures/superman.jpg",
-                                applyTo:"color",
-                                blendMode:"add"
-                            }
-                        ],
+                        type:"material",
+                        color:{
+                            r:1.0, g:0.5, b:0.5
+                        },
                         nodes:[
+
+                                // The color map
                             {
-                                type:"geometry",
-                                source:{
-                                    type:"box"
-                                }
+                                type:"texture",
+                                layers:[
+                                    {
+                                        src:"../../../textures/superman.jpg",
+                                        applyTo:"color",  // Apply to material "color" property (default)
+                                        blendMode:"add"
+                                    }
+                                ],
+                                nodes:[
+
+                                    // Box primitive implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                    {
+                                        type:"prims/box"
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -51,13 +74,6 @@
             }
         ]
     });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:5
-    });
-
 
 </script>
 </body>

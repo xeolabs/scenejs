@@ -18,44 +18,55 @@
 
 <script src="../../../api/latest/scenejs.js"></script>
 
-<script src="../../../api/latest/extras/orbitControl.js"></script>
-
 <script>
 
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
+    // Create scene
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Override default material to make text glow blue
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"material",
-                color:{ r:0.5, g:0.5, b:1.0 },
-                emit:1,
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:20,
+                zoomSensitivity:1.0,
+
                 nodes:[
 
+                    // Override default material to make text glow blue
                     {
-                        type:"translate",
-                        x:-10,
+                        type:"material",
+                        color:{ r:0.5, g:0.5, b:1.0 },
+                        emit:1,
                         nodes:[
 
-                            // A line of vector text
                             {
-                                type:"geometry",
-                                source:{
-                                    type:"vectorText",
-                                    text:"One line of vector text, please."
-                                }
+                                type:"translate",
+                                x:-10,
+                                nodes:[
+
+                                    // A line of vector text
+                                    {
+                                        type:"geometry",
+                                        source:{
+                                            type:"vectorText",
+                                            text:"One line of vector text, please."
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     }
                 ]
             }
         ]
-    });
-
-    new SceneJS.OrbitControls(scene, {
-        yaw:30,
-        pitch:-30,
-        zoom:20
     });
 
 </script>

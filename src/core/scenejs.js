@@ -68,12 +68,23 @@ var SceneJS = new (function () {
     };
 
     /**
-     * Gets an existing scene
+     * Gets an existing scene.
      *
-     * @param {String} sceneId ID of target scene
+     * When no scene ID is given, the first scene found is returned. This is a shorthand convenience for
+     * easy scripting when only one scene is defined.
+     *
+     * @param {String} [sceneId] ID of target scene
      * @returns {SceneJS.Scene} The selected scene
      */
     this.getScene = function (sceneId) {
+
+        if (!sceneId) {
+            for (var sceneId in this._engines) {
+                if (this._engines.hasOwnProperty(sceneId)) {
+                    return this._engines[sceneId].scene;
+                }
+            }
+        }
 
         var engine = this._engines[sceneId];
 

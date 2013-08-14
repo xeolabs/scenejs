@@ -216,34 +216,29 @@ new (function () {
 
                 arry = targetData.positions || positions;
                 if (arry) {
-                    target.vertexBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER,
-                        (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
-                        arry.length, 3, usage);
+                    target.positions = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
+                    target.vertexBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, target.positions, arry.length, 3, usage);
                     positions = arry;
                 }
 
                 arry = targetData.normals || normals;
                 if (arry) {
-                    target.normalBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER,
-                        (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
-                        arry.length,
-                        3, usage);
+                    target.normals = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
+                    target.normalBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, target.normals, arry.length, 3, usage);
                     normals = arry;
                 }
 
                 arry = targetData.uv || uv;
                 if (arry) {
-                    target.uvBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER,
-                        (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
-                        arry.length, 2, usage);
+                    target.uv = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
+                    target.uvBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv, arry.length, 2, usage);
                     uv = arry;
                 }
 
                 arry = targetData.uv2 || uv2;
                 if (arry) {
-                    target.uvBuf2 = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER,
-                        (typeof arry == "Float32Array") ? arry : new Float32Array(arry),
-                        arry.length, 2, usage);
+                    target.uv2 = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
+                    target.uvBuf2 = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv2, arry.length, 2, usage);
                     uv2 = arry;
                 }
 
@@ -329,6 +324,14 @@ new (function () {
 
     SceneJS.MorphGeometry.prototype.getFactor = function () {
         return this._core.factor;
+    };
+
+    SceneJS.MorphGeometry.prototype.getKeys = function () {
+        return this._core.keys;
+    };
+
+    SceneJS.MorphGeometry.prototype.getTargets = function () {
+        return this._core.targets;
     };
 
     SceneJS.MorphGeometry.prototype._compile = function () {
