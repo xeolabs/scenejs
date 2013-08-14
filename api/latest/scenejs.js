@@ -7138,8 +7138,6 @@ SceneJS.Node.prototype.destroy = function () {
 
     if (!this.destroyed) {
 
-        SceneJS_sceneStatusModule.nodeDestroyed(this);
-
         if (this.parent) {
 
             /* Remove from parent's child node list
