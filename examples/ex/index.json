@@ -840,25 +840,25 @@
                     },
                     {
                         "title":"Wobble effect",
-                        "path":"customNodes/bundled/wobble.html",
+                        "path":"customNodes/effects/wobble.html",
                         "tags":[],
                         "id":"customNodesWobble"
                     },
                     {
                         "title":"X-Ray effect",
-                        "path":"customNodes/bundled/xray.html",
+                        "path":"customNodes/effects/xray.html",
                         "tags":[],
                         "id":"customNodesXRay"
                     },
                     {
                         "title":"CRT scanline effect",
-                        "path":"customNodes/bundled/crt.html",
+                        "path":"customNodes/effects/crt.html",
                         "tags":[],
                         "id":"customNodesCRT"
                     },
                     {
                         "title":"Fog effect",
-                        "path":"customNodes/bundled/fog.html",
+                        "path":"customNodes/effects/fog.html",
                         "tags":[],
                         "id":"customNodesFog"
                     }
