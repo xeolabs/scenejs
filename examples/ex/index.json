@@ -816,7 +816,7 @@
                 "nodes":[
                     {
                         "title":"Mouse camera orbit",
-                        "path":"customNodes/bundled/cameraOrbit.html",
+                        "path":"customNodes/camera/cameraOrbit.html",
                         "tags":[],
                         "id":"customNodesCameraOrbit"
                     },
