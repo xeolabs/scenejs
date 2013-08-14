@@ -92,11 +92,22 @@
                                         ]
                                     },
 
-                                    // City, implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/object/buildings/city.js
+                                    // Flags to switch off backfaces
                                     {
-                                        type:"objects/buildings/city",
-                                        width:600
+                                        type:"flags",
+                                        flags:{
+                                            backfaces:false
+                                        },
+
+                                        nodes:[
+
+                                            // City, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/object/buildings/city.js
+                                            {
+                                                type:"objects/buildings/city",
+                                                width:600
+                                            }
+                                        ]
                                     }
                                 ]
                             }
