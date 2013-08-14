@@ -908,7 +908,7 @@
                         "title":"Wireframe torus",
                         "tip":"Creating a wireframe torus geometry using the torus primitive plugin",
                         "path":"customNodes/prims/wireframeTorus.html",
-                        "tags":["wireTorusNodePrim"]
+                        "id":"wireTorusNodePrim"
                     }
                 ]
             },
