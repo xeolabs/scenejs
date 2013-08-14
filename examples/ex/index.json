@@ -867,12 +867,11 @@
             {
                 "title":"Heightmaps",
                 "tip":"",
-                "tags":[],
+                "tags":["heightMap"],
                 "nodes":[
                     {
                         "title":"Heightmap with custom texture and fog",
                         "path":"customNodes/heightmaps/custom.html",
-                        "tags":["heightmaps"],
                         "id":"customHeightmap"
                     }
                 ]
@@ -880,54 +879,46 @@
             {
                 "title":"Skyboxes",
                 "tip":"",
-                "tags":[],
+                "tags":["skybox"],
                 "nodes":[
                     {
                         "title":"Skybox with custom texture",
                         "path":"customNodes/skyboxes/custom.html",
-                        "tags":["skyboxes"],
                         "id":"customSkybox"
                     },
                     {
                         "title":"Light Clouds",
                         "path":"customNodes/skyboxes/clouds.html",
-                        "tags":["skyboxes"],
                         "id":"cloudsSkybox"
                     },
                     {
                         "title":"Cloudy Sea",
                         "path":"customNodes/skyboxes/cloudySea.html",
-                        "tags":["skyboxes"],
                         "id":"cloudySeaSkybox"
                     },
                     {
                         "title":"Grimm Night",
                         "path":"customNodes/skyboxes/grimmNight.html",
-                        "tags":["skyboxes"],
                         "id":"grimmNightSkyBox"
                     },
                     {
                         "title":"Interstellar Clouds",
                         "path":"customNodes/skyboxes/interstellarClouds.html",
-                        "tags":["skyboxes"],
                         "id":"interstellarCloudsSkyBox"
                     },
                     {
                         "title":"Miramar Clouds",
                         "path":"customNodes/skyboxes/miramarClouds.html",
-                        "tags":["skyboxes"],
                         "id":"miramarCloudsSkyBox"
                     },
                     {
                         "title":"Stormy Days Clouds",
                         "path":"customNodes/skyboxes/stormyDaysClouds.html",
-                        "tags":["skyboxes"],
                         "id":"stormyDaysCloudsSkyBox"
                     },
                     {
                         "title":"Violent Days Clouds",
                         "path":"customNodes/skyboxes/violentDaysClouds.html",
-                        "tags":["skyboxes"],
                         "id":"violentDaysCloudsSkyBox"
                     }
                 ]
