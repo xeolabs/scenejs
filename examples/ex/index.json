@@ -840,7 +840,7 @@
                     },
                     {
                         "title":"Planet Earth",
-                        "path":"customNodes/bundled/earth.html",
+                        "path":"customNodes/objects/earth.html",
                         "tags":[],
                         "id":"customNodesEarth"
                     },
