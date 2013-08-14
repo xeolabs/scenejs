@@ -20,6 +20,7 @@
 <body>
 
 <script>
+
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
         pluginPath:"../../../../api/latest/plugins"
@@ -55,53 +56,45 @@
 
                         nodes:[
                             {
-                                type:"lookAt",
-                                eye:{ z:5 },
+                                type:"rotate",
+                                id:"pitch",
+                                angle:-30.0,
+                                x:1.0,
 
                                 nodes:[
-
                                     {
                                         type:"rotate",
-                                        id:"pitch",
+                                        id:"yaw",
                                         angle:-30.0,
-                                        x:1.0,
+                                        y:1.0,
 
                                         nodes:[
                                             {
-                                                type:"rotate",
-                                                id:"yaw",
-                                                angle:-30.0,
-                                                y:1.0,
-
+                                                type:"material",
+                                                color:{ r:1.0, g:0.3, b:0.3 },
+                                                emit:1.0,
                                                 nodes:[
                                                     {
-                                                        type:"material",
-                                                        color:{ r:1.0, g:0.3, b:0.3 },
-                                                        emit:1.0,
-                                                        nodes:[
+                                                        type:"texture",
+                                                        id:"theTexture",
+                                                        layers:[
                                                             {
-                                                                type:"texture",
-                                                                id:"theTexture",
-                                                                layers:[
-                                                                    {
-                                                                        src:"../../../textures/weirdGlowMap.jpg",
-                                                                        applyTo:"emit", // Apply to material "emit" property
-                                                                        blendMode:"multiply"
-                                                                    }
-                                                                ],
-                                                                nodes:[
+                                                                src:"../../../textures/weirdGlowMap.jpg",
+                                                                applyTo:"emit", // Apply to material "emit" property
+                                                                blendMode:"multiply"
+                                                            }
+                                                        ],
+                                                        nodes:[
 
-                                                                    // Torus primitive, implemented by plugin at
-                                                                    // http://scenejs.org/api/latest/plugins/node/prims/torus.js
-                                                                    {
-                                                                        type:"prims/torus",
-                                                                        radius:1.0,
-                                                                        tube:0.30,
-                                                                        segmentsR:60,
-                                                                        segmentsT:40,
-                                                                        arc:Math.PI * 2
-                                                                    }
-                                                                ]
+                                                            // Torus primitive, implemented by plugin at
+                                                            // http://scenejs.org/api/latest/plugins/node/prims/torus.js
+                                                            {
+                                                                type:"prims/torus",
+                                                                radius:1.0,
+                                                                tube:0.30,
+                                                                segmentsR:60,
+                                                                segmentsT:40,
+                                                                arc:Math.PI * 2
                                                             }
                                                         ]
                                                     }
