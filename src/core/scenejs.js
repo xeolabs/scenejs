@@ -6,7 +6,7 @@ var SceneJS = new (function () {
     /**
      * This SceneJS version
      */
-    this.VERSION = '3.0.0.0';
+    this.VERSION = '3.1';
 
     this._baseStateId = 0;
 
