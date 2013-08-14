@@ -865,6 +865,54 @@
                 ]
             },
             {
+                "title":"Primitives",
+                "tip":"Creating primitives using the bundled node type plugins",
+                "tags":["prims"],
+                "nodes":[
+                    {
+                        "title":"Plane",
+                        "tip":"Creating a solid plane geometry using the plane primitive plugin",
+                        "path":"customNodes/prims/plane.html",
+                        "tags":[],
+                        "id":"planeNodePrim"
+                    },
+                    {
+                        "title":"Box",
+                        "path":"customNodes/prims/box.html",
+                        "tip":"Creating a solid box geometry using the box primitive plugin",
+                        "tags":[],
+                        "id":"boxNodePrim"
+                    },
+                    {
+                        "title":"Sphere",
+                        "path":"customNodes/prims/sphere.html",
+                        "tip":"Creating a solid sphere geometry using the sphere primitive plugin",
+                        "tags":[],
+                        "id":"sphereNodePrim"
+                    },
+                    {
+                        "title":"Torus",
+                        "tip":"Creating a solid torus geometry using the torus primitive plugin",
+                        "path":"customNodes/prims/torus.html",
+                        "tags":[],
+                        "id":"torusNodePrim"
+                    },
+                    {
+                        "title":"Teapot",
+                        "tip":"Creating a solid teapot geometry using the teapot primitive plugin",
+                        "path":"customNodes/prims/teapot.html",
+                        "tags":[],
+                        "id":"teapotNodePrim"
+                    },
+                    {
+                        "title":"Wireframe torus",
+                        "tip":"Creating a wireframe torus geometry using the torus primitive plugin",
+                        "path":"customNodes/prims/wireframeTorus.html",
+                        "tags":["wireTorusNodePrim"]
+                    }
+                ]
+            },
+            {
                 "title":"Heightmaps",
                 "tip":"",
                 "tags":["heightMap"],
