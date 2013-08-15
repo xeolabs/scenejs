@@ -5231,22 +5231,22 @@ var SceneJS_PickBuffer = function (cfg) {
          */
         gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
         if (!gl.isFramebuffer(pickBuf.framebuf)) {
-            throw  SceneJS_errorModule.fatalError("Invalid framebuffer");
+            throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Invalid framebuffer");
         }
         var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
         switch (status) {
             case gl.FRAMEBUFFER_COMPLETE:
                 break;
             case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+                throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
             case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+                throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
             case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-                throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
+                throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
             case gl.FRAMEBUFFER_UNSUPPORTED:
-                throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED");
+                throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED");
             default:
-                throw  SceneJS_errorModule.fatalError("Incomplete framebuffer: " + status);
+                throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: " + status);
         }
 
         bound = false;
