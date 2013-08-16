@@ -13684,7 +13684,7 @@ SceneJS_Display.prototype.pick = function (params) {
 
         hit = {
             name:pickName,
-            canvasX:[canvasX, canvasY]
+            canvasPos:[canvasX, canvasY]
         };
 
         if (params.rayPick) { // Ray pick to find position
