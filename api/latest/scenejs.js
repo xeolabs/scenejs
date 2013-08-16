@@ -13636,7 +13636,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
 SceneJS_Display.prototype.pick = function (params) {
 
-    //return;
+    //  return null;
 
     var canvas = this._canvas.canvas;
 
@@ -13683,7 +13683,9 @@ SceneJS_Display.prototype.pick = function (params) {
     if (pickName) {
 
         hit = {
-            name:pickName
+            name:pickName,
+            canvasX:canvasX,
+            canvasY:canvasY
         };
 
         if (params.rayPick) { // Ray pick to find position
@@ -13738,7 +13740,6 @@ SceneJS_Display.prototype.pick = function (params) {
 
             var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec4Scalar(dir, screenZ, []), []);
 
-            hit.canvasPos = [canvasX, canvasY];
             hit.worldPos = vWorld;
         }
     }
