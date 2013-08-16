@@ -110,6 +110,11 @@
             function (hit) {
                 scene.getNode(hit.name + "-material").setColor({r:0.7, g:0.7, b:0.5});
                 info.innerHTML = "Pick hit: " + JSON.stringify(hit);
+
+                // To illustrate, these are the params to expect on the pick hit:
+                var name = hit.name;
+                var canvasX = hit.canvasPos[0];
+                var canvasY = hit.canvasPos[1];
             });
 
     // Mouse event handling to do a pick on each mouse click
