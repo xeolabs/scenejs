@@ -155,6 +155,10 @@ SceneJS_Engine.prototype.hasNodeType = function (type) {
  */
 SceneJS_Engine.prototype.createNode = function (json, ok) {
 
+    // Do buffered node destroys - don't want olds nodes
+    // hanging around whose IDs may clash with the new node
+    this._doDestroyNodes();
+
     json.type = json.type || "node"; // Nodes are SceneJS.Node type by default
     var core = this._coreFactory.getCore(json.type, json.coreId); // Create or share a core
     var self = this;
@@ -188,6 +192,26 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
                 }
             }
         });
+};
+
+/**
+ * Performs pending node destructions. When destroyed, each node and its core is released back to the
+ * node and core pools for reuse, respectively.
+ */
+SceneJS_Engine.prototype._doDestroyNodes = function () {
+
+    var node;
+
+    while (this._numNodesToDestroy > 0) {
+
+        node = this._nodesToDestroy[--this._numNodesToDestroy];
+
+        node._doDestroy();
+
+        this._coreFactory.putCore(node._core);    // Release state core for reuse
+
+        this._nodeFactory.putNode(node);         // Release node for reuse
+    }
 };
 
 /**
@@ -257,42 +281,6 @@ SceneJS_Engine.prototype.branchDirty = function (node) {
     this._sceneBranchesDirty = true;
 };
 
-//
-//SceneJS_Engine.prototype.nodeLoading = function (node) {
-//
-//    var nodeStatus = this.sceneStatus.nodes[node.id] || (this.sceneStatus.nodes[node.id] = { numLoading:0 });
-//
-//    nodeStatus.numLoading++;
-//
-//    this.sceneStatus.numLoading++;
-//
-//    this.events.fireEvent("loading", this.sceneStatus);
-//
-//    this.scene._publish("loadStatus", this.sceneStatus);
-//};
-//
-//SceneJS_Engine.prototype.nodeLoaded = function (node) {
-//
-//    var nodeStatus = this.sceneStatus.nodes[node.id];
-//
-//    if (!nodeStatus) {
-//        return;
-//    }
-//
-//    nodeStatus.numLoading--;
-//
-//    this.sceneStatus.numLoading--;
-//
-//    if (nodeStatus.numLoading == 0) {
-//        delete this.sceneStatus.nodes[node.id];
-//    }
-//
-//    this.events.fireEvent("loaded", this.sceneStatus);
-//
-//    this.scene._publish("loadStatus", this.sceneStatus);
-//};
-
-
 /**
  * Renders a single frame. Does any pending scene compilations or draw graph updates first.
  * Ordinarily the frame is rendered only if compilations or draw graph updates were performed,
@@ -303,12 +291,6 @@ SceneJS_Engine.prototype.branchDirty = function (node) {
 SceneJS_Engine.prototype.renderFrame = function (params) {
 
     if (this._tryCompile() || (params && params.force)) { // Do any pending (re)compilations
-
-//        var eventParams = {
-//            sceneId: this.id
-//        };
-//
-        //self.events.fireEvent("tick", eventParams);
 
         this.display.render(params);
 
@@ -501,26 +483,6 @@ SceneJS_Engine.prototype.destroyNode = function (node) {
     if (nodeStatus) {
         this.sceneStatus.numLoading -= nodeStatus.numLoading;
         delete this.sceneStatus.nodes[node.id];
-    }
-};
-
-/**
- * Performs pending node destructions. When destroyed, each node and its core is released back to the
- * node and core pools for reuse, respectively.
- */
-SceneJS_Engine.prototype._doDestroyNodes = function () {
-
-    var node;
-
-    while (this._numNodesToDestroy > 0) {
-
-        node = this._nodesToDestroy[--this._numNodesToDestroy];
-
-        node._doDestroy();
-
-        this._coreFactory.putCore(node._core);    // Release state core for reuse
-
-        this._nodeFactory.putNode(node);         // Release node for reuse
     }
 };
 
