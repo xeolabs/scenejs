@@ -65,16 +65,16 @@
                 window.setInterval(function () { // Then repeatedly create and destroy a child node with same attributes
                     createNode();
                     destroyNode();
-                }, 200);
+                }, 20);
 
                 function createNode() {
                     containerNode.addNode({
                         type:"translate",
                         id: "theNode",
-                        x:10,
+                        x:0,
                         nodes:[
                             {
-                                type:"prims/box"
+                                type:"prims/teapot"
                             }
                         ]
                     });
