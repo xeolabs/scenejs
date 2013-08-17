@@ -1098,7 +1098,7 @@
     {
         "title":"Tests",
         "tip":"",
-        "tags":["test" ],
+        "tags":["tests" ],
         "nodes":[
             {
                 "title":"Nodes",
