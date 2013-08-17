@@ -1096,9 +1096,9 @@
         ]
     },
     {
-        "title":"Stress Tests",
+        "title":"Tests",
         "tip":"",
-        "tags":["tests" ],
+        "tags":["test" ],
         "nodes":[
             {
                 "title":"Nodes",
