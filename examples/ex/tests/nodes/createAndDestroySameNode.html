@@ -70,18 +70,18 @@
                 function createNode() {
                     containerNode.addNode({
                         type:"translate",
+                        id: "theNode",
                         x:10,
                         nodes:[
                             {
-                                type:"prims/box",
-                                id:"theNode"
+                                type:"prims/box"
                             }
                         ]
                     });
                 }
 
                 function destroyNode() {
-                    scene.getNode("addedNode",
+                    scene.getNode("theNode",
                             function (theNode) {
                                 theNode.destroy();
                             });
