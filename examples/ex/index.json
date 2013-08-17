@@ -1094,5 +1094,27 @@
             }
 
         ]
+    },
+    {
+        "title":"Stress Tests",
+        "tip":"",
+        "tags":["tests" ],
+        "nodes":[
+            {
+                "title":"Nodes",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Create and destroy node with same attribs",
+                        "path":"tests/nodes/createAndDestroySameNode.html",
+                        "editor":false,
+                        "tags":[],
+                        "id":"testCreateAndDestroySameNode"
+                    }
+                ]
+            }
+
+        ]
     }
 ]
