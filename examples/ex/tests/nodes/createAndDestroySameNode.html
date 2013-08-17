@@ -29,6 +29,17 @@
         pluginPath:"../../../../api/latest/plugins"
     });
 
+    // Alert any errors
+    var errorCaught;
+    SceneJS.on("error",
+            function (e) {
+                if (!errorCaught) {  // Only catch first error
+                    errorCaught = true;
+                    alert("Test failed -  errorName: "
+                            + e.errorName + (e.message ? ", message: " + e.message : ", exception: " + e.exception));
+                }
+            });
+
     // Create scene
     var scene = SceneJS.createScene({
         nodes:[
