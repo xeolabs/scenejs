@@ -815,6 +815,12 @@
                 "tags":[],
                 "nodes":[
                     {
+                        "title":"Trivial example",
+                        "path":"customNodes/bundled/color.html",
+                        "tags":[],
+                        "id":"customNodesTrivialExample"
+                    },
+                    {
                         "title":"Mouse camera orbit",
                         "path":"customNodes/camera/cameraOrbit.html",
                         "tags":[],
