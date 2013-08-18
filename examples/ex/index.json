@@ -818,7 +818,7 @@
                         "title":"Trivial example",
                         "path":"customNodes/bundled/color.html",
                         "tags":[],
-                        "id":"customNodesTrivialExample"
+                        "id":"customBundledNodeColor"
                     },
                     {
                         "title":"Mouse camera orbit",

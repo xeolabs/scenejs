@@ -379,6 +379,7 @@ scene.getNode("myColor",
 
 See that setColor method, which is defined by our node type?
 
+[Run this example](http://scenejs.org/examples.html?page=customBundledNodeColor)
 
 ## Building SceneJS
 SceneJS requires nodejs and ncp. To build, simply:
