@@ -147,31 +147,31 @@
                         "title":"Triangles",
                         "path":"geometry/customTriangleMesh.html",
                         "tags":[],
-                        "id": "customTriangles"
+                        "id":"customTriangles"
                     },
                     {
                         "title":"Lines",
                         "path":"geometry/customLineSegments.html",
                         "tags":[],
-                        "id": "customLines"
+                        "id":"customLines"
                     },
                     {
                         "title":"Vertex colors",
                         "path":"geometry/vertexColors.html",
                         "tags":["vertexColoring"],
-                        "id": "customVertexColors"
+                        "id":"customVertexColors"
                     },
                     {
                         "title":"Using typed arrays",
                         "path":"geometry/customTriangleMeshTypedArrays.html",
                         "tags":[],
-                        "id": "customTrianglesTypedArrays"
+                        "id":"customTrianglesTypedArrays"
                     },
                     {
                         "title":"Automatically generated normals",
                         "path":"geometry/autoNormals.html",
                         "tags":[],
-                        "id": "autoNormals"
+                        "id":"autoNormals"
                     }
                 ]
             },
@@ -1075,6 +1075,13 @@
                         "editor":false,
                         "tags":["animation"],
                         "id":"firstExample"
+                    },
+                    {
+                        "title":"Teapot and Cube",
+                        "path":"demos/secondExample.html",
+                        "editor":false,
+                        "tags":[],
+                        "id":"secondExample"
                     },
                     {
                         "title":"Tron Tank",

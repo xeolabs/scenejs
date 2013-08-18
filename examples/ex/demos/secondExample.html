@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../api/latest/scenejs.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
+    // Define scene
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"material",
+                color:{ r:0.5, g:0.5, b:1.0 },
+
+                nodes:[
+                    {
+                        type:"rotate",
+                        id:"myRotate",
+                        y:1.0,
+                        angle:0,
+
+                        nodes:[
+                            {
+                                type:"scale",
+                                x:0.7, y:0.7, z:0.7,
+                                nodes:[
+                                    {
+                                        type:"prims/teapot"
+                                    }
+                                ]
+                            },
+                            {
+                                type:"texture",
+                                layers:[
+                                    {
+                                        src:"../../textures/superman.jpg"
+                                    }
+                                ],
+                                nodes:[
+                                    {
+                                        type:"translate",
+                                        y:-1.0,
+                                        nodes:[
+                                            {
+                                                type:"prims/box"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // On each frame, spin the teapot a little bit
+
+    scene.getNode("myRotate", function (myRotate) {
+
+        var angle = 0;
+
+        myRotate.setAngle(-20)
+
+        scene.on("tick",
+                function () {
+                  //  myRotate.setAngle(angle += 0.5);
+                });
+    });
+
+</script>
+</body>
+</html>

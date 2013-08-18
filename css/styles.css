@@ -44,13 +44,17 @@ body {
 }
 
 #top .links {
-    margin-left: 250px;
+    margin-left: 150px;
     width: auto;
     padding-top: 10px;
     text-align: right;
 }
 
 #top .links a {
+    font: 18px Helvetica, arial, freesans, clean, sans-serif !important;
+}
+
+#top .links span {
     font: 18px Helvetica, arial, freesans, clean, sans-serif !important;
 }
 
