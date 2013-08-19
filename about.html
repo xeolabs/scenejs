@@ -334,11 +334,10 @@ var scene = SceneJS.createScene({
     <img src="images/drawListObjects2.png">
 
     <p><strong>Figure 2.</strong> State-sorted draw list compiled from the scene graph data structure
-        of Figure 1. Nodes n1, n2 and n3 reference the states to set on WebGL to draw the teapot
-        and cubes at the leaves of the scene graph. Nodes n2 and n3 reference a similar
-        state configuration and therefore reference the same shader. The nodes are ordered to
-        prevent needless rebinding of the texture, geometry VBOs and shader programs when
-        rendering the frame.
+        of Figure 1. Draw list nodes N1, N2 and N3 reference the scene node states to activate on WebGL to
+        draw the teapot and cubes. N2 and N3 reference a similar state configuration and therefore
+        reference the same shader. The draw list nodes are ordered to prevent needless re-activation of
+        texture, geometry VBOs and shaders when rendering the frame.
     </p>
 
     <br/><br/><br/><br/>
@@ -368,8 +367,8 @@ scene.getNode("firstBoxPos", function (firstBoxPos) {
 });
 </pre>
     <p><strong>Listing 2.</strong> Animating the Y-axis position of the first box.
-        The translation node above the box is located by ID, then on each tick of the scene render
-        loop its Y-axis translation offset is updated.
+        The translation node above the box is located by ID, then its Y-axis
+        translation offset is updated on each tick of the scene render loop.
     </p>
 
 
