@@ -293,6 +293,7 @@ var scene = SceneJS.createScene({
 
             nodes: [{
                 type: "translate",
+                id: "firstBoxPos,
                 x: -3.0,
                 y: 1.0,
                 z: 5.0,
@@ -323,6 +324,7 @@ var scene = SceneJS.createScene({
 
 
     <img src="images/sceneGraphObjects3.png">
+
     <p><strong>Figure 1.</strong> Scene graph data structure compiled from the scene definition
         of Listing 1. Note that geometries at the leaves inherit state from parent nodes, and that
         various nodes hold resources allocated for them on the GPU.
@@ -330,6 +332,7 @@ var scene = SceneJS.createScene({
 
     <br/><br/>
     <img src="images/drawListObjects2.png">
+
     <p><strong>Figure 2.</strong> State-sorted draw list compiled from the scene graph data structure
         of Figure 1. Nodes n1, n2 and n3 reference the states to set on WebGL to draw the teapot
         and cubes at the leaves of the scene graph. Nodes n2 and n3 reference a similar
@@ -340,8 +343,33 @@ var scene = SceneJS.createScene({
 
     <br/><br/><br/><br/>
     <a href="examples.html?page=secondExample" target="_other"><img src="images/secondExample.jpg"></a>
+
     <p><strong>Figure 3.</strong> Screenshot of the 3D scene rendered from the draw list of Figure 2.
         Run it <a href="examples.html?page=secondExample" target="_other">here</a>.
+    </p>
+
+
+    <br/><br/><br/><br/>
+    <a name="animation"></a>
+            <pre class="prettyprint lang-javascript">
+scene.getNode("firstBoxPos", function (boxPos) {
+
+    var y = 1.0;
+    var inc = 0.02;
+
+    scene.on("tick", function () {
+        boxPos.setY(y);
+        y += inc;
+
+        if (y > 5 || y < 1.0) {
+            inc *= -1.0;
+        }
+    });
+});
+</pre>
+    <p><strong>Listing 2.</strong> Animating the Y-axis position of the first box.
+        The translation node above the box is located by ID, then on each tick of the scene render
+        loop its Y-axis translation offset is updated.
     </p>
 
 
