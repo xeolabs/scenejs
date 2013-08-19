@@ -622,7 +622,7 @@
                     },
                     {
                         "title":"Line dynamically connecting two geometries",
-                        "tags":["test"],
+                        "tags":[],
                         "path":"events/connectingLines.html",
                         "id": "lineConnectGeometry"
                     }
@@ -1131,6 +1131,12 @@
                         "editor":false,
                         "tags":[],
                         "id":"testCreateAndDestroySameNode"
+                    },
+                    {
+                        "title":"Slave geometry pos to another geometry",
+                        "tags":[],
+                        "path":"events/connectingLines.html",
+                        "id": "lineConnectGeometry"
                     }
                 ]
             }
