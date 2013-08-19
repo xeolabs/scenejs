@@ -352,13 +352,13 @@ var scene = SceneJS.createScene({
     <br/><br/><br/><br/>
     <a name="animation"></a>
             <pre class="prettyprint lang-javascript" style="margin-bottom:20px;">
-scene.getNode("firstBoxPos", function (boxPos) {
+scene.getNode("firstBoxPos", function (firstBoxPos) {
 
     var y = 1.0;
     var inc = 0.02;
 
     scene.on("tick", function () {
-        boxPos.setY(y);
+        firstBoxPos.setY(y);
         y += inc;
 
         if (y > 5 || y < 1.0) {
