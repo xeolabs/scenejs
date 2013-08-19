@@ -622,7 +622,7 @@
                     },
                     {
                         "title":"Line dynamically connecting two geometries",
-                        "tags":[],
+                        "tags":["test"],
                         "path":"events/connectingLines.html",
                         "id": "lineConnectGeometry"
                     }
