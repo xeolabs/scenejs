@@ -337,7 +337,8 @@ var scene = SceneJS.createScene({
         of Figure 1. Draw list nodes N1, N2 and N3 reference the scene node states to activate on WebGL to
         draw the teapot and cubes. N2 and N3 reference a similar state configuration and therefore
         reference the same shader. The draw list nodes are ordered to prevent needless re-activation of
-        texture, geometry VBOs and shaders when rendering the frame.
+        texture, geometry and shaders when rendering the frame. Note how the same box geometry
+        is shared by N2 and N3.
     </p>
 
     <br/><br/><br/><br/>
