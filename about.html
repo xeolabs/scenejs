@@ -118,7 +118,7 @@
     <p>A scene graph is a data structure that arranges the logical and spatial
         representation of a graphical scene as a collection of nodes in a graph, typically
         a tree. Scene graphs typically provide a convenient
-        abstraction on top of low-level graphics APIs that encapsulates optimisations
+        abstraction on top of low-level graphics APIs (such as WebGL) that encapsulates optimisations
         and API best practices, leaving the developer free to concentrate on
         scene content.</p>
 
@@ -196,7 +196,7 @@
 
     <h3>5. Scene Optimisation</h3>
 
-    <p>The API supports several scene definition techniques that improve scene
+    <p>The SceneJS API supports several scene definition techniques that improve scene
         performance by exploiting the draw list state sorting order described above.
 
     <h4>5.1. Texture Atlases</h4>
@@ -275,76 +275,77 @@
 </div>
 <div class="col right">
     <a name="sceneDef"></a>
-        <pre class="prettyprint lang-javascript" style="margin-bottom:30px;">
+        <pre class="prettyprint lang-javascript" style="margin-bottom:20px;">
 var scene = SceneJS.createScene({
-   nodes:[
-      {
-         type:"material",
-         color:{ r:0.3, g:0.3, b:1.0 },
+    nodes: [{
+        type: "material",
+        color: {
+            r: 0.5,
+            g: 0.5,
+            b: 1.0
+        },
 
-         nodes:[
-            {
-               type:"rotate",
-               id:"myRotate",
-               y:1.0,
-               angle:0,
+        nodes: [{
+            type: "texture",
+            layers: [{
+                src: "../../textures/superman.jpg"
+            }],
 
-               nodes:[
-                  {
-                     type:"scale",
-                     x:0.7, y:0.7, z:0.7,
-                     nodes:[
-                        {
-                           type:"prims/teapot"
-                        }
-                     ]
-                  },
-                  {
-                     type:"texture",
-                     layers:[
-                        {
-                           src:"textures/superman.jpg"
-                        }
-                     ],
-                     nodes:[
-                        {
-                           type:"translate",
-                           y:-1.0,
-                           nodes:[
-                              {
-                                 type:"prims/box"
-                              }
-                           ]
-                        }
-                     ]
-                  }
-               ]
-            }
-         ]
-      }
-   ]
-});
-</pre>
+            nodes: [{
+                type: "translate",
+                x: -3.0,
+                y: 1.0,
+                z: 5.0,
+
+                nodes: [{
+                    type: "prims/box"
+                }]
+            }, {
+                type: "translate",
+                y: 1.0,
+                z: 5.0,
+
+                nodes: [{
+                    type: "prims/box"
+                }]
+            }]
+        }, {
+            type: "prims/teapot"
+        }]
+    }]
+});</pre>
     <p><strong>Listing 1.</strong> Scene graph definition. The scene graph is a directed acyclic
         graph (DAG) expressed in JSON, in this case defining a scene containing a blue
-        teapot that rotates about its Y-axis. Geometry nodes are normally at the leaves,
-        where they inherit the state defined by higher nodes, in this case the material and rotation transform.
+        teapot sitting on a textured box, both of which rotate together about the Y-axis.
+        Geometry nodes are normally at the leaves, where they inherit the state defined by higher
+        nodes, in this case the material and rotation transform.
     </p>
 
-    <br/><br/><br/>
-    <img src="images/sceneGraphObjects.png">
-    <p><strong>Fig 1.</strong> Scene graph compiled from the scene definition of Listing 1. Note that
+
+    <img src="images/sceneGraphObjects3.png">
+    <p><strong>Figure 1.</strong> Scene graph compiled from the scene definition of Listing 1. Note that
         geometries at the leaves inherit state from parent nodes, and that various nodes hold resources
         allocated for them on the GPU.
     </p>
 
-    <br/><br/><br/>
+    <br/><br/>
+    <img src="images/drawListObjects2.png">
+    <p><strong>Figure 2.</strong> State-sorted draw list compiled from the scene graph of Figure 2.
+        Nodes n1, n2 and n3 reference the states to set on WebGL to draw the teapot
+        and cubes at the leaves of the scene graph. Nodes n2 and n3 reference a similar
+        state configuration and therefore reference the same shader. The nodes are ordered to
+        prevent needless rebinding of the texture, geometry VBOs and shader programs when
+        rendering the frame.
+    </p>
+
+    <br/><br/><br/><br/>
     <a href="examples.html?page=secondExample" target="_other"><img src="images/secondExample.jpg"></a>
-    <p><strong>Fig 2.</strong> Screenshot of 3D scene rendered from the scene definition of Listing 1.
+    <p><strong>Figure 2.</strong> The 3D scene rendered from the scene definition of Listing 1.
         Run it <a href="examples.html?page=secondExample" target="_other">here</a>.
     </p>
 
 
+    <br/><br/><br/><br/>
     <a name="nodeCores"></a>
             <pre class="prettyprint lang-javascript">
 var scene = SceneJS.createScene({
