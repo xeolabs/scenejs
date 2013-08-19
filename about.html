@@ -315,7 +315,7 @@ var scene = SceneJS.createScene({
     }]
 });</pre>
     <p><strong>Listing 1.</strong> Scene graph definition. The scene graph is a directed acyclic
-        graph (DAG) expressed in JSON, in this case defining a scene containing a blue
+        graph expressed in JSON, in this case defining a scene containing a blue
         teapot and two boxes sharing the same textured appearance. Geometry nodes are normally
         at the leaves, where they inherit the state defined by higher nodes, in this case the
         material and rotation transform.
@@ -323,15 +323,15 @@ var scene = SceneJS.createScene({
 
 
     <img src="images/sceneGraphObjects3.png">
-    <p><strong>Figure 1.</strong> Scene graph compiled from the scene definition of Listing 1. Note that
-        geometries at the leaves inherit state from parent nodes, and that various nodes hold resources
-        allocated for them on the GPU.
+    <p><strong>Figure 1.</strong> Scene graph data structure compiled from the scene definition
+        of Listing 1. Note that geometries at the leaves inherit state from parent nodes, and that
+        various nodes hold resources allocated for them on the GPU.
     </p>
 
     <br/><br/>
     <img src="images/drawListObjects2.png">
-    <p><strong>Figure 2.</strong> State-sorted draw list compiled from the scene graph of Figure 2.
-        Nodes n1, n2 and n3 reference the states to set on WebGL to draw the teapot
+    <p><strong>Figure 2.</strong> State-sorted draw list compiled from the scene graph data structure
+        of Figure 1. Nodes n1, n2 and n3 reference the states to set on WebGL to draw the teapot
         and cubes at the leaves of the scene graph. Nodes n2 and n3 reference a similar
         state configuration and therefore reference the same shader. The nodes are ordered to
         prevent needless rebinding of the texture, geometry VBOs and shader programs when
@@ -340,7 +340,7 @@ var scene = SceneJS.createScene({
 
     <br/><br/><br/><br/>
     <a href="examples.html?page=secondExample" target="_other"><img src="images/secondExample.jpg"></a>
-    <p><strong>Figure 2.</strong> The 3D scene rendered from the scene definition of Listing 1.
+    <p><strong>Figure 2.</strong> The 3D scene rendered from the draw list of Figure 2.
         Run it <a href="examples.html?page=secondExample" target="_other">here</a>.
     </p>
 
