@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../api/latest/scenejs.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    // In this example we dynamically repositition the end points of a line
+    // segment so as to keep it joining two spheres.
+    //
+    // We subscribe to the World-space positions of the spheres,then whenever
+    // those update as we move the camera, we set the line endpoints to them.
+    //
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:35,
+                zoomSensitivity:15,
+                nodes:[
+
+                    // Two spheres
+                    {
+                        type:"translate",
+                        x:-5.0,
+                        z:-5.0,
+                        id:"sphere1",
+                        nodes:[
+                            {
+                                type:"material",
+                                color:{ r:1.0, g:0.4, b:0.4 },
+                                nodes:[
+
+                                    // Sphere primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                    {
+                                        type:"prims/sphere"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        type:"translate",
+                        x:5.0,
+                        z:5.0,
+                        id:"sphere2",
+                        nodes:[
+                            {
+                                type:"material",
+                                color:{ r:0.4, g:1.0, b:0.4 },
+                                nodes:[
+
+                                    // Sphere primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                    {
+                                        type:"prims/sphere"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    // Brightly-coloured line segment
+                    {
+                        type:"material",
+                        color:{ r:1, g:1, b:1 },
+                        emit:1,
+
+                        nodes:[
+
+                            // Line segment geometry which we'll update to keep
+                            // it connecting the two spheres
+                            {
+                                type:"geometry",
+                                id:"myLine",
+                                primitive:"lines",
+
+                                // Two-segment line
+                                positions:[
+                                    0, 0, 0, // Start point
+                                    0, 0, 0  // End point
+                                ],
+
+                                "indices":[
+                                    0, 1
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Synchronise the start and end points of the line segment
+    // with the World-space positions of the spheres
+
+    var start;
+    var end;
+
+    scene.getNode("sphere1",
+            function (sphere1) {
+                sphere1.on("rendered",
+                        function (event) {
+                            start = event.getWorldPos();
+                            if (end) {
+                                updateLine();
+                            }
+                        });
+            });
+
+    scene.getNode("sphere2",
+            function (sphere2) {
+                sphere2.on("rendered",
+                        function (event) {
+                            end = event.getWorldPos();
+                            if (start) {
+                                updateLine();
+                            }
+                        });
+            });
+
+
+    function updateLine() {
+        scene.getNode("myLine",
+                function (myLine) {
+                    myLine.setPositions({
+                        positions:[start.x, start.y, start.z, end.x, end.y, end.z]
+                    });
+                });
+        start = null;
+        end = null;
+    }
+
+</script>
+</body>
+</html>

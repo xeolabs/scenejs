@@ -617,7 +617,14 @@
                     {
                         "title":"Subscribe to 3D position of a geometry",
                         "tags":[],
-                        "path":"events/nodeRenderedEvent.html"
+                        "path":"events/nodeRenderedEvent.html",
+                        "id": "subscribeGeometryPos"
+                    },
+                    {
+                        "title":"Line dynamically connecting two geometries",
+                        "tags":[],
+                        "path":"events/connectingLines.html",
+                        "id": "lineConnectGeometry"
                     }
                 ]
             }
