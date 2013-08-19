@@ -1136,7 +1136,7 @@
                         "title":"Slave geometry pos to another geometry",
                         "tags":[],
                         "path":"events/connectingLines.html",
-                        "id": "lineConnectGeometry"
+                        "id": "testSlaveGeometryPos"
                     }
                 ]
             }
