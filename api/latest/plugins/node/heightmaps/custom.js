@@ -59,7 +59,7 @@
                 });
             };
 
-            image.onerror = function () {alert("failed");
+            image.onerror = function () {
                 self.taskFailed(taskId);
             };
 
