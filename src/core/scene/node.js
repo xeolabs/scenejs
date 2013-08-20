@@ -97,6 +97,33 @@ SceneJS.Node.prototype._construct = function (engine, core, cfg, nodeId) {
 };
 
 /**
+ * Notifies that an asynchronous task has started on this node
+ * @param {String} [description] Description - will be "Task" by default
+ * @return {String} Unique ID for the task, which may be given to {@link #taskFinished} or {@link #taskFailed}
+ */
+SceneJS.Node.prototype.taskStarted = function (description) {
+    return SceneJS_sceneStatusModule.taskStarted(this, description || "Task");
+};
+
+/**
+ * Notifies that a task, whose initiation was previously notified with {@link #taskStarted},
+ * has now completed successfully.
+ * @param {String} taskId Unique ID for the task, which was got with {@link #taskStarted}
+ */
+SceneJS.Node.prototype.taskFinished = function (taskId) {
+    SceneJS_sceneStatusModule.taskFinished(taskId);
+};
+
+/**
+ * Notifies that a task, whose initiation was previously notified with {@link #taskStarted},
+ * has failed.
+ * @param {String} taskId Unique ID for the task, which was got with {@link #taskStarted}
+ */
+SceneJS.Node.prototype.taskFailed = function (taskId) {
+    SceneJS_sceneStatusModule.taskFailed(taskId);
+};
+
+/**
  * Publishes to a topic on this node.
  *
  * Immediately notifies existing subscriptions to that topic, retains the publication to give to

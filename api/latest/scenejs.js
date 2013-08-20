@@ -1820,6 +1820,26 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
 };
 
 /**
+ * Performs pending node destructions. When destroyed, each node and its core is released back to the
+ * node and core pools for reuse, respectively.
+ */
+SceneJS_Engine.prototype._doDestroyNodes = function () {
+
+    var node;
+
+    while (this._numNodesToDestroy > 0) {
+
+        node = this._nodesToDestroy[--this._numNodesToDestroy];
+
+        node._doDestroy();
+
+        this._coreFactory.putCore(node._core);    // Release state core for reuse
+
+        this._nodeFactory.putNode(node);         // Release node for reuse
+    }
+};
+
+/**
  * Finds the node with the given ID in this engine's scene graph
  * @return {SceneJS.Node} The node if found, else null
  */
@@ -2088,26 +2108,6 @@ SceneJS_Engine.prototype.destroyNode = function (node) {
     if (nodeStatus) {
         this.sceneStatus.numLoading -= nodeStatus.numLoading;
         delete this.sceneStatus.nodes[node.id];
-    }
-};
-
-/**
- * Performs pending node destructions. When destroyed, each node and its core is released back to the
- * node and core pools for reuse, respectively.
- */
-SceneJS_Engine.prototype._doDestroyNodes = function () {
-
-    var node;
-
-    while (this._numNodesToDestroy > 0) {
-
-        node = this._nodesToDestroy[--this._numNodesToDestroy];
-
-        node._doDestroy();
-
-        this._coreFactory.putCore(node._core);    // Release state core for reuse
-
-        this._nodeFactory.putNode(node);         // Release node for reuse
     }
 };
 
@@ -5944,6 +5944,33 @@ SceneJS.Node.prototype._construct = function (engine, core, cfg, nodeId) {
     if (this._init) {
         this._init(cfg);
     }
+};
+
+/**
+ * Notifies that an asynchronous task has started on this node
+ * @param {String} [description] Description - will be "Task" by default
+ * @return {String} Unique ID for the task, which may be given to {@link #taskFinished} or {@link #taskFailed}
+ */
+SceneJS.Node.prototype.taskStarted = function (description) {
+    return SceneJS_sceneStatusModule.taskStarted(this, description || "Task");
+};
+
+/**
+ * Notifies that a task, whose initiation was previously notified with {@link #taskStarted},
+ * has now completed successfully.
+ * @param {String} taskId Unique ID for the task, which was got with {@link #taskStarted}
+ */
+SceneJS.Node.prototype.taskFinished = function (taskId) {
+    SceneJS_sceneStatusModule.taskFinished(taskId);
+};
+
+/**
+ * Notifies that a task, whose initiation was previously notified with {@link #taskStarted},
+ * has failed.
+ * @param {String} taskId Unique ID for the task, which was got with {@link #taskStarted}
+ */
+SceneJS.Node.prototype.taskFailed = function (taskId) {
+    SceneJS_sceneStatusModule.taskFailed(taskId);
 };
 
 /**
@@ -13738,7 +13765,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
     gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
-    gl.lineWidth(1);
+    gl.lineWidth(2);
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);
 
