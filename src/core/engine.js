@@ -181,14 +181,14 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
                                 if (ok) {
                                     ok(node);
                                 }
-                                self.scene._publish("nodes/" + node.id, node);
+                                self.scene.publish("nodes/" + node.id, node);
                             }
                         });
                 }
             } else {
                 if (ok) {
                     ok(node);
-                    self.scene._publish("nodes/" + node.id, node);
+                    self.scene.publish("nodes/" + node.id, node);
                 }
             }
         });
@@ -342,7 +342,7 @@ SceneJS_Engine.prototype.start = function (cfg) {
                 time = (new Date()).getTime();
                 tick.time = time;
 
-                scene._publish("tick", tick);
+                scene.publish("tick", tick);
 
                 if (!self.running) { // idleFunc may have destroyed scene
                     return;
@@ -354,14 +354,14 @@ SceneJS_Engine.prototype.start = function (cfg) {
 
                     self.display.render();
 
-                    scene._publish("rendered", tick);
+                    scene.publish("rendered", tick);
 
                     window.requestAnimationFrame(window[fnName]);
 
                 } else {
 
                     if (!sleeping) {
-                        scene._publish("sleep", tick);
+                        scene.publish("sleep", tick);
                     }
 
                     sleeping = true;

@@ -135,7 +135,7 @@ SceneJS.Node.prototype.taskFailed = function (taskId) {
  * subsequent subscribers will not receive it
  * @private
  */
-SceneJS.Node.prototype._publish = function (topic, pub, forget) {
+SceneJS.Node.prototype.publish = function (topic, pub, forget) {
     if (!forget) {
         this._topicPubs[topic] = pub; // Save notification
     }
@@ -157,7 +157,7 @@ SceneJS.Node.prototype._publish = function (topic, pub, forget) {
  * @param topic Publication topic
  * @private
  */
-SceneJS.Node.prototype._unpublish = function (topic) {
+SceneJS.Node.prototype.unpublish = function (topic) {
     var subsForTopic = this._topicSubs[topic];
     if (subsForTopic) { // Notify subscriptions
         for (var handle in subsForTopic) {
@@ -1286,7 +1286,7 @@ SceneJS.Node.prototype.destroy = function () {
         }
 
         // Remove publication
-        this._engine.scene._unpublish("nodes/" + this.id);
+        this._engine.scene.unpublish("nodes/" + this.id);
 
         /* Recusrsively destroy child nodes without
          * bothering to remove them from their parents

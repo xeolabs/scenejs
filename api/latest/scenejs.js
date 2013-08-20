@@ -1806,14 +1806,14 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
                                 if (ok) {
                                     ok(node);
                                 }
-                                self.scene._publish("nodes/" + node.id, node);
+                                self.scene.publish("nodes/" + node.id, node);
                             }
                         });
                 }
             } else {
                 if (ok) {
                     ok(node);
-                    self.scene._publish("nodes/" + node.id, node);
+                    self.scene.publish("nodes/" + node.id, node);
                 }
             }
         });
@@ -1967,7 +1967,7 @@ SceneJS_Engine.prototype.start = function (cfg) {
                 time = (new Date()).getTime();
                 tick.time = time;
 
-                scene._publish("tick", tick);
+                scene.publish("tick", tick);
 
                 if (!self.running) { // idleFunc may have destroyed scene
                     return;
@@ -1979,14 +1979,14 @@ SceneJS_Engine.prototype.start = function (cfg) {
 
                     self.display.render();
 
-                    scene._publish("rendered", tick);
+                    scene.publish("rendered", tick);
 
                     window.requestAnimationFrame(window[fnName]);
 
                 } else {
 
                     if (!sleeping) {
-                        scene._publish("sleep", tick);
+                        scene.publish("sleep", tick);
                     }
 
                     sleeping = true;
@@ -5610,18 +5610,18 @@ var SceneJS_nodeEventsModule = new (function () {
         var subs = node._topicSubs["rendered"];
         if (subs) {
             idStack[stackLen] = node.id;
-            var fn = node.__publishRenderedEvent;
+            var fn = node._publishRenderedEvent;
             if (!fn) {
-                fn = node.__publishRenderedEvent = function (params) {
+                fn = node._publishRenderedEvent = function (params) {
                     // Don't retain
-                    node._publish("rendered", params, true);
+                    node.publish("rendered", params, true);
                 };
             }
             listenerStack[stackLen] = fn;
             stackLen++;
             dirty = true;
         } else {
-            node.__publishRenderedEvent = null;
+            node._publishRenderedEvent = null;
         }
     };
 
@@ -5985,7 +5985,7 @@ SceneJS.Node.prototype.taskFailed = function (taskId) {
  * subsequent subscribers will not receive it
  * @private
  */
-SceneJS.Node.prototype._publish = function (topic, pub, forget) {
+SceneJS.Node.prototype.publish = function (topic, pub, forget) {
     if (!forget) {
         this._topicPubs[topic] = pub; // Save notification
     }
@@ -6007,7 +6007,7 @@ SceneJS.Node.prototype._publish = function (topic, pub, forget) {
  * @param topic Publication topic
  * @private
  */
-SceneJS.Node.prototype._unpublish = function (topic) {
+SceneJS.Node.prototype.unpublish = function (topic) {
     var subsForTopic = this._topicSubs[topic];
     if (subsForTopic) { // Notify subscriptions
         for (var handle in subsForTopic) {
@@ -7136,7 +7136,7 @@ SceneJS.Node.prototype.destroy = function () {
         }
 
         // Remove publication
-        this._engine.scene._unpublish("nodes/" + this.id);
+        this._engine.scene.unpublish("nodes/" + this.id);
 
         /* Recusrsively destroy child nodes without
          * bothering to remove them from their parents
@@ -11063,7 +11063,7 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     var result = this._engine.pick(canvasX, canvasY, options);
     this.renderFrame({force:true }); // HACK: canvas blanks after picking
     if (result) {
-        this._publish("pick", result);
+        this.publish("pick", result);
         return result;
     }
 };

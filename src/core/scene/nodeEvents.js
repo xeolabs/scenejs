@@ -49,7 +49,7 @@ var SceneJS_nodeEventsModule = new (function () {
             if (!fn) {
                 fn = node.__publishRenderedEvent = function (params) {
                     // Don't retain
-                    node._publish("rendered", params, true);
+                    node.publish("rendered", params, true);
                 };
             }
             listenerStack[stackLen] = fn;

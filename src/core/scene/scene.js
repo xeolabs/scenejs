@@ -117,7 +117,7 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     var result = this._engine.pick(canvasX, canvasY, options);
     this.renderFrame({force:true }); // HACK: canvas blanks after picking
     if (result) {
-        this._publish("pick", result);
+        this.publish("pick", result);
         return result;
     }
 };
