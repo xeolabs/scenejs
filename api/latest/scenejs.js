@@ -1729,6 +1729,7 @@ var SceneJS_Engine = function (json, options) {
         "webglcontextlost",
         function (event) {
             event.preventDefault();
+            self.stop();
             SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_LOST, { scene:self.scene });
         },
         false);
@@ -1736,11 +1737,11 @@ var SceneJS_Engine = function (json, options) {
     this.canvas.canvas.addEventListener(// WebGL context recovered
         "webglcontextrestored",
         function (event) {
-            event.preventDefault();
             self.canvas.initWebGL();
             self._coreFactory.webglRestored();  // Reallocate WebGL resources for node state cores
             self.display.webglRestored(); // Reallocate shaders and re-cache shader var locations for display state chunks
             SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_RESTORED, { scene:self.scene });
+            self.start();
         },
         false);
 };
@@ -1927,16 +1928,10 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
 
 /**
  * Starts the render loop on this engine.
- * @params cfg Render loop configs
- * @params cfg.idleFunc {Function} Callback to call on each loop iteration
- * @params cfg.frameFunc {Function} Callback to call after a render is done to update the scene image
- * @params cfg.sleepFunc {Function}
  */
-SceneJS_Engine.prototype.start = function (cfg) {
+SceneJS_Engine.prototype.start = function () {
 
     if (!this.running) {
-
-        cfg = cfg || {};
 
         this.running = true;
         this.paused = false;
@@ -5610,9 +5605,9 @@ var SceneJS_nodeEventsModule = new (function () {
         var subs = node._topicSubs["rendered"];
         if (subs) {
             idStack[stackLen] = node.id;
-            var fn = node._publishRenderedEvent;
+            var fn = node.__publishRenderedEvent;
             if (!fn) {
-                fn = node._publishRenderedEvent = function (params) {
+                fn = node.__publishRenderedEvent = function (params) {
                     // Don't retain
                     node.publish("rendered", params, true);
                 };
@@ -5621,7 +5616,7 @@ var SceneJS_nodeEventsModule = new (function () {
             stackLen++;
             dirty = true;
         } else {
-            node._publishRenderedEvent = null;
+            node.__publishRenderedEvent = null;
         }
     };
 
