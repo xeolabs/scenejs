@@ -824,7 +824,7 @@
                     {
                         "title":"Define new node type that publishes something",
                         "path":"customNodes/defining/customNodeDefWithPublications.html",
-                        "tags":["tasks"],
+                        "tags":["pubsub"],
                         "id":"customNodeDefWithTasks"
                     }
                 ]
