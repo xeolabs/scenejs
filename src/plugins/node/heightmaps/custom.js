@@ -18,7 +18,7 @@
             var self = this;
 
             // Notify SceneJS so it can support loading/busy indicators etc
-            var taskId = this.taskStarted("Loading heightmap");
+            this._taskId = this.taskStarted("Loading heightmap");
 
             var image = new Image();
 
@@ -38,32 +38,39 @@
 
                 var wire = params.wire;
 
-                self.taskFinished(taskId);
+                if (self._taskId) {
 
-                // Create geometry node
-                self.addNode({
-                    type:"rotate",
-                    x:1,
-                    angle:90,
-                    nodes:[
-                        {
-                            type:"geometry",
-                            primitive:wire ? "lines" : "triangles",
-                            positions:mesh.positions,
-                            normals:!wire ? "auto" : null, // Get SceneJS to compute the normals
-                            uvs:!wire ? mesh.uvs : null,
-                            indices:mesh.indices,
-                            coreId:"heightmap_" + (wire == true ? "wire_" : "") + params.zSize + "_" + params.xSize + "_" + params.xSegments + "_" + params.zSegments
-                        }
-                    ]
-                });
+                    self._taskId = self.taskFinished(self._taskId);
+
+                    // Create geometry node
+                    self.addNode({
+                        type:"rotate",
+                        x:1,
+                        angle:90,
+                        nodes:[
+                            {
+                                type:"geometry",
+                                primitive:wire ? "lines" : "triangles",
+                                positions:mesh.positions,
+                                normals:!wire ? "auto" : null, // Get SceneJS to compute the normals
+                                uvs:!wire ? mesh.uvs : null,
+                                indices:mesh.indices,
+                                coreId:"heightmap_" + (wire == true ? "wire_" : "") + params.zSize + "_" + params.xSize + "_" + params.xSegments + "_" + params.zSegments
+                            }
+                        ]
+                    });
+                }
             };
 
             image.onerror = function () {
-                self.taskFailed(taskId);
+                self._taskId = self.taskFailed(self._taskId);
             };
 
             image.src = params.src;
+        },
+
+        destroy:function () {
+            this._taskId = self.taskFinished(this._taskId);
         }
     });
 

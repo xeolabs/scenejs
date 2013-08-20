@@ -5516,12 +5516,12 @@ var SceneJS_sceneStatusModule = new (function () {
     /** Notifies that a load has finished loading some data
      */
     this.taskFinished = function (taskId) {
-        if (taskId == -1) {
-            return;
+        if (taskId == -1 || taskId == null) {
+            return null;
         }
         var task = tasks[taskId];
         if (!task) {
-            return;
+            return null;
         }
         var sceneState = task.sceneState;
         this.sceneStatus[sceneState.sceneId].numTasks--;
@@ -5532,6 +5532,7 @@ var SceneJS_sceneStatusModule = new (function () {
         if (nodeState.numTasks == 0) {
             delete sceneState.nodeStates[nodeState.nodeId];
         }
+        return null;
     };
 
     function dismissPopup(element) {
@@ -5551,14 +5552,15 @@ var SceneJS_sceneStatusModule = new (function () {
     /** Notifies that a task has failed
      */
     this.taskFailed = function (taskId) {
-        if (taskId == -1) {
-            return;
+        if (taskId == -1 || taskId == null) {
+            return null;
         }
         var task = tasks[taskId];
         if (!task) {
-            return;
+            return null;
         }
         failPopup(task.element);
+        return null;
     };
 
     function failPopup(element) {
@@ -5962,18 +5964,20 @@ SceneJS.Node.prototype.taskStarted = function (description) {
  * Notifies that a task, whose initiation was previously notified with {@link #taskStarted},
  * has now completed successfully.
  * @param {String} taskId Unique ID for the task, which was got with {@link #taskStarted}
+ * @return null
  */
 SceneJS.Node.prototype.taskFinished = function (taskId) {
-    SceneJS_sceneStatusModule.taskFinished(taskId);
+   return SceneJS_sceneStatusModule.taskFinished(taskId);
 };
 
 /**
  * Notifies that a task, whose initiation was previously notified with {@link #taskStarted},
  * has failed.
  * @param {String} taskId Unique ID for the task, which was got with {@link #taskStarted}
+ * @return null
  */
 SceneJS.Node.prototype.taskFailed = function (taskId) {
-    SceneJS_sceneStatusModule.taskFailed(taskId);
+    return SceneJS_sceneStatusModule.taskFailed(taskId);
 };
 
 /**

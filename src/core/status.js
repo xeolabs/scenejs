@@ -126,12 +126,12 @@ var SceneJS_sceneStatusModule = new (function () {
     /** Notifies that a load has finished loading some data
      */
     this.taskFinished = function (taskId) {
-        if (taskId == -1) {
-            return;
+        if (taskId == -1 || taskId == null) {
+            return null;
         }
         var task = tasks[taskId];
         if (!task) {
-            return;
+            return null;
         }
         var sceneState = task.sceneState;
         this.sceneStatus[sceneState.sceneId].numTasks--;
@@ -142,6 +142,7 @@ var SceneJS_sceneStatusModule = new (function () {
         if (nodeState.numTasks == 0) {
             delete sceneState.nodeStates[nodeState.nodeId];
         }
+        return null;
     };
 
     function dismissPopup(element) {
@@ -161,14 +162,15 @@ var SceneJS_sceneStatusModule = new (function () {
     /** Notifies that a task has failed
      */
     this.taskFailed = function (taskId) {
-        if (taskId == -1) {
-            return;
+        if (taskId == -1 || taskId == null) {
+            return null;
         }
         var task = tasks[taskId];
         if (!task) {
-            return;
+            return null;
         }
         failPopup(task.element);
+        return null;
     };
 
     function failPopup(element) {

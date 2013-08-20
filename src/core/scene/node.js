@@ -109,18 +109,20 @@ SceneJS.Node.prototype.taskStarted = function (description) {
  * Notifies that a task, whose initiation was previously notified with {@link #taskStarted},
  * has now completed successfully.
  * @param {String} taskId Unique ID for the task, which was got with {@link #taskStarted}
+ * @return null
  */
 SceneJS.Node.prototype.taskFinished = function (taskId) {
-    SceneJS_sceneStatusModule.taskFinished(taskId);
+   return SceneJS_sceneStatusModule.taskFinished(taskId);
 };
 
 /**
  * Notifies that a task, whose initiation was previously notified with {@link #taskStarted},
  * has failed.
  * @param {String} taskId Unique ID for the task, which was got with {@link #taskStarted}
+ * @return null
  */
 SceneJS.Node.prototype.taskFailed = function (taskId) {
-    SceneJS_sceneStatusModule.taskFailed(taskId);
+    return SceneJS_sceneStatusModule.taskFailed(taskId);
 };
 
 /**
