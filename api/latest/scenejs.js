@@ -1708,7 +1708,7 @@ var SceneJS_Engine = function (json, options) {
      */
     this.sceneStatus = {
         nodes:{}, // Status for each node
-        numLoading:0  // Number of loads currently in progress
+        numTasks:0  // Number of loads currently in progress
     };
 
     var self = this;
@@ -1976,7 +1976,9 @@ SceneJS_Engine.prototype.start = function () {
 
                     scene.publish("rendered", tick);
 
-                    window.requestAnimationFrame(window[fnName]);
+                    if (self.running) {
+                        window.requestAnimationFrame(window[fnName]);
+                    }
 
                 } else {
 
@@ -1986,15 +1988,21 @@ SceneJS_Engine.prototype.start = function () {
 
                     sleeping = true;
 
-                    window.requestAnimationFrame(window[fnName]);
+                    if (self.running) {
+                        window.requestAnimationFrame(window[fnName]);
+                    }
                 }
             } else {
 
-                window.requestAnimationFrame(window[fnName]);
+                if (self.running) {
+                    window.requestAnimationFrame(window[fnName]);
+                }
             }
         };
 
-        window.requestAnimationFrame(window[fnName]);
+        if (self.running) {
+            window.requestAnimationFrame(window[fnName]);
+        }
     }
 };
 
@@ -2101,7 +2109,7 @@ SceneJS_Engine.prototype.destroyNode = function (node) {
     var nodeStatus = this.sceneStatus.nodes[node.id];
 
     if (nodeStatus) {
-        this.sceneStatus.numLoading -= nodeStatus.numLoading;
+        this.sceneStatus.numTasks -= nodeStatus.numTasks;
         delete this.sceneStatus.nodes[node.id];
     }
 };
@@ -5429,10 +5437,10 @@ var SceneJS_sceneStatusModule = new (function () {
         var status = this.sceneStatus[sceneId];
         if (!status) {
             status = this.sceneStatus[sceneId] = {
-                numLoading:0
+                numTasks:0
             };
         }
-        status.numLoading++;
+        status.numTasks++;
 
         // Track node
         var sceneState = sceneStates[sceneId];
@@ -5454,12 +5462,12 @@ var SceneJS_sceneStatusModule = new (function () {
         if (!nodeState) {
             nodeState = sceneState.nodeStates[nodeId] = {
                 nodeId:nodeId,
-                numLoading:0,
+                numTasks:0,
                 tasks:{}
             };
         }
         description = description + " " + sceneState.descCounts[description] + "...";
-        nodeState.numLoading++;
+        nodeState.numTasks++;
         var task = {
             sceneState:sceneState,
             nodeState:nodeState,
@@ -5516,12 +5524,12 @@ var SceneJS_sceneStatusModule = new (function () {
             return;
         }
         var sceneState = task.sceneState;
-        this.sceneStatus[sceneState.sceneId].numLoading--;
+        this.sceneStatus[sceneState.sceneId].numTasks--;
         dismissPopup(task.element);
         var nodeState = task.nodeState;
-        nodeState.numLoading--;
+        nodeState.numTasks--;
         delete nodeState.tasks[taskId];
-        if (nodeState.numLoading == 0) {
+        if (nodeState.numTasks == 0) {
             delete sceneState.nodeStates[nodeState.nodeId];
         }
     };
@@ -11165,7 +11173,7 @@ SceneJS.Scene.prototype.hasCore = function (type, coreId) {
  * Otherwise, the status will be:
  *
  * {
- *      numLoading: Total number of asset loads (eg. texture, geometry stream etc.) currently in progress for this scene
+ *      numTasks: Total number of asset loads (eg. texture, geometry stream etc.) currently in progress for this scene
  * }
  *
  */

@@ -69,15 +69,15 @@
     var checkLoaded;
 
     function blockUntilLoadsFinished (ok) {
-        var numLoading = scene.get("status");
-        if (!numLoading || numLoading == 0) {
+        var numTasks = scene.get("status");
+        if (!numTasks || numTasks == 0) {
             ok();
             return;
         }
         checkLoaded = window.setInterval(
                 function () {
-                    var numLoading = scene.get("status").numLoading;
-                    if (!numLoading || numLoading == 0) {
+                    var numTasks = scene.get("status").numTasks;
+                    if (!numTasks || numTasks == 0) {
                         window.clearInterval(checkLoaded);
                         checkLoaded = null;
                         ok();

@@ -83,7 +83,7 @@ var SceneJS_Engine = function (json, options) {
      */
     this.sceneStatus = {
         nodes:{}, // Status for each node
-        numLoading:0  // Number of loads currently in progress
+        numTasks:0  // Number of loads currently in progress
     };
 
     var self = this;
@@ -351,7 +351,9 @@ SceneJS_Engine.prototype.start = function () {
 
                     scene.publish("rendered", tick);
 
-                    window.requestAnimationFrame(window[fnName]);
+                    if (self.running) {
+                        window.requestAnimationFrame(window[fnName]);
+                    }
 
                 } else {
 
@@ -361,15 +363,21 @@ SceneJS_Engine.prototype.start = function () {
 
                     sleeping = true;
 
-                    window.requestAnimationFrame(window[fnName]);
+                    if (self.running) {
+                        window.requestAnimationFrame(window[fnName]);
+                    }
                 }
             } else {
 
-                window.requestAnimationFrame(window[fnName]);
+                if (self.running) {
+                    window.requestAnimationFrame(window[fnName]);
+                }
             }
         };
 
-        window.requestAnimationFrame(window[fnName]);
+        if (self.running) {
+            window.requestAnimationFrame(window[fnName]);
+        }
     }
 };
 
@@ -476,7 +484,7 @@ SceneJS_Engine.prototype.destroyNode = function (node) {
     var nodeStatus = this.sceneStatus.nodes[node.id];
 
     if (nodeStatus) {
-        this.sceneStatus.numLoading -= nodeStatus.numLoading;
+        this.sceneStatus.numTasks -= nodeStatus.numTasks;
         delete this.sceneStatus.nodes[node.id];
     }
 };
