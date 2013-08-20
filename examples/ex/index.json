@@ -618,13 +618,13 @@
                         "title":"Subscribe to 3D position of a geometry",
                         "tags":[],
                         "path":"events/nodeRenderedEvent.html",
-                        "id": "subscribeGeometryPos"
+                        "id":"subscribeGeometryPos"
                     },
                     {
                         "title":"Line dynamically connecting two geometries",
                         "tags":[],
                         "path":"events/connectingLines.html",
-                        "id": "lineConnectGeometry"
+                        "id":"lineConnectGeometry"
                     }
                 ]
             }
@@ -996,6 +996,18 @@
                         "id":"violentDaysCloudsSkyBox"
                     }
                 ]
+            },
+            {
+                "title":"Importing",
+                "tags":["importing"],
+                "nodes":[
+                    {
+                        "title":"Importing geometry from Wavefront .OBJ (unfinished)",
+                        "path":"customNodes/import/obj.html",
+                        "tags":["wavefront"],
+                        "id":"importObj"
+                    }
+                ]
             }
         ]
     },
@@ -1149,7 +1161,7 @@
                         "title":"Slave geometry pos to another geometry",
                         "tags":[],
                         "path":"tests/nodes/slaveGeometryPos.html",
-                        "id": "testSlaveGeometryPos"
+                        "id":"testSlaveGeometryPos"
                     }
                 ]
             }
