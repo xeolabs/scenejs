@@ -814,6 +814,18 @@
                         "path":"customNodes/defining/animatedInlineCustomNodeTypeDef.html",
                         "tags":["animation"],
                         "id":"animatedCustomNodeDef"
+                    },
+                    {
+                        "title":"Define new node type that runs tasks",
+                        "path":"customNodes/defining/customNodeDefWithTasks.html",
+                        "tags":["tasks"],
+                        "id":"customNodeDefWithTasks"
+                    },
+                    {
+                        "title":"Define new node type that publishes something",
+                        "path":"customNodes/defining/customNodeDefWithPublications.html",
+                        "tags":["tasks"],
+                        "id":"customNodeDefWithTasks"
                     }
                 ]
             },
