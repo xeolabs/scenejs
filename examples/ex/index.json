@@ -723,7 +723,8 @@
                     {
                         "title":"Render masking",
                         "path":"tags/renderMasking.html",
-                        "tags":["regexShowHide"]
+                        "tags":[],
+                        "id":"regexShowHide"
                     }
                 ]
             }
