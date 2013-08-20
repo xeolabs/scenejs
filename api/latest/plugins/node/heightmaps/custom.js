@@ -7,7 +7,7 @@
             if (!params.src) {
                 throw "heightmap param expected: src";
             }
-            
+
             params.xSize = params.xSize || 1.0;
             params.ySize = params.ySize || 1.0;
             params.zSize = params.zSize || 1.0;
@@ -16,6 +16,9 @@
             params.zSegments = params.zSegments || 1;
 
             var self = this;
+
+            // Notify SceneJS so it can support loading/busy indicators etc
+            var taskId = this.taskStarted("Loading heightmap");
 
             var image = new Image();
 
@@ -29,11 +32,13 @@
 
                 c.drawImage(image, 0, 0);
 
-                var imageData = c.getImageData(0, 0, image.width,  image.height).data;
+                var imageData = c.getImageData(0, 0, image.width, image.height).data;
 
                 var mesh = createMeshData(params, image, imageData);
 
                 var wire = params.wire;
+
+                self.taskFinished(taskId);
 
                 // Create geometry node
                 self.addNode({
@@ -52,6 +57,10 @@
                         }
                     ]
                 });
+            };
+
+            image.onerror = function () {alert("failed");
+                self.taskFailed(taskId);
             };
 
             image.src = params.src;
