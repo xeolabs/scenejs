@@ -58,7 +58,8 @@
 
     function parseOBJ(data) {
 
-        // Adapted an OBJ loader somebody wrote for THREE.js - TODO: find it and credit it
+        // Adapted from the THREE.js OBJLoader
+        // https://github.com/mrdoob/three.js/blob/8f1d55542a18c664603f48d352a5d261034e81d8/examples/js/loaders/OBJLoader.js
 
         var group = {};
 
