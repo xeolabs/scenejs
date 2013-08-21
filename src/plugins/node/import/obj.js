@@ -35,7 +35,7 @@
 
         xhr.addEventListener('progress',
             function (event) {
-//                scope.dispatchEvent({ type:'progress', loaded:event.loaded, total:event.total });
+                // TODO: Update the task? { type:'progress', loaded:event.loaded, total:event.total }
             }, false);
 
         xhr.addEventListener('load',
