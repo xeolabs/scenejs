@@ -58,6 +58,8 @@
 
     function parseOBJ(data) {
 
+        // Adapted an OBJ loader somebody wrote for THREE.js - TODO: find it and credit it
+
         var group = {};
 
         var positions = [];
