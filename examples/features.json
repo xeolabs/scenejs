@@ -38,6 +38,14 @@
                         "page":"frustumProjection"
                     }
                 ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"Orbiting camera",
+                        "page":"customNodesCameraOrbit"
+                    }
+                ]
             }
         ]
     },
@@ -64,23 +72,27 @@
                 "nodes":[
                     {
                         "title":"Plane",
-                        "page":"planePrim"
+                        "page":"planeNodePrim"
                     },
                     {
                         "title":"Box",
-                        "page":"boxPrim"
+                        "page":"boxNodePrim"
                     },
                     {
                         "title":"Sphere",
-                        "page":"spherePrim"
+                        "page":"sphereNodePrim"
                     },
                     {
                         "title":"Torus",
-                        "page":"torusPrim"
+                        "page":"torusNodePrim"
                     },
                     {
                         "title":"Teapot",
-                        "page":"teapotPrim"
+                        "page":"teapotNodePrim"
+                    },
+                    {
+                        "title":"Terrain heightmap",
+                        "page":"customHeightmap"
                     }
                 ]
             },
@@ -138,6 +150,10 @@
                     {
                         "title":"Bump map",
                         "page":"bumpMap"
+                    },
+                    {
+                        "title":"Glow map",
+                        "page":"glowMap"
                     }
                 ]
             },
@@ -183,7 +199,6 @@
             }
         ]
     },
-
     {
         "title":"Effects, eg:",
         "nodes":[
@@ -229,6 +244,19 @@
                     {
                         "title":"Ray picking",
                         "page":"rayPicking"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Importers",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":"Wavefront .OBJ",
+                        "page":"importObj"
                     }
                 ]
             }
@@ -328,6 +356,19 @@
                     {
                         "title":"Texture atlases",
                         "page":"textureAtlas"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Utilities",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":"Canvas image capture",
+                        "page":"canvasCapture"
                     }
                 ]
             }

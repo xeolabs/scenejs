@@ -439,7 +439,7 @@
                 ]
             },
             {
-                "title":"Emission mapping",
+                "title":"Glow mapping",
                 "tip":"Application of texture to surface glow",
                 "tags":["glowMap"],
                 "nodes":[
