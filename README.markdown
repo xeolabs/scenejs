@@ -15,7 +15,7 @@ articulated and pickable objects as required for high-detail visualisation appli
 * [Custom Node Types](#custom-node-types)
  * [Defining a Custom Node Type](#defining-a-custom-node-type)
  * [Using a Custom Node Type](#using-a-custom-node-type)
- * [Loading Plugin Support Libraries with RequireJS](loading-plugin-support-libraries-with-requirejs)
+ * [Loading Plugin Support Libraries with RequireJS](#loading-plugin-support-libraries-with-requirejs)
 * [Building](#building-scenejs)
 
 ## Downloads
@@ -387,7 +387,7 @@ See that setColor method, which is defined by our node type?
 
 SceneJS bundles RequireJS, so that plugins can dynamically load support libraries, such as those from 3rd-party vendors.
 
-Support libraries used by custom node types are kept in a [lib directory inside the plugins directory](http://scenejs.org/api/latest/plugins/node/lib).
+Support libraries used by custom node types are kept in a [lib directory inside the plugins directory](http://scenejs.org/api/latest/plugins/lib).
 
 Custom node types can then require the dependencies using a *scenejsPluginDeps* prefix:
 
