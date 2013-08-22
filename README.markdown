@@ -412,6 +412,10 @@ require([
 
 SceneJS synchronises that RequireJS ```scenejsPluginDeps``` path with the current ```pluginPath``` configuration setting.
 
+* [Demo of a node that uses a 3rd-party library](http://scenejs.org/examples.html?page=canvasCapture)
+* [Sourcecode for the node](https://github.com/xeolabs/scenejs/blob/V3.1/api/latest/plugins/node/canvas/capture.js)
+
+
 ## Building SceneJS
 SceneJS requires nodejs and ncp. To build, simply:
 
