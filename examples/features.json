@@ -296,7 +296,7 @@
             {
                 "nodes":[
                     {
-                        "title":"WebGLContextLost recovery",
+                        "title":"Auto WebGLContextLost recovery",
                         "page":"webglContextLost"
                     }
                 ]
@@ -321,15 +321,15 @@
             {
                 "nodes":[
                     {
-                        "title":"Cities",
+                        "title":"City",
                         "page":"city"
                     },
                     {
-                        "title":"Vehicles",
+                        "title":"Tank",
                         "page":"customNodesTank"
                     },
                     {
-                        "title":"Planets",
+                        "title":"Earth",
                         "page":"customNodesEarth"
                     }
                 ]
