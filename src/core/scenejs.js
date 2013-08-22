@@ -6,9 +6,15 @@ var SceneJS = new (function () {
     /**
      * This SceneJS version
      */
-    this.VERSION = '3.1';
+    this.VERSION = '3.2';
 
     this._baseStateId = 0;
+
+    // Pub/sub support
+    this._handleMap = new SceneJS_Map(); // Subscription handle pool
+    this._topicSubs = {}; // A [handle -> callback] map for each topic name
+    this._handleTopics = {}; // Maps handles to topic names
+    this._topicPubs = {}; // Maps topics to publications
 
     /**
      * @property {SceneJS_Engine} Engines currently in existance
@@ -16,6 +22,116 @@ var SceneJS = new (function () {
     this._engines = {};
 
     this._engineIds = new SceneJS_Map();
+
+
+    /**
+     * Publishes to a topic.
+     *
+     * Immediately notifies existing subscriptions to that topic, retains the publication to give to
+     * any subsequent notifications on that topic as they are made.
+     *
+     * @param {String} topic Publication topic
+     * @param {Object} pub The publication
+     * @param {Boolean} [forget] When true, the publication will be sent to subscribers then forgotten, so that any
+     * subsequent subscribers will not receive it
+     * @private
+     */
+    this.publish = function (topic, pub, forget) {
+        if (!forget) {
+            this._topicPubs[topic] = pub; // Save notification
+        }
+        var subsForTopic = this._topicSubs[topic];
+        if (subsForTopic) { // Notify subscriptions
+            for (var handle in subsForTopic) {
+                if (subsForTopic.hasOwnProperty(handle)) {
+                    subsForTopic[handle].call(this, pub);
+                }
+            }
+        }
+    };
+
+    /**
+     * Removes a topic publication
+     *
+     * Immediately notifies existing subscriptions to that topic, sending them each a null publication.
+     *
+     * @param topic Publication topic
+     * @private
+     */
+    this.unpublish = function (topic) {
+        var subsForTopic = this._topicSubs[topic];
+        if (subsForTopic) { // Notify subscriptions
+            for (var handle in subsForTopic) {
+                if (subsForTopic.hasOwnProperty(handle)) {
+                    subsForTopic[handle].call(this, null);
+                }
+            }
+        }
+        delete this._topicPubs[topic];
+    };
+
+
+    /**
+     * Listen for data changes at a particular location
+     *
+     * <p>Your callback will be triggered for
+     * the initial data and again whenever the data changes. Use {@link #off} to stop receiving updates.</p>
+     *
+     * <p>The callback is be called with SceneJS as scope.</p>
+     *
+     * @param {String} location Publication location
+     * @param {Function(data)} callback Called when fresh data is available at the location
+     * @return {String} Handle to the subscription, which may be used to unsubscribe with {@link #off}.
+     */
+    this.on = function (topic, callback) {
+        var subsForTopic = this._topicSubs[topic];
+        if (!subsForTopic) {
+            subsForTopic = {};
+            this._topicSubs[topic] = subsForTopic;
+        }
+        var handle = this._handleMap.addItem(); // Create unique handle
+        subsForTopic[handle] = callback;
+        this._handleTopics[handle] = topic;
+        var pub = this._topicPubs[topic];
+        if (pub) { // A publication exists, notify callback immediately
+            callback.call(this, pub);
+        }
+        return handle;
+    };
+
+    /**
+     * Unsubscribes from a publication that was previously made with {@link #on}.
+     * @param handle Publication handle
+     */
+    this.off = function (handle) {
+        var topic = this._handleTopics[handle];
+        if (topic) {
+            delete this._handleTopics[handle];
+            var topicSubs = this._topicSubs[topic];
+            if (topicSubs) {
+                delete topicSubs[handle];
+            }
+            this._handleMap.removeItem(handle); // Release handle
+            if (topic == "rendered") {
+                this._engine.branchDirty(this);
+            }
+        }
+    };
+
+    /**
+     * Listens for exactly one data update at the specified location, and then stops listening.
+     * <p>This is equivalent to calling {@link #on}, and then calling {@link #off} inside the callback function.</p>
+     * @param {String} location Data location to listen to
+     * @param {Function(data)} callback Called when fresh data is available at the location
+     */
+    this.once = function (topic, callback) {
+        var self = this;
+        var sub = this.on(topic,
+            function (pub) {
+                self.off(sub);
+                callback(pub);
+            });
+    };
 
     /**
      * Creates a new scene from the given JSON description and begins rendering it

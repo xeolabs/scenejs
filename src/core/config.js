@@ -4,7 +4,7 @@
  * @class SceneJS_configsModule
  * @private
  */
-var SceneJS_configsModule = new (function() {
+var SceneJS_configsModule = new (function () {
 
     this.configs = {};
     var subs = {};
@@ -14,7 +14,7 @@ var SceneJS_configsModule = new (function() {
      * @param path
      * @param data
      */
-    this.setConfigs = function(path, data) {
+    this.setConfigs = function (path, data) {
         // Update configs
         if (!path) {
             this.configs = data;
@@ -40,6 +40,8 @@ var SceneJS_configsModule = new (function() {
                 list[i](cfg);
             }
         }
+
+        SceneJS.publish("configs", this.configs);
     };
 
     /**
@@ -47,7 +49,7 @@ var SceneJS_configsModule = new (function() {
      * @param path
      * @return {*}
      */
-    this.getConfigs = function(path) {
+    this.getConfigs = function (path) {
         if (!path) {
             return this.configs;
         } else {
@@ -65,7 +67,7 @@ var SceneJS_configsModule = new (function() {
      * @param path
      * @param ok
      */
-    this.on = function(path, ok) {
+    this.on = function (path, ok) {
         path = path || "_all";
         (subs[path] || (subs[path] = [])).push(ok);
         ok(this.getConfigs(path));

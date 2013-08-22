@@ -97,8 +97,11 @@
             //--------------------------------------------------------------------
 
             // RequireJS supports dynamic loading of dependencies by plugins
+            // We're wrapping it in a conditional to define it if not already defined.
 
-            //  "src/lib/require.js",
+            "src/lib/requireWrapperStart.js",
+            "src/lib/require.js",
+            "src/lib/requireWrapperEnd.js",
 
             "src/lib/webgl-debug-utils.js",
 
@@ -110,6 +113,9 @@
 
             "src/core/map.js",
             "src/core/scenejs.js",
+            // Synchronises the plugins' RequireJS 3rd-party libs route to the plugin path config,
+            // so that the plugins' require calls can find their 'lib' directory relative to their plugins directory
+            "src/lib/requireConfig.js",
             "src/core/eventManager.js",
             "src/core/plugins.js",
             "src/core/events.js",
