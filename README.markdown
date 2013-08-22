@@ -410,7 +410,7 @@ require([
    });
 ```
 
-SceneJS synchronises that RequireJS ```scenejsPluginDeps``` path with the current [```pluginPath```] configuration](#serving-plugins-yourself).
+SceneJS synchronises that RequireJS ```scenejsPluginDeps``` path with the current [pluginPath configuration](#serving-plugins-yourself).
 
 As an example, the bundled [canvas/capture](https://github.com/xeolabs/scenejs/blob/V3.1/api/latest/plugins/node/canvas/capture.js) node type
  uses the 3rd-party ```canvas2image``` library to capture the canvas to an image. Run a demo of that node
