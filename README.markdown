@@ -15,6 +15,7 @@ articulated and pickable objects as required for high-detail visualisation appli
 * [Custom Node Types](#custom-node-types)
  * [Defining a Custom Node Type](#defining-a-custom-node-type)
  * [Using a Custom Node Type](#using-a-custom-node-type)
+ * [Loading Plugin Support Libraries with RequireJS](loading-plugin-support-libraries-with-requirejs)
 * [Building](#building-scenejs)
 
 ## Downloads
@@ -380,6 +381,36 @@ scene.getNode("myColor",
 See that setColor method, which is defined by our node type?
 
  [ [Run this example](http://scenejs.org/examples.html?page=customBundledNodeColor) ]
+
+
+### Loading Plugin Support Libraries with RequireJS
+
+SceneJS bundles RequireJS, so that plugins can dynamically load support libraries, such as those from 3rd-party vendors.
+
+Support libraries used by custom node types are kept in a [lib directory inside the plugins directory](http://scenejs.org/api/latest/plugins/node/lib).
+
+Custom node types can then require the dependencies using a *scenejsPluginDeps* prefix:
+
+``` javascript
+require([
+
+      // This prefix routes to the 3rd-party libs directory
+      // containing resources used by plugins
+      "scenejsPluginDeps/someLibrary.js"
+   ],
+   function () {
+
+      SceneJS.Types.addType("foo/myCustomNodeType", {
+
+         init: function (params) {
+            // Now we can use that library in our node
+            // ...
+         }
+      });
+   });
+```
+
+SceneJS synchronises that RequireJS ```scenejsPluginDeps``` path with the current ```pluginPath``` configuration setting.
 
 ## Building SceneJS
 SceneJS requires nodejs and ncp. To build, simply:
