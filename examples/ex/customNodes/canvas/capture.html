@@ -27,8 +27,8 @@
 
 <script>
 
-    // Demonstrates the 'utils/canvasCapture' node, which is implemented by plugin in
-    // http://scenejs.org/api/latest/plugins/node/utils/canvasCapture.js
+    // Demonstrates the 'canvas/capture' node, which is implemented by plugin in
+    // http://scenejs.org/api/latest/plugins/node/canvas/capture.js
     //
     // This example periodically makes the node capture the scene canvas
     // and copy the captured image data to an image element.
@@ -43,7 +43,7 @@
         pluginPath:"../../../../api/latest/plugins"
     });
 
-    // Create scene containing our canvasCapture node
+    // Create scene containing our capture node
     var scene = SceneJS.createScene({
 
         // Link to our canvas element
@@ -71,10 +71,10 @@
                 ]
             },
 
-            // The canvasCapture node, implemented by plugin at
-            // http://scenejs.org/api/latest/plugins/node/utils/canvasCapture.js
+            // The capture node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/canvas/capture.js
             {
-                type:"utils/canvasCapture",
+                type:"canvas/capture",
                 id:"myCanvasCapture"
             }
         ]
@@ -86,7 +86,7 @@
 
     var imageElement = document.getElementById("myCapturedImage");
 
-    // Get the canvasCapture node
+    // Get the 'canvas/capture' node instance
     scene.getNode("myCanvasCapture",
             function (myCanvasCapture) {
 

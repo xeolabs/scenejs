@@ -4,7 +4,7 @@
  * Usage example:
  *
  * someNode.addNode({
- *      type: "utils/canvasCapture",
+ *      type: "canvas/capture",
  *
  *      // Optional image format, "jpeg" (default), "png" or "bmp"
  *      format: "jpeg",
@@ -45,7 +45,7 @@ require([
 ],
     function () {
 
-        SceneJS.Types.addType("utils/canvasCapture", {
+        SceneJS.Types.addType("canvas/capture", {
 
             init:function (params) {
                 this._format = params.format ? supportedFormat(params.format) : "jpeg";
@@ -82,7 +82,7 @@ require([
                         break;
 
                     default:
-                        console.log("ERROR: utils/canvasCapture format unsupported: " + format);
+                        console.log("ERROR: canvas/capture format unsupported: " + format);
                         return;
                 }
 
@@ -97,7 +97,7 @@ require([
 
         function supportedFormat(format) {
             if (format != "jpeg" && format != "png" && format != "bmp") {
-                console.log("ERROR: unsupported format for utils/canvasCapture node: " + format
+                console.log("ERROR: unsupported format for canvas/capture node: " + format
                     + " - supported types are 'jpeg', 'bmp' and 'png' - falling back on 'jpeg'");
                 return "jpeg";
             }

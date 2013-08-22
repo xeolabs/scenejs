@@ -1016,7 +1016,7 @@
                 "nodes":[
                     {
                         "title":"Capture canvas as JPEG to an image element",
-                        "path":"customNodes/utils/canvasCapture.html",
+                        "path":"customNodes/canvas/capture.html",
                         "id":"canvasCapture"
                     }
                 ]
