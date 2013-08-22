@@ -1008,6 +1008,18 @@
                         "id":"importObj"
                     }
                 ]
+            },
+            {
+                "title":"Utils",
+                "tip":"",
+                "tags":["canvasCapture"],
+                "nodes":[
+                    {
+                        "title":"Capture canvas as JPEG to an image element",
+                        "path":"customNodes/utils/canvasCapture.html",
+                        "id":"canvasCapture"
+                    }
+                ]
             }
         ]
     },
