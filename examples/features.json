@@ -89,9 +89,13 @@
                     {
                         "title":"Teapot",
                         "page":"teapotNodePrim"
-                    },
+                    }
+                ]
+            },
+            {
+                "nodes":[
                     {
-                        "title":"Terrain heightmap",
+                        "title":"Terrain",
                         "page":"customHeightmap"
                     }
                 ]
