@@ -140,23 +140,23 @@
             {
                 "nodes":[
                     {
-                        "title":"Color map",
+                        "title":"Color",
                         "page":"colorMap"
                     },
                     {
-                        "title":"Alpha map",
+                        "title":"Alpha",
                         "page":"alphaMap"
                     },
                     {
-                        "title":"Specular map",
+                        "title":"Specular",
                         "page":"specularMap"
                     },
                     {
-                        "title":"Bump map",
+                        "title":"Bump",
                         "page":"bumpMap"
                     },
                     {
-                        "title":"Glow map",
+                        "title":"Glow",
                         "page":"glowMap"
                     }
                 ]
