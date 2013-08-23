@@ -11,20 +11,9 @@ require([
 
             init:function (params) {
 
-                // Check params
-                var shape = params.shape;
-                if (!shape) {
-                    console.log("import/obj param missing: shape - won't create body");
-                    this.addNodes(params.nodes); // Add child nodes nonetheless
-                    return;
-                }
-
-                // Get physics system for this scene
-                // TODO: support multiple systems per scene with an optional "systemId" param
-                this._system = physics.getSystem(this.getScene());
-
                 var translate = this.addNode({
                     type:"translate"
+                    // TODO: set pos
                 });
 
                 var rotate = translate.addNode({
@@ -32,18 +21,35 @@ require([
                     nodes:params.nodes // Plugin node is responsible for attaching specified child nodes
                 });
 
-                this._bodyId = this._system.createBody({
-                        shape:shape
-                    },
-                    function (pos, dir) { // Body update handler
-                        translate.setXYZ({ x:pos[0], y:pos[1], z:pos[2] });
-                        //  rotate.setElements(dir);
-                    });
+                // Check params
+                var shape = params.shape;
+                if (!shape) {
+                    console.log("Failed to create 'physics/body' node ID '"
+                        + this.getId() + "' - param missing: 'shape'");
+                    return;
+                }
+
+                // Get physics system for this scene
+                this._system = physics.getSystem(this.getScene());
+
+                try {
+                    this._bodyId = this._system.createBody({
+                            shape:shape
+                        },
+                        function (pos, dir) { // Body update handler
+                            translate.setXYZ({ x:pos[0], y:pos[1], z:pos[2] });
+                            //  rotate.setElements(dir);
+                        });
+                } catch (e) {
+                    console.log("Failed to create 'physics/body' node ID '" + this.getId() + "' : " + e);
+                }
             },
 
             destroy:function () {
-                if (this._system) {
+                if (this._bodyId) {
                     this._system.removeBody(this._bodyId);
+                }
+                if (this._system) {
                     physics.putSystem(this._system);
                 }
             }

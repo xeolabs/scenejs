@@ -79,8 +79,35 @@ define(
                     }
                 }, false);
 
+
+            worker.addEventListener('message',
+                function (e) {
+                    var updates = e.data;
+                    var bodyId;
+                    var body;
+
+                    // The data buffer from the web worker contains a 20-element portion for
+                    // each physics body, each of which contains the body ID, a new position,
+                    // and a 16-element rotation matrix:
+                    //
+                    // [
+                    //      bodyId, xPos, yPos, zPos, mat0, ... mat15,
+                    //      bodyId, xPos, yPos, zPos, mat0, ... mat15,
+                    //      ...
+                    // ]
+                    for (var i = 0, len = updates.length - 20; i < len; i += 20) {
+                        bodyId = Math.round(updates[i]); // First element for body ID
+                        body = bodies[bodyId];
+                        if (body) { // May have been deleted
+                            body.callback(
+                                updates.slice(i + 1, i + 4), // 3 elements for position
+                                updates.slice(i + 4, i + 20)); // 16 elements for rotation matrix
+                        }
+                    }
+                }, false);
+
             /**
-             * Creates physics body, returns it's unique ID
+             * Creates a physics body, returns it's unique ID
              * @param params Body params
              * @param callback Callback fired whenever body updated
              * @return Body ID
@@ -89,12 +116,12 @@ define(
                 var bodyId = map.add({
                     callback:callback
                 });
-                worker.postMessage({ cmd:"createBody", bodyId:bodyId, body:params });
+                worker.postMessage({ cmd:"createBody", bodyId:bodyId, bodyCfg:params });
                 return bodyId;
             };
 
             /**
-             * Removes physics body
+             * Removes a physics body
              */
             this.removeBody = function (bodyId) {
                 worker.postMessage({ cmd:"removeBody", bodyId:bodyId });
