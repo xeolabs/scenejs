@@ -420,6 +420,7 @@ As an example, the bundled [canvas/capture](https://github.com/xeolabs/scenejs/b
 SceneJS requires nodejs and ncp. To build, simply:
 
 ```npm install ncp```
+
 ```node build.js```
 
 Then the binaries will appear in ```./api```.
