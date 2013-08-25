@@ -1233,7 +1233,13 @@ SceneJS.Node.prototype.getJSON = function () {
 
 
 SceneJS.Node.prototype._compile = function () {
+    if (this.preCompile) {
+        this.preCompile();
+    }
     this._compileNodes();
+    if (this.postCompile) {
+        this.postCompile();
+    }
 };
 
 SceneJS.Node.prototype._compileNodes = function () {
