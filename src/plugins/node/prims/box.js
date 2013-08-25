@@ -22,9 +22,17 @@
 
     function build(params) {
 
-        var x = params.xSize || 1;
-        var y = params.ySize || 1;
-        var z = params.zSize || 1;
+        var x, y, z;
+        if (params.size) {
+            x = params.size[0];
+            y = params.size[1];
+            z = params.size[2];
+        } else {
+            // Deprecated
+            x = params.xSize || 1;
+            y = params.ySize || 1;
+            z = params.zSize || 1;
+        }
 
         var coreId = "prims/box_" + x + "_" + y + "_" + z + (params.wire ? "wire" : "_solid");
 
@@ -32,14 +40,14 @@
         // then for efficiency we'll share that core rather than create another geometry
         if (this.getScene().hasCore("geometry", coreId)) {
             return {
-                type: "geometry",
+                type:"geometry",
                 coreId:coreId
             };
         }
 
         // Otherwise, create a new geometry
         return {
-            type: "geometry",
+            type:"geometry",
             primitive:params.wire ? "lines" : "triangles",
             coreId:coreId,
             positions:new Float32Array([

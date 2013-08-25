@@ -1,17 +1,17 @@
 /**
- * A box geometry with rigid-body physics behavior
+ * A teapot geometry with rigid-body physics behavior
  *
  * Documentation: https://github.com/xeolabs/scenejs/wiki/Physics
  *
  */
-SceneJS.Types.addType("physics/box", {
+SceneJS.Types.addType("physics/teapot", {
     init:function (params) {
 
         this.addNode({
             type:"physics/body",
-            shape: "box",
+            shape: "sphere",
             pos: params.pos,
-            size: params.size,
+            radius: 1,
             mass: params.mass,
             restitution: params.restitution,
             friction: params.friction,
@@ -20,8 +20,7 @@ SceneJS.Types.addType("physics/box", {
 
             nodes:[
                 {
-                    type:"prims/box",
-                    size: params.size
+                    type:"prims/teapot"
                 }
             ]
         });

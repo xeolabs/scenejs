@@ -38,11 +38,19 @@ require([
                     this._bodyId = this._system.createBody(params,
                         function (pos, dir) { // Body update handler
                             translate.setXYZ({ x:pos[0], y:pos[1], z:pos[2] });
-                            //rotate.setElements(dir);
+                            rotate.setElements(dir);
                         });
                 } catch (e) {
                     console.log("Failed to create 'physics/body' node ID '" + this.getId() + "' : " + e);
                 }
+            },
+
+            preCompile: function() {
+              //  console.log("body precompile");
+            },
+
+            postCompile: function() {
+               // console.log("body postcompile");
             },
 
             destroy:function () {

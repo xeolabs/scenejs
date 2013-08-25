@@ -1,17 +1,17 @@
 /**
- * A box geometry with rigid-body physics behavior
+ * A sphere geometry with rigid-body physics behavior
  *
  * Documentation: https://github.com/xeolabs/scenejs/wiki/Physics
  *
  */
-SceneJS.Types.addType("physics/box", {
+SceneJS.Types.addType("physics/sphere", {
     init:function (params) {
 
         this.addNode({
-            type:"physics/body",
-            shape: "box",
+            type:"physics/sphere",
+            shape: "sphere",
             pos: params.pos,
-            size: params.size,
+            radius: params.radius,
             mass: params.mass,
             restitution: params.restitution,
             friction: params.friction,
@@ -20,8 +20,10 @@ SceneJS.Types.addType("physics/box", {
 
             nodes:[
                 {
-                    type:"prims/box",
-                    size: params.size
+                    type:"prims/radius",
+                    latitudeBands: params.latitudeBands,
+                    longitudeBands: params.longitudeBands,
+                    radius: params.radius
                 }
             ]
         });

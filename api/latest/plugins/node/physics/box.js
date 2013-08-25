@@ -6,23 +6,22 @@
  */
 SceneJS.Types.addType("physics/box", {
     init:function (params) {
+
         this.addNode({
             type:"physics/body",
-
             shape: "box",
-
-            xPos: params.xPos,
-            yPos: params.yPos,
-            zPos: params.zPos,
-
-            //...etc
+            pos: params.pos,
+            size: params.size,
+            mass: params.mass,
+            restitution: params.restitution,
+            friction: params.friction,
+            velocity: params.velocity,
+            movable: params.movable,
 
             nodes:[
                 {
                     type:"prims/box",
-                    xSize:params.xSize,
-                    ySize:params.ySize,
-                    zSize:params.zSize
+                    size: params.size
                 }
             ]
         });
