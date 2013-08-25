@@ -1024,6 +1024,26 @@
         ]
     },
     {
+        "title":"Physics (alpha)",
+        "tip":"",
+        "tags":["physics"],
+        "nodes":[
+            {
+                "title":"Rigid-body physics",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Bouncing spheres",
+                        "path":"physics/bouncingSpheres.html",
+                        "tags":[],
+                        "id":"physicsBouncingSpheres"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "title":"Interaction",
         "tip":"",
         "tags":[],
