@@ -1034,10 +1034,16 @@
                 "tags":[],
                 "nodes":[
                     {
-                        "title":"Bouncing spheres",
+                        "title":"100 bouncing spheres",
                         "path":"physics/bouncingSpheres.html",
                         "tags":[],
                         "id":"physicsBouncingSpheres"
+                    },
+                    {
+                        "title":"400 bouncing spheres in four systems",
+                        "path":"physics/bouncingSpheresMultipleSystems.html",
+                        "tags":[],
+                        "id":"physicsBouncingSpheresMultiSystems"
                     }
                 ]
             }
