@@ -21,7 +21,7 @@ define(
                     return item.system;
                 }
                 var system = new System(systemId);
-                item = items[systemId] = {
+                items[systemId] = {
                     useCount:1,
                     system:system,
                     scene:scene,
@@ -75,12 +75,47 @@ define(
                                 updates.slice(offset, offset + 3), // Pos
                                 updates.slice(offset + 3, offset + 19)); // Rotation matrix
                         }
-                        offset += 19; // Pos and matrix elements
+                        offset += 20; // Pos and matrix elements
+                    }
+                }, false);
+
+
+            worker.addEventListener('message',
+                function (e) {
+                    var updates = e.data;
+                    var bodyId;
+                    var body;
+
+                    // The data buffer from the web worker contains a 20-element portion for
+                    // each physics body, each of which contains the body ID, a new position,
+                    // and a 16-element rotation matrix:
+                    //
+                    // [
+                    //      bodyId, xPos, yPos, zPos, mat0, ... mat15,
+                    //      bodyId, xPos, yPos, zPos, mat0, ... mat15,
+                    //      ...
+                    // ]
+                    for (var i = 0, len = updates.length - 20; i < len; i += 20) {
+                        bodyId = Math.round(updates[i]); // First element for body ID
+                        body = bodies[bodyId];
+                        if (body) { // May have been deleted
+                            body.callback(
+                                updates.slice(i + 1, i + 4), // 3 elements for position
+                                updates.slice(i + 4, i + 20)); // 16 elements for rotation matrix
+                        }
                     }
                 }, false);
 
             /**
-             * Creates physics body, returns it's unique ID
+             * Configures this physics system
+             * @param params Values for configs
+             */
+            this.setConfigs = function (params) {
+                worker.postMessage({ cmd:"setConfigs", configs:params });
+            };
+
+            /**
+             * Creates a physics body, returns it's unique ID
              * @param params Body params
              * @param callback Callback fired whenever body updated
              * @return Body ID
@@ -89,12 +124,12 @@ define(
                 var bodyId = map.add({
                     callback:callback
                 });
-                worker.postMessage({ cmd:"createBody", bodyId:bodyId, body:params });
+                worker.postMessage({ cmd:"createBody", bodyId:bodyId, bodyCfg:params });
                 return bodyId;
             };
 
             /**
-             * Removes physics body
+             * Removes a physics body
              */
             this.removeBody = function (bodyId) {
                 worker.postMessage({ cmd:"removeBody", bodyId:bodyId });
@@ -114,14 +149,23 @@ define(
          * @param items Array that will contain the items
          */
         function Map(items) {
-            var lastUniqueId = 1;
             this.add = function (item) {
+
+                // Start looking from the beginning of the array
+                // because we don't want an infinitely-expanding
+                // sparse array as we remove then add nodes.
+
+                // We're trading insertion overhead for the benefit
+                // of a nicely packed array that's fast to traverse
+                // when posting updates back to the physics body nodes.
+
+                var i = 0;
                 while (true) {
-                    var findId = lastUniqueId++;
-                    if (!items[findId]) {
-                        items[findId] = item;
-                        return findId;
+                    if (!items[i]) {
+                        items[i] = item;
+                        return i;
                     }
+                    i++;
                 }
             };
             this.remove = function (id) {

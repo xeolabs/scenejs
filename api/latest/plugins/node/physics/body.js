@@ -1,5 +1,7 @@
 /**
  * Physics rigid-body
+ *
+ * Documentation: https://github.com/xeolabs/scenejs/wiki/Physics
  */
 require([
     // Prefix routes to plugin support libs
@@ -11,17 +13,9 @@ require([
 
             init:function (params) {
 
-                // Check params
-                var shape = params.shape;
-                if (!shape) {
-                    console.log("import/obj param missing: shape - won't create body");
-                    this.addNodes(params.nodes); // Add child nodes nonetheless
-                    return;
-                }
-
-                // Get physics system for this scene
-                // TODO: support multiple systems per scene with an optional "systemId" param
-                this._system = physics.getSystem(this.getScene());
+                // Don't need to set the pos and direction on our scene nodes
+                // because that will will happen via an update from the physics
+                // system once we have created the physics body.
 
                 var translate = this.addNode({
                     type:"translate"
@@ -32,20 +26,29 @@ require([
                     nodes:params.nodes // Plugin node is responsible for attaching specified child nodes
                 });
 
-                this._bodyId = this._system.createBody({
-                        shape:shape
-                    },
-                    function (pos, dir) { // Body update handler
-                        translate.setXYZ({ x:pos[0], y:pos[1], z:pos[2] });
-                        //  rotate.setElements(dir);
-                    });
+                // Get physics system for this scene
+                this._system = physics.getSystem(this.getScene(), params.systemId);
+
+                try {
+
+                    // There must be no overlap in params for SceneJS and the physics system
+                    // because we are just passing those params straight through to the system.
+
+                    this._bodyId = this._system.createBody(params,
+                        function (pos, dir) { // Body update handler
+                            translate.setXYZ({ x:pos[0], y:pos[1], z:pos[2] });
+                            //rotate.setElements(dir);
+                        });
+                } catch (e) {
+                    console.log("Failed to create 'physics/body' node ID '" + this.getId() + "' : " + e);
+                }
             },
 
             destroy:function () {
-                if (this._system) {
+                if (this._bodyId) {
                     this._system.removeBody(this._bodyId);
-                    physics.putSystem(this._system);
                 }
+                physics.putSystem(this._system);
             }
         });
     });

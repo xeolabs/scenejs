@@ -33,5 +33,4 @@ SceneJS.Types.addType("effects/crt", {
     destroy:function () {
         // Not used
     }
-})
-;
+});

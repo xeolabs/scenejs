@@ -1,3 +1,73 @@
+/**
+ * Web worker containing a JigLibJS rigid-body physics system.
+ *
+ * This worker accepts various commands to setConfigs the system, add or
+ * remove bodies, and integrate (which means run the system for one frame).
+ *
+ * After each integration, this worker posts back an array buffer containing
+ * an updated position and direction for each body.
+ *
+ *
+ * Input Commands
+ * --------------------------------------------------------------------------
+ *
+ * Configure the system:
+ * {
+ *      cmd: "setConfigs",
+ *      //..configs
+ * }
+ *
+ * Create a body:
+ * {
+ *      cmd: "createBody",
+ *      bodyId: Number,
+ *      bodyCfg: {
+ *          shape: "plane" | "box" | "sphere",
+ *          movable: true | false,
+ *          pos: [Number, Number, Number],
+ *          mass: Number,
+ *          restitution: Number,
+ *          friction: Number,
+ *          velocity: [Number, Number, Number]
+ *      }
+ *  }
+ *
+ * Remove a body:
+ * {
+ *      cmd: "removeBody",
+ *      bodyId: Number
+ * }
+ *
+ * Integrate the phsycis system:
+ * {
+ *      cmd: "integrate"
+ * }
+ *
+ *
+ * For efficiency, the physics system manages bodies in an array. The "bodyId"
+ * parameter on the "createBody" command is the index for that body in the array.
+ *
+ * The "removeBody" command will delete a body from the array, leaving a hole.
+ *
+ * The worker can handle holes in the array OK, but in order to keep the array
+ * from getting too sparse, it's the reponsibility of the worker client to make
+ * its next "createBody" command specify a "bodyId" that indexes that hole, to plug
+ * the gap with the next new body.
+ *
+ *
+ * Output Buffer
+ * --------------------------------------------------------------------------
+ *
+ * The output buffer contains a 20-element portion for each physics body, each of
+ * which contains the body ID, a new position, and a 16-element rotation matrix:
+ *
+ * [
+ *      bodyId, xPos, yPos, zPos, mat0, ... mat15,
+ *      bodyId, xPos, yPos, zPos, mat0, ... mat15,
+ *      ...
+ * ]
+ *
+ */
 importScripts("jiglib.all.min.js");
 
 var bodies = [];
@@ -9,12 +79,12 @@ var updates = [];
 
 var system = jigLib.PhysicsSystem.getInstance();
 
-// Initial physics system configuration
-configure();
+// Set initial default configuration for physics system
+setConfigs();
 
 /** Configures JigLibJS
  */
-function configure(params) {
+function setConfigs(params) {
     params = params || {};
     system.setGravity(params.gravity || [0, -9.8, 0, 0]); //-120
     system.setSolverType(params.solver || 'ACCUMULATED'); //FAST, NORMAL, ACCUMULATED
@@ -32,8 +102,8 @@ addEventListener("message",
         switch (data.cmd) {
 
             // Configure the physics system
-            case "configure":
-                configure(data);
+            case "setConfigs":
+                setConfigs(data.configs);
                 break;
 
             // Create a physics body
@@ -41,13 +111,13 @@ addEventListener("message",
 
                 var bodyId = data.bodyId;
                 var bodyCfg = data.bodyCfg;
-                var shape = body.shape;
+                var shape = bodyCfg.shape;
                 var body;
 
                 switch (shape) {
 
                     case "plane":
-                        body = new jigLib.JPlane(null, bodyCfg.dir || [0,1,0]);
+                        body = new jigLib.JPlane(null, bodyCfg.dir || [0, 1, 0]);
                         break;
 
                     case "box":
@@ -115,6 +185,7 @@ addEventListener("message",
 
                     var secs = (now - then) / 1000;
                     var body;
+                    var state;
                     var pos;
                     var dir;
 
@@ -128,8 +199,9 @@ addEventListener("message",
                             continue;
                         }
 
-                        pos = body.get_currentState().position;
-                        dir = body.get_currentState().get_orientation().glmatrix;
+                        state = body.get_currentState();
+                        pos = state.position;
+                        dir = state.get_orientation().glmatrix;
 
                         // Body ID
                         updates[ibuf] = bodyId;
@@ -143,9 +215,21 @@ addEventListener("message",
                         updates[ibuf + 4] = dir[0];
                         updates[ibuf + 5] = dir[1];
                         updates[ibuf + 6] = dir[2];
+                        updates[ibuf + 7] = dir[3];
+                        updates[ibuf + 8] = dir[4];
+                        updates[ibuf + 9] = dir[5];
+                        updates[ibuf + 10] = dir[6];
+                        updates[ibuf + 11] = dir[7];
+                        updates[ibuf + 12] = dir[8];
+                        updates[ibuf + 13] = dir[9];
+                        updates[ibuf + 14] = dir[10];
+                        updates[ibuf + 15] = dir[11];
+                        updates[ibuf + 16] = dir[12];
+                        updates[ibuf + 17] = dir[13];
+                        updates[ibuf + 18] = dir[14];
+                        updates[ibuf + 19] = dir[15];
 
-                        ibuf += 20;
-
+                        ibuf += 20; // Next buffer portion
                         ibody++; // Next body;
                     }
 
