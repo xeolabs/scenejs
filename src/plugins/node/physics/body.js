@@ -27,6 +27,7 @@ require([
                 });
 
                 // Get physics system for this scene
+                // When params.systemId is undefined, get the default system for this scene
                 this._system = physics.getSystem(this.getScene(), params.systemId);
 
                 try {

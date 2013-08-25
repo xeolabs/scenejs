@@ -12,9 +12,10 @@ define(
             /**
              * Acquire a physics system for the given SceneJS scene, creating first if not existing
              * @param {SceneJS.Scene} scene
+             * @param {String} [systemId] Optional systemId
              */
-            getSystem:function (scene) {
-                var systemId = scene.getId();
+            getSystem:function (scene, systemId) {
+                systemId = systemId ? scene.getId() + "." + systemId : scene.getId();
                 var item = items[systemId];
                 if (item) {
                     item.useCount++;
@@ -41,6 +42,7 @@ define(
                 var item = items[system.systemId];
                 if (item) {
                     if (item.useCount-- <= 0) {
+                        item.system.destroy();
                         item.scene.off(item.tick); // Stop integrating the system
                         delete items[system.systemId];
                     }
@@ -55,6 +57,9 @@ define(
 
             this.systemId = systemId;
 
+            // Maximum number of bodies supported
+            var maxBodies = 1000;
+
             var bodies = [];
             var map = new Map(bodies);
 
@@ -62,27 +67,20 @@ define(
             var workerPath = SceneJS.getConfigs().pluginPath + "/lib/physics/worker.js";
             var worker = new Worker(workerPath);
 
+            var workerOutputBuf = new ArrayBuffer(maxBodies * 20);
+
+            // True while worker is busy integrating
+            // We don't send integration requests to it while this is true
+            var integrating = false;
+
             // Route updates from physics engine to bodies
             worker.addEventListener('message',
                 function (e) {
-                    var updates = e.data;
-                    var body;
-                    var offset = 0;
-                    for (var i = 0, len = bodies.length; i < len; i++) {
-                        body = bodies[i];
-                        if (body) { // May have been deleted
-                            body.callback(
-                                updates.slice(offset, offset + 3), // Pos
-                                updates.slice(offset + 3, offset + 19)); // Rotation matrix
-                        }
-                        offset += 20; // Pos and matrix elements
-                    }
-                }, false);
 
-
-            worker.addEventListener('message',
-                function (e) {
-                    var updates = e.data;
+                    var data = e.data;
+                    workerOutputBuf = data.buffer; // Worker transfers ownership of buffer to us
+                    var output = new Float32Array(workerOutputBuf);
+                    var lenOutput = data.lenOutput;
                     var bodyId;
                     var body;
 
@@ -95,15 +93,19 @@ define(
                     //      bodyId, xPos, yPos, zPos, mat0, ... mat15,
                     //      ...
                     // ]
-                    for (var i = 0, len = updates.length - 20; i < len; i += 20) {
-                        bodyId = Math.round(updates[i]); // First element for body ID
+                    for (var i = 0, len = lenOutput - 20; i < len; i += 20) {
+                        bodyId = Math.round(output[i]); // First element for body ID
                         body = bodies[bodyId];
                         if (body) { // May have been deleted
                             body.callback(
-                                updates.slice(i + 1, i + 4), // 3 elements for position
-                                updates.slice(i + 4, i + 20)); // 16 elements for rotation matrix
+                                output.subarray(i + 1, i + 4), // 3 elements for position
+                                null);
+                                //output.subarray(i + 4, i + 20)); // 16 elements for rotation matrix
                         }
                     }
+
+                    integrating = false;
+
                 }, false);
 
             /**
@@ -140,7 +142,25 @@ define(
              * Integrates this physics system
              */
             this.integrate = function () {
-                worker.postMessage({ cmd:"integrate" });
+
+                if (integrating) { // Don't choke worker
+                    return;
+                }
+                integrating = true;
+
+                // Transfer ownership of output buffer to the worker
+                var msg = {
+                    cmd:"integrate",
+                    buffer: workerOutputBuf
+                };
+                worker.postMessage(msg, [msg.buffer]);
+            };
+
+            /**
+             * Destroys system, terminating its worker
+             */
+            this.destroy = function () {
+                worker.terminate();
             };
         }
 

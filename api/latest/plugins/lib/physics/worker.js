@@ -73,10 +73,11 @@ importScripts("jiglib.all.min.js");
 var bodies = [];
 var numBodies = 0;
 
-// Buffer in which this worker posts back
+// Array in which this worker posts back
 // an updated position and direction for each body
-var updates = [];
+var output;
 
+// Physics engine system
 var system = jigLib.PhysicsSystem.getInstance();
 
 // Set initial default configuration for physics system
@@ -179,70 +180,80 @@ addEventListener("message",
             // Integrate the physics system and post back the body updates
             case "integrate":
 
+                var output = new Float32Array(data.buffer);
+
                 var now = (new Date()).getTime();
 
-                if (numBodies > 0) { // Only integrate and post if there are bodies
+                //       if (numBodies > 0) { // Only integrate and post if there are bodies
 
-                    var secs = (now - then) / 1000;
-                    var body;
-                    var state;
-                    var pos;
-                    var dir;
+                var secs = (now - then) / 1000;
+                var body;
+                var state;
+                var pos;
+                var dir;
+                var ibuf = 0;
 
-                    system.integrate(secs);
+                system.integrate(secs);
 
-                    for (var bodyId = 0, ibuf = 0, ibody = 0; ibody < numBodies; bodyId++) {
+                for (var bodyId = 0, ibody = 0; ibody < numBodies; bodyId++) {
 
-                        body = bodies[bodyId];
+                    body = bodies[bodyId];
 
-                        if (!body) { // Deleted
-                            continue;
-                        }
-
-                        state = body.get_currentState();
-                        pos = state.position;
-                        dir = state.get_orientation().glmatrix;
-
-                        // Body ID
-                        updates[ibuf] = bodyId;
-
-                        // New position
-                        updates[ibuf + 1] = pos[0];
-                        updates[ibuf + 2] = pos[1];
-                        updates[ibuf + 3] = pos[2];
-
-                        // New rotation matrix
-                        updates[ibuf + 4] = dir[0];
-                        updates[ibuf + 5] = dir[1];
-                        updates[ibuf + 6] = dir[2];
-                        updates[ibuf + 7] = dir[3];
-                        updates[ibuf + 8] = dir[4];
-                        updates[ibuf + 9] = dir[5];
-                        updates[ibuf + 10] = dir[6];
-                        updates[ibuf + 11] = dir[7];
-                        updates[ibuf + 12] = dir[8];
-                        updates[ibuf + 13] = dir[9];
-                        updates[ibuf + 14] = dir[10];
-                        updates[ibuf + 15] = dir[11];
-                        updates[ibuf + 16] = dir[12];
-                        updates[ibuf + 17] = dir[13];
-                        updates[ibuf + 18] = dir[14];
-                        updates[ibuf + 19] = dir[15];
-
-                        ibuf += 20; // Next buffer portion
-                        ibody++; // Next body;
+                    if (!body) { // Deleted
+                        continue;
                     }
 
-                    // Post the updates
-                    self.postMessage(updates);
+                    state = body.get_currentState();
+                    pos = state.position;
+                    dir = state.get_orientation().glmatrix;
+
+                    // Body ID
+                    output[ibuf] = bodyId;
+
+                    // New position
+                    output[ibuf + 1] = pos[0];
+                    output[ibuf + 2] = pos[1];
+                    output[ibuf + 3] = pos[2];
+
+                    // New rotation matrix
+                    output[ibuf + 4] = dir[0];
+                    output[ibuf + 5] = dir[1];
+                    output[ibuf + 6] = dir[2];
+                    output[ibuf + 7] = dir[3];
+                    output[ibuf + 8] = dir[4];
+                    output[ibuf + 9] = dir[5];
+                    output[ibuf + 10] = dir[6];
+                    output[ibuf + 11] = dir[7];
+                    output[ibuf + 12] = dir[8];
+                    output[ibuf + 13] = dir[9];
+                    output[ibuf + 14] = dir[10];
+                    output[ibuf + 15] = dir[11];
+                    output[ibuf + 16] = dir[12];
+                    output[ibuf + 17] = dir[13];
+                    output[ibuf + 18] = dir[14];
+                    output[ibuf + 19] = dir[15];
+
+                    ibuf += 20; // Next buffer portion
+                    ibody++; // Next body;
                 }
+
+                // Post the output
+
+                var response = {
+                    buffer:output.buffer,
+                    lenOutput:ibuf - 20
+                };
+
+                self.postMessage(response, [response.buffer]);
+                //  }
 
                 then = now;
 
                 break;
 
             default:
-                // Unknown command
+
+
                 break;
         }
     }, false);
