@@ -1024,7 +1024,7 @@
         ]
     },
     {
-        "title":"Physics (alpha)",
+        "title":"Physics (alpha status)",
         "tip":"",
         "tags":["physics"],
         "nodes":[
@@ -1044,6 +1044,12 @@
                         "path":"physics/bouncingSpheresMultipleSystems.html",
                         "tags":[],
                         "id":"physicsBouncingSpheresMultiSystems"
+                    },
+                    {
+                        "title":"30 falling boxes",
+                        "path":"physics/bouncingBoxes.html",
+                        "tags":[],
+                        "id":"physicsBouncingBoxes"
                     }
                 ]
             }
