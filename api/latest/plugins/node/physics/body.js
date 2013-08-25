@@ -45,12 +45,18 @@ require([
                 }
             },
 
-            preCompile: function() {
-              //  console.log("body precompile");
+            preCompile:function () {
+                if (this._bodyId != undefined) {
+                    var material = window._sceneJSPhysicsMaterial;
+                    if (material) {
+                        // Inherit state from parent "physics/material" node
+                        this._system.updateBody(this._bodyId, material);
+                    }
+                }
             },
 
-            postCompile: function() {
-               // console.log("body postcompile");
+            postCompile:function () {
+                // Not used
             },
 
             destroy:function () {

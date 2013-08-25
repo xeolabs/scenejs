@@ -38,6 +38,20 @@
  *      bodyId: Number
  * }
  *
+ * Update a body:
+ * {
+ *      cmd: "updateBody",
+ *      bodyId: Number,
+ *      bodyCfg: {
+ *          movable: true | false,
+ *          pos: [Number, Number, Number],
+ *          mass: Number,
+ *          restitution: Number,
+ *          friction: Number,
+ *          velocity: [Number, Number, Number]
+ *      }
+ * }
+ *
  * Integrate the phsycis system:
  * {
  *      cmd: "integrate"
@@ -166,6 +180,44 @@ addEventListener("message",
 
                 break;
 
+            // Update a physics body
+            case "updateBody":
+
+                var bodyId = data.bodyId;
+                var body = bodies[bodyId];
+
+                if (!body) {
+                    return;
+                }
+
+                var bodyCfg = data.bodyCfg;
+
+                if (bodyCfg.movable != undefined) {
+                    body.set_movable(!!bodyCfg.movable);
+                }
+
+                if (bodyCfg.pos) {
+                    body.moveTo(bodyCfg.pos);
+                }
+
+                if (bodyCfg.mass != undefined) {
+                    body.set_mass(bodyCfg.mass);
+                }
+
+                if (bodyCfg.restitution != undefined) {
+                    body.set_restitution(bodyCfg.restitution);
+                }
+
+                if (bodyCfg.friction != undefined) {
+                    body.set_friction(bodyCfg.friction);
+                }
+
+                if (bodyCfg.velocity != undefined) {
+                    body.setVelocity(bodyCfg.velocity);
+                }
+
+                break;
+
             // Remove a physics body
             case "removeBody":
                 var body = bodies[data.bodyId];
@@ -208,32 +260,31 @@ addEventListener("message",
                     dir = state.get_orientation().glmatrix;
 
                     // Body ID
-                    output[ibuf] = bodyId;
+                    output[ibuf++] = bodyId;
 
                     // New position
-                    output[ibuf + 1] = pos[0];
-                    output[ibuf + 2] = pos[1];
-                    output[ibuf + 3] = pos[2];
+                    output[ibuf++] = pos[0];
+                    output[ibuf++] = pos[1];
+                    output[ibuf++] = pos[2];
 
                     // New rotation matrix
-                    output[ibuf + 4] = dir[0];
-                    output[ibuf + 5] = dir[1];
-                    output[ibuf + 6] = dir[2];
-                    output[ibuf + 7] = dir[3];
-                    output[ibuf + 8] = dir[4];
-                    output[ibuf + 9] = dir[5];
-                    output[ibuf + 10] = dir[6];
-                    output[ibuf + 11] = dir[7];
-                    output[ibuf + 12] = dir[8];
-                    output[ibuf + 13] = dir[9];
-                    output[ibuf + 14] = dir[10];
-                    output[ibuf + 15] = dir[11];
-                    output[ibuf + 16] = dir[12];
-                    output[ibuf + 17] = dir[13];
-                    output[ibuf + 18] = dir[14];
-                    output[ibuf + 19] = dir[15];
+                    output[ibuf++] = dir[0];
+                    output[ibuf++] = dir[1];
+                    output[ibuf++] = dir[2];
+                    output[ibuf++] = dir[3];
+                    output[ibuf++] = dir[4];
+                    output[ibuf++] = dir[5];
+                    output[ibuf++] = dir[6];
+                    output[ibuf++] = dir[7];
+                    output[ibuf++] = dir[8];
+                    output[ibuf++] = dir[9];
+                    output[ibuf++] = dir[10];
+                    output[ibuf++] = dir[11];
+                    output[ibuf++] = dir[12];
+                    output[ibuf++] = dir[13];
+                    output[ibuf++] = dir[14];
+                    output[ibuf++] = dir[15];
 
-                    ibuf += 20; // Next buffer portion
                     ibody++; // Next body;
                 }
 

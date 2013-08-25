@@ -99,8 +99,7 @@ define(
                         if (body) { // May have been deleted
                             body.callback(
                                 output.subarray(i + 1, i + 4), // 3 elements for position
-                                null);
-                                //output.subarray(i + 4, i + 20)); // 16 elements for rotation matrix
+                                output.subarray(i + 4, i + 20)); // 16 elements for rotation matrix
                         }
                     }
 
@@ -128,6 +127,15 @@ define(
                 });
                 worker.postMessage({ cmd:"createBody", bodyId:bodyId, bodyCfg:params });
                 return bodyId;
+            };
+
+            /**
+             * Updates an existing physics body
+             * @param bodyId Body ID
+             * @param params Body params
+             */
+            this.updateBody = function (bodyId, params) {
+                worker.postMessage({ cmd:"updateBody", bodyId:bodyId, bodyCfg:params });
             };
 
             /**
