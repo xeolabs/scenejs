@@ -233,6 +233,28 @@
         ]
     },
     {
+        "title":"Physics (alpha)",
+        "status": "alpha",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":"Rigid body dynamics",
+                        "page":"physicsBouncingSpheres"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"Multiple systems",
+                        "page":"physicsBouncingSpheresMultiSystems"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "title":"Interaction",
         "nodes":[
             {
