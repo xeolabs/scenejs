@@ -204,7 +204,29 @@
         ]
     },
     {
-        "title":"Effects, eg:",
+        "title":"Physics (alpha)",
+        "status": "alpha",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":"Rigid body dynamics",
+                        "page":"physicsBouncingSpheres"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"Multiple systems",
+                        "page":"physicsBouncingSpheresMultiSystems"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Custom shaders, eg:",
         "nodes":[
             {
                 "nodes":[
@@ -227,28 +249,6 @@
                     {
                         "title":"Transparency sorting",
                         "page":"transparencySorting"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"Physics (alpha)",
-        "status": "alpha",
-        "nodes":[
-            {
-                "nodes":[
-                    {
-                        "title":"Rigid body dynamics",
-                        "page":"physicsBouncingSpheres"
-                    }
-                ]
-            },
-            {
-                "nodes":[
-                    {
-                        "title":"Multiple systems",
-                        "page":"physicsBouncingSpheresMultiSystems"
                     }
                 ]
             }
