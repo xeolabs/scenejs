@@ -13,18 +13,32 @@ require([
 
             init:function (params) {
 
-                // Don't need to set the pos and direction on our scene nodes
+                // Don't need to provide initial attributes for our scene nodes
                 // because that will will happen via an update from the physics
                 // system once we have created the physics body.
 
-                var translate = this.addNode({
-                    type:"translate"
-                });
+                var translate;
+                var rotate;
 
-                var rotate = translate.addNode({
-                    type:"matrix",
-                    nodes:params.nodes // Plugin node is responsible for attaching specified child nodes
-                });
+                if (params.shape == "sphere") {
+
+                    // No point in rotating a sphere
+                    translate = this.addNode({
+                        type:"translate",
+                        nodes:params.nodes
+                    });
+
+                } else {
+
+                    translate = this.addNode({
+                        type:"translate"
+                    });
+
+                    rotate = translate.addNode({
+                        type:"matrix",
+                        nodes:params.nodes // Plugin node is responsible for attaching specified child nodes
+                    });
+                }
 
                 // Get physics system for this scene
                 // When params.systemId is undefined, get the default system for this scene
@@ -38,7 +52,9 @@ require([
                     this._bodyId = this._system.createBody(params,
                         function (pos, dir) { // Body update handler
                             translate.setXYZ({ x:pos[0], y:pos[1], z:pos[2] });
-                            rotate.setElements(dir);
+                            if (rotate) {
+                                rotate.setElements(dir);
+                            }
                         });
                 } catch (e) {
                     console.log("Failed to create 'physics/body' node ID '" + this.getId() + "' : " + e);
