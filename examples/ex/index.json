@@ -998,24 +998,6 @@
                 ]
             },
             {
-                "title":"Backgrounds",
-                "tags":["backgrounds"],
-                "nodes":[
-                    {
-                        "title":"Gradient",
-                        "tags":[],
-                        "nodes":[
-                            {
-                                "title":"Gradient background",
-                                "tags":[],
-                                "path":"backgrounds/gradient.html",
-                                "id":"gradientBackground"
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
                 "title":"Importing",
                 "tags":["importing"],
                 "nodes":[
@@ -1036,6 +1018,24 @@
                         "title":"Capture canvas as JPEG to an image element",
                         "path":"customNodes/canvas/capture.html",
                         "id":"canvasCapture"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Backgrounds",
+        "tags":["backgrounds"],
+        "nodes":[
+            {
+                "title":"Gradient",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Gradient background",
+                        "tags":[],
+                        "path":"backgrounds/gradient.html",
+                        "id":"gradientBackground"
                     }
                 ]
             }
