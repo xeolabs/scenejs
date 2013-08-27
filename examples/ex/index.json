@@ -680,7 +680,8 @@
                         "title":"Toggle backface texturing",
                         "tags":["texture"],
                         "tip":"Using a flags node to toggle lighting of back faces of child geometries",
-                        "path":"flags/backfaceTexturing.html"
+                        "path":"flags/backfaceTexturing.html",
+                        "id": "flagsToggleBackfaces"
                     },
                     {
                         "title":"Toggle diffuse lighting",
