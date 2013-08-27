@@ -1008,7 +1008,8 @@
                             {
                                 "title":"Gradient background",
                                 "tags":[],
-                                "path":"backgrounds/gradient.html"
+                                "path":"backgrounds/gradient.html",
+                                "id":"gradientBackground"
                             }
                         ]
                     }
