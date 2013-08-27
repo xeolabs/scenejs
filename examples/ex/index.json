@@ -998,6 +998,23 @@
                 ]
             },
             {
+                "title":"Backgrounds",
+                "tags":["backgrounds"],
+                "nodes":[
+                    {
+                        "title":"Gradient",
+                        "tags":[],
+                        "nodes":[
+                            {
+                                "title":"Gradient background",
+                                "tags":[],
+                                "path":"backgrounds/gradient.html"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
                 "title":"Importing",
                 "tags":["importing"],
                 "nodes":[
