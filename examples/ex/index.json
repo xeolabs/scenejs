@@ -1229,7 +1229,7 @@
                     {
                         "title":"Apply color map to heightmap",
                         "tags":[],
-                        "path":"tests/heightMap/colorMapHeightMap.html",
+                        "path":"tests/heightmaps/colorMapHeightMap.html",
                         "id":"testcolorMapHeightMap"
                     }
                 ]
