@@ -53,7 +53,7 @@
                                 primitive:wire ? "lines" : "triangles",
                                 positions:mesh.positions,
                                 normals:!wire ? "auto" : null, // Get SceneJS to compute the normals
-                                uvs:!wire ? mesh.uvs : null,
+                                uv:!wire ? mesh.uv : null,
                                 indices:mesh.indices,
                                 coreId:"heightmap_" + (wire == true ? "wire_" : "") + params.zSize + "_" + params.xSize + "_" + params.xSegments + "_" + params.zSegments
                             }
