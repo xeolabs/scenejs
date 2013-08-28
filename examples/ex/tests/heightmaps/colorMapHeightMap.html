@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../../../../api/latest/scenejs.js"></script>
+
+<script>
+
+    // Demo of the "heightmaps/custom" custom node type with a video texture,
+    // plus an "effects/fog" node thrown in for fun.
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create a scene
+    var scene = SceneJS.createScene({
+                nodes:[
+
+                    // Mouse-orbited camera,
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                    {
+                        type:"cameras/orbit",
+                        yaw:-40,
+                        pitch:-80,
+                        maxPitch:-10,
+                        minPitch:-80,
+                        zoom:1200,
+                        eye:{ y:150 },
+                        look:{ y:150 },
+                        zoomSensitivity:20.0,
+
+                        nodes:[
+
+                            // Color map
+                            {
+                                type:"texture",
+                                layers:[
+                                    {
+                                        src:"../../../textures/superman.jpg"
+                                    }
+                                ],
+                                nodes:[
+                                    // Heightmap, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/heightmaps/custom.js
+                                    {
+                                        type:"heightmaps/custom",
+
+                                        // Texture image
+                                        src:'../../../textures/heightmap.jpg',
+
+                                        // Wireframe or solid - default is false
+                                        wire:false,
+
+                                        // Dimensions
+                                        xSize:1000,
+                                        zSize:1000,
+                                        ySize:50,
+
+                                        // Segments on X and Z axis
+                                        xSegments:10,
+                                        zSegments:10
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    );
+
+</script>
+</body>
+</html>

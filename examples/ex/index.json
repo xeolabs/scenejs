@@ -1225,6 +1225,12 @@
                         "tags":[],
                         "path":"tests/nodes/slaveGeometryPos.html",
                         "id":"testSlaveGeometryPos"
+                    },
+                    {
+                        "title":"Apply color map to heightmap",
+                        "tags":[],
+                        "path":"tests/heightMap/colorMapHeightMap.html",
+                        "id":"testcolorMapHeightMap"
                     }
                 ]
             }
