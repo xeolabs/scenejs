@@ -54,12 +54,6 @@
                                 // Location of example pages
                                 pageBase:"http://xeolabs.github.io/scenejs/examples/ex/",
 
-                                // Initially selected tags
-                                tags:getURLTags(),
-
-                                // Initially selected page
-                                page:getURLPage(),
-
                                 // Initially hide code
                                 showCode:false
                             });
@@ -72,35 +66,6 @@
                         });
             });
 
-    function getURLTags() {
-        var tags = {};
-        var params = getSearchParams();
-        var tagListStr = params.tags;
-        if (tagListStr) {
-            var tagList = tagListStr.split(",");
-            for (var i = 0, len = tagList.length; i < len; i++) {
-                tags[tagList[i]] = true;
-            }
-        }
-        return tags;
-    }
-
-    function getURLPage() {
-        var params = getSearchParams();
-        return params.page;
-    }
-
-    function getSearchParams() {
-        var searchParams = {};
-        var search = window.location.search.slice(1);
-        var params = search.split('&');
-        var tokens;
-        for (var i = 0, len = params.length; i < len; i++) {
-            tokens = params[i].split("=");
-            searchParams[tokens[0]] = tokens[1];
-        }
-        return searchParams;
-    }
 
 </script>
 </body>
