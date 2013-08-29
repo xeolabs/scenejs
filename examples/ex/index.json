@@ -642,7 +642,7 @@
                 "nodes":[
                     {
                         "title":"Toggle visibility",
-                        "tags":[],
+                        "tags":["culling"],
                         "tip":"Using a flags node to toggle visibility of child geometries",
                         "path":"flags/enabled.html"
                     },
@@ -681,7 +681,7 @@
                         "tags":["texture"],
                         "tip":"Using a flags node to toggle lighting of back faces of child geometries",
                         "path":"flags/backfaceTexturing.html",
-                        "id": "flagsToggleBackfaces"
+                        "id":"flagsToggleBackfaces"
                     },
                     {
                         "title":"Toggle diffuse lighting",
@@ -706,26 +706,13 @@
             {
                 "title":"Layers",
                 "tip":"",
-                "tags":["renderMasking"],
+                "tags":["culling"],
                 "nodes":[
                     {
                         "title":"Transparency sorting",
                         "path":"layers/alphaSort.html",
                         "tags":["transparency"],
                         "id":"transparencySorting"
-                    }
-                ]
-            },
-            {
-                "title":"Tags",
-                "tip":"",
-                "tags":["renderMasking"],
-                "nodes":[
-                    {
-                        "title":"Render masking",
-                        "path":"tags/renderMasking.html",
-                        "tags":[],
-                        "id":"regexShowHide"
                     }
                 ]
             }
@@ -1069,6 +1056,35 @@
                         "path":"physics/bouncingBoxes.html",
                         "tags":[],
                         "id":"physicsBouncingBoxes"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Culling",
+        "tip":"",
+        "tags":["culling"],
+        "nodes":[
+            {
+                "title":"Scene node culling",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Toggle visibility using the 'enable' node",
+                        "path":"culling/enableNode.html",
+                        "id":"cullingWithEnableNode"
+                    },
+                    {
+                        "title":"Toggle visibility using the 'flags' node",
+                        "path":"flags/enabled.html",
+                        "id":"cullingWithFlagsNode"
+                    },
+                    {
+                        "title":"Toggle visibility using regular expression matching",
+                        "path":"culling/tagNode.html",
+                        "id":"regexShowHide"
                     }
                 ]
             }

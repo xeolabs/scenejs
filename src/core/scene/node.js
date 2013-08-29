@@ -128,8 +128,8 @@ SceneJS.Node.prototype.taskFailed = function (taskId) {
 /**
  * Publishes to a topic on this node.
  *
- * Immediately notifies existing subscriptions to that topic, retains the publication to give to
- * any subsequent notifications on that topic as they are made.
+ * Immediately notifies existing subscriptions to that topic, and unless the "forget' parameter is
+ * true, retains the publication to give to any subsequent notifications on that topic as they are made.
  *
  * @param {String} topic Publication topic
  * @param {Object} pub The publication
@@ -461,7 +461,7 @@ SceneJS.Node.prototype.disconnectNodes = function () {
 SceneJS.Node.prototype.removeNodes = function () {
     var nodes = this.disconnectNodes();
     for (var i = 0; i < nodes.length; i++) {
-        this.nodes[i].destroy();
+        nodes[i].destroy();
         this._engine.display.objectListDirty = true;
     }
 };

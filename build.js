@@ -137,6 +137,7 @@
             "src/core/scene/nodeFactory.js",
             "src/core/scene/camera.js",
             "src/core/scene/clips.js",
+            "src/core/scene/enable.js",
             "src/core/scene/flags.js",
             "src/core/scene/framebuf.js",
             "src/core/scene/geometry.js",

@@ -226,6 +226,19 @@
         ]
     },
     {
+        "title":"Culling",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":"Regex-selected object visibility",
+                        "page":"renderMasking"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "title":"Custom shaders, eg:",
         "nodes":[
             {
@@ -304,14 +317,6 @@
                     {
                         "title":"Multiple scenes",
                         "page":"multipleScenes"
-                    }
-                ]
-            },
-            {
-                "nodes":[
-                    {
-                        "title":"Regex-selected object visibility",
-                        "page":"renderMasking"
                     }
                 ]
             },

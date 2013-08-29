@@ -84,6 +84,12 @@ var SceneJS_Display = function (cfg) {
     this._chunkFactory = new SceneJS_ChunkFactory();
 
     /**
+     * Node state core for the last {@link SceneJS.Enable} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.enable = null;
+
+    /**
      * Node state core for the last {@link SceneJS.Flags} visited during scene graph compilation traversal
      * @type Object
      */
@@ -334,6 +340,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     object.layer = this.layer;
     object.texture = this.texture;
     object.geometry = this.geometry;
+    object.enable = this.enable;
     object.flags = this.flags;
     object.tag = this.tag;
 
@@ -609,12 +616,15 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
         object = this._objectList[i];
 
+        // Cull invisible objects
+        if (object.enable.enabled === false) {
+            continue;
+        }
+
         flags = object.flags;
 
-        /* Cull invisible objects
-         */
-
-        if (flags.enabled === false) {                              // Skip disabled object
+        // Cull invisible objects
+        if (flags.enabled === false) {
             continue;
         }
 
