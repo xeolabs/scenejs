@@ -7,8 +7,7 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
     <script src="lib/jquery-1.8.3.min.js"></script>
-    <!--<script src="../examplejs/api/latest/tweakjs.js"></script>-->
-    <script src="http://xeolabs.github.io/examplejs/api/v0/tweakjs.js"></script>
+    <script src="http://xeolabs.github.io/examplejs/api/v0/example.js"></script>
 
 </head>
 <body>
@@ -27,7 +26,6 @@
 
 <script>
 
-
     jQuery(document).ready(
             function ($) {
 
@@ -38,7 +36,7 @@
                             var href = window.location.href;
 
                             // Create examples browser
-                            var tweakjs = new TweakJS({
+                            var examplejs = new ExampleJS({
 
                                 title:"SceneJS 3.0",
 
@@ -66,7 +64,7 @@
                             });
 
                             // Listen for home link click
-                            tweakjs.once("home",
+                            examplejs.once("home",
                                     function () {
                                         window.location = "http://scenejs.org"
                                     });
