@@ -13,11 +13,9 @@
 <body>
 
 <style>
-
     html, body {
         height: 100%;
     }
-
     body {
         margin: 0px;
         overflow: hidden;
@@ -30,42 +28,37 @@
     jQuery(document).ready(
             function ($) {
 
-                // Load examples index
+                // Load our examples index
                 $.getJSON("examples/ex/index.json",
                         function (index) {
 
-                            var href = window.location.href;
-
-                            // Create examples browser
+                            // Create an examples browser
                             var examplejs = new ExampleJS({
 
                                 title:"SceneJS 3.0",
 
-                                logo: "http://xeolabs.github.io/scenejs/images/scenejs.png",
+                                logo:"http://xeolabs.github.io/scenejs/images/scenejs.png",
 
+                                // Stick this under the logo:
                                 caption:"Examples",
 
-                                // Use built-in code viewer
-                                editor:"html",
-
-                                // JSON examples index
+                                // Provide our JSON examples index
                                 index:index,
 
-                                // Location of example pages
-                                pageBase:"http://xeolabs.github.io/scenejs/examples/ex/",
+                                // Our directory of example pages
+                                pageBase:"http://xeolabs.github.io/scenejs/examples/ex/",                                                               
 
                                 // Initially hide code
                                 showCode:false
                             });
 
-                            // Listen for home link click
+                            // Go to SceneJS.org when the home link (ie. logo) is clicked
                             examplejs.once("home",
                                     function () {
                                         window.location = "http://scenejs.org"
                                     });
                         });
             });
-
 
 </script>
 </body>
