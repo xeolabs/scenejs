@@ -14,7 +14,7 @@
             {
                 "nodes":[
                     {
-                        "title":"Multiple systems",
+                        "title":"Multiple systems in workers",
                         "page":"physicsBouncingSpheresMultiSystems"
                     }
                 ]
