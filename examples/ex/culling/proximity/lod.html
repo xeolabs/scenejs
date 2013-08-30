@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../../../../api/latest/scenejs.js"></script>
+
+<script>
+
+
+    // Basic demonstration of the "proximity/body" node
+    // within the SceneJS proximity culling system.
+    //
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:100,
+                zoomSensitivity:20.0,
+
+                nodes:[
+
+                    // Optional physics system configs, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/physics/system.js
+//                    {
+//                        type:"proximity/system",
+//                        innerRadius:1000,
+//                        outerRadius:5000
+//                    },
+
+                    // Ground plane
+
+                    // Blue color for ground plane
+                    {
+                        type:"material",
+                        color:{ r:0.8, g:0.8, b:1.0 },
+                        nodes:[
+
+                            // Grid ground plane geometry, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/prims/grid.js
+                            {
+                                type:"prims/grid",
+                                size:{ x:1000, z:1000 },
+                                xSegments:100,
+                                zSegments:100
+                            }
+                        ]
+                    },
+
+                    // A bunch of proximity bodies wrapping colored spheres
+                    {
+                        type:"node",
+                        nodes:makeBodies(1000)
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Returns a bunch of "prims/sphere" nodes, each wrapped by a "proximity/body" node
+    function makeBodies(numBodies) {
+        var nodes = [];
+
+        var xPos;
+        var yPos;
+        var zPos;
+
+        for (var i = 0; i < numBodies; i++) {
+
+            xPos = Math.random() * 500 - 250;
+            yPos = Math.random() * 500 - 250;
+            zPos = Math.random() * 500 - 250;
+
+            nodes.push(
+                    {
+                        type:"material",
+                        color:{
+                            r:Math.random() * 0.8 + 0.1,
+                            g:Math.random() * 0.8 + 0.1,
+                            b:Math.random() * 0.8 + 0.1
+                        },
+
+                        nodes:[
+
+                            // Physics body primitive, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/physics/body.js
+                            {
+                                type:"proximity/lod",
+                                pos:[xPos, yPos, zPos],
+                                radius:5.0,
+                                culling:true,
+
+                                // Child node will be culled according to changes in
+                                // the body's status within the proximity system
+                                nodes:[
+                                    {
+                                        type:"translate",
+                                        x:xPos,
+                                        y:yPos - 1.5,
+                                        z:zPos,
+
+                                        nodes:[
+                                            {
+                                                type:"scale",
+                                                x:2.5, y:2.5, z:2.5,
+                                                nodes:[
+                                                    {
+                                                        type:"prims/teapot"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        type:"translate",
+                                        x:xPos,
+                                        y:yPos,
+                                        z:zPos,
+
+                                        nodes:[
+                                            {
+                                                type:"scale",
+                                                x:1.0,
+                                                y:0.7,
+                                                z:1.0,
+
+                                                nodes:[
+                                                    // Sphere primitive, implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                                    {
+                                                        type:"prims/sphere",
+                                                        radius:5,
+                                                        latitudeBands:16, // A fairly low-rez sphere
+                                                        longitudeBands:16
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        type:"translate",
+                                        x:xPos,
+                                        y:yPos,
+                                        z:zPos,
+
+                                        nodes:[
+                                            {
+                                                type:"scale",
+                                                x:4, y:3, z:4,
+                                                nodes:[
+                                                    // Sphere primitive, implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                                    {
+                                                        type:"prims/box"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    });
+        }
+        return nodes;
+    }
+
+</script>
+</body>
+</html>

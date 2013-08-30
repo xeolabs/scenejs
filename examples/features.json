@@ -22,6 +22,23 @@
         ]
     },
     {
+        "title":"Culling",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":"Distance culling (beta)",
+                        "page":"proximityCullingLOD"
+                    },
+                    {
+                        "title":"Regex-selected object visibility",
+                        "page":"regexShowHide"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "title":"Lights",
         "nodes":[
             {
@@ -220,19 +237,6 @@
                     {
                         "title":"Texture plugin API",
                         "page":"videoAlphaMap"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"Culling",
-        "nodes":[
-            {
-                "nodes":[
-                    {
-                        "title":"Regex-selected object visibility",
-                        "page":"culling/tagNode"
                     }
                 ]
             }

@@ -1087,6 +1087,19 @@
                         "id":"regexShowHide"
                     }
                 ]
+            },
+            {
+                "title":"Distance culling",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Switch LOD for distance",
+                        "tags":["lod"],
+                        "path":"culling/proximity/lod.html",
+                        "id":"proximityCullingLOD"
+                    }
+                ]
             }
         ]
     },

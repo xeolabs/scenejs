@@ -1,7 +1,7 @@
 /**
  * Web worker containing a JigLibJS rigid-body physics system.
  *
- * This worker accepts various commands to setConfigs the system, add or
+ * This worker accepts various commands to configure the system, add or
  * remove bodies, and integrate (which means run the system for one frame).
  *
  * After each integration, this worker posts back an array buffer containing
@@ -148,7 +148,10 @@ addEventListener("message",
                         return;
                 }
 
-                bodies[bodyId] = body;
+                bodies[bodyId] = {
+                    body:body,
+                    spherical:shape == "sphere"
+                };
 
                 system.addBody(body);
 
@@ -184,7 +187,7 @@ addEventListener("message",
             case "updateBody":
 
                 var bodyId = data.bodyId;
-                var body = bodies[bodyId];
+                var body = bodies[bodyId].body;
 
                 if (!body) {
                     return;
@@ -239,7 +242,9 @@ addEventListener("message",
                 //       if (numBodies > 0) { // Only integrate and post if there are bodies
 
                 var secs = (now - then) / 1000;
+                var item;
                 var body;
+                var spherical;
                 var state;
                 var pos;
                 var dir;
@@ -249,41 +254,56 @@ addEventListener("message",
 
                 for (var bodyId = 0, ibody = 0; ibody < numBodies; bodyId++) {
 
-                    body = bodies[bodyId];
+                    item = bodies[bodyId];
 
-                    if (!body) { // Deleted
+                    if (!item) { // Deleted
                         continue;
                     }
 
+                    body = item.body;
+                    spherical = item.spherical;
+
                     state = body.get_currentState();
-                    pos = state.position;
-                    dir = state.get_orientation().glmatrix;
 
                     // Body ID
                     output[ibuf++] = bodyId;
 
                     // New position
+
+                    pos = state.position;
+
                     output[ibuf++] = pos[0];
                     output[ibuf++] = pos[1];
                     output[ibuf++] = pos[2];
 
-                    // New rotation matrix
-                    output[ibuf++] = dir[0];
-                    output[ibuf++] = dir[1];
-                    output[ibuf++] = dir[2];
-                    output[ibuf++] = dir[3];
-                    output[ibuf++] = dir[4];
-                    output[ibuf++] = dir[5];
-                    output[ibuf++] = dir[6];
-                    output[ibuf++] = dir[7];
-                    output[ibuf++] = dir[8];
-                    output[ibuf++] = dir[9];
-                    output[ibuf++] = dir[10];
-                    output[ibuf++] = dir[11];
-                    output[ibuf++] = dir[12];
-                    output[ibuf++] = dir[13];
-                    output[ibuf++] = dir[14];
-                    output[ibuf++] = dir[15];
+                    if (spherical) {
+
+                        // No rotation necessary for spheres
+                        ibuf += 16;
+
+                    } else {
+
+                        // New rotation matrix
+
+                        dir = state.get_orientation().glmatrix;
+
+                        output[ibuf++] = dir[0];
+                        output[ibuf++] = dir[1];
+                        output[ibuf++] = dir[2];
+                        output[ibuf++] = dir[3];
+                        output[ibuf++] = dir[4];
+                        output[ibuf++] = dir[5];
+                        output[ibuf++] = dir[6];
+                        output[ibuf++] = dir[7];
+                        output[ibuf++] = dir[8];
+                        output[ibuf++] = dir[9];
+                        output[ibuf++] = dir[10];
+                        output[ibuf++] = dir[11];
+                        output[ibuf++] = dir[12];
+                        output[ibuf++] = dir[13];
+                        output[ibuf++] = dir[14];
+                        output[ibuf++] = dir[15];
+                    }
 
                     ibody++; // Next body;
                 }
@@ -296,7 +316,6 @@ addEventListener("message",
                 };
 
                 self.postMessage(response, [response.buffer]);
-                //  }
 
                 then = now;
 

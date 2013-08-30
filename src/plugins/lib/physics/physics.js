@@ -58,7 +58,7 @@ define(
             this.systemId = systemId;
 
             // Maximum number of bodies supported
-            var maxBodies = 1000;
+            var maxBodies = 10000;
 
             var bodies = [];
             var map = new Map(bodies);
@@ -72,6 +72,9 @@ define(
             // True while worker is busy integrating
             // We don't send integration requests to it while this is true
             var integrating = false;
+
+            // System is integrating only when this true
+            var enabled = true;
 
             // Route updates from physics engine to bodies
             worker.addEventListener('message',
@@ -98,8 +101,10 @@ define(
                         body = bodies[bodyId];
                         if (body) { // May have been deleted
                             body.callback(
-                                output.subarray(i + 1, i + 4), // 3 elements for position
-                                output.subarray(i + 4, i + 20)); // 16 elements for rotation matrix
+                                output.subarray(i + 1, i + 4),
+                                null);
+//                                , // 3 elements for position
+//                                output.subarray(i + 4, i + 20)); // 16 elements for rotation matrix
                         }
                     }
 
@@ -113,6 +118,15 @@ define(
              */
             this.setConfigs = function (params) {
                 worker.postMessage({ cmd:"setConfigs", configs:params });
+            };
+
+            /**
+             * Enable or disable this physics system.
+             * To save on CPU, you would typically disable the system when its not in view.
+             * @param enable
+             */
+            this.setEnabled = function (enable) {
+                enabled = enable;
             };
 
             /**
@@ -148,18 +162,24 @@ define(
 
             /**
              * Integrates this physics system
+             * Does nothing when system is disabled with {@link System#setEnabled}
              */
             this.integrate = function () {
+
+                if (!enabled) {
+                    return;
+                }
 
                 if (integrating) { // Don't choke worker
                     return;
                 }
+
                 integrating = true;
 
                 // Transfer ownership of output buffer to the worker
                 var msg = {
                     cmd:"integrate",
-                    buffer: workerOutputBuf
+                    buffer:workerOutputBuf
                 };
                 worker.postMessage(msg, [msg.buffer]);
             };
