@@ -27,7 +27,7 @@
             {
                 "nodes":[
                     {
-                        "title":"Distance culling (beta)",
+                        "title":"LOD switching on distance (beta)",
                         "page":"proximityCullingLOD"
                     }
                 ]
