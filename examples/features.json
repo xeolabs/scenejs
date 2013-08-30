@@ -29,7 +29,11 @@
                     {
                         "title":"Distance culling (beta)",
                         "page":"proximityCullingLOD"
-                    },
+                    }
+                ]
+            },
+            {
+                "nodes":[
                     {
                         "title":"Regex-selected object visibility",
                         "page":"regexShowHide"
