@@ -5,27 +5,28 @@
  *      type: "proximity/body",
  *      pos: [45, -34, 100],
  *      radius: 35
- *  });
+ *  },
+ *      function (body) {
+ *          body.on("proximity",
  *
- *  body.on("proximity",
- *      function(status) {
- *          switch(status) {
-                case 0:
- *                  // Body is outside outer proximity radius
- *                  break;
+ *              function(status) {
+ *                  switch(status) {
+ *                      case 0:
+ *                          // Body is outside outer proximity radius
+ *                          break;
  *
- *              case 1:
- *                  // Body intersects outer proximity radius
- *                  break;
+ *                      case 1:
+ *                          // Body intersects outer proximity radius
+ *                          break;
  *
- *              case 2:
- *                  // Body intersects inner proximity radius
- *                  break;
- *          }
- *      });
+ *                      case 2:
+ *                          // Body intersects inner proximity radius
+ *                          break;
+ *                  }
+ *              });
+ *          });
  *
  *  TODO:
- *
  *  Handle load/unload for nodes that are added with #addNode and #addNodes etc
  */
 require([
@@ -76,17 +77,13 @@ require([
             _build:function () {
                 this._putSystem();
                 // Find parent lookat
-                var lookat = this.parent;
-                while (lookat && lookat.type != "lookAt") {
-                    lookat = lookat.parent;
-                }
+                var lookat = this.getParentOfType("lookAt");
                 if (!lookat) {
                     console.log("Failed to create 'proximity/body' node ID '" + this.getId()
                         + "' : mandatory parent 'lookat' node not found");
                 } else {
                     this._getSystem(lookat);
                 }
-                this._lastStatus = null;
             },
 
             _putSystem:function () {

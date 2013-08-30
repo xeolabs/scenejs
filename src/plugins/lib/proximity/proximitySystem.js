@@ -32,8 +32,7 @@
 
         // Only integrate when center or radii change
         var center;
-        var innerRadius;
-        var outerRadius;
+        var radii;
 
         // Schedules integration when true
         var needIntegrate = true;
@@ -80,24 +79,16 @@
             if (configs.center) {
                 var c = configs.center;
                 if (!center || c[0] != center[0] || c[1] != center[1] || c[2] != center[2]) {
-                    center = center || [0,0,0];
+                    center = center || [0, 0, 0];
                     center[0] = c[0];
                     center[1] = c[1];
                     center[2] = c[2];
                     needIntegrate = true;
                 }
             }
-            if (configs.innerRadius != undefined) {
-                if (configs.innerRadius != innerRadius) {
-                    innerRadius = configs.innerRadius;
-                    needIntegrate = true;
-                }
-            }
-            if (configs.outerRadius != undefined) {
-                if (configs.outerRadius != outerRadius) {
-                    outerRadius = configs.outerRadius;
-                    needIntegrate = true;
-                }
+            if (configs.radii != undefined) {
+                radii = configs.radii;
+                needIntegrate = true;
             }
             // Configure proximity system
             worker.postMessage({ cmd:"setConfigs", configs:configs });

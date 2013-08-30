@@ -14,8 +14,7 @@
  * {
  *      cmd: "setConfigs",
  *      center: [Number, Number, Number,
- *      innerRadius: Number,
- *      outerRadius: Number
+ *      radii: [Number,Number, ...]
  * }
  *
  * Create a body:
@@ -24,7 +23,7 @@
  *      bodyId: Number,
  *      bodyCfg: {
  *          pos: [Number, Number, Number],
- *          radius: Number
+ *          radii: [Number,Number, ...]
  *      }
  *  }
  *
@@ -40,7 +39,7 @@
  *      bodyId: Number,
  *      bodyCfg: {
  *          pos: [Number, Number, Number],
- *          radius: Number
+ *          radii: [Number,Number, ...]
  *      }
  * }
  *

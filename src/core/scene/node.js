@@ -112,7 +112,7 @@ SceneJS.Node.prototype.taskStarted = function (description) {
  * @return null
  */
 SceneJS.Node.prototype.taskFinished = function (taskId) {
-   return SceneJS_sceneStatusModule.taskFinished(taskId);
+    return SceneJS_sceneStatusModule.taskFinished(taskId);
 };
 
 /**
@@ -808,10 +808,25 @@ SceneJS.Node.prototype.removeListeners = function () {
     return this;
 };
 
-/** Returns the parent node
+/**
+ * Returns the parent node
+ * @return {SceneJS.Node}
  */
-SceneJS.Node.prototype.getParent = function () {
+SceneJS.Node.prototype.getParent = function (type) {
     return this.parent;
+};
+
+/**
+ * Finds the first node of given type on path to root.
+ * @param {String} type Parent type to find on path to root
+ * @return {SceneJS.Node}
+ */
+SceneJS.Node.prototype.getParentOfType = function (type) {
+    var parent = this.parent;
+    while (parent && parent.type != type) {
+        parent = parent.parent;
+    }
+    return parent;
 };
 
 /**
