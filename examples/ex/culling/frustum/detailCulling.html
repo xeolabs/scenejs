@@ -38,19 +38,6 @@ SceneJS.setConfigs({
 var scene = SceneJS.createScene({
     nodes:[
 
-        // Gradient background node, implemented by plugin at
-        // http://scenejs.org/api/latest/plugins/node/backgrounds/gradient.js
-        {
-            type:"backgrounds/gradient",
-            depth:-40,
-            color:[ // Default color
-                0.05, 0.06, 0.07, 1.0, // top left (R,G,B,A)
-                0.05, 0.06, 0.07, 1.0, // top right
-                0.85, 0.9, 0.98, 1.0, // bottom right
-                0.85, 0.9, 0.98, 1.0   // bottom left
-            ]
-        },
-
         // Mouse-orbited camera, implemented by plugin at
         // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
         {
@@ -70,7 +57,7 @@ var scene = SceneJS.createScene({
                     },
 
                     // A cloud of frustum-culled teapots
-                    nodes:makeBodies(400)
+                    nodes:makeBodies(600)
                 }
             ]
         }
@@ -87,9 +74,9 @@ function makeBodies(numBodies) {
 
     for (var i = 0; i < numBodies; i++) {
 
-        xPos = Math.random() * 300 - 150;
-        yPos = Math.random() * 300 - 150;
-        zPos = Math.random() * 300 - 150;
+        xPos = Math.random() * 400 - 200;
+        yPos = Math.random() * 400 - 200;
+        zPos = Math.random() * 400 - 200;
 
 
         // Detailing culling bounding box, implemented by plugin at
