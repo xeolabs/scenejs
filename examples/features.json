@@ -22,12 +22,12 @@
         ]
     },
     {
-        "title":"Frustum Culling",
+        "title":"Culling",
         "nodes":[
             {
                 "nodes":[
                     {
-                        "title":"Visibility culling",
+                        "title":"Frustum Culling",
                         "page":"frustumVisibilityCulling"
                     }
                 ]
