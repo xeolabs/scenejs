@@ -23,12 +23,15 @@
 
 <script>
 
-    // Demonstrates Frustum Culling using the axis-aligned bounding box node defined
+    // Demonstrates frustum culling using the axis-aligned bounding box node defined
     // by the plugin in http://scenejs.org/api/latest/plugins/node/frustum/cull.js
     //
     // This node lets you insert axis-aligned World-space boundaries into your scene
-    // graph that will only allow the nodes in its subgraph to render when they intersect
-    // the view frustum.
+    // graph that will only allow the nodes in its subgraph to render when the boundary
+    // intersects the view frustum.
+    //
+    // This is related to the detail culling node described on the wiki:
+    // https://github.com/xeolabs/scenejs/wiki/Detail-Culling
     //
 
     // Point SceneJS to the bundled plugins
@@ -88,7 +91,6 @@
                     // http://scenejs.org/api/latest/plugins/node/frustum/cull.js
                     {
                         type:"frustum/cull",
-                        shape:"box",
                         min:[xPos - 8, yPos - 3, zPos - 5],
                         max:[xPos + 8, yPos + 6, zPos + 5],
                         showBoundary:true, // Shows boundary as wireframe box

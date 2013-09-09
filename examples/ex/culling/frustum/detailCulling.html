@@ -22,12 +22,28 @@
 
 <script>
 
+//
 // Demonstrates Detail Culling using the axis-aligned bounding box node defined
 // by the plugin in http://scenejs.org/api/latest/plugins/node/frustum/lod.js
 //
-// This node lets you insert an axis-aligned World-space boundary into your scene
-// graph that will select and enable one child node for the projected 2D size of
-// its bounding box.
+// The frustum/lod node encloses its child nodes in an axis-aligned World-space bounding
+// box and enables the appropriate child for the box's current projected 2D canvas size.
+
+// As shown in the example below, we configure the node with a 2D size threshold for
+// each child node, given in property sizes. When the boundary's projected size falls
+// below the first of these thresholds, then no child will be enabled. When the projected
+// size is between the first and second thresholds, the first child is enabled, then when
+// between the second and third thresholds, the second child is enabled, and so on.
+
+// You can have an unlimited number of child nodes and size thresholds.
+
+// By default, all of the children are disabled when the bounding box falls outside the
+// view frustum, but we can use the optional frustumCull property to disable that
+// behaviour and cull the children solely on the projected box size, which actually
+// works regardless of which direction the box is in with regard to the viewing
+// direction. This is useful for disabling distant sound effects etc.
+//
+// More info on the wiki: https://github.com/xeolabs/scenejs/wiki/Detail-Culling
 //
 
 // Point SceneJS to the bundled plugins
@@ -57,7 +73,7 @@ var scene = SceneJS.createScene({
                         backfaces:false
                     },
 
-                    // A cloud of frustum-culled teapots
+                    // A cloud of detail-culled objects
                     nodes:makeBodies(600)
                 }
             ]
@@ -65,7 +81,7 @@ var scene = SceneJS.createScene({
     ]
 });
 
-// Returns a bunch of LOD-switching subgraphs
+// Returns an array of detail-culled objects
 function makeBodies(numBodies) {
     var nodes = [];
 
@@ -80,36 +96,36 @@ function makeBodies(numBodies) {
         zPos = Math.random() * 400 - 200;
 
 
-        // Detailing culling bounding box, implemented by plugin at
+        // Detail culling node, implemented by plugin at
         // http://scenejs.org/api/latest/plugins/node/frustum/lod.js
+        //
+        // More info at: https://github.com/xeolabs/scenejs/wiki/Detail-Culling
+
         nodes.push({
             type:"frustum/lod",
 
             // World-space axis-aligned bounding box
-            shape:"box",
             min:[xPos - 8, yPos - 3, zPos - 5],
             max:[xPos + 8, yPos + 6, zPos + 5],
 
-            // The child node corresponding to the largest of these
-            // sizes that fits within the bounding box's diagonal
-            // projected size will be activated
+            // 2D canvas size thresholds, one for each child node, in ascending
+            // order for size, unlimited quantity
+            sizes:[
+                50, 250, 350 // More as required...
+            ],
 
-            // Nothing rendered when canvas size < 50
-            // Box rendered when canvas size between [50..250]
-            // Sphere rendered when canvas size between [250..350]
-            // Teapot rendered when canvas size >= 350
-            //.. Can have many more sizes and child nodes if you need them...
-            sizes:[  50, 250, 350 ],
-
-            // Shows visible boundary when true
+            // Option to show the boundary as a wireframe box for debugging - default false
             showBoundary:false,
 
-            // A child node for each size,
-            // in ascending order of detail
+            // Option to disable all child nodes when the bounding box
+            // falls outside the view frustum - true by default
+            frustumCull:true,
 
+            // A child node for each size threshold, in ascending order of
+            // detail, unlimited quantity
             nodes:[
 
-                // Detail level #1 (lowest)
+                // Detail level 1 (lowest)
                 // A light blue box
 
                 {
@@ -146,7 +162,7 @@ function makeBodies(numBodies) {
                     ]
                 },
 
-                // Detail level #2 (middle)
+                // Detail level 2 (middle)
                 // A medium-blue sphere
 
                 {
@@ -188,7 +204,7 @@ function makeBodies(numBodies) {
                     ]
                 },
 
-                // Detail level #3 (highest)
+                // Detail level 3 (highest)
                 // A dark blue teapot
 
                 {
@@ -222,6 +238,8 @@ function makeBodies(numBodies) {
                         }
                     ]
                 }
+
+                // Mode children as required for more detail levels..
             ]
         });
     }

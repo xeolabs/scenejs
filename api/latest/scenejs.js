@@ -1848,17 +1848,6 @@ var SceneJS_Engine = function (json, options) {
     this._sceneBranchesDirty = false;
 
     /**
-     * List of nodes scheduled for destruction by #addNode
-     * Destructions are done in a batch at the end of each render so as not to disrupt the render.
-     */
-    this._nodesToAdd = [];
-
-    /**
-     * Number of nodes in addition list
-     */
-    this._numNodesToAdd = 0;
-
-    /**
      * List of nodes scheduled for destruction by #destroyNode
      * Destructions are done in a batch at the end of each render so as not to disrupt the render.
      */
@@ -1990,7 +1979,6 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
                                 }
                                 self.scene.publish("nodes/" + node.id, node);
                             }
-
                         });
                 }
             } else {
@@ -2021,20 +2009,6 @@ SceneJS_Engine.prototype._doDestroyNodes = function () {
         this._nodeFactory.putNode(node);         // Release node for reuse
     }
 };
-
-/**
- * Schedules addition of a node within this engine's {@link SceneJS.Scene}
- */
-SceneJS_Engine.prototype.addNode = function (fn) {
-    this._nodesToAdd[this._numNodesToAdd++] = fn;
-};
-
-SceneJS_Engine.prototype._doAddNodes = function () {
-    while (this._numNodesToAdd > 0) {
-        this._nodesToAdd[--this._numNodesToAdd]();
-    }
-};
-
 
 /**
  * Finds the node with the given ID in this engine's scene graph
@@ -5811,24 +5785,6 @@ var SceneJS_nodeEventsModule = new (function () {
             }
         });
 
-    this.preVisitNodeOLD = function (node) {
-        var subs = node._topicSubs["rendered"];
-        if (subs) {
-            idStack[stackLen] = node.id;
-            var fn = node.__publishRenderedEvent;
-            if (!fn) {
-                fn = node.__publishRenderedEvent = function (params) {
-                    // Don't retain
-                    node.publish("rendered", params, true);
-                };
-            }
-            listenerStack[stackLen] = fn;
-            stackLen++;
-            dirty = true;
-        } else {
-            node.__publishRenderedEvent = null;
-        }
-    };
 
     this.preVisitNode = function (node) {
 
@@ -6736,7 +6692,6 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
         this.nodes.push(node);
         node.parent = this;
         this._engine.branchDirty(node);
-        //      this._engine.sceneDirty = true;
         if (ok) {
             ok(node);
         }
@@ -6751,16 +6706,12 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
         var self = this;
         this._engine.createNode(node,
             function (node) {
-//                self._engine.addNode(
-//                    function () {
                 self.nodes.push(node);
                 node.parent = self;
                 self._engine.branchDirty(node);
-                //self._engine.sceneDirty = true;
                 if (ok) {
                     ok(node);
                 }
-                // });
             });
         return null;
     }
@@ -13142,7 +13093,7 @@ var SceneJS_modelXFormStack = new (function () {
                 SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
 
         core.dirty = false;         // Does this subtree need matrices rebuilt
-        core.dirty = true;
+
         core.setDirty = function () {
 
             core.matrixDirty = true;

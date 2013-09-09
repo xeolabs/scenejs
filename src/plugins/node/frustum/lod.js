@@ -40,8 +40,8 @@ SceneJS.Types.addType("frustum/lod", {
                 min:params.min,
                 max:params.max,
                 showBoundary:params.showBoundary,
-                cull:true, // Enable visibility culling information (default)
-                lod:true // Enable detail culling information (default)
+                frustumCull: params.frustumCull ? params.frustumCull : true, // Enable frustum culling?
+                detailCull:true // Enable detail culling information (default)
             },
             function (body) {
                 if (params.nodes) {
@@ -59,7 +59,11 @@ SceneJS.Types.addType("frustum/lod", {
                     // The currently active child node
                     var currentNode;
 
-                    // We'll get an intersection update first..
+                    // If frustum culling is not disabled by
+                    // params.frustumCull, then we'll get notification
+                    // whenever the boundaries intersection status
+                    // changes with respect to the view frustum.
+
                     body.on("intersect",
                         function (intersect) {
                             if (currentNode) {
@@ -77,16 +81,24 @@ SceneJS.Types.addType("frustum/lod", {
                             }
                         });
 
-                    // .. then we'll only get a 2D size update if
-                    // we're intersecting the view frustum.
+                    // If frustum culling is not disabled by params.frustumCull,
+                    // then we'll get notifications of change in projected canvas
+                    // size for the boundary as long as the "intersect" notification
+                    // reported that the boundary is not outside the view frustum.
+
+                    // If frustum culling is disabled. then we'll get
+                    // notification of canvas size changes regardless of
+                    // whether the boundary is outside the frustum of not.
+
                     body.on("canvasSize",
                         function (canvasSize) {
 
                             if (currentNode) {
 
                                 // We only get a 2d size update when the size has changed,
-                                // so safe to say we'll not be immediately re-enabling
-                                // the currently enabled child node
+                                // so its safe to say we'll not be immediately re-enabling
+                                // the currently enabled child node. No need to avoid
+                                // any redundant re-enabling or disabling here.
 
                                 currentNode.setEnabled(false);
                             }

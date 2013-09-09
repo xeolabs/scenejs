@@ -9,22 +9,19 @@ require([
             construct:function (params) {
 
                 // Frustum culling and projected canvas size enabled by default
-                this._cull = params.cull != undefined ? params.cull : true;
-                this._lod = params.lod != undefined ? params.lod : true;
+                this._frustumCull = params.frustumCull != undefined ? params.frustumCull : true;
+                this._detailCull = params.detailCull != undefined ? params.detailCull : true;
 
-                if (!params.shape) {
-                    this.log("error", "Mandatory attribute expected: 'shape'");
-                    return;
-                }
+                var shape = params.shape || "box";
 
-                switch (params.shape) {
+                switch (shape) {
                     case "box":
                         this._bodyCfg = {
-                            shape:"box",
+                            shape:shape,
                             min:params.min || [0, 0, 0],
                             max:params.max || [0, 0, 0],
-                            cull:this._cull,
-                            lod:this._lod
+                            frustumCull:this._frustumCull,
+                            detailCull:this._detailCull
                         };
                         if (params.showBoundary) {
                             this.addNode({
@@ -85,15 +82,15 @@ require([
                             // updates via pub/sub because they only happen sparsely,
                             // ie. for bodies whose status actually changes
 
-                            if (self._cull) { // Frustum culling switching enabled
+                            if (self._frustumCull) { // Frustum culling switching enabled
                                 self.publish("intersect", intersect);
                             }
 
-                            if (self._lod) { // LOD switching enabled
+                            if (self._detailCull) { // LOD switching enabled
                                 self.publish("canvasSize", canvasSize);
                             }
 
-                          //  self.log(" intersect = " + intersect + ", canvasSize = " + canvasSize);
+                            //  self.log(" intersect = " + intersect + ", canvasSize = " + canvasSize);
                         });
                 } catch (e) {
                     this.log("Error : " + e);

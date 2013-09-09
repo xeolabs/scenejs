@@ -10,8 +10,8 @@ SceneJS.Types.addType("frustum/cull", {
                 min:params.min,
                 max:params.max,
                 showBoundary:params.showBoundary,
-                cull: true, // Enable frustum culling (this is default)
-                lod: false // Don't need LOD switching
+                frustumCull: params.frustumCull ? params.frustumCull : true, // Enable frustum culling?
+                detailCull: false // Don't need LOD switching
             },
             function (body) {
                 if (params.nodes) {

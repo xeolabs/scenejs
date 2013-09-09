@@ -31,18 +31,9 @@
  *      bodyCfg: {
  *          shape: "box",
  *          min: [Number, Number, Number],
- *          max: [Number, Number, Number]
- *      }
- *  }
- *
- * Sphere:
- * {
- *      cmd: "createBody",
- *      bodyId: Number,
- *      bodyCfg: {
- *          shape: "sphere",
- *          centre: [Number, Number, Number],
- *          radius: Number
+ *          max: [Number, Number, Number],
+ *          frustumCull: Boolean, // Perform frustum culling for this body? Default is true.
+ *          detailCull: Boolean, // Perform detail culling for this body? Default is true.
  *      }
  *  }
  *
@@ -70,7 +61,7 @@
  * Output Buffer
  * --------------------------------------------------------------------------
  *
- * The output buffer is an Int16Array containing a 3-element portion for each proximity
+ * The output buffer is an Int16Array containing a 3-element portion for each
  * body, each of which contains the body ID, its frustum intersection status and the
  * projected size within the viewport:
  *
@@ -84,11 +75,11 @@
  *      0 == body is completely outside frustum
  *      1 == body is partially inside frustum
  *      2 == body is completely inside frustum
+ *      Undefined when body frustumCull == false
  *
  * canvasSize:
  *      For box, will be the length of diagonal size of projected boundary.
- *      For sphere, will be size of projected radius.
- *      For either type, will be undefined when intersect == 0.
+ *      Undefined when body detailCull == false or intersect == 0.
  *
  */
 importScripts("frustumCullEngine.js");

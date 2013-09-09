@@ -135,16 +135,25 @@ Engine.prototype.integrate = function (callback) {
         body = this._bodyList[i];
         intersect = -1;
         canvasSize = -1;
-        intersect = this._frustum.textAxisBoxIntersection(body);
-        if (body.lod) {
-            switch (intersect) {
-                case INTERSECT_FRUSTUM:
-                case INSIDE_FRUSTUM:
-                    body.projBox.fromPoints(body.viewBox);
-                    canvasSize = this._frustum.getProjectedSize(body.projBox);
-                    break;
+        if (body.frustumCull) {
+            // Frustum cull this body
+            intersect = this._frustum.textAxisBoxIntersection(body);
+            if (body.detailCull) {
+                // And detail cull
+                switch (intersect) {
+                    case INTERSECT_FRUSTUM:
+                    case INSIDE_FRUSTUM:
+                        body.projBox.fromPoints(body.viewBox);
+                        canvasSize = this._frustum.getProjectedSize(body.projBox);
+                        break;
+                }
             }
+        } else {
+            // Just detail cull
+            body.projBox.fromPoints(body.viewBox);
+            canvasSize = this._frustum.getProjectedSize(body.projBox);
         }
+
         if (intersect !== body.intersect || canvasSize != body.canvasSize) {
             body.intersect = intersect;
             body.canvasSize = canvasSize;
@@ -201,12 +210,12 @@ function Body(bodyId, cfg) {
     /**
      * True when frustum culling is to be performed for this body
      */
-    this.cull = cfg.cull;
+    this.frustumCull = cfg.frustumCull != undefined ? cfg.frustumCull : true;
 
     /**
      * True when projected canvas size is to be determined for this body
      */
-    this.lod = cfg.lod;
+    this.detailCull = cfg.detailCull != undefined ? cfg.detailCull : true;
 
     /**
      * View-space extents
@@ -718,7 +727,7 @@ function Box3(min, max) {
     this.fromPoints = function (points) {
         var pointsLength = points.length;
         for (var i = 0; i < pointsLength; ++i) {
-         //   var points_i3 = points[i][3];
+            //   var points_i3 = points[i][3];
             var points_i3 = 1;
             var pDiv0 = points[i][0] / points_i3;
             var pDiv1 = points[i][1] / points_i3;
