@@ -35,7 +35,7 @@
             {
                 "nodes":[
                     {
-                        "title":"Detail culling",
+                        "title":"Level-of-Detail",
                         "page":"frustumDetailCulling"
                     }
                 ]

@@ -1100,7 +1100,7 @@
                         "id":"frustumVisibilityCulling"
                     },
                     {
-                        "title":"Detail culling",
+                        "title":"Level-of-Detail",
                         "tags":["LOD"],
                         "path":"culling/frustum/detailCulling.html",
                         "id":"frustumDetailCulling"
