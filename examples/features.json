@@ -14,7 +14,7 @@
             {
                 "nodes":[
                     {
-                        "title":"Multi-threaded",
+                        "title":"Multi-threaded physics",
                         "page":"physicsBouncingSpheresMultiSystems"
                     }
                 ]
