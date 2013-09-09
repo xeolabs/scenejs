@@ -27,7 +27,7 @@
             {
                 "nodes":[
                     {
-                        "title":"Visibility",
+                        "title":"Visibility culling",
                         "page":"frustumVisibilityCulling"
                     }
                 ]
@@ -35,7 +35,7 @@
             {
                 "nodes":[
                     {
-                        "title":"Detail",
+                        "title":"Detail culling",
                         "page":"frustumDetailCulling"
                     }
                 ]
