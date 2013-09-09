@@ -247,7 +247,7 @@
         ]
     },
     {
-        "title":"Custom shaders, eg:",
+        "title":"Shaders, eg:",
         "nodes":[
             {
                 "nodes":[
@@ -339,7 +339,7 @@
         ]
     },
     {
-        "title":"Custom node types, eg:",
+        "title":"Custom nodes, eg:",
         "nodes":[
             {
                 "nodes":[
