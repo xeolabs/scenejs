@@ -14,10 +14,11 @@
         }
     </style>
 
+    <script src="../../../api/latest/scenejs.js"></script>
+    <script src="../../libs/stats.min.js"></script>
+
 </head>
 <body>
-
-<script src="../../../api/latest/scenejs.js"></script>
 
 <script>
 
@@ -228,6 +229,20 @@ function makeBodies(numBodies, systemId) {
     }
     return nodes;
 }
+
+// Stats
+
+var stats = new Stats();
+stats.domElement.style.position = 'absolute';
+stats.domElement.style.top = '0px';
+stats.domElement.style.right = '0px';
+stats.domElement.style.zIndex = 100;
+document.body.appendChild(stats.domElement);
+scene.on("tick",
+        function () {
+            stats.end();
+            stats.begin();
+        });
 
 </script>
 </body>
