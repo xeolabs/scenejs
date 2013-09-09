@@ -47,7 +47,7 @@ require([
 
         SceneJS.Types.addType("canvas/capture", {
 
-            init:function (params) {
+            construct:function (params) {
                 this._format = params.format ? supportedFormat(params.format) : "jpeg";
                 this._width = params.width;
                 this._height = params.height;
@@ -66,7 +66,7 @@ require([
 
                 var image;
 
-                var format = params.format ? supportedFormat(params.format) : this._format;
+                var format = params.format ? this._supportedFormat(params.format) : this._format;
 
                 switch (format) {
                     case "jpeg":
@@ -82,7 +82,7 @@ require([
                         break;
 
                     default:
-                        console.log("ERROR: canvas/capture format unsupported: " + format);
+                        this.log("error", "format unsupported: " + format);
                         return;
                 }
 
@@ -92,15 +92,16 @@ require([
                     width:width,
                     height:height
                 });
+            },
+
+            _supportedFormat:function (format) {
+                if (format != "jpeg" && format != "png" && format != "bmp") {
+                    this.log("error", "unsupported format for canvas/capture node: " + format
+                        + " - supported types are 'jpeg', 'bmp' and 'png' - falling back on 'jpeg'");
+                    return "jpeg";
+                }
+                return format;
             }
         });
 
-        function supportedFormat(format) {
-            if (format != "jpeg" && format != "png" && format != "bmp") {
-                console.log("ERROR: unsupported format for canvas/capture node: " + format
-                    + " - supported types are 'jpeg', 'bmp' and 'png' - falling back on 'jpeg'");
-                return "jpeg";
-            }
-            return format;
-        }
     });

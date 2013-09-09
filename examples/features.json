@@ -1,6 +1,6 @@
 [
     {
-        "title":"Physics (beta)",
+        "title":"Physics",
         "status": "alpha",
         "nodes":[
             {
@@ -14,7 +14,7 @@
             {
                 "nodes":[
                     {
-                        "title":"Multiple systems in workers",
+                        "title":"Multi-threaded",
                         "page":"physicsBouncingSpheresMultiSystems"
                     }
                 ]
@@ -22,21 +22,21 @@
         ]
     },
     {
-        "title":"Culling",
+        "title":"Frustum Culling",
         "nodes":[
             {
                 "nodes":[
                     {
-                        "title":"LOD switching on distance (beta)",
-                        "page":"proximityCullingLOD"
+                        "title":"Visibility",
+                        "page":"frustumVisibilityCulling"
                     }
                 ]
             },
             {
                 "nodes":[
                     {
-                        "title":"Regex-selected object visibility",
-                        "page":"regexShowHide"
+                        "title":"Detail",
+                        "page":"frustumDetailCulling"
                     }
                 ]
             }

@@ -4,7 +4,7 @@
  */
 SceneJS.Types.addType("demos/spinningTeapot", {
 
-    init:function (params) {
+    construct:function (params) {
 
         // Create child nodes
         var rotate = this.addNode({
@@ -37,7 +37,7 @@ SceneJS.Types.addType("demos/spinningTeapot", {
     },
 
     // Node destructor, unsubscribes from scene tick
-    destroy:function () {
+    destruct:function () {
         this.getScene().off(this._tick);
     }
 });

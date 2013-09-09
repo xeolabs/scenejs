@@ -15,7 +15,7 @@
 
     SceneJS.Types.addType("prims/sphere", {
 
-        init:function (params) {
+        construct:function (params) {
             this.addNode(build.call(this, params));
         }
     });
@@ -76,13 +76,21 @@
             for (var longNumber = 0; longNumber < longitudeBands; longNumber++) {
                 var first = (latNumber * (longitudeBands + 1)) + longNumber;
                 var second = first + longitudeBands + 1;
-                indices.push(first);
-                indices.push(second);
-                indices.push(first + 1);
+//                indices.push(first);
+//                indices.push(second);
+//                indices.push(first + 1);
+//
+//                indices.push(second);
+//                indices.push(second + 1);
+//                indices.push(first + 1);
 
-                indices.push(second);
-                indices.push(second + 1);
+
                 indices.push(first + 1);
+                indices.push(second + 1);
+                indices.push(second);
+                indices.push(first + 1);
+                indices.push(second);
+                indices.push(first);
             }
         }
 

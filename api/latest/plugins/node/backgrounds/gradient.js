@@ -50,11 +50,11 @@
 
     SceneJS.Types.addType("backgrounds/gradient", {
 
-        init:function (params) {
+        construct:function (params) {
 
             var colors = params.colors;
             if (colors && colors.length != 16) {
-                console.log("Invalid 'colors' param for backgrounds/gradients: should be 16-element array");
+                this.log("error", "Invalid 'colors' param for backgrounds/gradients: should be 16-element array");
                 colors = defaultColors;
             }
 
@@ -140,7 +140,7 @@
             this._lookat.setEye({ x:0, y:0, z:params.depth || defaultDepth });
         },
 
-        destroy:function () {
+        destruct:function () {
             // Not used
         }
     });

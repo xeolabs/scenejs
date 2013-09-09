@@ -68,6 +68,8 @@
 
             var core = this._core;
 
+            var self = this;
+
             this._core.rebuild = function () {
 
                 core.matrix = SceneJS_math_lookAtMat4c(
@@ -91,11 +93,29 @@
                     core.normalMat.set(SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
                 }
 
+                self.publish("matrix", core.matrix);
+
                 core.dirty = false;
             };
 
             this._core.dirty = true;
+
+            // Rebuild on every scene tick
+            // https://github.com/xeolabs/scenejs/issues/277
+            this._tick = this.getScene().on("tick", function () {
+                if (self._core.dirty) {
+                    self._core.rebuild();
+                }
+            });
         }
+    };
+
+    /**
+     * Returns the default view transformation matrix
+     * @return {Float32Array}
+     */
+    SceneJS.Lookat.getDefaultMatrix = function () {
+        return defaultMat;
     };
 
     SceneJS.Lookat.prototype.setEye = function (eye) {
@@ -378,6 +398,11 @@
         this._engine.display.viewTransform = coreStack[stackLen++] = this._core;
         this._compileNodes();
         this._engine.display.viewTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+    };
+
+    SceneJS.Lookat.prototype._destroy = function () {
+        // Stop publishing matrix on each tick
+        this.getScene().off(this._tick);
     };
 
 })();

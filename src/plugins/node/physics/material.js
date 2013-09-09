@@ -11,7 +11,7 @@ require([
 
         SceneJS.Types.addType("physics/material", {
 
-            init:function (params) {
+            construct:function (params) {
                 this._material = params;
                 if (params.nodes) {
                     this.addNodes(params.nodes);

@@ -8,7 +8,7 @@
  *  });
  */
 SceneJS.Types.addType("skyboxes/stormyDays", {
-    init:function (params) {
+    construct:function (params) {
 
         // Wraps a 'custom' skybox node type, passing in the stormyDays texture
         this.addNode({

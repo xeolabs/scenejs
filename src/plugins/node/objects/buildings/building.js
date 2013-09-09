@@ -4,7 +4,7 @@
 
     SceneJS.Types.addType("objects/buildings/building", {
 
-        init:function (params) {
+        construct:function (params) {
             var type = params.buildingType || 0;
             var buildingType = buildingTypes[type];
             if (!buildingType) {

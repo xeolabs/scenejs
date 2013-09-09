@@ -126,6 +126,40 @@ SceneJS.Node.prototype.taskFailed = function (taskId) {
 };
 
 /**
+ * Logs a message in the context of this node
+ * @param {String} [channel] Logging channel - "error", "warn" or "info" (default)
+ * @param {String} msg Message to log
+ */
+SceneJS.Node.prototype.log = function () {
+    var channel;
+    var msg;
+    if (arguments.length == 1) {
+        channel = "info";
+        msg = arguments[0];
+    } else if (arguments.length == 2) {
+        channel = arguments[0];
+        msg = arguments[1];
+    }
+    switch (channel) {
+        case "warn":
+            msg = "WARN;  [SceneJS.Node type=" + this.type + ", id=" + this.id + "] : " + msg;
+            break;
+        case "error":
+            msg = "ERROR; [SceneJS.Node type=" + this.type + ", id=" + this.id + "] : " + msg;
+            break;
+        default:
+            msg = "INFO;  [SceneJS.Node type=" + this.type + ", id=" + this.id + "] : " + msg;
+            break;
+    }
+
+    if (console[channel]) {
+        console[channel](msg);
+    } else {
+        console.log(msg);
+    }
+};
+
+/**
  * Publishes to a topic on this node.
  *
  * Immediately notifies existing subscriptions to that topic, and unless the "forget' parameter is
@@ -135,14 +169,13 @@ SceneJS.Node.prototype.taskFailed = function (taskId) {
  * @param {Object} pub The publication
  * @param {Boolean} [forget] When true, the publication will be sent to subscribers then forgotten, so that any
  * subsequent subscribers will not receive it
- * @private
  */
 SceneJS.Node.prototype.publish = function (topic, pub, forget) {
     if (!forget) {
         this._topicPubs[topic] = pub; // Save notification
     }
-    var subsForTopic = this._topicSubs[topic];
-    if (subsForTopic) { // Notify subscriptions
+    if (this._topicSubs[topic]) { // Notify subscriptions
+        var subsForTopic = this._topicSubs[topic];
         for (var handle in subsForTopic) {
             if (subsForTopic.hasOwnProperty(handle)) {
                 subsForTopic[handle].call(this, pub);
@@ -615,7 +648,6 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
         // so we need to create it asynchronously. By this contract,
         // the Caller would not rely on synchronous creation of
         // non-core types.
-
         var self = this;
         this._engine.createNode(node,
             function (node) {
@@ -1275,10 +1307,10 @@ SceneJS.Node.prototype._compileNodes = function () {
 
         if (child.dirty || child.branchDirty || this._engine.sceneDirty) {  // Compile nodes that are flagged dirty
 
-            child._compile();
-
             child.dirty = false;
             child.branchDirty = false;
+
+            child._compile();
         }
     }
 

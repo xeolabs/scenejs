@@ -8,7 +8,7 @@
  *  });
  */
 SceneJS.Types.addType("skyboxes/miramarClouds", {
-    init:function (params) {
+    construct:function (params) {
 
         // Wraps a 'custom' skybox node type, passing in the miramarClouds texture
         this.addNode({

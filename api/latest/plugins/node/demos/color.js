@@ -1,6 +1,6 @@
 SceneJS.Types.addType("demos/color", {
 
-    init:function (params) {
+    construct:function (params) {
 
         this._material = this.addNode({
             type:"material",
@@ -24,7 +24,7 @@ SceneJS.Types.addType("demos/color", {
         return this._material.getColor();
     },
 
-    destroy:function () {
+    destruct:function () {
         // Not used
     }
 });

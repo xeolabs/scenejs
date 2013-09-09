@@ -5,7 +5,7 @@
  *
  */
 SceneJS.Types.addType("physics/teapot", {
-    init:function (params) {
+    construct:function (params) {
 
         this.addNode({
             type:"physics/body",

@@ -1,6 +1,6 @@
 SceneJS.Types.addType("prims/grid", {
 
-    init:function (params) {
+    construct:function (params) {
 
         this._translate = this.addNode({
             type:"translate"

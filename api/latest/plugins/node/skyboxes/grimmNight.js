@@ -8,7 +8,7 @@
  *  });
  */
 SceneJS.Types.addType("skyboxes/grimmNight", {
-    init:function (params) {
+    construct:function (params) {
 
         // Wraps a 'custom' skybox node type, passing in a the grimmNight texture
         this.addNode({

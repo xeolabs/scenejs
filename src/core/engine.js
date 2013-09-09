@@ -416,6 +416,8 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
  */
 SceneJS_Engine.prototype._tryCompile = function () {
 
+   // this._doAddNodes();
+
     if (this.display.imageDirty // Frame buffer needs redraw
         || this.display.drawListDirty // Draw list needs rebuild
         || this.display.stateSortDirty // Draw list needs to redetermine state order
@@ -424,9 +426,10 @@ SceneJS_Engine.prototype._tryCompile = function () {
         || this._sceneBranchesDirty // One or more branches in scene graph need (re)compilation
         || this.sceneDirty) { // Whole scene needs recompilation
 
-        this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true
-
         if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
+
+            this._sceneBranchesDirty = false;
+            this.sceneDirty = false;
 
             SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
                 engine:this                                            // Compilation support modules get ready
@@ -435,8 +438,7 @@ SceneJS_Engine.prototype._tryCompile = function () {
             this.scene._compileNodes(); // Begin depth-first compilation descent into scene sub-nodes
         }
 
-        this._sceneBranchesDirty = false;
-        this.sceneDirty = false;
+        this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true
 
         return true; // Compilation was performed, need frame redraw now
     }

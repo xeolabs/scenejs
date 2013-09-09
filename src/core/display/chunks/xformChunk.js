@@ -19,7 +19,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         /* Rebuild core's matrix from matrices at cores on path up to root
          */
-       if (this.core.dirty && this.core.build) {
+        if (this.core.dirty && this.core.build) {
             this.core.build();
         }
 

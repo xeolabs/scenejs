@@ -11,7 +11,7 @@
 (function () {
 
     SceneJS.Types.addType("prims/quad", {
-        init:function (params) {
+        construct:function (params) {
             this.addNode(build.call(this, params));
         }
     });

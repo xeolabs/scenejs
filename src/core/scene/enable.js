@@ -26,15 +26,18 @@
     SceneJS.Enable.prototype._init = function (params) {
         if (this._core.useCount == 1) {   // This node is first to reference the state core, so sets it up
             this._core.enabled = true;
-            if (params.enable) {
-                this.setEnabled(params.enable);
+            if (params.enabled != undefined) {
+                this.setEnabled(params.enabled);
             }
         }
     };
 
-    SceneJS.Enable.prototype.setEnabled = function (enable) {
-        this._core.enabled = !!enable;
-        this._engine.display.drawListDirty = true;
+    SceneJS.Enable.prototype.setEnabled = function (enabled) {
+        if (enabled !== this._core.enabled) {
+            this._core.enabled = enabled;
+            this._engine.display.drawListDirty = true;
+            this.publish("enabled", enabled);
+        }
         return this;
     };
 

@@ -1089,14 +1089,33 @@
                 ]
             },
             {
+                "title":"View frustum culling",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Visibility culling",
+                        "tags":["frustum"],
+                        "path":"culling/frustum/visibilityCulling.html",
+                        "id":"frustumVisibilityCulling"
+                    },
+                    {
+                        "title":"Detail culling",
+                        "tags":["detail"],
+                        "path":"culling/frustum/detailCulling.html",
+                        "id":"frustumDetailCulling"
+                    }
+                ]
+            },
+            {
                 "title":"Distance culling",
                 "tip":"",
                 "tags":[],
                 "nodes":[
                     {
                         "title":"Switch LOD for distance",
-                        "tags":["lod"],
-                        "path":"culling/proximity/lod.html",
+                        "tags":["detail"],
+                        "path":"culling/frustum/detailCulling.html",
                         "id":"proximityCullingLOD"
                     }
                 ]

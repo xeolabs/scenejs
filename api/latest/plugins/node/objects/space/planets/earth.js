@@ -1,6 +1,6 @@
 SceneJS.Types.addType("objects/space/planets/earth", {
 
-    init:function (params) {
+    construct:function (params) {
 
         var texturePath = SceneJS.getConfigs("pluginPath") + "/node/objects/space/planets/earth/";
 
@@ -162,7 +162,7 @@ SceneJS.Types.addType("objects/space/planets/earth", {
     },
 
     // Node destructor, unsubscribes from scene tick
-    destroy:function () {
+    destruct:function () {
         this.getScene().off(this._tick);
     }
 });

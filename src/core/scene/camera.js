@@ -1,20 +1,19 @@
 (function () {
 
+    var defaultMatrix = SceneJS_math_perspectiveMatrix4(
+        45, // fovy
+        1, // aspect
+        0.1, // near
+        10000); // far
+
+    var defaultMat = new Float32Array(defaultMatrix);
+
     // The default state core singleton for {@link SceneJS.Camera} nodes
     var defaultCore = {
-
         type:"camera",
-
         stateId:SceneJS._baseStateId++,
-
-        // Default perspective projection matrix
-        mat:SceneJS_math_perspectiveMatrix4(
-            45, // fovy
-            1, // aspect
-            0.1, // near
-            10000), // far
-
-        //Default optical attributes for perspective projection
+        matrix:defaultMatrix,
+        mat:defaultMat,
         optics:{
             type:"perspective",
             fovy:45.0,
@@ -44,14 +43,30 @@
     SceneJS.Camera.prototype._init = function (params) {
         if (this._core.useCount == 1) {
             this.setOptics(params.optics); // Can be undefined
+
+            // Rebuild on every scene tick
+            // https://github.com/xeolabs/scenejs/issues/277
+            this._tick = this.getScene().on("tick", function () {
+                if (self._core.dirty) {
+                    self._core.rebuild();
+                }
+            });
         }
+    };
+
+    /**
+     * Returns the default camera projection matrix
+     * @return {Float32Array}
+     */
+    SceneJS.Camera.getDefaultMatrix = function () {
+        return defaultMat;
     };
 
     SceneJS.Camera.prototype.setOptics = function (optics) {
         var core = this._core;
         if (!optics) {
             core.optics = {
-                type:type,
+                type:"perspective",
                 fovy:60.0,
                 aspect:1.0,
                 near:0.1,
@@ -135,6 +150,7 @@
         } else {
             this._core.mat.set(this._core.matrix);
         }
+        this.publish("matrix", this._core.matrix);
     };
 
     SceneJS.Camera.prototype.getOptics = function () {
@@ -159,5 +175,10 @@
         this._engine.display.projTransform = coreStack[stackLen++] = this._core;
         this._compileNodes();
         this._engine.display.projTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+    };
+
+    SceneJS.Camera.prototype._destroy = function () {
+        // Stop publishing matrix on each tick
+        this.getScene().off(this._tick);
     };
 })();

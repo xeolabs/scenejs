@@ -1,6 +1,6 @@
 SceneJS.Types.addType("effects/snowyPeaks", {
 
-    init:function (params) {
+    construct:function (params) {
 
         var altitude = params.altitude || 0;
 
@@ -43,7 +43,7 @@ SceneJS.Types.addType("effects/snowyPeaks", {
         });
     },
 
-    destroy:function () {
+    destruct:function () {
         // Not used
     }
 })

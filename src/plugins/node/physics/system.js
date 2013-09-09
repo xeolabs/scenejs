@@ -11,7 +11,7 @@ require([
 
         SceneJS.Types.addType("physics/system", {
 
-            init:function (params) {
+            construct:function (params) {
 
                 // Get physics system for this scene
                 // When params.systemId is undefined, get the default system for this scene
@@ -37,7 +37,7 @@ require([
                 this._system.setEnabled(enabled);
             },
 
-            destroy:function () {
+            destruct:function () {
                 physics.putSystem(this._system);
             }
         });

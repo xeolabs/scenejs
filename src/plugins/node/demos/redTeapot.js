@@ -4,7 +4,7 @@
  */
 SceneJS.Types.addType("demos/redTeapot", {
 
-    init:function (params) {
+    construct:function (params) {
 
         // Create child nodes
 

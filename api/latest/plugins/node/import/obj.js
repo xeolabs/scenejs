@@ -2,10 +2,10 @@
 
     SceneJS.Types.addType("import/obj", {
 
-        init:function (params) {
+        construct:function (params) {
 
             if (!params.src) {
-                throw "import/obj param expected: src";
+                this.log("error", "Attribute expected: src");
             }
 
             // Notify SceneJS so it can support loading/busy indicators etc
@@ -19,12 +19,12 @@
                     self._taskId = self.taskFinished(self._taskId);
                 },
                 function (err) {
-                    console.log("ERROR: import/obj node failed to load file: " + err);
+                    self.log("error", "Failed to load file: " + err);
                     self._taskId = self.taskFailed(self._taskId);
                 });
         },
 
-        destroy:function () {
+        destruct:function () {
             this._taskId = this.taskFinished(this._taskId);
         }
     });

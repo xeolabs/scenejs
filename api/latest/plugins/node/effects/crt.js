@@ -1,6 +1,6 @@
 SceneJS.Types.addType("effects/crt", {
 
-    init:function (params) {
+    construct:function (params) {
 
         this._shader = this.addNode({
             type:"shader",
@@ -30,7 +30,7 @@ SceneJS.Types.addType("effects/crt", {
         });
     },
 
-    destroy:function () {
+    destruct:function () {
         // Not used
     }
 });

@@ -2,7 +2,7 @@
 
     SceneJS.Types.addType("heightmaps/custom", {
 
-        init:function (params) {
+        construct:function (params) {
 
             if (!params.src) {
                 throw "heightmap param expected: src";
@@ -69,7 +69,7 @@
             image.src = params.src;
         },
 
-        destroy:function () {
+        destruct:function () {
             this._taskId = self.taskFinished(this._taskId);
         }
     });

@@ -12,7 +12,7 @@
 
     SceneJS.Types.addType("prims/teapot", {
 
-        init:function (params) {
+        construct:function (params) {
             this.addNode(build.call(this, params));
         }
     });

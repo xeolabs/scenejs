@@ -1,27 +1,27 @@
 /**
- * A proximity system, which proxies a ProximityEngine running in a Web Worker
+ * A frustum cuilling system, which manages a frustum culling worker implemented in frustumCullWorker.js
  */
 (function () {
 
     define(function () {
-        return ProximitySystem;
+        return System;
     });
 
-    function ProximitySystem(systemId) {
+    function System(systemId) {
 
         this.systemId = systemId;
 
-        // Maximum number of bodies supported
-        var maxBodies = 20000;
+        // Maximum number of bodies supported per system
+        var maxBodies = 1000;
 
         var bodies = [];
         var map = new Map(bodies);
 
-        // Create proximity engine in worker
-        var workerPath = SceneJS.getConfigs().pluginPath + "/lib/proximity/proximityEngineWorker.js";
+        // Create engine in worker
+        var workerPath = SceneJS.getConfigs().pluginPath + "/lib/frustum/frustumCullWorker.js";
         var worker = new Worker(workerPath);
 
-        var workerOutputBuf = new ArrayBuffer(maxBodies * 2);
+        var workerOutputBuf = new ArrayBuffer(maxBodies * 3);
 
         // True while worker is busy integrating
         // We don't send integration requests to it while this is true
@@ -30,14 +30,10 @@
         // System is integrating only when this true
         var enabled = true;
 
-        // Only integrate when center or radii change
-        var center;
-        var radii;
-
         // Schedules integration when true
         var needIntegrate = true;
 
-        // Route updates from proximity engine to bodies
+        // Route updates from engine to bodies
         worker.addEventListener('message',
             function (e) {
 
@@ -47,22 +43,25 @@
                 var lenOutput = data.lenOutput;
                 var bodyId;
                 var body;
-                var status;
+                var intersect;
+                var canvasSize;
 
-                // The data buffer from the web worker contains a 2-element portion for
-                // each proximity body, each of which contains the body ID and proximity status:
+                // The data buffer from the web worker contains a 3-element portion for
+                // each body, each of which contains the body ID, frustum intesection status
+                // and projected canvas size:
                 //
                 // [
-                //      bodyId, status,
-                //      bodyId, status,
+                //      bodyId, intersect, canvasSize
+                //      bodyId, intersect, canvasSize
                 //      ...
                 // ]
-                for (var i = 0, len = lenOutput - 1; i < len; i += 2) {
+                for (var i = 0, len = lenOutput - 2; i < len; i += 3) {
                     bodyId = output[i]; // First element for body ID
                     body = bodies[bodyId];
-                    status = output[i + 1];
+                    intersect = output[i + 1];
+                    canvasSize = output[i + 2];
                     if (body) { // May have been deleted
-                        body.callback(status);
+                        body.callback(intersect, canvasSize);
                     }
                 }
 
@@ -71,31 +70,16 @@
             }, false);
 
         /**
-         * Configures this proximity system
+         * Configures this system
          * @param configs Values for configs
          */
         this.setConfigs = function (configs) {
-            // Schedule integration needed if center or radii updated
-            if (configs.center) {
-                var c = configs.center;
-                if (!center || c[0] != center[0] || c[1] != center[1] || c[2] != center[2]) {
-                    center = center || [0, 0, 0];
-                    center[0] = c[0];
-                    center[1] = c[1];
-                    center[2] = c[2];
-                    needIntegrate = true;
-                }
-            }
-            if (configs.radii != undefined) {
-                radii = configs.radii;
-                needIntegrate = true;
-            }
-            // Configure proximity system
+            needIntegrate = true;
             worker.postMessage({ cmd:"setConfigs", configs:configs });
         };
 
         /**
-         * Enable or disable this proximity system.
+         * Enable or disable this system.
          * To save on CPU, you would typically disable the system when its not in view.
          * @param enable
          */
@@ -107,7 +91,7 @@
         };
 
         /**
-         * Creates a proximity body, returns it's unique ID
+         * Creates a body, returns it's unique ID
          * @param params Body params
          * @param callback Callback fired whenever body updated
          * @return Body ID
@@ -122,7 +106,7 @@
         };
 
         /**
-         * Updates an existing proximity body
+         * Updates an existing body
          * @param bodyId Body ID
          * @param params Body params
          */
@@ -132,7 +116,7 @@
         };
 
         /**
-         * Removes a proximity body
+         * Removes a body
          */
         this.removeBody = function (bodyId) {
             worker.postMessage({ cmd:"removeBody", bodyId:bodyId });
@@ -140,30 +124,24 @@
         };
 
         /**
-         * Integrates this proximity system
-         * Does nothing when system is disabled with {@link ProximitySystem#setEnabled}.
+         * Integrates this system
+         * Does nothing when system is disabled with {@link System#setEnabled}.
          */
         this.integrate = function () {
-
             if (!enabled) {
                 return;
             }
-
             if (integrating) { // Don't choke worker
                 return;
             }
-
             if (needIntegrate) {
-
                 integrating = true;
                 needIntegrate = false;
-
                 // Transfer ownership of output buffer to the worker
                 var msg = {
                     cmd:"integrate",
                     buffer:workerOutputBuf
                 };
-
                 worker.postMessage(msg, [msg.buffer]);
             }
         };
@@ -189,7 +167,7 @@
 
             // We're trading insertion overhead for the benefit
             // of a nicely packed array that's fast to traverse
-            // when posting updates back to the proximity body nodes.
+            // when posting output.
 
             var i = 0;
             while (true) {

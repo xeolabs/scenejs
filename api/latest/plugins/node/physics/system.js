@@ -11,7 +11,7 @@ require([
 
         SceneJS.Types.addType("physics/system", {
 
-            init:function (params) {
+            construct:function (params) {
 
                 // Get physics system for this scene
                 // When params.systemId is undefined, get the default system for this scene
@@ -28,7 +28,16 @@ require([
                 this._system.setConfigs(params);
             },
 
-            destroy:function () {
+            /**
+             * Enable or disable this physics system.
+             * To save CPU, you would typically disable the system when its not in view.
+             * @param enabled
+             */
+            setEnabled:function (enabled) {
+                this._system.setEnabled(enabled);
+            },
+
+            destruct:function () {
                 physics.putSystem(this._system);
             }
         });

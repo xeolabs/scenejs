@@ -17,7 +17,8 @@ SceneJS.Types = new (function () {
                     if (methods.hasOwnProperty(methodName)) {
                         method = methods[methodName];
                         switch (methodName) {
-                            case "init":
+                            case "init": // Deprecated
+                            case "construct":
                                 (function () {
                                     var _method = methods[methodName];
                                     type.prototype._init = function (params) {
@@ -28,7 +29,8 @@ SceneJS.Types = new (function () {
                                     type.prototype._fromPlugin = true;
                                 })();
                                 break;
-                            case "destroy":
+                            case "destroy": // Deprecated
+                            case "destruct":
                                 type.prototype._destroy = method;
                                 break;
                             default:

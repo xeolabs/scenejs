@@ -126,6 +126,9 @@
     var start;
     var end;
 
+    var lastStart;
+    var lastEnd;
+
     scene.getNode("sphere1",
             function (sphere1) {
                 sphere1.on("rendered",
@@ -148,16 +151,26 @@
                         });
             });
 
-
     function updateLine() {
         scene.getNode("myLine",
                 function (myLine) {
+
+                    if (lastStart && lastEnd && matchPos(start, lastStart) && matchPos(end, lastEnd)) {
+                        return;
+                    }
+
+                    console.log("set line pos: " + JSON.stringify(start) + ", " + JSON.stringify(end));
                     myLine.setPositions({
                         positions:[start.x, start.y, start.z, end.x, end.y, end.z]
                     });
                 });
-        start = null;
-        end = null;
+
+        lastStart = start;
+        lastEnd = end;
+    }
+
+    function matchPos(a, b) {
+        return !(a.x != b.x || a.y != b.y || a.z != b.z );
     }
 
 </script>

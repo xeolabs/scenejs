@@ -13,7 +13,7 @@
 
     SceneJS.Types.addType("prims/torus", {
 
-        init:function (params) {
+        construct:function (params) {
             this.addNode(build.call(this, params));
         }
     });

@@ -1,6 +1,6 @@
 SceneJS.Types.addType("effects/wobble", {
 
-    init:function (params) {
+    construct:function (params) {
 
         var shader = this.addNode({
             type:"shader",
@@ -36,7 +36,7 @@ SceneJS.Types.addType("effects/wobble", {
             });
     },
 
-    destroy:function () {
+    destruct:function () {
         this.getScene().off(this._tick);
     }
 });

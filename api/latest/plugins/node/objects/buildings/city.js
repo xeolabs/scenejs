@@ -1,6 +1,6 @@
 SceneJS.Types.addType("objects/buildings/city", {
 
-    init:function (params) {
+    construct:function (params) {
 
         var width = params.width || 600;
         if (width < 100) {

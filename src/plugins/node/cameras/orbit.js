@@ -20,7 +20,7 @@
  */
 SceneJS.Types.addType("cameras/orbit", {
 
-    init:function (params) {
+    construct:function (params) {
 
         var lookat = this.addNode({
             type:"lookAt",
@@ -159,7 +159,7 @@ SceneJS.Types.addType("cameras/orbit", {
         }
     },
 
-    destroy:function () {
+    destruct:function () {
         // TODO: remove mouse handlers
     }
 });

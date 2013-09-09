@@ -15,7 +15,7 @@
 
     SceneJS.Types.addType("prims/box", {
 
-        init:function (params) {
+        construct:function (params) {
             this.addNode(build.call(this, params));
         }
     });

@@ -13,7 +13,7 @@ SceneJS.Types.addType("skyboxes/custom", {
 
     // TODO: expose node props to tweak the geometry coords to map to variations in texture UV mappings?
 
-    init:function (params) {
+    construct:function (params) {
 
         // Fall back on clouds texture by default
         var src = params.src || SceneJS.getConfigs("pluginPath") + "/node/skyboxes/textures/clouds.jpg";

@@ -8,7 +8,7 @@
  *  });
  */
 SceneJS.Types.addType("skyboxes/interstellarClouds", {
-    init:function (params) {
+    construct:function (params) {
 
         // Wraps a 'custom' skybox node type, passing in the interstellarClouds texture
         this.addNode({

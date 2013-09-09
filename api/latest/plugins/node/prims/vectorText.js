@@ -14,7 +14,7 @@
 (function () {
 
     SceneJS.Types.addType("prims/vectorText", {
-        init:function (params) {
+        construct:function (params) {
             this.addNode(buildText.call(this, params));
         }
     });

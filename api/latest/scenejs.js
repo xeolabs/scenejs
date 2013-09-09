@@ -1778,6 +1778,7 @@ SceneJS_Canvas.prototype.initWebGL = function () {
     this.gl.disable(this.gl.CULL_FACE);
     this.gl.depthRange(0, 1);
     this.gl.disable(this.gl.SCISSOR_TEST);
+    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 };
 
 
@@ -1845,6 +1846,17 @@ var SceneJS_Engine = function (json, options) {
      * Flag set when at least one branch of the scene graph needs recompilation
      */
     this._sceneBranchesDirty = false;
+
+    /**
+     * List of nodes scheduled for destruction by #addNode
+     * Destructions are done in a batch at the end of each render so as not to disrupt the render.
+     */
+    this._nodesToAdd = [];
+
+    /**
+     * Number of nodes in addition list
+     */
+    this._numNodesToAdd = 0;
 
     /**
      * List of nodes scheduled for destruction by #destroyNode
@@ -1978,6 +1990,7 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
                                 }
                                 self.scene.publish("nodes/" + node.id, node);
                             }
+
                         });
                 }
             } else {
@@ -2008,6 +2021,20 @@ SceneJS_Engine.prototype._doDestroyNodes = function () {
         this._nodeFactory.putNode(node);         // Release node for reuse
     }
 };
+
+/**
+ * Schedules addition of a node within this engine's {@link SceneJS.Scene}
+ */
+SceneJS_Engine.prototype.addNode = function (fn) {
+    this._nodesToAdd[this._numNodesToAdd++] = fn;
+};
+
+SceneJS_Engine.prototype._doAddNodes = function () {
+    while (this._numNodesToAdd > 0) {
+        this._nodesToAdd[--this._numNodesToAdd]();
+    }
+};
+
 
 /**
  * Finds the node with the given ID in this engine's scene graph
@@ -2210,6 +2237,8 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
  */
 SceneJS_Engine.prototype._tryCompile = function () {
 
+   // this._doAddNodes();
+
     if (this.display.imageDirty // Frame buffer needs redraw
         || this.display.drawListDirty // Draw list needs rebuild
         || this.display.stateSortDirty // Draw list needs to redetermine state order
@@ -2218,9 +2247,10 @@ SceneJS_Engine.prototype._tryCompile = function () {
         || this._sceneBranchesDirty // One or more branches in scene graph need (re)compilation
         || this.sceneDirty) { // Whole scene needs recompilation
 
-        this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true
-
         if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
+
+            this._sceneBranchesDirty = false;
+            this.sceneDirty = false;
 
             SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
                 engine:this                                            // Compilation support modules get ready
@@ -2229,8 +2259,7 @@ SceneJS_Engine.prototype._tryCompile = function () {
             this.scene._compileNodes(); // Begin depth-first compilation descent into scene sub-nodes
         }
 
-        this._sceneBranchesDirty = false;
-        this.sceneDirty = false;
+        this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true
 
         return true; // Compilation was performed, need frame redraw now
     }
@@ -5782,7 +5811,7 @@ var SceneJS_nodeEventsModule = new (function () {
             }
         });
 
-    this.preVisitNode = function (node) {
+    this.preVisitNodeOLD = function (node) {
         var subs = node._topicSubs["rendered"];
         if (subs) {
             idStack[stackLen] = node.id;
@@ -5798,6 +5827,50 @@ var SceneJS_nodeEventsModule = new (function () {
             dirty = true;
         } else {
             node.__publishRenderedEvent = null;
+        }
+    };
+
+    this.preVisitNode = function (node) {
+
+        var renderedSubs = node._topicSubs["rendered"]; // DEPRECATED in V3.2
+        var worldPosSubs = node._topicSubs["worldPos"];
+        var viewPosSubs = node._topicSubs["viewPos"];
+        var cameraPosSubs = node._topicSubs["cameraPos"];
+        var projPosSubs = node._topicSubs["projPos"];
+        var canvasPosSubs = node._topicSubs["canvasPos"];
+
+        if (worldPosSubs || viewPosSubs || cameraPosSubs || projPosSubs || canvasPosSubs) {
+            idStack[stackLen] = node.id;
+
+            listenerStack[stackLen] = function (event) {
+
+                // Don't retain - callback must get positions for
+                // required coordinate via methods on the event object.
+                // That's dirty, therefore deprecated.
+                if (renderedSubs) {
+                    node.publish("rendered", event, true); // DEPRECATED in V3.2
+                }
+
+                // Publish retained positions for coordinate systems where subscribed
+                if (worldPosSubs) {
+                    node.publish("worldPos", event.getWorldPos());
+                }
+                if (viewPosSubs) {
+                    node.publish("viewPos", event.getViewPos());
+                }
+                if (cameraPosSubs) {
+                    node.publish("cameraPos", event.getCameraPos());
+                }
+                if (projPosSubs) {
+                    node.publish("projPos", event.getProjPos());
+                }
+                if (canvasPosSubs) {
+                    node.publish("canvasPos", event.getCanvasPos());
+                }
+            };
+
+            stackLen++;
+            dirty = true;
         }
     };
 
@@ -6152,6 +6225,40 @@ SceneJS.Node.prototype.taskFailed = function (taskId) {
 };
 
 /**
+ * Logs a message in the context of this node
+ * @param {String} [channel] Logging channel - "error", "warn" or "info" (default)
+ * @param {String} msg Message to log
+ */
+SceneJS.Node.prototype.log = function () {
+    var channel;
+    var msg;
+    if (arguments.length == 1) {
+        channel = "info";
+        msg = arguments[0];
+    } else if (arguments.length == 2) {
+        channel = arguments[0];
+        msg = arguments[1];
+    }
+    switch (channel) {
+        case "warn":
+            msg = "WARN;  [SceneJS.Node type=" + this.type + ", id=" + this.id + "] : " + msg;
+            break;
+        case "error":
+            msg = "ERROR; [SceneJS.Node type=" + this.type + ", id=" + this.id + "] : " + msg;
+            break;
+        default:
+            msg = "INFO;  [SceneJS.Node type=" + this.type + ", id=" + this.id + "] : " + msg;
+            break;
+    }
+
+    if (console[channel]) {
+        console[channel](msg);
+    } else {
+        console.log(msg);
+    }
+};
+
+/**
  * Publishes to a topic on this node.
  *
  * Immediately notifies existing subscriptions to that topic, and unless the "forget' parameter is
@@ -6161,14 +6268,13 @@ SceneJS.Node.prototype.taskFailed = function (taskId) {
  * @param {Object} pub The publication
  * @param {Boolean} [forget] When true, the publication will be sent to subscribers then forgotten, so that any
  * subsequent subscribers will not receive it
- * @private
  */
 SceneJS.Node.prototype.publish = function (topic, pub, forget) {
     if (!forget) {
         this._topicPubs[topic] = pub; // Save notification
     }
-    var subsForTopic = this._topicSubs[topic];
-    if (subsForTopic) { // Notify subscriptions
+    if (this._topicSubs[topic]) { // Notify subscriptions
+        var subsForTopic = this._topicSubs[topic];
         for (var handle in subsForTopic) {
             if (subsForTopic.hasOwnProperty(handle)) {
                 subsForTopic[handle].call(this, pub);
@@ -6630,6 +6736,7 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
         this.nodes.push(node);
         node.parent = this;
         this._engine.branchDirty(node);
+        //      this._engine.sceneDirty = true;
         if (ok) {
             ok(node);
         }
@@ -6641,16 +6748,19 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
         // so we need to create it asynchronously. By this contract,
         // the Caller would not rely on synchronous creation of
         // non-core types.
-
         var self = this;
         this._engine.createNode(node,
             function (node) {
+//                self._engine.addNode(
+//                    function () {
                 self.nodes.push(node);
                 node.parent = self;
                 self._engine.branchDirty(node);
+                //self._engine.sceneDirty = true;
                 if (ok) {
                     ok(node);
                 }
+                // });
             });
         return null;
     }
@@ -7301,10 +7411,10 @@ SceneJS.Node.prototype._compileNodes = function () {
 
         if (child.dirty || child.branchDirty || this._engine.sceneDirty) {  // Compile nodes that are flagged dirty
 
-            child._compile();
-
             child.dirty = false;
             child.branchDirty = false;
+
+            child._compile();
         }
     }
 
@@ -7520,21 +7630,20 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
 };
 (function () {
 
+    var defaultMatrix = SceneJS_math_perspectiveMatrix4(
+        45, // fovy
+        1, // aspect
+        0.1, // near
+        10000); // far
+
+    var defaultMat = new Float32Array(defaultMatrix);
+
     // The default state core singleton for {@link SceneJS.Camera} nodes
     var defaultCore = {
-
         type:"camera",
-
         stateId:SceneJS._baseStateId++,
-
-        // Default perspective projection matrix
-        mat:SceneJS_math_perspectiveMatrix4(
-            45, // fovy
-            1, // aspect
-            0.1, // near
-            10000), // far
-
-        //Default optical attributes for perspective projection
+        matrix:defaultMatrix,
+        mat:defaultMat,
         optics:{
             type:"perspective",
             fovy:45.0,
@@ -7564,14 +7673,30 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     SceneJS.Camera.prototype._init = function (params) {
         if (this._core.useCount == 1) {
             this.setOptics(params.optics); // Can be undefined
+
+            // Rebuild on every scene tick
+            // https://github.com/xeolabs/scenejs/issues/277
+            this._tick = this.getScene().on("tick", function () {
+                if (self._core.dirty) {
+                    self._core.rebuild();
+                }
+            });
         }
+    };
+
+    /**
+     * Returns the default camera projection matrix
+     * @return {Float32Array}
+     */
+    SceneJS.Camera.getDefaultMatrix = function () {
+        return defaultMat;
     };
 
     SceneJS.Camera.prototype.setOptics = function (optics) {
         var core = this._core;
         if (!optics) {
             core.optics = {
-                type:type,
+                type:"perspective",
                 fovy:60.0,
                 aspect:1.0,
                 near:0.1,
@@ -7655,6 +7780,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         } else {
             this._core.mat.set(this._core.matrix);
         }
+        this.publish("matrix", this._core.matrix);
     };
 
     SceneJS.Camera.prototype.getOptics = function () {
@@ -7679,6 +7805,11 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.projTransform = coreStack[stackLen++] = this._core;
         this._compileNodes();
         this._engine.display.projTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+    };
+
+    SceneJS.Camera.prototype._destroy = function () {
+        // Stop publishing matrix on each tick
+        this.getScene().off(this._tick);
     };
 })();(function() {
 
@@ -7805,15 +7936,18 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     SceneJS.Enable.prototype._init = function (params) {
         if (this._core.useCount == 1) {   // This node is first to reference the state core, so sets it up
             this._core.enabled = true;
-            if (params.enable) {
-                this.setEnabled(params.enable);
+            if (params.enabled != undefined) {
+                this.setEnabled(params.enabled);
             }
         }
     };
 
-    SceneJS.Enable.prototype.setEnabled = function (enable) {
-        this._core.enabled = !!enable;
-        this._engine.display.drawListDirty = true;
+    SceneJS.Enable.prototype.setEnabled = function (enabled) {
+        if (enabled !== this._core.enabled) {
+            this._core.enabled = enabled;
+            this._engine.display.drawListDirty = true;
+            this.publish("enabled", enabled);
+        }
         return this;
     };
 
@@ -9510,6 +9644,8 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
 
             var core = this._core;
 
+            var self = this;
+
             this._core.rebuild = function () {
 
                 core.matrix = SceneJS_math_lookAtMat4c(
@@ -9533,11 +9669,29 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
                     core.normalMat.set(SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
                 }
 
+                self.publish("matrix", core.matrix);
+
                 core.dirty = false;
             };
 
             this._core.dirty = true;
+
+            // Rebuild on every scene tick
+            // https://github.com/xeolabs/scenejs/issues/277
+            this._tick = this.getScene().on("tick", function () {
+                if (self._core.dirty) {
+                    self._core.rebuild();
+                }
+            });
         }
+    };
+
+    /**
+     * Returns the default view transformation matrix
+     * @return {Float32Array}
+     */
+    SceneJS.Lookat.getDefaultMatrix = function () {
+        return defaultMat;
     };
 
     SceneJS.Lookat.prototype.setEye = function (eye) {
@@ -9820,6 +9974,11 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         this._engine.display.viewTransform = coreStack[stackLen++] = this._core;
         this._compileNodes();
         this._engine.display.viewTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+    };
+
+    SceneJS.Lookat.prototype._destroy = function () {
+        // Stop publishing matrix on each tick
+        this.getScene().off(this._tick);
     };
 
 })();/*
@@ -12983,7 +13142,7 @@ var SceneJS_modelXFormStack = new (function () {
                 SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
 
         core.dirty = false;         // Does this subtree need matrices rebuilt
-
+        core.dirty = true;
         core.setDirty = function () {
 
             core.matrixDirty = true;
@@ -13076,7 +13235,7 @@ var SceneJS_modelXFormStack = new (function () {
                     SceneJS_math_inverseMat4(matrix, SceneJS_math_mat4())));
             //}
 
-            core.dirty = false;
+           core.dirty = false;
         };
     };
 
@@ -13102,6 +13261,7 @@ var SceneJS_modelXFormStack = new (function () {
 
         this.top = (--stackLen > 0) ? transformStack[stackLen - 1] : defaultCore;
 
+
         dirty = true;
     };
 
@@ -13125,7 +13285,8 @@ SceneJS.Types = new (function () {
                     if (methods.hasOwnProperty(methodName)) {
                         method = methods[methodName];
                         switch (methodName) {
-                            case "init":
+                            case "init": // Deprecated
+                            case "construct":
                                 (function () {
                                     var _method = methods[methodName];
                                     type.prototype._init = function (params) {
@@ -13136,7 +13297,8 @@ SceneJS.Types = new (function () {
                                     type.prototype._fromPlugin = true;
                                 })();
                                 break;
-                            case "destroy":
+                            case "destroy": // Deprecated
+                            case "destruct":
                                 type.prototype._destroy = method;
                                 break;
                             default:
@@ -15646,6 +15808,10 @@ SceneJS_ChunkFactory.createChunkType({
 
     draw : function(ctx) {
 
+        if (this.core.dirty) {
+            this.core.rebuild();
+        }
+
         var gl = this.program.gl;
 
         if (this._uPMatrixDraw) {
@@ -16591,7 +16757,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         /* Rebuild core's matrix from matrices at cores on path up to root
          */
-       if (this.core.dirty && this.core.build) {
+        if (this.core.dirty && this.core.build) {
             this.core.build();
         }
 

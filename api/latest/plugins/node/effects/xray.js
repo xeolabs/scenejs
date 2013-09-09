@@ -1,6 +1,6 @@
 SceneJS.Types.addType("effects/xray", {
 
-    init:function (params) {
+    construct:function (params) {
 
         this._shader = this.addNode({
             type:"shader",
@@ -119,7 +119,7 @@ SceneJS.Types.addType("effects/xray", {
         return !!this._monochrome;
     },
 
-    destroy:function () {
+    destruct:function () {
         // Not used
     }
 })

@@ -99,6 +99,7 @@ SceneJS_Canvas.prototype.initWebGL = function () {
     this.gl.disable(this.gl.CULL_FACE);
     this.gl.depthRange(0, 1);
     this.gl.disable(this.gl.SCISSOR_TEST);
+    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 };
 
 

@@ -41,22 +41,48 @@ var SceneJS_nodeEventsModule = new (function () {
             }
         });
 
+
     this.preVisitNode = function (node) {
-        var subs = node._topicSubs["rendered"];
-        if (subs) {
+
+        var renderedSubs = node._topicSubs["rendered"]; // DEPRECATED in V3.2
+        var worldPosSubs = node._topicSubs["worldPos"];
+        var viewPosSubs = node._topicSubs["viewPos"];
+        var cameraPosSubs = node._topicSubs["cameraPos"];
+        var projPosSubs = node._topicSubs["projPos"];
+        var canvasPosSubs = node._topicSubs["canvasPos"];
+
+        if (worldPosSubs || viewPosSubs || cameraPosSubs || projPosSubs || canvasPosSubs) {
             idStack[stackLen] = node.id;
-            var fn = node.__publishRenderedEvent;
-            if (!fn) {
-                fn = node.__publishRenderedEvent = function (params) {
-                    // Don't retain
-                    node.publish("rendered", params, true);
-                };
-            }
-            listenerStack[stackLen] = fn;
+
+            listenerStack[stackLen] = function (event) {
+
+                // Don't retain - callback must get positions for
+                // required coordinate via methods on the event object.
+                // That's dirty, therefore deprecated.
+                if (renderedSubs) {
+                    node.publish("rendered", event, true); // DEPRECATED in V3.2
+                }
+
+                // Publish retained positions for coordinate systems where subscribed
+                if (worldPosSubs) {
+                    node.publish("worldPos", event.getWorldPos());
+                }
+                if (viewPosSubs) {
+                    node.publish("viewPos", event.getViewPos());
+                }
+                if (cameraPosSubs) {
+                    node.publish("cameraPos", event.getCameraPos());
+                }
+                if (projPosSubs) {
+                    node.publish("projPos", event.getProjPos());
+                }
+                if (canvasPosSubs) {
+                    node.publish("canvasPos", event.getCanvasPos());
+                }
+            };
+
             stackLen++;
             dirty = true;
-        } else {
-            node.__publishRenderedEvent = null;
         }
     };
 

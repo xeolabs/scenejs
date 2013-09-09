@@ -11,7 +11,7 @@ require([
 
         SceneJS.Types.addType("physics/body", {
 
-            init:function (params) {
+            construct:function (params) {
 
                 // Don't need to provide initial attributes for our scene nodes
                 // because that will will happen via an update from the physics
@@ -57,7 +57,7 @@ require([
                             }
                         });
                 } catch (e) {
-                    console.log("Failed to create 'physics/body' node ID '" + this.getId() + "' : " + e);
+                    this.log("error", e);
                 }
             },
 
@@ -75,7 +75,7 @@ require([
                 // Not used
             },
 
-            destroy:function () {
+            destruct:function () {
                 if (this._bodyId) {
                     this._system.removeBody(this._bodyId);
                 }

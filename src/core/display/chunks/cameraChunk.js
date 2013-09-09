@@ -13,6 +13,10 @@ SceneJS_ChunkFactory.createChunkType({
 
     draw : function(ctx) {
 
+        if (this.core.dirty) {
+            this.core.rebuild();
+        }
+
         var gl = this.program.gl;
 
         if (this._uPMatrixDraw) {

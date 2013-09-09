@@ -14,7 +14,7 @@
 
     SceneJS.Types.addType("prims/plane", {
 
-        init:function (params) {
+        construct:function (params) {
             this.addNode(build.call(this, params));
         }
     });

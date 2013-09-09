@@ -1,6 +1,6 @@
 SceneJS.Types.addType("effects/fog", {
 
-    init:function (params) {
+    construct:function (params) {
 
         // Holds params for custom shader node
         this._shaderParams = {
@@ -153,7 +153,7 @@ SceneJS.Types.addType("effects/fog", {
         return { r:color[0], g:color[1], b:color[2] };
     },
 
-    destroy:function () {
+    destruct:function () {
         // Not used
     }
 });
