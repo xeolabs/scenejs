@@ -706,7 +706,7 @@
             {
                 "title":"Layers",
                 "tip":"",
-                "tags":["culling"],
+                "tags":["layers"],
                 "nodes":[
                     {
                         "title":"Transparency sorting",
