@@ -1,3 +1,19 @@
+/**
+ * A procedurally-generated tree
+ *
+ * This is a quick bit of fun that borrows the procedural tree generation
+ * code from the "Ghost Trees" Chrome Experiment by Marek Kapolka:
+ *
+ * http://www.chromeexperiments.com/detail/ghost-trees/
+ *
+ * Tree generation code is wrapped in a custom SceneJS node type defined in:
+ * http://scenejs.org/api/latest/plugins/node/objects/plants/ghostTree.js
+ *
+ * All the parameters for the tree generator are exposed as configurations
+ * for the node type.
+ *
+ */
+
 (function () {
 
     require([
