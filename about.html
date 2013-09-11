@@ -323,7 +323,7 @@ var scene = SceneJS.createScene({
     </p>
 
 
-    <img src="images/sceneGraphObjects3.png">
+    <img src="images/sceneGraphObjects.png">
 
     <p><strong>Figure 1.</strong> Scene graph data structure compiled from the scene definition
         of Listing 1. Note that geometries at the leaves inherit state from parent nodes, and that
@@ -331,14 +331,14 @@ var scene = SceneJS.createScene({
     </p>
 
     <br/><br/>
-    <img src="images/drawListObjects2.png">
+    <img src="images/drawListObjects.png">
 
     <p><strong>Figure 2.</strong> State-sorted draw list compiled from the scene graph data structure
-        of Figure 1. Draw list nodes N1, N2 and N3 reference the scene node states to activate on WebGL to
+        of Figure 1. Draw list nodes N1, N2 and N3 reference scene node states to activate on WebGL to
         draw the teapot and cubes. N2 and N3 reference a similar state configuration and therefore
-        reference the same shader. The draw list nodes are ordered to prevent needless re-activation of
+        reference the same shader. The draw list nodes are ordered to minimise re-activation of
         texture, geometry and shaders when rendering the frame. Note how the same box geometry
-        is shared by N2 and N3.
+        is shared by N1 and N2.
     </p>
 
     <br/><br/><br/><br/>
