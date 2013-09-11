@@ -20,16 +20,16 @@
                     if (params.branchAngleFactor == undefined) params.branchAngleFactor = 1.5;
                     if (params.branchSegmentFactor == undefined) params.branchSegmentFactor = 1;
                     if (params.branchBranchFactor == undefined) params.branchBranchFactor = .5;
-                    if (params.color == undefined) params.color = [1,1,1];
+                    if (params.color == undefined) params.color = [1, 1, 1];
 
                     var segment = generateSegment(null, params);
                     var height = countSegmentMaxHeight(segment);
 
-                    this.addNode(buildGeometry(segment, params));
+                    this.addNode(buildGeometry(segment));
                 }
             });
 
-            function buildGeometry(segment, params) {
+            function buildGeometry(segment) {
 
                 var templateVertices = [];
 
@@ -44,7 +44,7 @@
                 var colorArray = [];
                 //Initialize color array
                 for (var i = 0; i < vertexArray.length; i++) {
-                    colorArray.push([params.color[0], params.color[1], params.color[2], 1]);
+                    colorArray.push([1, 1, 1, 1]);
                 }
                 var rootMatrix = glmat.mat4.create();
                 glmat.mat4.identity(rootMatrix);
@@ -132,18 +132,20 @@
                 this.branchBranchFactor = 1;
             }
 
-//Generates a random value between min and max (inclusive)
+            //Generates a random value between min and max (inclusive)
+
             function randomRange(min, max) {
                 return min + Math.random() * (max - min);
             }
 
-//Parameters:
-//--root--
-//Type: Segment
-//The generated segment will stem from this segment
-//--params--
-//Type: SegmentParameters
-//The values to use when generating this Segment
+            //Parameters:
+            //--root--
+            //Type: Segment
+            //The generated segment will stem from this segment
+            //--params--
+            //Type: SegmentParameters
+            //The values to use when generating this Segment
+
             function generateSegment(root, params) {
                 var segment = new Segment();
                 segment.previousSegment = root;
@@ -168,7 +170,8 @@
                 return segment;
             }
 
-//Returns the root-most segment connected to the input Segment
+            //Returns the root-most segment connected to the input Segment
+
             function getBaseSegment(segment) {
                 if (segment.prevSegment === null) {
                     return segment;
@@ -177,15 +180,16 @@
                 }
             }
 
-//Creates a new SegmentParameters object
-//by shrinking the min and max values of the
-//given SegmentParameters object by the factors specified
-//in that object.
-//Parameters:
-//--params--
-//Type: SegmentParameters
-//The input SegmentParameters object that will have its values
-//shrunk
+            //Creates a new SegmentParameters object
+            //by shrinking the min and max values of the
+            //given SegmentParameters object by the factors specified
+            //in that object.
+            //Parameters:
+            //--params--
+            //Type: SegmentParameters
+            //The input SegmentParameters object that will have its values
+            //shrunk
+
             function branchSegmentParams(params) {
                 var sp2 = new SegmentParameters();
                 sp2.minSegmentLength = params.minSegmentLength * params.branchLengthFactor;
@@ -203,10 +207,11 @@
                 return sp2;
             }
 
-//Unpacks an array of vectors into an array of values.
-//This is useful because the addSegmentToRenderable method
-//expects the values in its vertexArray to be glMatrix vec3s, but
-//WebGL buffers should be filled with primative values
+            //Unpacks an array of vectors into an array of values.
+            //This is useful because the addSegmentToRenderable method
+            //expects the values in its vertexArray to be glMatrix vec3s, but
+            //WebGL buffers should be filled with primative values
+
             function unpackArray(input) {
                 var output = [];
 
@@ -219,8 +224,9 @@
                 return output;
             }
 
-//Generates the vertex, element, and color array data for a tree segment
-//and its children recursively.
+            //Generates the vertex, element, and color array data for a tree segment
+            //and its children recursively.
+
             function addSegmentToRenderable(vertexArray, elementArray, colorArray, rootIndexStart, templateVertices, segment, rootMatrix, level) {
                 var m = glmat.mat4.clone(rootMatrix);
 
@@ -278,7 +284,8 @@
                 }
             }
 
-//Generates the pattern of vertices that will be used for each ring of the tree
+            //Generates the pattern of vertices that will be used for each ring of the tree
+
             function makeTemplateVertices() {
                 var templateVertices = [];
 
@@ -291,7 +298,8 @@
                 return templateVertices;
             }
 
-//Generates a Renderable tree from this segment and its children.
+            //Generates a Renderable tree from this segment and its children.
+
             function makeSegmentRenderable(segment, glContext) {
                 var templateVertices = makeTemplateVertices();
 
@@ -321,8 +329,9 @@
                 return renderable;
             }
 
-//Returns the maxiumum number of segments that follow this one
-//Before a leaf segment is found
+            //Returns the maxiumum number of segments that follow this one
+            //Before a leaf segment is found
+
             function countSegmentMaxHeight(segment) {
                 if (segment.nextSegment === null && segment.branches.length === 0) {
                     return 1;
@@ -344,7 +353,8 @@
                 }
             }
 
-//Counts the total number of segments below this segment in a tree.
+            //Counts the total number of segments below this segment in a tree.
+
             function countNumSegments(segment) {
                 var output;
                 if (segment.nextSegment != null) {
