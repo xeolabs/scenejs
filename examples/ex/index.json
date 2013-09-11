@@ -1241,6 +1241,13 @@
                         "id":"city"
                     },
                     {
+                        "title":"Ghost Trees",
+                        "path":"demos/ghostTrees.html",
+                        "editor":false,
+                        "tags":[],
+                        "id":"ghostTrees"
+                    },
+                    {
                         "title":"Bubbles",
                         "path":"demos/bubbles.html",
                         "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "picking", "animation"],
