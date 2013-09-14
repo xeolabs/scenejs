@@ -875,7 +875,13 @@
                         "path":"customNodes/effects/fog.html",
                         "tags":[],
                         "id":"customNodesFog"
-                    }
+                    },
+                    {
+                        "title":"Drinking Bird Toy",
+                        "path":"customNodes/objects/drinkingBird.html",
+                        "tags":[],
+                        "id":"customNodesDrinkingBird"
+                    },
                 ]
             },
             {
