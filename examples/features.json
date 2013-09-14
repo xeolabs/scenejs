@@ -122,6 +122,10 @@
                         "page":"boxNodePrim"
                     },
                     {
+                        "title":"Cylinder",
+                        "page":"cylinderNodePrim"
+                    },
+                    {
                         "title":"Sphere",
                         "page":"sphereNodePrim"
                     },
