@@ -1,7 +1,7 @@
 /**
  * Sphere geometry node type
  *
- * @author Moritz MrGrain
+ * @author Moritz Kornher
  *
  * Usage example:
  *
