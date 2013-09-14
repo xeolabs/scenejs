@@ -898,6 +898,13 @@
                         "id":"boxNodePrim"
                     },
                     {
+                        "title":"Cylinder",
+                        "tip":"Creating a solid cylinder geometry using the cylinder primitive plugin",
+                        "path":"customNodes/prims/cylinder.html",
+                        "tags":[],
+                        "id":"cylinderNodePrim"
+                    },
+                    {
                         "title":"Sphere",
                         "path":"customNodes/prims/sphere.html",
                         "tip":"Creating a solid sphere geometry using the sphere primitive plugin",
