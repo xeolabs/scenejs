@@ -3,6 +3,13 @@
 **SceneJS** is an open-source 3D engine on WebGL that's geared towards rendering large numbers of individually
 articulated and pickable objects as required for high-detail visualisation applications.
 
+
+###This fork
+
+This fork by Lucas Doyle adds the following:
+* A proper package.json
+* Grunt based builds
+
 ![Tron Tank Demo](http://scenejs.org/images/tron-tank.jpg)
 
 ## Table of Contents
