@@ -17,7 +17,15 @@ Vagrant.configure("2") do |config|
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine.
+  
+  # connect
   config.vm.network :forwarded_port, host: 1234, guest: 1234
+  
+  # livereload
+  config.vm.network :forwarded_port, host: 12345, guest: 12345
+  
+  # jekyll
+  config.vm.network :forwarded_port, host: 9001, guest: 9001
 
   # Share an additional folder to the guest VM. The first argument is
   # an identifier, the second is the path on the guest to mount the

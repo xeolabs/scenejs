@@ -8,27 +8,27 @@ module.exports = function(grunt) {
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
   grunt.initConfig({
+    
+    jekyll: {
+      default: {}
+    },
 
     // watch list
     watch: {
 
-      livereload: {
+      jekyll: {
         files: [
-
-          'js/{,**/}*.js'
+          'assets/**/*',
+          '_includes/**/*.html',
+          '_layouts/**/*.html',
+          'index.html',
+          'example.html'
         ],
-        // tasks: ['exec'],
+        tasks: ['jekyll'],
         options: {
           livereload: 12345,
         }
       }
-      /* not used at the moment
-      handlebars: {
-        files: [
-          '<%= yeoman.app %>/templates/*.hbs'
-        ],
-        tasks: ['handlebars']
-      }*/
     },
 
     // testing server
@@ -49,12 +49,7 @@ module.exports = function(grunt) {
     grunt.option('force', true);
 
     grunt.task.run([
-      // 'clean:server',
-      // 'compass:server',
-      'connect:testserver',
-      // 'express:dev',
-      // 'exec',
-      // 'open',
+      'connect',
       'watch'
     ]);
   });

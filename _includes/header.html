@@ -1,0 +1,98 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>
+  {% if page.title == "SceneJS" %}
+    {{ page.title }}
+  {% else %}
+    {{ page.title }} &middot; SceneJS
+  {% endif %}
+</title>
+
+<script src="{{ page.base_url }}assets/js/jquery-1.8.3.min.js"></script>
+
+<!-- slider -->
+<script src="{{ page.base_url }}assets/js/jquery.bxslider.min.js"></script>
+<link href="{{ page.base_url }}assets/css/jquery.bxslider.css" rel="stylesheet"/>
+
+<!-- code syntax highlighting -->
+<link href="{{ page.base_url }}assets/css/prettify.css" rel="stylesheet"/>
+<script src="{{ page.base_url }}assets/js/prettify.js"></script>
+
+<!-- extra styling -->
+<link href="{{ page.base_url }}assets/css/styles.css" rel="stylesheet"/>
+<style>
+    p.sectionHeading {
+        font-weight: bold;
+        font-size: 20px;
+        padding-bottom: 0;
+        padding-top: 15px;
+    }
+
+    p.quickStart {
+        font-weight: bold;
+        font-size: 30px;
+        padding-bottom: 0;
+        padding-top: 15px;
+    }
+
+    p.bulletHeading {
+        font-weight: bold;
+        padding-top: 0px;
+        padding-bottom: 5px;
+    }
+
+    p.bullet {
+        padding-top: 0;
+        padding-bottom: 5px;
+        margin-top: 0px;
+        /*line-height: 20px;*/
+        /*color: #2a2a2a;            */
+    }
+
+        /*p {*/
+        /*padding-top: 0;*/
+
+        /*margin-top: 0px;*/
+        /*line-height: 20px;*/
+        /*color: #2a2a2a;*/
+        /*font: 400 14px/1.4 "Open Sans", sans-serif;*/
+        /*}*/
+
+    .col {
+        background-repeat: no-repeat;
+        background-color: white;
+    }
+
+    .left {
+        float: left;
+        width: 30%;
+        padding: 10px;
+        padding-left: 0;
+    }
+
+    .right {
+        float: left;
+        width: 65%;
+        padding-left: 25px;
+        padding-top: 10px;
+        padding-right: 0;
+    }
+
+</style>
+
+
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+  <script src="{{ page.base_url }}assets/js/html5shiv.js"></script>
+  <script src="{{ page.base_url }}assets/js/respond.min.js"></script>
+<![endif]-->
+
+<!-- Favicons -->
+<!--
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ page.base_url }}assets/ico/apple-touch-icon-144-precomposed.png">
+-->
+<link rel="shortcut icon" href="{{ page.base_url }}assets/ico/favicon.png">
+

@@ -39,7 +39,7 @@ body {
     margin-left: auto;
     margin-right: auto;
     padding: 10px;
-    background: white url("../images/scenejs.png") no-repeat 0;
+    background: white url("../img/scenejs.png") no-repeat 0;
 
 }
 
@@ -283,7 +283,7 @@ body {
 /* Slide styles */
 
 article.biglogo {
-    background: url(images/three_dof.png) 50% 50% no-repeat, black;
+    background: url(../img/three_dof.png) 50% 50% no-repeat, black;
 }
 
 /* Slides */
@@ -571,7 +571,7 @@ h3.subtitle {
     font-weight: bold;
     -webkit-transform-origin: 0% 100%;
     text-shadow: 0 0 1px #114166;
-    background: url('../examples/images/a-xeolabs-project.png') no-repeat top right;
+    background: url('../images/a-xeolabs-project.png') no-repeat top right;
 }
 
 article.fill h3 {
@@ -609,7 +609,7 @@ ul.notes {
 
 ul.notes li {
     list-style-type: none;
-    background: url('../images/arrow_right_green.png') no-repeat top left;
+    background: url('../img/arrow_right_green.png') no-repeat top left;
     padding-left: 25px;
     padding-bottom: 10px;
 }
@@ -657,7 +657,7 @@ h3.feature-category {
     font-size: 14px;
     font-weight: normal;
     padding-left: 22px;
-    background: url("../images/bullet-point.png") no-repeat 8px 2px !important;
+    background: url("../img/bullet-point.png") no-repeat 8px 2px !important;
 }
 
 pre {
@@ -1008,7 +1008,7 @@ article.smaller q::after {
 }
 
 .pageSeparator {
-    background: url("../images/page-separator.jpg") no-repeat center #ffffff;
+    background: url("../img/page-separator.jpg") no-repeat center #ffffff;
 
     width: 100%;
     text-align: center;

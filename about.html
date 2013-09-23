@@ -323,7 +323,7 @@ var scene = SceneJS.createScene({
     </p>
 
 
-    <img src="images/sceneGraphObjects.png">
+    <img src="{{ page.base_url }}assets/img/sceneGraphObjects.png">
 
     <p><strong>Figure 1.</strong> Scene graph data structure compiled from the scene definition
         of Listing 1. Note that geometries at the leaves inherit state from parent nodes, and that
@@ -331,7 +331,7 @@ var scene = SceneJS.createScene({
     </p>
 
     <br/><br/>
-    <img src="images/drawListObjects.png">
+    <img src="{{ page.base_url }}assets/img/drawListObjects.png">
 
     <p><strong>Figure 2.</strong> State-sorted draw list compiled from the scene graph data structure
         of Figure 1. Draw list nodes N1, N2 and N3 reference scene node states to activate on WebGL to
@@ -342,7 +342,7 @@ var scene = SceneJS.createScene({
     </p>
 
     <br/><br/><br/><br/>
-    <a href="examples.html?page=secondExample" target="_other"><img src="images/secondExample.jpg"></a>
+    <a href="examples.html?page=secondExample" target="_other"><img src="{{ page.base_url }}assets/img/secondExample.jpg"></a>
 
     <p><strong>Figure 3.</strong> Screenshot of the 3D scene rendered from the draw list of Figure 2.
         Run it <a href="examples.html?page=secondExample" target="_other">here</a>.

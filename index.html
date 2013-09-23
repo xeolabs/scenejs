@@ -1,181 +1,24 @@
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-<head>
-    <title>SceneJS V3</title>
+---
+layout: default
+title: SceneJS
+base_url: "./"
+---
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
-    <link href="css/styles.css" rel="stylesheet"/>
-
-    <script src="lib/jquery-1.8.3.min.js"></script>
-
-    <script src="lib/jquery.bxslider.min.js"></script>
-    <link href="css/jquery.bxslider.css" rel="stylesheet"/>
-
-    <link href="css/prettify.css" rel="stylesheet"/>
-    <script src="lib/prettify.js"></script>
-
-
-    <style>
-        p.sectionHeading {
-            font-weight: bold;
-            font-size: 20px;
-            padding-bottom: 0;
-            padding-top: 15px;
-        }
-
-        p.quickStart {
-            font-weight: bold;
-            font-size: 30px;
-            padding-bottom: 0;
-            padding-top: 15px;
-        }
-
-        p.bulletHeading {
-            font-weight: bold;
-            padding-top: 0px;
-            padding-bottom: 5px;
-        }
-
-        p.bullet {
-            padding-top: 0;
-            padding-bottom: 5px;
-            margin-top: 0px;
-            /*line-height: 20px;*/
-            /*color: #2a2a2a;            */
-        }
-
-            /*p {*/
-            /*padding-top: 0;*/
-
-            /*margin-top: 0px;*/
-            /*line-height: 20px;*/
-            /*color: #2a2a2a;*/
-            /*font: 400 14px/1.4 "Open Sans", sans-serif;*/
-            /*}*/
-
-        .col {
-            background-repeat: no-repeat;
-            background-color: white;
-        }
-
-        .left {
-            float: left;
-            width: 30%;
-            padding: 10px;
-            padding-left: 0;
-        }
-
-        .right {
-            float: left;
-            width: 65%;
-            padding-left: 25px;
-            padding-top: 10px;
-            padding-right: 0;
-        }
-
-    </style>
-</head>
-<body>
-
-<div id="top">
-    <div class="links"><a href="examples.html">Examples</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
-            href="https://github.com/xeolabs/scenejs#downloads">Downloads</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
-            href="https://github.com/xeolabs/scenejs/issues">Issues</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
-            href="https://github.com/xeolabs/scenejs/tree/V3.1/licenses">License</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
-            href="https://twitter.com/xeolabs">Twitter</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
-            href="http://www.facebook.com/group.php?gid=350488973712">Facebook</a></div>
-
-    <!--<div class="links"><span>Home</span>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="about.html">About</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="examples.html">Examples</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
-            <!--href="https://github.com/xeolabs/scenejs#downloads">Downloads</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
-            <!--href="https://github.com/xeolabs/scenejs/issues">Issues</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
-            <!--href="https://github.com/xeolabs/scenejs/tree/V3.1/licenses">License</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
-            <!--href="https://twitter.com/xeolabs">Twitter</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
-            <!--href="http://www.facebook.com/group.php?gid=350488973712">Facebook</a></div>-->
-</div>
-
-<div id="header">
-    <div class="inner">
-        <ul class="bxslider">
-            <li>
-                <a href="http://www.biodigital.com/biodigital-human.html">
-                    <img src="images/human.jpg" alt=""
-                         title="BioDigital Human: A Web-based atlas of human anatomy and conditions"/>
-                </a>
-            </li>
-            <li>
-                <a href="examples.html?page=city"><img
-                        src="images/procedural-city.jpg" alt=""
-                        title="SceneJS Example: Procedurally-Generated City"/></a>
-            </li>
-            <li>
-                <a href="https://smiletrain.biodigitalhuman.com/home/"><img
-                        src="images/smiletrain.jpg" alt=""
-                        title="Smile Train: World's first surgery simulator to train doctors for cleft repair surgery "/></a>
-            </li>
-            <li>
-                <a href="examples.html?page=tronTank"><img
-                        src="images/tronTank.jpg" alt=""
-                        title="SceneJS Example: Tank Program from the 1982 Disney motion picture Tron"/></a>
-            </li>
-            <li>
-                <a href="http://bimsurfer.org">
-                    <img src="images/bimSurfer.jpg" alt=""
-                         title="BIMSurfer - Open-Source IFC Viewer"/>
-                </a>
-            </li>
-            <li>
-                <a href="http://www.biodigital.com/biodigital-human.html">
-                    <img src="images/bdhuman-skin.png" alt=""
-                         title="BioDigital Human: Skin Cross-Section"/>
-                </a>
-            </li>
-            <li>
-                <a href="examples.html?page=customHeightmap"><img
-                        src="images/heightMapWithFog.jpg" alt=""
-                        title="SceneJS Example: Heightmap with Fog"/></a>
-            </li>
-            <li>
-                <a href="http://www.biodigital.com/biodigital-human.html">
-                    <img src="images/salmonella.png" alt=""
-                         title="BioDigital Human: Salmonella Bacterium"/>
-                </a>
-            </li>
-            <li>
-                <a href="examples.html?page=bubbles">
-                    <img src="images/bubbles.jpg" alt=""
-                         title="SceneJS Examples: Bubbles using a custom fragment shader"/>
-                </a>
-            </li>
-            <li>
-                <a href="examples.html?page=multitexturing"><img
-                        src="images/earth.jpg" alt=""
-                        title="SceneJS Example: Earth rendered with color, specular, alpha and glow maps"/></a>
-            </li>
-            <!--<li>-->
-                <!--<a href="http://openglinsights.com/"><img-->
-                        <!--src="images/openGLInsights.jpg" alt=""-->
-                        <!--title="SceneJS: A WebGL-Based Scene Graph Engine - OpenGL Insights 2012"/></a>-->
-            <!--</li>-->
-        </ul>
-    </div>
-</div>
+{% include main-slider.html %}
 
 <div id="intro">
-    <!--<p>A JSON-based scene graph engine on WebGL</p>-->
-    <p><span class="strong">SceneJS</span> is an extensible WebGL-based engine for high-detail 3D visualisation using JavaScript.</p>
+    <p><span class="strong">SceneJS {{ site.current_version }}</span> is an extensible WebGL-based engine for high-detail 3D visualisation using JavaScript.</p>
     <p>It's created and maintained by <a href="http://about.me/kaylindsay">Lindsay Kay</a> and is free for use under an open-source license.</p>
 </div>
 
 <div id="container">
-    <div style="width:100%;">
+    <div style="width: 100%;">
         <div class="col left">
-            <p class="sectionHeading">Features in V3.2</p>
+            <p class="sectionHeading">Features in {{ site.current_version }}</p>
 
             <div id="featureList">
-
             </div>
+
         </div>
         <div class="col right">
             <p class="sectionHeading quickStart">Quick Start</p>
@@ -187,7 +30,7 @@
             <pre>&lt;script src="http://scenejs.org/api/latest/scenejs.js"&gt;&lt;/script&gt;</pre>
             <p>Then build a scene. We'll make a spinning blue teapot:</p>
 
-        <pre class="prettyprint lang-javascript">
+            <pre class="prettyprint lang-javascript">
 var scene = SceneJS.createScene({
     nodes:[
         {
@@ -211,15 +54,14 @@ var scene = SceneJS.createScene({
         }
     ]
 });
-</pre>
+            </pre>
             <p>And voilà, one blue teapot:</p><br>
-            <a href="examples.html?page=firstExample"
-               target="other"> <img
-                    style="display: block; margin-left: auto; margin-right: auto;" src="images/firstExample.png"/></a>
+            <a href="examples.html?page=firstExample" target="other">
+                <img style="display: block; margin-left: auto; margin-right: auto;" src="images/firstExample.png"/></a>
             <br>
 
             <p>Now let's start the teapot spinning:</p>
-<pre class="prettyprint lang-javascript">
+            <pre class="prettyprint lang-javascript">
 scene.getNode("myRotate", function(myRotate) {
 
     var angle = 0;
@@ -229,99 +71,83 @@ scene.getNode("myRotate", function(myRotate) {
             myRotate.setAngle(angle += 0.5);
         });
 });
-        </pre>
-            <p>
-                <a href="examples.html?page=firstExample"
-                   target="other">Run this example</a></p>
+            </pre>
+            <p><a href="examples.html?page=firstExample" target="other">Run this example</a></p>
 
             <p class="sectionHeading">Plugins</p>
 
-            <p>To keep the core library small, SceneJS dynamically loads it's non-core functionality from a directory of
-                plugins. In the example above, the <code>prims/teapot</code> node is a custom node type instantiated from a <a
-                        href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins/node/prims/teapot.js">prims/teapot</a> plugin, which SceneJS
-                loaded on-demand from <a href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins">the plugins directory</a> within its repository on
-                GitHub.</p>
+            <p>To keep the core library small, SceneJS dynamically loads it's non-core functionality from a directory of plugins. In the example above, the <code>prims/teapot</code> node is a custom node type instantiated from a <a href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins/node/prims/teapot.js">prims/teapot</a> plugin, which SceneJS loaded on-demand from <a href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins">the plugins directory</a> within its repository on GitHub.</p>
 
-            <p>If you'd rather serve the plugins yourself, then just copy that directory to your server and configure
-                SceneJS to load them from there, like this:</p>
+            <p>If you'd rather serve the plugins yourself, then just copy that directory to your server and configure SceneJS to load them from there, like this:</p>
 
-            <pre class="prettyprint lang-javascript">SceneJS.setConfigs({
+            <pre class="prettyprint lang-javascript">
+SceneJS.setConfigs({
     pluginPath: "./foo/myPluginsDir"
 });
             </pre>
 
-            <p>Want to write your own plugins? Excellent, please read more about the plugin API <a
-                    href="https://github.com/xeolabs/scenejs#plugin-api">here</a>.</p>
+            <p>Want to write your own plugins? Excellent, please read more about the plugin API <a href="https://github.com/xeolabs/scenejs#plugin-api">here</a>.</p>
         </div>
     </div>
 </div>
 
-<a href="https://github.com/xeolabs/scenejs" target="_blank"><img
-        style="position: absolute; top: 0; left: 0; border: 0;"
-        src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
+<a href="https://github.com/xeolabs/scenejs" target="_blank"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
 
 <script>
 
-    jQuery(document).ready(
-            function ($) {
-                addFeatures();
-                addPrettify();
-                addSlider();
-            });
+    $(document).ready(function () {
+        addFeatures();
+        addPrettify();
+    });
 
     function addFeatures() {
-        $.ajax({
-            type:'GET',
-            url:'examples/features.json',
-            dataType:'json',
-            success:function (features) {
+        $.getJSON('examples/features.json', function (features) {
 
-                var featureList = $('#featureList');
+            var featureList = $('#featureList');
 
-                var category;
-                var categoryElem;
-                var subCategoryElem;
-                var featureElem;
-                var subSection;
-                var subCategory;
-                var feature;
+            var category;
+            var categoryElem;
+            var subCategoryElem;
+            var featureElem;
+            var subSection;
+            var subCategory;
+            var feature;
 
-                var li;
+            var li;
 
-                for (var categoryName in features) {
-                    if (features.hasOwnProperty(categoryName)) {
+            for (var categoryName in features) {
+                if (features.hasOwnProperty(categoryName)) {
 
-                        category = features[categoryName];
+                    category = features[categoryName];
 
-                        categoryElem = $('<h3/>')
-                                .addClass('feature-category')
-                                .text(category.title)
+                    categoryElem = $('<h3/>')
+                            .addClass('feature-category')
+                            .text(category.title)
+                            .appendTo(featureList);
+
+                    for (var i = 0, len = category.nodes.length; i < len; i++) {
+                        subCategory = category.nodes[i];
+                        subCategoryElem = $('<div/>')
+                                .addClass('feature-subcategory')
                                 .appendTo(featureList);
 
-                        for (var i = 0, len = category.nodes.length; i < len; i++) {
-                            subCategory = category.nodes[i];
-                            subCategoryElem = $('<div/>')
-                                    .addClass('feature-subcategory')
-                                    .appendTo(featureList);
-
-                            var nodes = subCategory.nodes;
-                            if (nodes) {
-                                for (var j = 0, lenj = subCategory.nodes.length; j < lenj; j++) {
-                                    feature = subCategory.nodes[j];
-                                    featureElem = $('<a/>')
-                                            .addClass('feature-feature')
-                                            .attr('href', 'examples.html?page=' + feature.page)
-                                            .text(feature.title)
-                                            .appendTo(subCategoryElem);
-                                    if (j < lenj - 2) {
-                                        $('<span/>')
-                                                .text(", ")
-                                                .appendTo(featureElem);
-                                    } else if (j < lenj - 1) {
-                                        $('<span/>')
-                                                .text(" and ")
-                                                .appendTo(featureElem);
-                                    }
+                        var nodes = subCategory.nodes;
+                        if (nodes) {
+                            for (var j = 0, lenj = subCategory.nodes.length; j < lenj; j++) {
+                                feature = subCategory.nodes[j];
+                                featureElem = $('<a/>')
+                                        .addClass('feature-feature')
+                                        .attr('href', 'examples.html?page=' + feature.page)
+                                        .text(feature.title)
+                                        .appendTo(subCategoryElem);
+                                if (j < lenj - 2) {
+                                    $('<span/>')
+                                            .text(", ")
+                                            .appendTo(featureElem);
+                                } else if (j < lenj - 1) {
+                                    $('<span/>')
+                                            .text(" and ")
+                                            .appendTo(featureElem);
                                 }
                             }
                         }
@@ -340,27 +166,10 @@ scene.getNode("myRotate", function(myRotate) {
         }
         var el = document.createElement('script');
         el.type = 'text/javascript';
-        el.src = 'lib/prettify.js';
+        el.src = '{{ page.base_url }}/assets/js/prettify.js';
         el.onload = function () {
             prettyPrint();
         };
         document.body.appendChild(el);
     }
-
-    function addSlider() {
-        $('.bxslider').bxSlider({
-            mode:'fade',
-            pause:6000,
-            useCSS:false,
-            infiniteLoop:true,
-            hideControlOnEnd:true,
-            speed:1000,
-            captions:true,
-            auto:true,
-            pager:false
-        });
-    }
-
 </script>
-</body>
-</html>
