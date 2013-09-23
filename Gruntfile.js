@@ -37,7 +37,7 @@ module.exports = function(grunt) {
         options: {
           hostname: '*',
           port: 1234,
-          base: '.'
+          base: '_gh_pages'
         }
       }
     }
@@ -49,6 +49,7 @@ module.exports = function(grunt) {
     grunt.option('force', true);
 
     grunt.task.run([
+      'jekyll',
       'connect',
       'watch'
     ]);

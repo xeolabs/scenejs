@@ -571,7 +571,7 @@ h3.subtitle {
     font-weight: bold;
     -webkit-transform-origin: 0% 100%;
     text-shadow: 0 0 1px #114166;
-    background: url('../images/a-xeolabs-project.png') no-repeat top right;
+    background: url('../img/a-xeolabs-project.png') no-repeat top right;
 }
 
 article.fill h3 {

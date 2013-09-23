@@ -57,7 +57,7 @@ var scene = SceneJS.createScene({
             </pre>
             <p>And voilà, one blue teapot:</p><br>
             <a href="examples.html?page=firstExample" target="other">
-                <img style="display: block; margin-left: auto; margin-right: auto;" src="images/firstExample.png"/></a>
+                <img style="display: block; margin-left: auto; margin-right: auto;" src="{{ page.base_url }}assets/img/firstExample.png"/></a>
             <br>
 
             <p>Now let's start the teapot spinning:</p>
@@ -72,7 +72,7 @@ scene.getNode("myRotate", function(myRotate) {
         });
 });
             </pre>
-            <p><a href="examples.html?page=firstExample" target="other">Run this example</a></p>
+            <p><a href="{{ page.base_url }}examples.html?page=firstExample" target="other">Run this example</a></p>
 
             <p class="sectionHeading">Plugins</p>
 
@@ -166,7 +166,7 @@ SceneJS.setConfigs({
         }
         var el = document.createElement('script');
         el.type = 'text/javascript';
-        el.src = '{{ page.base_url }}/assets/js/prettify.js';
+        el.src = '{{ page.base_url }}assets/js/prettify.js';
         el.onload = function () {
             prettyPrint();
         };
