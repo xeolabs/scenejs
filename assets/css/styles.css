@@ -1025,3 +1025,60 @@ article.smaller q::after {
     font-weight: bold;
     color: rgb(0, 0, 0);
 }
+
+p.sectionHeading {
+    font-weight: bold;
+    font-size: 20px;
+    padding-bottom: 0;
+    padding-top: 15px;
+}
+
+p.quickStart {
+    font-weight: bold;
+    font-size: 30px;
+    padding-bottom: 0;
+    padding-top: 15px;
+}
+
+p.bulletHeading {
+    font-weight: bold;
+    padding-top: 0px;
+    padding-bottom: 5px;
+}
+
+p.bullet {
+    padding-top: 0;
+    padding-bottom: 5px;
+    margin-top: 0px;
+    /*line-height: 20px;*/
+    /*color: #2a2a2a;            */
+}
+
+    /*p {*/
+    /*padding-top: 0;*/
+
+    /*margin-top: 0px;*/
+    /*line-height: 20px;*/
+    /*color: #2a2a2a;*/
+    /*font: 400 14px/1.4 "Open Sans", sans-serif;*/
+    /*}*/
+
+.col {
+    background-repeat: no-repeat;
+    background-color: white;
+}
+
+.left {
+    float: left;
+    width: 30%;
+    padding: 10px;
+    padding-left: 0;
+}
+
+.right {
+    float: left;
+    width: 65%;
+    padding-left: 25px;
+    padding-top: 10px;
+    padding-right: 0;
+}
