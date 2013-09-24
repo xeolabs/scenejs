@@ -8,7 +8,10 @@ articulated and pickable objects as required for high-detail visualisation appli
 
 This fork by Lucas Doyle adds the following:
 * A proper package.json
+* Sematic Versioning
 * Grunt based builds
+* Website and docs compiled with jekyll
+* Vagrant dev environment
 
 ![Tron Tank Demo](http://scenejs.org/images/tron-tank.jpg)
 

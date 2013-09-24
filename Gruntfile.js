@@ -21,8 +21,7 @@ module.exports = function(grunt) {
           'assets/**/*',
           '_includes/**/*.html',
           '_layouts/**/*.html',
-          'index.html',
-          'example.html'
+          '*.html'
         ],
         tasks: ['jekyll'],
         options: {
