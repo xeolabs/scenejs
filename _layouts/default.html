@@ -7,7 +7,9 @@
     </head>
     <body>
 
-        {% include nav-main.html %}
+        {% if page.title != "Examples" %}
+            {% include nav-main.html %}
+        {% endif %}
 
         {{ content }}
 

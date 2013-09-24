@@ -5,20 +5,7 @@ base_url: "./"
 permalink: "examples.html"
 ---
 
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
-<head>
-    <title>SceneJS Examples</title>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-
-    <script src="lib/jquery-1.8.3.min.js"></script>
-    <script src="http://xeolabs.github.io/examplejs/api/v0/example.js"></script>
-    <!--<script src="/home/lindsay/xeolabs/projects/examplejs/api/v0/example.js"></script>-->
-
-</head>
-<body>
+<script src="http://xeolabs.github.io/examplejs/api/v0/example.js"></script>
 
 <style>
     html, body {
@@ -30,44 +17,38 @@ permalink: "examples.html"
     }
 </style>
 
-
 <script>
 
-    jQuery(document).ready(
-            function ($) {
+    $(document).ready(function () {
 
-                // Load our examples index
-                $.getJSON("examples/ex/index.json",
-                        function (index) {
+        // Load our examples index
+        $.getJSON("{{ page.base_url }}examples/ex/index.json", function (index) {
 
-                            // Create an examples browser
-                            var examplejs = new ExampleJS({
+            // Create an examples browser
+            var examplejs = new ExampleJS({
 
-                                title:"SceneJS 3.2",
+                title: "SceneJS {{ site.current_version }}",
 
-                                logo:"http://xeolabs.github.io/scenejs/images/scenejs.png",
+                logo:"http://xeolabs.github.io/scenejs/images/scenejs.png",
 
-                                // Stick this under the logo:
-                                caption:"Examples (V3.2)",
+                // Stick this under the logo:
+                caption: "Examples (V{{ site.current_version }})",
 
-                                // Provide our JSON examples index
-                                index:index,
+                // Provide our JSON examples index
+                index: index,
 
-                                // Our directory of example pages
-                                pageBase:"http://xeolabs.github.io/scenejs/examples/ex/",
+                // Our directory of example pages
+                pageBase: "{{ page.base_url }}examples/ex/",
 
-                                // Initially hide code
-                                showCode:false
-                            });
-
-                            // Go to SceneJS.org when the home link (ie. logo) is clicked
-                            examplejs.once("home",
-                                    function () {
-                                        window.location = "http://scenejs.org"
-                                    });
-                        });
+                // Initially hide code
+                showCode: false
             });
 
+            // Go to SceneJS.org when the home link (ie. logo) is clicked
+            examplejs.once("home", function () {
+                window.location = "http://scenejs.org"
+            });
+        });
+    });
+
 </script>
-</body>
-</html>
