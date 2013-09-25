@@ -6,8 +6,10 @@
  * Copyright 2010, Lindsay Kay
  *
  *
- */// Only define RequireJS if not already present
-if (undefined === require) {/*
+ */
+// Only define RequireJS if not already present
+if (undefined === require) {
+/*
  RequireJS 2.1.6 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
  Available via the MIT or new BSD license.
  see: http://github.com/jrburke/requirejs for details
@@ -42,7 +44,9 @@ var requirejs,require,define;
     "html:script"):document.createElement("script"),g.type=h.scriptType||"text/javascript",g.charset="utf-8",g.async=!0,g.setAttribute("data-requirecontext",b.contextName),g.setAttribute("data-requiremodule",c),g.attachEvent&&!(g.attachEvent.toString&&0>g.attachEvent.toString().indexOf("[native code"))&&!Z?(Q=!0,g.attachEvent("onreadystatechange",b.onScriptLoad)):(g.addEventListener("load",b.onScriptLoad,!1),g.addEventListener("error",b.onScriptError,!1)),g.src=d,M=g,E?y.insertBefore(g,E):y.appendChild(g),
     M=null,g;if(ea)try{importScripts(d),b.completeLoad(c)}catch(l){b.onError(B("importscripts","importScripts failed for "+c+" at "+d,l,[c]))}};A&&O(document.getElementsByTagName("script"),function(b){y||(y=b.parentNode);if(L=b.getAttribute("data-main"))return s=L,u.baseUrl||(F=s.split("/"),s=F.pop(),ga=F.length?F.join("/")+"/":"./",u.baseUrl=ga),s=s.replace(fa,""),h.jsExtRegExp.test(s)&&(s=L),u.deps=u.deps?u.deps.concat(s):[s],!0});define=function(b,c,d){var h,g;"string"!==typeof b&&(d=c,c=b,b=null);
     K(c)||(d=c,c=null);!c&&J(d)&&(c=[],d.length&&(d.toString().replace(ma,"").replace(na,function(b,d){c.push(d)}),c=(1===d.length?["require"]:["require","exports","module"]).concat(c)));if(Q){if(!(h=M))R&&"interactive"===R.readyState||O(document.getElementsByTagName("script"),function(b){if("interactive"===b.readyState)return R=b}),h=R;h&&(b||(b=h.getAttribute("data-requiremodule")),g=G[h.getAttribute("data-requirecontext")])}(g?g.defQueue:U).push([b,c,d])};define.amd={jQuery:!0};h.exec=function(b){return eval(b)};
-    h(u)}})(this);}
+    h(u)}})(this);
+}
+
 WebGLDebugUtils = function() {
 
 /**
@@ -881,6 +885,7 @@ return {
 };
 
 }();
+
 /**
  * @class Generic map of IDs to items - can generate own IDs or accept given IDs. IDs should be strings in order to not
  * clash with internally generated IDs, which are numbers.
@@ -945,7 +950,8 @@ var SceneJS_Map = function(items, _baseId) {
     this.removeItem = function(id) {
         delete this.items[id];
     };
-};/**
+};
+/**
  * The SceneJS object.
  */
 var SceneJS = new (function () {
@@ -1258,6 +1264,7 @@ var SceneJS = new (function () {
     };
 
 })();
+
 // Configure RequireJS to find plugins relative to plugins location
 (function () {
 
@@ -1275,7 +1282,8 @@ var SceneJS = new (function () {
                 });
             }
         });
-})();/**
+})();
+/**
  *  @private
  */
 var SceneJS_eventManager = function () {
@@ -1368,6 +1376,7 @@ SceneJS_eventManager.prototype.unEvent = function (handlerId) {
     delete handlers[handlerId];
     this.typeHandlers[type].numSubs--;
 };
+
 /**
  * SceneJS plugin registry
  */
@@ -1494,7 +1503,8 @@ SceneJS.Plugins = new (function () {
         document.getElementsByTagName("head")[0].appendChild(script);
     }
 
-})();/**
+})();
+/**
  *  @private
  */
 var SceneJS_events = new (function () {
@@ -1677,6 +1687,7 @@ SceneJS.off = SceneJS.unEvent;
 
 
 
+
 /**
  *
  */
@@ -1791,6 +1802,7 @@ SceneJS_Canvas.prototype.loseWebGLContext = function () {
         this.canvas.loseContext();
     }
 };
+
 
 
 /**
@@ -2335,6 +2347,7 @@ if (!self.Int32Array) {
             clearTimeout(id);
         };
 }());
+
 /**
  * Backend module that provides single point through which exceptions may be raised
  *
@@ -2418,6 +2431,7 @@ SceneJS.errors._getErrorName = function(code) {
     }
     return null;
 };
+
 
 /**
  * Backend that manages configurations.
@@ -2513,6 +2527,7 @@ SceneJS.configure = SceneJS.setConfigs = SceneJS.setDebugConfigs = function () {
 SceneJS.getConfigs = SceneJS.getDebugConfigs = function (path) {
     return SceneJS_configsModule.getConfigs(path);
 };
+
 
 /**
  * @class Manages logging
@@ -2615,7 +2630,8 @@ SceneJS.log = new (function() {
         return funcs;
     };
 
-})();/* 
+})();
+/* 
  * Optimizations made based on glMatrix by Brandon Jones
  */
 
@@ -4724,6 +4740,7 @@ var SceneJS_math_angleAxisFromQuaternion = function(q) {
         };
     }
 };
+
 /** Maps SceneJS node parameter names to WebGL enum names
  * @private
  */
@@ -5562,6 +5579,7 @@ var SceneJS_PickBufferOLD = function (cfg) {
 
     this.init(cfg.canvas.gl);
 };
+
 /**
  * Backend that tracks statistics on loading states of nodes during scene traversal.
  *
@@ -5742,6 +5760,7 @@ var SceneJS_sceneStatusModule = new (function () {
     }
 })();
 
+
 /**
  * Manages scene node event listeners
  * @private
@@ -5839,6 +5858,7 @@ var SceneJS_nodeEventsModule = new (function () {
 
 })();
 
+
 /**
  * @class Holds state for one or more {@link SceneJS.Node}s.
  *
@@ -5881,7 +5901,8 @@ var SceneJS_Core = function(type) {
      * Count of {@link SceneJS.Node} instances this core holds state for
      */
     this.useCount = 0;
-};/**
+};
+/**
  * @class Manages creation, recycle and destruction of {@link SceneJS_Core} instances
  * @private
  */
@@ -6053,6 +6074,7 @@ SceneJS_CoreFactory.prototype.webglRestored = function () {
         }
     }
 };
+
 /**
  * @class The basic scene graph node type
  */
@@ -7432,7 +7454,8 @@ SceneJS.Node.prototype._doDestroy = function () {
     }
 
     return this;
-};/**
+};
+/**
  * @class Manages creation, recycle and destruction of {@link SceneJS.Node} instances
  * @private
  */
@@ -7579,6 +7602,7 @@ SceneJS_NodeFactory.prototype._loadScript = function (url, error) {
 SceneJS_NodeFactory.prototype.putNode = function (node) {
     this.nodes.removeItem(node.id);
 };
+
 (function () {
 
     var defaultMatrix = SceneJS_math_perspectiveMatrix4(
@@ -7763,7 +7787,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         // Stop publishing matrix on each tick
         this.getScene().off(this._tick);
     };
-})();(function() {
+})();
+(function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Clips} nodes
@@ -7860,7 +7885,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     };
 
 
-})();(function () {
+})();
+(function () {
 
     // The default state core singleton for {@link SceneJS.Enable} nodes
     var defaultCore = {
@@ -7913,7 +7939,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.enable = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();(function() {
+})();
+(function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Flags} nodes
@@ -8228,7 +8255,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.flags = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();new (function() {
+})();
+new (function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Framebuf} nodes
@@ -8428,7 +8456,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     };
 
 
-})();new (function () {
+})();
+new (function () {
 
     var coreStack = [];
     var stackLen = 0;
@@ -9186,7 +9215,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     };
 
 })
-    ();(function() {
+    ();
+(function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Layer} nodes
@@ -9253,6 +9283,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
 
 })();
 
+
 /**
  * @class Scene graph node which assigns nodes in its subgraph to a library
  * @extends SceneJS.Node
@@ -9260,6 +9291,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
 SceneJS.Library = SceneJS_NodeFactory.createNodeType("library");
 SceneJS.Library.prototype._compile = function() { // Bypass child nodes
 };
+
 
 (function () {
 
@@ -9526,7 +9558,8 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         this._engine.display.lights = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();(function () {
+})();
+(function () {
 
     var defaultMatrix = SceneJS_math_lookAtMat4c(0, 0, 10, 0, 0, 0, 0, 1, 0);
     var defaultMat = new Float32Array(defaultMatrix);
@@ -9933,7 +9966,8 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         this.getScene().off(this._tick);
     };
 
-})();/*
+})();
+/*
 
  TODO: material system from virtualworldframework:
 
@@ -10087,7 +10121,8 @@ new (function () {
         this._engine.display.material = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();new (function () {
+})();
+new (function () {
 
     /**
      * The default state core singleton for {@link SceneJS.MorphGeometry} nodes
@@ -10478,7 +10513,8 @@ new (function () {
         }
     };
 
-})();(function() {
+})();
+(function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Name} nodes
@@ -10525,7 +10561,8 @@ new (function () {
         this._compileNodes();
         this._engine.display.name = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
-})();new (function() {
+})();
+new (function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Renderer} nodes
@@ -11304,7 +11341,8 @@ new (function () {
         this._compileNodes();
         //this._engine.display.renderer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
-})();/**
+})();
+/**
  * @class The root node of a scenegraph
  * @extends SceneJS.Node
  *
@@ -11543,6 +11581,7 @@ SceneJS.Scene.prototype.getStatus = function () {
     }
     return SceneJS._shallowClone(sceneStatus);
 };
+
 new (function() {
 
     /**
@@ -11736,7 +11775,8 @@ new (function() {
         dirty = true;
     };
 
-})();new (function() {
+})();
+new (function() {
 
     /**
      * The default state core singleton for {@link SceneJS.ShaderParams} nodes
@@ -11832,7 +11872,8 @@ new (function() {
         dirty = true;
     };
 
-})();(function() {
+})();
+(function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Tag} nodes
@@ -11891,7 +11932,8 @@ new (function() {
         this._compileNodes();
         this._engine.display.tag = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
-})();/**
+})();
+/**
  * @class Scene graph node which defines textures to apply to the objects in its subgraph
  * @extends SceneJS.Node
  */
@@ -12379,7 +12421,8 @@ new (function () {
         }
     };
 
-})();/**
+})();
+/**
  * @class Scene graph node which defines the modelling transform to apply to the objects in its subgraph
  * @extends SceneJS.Node
  */
@@ -12459,6 +12502,7 @@ SceneJS.XForm.prototype._compile = function () {
     this._compileNodes();
     SceneJS_modelXFormStack.pop();
 };
+
 
 /**
  * @class Scene graph node which defines a modelling transform matrix to apply to the objects in its subgraph
@@ -12544,6 +12588,7 @@ SceneJS.Matrix.prototype._compile = function() {
     this._compileNodes();
     SceneJS_modelXFormStack.pop();
 };
+
 /**
  * @class Scene graph node which defines a rotation modelling transform to apply to the objects in its subgraph
  * @extends SceneJS.Node
@@ -12692,6 +12737,7 @@ SceneJS.Rotate.prototype._compile = function() {
     this._compileNodes();
     SceneJS_modelXFormStack.pop();
 };
+
 /**
  * @class Scene graph node which defines a translation modelling transform to apply to the objects in its subgraph
  * @extends SceneJS.Node
@@ -12850,6 +12896,7 @@ SceneJS.Translate.prototype._compile = function() {
     this._compileNodes();
     SceneJS_modelXFormStack.pop();
 };
+
 /**
  * @class Scene graph node which defines a rotation modelling transform to apply to the objects in its subgraph
  * @extends SceneJS.Node
@@ -13002,6 +13049,7 @@ SceneJS.Scale.prototype._compile = function() {
     this._compileNodes();
     SceneJS_modelXFormStack.pop();
 };
+
 /**
  * Provides a model transform stack in front of the renderer.
  * Nodes peek push and pop to the stack, while the renderer peeks at
@@ -13187,7 +13235,7 @@ var SceneJS_modelXFormStack = new (function () {
                     SceneJS_math_inverseMat4(matrix, SceneJS_math_mat4())));
             //}
 
-           core.dirty = false;
+            core.dirty = false;
         };
     };
 
@@ -13213,11 +13261,11 @@ var SceneJS_modelXFormStack = new (function () {
 
         this.top = (--stackLen > 0) ? transformStack[stackLen - 1] : defaultCore;
 
-
         dirty = true;
     };
 
 })();
+
 /**
  * Container for custom node types
  */
@@ -13270,6 +13318,7 @@ SceneJS.Types = new (function () {
         return !!SceneJS_NodeFactory.nodeTypes[typeName];
     };
 })();
+
 
 /**
  * @class Renders and picks a {@link SceneJS.Scene}
@@ -14189,6 +14238,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 SceneJS_Display.prototype.destroy = function () {
     this._programFactory.destroy();
 };
+
 
 /**
  * @class Manages creation, sharing and recycle of {@link SceneJS_ProgramSource} instances
@@ -15163,7 +15213,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return src;
     };
 
-})();/**
+})();
+/**
  * @class Source code for pick and draw shader programs, to be compiled into one or more {@link SceneJS_Program}s
  * @private
  * 
@@ -15211,6 +15262,7 @@ var SceneJS_ProgramSource = function(hash, pickVertexSrc, pickFragmentSrc, drawV
      */
     this.useCount = 0;
 };
+
 
 /**  
  * @class Manages creation, sharing and recycle of {@link SceneJS_Program} instances
@@ -15281,6 +15333,7 @@ SceneJS_ProgramFactory.prototype.webglRestored = function() {
  */
 SceneJS_ProgramFactory.prototype.destroy = function() {
 };
+
 /**
  * @class Vertex and fragment shaders for pick and draw
  * @private
@@ -15345,7 +15398,8 @@ SceneJS_Program.prototype.build = function(gl) {
     this.gl = gl;
     this.draw = new SceneJS_webgl_Program(gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
     this.pick = new SceneJS_webgl_Program(gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
-};/**
+};
+/**
  * @class Manages creation and recycle of {@link SceneJS_Object} instances
  * @private
  */
@@ -15391,7 +15445,8 @@ SceneJS_ObjectFactory.prototype.getObject = function(id) {
 SceneJS_ObjectFactory.prototype.putObject = function (object) {
 
     this._freeObjects[this._numFreeObjects++] = object;
-};/**
+};
+/**
  * @class An object within a {@link SceneJS_Display}
  * @private
  */
@@ -15452,7 +15507,8 @@ var SceneJS_Object = function(id) {
      * State core for the {@link SceneJS.Tag} that this object was compiled from, used for visibility cull
      */
     this.tag = null;
-};/**
+};
+/**
  * @class A facade which exposes internal scene rendering state to "rendered" event listeners bound to scene graph nodes with {@link SceneJS.Node#bind}.
  *
  * <p>The listener is fired for each {@link SceneJS.Geometry} that is rendered within the subgraph of the bound node.
@@ -15539,6 +15595,7 @@ SceneJS.RenderContext.prototype.getWorldPos = function(offset) {
     this._wc = SceneJS_math_transformPoint3(this._frameCtx.modelMat, offset || [0,0,0]);
     return { x: this._wc[0], y: this._wc[1], z: this._wc[2],  w: this._wc[3] };
 };
+
 /**
  * @class A chunk of WebGL state changes to render a {@link SceneJS_Core} for drawing and picking (if applicable to the core type).
  *
@@ -15605,6 +15662,7 @@ SceneJS_Chunk.prototype.init = function(id, program, core) {
         this.build();
     }
 };
+
 /**
  * @class Manages creation, reuse and destruction of {@link SceneJS_Chunk}s for the nodes within a single {@link SceneJS_Display}.
  * @private
@@ -15745,6 +15803,7 @@ SceneJS_ChunkFactory.prototype.webglRestored = function () {
         }
     }
 };
+
 SceneJS_ChunkFactory.createChunkType({
 
     type: "camera",
@@ -15795,7 +15854,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         ctx.cameraMat = this.core.mat; // Query only in draw pass
     }
-});/**
+});
+/**
  * Create display state chunk type for draw and pick render of user clipping planes
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -15867,7 +15927,8 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
     }
-});/**
+});
+/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -15891,7 +15952,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, gl.UNSIGNED_SHORT, 0);
     }
-});/**
+});
+/**
  *  Create display state chunk type for draw and pick render of flags
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -15952,7 +16014,8 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniform1i(this._uDiffuseDraw, this.core.diffuse);
         }
     }
-});/**
+});
+/**
  *   Create display state chunk type for draw and pick render of framebuf
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -15980,7 +16043,8 @@ SceneJS_ChunkFactory.createChunkType({
             ctx.framebuf = framebuf;  // Must flush on cleanup
         }
     }
-});/**
+});
+/**
  *  Create display state chunk type for draw and pick render of geometry
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -16078,7 +16142,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, gl.UNSIGNED_SHORT, 0);
     }
-});/**
+});
+/**
  *  Create display state chunk type for draw render of lights projection
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -16160,7 +16225,8 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
     }
-});/**
+});
+/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -16181,7 +16247,8 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
     }
-});/**
+});
+/**
  * Create display state chunk type for draw and pick render of lookAt transform
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -16230,7 +16297,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         ctx.viewMat = this.core.mat;
     }
-});/**
+});
+/**
  * Create display state chunk type for draw render of material transform
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -16277,7 +16345,8 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniform1f(this._uMaterialAlpha, this.core.alpha);
         }
     }
-});/**
+});
+/**
  * Create display state chunk type for draw render of material transform
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -16443,6 +16512,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });
+
 /**
  * Create display state chunk type for draw render of material transform
  */
@@ -16467,7 +16537,8 @@ SceneJS_ChunkFactory.createChunkType({
             this.program.gl.uniform3fv(this._uPickColor, [r / 255, g / 255, b / 255]);
         }
     }
-});SceneJS_ChunkFactory.createChunkType({
+});
+SceneJS_ChunkFactory.createChunkType({
 
     type: "program",
 
@@ -16540,6 +16611,7 @@ SceneJS_ChunkFactory.createChunkType({
 
 
 
+
 /**
  *
  */
@@ -16565,6 +16637,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });
+
 /**
  *
  */
@@ -16595,7 +16668,8 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
     }
-});/**
+});
+/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -16625,7 +16699,8 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
     }
-});SceneJS_ChunkFactory.createChunkType({
+});
+SceneJS_ChunkFactory.createChunkType({
 
     type: "texture",
 
@@ -16688,7 +16763,8 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
     }
-});SceneJS_ChunkFactory.createChunkType({
+});
+SceneJS_ChunkFactory.createChunkType({
 
     type: "xform",
 
@@ -16747,4 +16823,3 @@ SceneJS_ChunkFactory.createChunkType({
         ctx.modelMat = this.core.mat;
     }
 });
-SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/api/latest/plugins" });
