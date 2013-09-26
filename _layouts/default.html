@@ -7,13 +7,13 @@
     </head>
     <body>
 
-        {% if page.title != "Examples" %}
-            {% include nav-main.html %}
-        {% endif %}
+{% if page.title != "Examples" %}
+    {% include nav-main.html %}
+{% endif %}
 
-        {{ content }}
+{{ content }}
 
-        {% include footer.html %}
+{% include footer.html %}
 
     </body>
 </html>
