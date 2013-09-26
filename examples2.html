@@ -1,0 +1,73 @@
+---
+layout: default
+title: Site Map
+base_url: "./"
+---
+
+<div id="intro">
+    <p><span class="strong">SceneJS</span> is an extensible WebGL-based engine for high-detail 3D visualisation using JavaScript.</p>
+
+    <p>It's created and maintained by <a href="http://about.me/kaylindsay">Lindsay Kay</a> and is free for use under an open-source license.</p>
+</div>
+
+<div id="container">
+    <div style="width: 100%;">
+        <div class="col">
+            <p class="sectionHeading quickStart">SceneJS {{ site.current_version }} Examples Directory</p>
+            
+            <p>This is a temporary listing of SceneJS examples because the existing examples page loads iframes from scenejs.org and doesn't use the examples local to this repository. To change this I'd need to fork <a href="https://github.com/xeolabs/examplejs">examplejs</a> and start changing stuff in there which I don't feel like doing right now.</p>
+            
+            <div id="examples-anchor">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ page.base_url }}bower_components/underscore/underscore-min.js"></script>
+
+<script type="text/template" id="node-template">
+    <div style="margin-left: <%= depth * 10 %>px;">
+        <% if (path !== undefined) { %>
+            <a href="{{ page.base_url }}examples/ex/<%= path %>">
+        <% } %>
+        <h<%= depth + 2 %>><%= title %></h<%= depth + 2 %>>
+        <% if (path !== undefined) { %>
+            </a>
+        <% } %>
+        <% if (tip != undefined && tip != "") { %>
+            <p><%= tip %></p>
+        <% } %>
+    </div>
+</script>
+
+<script>
+
+    $(document).ready(function () {
+        
+        var $anchor = $('#examples-anchor');
+        
+        var nodeTemplate = _.template($('#node-template').html());
+        
+        var processNode = function (node, parent) {
+
+            node.depth = _.isObject(parent) ? parent.depth + 1 : 0;
+
+            $anchor.append(nodeTemplate(_.extend({
+                tip: undefined,
+                path: undefined
+            }, node)));
+            
+            if (node.hasOwnProperty('nodes')) {
+                node.nodes.forEach(function(subNode) {
+                    processNode(subNode, node);
+                });
+            }
+        };
+
+        $.getJSON("{{ page.base_url }}examples/ex/index.json", function (index) {
+            console.log(index);
+            index.forEach(processNode);
+        });
+    });
+
+</script>
