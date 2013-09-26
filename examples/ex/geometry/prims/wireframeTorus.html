@@ -17,15 +17,15 @@
 </head>
 <body>
 
-<script src="../../../../api/latest/scenejs.js"></script>
+<script src="../../../../dist/latest/scenejs.js"></script>
 
-<script src="../../../../api/latest/extras/orbitControl.js"></script>
+<script src="../../../../dist/latest/extras/orbitControl.js"></script>
 
 <script>
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../../../../api/latest/plugins"
+        pluginPath:"../../../../dist/latest/plugins"
     });
 
     // Create scene
@@ -33,7 +33,7 @@
         nodes:[
 
             // Mouse-orbited camera, implemented by plugin at
-            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            // http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:30,
@@ -49,7 +49,7 @@
                         color:{ r:0.5, g:0.5, b:0.6 },
                         nodes:[
 
-                            // Torus geometry using plugin in http://scenejs.org/api/latest/plugins/geometry/torus.js
+                            // Torus geometry using plugin in http://scenejs.org/dist/latest/plugins/geometry/torus.js
                             // This torus is in wireframe mode, which is also supported by most prim types
                             {
                                 type:"geometry",

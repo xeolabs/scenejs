@@ -17,7 +17,7 @@
 </head>
 <body>
 
-<script src="../../../../api/latest/scenejs.js"></script>
+<script src="../../../../dist/latest/scenejs.js"></script>
 
 <script>
 
@@ -52,7 +52,7 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../../../../api/latest/plugins"
+        pluginPath:"../../../../dist/latest/plugins"
     });
 
     // Define our custom node type
@@ -77,7 +77,7 @@
                         color:{ r:1.0, g:0.6, b:0.6 },
                         nodes:[
 
-                            // Node type implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            // Node type implemented by plugin at http://scenejs.org/dist/latest/plugins/node/prims/teapot.js
                             {
                                 type:"prims/teapot"
                             }
@@ -121,7 +121,7 @@
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Mouse-orbited camera, implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
+            // Mouse-orbited camera, implemented by plugin at ../../../../dist/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:-150,

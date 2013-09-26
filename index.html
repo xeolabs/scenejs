@@ -23,9 +23,9 @@ base_url: "./"
         <div class="col right">
             <p class="sectionHeading quickStart">Quick Start</p>
 
-            <p>First, include the <a href="api/latest/scenejs.js">SceneJS library</a> in the &lt;head&gt; tag of your web page:</p>
+            <p>First, include the <a href="dist/latest/scenejs.js">SceneJS library</a> in the &lt;head&gt; tag of your web page:</p>
             <pre>
-&lt;script src="http://scenejs.org/api/latest/scenejs.js"&gt;&lt;/script&gt;
+&lt;script src="http://scenejs.org/dist/latest/scenejs.js"&gt;&lt;/script&gt;
 </pre>
 
             <p>Then build a scene. We'll make a spinning blue teapot:</p>
@@ -77,7 +77,7 @@ scene.getNode("myRotate", function(myRotate) {
 
             <p class="sectionHeading">Plugins</p>
 
-            <p>To keep the core library small, SceneJS dynamically loads it's non-core functionality from a directory of plugins. In the example above, the <code>prims/teapot</code> node is a custom node type instantiated from a <a href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins/node/prims/teapot.js">prims/teapot</a> plugin, which SceneJS loaded on-demand from <a href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins">the plugins directory</a> within its repository on GitHub.</p>
+            <p>To keep the core library small, SceneJS dynamically loads it's non-core functionality from a directory of plugins. In the example above, the <code>prims/teapot</code> node is a custom node type instantiated from a <a href="https://github.com/xeolabs/scenejs/tree/V3.1/dist/latest/plugins/node/prims/teapot.js">prims/teapot</a> plugin, which SceneJS loaded on-demand from <a href="https://github.com/xeolabs/scenejs/tree/V3.1/dist/latest/plugins">the plugins directory</a> within its repository on GitHub.</p>
 
             <p>If you'd rather serve the plugins yourself, then just copy that directory to your server and configure SceneJS to load them from there, like this:</p>
             <pre class="prettyprint lang-javascript">

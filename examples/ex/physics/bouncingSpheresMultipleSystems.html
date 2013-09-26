@@ -14,7 +14,7 @@
         }
     </style>
 
-    <script src="../../../api/latest/scenejs.js"></script>
+    <script src="../../../dist/latest/scenejs.js"></script>
     <script src="../../libs/stats.min.js"></script>
 
 </head>
@@ -35,7 +35,7 @@
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"../../../api/latest/plugins"
+    pluginPath:"../../../dist/latest/plugins"
 });
 
 // Create scene
@@ -43,7 +43,7 @@ var scene = SceneJS.createScene({
     nodes:[
 
         // Mouse-orbited camera, implemented by plugin at
-        // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+        // http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
         {
             type:"cameras/orbit",
             yaw:30,
@@ -80,7 +80,7 @@ function makeSimulation(x, z, numBodies, systemId) {
         nodes:[
 
             // Optional physics system configs, implemented by plugin at
-            // http://scenejs.org/api/latest/plugins/node/physics/system.js
+            // http://scenejs.org/dist/latest/plugins/node/physics/system.js
             {
                 type:"physics/system",
                 systemId:systemId,
@@ -91,7 +91,7 @@ function makeSimulation(x, z, numBodies, systemId) {
             // Ground plane
 
             // Physics body, implemented by plugin at
-            // http://scenejs.org/api/latest/plugins/node/physics/body.js
+            // http://scenejs.org/dist/latest/plugins/node/physics/body.js
             {
                 type:"physics/body",
 
@@ -136,7 +136,7 @@ function makeSimulation(x, z, numBodies, systemId) {
                         nodes:[
 
                             // Grid ground plane geometry, implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/prims/grid.js
+                            // http://scenejs.org/dist/latest/plugins/node/prims/grid.js
                             {
                                 type:"prims/grid",
                                 size:{ x:50, z:50 },
@@ -168,7 +168,7 @@ function makeBodies(numBodies, systemId) {
         nodes.push(
 
                 // Physics body primitive, implemented by plugin at
-                // http://scenejs.org/api/latest/plugins/node/physics/body.js
+                // http://scenejs.org/dist/latest/plugins/node/physics/body.js
                 {
                     type:"physics/body",
 
@@ -214,7 +214,7 @@ function makeBodies(numBodies, systemId) {
                             nodes:[
 
                                 // Sphere primitive, implemented by plugin at
-                                // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                // http://scenejs.org/dist/latest/plugins/node/prims/sphere.js
                                 {
                                     type:"prims/sphere",
                                     radius:1,

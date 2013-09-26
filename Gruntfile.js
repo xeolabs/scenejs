@@ -190,6 +190,8 @@ module.exports = function(grunt) {
                 ],
                 
                 dest: distDir + 'scenejs.js',
+                
+                footer: 'SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/dist/latest/plugins" });'
             },
             
             gui: {

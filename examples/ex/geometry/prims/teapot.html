@@ -14,7 +14,7 @@
         }
     </style>
 
-    <script src="../../../../api/latest/scenejs.js"></script>
+    <script src="../../../../dist/latest/scenejs.js"></script>
 
 </head>
 <body>
@@ -23,14 +23,14 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../../../../api/latest/plugins"
+        pluginPath:"../../../../dist/latest/plugins"
     });
 
     // Create scene
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:30,
@@ -50,7 +50,7 @@
                                 y:-1,
                                 nodes:[
 
-                                    // Teapot geometry using plugin in http://scenejs.org/api/latest/plugins/geometry/teapot.js
+                                    // Teapot geometry using plugin in http://scenejs.org/dist/latest/plugins/geometry/teapot.js
                                     {
                                         type:"geometry",
                                         source:{

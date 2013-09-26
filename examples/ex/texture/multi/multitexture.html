@@ -14,7 +14,7 @@
         }
     </style>
 
-    <script src="../../../../api/latest/scenejs.js"></script>
+    <script src="../../../../dist/latest/scenejs.js"></script>
 
 </head>
 <body>
@@ -23,7 +23,7 @@
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"../../../../api/latest/plugins"
+    pluginPath:"../../../../dist/latest/plugins"
 });
 
 // Create scene
@@ -31,7 +31,7 @@ var scene = SceneJS.createScene({
     nodes:[
 
         // Orbiting camera node, implemented by plugin at
-        // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+        // http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
         {
             type:"cameras/orbit",
             yaw:30,
@@ -115,7 +115,7 @@ var scene = SceneJS.createScene({
                                                                     nodes:[
 
                                                                         // Sphere geometry node implemented by plugin at
-                                                                        // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                                                        // http://scenejs.org/dist/latest/plugins/node/prims/sphere.js
                                                                         {
                                                                             type:"prims/sphere",
                                                                             latitudeBands:120,
@@ -186,7 +186,7 @@ var scene = SceneJS.createScene({
                                                                                     nodes:[
 
                                                                                         // Sphere geometry node implemented by plugin at
-                                                                                        // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                                                                        // http://scenejs.org/dist/latest/plugins/node/prims/sphere.js
                                                                                         {
                                                                                             type:"prims/sphere",
                                                                                             latitudeBands:120,

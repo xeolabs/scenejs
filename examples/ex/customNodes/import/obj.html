@@ -17,7 +17,7 @@
 </head>
 <body>
 
-<script src="../../../../api/latest/scenejs.js"></script>
+<script src="../../../../dist/latest/scenejs.js"></script>
 
 <script>
 
@@ -25,7 +25,7 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../../../../api/latest/plugins"
+        pluginPath:"../../../../dist/latest/plugins"
     });
 
     // Create a scene
@@ -33,7 +33,7 @@
                 nodes:[
 
                     // Mouse-orbited camera,
-                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                    // implemented by plugin at http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
                     {
                         type:"cameras/orbit",
                         yaw:-40,
@@ -60,7 +60,7 @@
                                         nodes:[
 
                                             // Geometry imported from a Wavefront .OBJ file, implemented by plugin at
-                                            // http://scenejs.org/api/latest/plugins/node/import/obj.js
+                                            // http://scenejs.org/dist/latest/plugins/node/import/obj.js
                                             {
                                                 type:"import/obj",
                                                 src:'../../../models/minicooper.obj'

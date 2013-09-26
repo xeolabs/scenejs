@@ -17,7 +17,7 @@
 </head>
 <body>
 
-<script src="../../../../api/latest/scenejs.js"></script>
+<script src="../../../../dist/latest/scenejs.js"></script>
 
 <script>
 
@@ -25,7 +25,7 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../../../../api/latest/plugins"
+        pluginPath:"../../../../dist/latest/plugins"
     });
 
     // Create scene
@@ -42,13 +42,13 @@
                 nodes:[
 
                     // Clouds skybox, implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
+                    // http://scenejs.org/dist/latest/plugins/node/skyboxes/clouds.js
                     {
                         type:"skyboxes/clouds"
                     },
 
                     // Node type implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/prims/grid.js
+                    // http://scenejs.org/dist/latest/plugins/node/prims/grid.js
                     {
                         type:"prims/grid",
                         size:{ x:1000, z:1000 },
@@ -57,7 +57,7 @@
                     },
 
                     // Tron Tank vehicle, implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/objects/vehicles/tank.js
+                    // http://scenejs.org/dist/latest/plugins/node/objects/vehicles/tank.js
                     {
                         type:"objects/vehicles/tank",
                         id:"myTank",

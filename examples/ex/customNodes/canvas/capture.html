@@ -17,7 +17,7 @@
 </head>
 <body>
 
-<script src="../../../../api/latest/scenejs.js"></script>
+<script src="../../../../dist/latest/scenejs.js"></script>
 
 <!-- Canvas containing our scene -->
 <canvas id="mySceneCanvas" width="600px" height="600px"></canvas>
@@ -28,7 +28,7 @@
 <script>
 
     // Demonstrates the 'canvas/capture' node, which is implemented by plugin in
-    // http://scenejs.org/api/latest/plugins/node/canvas/capture.js
+    // http://scenejs.org/dist/latest/plugins/node/canvas/capture.js
     //
     // This example periodically makes the node capture the scene canvas
     // and copy the captured image data to an image element.
@@ -40,7 +40,7 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../../../../api/latest/plugins"
+        pluginPath:"../../../../dist/latest/plugins"
     });
 
     // Create scene containing our capture node
@@ -52,7 +52,7 @@
         nodes:[
 
             // Mouse-orbited camera, implemented by plugin at
-            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            // http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:30,
@@ -63,7 +63,7 @@
                 nodes:[
 
                     // City, implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/object/buildings/city.js
+                    // http://scenejs.org/dist/latest/plugins/node/object/buildings/city.js
                     {
                         type:"objects/buildings/city",
                         width:600
@@ -72,7 +72,7 @@
             },
 
             // The capture node, implemented by plugin at
-            // http://scenejs.org/api/latest/plugins/node/canvas/capture.js
+            // http://scenejs.org/dist/latest/plugins/node/canvas/capture.js
             {
                 type:"canvas/capture",
                 id:"myCanvasCapture"

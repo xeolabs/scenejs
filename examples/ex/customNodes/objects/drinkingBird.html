@@ -17,7 +17,7 @@
 </head>
 <body>
 
-<script src="../../../../api/latest/scenejs.js"></script>
+<script src="../../../../dist/latest/scenejs.js"></script>
 
 <script>
 
@@ -25,14 +25,14 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../../../../api/latest/plugins"
+        pluginPath:"../../../../dist/latest/plugins"
     });
 
     // Create scene
     var scene = SceneJS.createScene({
         nodes:[
             // Mouse-orbited camera,
-            // http://scenejs.org/api/latest/plugins/node/prims/plane.js
+            // http://scenejs.org/dist/latest/plugins/node/prims/plane.js
             {
                 type:"cameras/orbit",
                 yaw:340,
@@ -50,7 +50,7 @@
                         nodes:[
 
                             // Node type implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/prims/grid.js
+                            // http://scenejs.org/dist/latest/plugins/node/prims/grid.js
                             {
                                 type:"prims/grid",
                                 size:{ x:10000, z:10000 },
@@ -62,7 +62,7 @@
 
                     // Drinking Bird,
                     // implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/objects/toys/drinkingBird.js
+                    // http://scenejs.org/dist/latest/plugins/node/objects/toys/drinkingBird.js
                     // Author: Moritz Kornher
                     {
                         type:"objects/toys/drinkingBird",

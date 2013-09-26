@@ -14,7 +14,7 @@
         }
     </style>
 
-    <script src="../../../api/latest/scenejs.js"></script>
+    <script src="../../../dist/latest/scenejs.js"></script>
 
 </head>
 <body>
@@ -24,7 +24,7 @@
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Node type implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            // Node type implemented by plugin at http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:-100,
@@ -36,7 +36,7 @@
 
                 nodes:[
 
-                    // Node type implemented by plugin at http://scenejs.org/api/latest/plugins/node/physics/body.js
+                    // Node type implemented by plugin at http://scenejs.org/dist/latest/plugins/node/physics/body.js
                     {
                         type:"physics/body",
                         shape:"sphere",
@@ -53,7 +53,7 @@
                         ]
                     },
 
-                    // Node type implemented by plugin at http://scenejs.org/api/latest/plugins/node/physics/body.js
+                    // Node type implemented by plugin at http://scenejs.org/dist/latest/plugins/node/physics/body.js
                     {
                         type:"physics/body",
                         shape:"plane",
@@ -63,7 +63,7 @@
 
                         nodes:[
 
-                            // Node type implemented by plugin at http://scenejs.org/api/latest/plugins/node/ground/grid.js
+                            // Node type implemented by plugin at http://scenejs.org/dist/latest/plugins/node/ground/grid.js
                             {
                                 type:"objects/ground/grid",
                                 size:{ x:10000, z:10000 },

@@ -17,7 +17,7 @@
 </head>
 <body>
 
-<script src="../../../../api/latest/scenejs.js"></script>
+<script src="../../../../dist/latest/scenejs.js"></script>
 
 <script>
 
@@ -27,7 +27,7 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../../../../api/latest/plugins"
+        pluginPath:"../../../../dist/latest/plugins"
     });
 
     // Create scene containing our custom node types
@@ -40,7 +40,7 @@
                 nodes:[
 
                     // Demo custom node,
-                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/demos/color.js
+                    // implemented by plugin at http://scenejs.org/dist/latest/plugins/node/demos/color.js
                     {
                         type:"demos/color",
                         id: "myColor",
@@ -49,7 +49,7 @@
                         nodes:[
 
                             // Teapot primitive,
-                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            // implemented by plugin at http://scenejs.org/dist/latest/plugins/node/prims/teapot.js
                             {
                                 type:"prims/teapot"
                             }

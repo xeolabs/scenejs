@@ -16,7 +16,7 @@
 
     <script src="../../libs/jquery-1.8.3.min.js"></script>
 
-    <script src="../../../api/latest/scenejs.js"></script>
+    <script src="../../../dist/latest/scenejs.js"></script>
 
     <style type="text/css">
 
@@ -106,14 +106,14 @@
 
                 // Point SceneJS to the bundled plugins
                 SceneJS.setConfigs({
-                    pluginPath:"../../../api/latest/plugins"
+                    pluginPath:"../../../dist/latest/plugins"
                 });
 
                 var scene = SceneJS.createScene({
                     nodes:[
 
                         // Mouse-orbited camera, implemented by plugin at
-                        // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                        // http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
                         {
                             type:"cameras/orbit",
                             yaw:30,
@@ -132,7 +132,7 @@
                                             nodes:[
 
                                                 // Teapot primitive, implemented by plugin at
-                                                // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                                // http://scenejs.org/dist/latest/plugins/node/prims/teapot.js
                                                 {
                                                     type:"prims/teapot"
                                                 }
@@ -151,7 +151,7 @@
                                             nodes:[
 
                                                 // Teapot primitive, implemented by plugin at
-                                                // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                                // http://scenejs.org/dist/latest/plugins/node/prims/teapot.js
                                                 {
                                                     type:"prims/teapot"
                                                 }
@@ -170,7 +170,7 @@
                                             nodes:[
 
                                                 // Teapot primitive, implemented by plugin at
-                                                // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                                // http://scenejs.org/dist/latest/plugins/node/prims/teapot.js
                                                 {
                                                     type:"prims/teapot"
                                                 }
