@@ -1,22 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>SceneJS Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+---
+layout: example
+base_url: "../../../../"
+---
 
-    <style>
-        body {
-            margin: 0;
-            -moz-user-select: -moz-none;
-            -khtml-user-select: none;
-            -webkit-user-select: none;
-        }
-    </style>
-
-    <script src="../../../../dist/latest/scenejs.js"></script>
-</head>
-<body>
+<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
 
 <script>
 
@@ -29,7 +16,7 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../../../../dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}dist/latest/plugins"
     });
 
     // Create scene
@@ -74,5 +61,4 @@
     });
 
 </script>
-</body>
-</html>
+

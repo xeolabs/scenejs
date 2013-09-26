@@ -1,28 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>SceneJS Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+---
+layout: example
+base_url: "../../../"
+---
 
-    <style>
-        body {
-            margin: 0;
-            -moz-user-select: -moz-none;
-            -khtml-user-select: none;
-            -webkit-user-select: none;
-        }
-    </style>
-
-    <script src="../../../dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
 
     <script type="application/x-javascript" src="../../models/sky.js"></script>
     <script type="application/x-javascript" src="../../models/wireGrid.js"></script>
     <script type="application/x-javascript" src="../../models/tank.js"></script>
-    <script type="application/x-javascript" src="../../libs/sylvester.js"></script>
-
-</head>
-<body>
+    <script type="application/x-javascript" src="../../assets/js/sylvester.js"></script>
 
 <script>
 
@@ -32,7 +18,7 @@
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"../../../dist/latest/plugins"
+    pluginPath:"{{ page.base_url }}dist/latest/plugins"
 });
 
 // Create scene
@@ -128,7 +114,6 @@ var scene = SceneJS.createScene({
         }
     ]
 });
-
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
@@ -332,5 +317,4 @@ scene.getNode("myShader", function (myShader) {
 });
 
 </script>
-</body>
-</html>
+

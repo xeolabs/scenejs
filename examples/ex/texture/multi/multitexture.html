@@ -1,29 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>SceneJS V3 Texture Layers</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+---
+layout: example
+base_url: "../../../../"
+---
 
-    <style>
-        body {
-            margin: 0;
-            -moz-user-select: -moz-none;
-            -khtml-user-select: none;
-            -webkit-user-select: none;
-        }
-    </style>
-
-    <script src="../../../../dist/latest/scenejs.js"></script>
-
-</head>
-<body>
+<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
 
 <script>
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"../../../../dist/latest/plugins"
+    pluginPath:"{{ page.base_url }}dist/latest/plugins"
 });
 
 // Create scene
@@ -100,15 +86,15 @@ var scene = SceneJS.createScene({
                                                                     type:"texture",
                                                                     layers:[
                                                                         {
-                                                                            src:"../../../textures/earth.jpg",
+                                                                            src:"{{ page.base_url }}textures/earth.jpg",
                                                                             applyTo:"color"  // Apply to material "color" property (default)
                                                                         },
                                                                         {
-                                                                            src:"../../../textures/earth-specular.jpg",
+                                                                            src:"{{ page.base_url }}textures/earth-specular.jpg",
                                                                             applyTo:"specular" // Apply to material "specular" property
                                                                         } ,
                                                                         {
-                                                                            src:"../../../textures/earth-lights.gif",
+                                                                            src:"{{ page.base_url }}textures/earth-lights.gif",
                                                                             applyTo:"emit" // Apply to material "emit" property
                                                                         }
                                                                     ],
@@ -172,7 +158,7 @@ var scene = SceneJS.createScene({
                                                                             type:"texture",
                                                                             layers:[
                                                                                 {
-                                                                                    src:"../../../textures/earthclouds.jpg",
+                                                                                    src:"{{ page.base_url }}textures/earthclouds.jpg",
                                                                                     applyTo:"alpha", // Apply to material "alpha" property
                                                                                     flipY:false
                                                                                 }
@@ -242,5 +228,4 @@ scene.on("tick",
         });
 
 </script>
-</body>
-</html>
+

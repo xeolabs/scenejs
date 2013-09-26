@@ -1,23 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>SceneJS Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+---
+layout: example
+base_url: "../../../../"
+---
 
-    <style>
-        body {
-            margin: 0;
-            -moz-user-select: -moz-none;
-            -khtml-user-select: none;
-            -webkit-user-select: none;
-        }
-    </style>
-
-</head>
-<body>
-
-<script src="../../../../dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
 
 <script>
 
@@ -49,13 +35,11 @@
     // In the example below, we'll define a custom node type inline within this page, instead of in a
     // plugin script, so that we can show the node type API.
 
-
     // Point SceneJS to the bundled plugins
 
     SceneJS.setConfigs({
-        pluginPath:"../../../../dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}dist/latest/plugins"
     });
-
 
     // Define a new node type:
 
@@ -116,7 +100,6 @@
                         // custom types' constructors (see this in the custom node type's constructor above)
                         nodes:[
 
-
                             // Teapot primitive,
                             // implemented by plugin at http://scenejs.org/dist/latest/plugins/node/prims/teapot.js
                             {
@@ -146,5 +129,4 @@
             });
 
 </script>
-</body>
-</html>
+

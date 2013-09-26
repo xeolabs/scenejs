@@ -1,23 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>SceneJS Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+---
+layout: example
+base_url: "../../../"
+---
 
     <style>
         body {
             background-color: #000000;
-            margin: 0px;
-            overflow: auto;
-            height: 100%;
         }
     </style>
 
-</head>
-<body>
-
-<script src="../../../dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
 
 <script>
 
@@ -99,7 +91,6 @@
                 scene.off(destroyed);
             });
 
-
     //---------------------------------------------
     // Subscribe to single occurrence of an event.    
     // This is equivalent to calling #off in the
@@ -119,5 +110,4 @@
             });
 
 </script>
-</body>
-</html>
+

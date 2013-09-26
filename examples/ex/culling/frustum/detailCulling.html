@@ -1,24 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>SceneJS Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+---
+layout: example
+base_url: "../../../../"
+---
 
-    <style>
-        body {
-            margin: 0;
-            -moz-user-select: -moz-none;
-            -khtml-user-select: none;
-            -webkit-user-select: none;
-        }
-    </style>
-
-</head>
-<body>
-
-<script src="../../../../dist/latest/scenejs.js"></script>
-<script src="../../../libs/stats.min.js"></script>
+<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}assets/js/stats.min.js"></script>
 
 <script>
 
@@ -48,7 +34,7 @@
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"../../../../dist/latest/plugins"
+    pluginPath:"{{ page.base_url }}dist/latest/plugins"
 });
 
 // Create scene
@@ -94,7 +80,6 @@ function makeBodies(numBodies) {
         xPos = Math.random() * 400 - 200;
         yPos = Math.random() * 400 - 200;
         zPos = Math.random() * 400 - 200;
-
 
         // Detail culling node, implemented by plugin at
         // http://scenejs.org/dist/latest/plugins/node/frustum/lod.js
@@ -260,7 +245,5 @@ scene.on("tick", function () {
     stats.begin();
 });
 
-
 </script>
-</body>
-</html>
+

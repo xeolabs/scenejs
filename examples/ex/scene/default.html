@@ -1,24 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>SceneJS Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+---
+layout: example
+base_url: "../../../"
+---
 
-    <style>
-        body {
-            margin: 0;
-            -moz-user-select: -moz-none;
-            -khtml-user-select: none;
-            -webkit-user-select: none;
-        }
-    </style>
-
-    <script src="../../../dist/latest/scenejs.js"></script>
-    <script src="../../../dist/latest/extras/orbitControl.js"></script>
-    <script src="../../../dist/latest/extras/gui.js"></script>
-</head>
-<body>
+<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}dist/latest/extras/orbitControl.js"></script>
+<script src="{{ page.base_url }}dist/latest/extras/gui.js"></script>
 
 <script>
 
@@ -131,5 +118,4 @@
     //new SceneJS.OrbitControls(scene);
 
 </script>
-</body>
-</html>
+

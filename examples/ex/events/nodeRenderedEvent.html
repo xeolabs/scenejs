@@ -1,22 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>SceneJS Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+---
+layout: example
+base_url: "../../../"
+---
 
-    <style>
-        body {
-            margin: 0;
-            -moz-user-select: -moz-none;
-            -khtml-user-select: none;
-            -webkit-user-select: none;
-        }
-    </style>
+<script src="../../assets/js/jquery-1.8.3.min.js"></script>
 
-    <script src="../../libs/jquery-1.8.3.min.js"></script>
-
-    <script src="../../../dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
 
     <style type="text/css">
 
@@ -84,8 +73,6 @@
             z-index: 100000;
         }
     </style>
-</head>
-<body>
 
 <div id="teapot1" class="transparent-ui">
     Teapot 1
@@ -106,7 +93,7 @@
 
                 // Point SceneJS to the bundled plugins
                 SceneJS.setConfigs({
-                    pluginPath:"../../../dist/latest/plugins"
+                    pluginPath:"{{ page.base_url }}dist/latest/plugins"
                 });
 
                 var scene = SceneJS.createScene({
@@ -253,5 +240,4 @@
             });
 
 </script>
-</body>
-</html>
+

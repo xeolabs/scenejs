@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>SceneJS Example</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-</head>
-<body>
+---
+layout: example
+base_url: "../../../"
+---
 
-<script src="../../../dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
 
 <script>
 
@@ -19,10 +15,9 @@
 //   performance penalty for deep hierarchies. They are efficiently re-baked as required when you update their
 //   properties (angle, scale factors etc).
 
-
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"../../../dist/latest/plugins"
+    pluginPath:"{{ page.base_url }}dist/latest/plugins"
 });
 
 // Create scene
@@ -379,5 +374,4 @@ var scene = SceneJS.createScene({
 });
 
 </script>
-</body>
-</html>
+
