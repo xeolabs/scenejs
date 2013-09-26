@@ -65,7 +65,6 @@ base_url: "./"
         };
 
         $.getJSON("{{ page.base_url }}examples/ex/index.json", function (index) {
-            console.log(index);
             index.forEach(processNode);
         });
     });
