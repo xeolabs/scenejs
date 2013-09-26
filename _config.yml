@@ -11,4 +11,4 @@ exclude:          [".editorconfig", ".gitignore", ".ruby-version", "bower.json",
 port:             9001
 
 # Custom vars
-current_version:    3.1.0
+current_version:    3.2.0
