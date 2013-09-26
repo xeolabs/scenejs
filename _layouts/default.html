@@ -4,6 +4,14 @@
 
         {% include header.html %}
 
+        <title>
+            {% if page.title == "SceneJS" %}
+                {{ page.title }}
+            {% else %}
+                {{ page.title }} &middot; SceneJS
+            {% endif %} V{{ site.current_version }}
+        </title>
+
     </head>
     <body>
 

@@ -7,7 +7,7 @@ var utils = {
             }
         });
           
-        $.getScript(window.BASE_URL + 'assets/js/prettify.js', function() {
+        $.getScript(window.BASE_URL + 'bower_components/google-code-prettify/src/prettify.js', function() {
             prettyPrint();
         });
     }

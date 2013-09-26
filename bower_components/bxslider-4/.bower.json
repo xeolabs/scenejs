@@ -1,0 +1,13 @@
+{
+  "name": "bxslider-4",
+  "homepage": "https://github.com/wandoledzep/bxslider-4",
+  "_release": "4.0",
+  "_resolution": {
+    "type": "branch",
+    "branch": "4.0",
+    "commit": "025366264b1e8162d4c40591ebbac18fe9a2c06d"
+  },
+  "_source": "git://github.com/wandoledzep/bxslider-4.git",
+  "_target": "4.0",
+  "_originalSource": "bxslider-4"
+}
