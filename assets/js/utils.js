@@ -15,4 +15,16 @@ var utils = {
 
 $(document).ready(function () {
     utils.addPrettify();
+
+    // livereload stuff
+    var hostname = (location.host || 'localhost').split(':')[0];
+    if (hostname == 'localhost') {
+        $.getScript('http://' + hostname + ':12345/livereload.js', function() {
+            if (window.hasOwnProperty('LiveReload')) {
+                console.log('Livereload enabled');
+            }
+        });
+    }
 });
+
+

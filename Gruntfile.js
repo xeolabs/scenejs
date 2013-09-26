@@ -22,7 +22,7 @@ module.exports = function(grunt) {
     grunt.initConfig({
 
         jekyll: {
-            default: {}
+            website: {}
         },
 
         watch: {
@@ -199,7 +199,7 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('jekyll', function() {
+    grunt.registerTask('website', function() {
 
         grunt.option('force', true);
 

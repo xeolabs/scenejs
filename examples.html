@@ -5,7 +5,7 @@ base_url: "./"
 permalink: "examples.html"
 ---
 
-<script src="http://xeolabs.github.io/examplejs/api/v0/example.js"></script>
+<script src="https://raw.github.com/xeolabs/examplejs/master/api/v0/example.js"></script>
 
 <style>
     html, body {
@@ -46,7 +46,7 @@ permalink: "examples.html"
 
             // Go to SceneJS.org when the home link (ie. logo) is clicked
             examplejs.once("home", function () {
-                window.location = "http://scenejs.org"
+                window.location = "{{ page.base_url }}"
             });
         });
     });
