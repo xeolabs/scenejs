@@ -1241,11 +1241,11 @@ var SceneJS = new (function () {
                 pluginPath = configs.pluginPath;
                 var libPath = pluginPath + "/lib";
                 
-                // don't steamroller over existing requirejs config if its there
-                var _config = requirejs.s.contexts._.config || {};
-                _config.paths["scenejsPluginDeps"] = libPath;
-
-                require.config(_config);
+                require.config({
+                    paths:{
+                        "scenejsPluginDeps":libPath
+                    }
+                });
             }
         });
 })();
