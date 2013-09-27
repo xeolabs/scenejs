@@ -3287,26 +3287,6 @@ var SceneJS = new (function () {
 
 })();
 
-// Configure RequireJS to find plugins relative to plugins location
-(function () {
-
-    var pluginPath;
-
-    SceneJS.on("configs",
-        function (configs) {
-            if (configs.pluginPath != pluginPath) {
-                pluginPath = configs.pluginPath;
-                var libPath = pluginPath + "/lib";
-                
-                require.config({
-                    paths:{
-                        "scenejsPluginDeps":libPath
-                    }
-                });
-            }
-        });
-})();
-
 /**
  *  @private
  */
@@ -18847,4 +18827,23 @@ SceneJS_ChunkFactory.createChunkType({
         ctx.modelMat = this.core.mat;
     }
 });
-SceneJS.configure({ pluginPath: "/dist/latest/plugins" });
+
+// Configure RequireJS to find plugins relative to plugins location
+(function () {
+
+    var pluginPath;
+
+    SceneJS.on("configs",
+        function (configs) {
+            if (configs.pluginPath != pluginPath) {
+                pluginPath = configs.pluginPath;
+                var libPath = pluginPath + "/lib";
+                
+                require.config({
+                    paths:{
+                        "scenejsPluginDeps":libPath
+                    }
+                });
+            }
+        });
+})();

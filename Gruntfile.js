@@ -18,7 +18,6 @@ var sjsFiles = [
     "src/core/map.js",
     "src/core/scenejs.js",
     
-    "src/misc/requireConfig.js",
     "src/core/eventManager.js",
     "src/core/plugins.js",
     "src/core/events.js",
@@ -204,13 +203,15 @@ module.exports = function(grunt) {
         concat: {
 
             options: {
-                banner: grunt.file.read('BANNER'),
-                footer: 'SceneJS.configure({ pluginPath: "/dist/latest/plugins" });'
+                banner: grunt.file.read('BANNER')
             },
 
             default: {
-                src: ["src/misc/requirejsSafe.js", "src/misc/webgl-debug-utils.js"].concat(sjsFiles),
+                src: ["src/misc/requirejsSafe.js", "src/misc/webgl-debug-utils.js"].concat(sjsFiles).concat("src/misc/requireConfig.js"),
+                
                 dest: distDir + 'scenejs.js',
+                
+                footer: 'SceneJS.configure({ pluginPath: "/dist/latest/plugins" });\n'
             },
             
             amd: {

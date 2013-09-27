@@ -489,4 +489,3 @@ SceneJS.GUI = function (scene, nodeIds) {
 
 
 
-SceneJS.configure({ pluginPath: "/dist/latest/plugins" });
