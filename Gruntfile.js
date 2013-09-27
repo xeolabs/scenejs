@@ -20,37 +20,60 @@ module.exports = function(grunt) {
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
     grunt.initConfig({
-
+        
+        pkg: grunt.file.readJSON('package.json'),
+        
         jekyll: {
             website: {}
         },
 
         watch: {
-
-            jekyll: {
+            options: {
+                livereload: 12345,
+            },
+            
+            // build the website if anything changes
+            website: {
                 files: [
+                    '_config.yml',
                     'assets/**/*',
                     '_includes/**/*.html',
                     '_layouts/**/*.html',
                     'examples/**/*',
+                    'bower_components/**/*',
                     '*.html'
                 ],
-                tasks: ['jekyll'],
-                options: {
-                    livereload: 12345,
-                }
+                tasks: ['jekyll']
+            },
+            
+            // build scenejs if any source changes
+            src: {
+                files: [
+                    'src/**/*',
+                    'BANNER'
+                ],
+                tasks: ['build']
+            },
+            
+            // copy dist over to the site if it changes
+            dist: {
+                files: [
+                    'dist/**/*',
+                ],
+                tasks: ['rsync:dist2site']
             }
         },
 
         // testing server
         connect: {
-            testserver: {
-                options: {
-                    hostname: '*',
-                    port: 1234,
-                    base: '_gh_pages'
-                }
-            }
+            options: {
+                hostname: '*',
+                port: 1234,
+                livereload: 12345,
+                base: '_site'
+            },
+
+            testserver: {}
         },
         
         rsync: {
@@ -58,16 +81,25 @@ module.exports = function(grunt) {
                 recursive: true,
                 syncDest: true
             },
+            
             plugins: {
                 options: {
                     src: "src/plugins",
                     dest: distDir
                 }
             },
+            
             extras: {
                 options: {
                     src: "src/extras",
                     dest: distDir
+                }
+            },
+            
+            dist2site: {
+                options: {
+                    src: "dist",
+                    dest: "_site"
                 }
             }
         },
@@ -77,13 +109,9 @@ module.exports = function(grunt) {
             dist: {
                 src: [
 
-                    // TODO: do automatic banner generation in grunt
-                    "licenses/license-header.js",
-
                     //--------------------------------------------------------------------
                     // Integrated 3rd party libs
                     //--------------------------------------------------------------------
-                    // TODO: manage these with grunt or bower
                     // TODO: have a build that optionally doesn't include requirejs
 
                     // RequireJS supports dynamic loading of dependencies by plugins
@@ -189,10 +217,14 @@ module.exports = function(grunt) {
                     "src/core/display/chunks/textureChunk.js",
                     "src/core/display/chunks/xformChunk.js"
                 ],
+                options: {
+                    banner: grunt.file.read('BANNER'),
+                    footer: 'SceneJS.configure({ pluginPath: "/dist/latest/plugins" });'
+                },
+
                 
                 dest: distDir + 'scenejs.js',
                 
-                footer: 'SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/dist/latest/plugins" });'
             },
             
             gui: {
@@ -212,7 +244,7 @@ module.exports = function(grunt) {
             'watch'
         ]);
     });
-
+    
     grunt.registerTask('build', function(target) {
         
         target = target || 'all';
@@ -227,7 +259,8 @@ module.exports = function(grunt) {
     
     grunt.registerTask('default', function() {
         grunt.task.run([
-            'build'
+            'build',
+            'website'
         ]);
     });
 };

@@ -1,17 +1,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
-<script>
-    window.BASE_URL = '{{ page.base_url }}';
-</script>
-
 <script src="{{ page.base_url }}bower_components/jquery/jquery.min.js"></script>
 
 <!-- code syntax highlighting -->
 <link href="{{ page.base_url }}bower_components/google-code-prettify/src/prettify.css" rel="stylesheet"/>
 
-<!-- general website helper functions -->
-<script src="{{ page.base_url }}assets/js/utils.js"></script>
+<script>
+
+    var utils = {
+        addPrettify: function () {
+            $('pre').each(function() {
+                var $this = $(this);
+                if (!$this.hasClass('noprettyprint')) {
+                    $this.addClass('prettyprint');
+                }
+            });
+              
+            $.getScript('{{ page.base_url }}bower_components/google-code-prettify/src/prettify.js', function() {
+                prettyPrint();
+            });
+        }
+    }
+
+    $(document).ready(function () {
+        utils.addPrettify();
+    });
+
+</script>
 
 <!-- slider -->
 <script src="{{ page.base_url }}bower_components/bxslider-4/jquery.bxslider.min.js"></script>

@@ -1,14 +1,16 @@
 /*
- * SceneJS WebGL Scene Graph Library for JavaScript
+ * SceneJS V3.2.0
+ * WebGL Scene Graph Library for JavaScript
  * http://scenejs.org/
- * Dual licensed under the MIT or GPL Version 2 licenses.
- * http://scenejs.org/license
- * Copyright 2010, Lindsay Kay
  *
+ * Built on 2013-09-27
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * Copyright 2013, Lindsay Kay
  *
  */
 // Only define RequireJS if not already present
 if (undefined === require) {
+
 /*
  RequireJS 2.1.6 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
  Available via the MIT or new BSD license.
@@ -16823,3 +16825,4 @@ SceneJS_ChunkFactory.createChunkType({
         ctx.modelMat = this.core.mat;
     }
 });
+SceneJS.configure({ pluginPath: "/dist/latest/plugins" });
