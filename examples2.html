@@ -28,7 +28,7 @@ base_url: "./"
 <script type="text/template" id="node-template">
     <div style="margin-left: <%= depth * 10 %>px;">
         <% if (path !== undefined) { %>
-            <a href="{{ page.base_url }}examples/ex/<%= path %>">
+            <a href="javascript:void(0);" onclick="window.open('{{ page.base_url }}examples/ex/<%= path %>', '<%= title %> &middot; SceneJS Example', 'height=800,width=1000,scrollbars=yes,resizable=yes,menubar=yes,location=yes')">
         <% } %>
         <h<%= depth + 2 %>><%= title %></h<%= depth + 2 %>>
         <% if (path !== undefined) { %>
