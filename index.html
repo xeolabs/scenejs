@@ -80,7 +80,8 @@
 <body>
 
 <div id="top">
-    <div class="links"><a href="examples.html">Examples</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+    <div class="links">
+        <a href="examples.html?page=firstExample">Examples</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
             href="https://github.com/xeolabs/scenejs#downloads">Downloads</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
             href="https://github.com/xeolabs/scenejs/issues">Issues</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
             href="https://github.com/xeolabs/scenejs/tree/V3.1/licenses">License</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
@@ -88,11 +89,11 @@
             href="http://www.facebook.com/group.php?gid=350488973712">Facebook</a></div>
 
     <!--<div class="links"><span>Home</span>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="about.html">About</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="examples.html">Examples</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
-            <!--href="https://github.com/xeolabs/scenejs#downloads">Downloads</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
-            <!--href="https://github.com/xeolabs/scenejs/issues">Issues</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
-            <!--href="https://github.com/xeolabs/scenejs/tree/V3.1/licenses">License</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
-            <!--href="https://twitter.com/xeolabs">Twitter</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
-            <!--href="http://www.facebook.com/group.php?gid=350488973712">Facebook</a></div>-->
+    <!--href="https://github.com/xeolabs/scenejs#downloads">Downloads</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
+    <!--href="https://github.com/xeolabs/scenejs/issues">Issues</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
+    <!--href="https://github.com/xeolabs/scenejs/tree/V3.1/licenses">License</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
+    <!--href="https://twitter.com/xeolabs">Twitter</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a-->
+    <!--href="http://www.facebook.com/group.php?gid=350488973712">Facebook</a></div>-->
 </div>
 
 <div id="header">
@@ -102,7 +103,7 @@
                 <a href="examples.html?page=city"><img
                         src="images/procedural-city.jpg" alt=""
                         title="SceneJS Example: Procedurally-Generated City"/></a>
-            </li> 
+            </li>
             <li>
                 <a href="http://bimsurfer.org">
                     <img src="images/bimSurfer.jpg" alt=""
@@ -154,9 +155,9 @@
                         title="SceneJS Example: Earth rendered with color, specular, alpha and glow maps"/></a>
             </li>
             <!--<li>-->
-                <!--<a href="http://openglinsights.com/"><img-->
-                        <!--src="images/openGLInsights.jpg" alt=""-->
-                        <!--title="SceneJS: A WebGL-Based Scene Graph Engine - OpenGL Insights 2012"/></a>-->
+            <!--<a href="http://openglinsights.com/"><img-->
+            <!--src="images/openGLInsights.jpg" alt=""-->
+            <!--title="SceneJS: A WebGL-Based Scene Graph Engine - OpenGL Insights 2012"/></a>-->
             <!--</li>-->
         </ul>
     </div>
@@ -164,8 +165,11 @@
 
 <div id="intro">
     <!--<p>A JSON-based scene graph engine on WebGL</p>-->
-    <p><span class="strong">SceneJS</span> is an extensible WebGL-based engine for high-detail 3D visualisation using JavaScript.</p>
-    <p>It's created and maintained by <a href="http://about.me/kaylindsay">Lindsay Kay</a> and is free for use under an open-source license.</p>
+    <p><span class="strong">SceneJS</span> is an extensible WebGL-based engine for high-detail 3D visualisation using
+        JavaScript.</p>
+
+    <p>It's created and maintained by <a href="http://about.me/kaylindsay">Lindsay Kay</a> and is free for use under an
+        open-source license.</p>
 </div>
 
 <div id="container">
@@ -237,9 +241,12 @@ scene.getNode("myRotate", function(myRotate) {
             <p class="sectionHeading">Plugins</p>
 
             <p>To keep the core library small, SceneJS dynamically loads it's non-core functionality from a directory of
-                plugins. In the example above, the <code>prims/teapot</code> node is a custom node type instantiated from a <a
-                        href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins/node/prims/teapot.js">prims/teapot</a> plugin, which SceneJS
-                loaded on-demand from <a href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins">the plugins directory</a> within its repository on
+                plugins. In the example above, the <code>prims/teapot</code> node is a custom node type instantiated
+                from a <a
+                        href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins/node/prims/teapot.js">prims/teapot</a>
+                plugin, which SceneJS
+                loaded on-demand from <a href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins">the
+                    plugins directory</a> within its repository on
                 GitHub.</p>
 
             <p>If you'd rather serve the plugins yourself, then just copy that directory to your server and configure
