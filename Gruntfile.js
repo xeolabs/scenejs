@@ -232,8 +232,6 @@ module.exports = function(grunt) {
 
     grunt.registerTask('website', function() {
 
-        grunt.option('force', true);
-
         grunt.task.run([
             'jekyll',
             'connect',
@@ -256,6 +254,9 @@ module.exports = function(grunt) {
     });
     
     grunt.registerTask('default', function() {
+
+        grunt.option('force', true);
+
         grunt.task.run([
             'build',
             'website'
