@@ -1,3 +1,15 @@
+/*
+ * SceneJS V3.2.0
+ * WebGL Scene Graph Library for JavaScript
+ * http://scenejs.org/
+ *
+ * Built on 2013-09-27
+ *
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * Copyright 2013, Lindsay Kay
+ *
+ */
+
 /**
  * dat-gui JavaScript Controller Library
  * http://code.google.com/p/dat-gui
@@ -477,3 +489,4 @@ SceneJS.GUI = function (scene, nodeIds) {
 
 
 
+SceneJS.configure({ pluginPath: "/dist/latest/plugins" });

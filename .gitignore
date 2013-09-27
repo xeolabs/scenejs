@@ -1,5 +1,6 @@
 # Ignore compiled stuff
 _site
+src/misc/requirejsSafe.js
 
 # Numerous always-ignore extensions
 *.diff
