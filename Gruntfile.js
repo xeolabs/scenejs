@@ -210,8 +210,10 @@ module.exports = function(grunt) {
                 src: ["src/misc/requirejsSafe.js", "src/misc/webgl-debug-utils.js"].concat(sjsFiles).concat("src/misc/requireConfig.js"),
                 
                 dest: distDir + 'scenejs.js',
-                
-                footer: 'SceneJS.configure({ pluginPath: "/dist/latest/plugins" });\n'
+
+                options: {
+                    footer: 'SceneJS.configure({ pluginPath: "/dist/latest/plugins" });\n'
+                }
             },
             
             amd: {

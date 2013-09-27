@@ -18847,3 +18847,4 @@ SceneJS_ChunkFactory.createChunkType({
             }
         });
 })();
+SceneJS.configure({ pluginPath: "/dist/latest/plugins" });
