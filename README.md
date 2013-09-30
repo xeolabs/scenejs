@@ -1,17 +1,20 @@
-## SceneJS 3.1
+## SceneJS
 
 **SceneJS** is an open-source 3D engine on WebGL that's geared towards rendering large numbers of individually
 articulated and pickable objects as required for high-detail visualisation applications.
 
 
-###This fork
+##This fork
 
-This fork by Lucas Doyle adds the following:
-* A proper package.json
-* Sematic Versioning
-* Grunt based builds
-* Website and docs compiled with jekyll
-* Vagrant dev environment
+This fork by Lucas Doyle basically applied modern javascript development practices to the old scenejs repository. More specifically, here is what is different in this fork: 
+* [Sematic Versioning](http://semver.org/) for more consistency and to play nice with other JS package managers ([bower](http://bower.io/) and [npm](https://npmjs.org/))
+* A proper [package.json](https://npmjs.org/doc/json.html)
+* [Grunt](http://gruntjs.com/) based builds with several build targets, including an AMD build
+* A bunch of other grunt shortcuts to help development, including automated builds and browser refreshes whenever a source file changes
+* SceneJS website and examples compiled with [jekyll](http://jekyllrb.com/) that play nice with [github pages](http://pages.github.com/)... it cut down ~4000 lines (see the website for this repo at [http://stonelinks.github.io/scenejs/](http://stonelinks.github.io/scenejs/))
+* Website dependencies managed with [bower](http://bower.io/)
+* A [Vagrant](http://www.vagrantup.com/) dev environment for developing everything above
+* Moved builds to the `dist` folder for consistency with other libraries
 
 ![Tron Tank Demo](http://scenejs.org/images/tron-tank.jpg)
 

@@ -19,11 +19,10 @@ class must-have {
     require => Exec["apt-get update 2"],
   }
 
-  exec { 'install npm deps':
-    command => '/usr/bin/npm install -g grunt-cli bower',
+  exec { 'install grunt':
+    command => '/usr/bin/npm install -g grunt-cli',
     creates => [
-      '/usr/lib/node_modules/bower/bin/bower',
-      '/usr/lib/node_modules/grunt-cli/bin/grunt',
+      '/usr/lib/node_modules/grunt-cli/bin/grunt'
     ],
     require => [ Exec["apt-get update 2"], Package["nodejs"] ],
   }

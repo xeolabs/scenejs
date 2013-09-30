@@ -22,7 +22,8 @@
     "grunt-rsync": "~0.2.1",
     "grunt-contrib-concat": "~0.3.0",
     "requirejs": "~2.1.8",
-    "grunt-wrap": "~0.3.0"
+    "grunt-wrap": "~0.3.0",
+    "grunt-jsdoc": "~0.4.1"
   },
   "engines": {
     "node": ">=0.10.17",
