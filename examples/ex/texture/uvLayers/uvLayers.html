@@ -35,12 +35,12 @@ base_url: "../../../../"
                             // First layer of our texture is a color map that maps to the geometry's first UV array
                             // A texture maps to first UV array by default
                             {
-                                src:"{{ page.base_url }}textures/superman.jpg"
+                                src:"{{ page.base_url }}assets/textures/superman.jpg"
                             },
 
                             // Second layer of our texture is a color map that maps to the geometry's second UV array
                             {
-                                src:"{{ page.base_url }}textures/superman.jpg",
+                                src:"{{ page.base_url }}assets/textures/superman.jpg",
                                 applyFrom:"uv2", // Apply to second set of UVs
                                 blendFactor:0.5,
                                 wrapS:"repeat",
