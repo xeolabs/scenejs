@@ -103,10 +103,13 @@ module.exports = function(grunt) {
 
     // load all grunt tasks
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+    
+    // read package.json
+    var pkg = grunt.file.readJSON('package.json')
 
     grunt.initConfig({
 
-        pkg: grunt.file.readJSON('package.json'),
+        pkg: pkg,
 
         jekyll: {
             website: {}
@@ -186,6 +189,13 @@ module.exports = function(grunt) {
                     src: 'api',
                     dest: '_site'
                 }
+            },
+            
+            apiVersionFolder: {
+                options: {
+                    src: apiDir,
+                    dest: 'api/' + pkg.version
+                }
             }
         },
 
@@ -254,6 +264,7 @@ module.exports = function(grunt) {
 
         grunt.task.run(tasks.common);
         grunt.task.run(target == 'all' ? tasks.default.concat(tasks.amd) : tasks[target]);
+        grunt.task.run('rsync:apiVersionFolder');
     });
 
     grunt.registerTask('default', function() {
