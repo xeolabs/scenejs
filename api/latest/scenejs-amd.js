@@ -924,7 +924,7 @@ var SceneJS = new (function () {
     /**
      * This SceneJS version
      */
-    this.VERSION = '3.2';
+    this.VERSION = '3.2.0';
 
     this._baseStateId = 0;
 
