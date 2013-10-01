@@ -40,7 +40,7 @@ SceneJS.XForm.prototype.getWorldMatrix = function() {
 
 SceneJS.XForm.prototype.setElements = function (elements) {
 
-    elements = elements || SceneJS_math_identityMat4();
+    elements = elements || SceneJS.math.identityMat4();
 
     if (elements.length != 16) {
         throw SceneJS_error.fatalError(
@@ -62,8 +62,8 @@ SceneJS.XForm.prototype.setElements = function (elements) {
 
 //    core.mat.set(core.matrix);
 //    core.normalMat.set(
-//        SceneJS_math_transposeMat4(
-//            SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
+//        SceneJS.math.transposeMat4(
+//            SceneJS.math.inverseMat4(core.matrix, SceneJS.math.mat4())));
 
 
     core.setDirty();

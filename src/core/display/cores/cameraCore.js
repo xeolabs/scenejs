@@ -22,7 +22,7 @@ SceneJS_CoreFactory.createCoreType("camera", {
 
             if (opticsType == "ortho") {
 
-                this.optics = SceneJS._applyIf(SceneJS_math_ORTHO_OBJ, {
+                this.optics = SceneJS._applyIf(SceneJS.math.ORTHO_OBJ, {
                     type: optics.type,
                     left : optics.left,
                     bottom : optics.bottom,
@@ -79,7 +79,7 @@ SceneJS_CoreFactory.createCoreType("camera", {
 
         if (optics.type == "ortho") {
 
-            this.matrix = SceneJS_math_orthoMat4c(
+            this.matrix = SceneJS.math.orthoMat4c(
                     optics.left,
                     optics.right,
                     optics.bottom,
@@ -89,7 +89,7 @@ SceneJS_CoreFactory.createCoreType("camera", {
 
         } else if (optics.type == "frustum") {
 
-            this.matrix = SceneJS_math_frustumMatrix4(
+            this.matrix = SceneJS.math.frustumMatrix4(
                     optics.left,
                     optics.right,
                     optics.bottom,
@@ -99,7 +99,7 @@ SceneJS_CoreFactory.createCoreType("camera", {
 
         } else if (optics.type == "perspective") {
 
-            this.matrix = SceneJS_math_perspectiveMatrix4(
+            this.matrix = SceneJS.math.perspectiveMatrix4(
                     optics.fovy * Math.PI / 180.0,
                     optics.aspect,
                     optics.near,

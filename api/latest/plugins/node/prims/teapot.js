@@ -5789,10 +5789,10 @@
             var v2 = positions[j1];
             var v3 = positions[j2];
 
-            v2 = SceneJS_math_subVec4(v2, v1, [0, 0, 0, 0]);
-            v3 = SceneJS_math_subVec4(v3, v1, [0, 0, 0, 0]);
+            v2 = SceneJS.math.subVec4(v2, v1, [0, 0, 0, 0]);
+            v3 = SceneJS.math.subVec4(v3, v1, [0, 0, 0, 0]);
 
-            var n = SceneJS_math_normalizeVec4(SceneJS_math_cross3Vec4(v2, v3, [0, 0, 0, 0]), [0, 0, 0, 0]);
+            var n = SceneJS.math.normalizeVec4(SceneJS.math.cross3Vec4(v2, v3, [0, 0, 0, 0]), [0, 0, 0, 0]);
 
             if (!nvecs[j0]) nvecs[j0] = [];
             if (!nvecs[j1]) nvecs[j1] = [];

@@ -1,8 +1,8 @@
 (function () {
 
-    var defaultMatrix = SceneJS_math_lookAtMat4c(0, 0, 10, 0, 0, 0, 0, 1, 0);
+    var defaultMatrix = SceneJS.math.lookAtMat4c(0, 0, 10, 0, 0, 0, 0, 1, 0);
     var defaultMat = new Float32Array(defaultMatrix);
-    var normalMat = SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(defaultMat, SceneJS_math_mat4()));
+    var normalMat = SceneJS.math.transposeMat4(SceneJS.math.inverseMat4(defaultMat, SceneJS.math.mat4()));
     var defaultNormalMat = new Float32Array(normalMat);
 
     /**
@@ -15,7 +15,7 @@
         mat:defaultMat,
         normalMatrix:normalMat,
         normalMat:defaultNormalMat,
-        lookAt:SceneJS_math_LOOKAT_ARRAYS
+        lookAt:SceneJS.math.LOOKAT_ARRAYS
     };
 
     var coreStack = [];
@@ -72,7 +72,7 @@
 
             this._core.rebuild = function () {
 
-                core.matrix = SceneJS_math_lookAtMat4c(
+                core.matrix = SceneJS.math.lookAtMat4c(
                     core.eyeX, core.eyeY, core.eyeZ,
                     core.lookX, core.lookY, core.lookZ,
                     core.upX, core.upY, core.upZ);
@@ -86,11 +86,11 @@
                 if (!core.mat) { // Lazy-create arrays
                     core.mat = new Float32Array(core.matrix);
                     core.normalMat = new Float32Array(
-                        SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
+                        SceneJS.math.transposeMat4(SceneJS.math.inverseMat4(core.matrix, SceneJS.math.mat4())));
 
                 } else { // Insert into arrays
                     core.mat.set(core.matrix);
-                    core.normalMat.set(SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
+                    core.normalMat.set(SceneJS.math.transposeMat4(SceneJS.math.inverseMat4(core.matrix, SceneJS.math.mat4())));
                 }
 
                 self.publish("matrix", core.matrix);

@@ -21,7 +21,7 @@ SceneJS.Translate.prototype._init = function(params) {
         var core = this._core;
 
         this._core.buildMatrix = function() {
-            core.matrix = SceneJS_math_translationMat4v([core.x, core.y, core.z], core.matrix);
+            core.matrix = SceneJS.math.translationMat4v([core.x, core.y, core.z], core.matrix);
         };
     }
 };

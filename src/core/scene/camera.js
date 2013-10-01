@@ -1,6 +1,6 @@
 (function () {
 
-    var defaultMatrix = SceneJS_math_perspectiveMatrix4(
+    var defaultMatrix = SceneJS.math.perspectiveMatrix4(
         45, // fovy
         1, // aspect
         0.1, // near
@@ -76,7 +76,7 @@
         } else {
             var type = optics.type || core.optics.type;
             if (type == "ortho") {
-                core.optics = SceneJS._applyIf(SceneJS_math_ORTHO_OBJ, {
+                core.optics = SceneJS._applyIf(SceneJS.math.ORTHO_OBJ, {
                     type:type,
                     left:optics.left,
                     bottom:optics.bottom,
@@ -122,7 +122,7 @@
     SceneJS.Camera.prototype._rebuild = function () {
         var optics = this._core.optics;
         if (optics.type == "ortho") {
-            this._core.matrix = SceneJS_math_orthoMat4c(
+            this._core.matrix = SceneJS.math.orthoMat4c(
                 optics.left,
                 optics.right,
                 optics.bottom,
@@ -131,7 +131,7 @@
                 optics.far);
 
         } else if (optics.type == "frustum") {
-            this._core.matrix = SceneJS_math_frustumMatrix4(
+            this._core.matrix = SceneJS.math.frustumMatrix4(
                 optics.left,
                 optics.right,
                 optics.bottom,
@@ -140,7 +140,7 @@
                 optics.far);
 
         } else if (optics.type == "perspective") {
-            this._core.matrix = SceneJS_math_perspectiveMatrix4(
+            this._core.matrix = SceneJS.math.perspectiveMatrix4(
                 optics.fovy * Math.PI / 180.0,
                 optics.aspect,
                 optics.near,

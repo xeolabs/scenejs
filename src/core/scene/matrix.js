@@ -44,7 +44,7 @@ SceneJS.Matrix.prototype.getWorldMatrix = function() {
  */
 SceneJS.Matrix.prototype.setMatrix = function(elements) {
 
-    elements = elements || SceneJS_math_identityMat4();
+    elements = elements || SceneJS.math.identityMat4();
 
     if (elements.length != 16) {
         throw SceneJS_error.fatalError(

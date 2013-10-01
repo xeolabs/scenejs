@@ -395,7 +395,7 @@ new (function () {
             if (translate.y != undefined) {
                 layer.translate.y = translate.y;
             }
-            matrix = SceneJS_math_translationMat4v([ translate.x || 0, translate.y || 0, 0]);
+            matrix = SceneJS.math.translationMat4v([ translate.x || 0, translate.y || 0, 0]);
         }
 
         if (cfg.scale) {
@@ -406,8 +406,8 @@ new (function () {
             if (scale.y != undefined) {
                 layer.scale.y = scale.y;
             }
-            t = SceneJS_math_scalingMat4v([ scale.x || 1, scale.y || 1, 1]);
-            matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
+            t = SceneJS.math.scalingMat4v([ scale.x || 1, scale.y || 1, 1]);
+            matrix = matrix ? SceneJS.math.mulMat4(matrix, t) : t;
         }
 
         if (cfg.rotate) {
@@ -415,8 +415,8 @@ new (function () {
             if (rotate.z != undefined) {
                 layer.rotate.z = rotate.z || 0;
             }
-            t = SceneJS_math_rotationMat4v(rotate.z * 0.0174532925, [0, 0, 1]);
-            matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
+            t = SceneJS.math.rotationMat4v(rotate.z * 0.0174532925, [0, 0, 1]);
+            matrix = matrix ? SceneJS.math.mulMat4(matrix, t) : t;
         }
 
         if (matrix) {

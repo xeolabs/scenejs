@@ -23,7 +23,7 @@ SceneJS.Rotate.prototype._init = function(params) {
         var core = this._core;
 
         this._core.buildMatrix = function() {
-            core.matrix = SceneJS_math_rotationMat4v(core.angle * Math.PI / 180.0, [core.x, core.y, core.z]);
+            core.matrix = SceneJS.math.rotationMat4v(core.angle * Math.PI / 180.0, [core.x, core.y, core.z]);
         };
     }
 };

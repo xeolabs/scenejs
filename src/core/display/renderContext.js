@@ -64,24 +64,24 @@ SceneJS.RenderContext.prototype.getCanvasPos = function(offset) {
  */
 SceneJS.RenderContext.prototype.getCameraPos = function(offset) {
     this.getProjPos(offset);
-    this._camPos = SceneJS_math_normalizeVec3(this._pc, [0,0,0]);
+    this._camPos = SceneJS.math.normalizeVec3(this._pc, [0,0,0]);
     return { x: this._camPos[0], y: this._camPos[1], z: this._camPos[2] }; // TODO: return _camPos and lose the temp object
 };
 
 
 SceneJS.RenderContext.prototype.getProjPos = function(offset) {
     this.getViewPos(offset);
-    this._pc = SceneJS_math_transformPoint3(this._frameCtx.cameraMat, this._vc);
+    this._pc = SceneJS.math.transformPoint3(this._frameCtx.cameraMat, this._vc);
     return { x: this._pc[0], y: this._pc[1], z: this._pc[2],  w: this._pc[3] };
 };
 
 SceneJS.RenderContext.prototype.getViewPos = function(offset) {
     this.getWorldPos(offset);
-    this._vc = SceneJS_math_transformPoint3(this._frameCtx.viewMat, this._wc);
+    this._vc = SceneJS.math.transformPoint3(this._frameCtx.viewMat, this._wc);
     return { x: this._vc[0], y: this._vc[1], z: this._vc[2],  w: this._vc[3] };
 };
 
 SceneJS.RenderContext.prototype.getWorldPos = function(offset) {
-    this._wc = SceneJS_math_transformPoint3(this._frameCtx.modelMat, offset || [0,0,0]);
+    this._wc = SceneJS.math.transformPoint3(this._frameCtx.modelMat, offset || [0,0,0]);
     return { x: this._wc[0], y: this._wc[1], z: this._wc[2],  w: this._wc[3] };
 };

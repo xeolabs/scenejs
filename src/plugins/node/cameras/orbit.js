@@ -146,14 +146,14 @@ SceneJS.Types.addType("cameras/orbit", {
             var look = [0, 0, 0];
             var up = [0, 1, 0];
 
-            var eyeVec = SceneJS_math_subVec3(eye, look, []);
-            var axis = SceneJS_math_cross3Vec3(up, eyeVec, []);
+            var eyeVec = SceneJS.math.subVec3(eye, look, []);
+            var axis = SceneJS.math.cross3Vec3(up, eyeVec, []);
 
-            var pitchMat = SceneJS_math_rotationMat4v(pitch * 0.0174532925, axis);
-            var yawMat = SceneJS_math_rotationMat4v(yaw * 0.0174532925, up);
+            var pitchMat = SceneJS.math.rotationMat4v(pitch * 0.0174532925, axis);
+            var yawMat = SceneJS.math.rotationMat4v(yaw * 0.0174532925, up);
 
-            var eye3 = SceneJS_math_transformPoint3(pitchMat, eye);
-            eye3 = SceneJS_math_transformPoint3(yawMat, eye3);
+            var eye3 = SceneJS.math.transformPoint3(pitchMat, eye);
+            eye3 = SceneJS.math.transformPoint3(yawMat, eye3);
 
             lookat.setEye({x:eye3[0], y:eye3[1], z:eye3[2] });
         }

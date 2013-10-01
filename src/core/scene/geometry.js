@@ -452,10 +452,10 @@ new (function () {
             v2 = [positions[j1 * 3 + 0], positions[j1 * 3 + 1], positions[j1 * 3 + 2]];
             v3 = [positions[j2 * 3 + 0], positions[j2 * 3 + 1], positions[j2 * 3 + 2]];
 
-            v2 = SceneJS_math_subVec4(v2, v1, [0, 0, 0, 0]);
-            v3 = SceneJS_math_subVec4(v3, v1, [0, 0, 0, 0]);
+            v2 = SceneJS.math.subVec4(v2, v1, [0, 0, 0, 0]);
+            v3 = SceneJS.math.subVec4(v3, v1, [0, 0, 0, 0]);
 
-            var n = SceneJS_math_normalizeVec4(SceneJS_math_cross3Vec4(v2, v3, [0, 0, 0, 0]), [0, 0, 0, 0]);
+            var n = SceneJS.math.normalizeVec4(SceneJS.math.cross3Vec4(v2, v3, [0, 0, 0, 0]), [0, 0, 0, 0]);
 
             if (!nvecs[j0]) nvecs[j0] = [];
             if (!nvecs[j1]) nvecs[j1] = [];
@@ -594,12 +594,12 @@ new (function () {
         }
 
         this._boundary = {
-            xmin:SceneJS_math_MAX_DOUBLE,
-            ymin:SceneJS_math_MAX_DOUBLE,
-            zmin:SceneJS_math_MAX_DOUBLE,
-            xmax:SceneJS_math_MIN_DOUBLE,
-            ymax:SceneJS_math_MIN_DOUBLE,
-            zmax:SceneJS_math_MIN_DOUBLE
+            xmin:SceneJS.math.MAX_DOUBLE,
+            ymin:SceneJS.math.MAX_DOUBLE,
+            zmin:SceneJS.math.MAX_DOUBLE,
+            xmax:SceneJS.math.MIN_DOUBLE,
+            ymax:SceneJS.math.MIN_DOUBLE,
+            zmax:SceneJS.math.MIN_DOUBLE
         };
 
         var x, y, z;

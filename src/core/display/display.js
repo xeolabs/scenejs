@@ -815,18 +815,18 @@ SceneJS_Display.prototype.pick = function (params) {
             var projMat = this._frameCtx.cameraMat;
             var viewMat = this._frameCtx.viewMat;
 
-            var pvMat = SceneJS_math_mulMat4(projMat, viewMat, []);
-            var pvMatInverse = SceneJS_math_inverseMat4(pvMat, []);
+            var pvMat = SceneJS.math.mulMat4(projMat, viewMat, []);
+            var pvMatInverse = SceneJS.math.inverseMat4(pvMat, []);
 
-            var world1 = SceneJS_math_transformVector4(pvMatInverse, [x, y, -1, 1]);
-            world1 = SceneJS_math_mulVec4Scalar(world1, 1 / world1[3]);
+            var world1 = SceneJS.math.transformVector4(pvMatInverse, [x, y, -1, 1]);
+            world1 = SceneJS.math.mulVec4Scalar(world1, 1 / world1[3]);
 
-            var world2 = SceneJS_math_transformVector4(pvMatInverse, [x, y, 1, 1]);
-            world2 = SceneJS_math_mulVec4Scalar(world2, 1 / world2[3]);
+            var world2 = SceneJS.math.transformVector4(pvMatInverse, [x, y, 1, 1]);
+            world2 = SceneJS.math.mulVec4Scalar(world2, 1 / world2[3]);
 
-            var dir = SceneJS_math_subVec3(world2, world1, []);
+            var dir = SceneJS.math.subVec3(world2, world1, []);
 
-            var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec4Scalar(dir, screenZ, []), []);
+            var vWorld = SceneJS.math.addVec3(world1, SceneJS.math.mulVec4Scalar(dir, screenZ, []), []);
 
             hit.worldPos = vWorld;
         }
@@ -838,7 +838,7 @@ SceneJS_Display.prototype.pick = function (params) {
 SceneJS_Display.prototype._unpackDepth = function (depthZ) {
     var vec = [depthZ[0] / 256.0, depthZ[1] / 256.0, depthZ[2] / 256.0, depthZ[3] / 256.0];
     var bitShift = [1.0 / (256.0 * 256.0 * 256.0), 1.0 / (256.0 * 256.0), 1.0 / 256.0, 1.0];
-    return SceneJS_math_dotVector4(vec, bitShift);
+    return SceneJS.math.dotVector4(vec, bitShift);
 };
 
 SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {

@@ -6,13 +6,13 @@
  */
 var SceneJS_modelXFormStack = new (function () {
 
-    var defaultMatrix = SceneJS_math_identityMat4();
+    var defaultMatrix = SceneJS.math.identityMat4();
     var defaultMat = new Float32Array(defaultMatrix);
 
-    var defaultNormalMatrix = SceneJS_math_transposeMat4(
-        SceneJS_math_inverseMat4(
-            SceneJS_math_identityMat4(),
-            SceneJS_math_mat4()));
+    var defaultNormalMatrix = SceneJS.math.transposeMat4(
+        SceneJS.math.inverseMat4(
+            SceneJS.math.identityMat4(),
+            SceneJS.math.mat4()));
     var defaultNormalMat = new Float32Array(defaultNormalMatrix);
 
     var defaultCore = {
@@ -82,12 +82,12 @@ var SceneJS_modelXFormStack = new (function () {
         core.numCores = 0;          // Number of child transform cores
         core.matrixDirty = false;
 
-        core.matrix = SceneJS_math_identityMat4();
+        core.matrix = SceneJS.math.identityMat4();
 
         core.mat = new Float32Array(core.matrix);
         core.normalMat = new Float32Array(
-            SceneJS_math_transposeMat4(
-                SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
+            SceneJS.math.transposeMat4(
+                SceneJS.math.inverseMat4(core.matrix, SceneJS.math.mat4())));
 
         core.dirty = false;         // Does this subtree need matrices rebuilt
 
@@ -145,13 +145,13 @@ var SceneJS_modelXFormStack = new (function () {
                         }
                         parent.mat.set(parent.matrix);
                         parent.normalMat.set(
-                            SceneJS_math_transposeMat4(
-                                SceneJS_math_inverseMat4(parent.matrix, SceneJS_math_mat4())));
+                            SceneJS.math.transposeMat4(
+                                SceneJS.math.inverseMat4(parent.matrix, SceneJS.math.mat4())));
 
                         parent.matrixDirty = false;
                     }
 
-                    SceneJS_math_mulMat4(parent.matrix, matrix, matrix);
+                    SceneJS.math.mulMat4(parent.matrix, matrix, matrix);
 
                     if (!parent.dirty) {
                         //   break;
@@ -172,15 +172,15 @@ var SceneJS_modelXFormStack = new (function () {
             //                core.mat = new Float32Array(matrix);
             //
             //                core.normalMat = new Float32Array(
-            //                        SceneJS_math_transposeMat4(
-            //                                SceneJS_math_inverseMat4(matrix, SceneJS_math_mat4())));
+            //                        SceneJS.math.transposeMat4(
+            //                                SceneJS.math.inverseMat4(matrix, SceneJS.math.mat4())));
             //            } else {
 
             core.mat.set(matrix);
 
             core.normalMat.set(
-                SceneJS_math_transposeMat4(
-                    SceneJS_math_inverseMat4(matrix, SceneJS_math_mat4())));
+                SceneJS.math.transposeMat4(
+                    SceneJS.math.inverseMat4(matrix, SceneJS.math.mat4())));
             //}
 
             core.dirty = false;

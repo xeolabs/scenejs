@@ -21,7 +21,7 @@ SceneJS.Scale.prototype._init = function(params) {
         var core = this._core;
 
         this._core.buildMatrix = function() {
-            core.matrix = SceneJS_math_scalingMat4v([core.x, core.y, core.z]);
+            core.matrix = SceneJS.math.scalingMat4v([core.x, core.y, core.z]);
         };
     }
 };
