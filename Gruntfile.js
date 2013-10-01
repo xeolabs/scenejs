@@ -8,8 +8,8 @@
 'use strict';
 
 
-// var distDir = "dist/" + (productionBuild ? "latest" : "dev");
-var distDir = 'dist/latest/';
+// var apiDir = "api/" + (productionBuild ? "latest" : "dev");
+var apiDir = 'api/latest/';
 
 var sjsFiles = [
 
@@ -138,12 +138,12 @@ module.exports = function(grunt) {
                 tasks: ['build']
             },
 
-            // copy dist over to the site if it changes
-            dist: {
+            // copy api folder over to the site if it changes
+            api: {
                 files: [
-                    'dist/**/*'
+                    'api/**/*'
                 ],
-                tasks: ['rsync:dist2site']
+                tasks: ['rsync:api2site']
             }
         },
 
@@ -170,20 +170,20 @@ module.exports = function(grunt) {
             plugins: {
                 options: {
                     src: 'src/plugins',
-                    dest: distDir
+                    dest: apiDir
                 }
             },
 
             extras: {
                 options: {
                     src: 'src/extras',
-                    dest: distDir
+                    dest: apiDir
                 }
             },
 
-            dist2site: {
+            api2site: {
                 options: {
-                    src: 'dist',
+                    src: 'api',
                     dest: '_site'
                 }
             }
@@ -209,16 +209,16 @@ module.exports = function(grunt) {
             default: {
                 src: ['src/misc/requirejsSafe.js', 'src/misc/webgl-debug-utils.js'].concat(sjsFiles).concat('src/misc/requireConfig.js'),
 
-                dest: distDir + 'scenejs.js',
+                dest: apiDir + 'scenejs.js',
 
                 options: {
-                    footer: 'SceneJS.configure({ pluginPath: "/dist/latest/plugins" });\n'
+                    footer: 'SceneJS.configure({ pluginPath: "/api/latest/plugins" });\n'
                 }
             },
 
             amd: {
                 src: ['src/misc/webgl-debug-utils.js'].concat(sjsFiles),
-                dest: distDir + 'scenejs-amd.js',
+                dest: apiDir + 'scenejs-amd.js',
 
                 options: {
                     banner: grunt.file.read('BANNER') + 'define([], function() {\n',
@@ -228,7 +228,7 @@ module.exports = function(grunt) {
 
             gui: {
                 src: ['src/extras/gui/dat.gui.min.js', 'src/extras/gui/gui.js'],
-                dest: distDir + 'extras/gui.js'
+                dest: apiDir + 'extras/gui.js'
             }
         }
     });

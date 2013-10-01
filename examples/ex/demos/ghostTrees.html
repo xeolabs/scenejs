@@ -3,7 +3,7 @@ layout: example
 base_url: "../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
 <script>
 
@@ -14,7 +14,7 @@ base_url: "../../../"
     // http://www.chromeexperiments.com/detail/ghost-trees/
     //
     // The tree generation code is wrapped in a custom SceneJS node type defined in:
-    // http://scenejs.org/dist/latest/plugins/node/objects/plants/ghostTree.js
+    // http://scenejs.org/api/latest/plugins/node/objects/plants/ghostTree.js
     //
     // All the parameters for the tree generator are exposed as configurations
     // for the node type.
@@ -25,7 +25,7 @@ base_url: "../../../"
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     var scene = SceneJS.createScene({
@@ -44,7 +44,7 @@ base_url: "../../../"
                 nodes:[
 
                     // Mouse-orbited camera, implemented by plugin at
-                    // http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
+                    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
                     {
                         type:"cameras/orbit",
                         yaw:-130,
@@ -55,7 +55,7 @@ base_url: "../../../"
                         nodes:[
 
                             // Procedurally-generated tree nodes, implemented by plugin at:
-                            // http://scenejs.org/dist/latest/plugins/node/objects/plants/ghostTree.js
+                            // http://scenejs.org/api/latest/plugins/node/objects/plants/ghostTree.js
                             //
                             // This plugin integrates the Ghost Trees generator from the Chrome Experiment
                             // by Marek Kapolka: http://www.chromeexperiments.com/detail/ghost-trees/

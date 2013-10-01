@@ -3,7 +3,7 @@ layout: example
 base_url: "../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 <script src="{{ page.base_url }}assets/js/stats.min.js"></script>
 
 <script>
@@ -19,7 +19,7 @@ base_url: "../../../"
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     // Create scene
@@ -27,7 +27,7 @@ base_url: "../../../"
         nodes:[
 
             // Mouse-orbited camera, implemented by plugin at
-            // http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:30,
@@ -38,7 +38,7 @@ base_url: "../../../"
                 nodes:[
 
                     // Optional physics system configs, implemented by plugin at
-                    // http://scenejs.org/dist/latest/plugins/node/physics/system.js
+                    // http://scenejs.org/api/latest/plugins/node/physics/system.js
                     {
                         type:"physics/system",
                         gravity:[0, -9, 0, 0],
@@ -48,7 +48,7 @@ base_url: "../../../"
                     // Ground plane
 
                     // Physics body, implemented by plugin at
-                    // http://scenejs.org/dist/latest/plugins/node/physics/body.js
+                    // http://scenejs.org/api/latest/plugins/node/physics/body.js
                     {
                         type:"physics/body",
                         shape:"plane",
@@ -90,7 +90,7 @@ base_url: "../../../"
                                 nodes:[
 
                                     // Grid ground plane geometry, implemented by plugin at
-                                    // http://scenejs.org/dist/latest/plugins/node/prims/grid.js
+                                    // http://scenejs.org/api/latest/plugins/node/prims/grid.js
                                     {
                                         type:"prims/grid",
                                         size:{ x:1000, z:1000 },
@@ -134,7 +134,7 @@ base_url: "../../../"
             nodes.push(
 
                     // Physics body primitive, implemented by plugin at
-                    // http://scenejs.org/dist/latest/plugins/node/physics/body.js
+                    // http://scenejs.org/api/latest/plugins/node/physics/body.js
                     {
                         type:"physics/body",
                         shape:"box",
@@ -178,7 +178,7 @@ base_url: "../../../"
                                 nodes:[
 
                                     // Sphere primitive, implemented by plugin at
-                                    // http://scenejs.org/dist/latest/plugins/node/prims/sphere.js
+                                    // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
                                     {
                                         type:"prims/box",
                                         xSize:xSize / 2,

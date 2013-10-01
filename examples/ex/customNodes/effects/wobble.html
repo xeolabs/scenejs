@@ -3,7 +3,7 @@ layout: example
 base_url: "../../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
 <script>
 
@@ -12,7 +12,7 @@ base_url: "../../../../"
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     // Create a scene
@@ -20,7 +20,7 @@ base_url: "../../../../"
         nodes:[
 
             // Mouse-orbited camera,
-            // implemented by plugin at ../../../../dist/latest/plugins/node/cameras/orbit.js
+            // implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:-150,
@@ -35,14 +35,14 @@ base_url: "../../../../"
                         nodes:[
 
                             // Wobble effect,
-                            // implemented by plugin at http://scenejs.org/dist/latest/plugins/node/effects/wobble.js
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/effects/wobble.js
                             {
                                 type:"effects/wobble",
 
                                 nodes:[
 
                                     // Tank vehicle,
-                                    // implemented by plugin at http://scenejs.org/dist/latest/plugins/node/objects/vehicles/tank.js
+                                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/objects/vehicles/tank.js
                                     {
                                         type:"objects/vehicles/tank"
                                     }
@@ -50,7 +50,7 @@ base_url: "../../../../"
                             },
 
                             // Grid primitive,
-                            // implemented by plugin at http://scenejs.org/dist/latest/plugins/node/prims/grid.js
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/grid.js
                             {
                                 type:"prims/grid",
                                 size:{ x:1000, z:1000 },

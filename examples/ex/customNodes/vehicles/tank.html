@@ -3,7 +3,7 @@ layout: example
 base_url: "../../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
 <script>
 
@@ -11,7 +11,7 @@ base_url: "../../../../"
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     // Create scene
@@ -28,13 +28,13 @@ base_url: "../../../../"
                 nodes:[
 
                     // Clouds skybox, implemented by plugin at
-                    // http://scenejs.org/dist/latest/plugins/node/skyboxes/clouds.js
+                    // http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
                     {
                         type:"skyboxes/clouds"
                     },
 
                     // Node type implemented by plugin at
-                    // http://scenejs.org/dist/latest/plugins/node/prims/grid.js
+                    // http://scenejs.org/api/latest/plugins/node/prims/grid.js
                     {
                         type:"prims/grid",
                         size:{ x:1000, z:1000 },
@@ -43,7 +43,7 @@ base_url: "../../../../"
                     },
 
                     // Tron Tank vehicle, implemented by plugin at
-                    // http://scenejs.org/dist/latest/plugins/node/objects/vehicles/tank.js
+                    // http://scenejs.org/api/latest/plugins/node/objects/vehicles/tank.js
                     {
                         type:"objects/vehicles/tank",
                         id:"myTank",

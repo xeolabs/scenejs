@@ -3,7 +3,7 @@ layout: example
 base_url: "../../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
 <script>
 
@@ -17,14 +17,14 @@ base_url: "../../../../"
 
     // Point SceneJS to the plugins bundled with these examples:
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     var scene = SceneJS.createScene({
         nodes:[
 
             // Mouse-orbited camera,
-            // implemented by plugin at ../../../../dist/latest/plugins/node/cameras/orbit.js
+            // implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:30,
@@ -39,7 +39,7 @@ base_url: "../../../../"
                         nodes:[
 
                             // Torus primitive,
-                            // implemented by plugin at ../../../../dist/latest/plugins/node/prims/torus.js
+                            // implemented by plugin at ../../../../api/latest/plugins/node/prims/torus.js
                             {
                                 type:"prims/torus",
                                 radius:1.0,

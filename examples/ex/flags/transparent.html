@@ -3,8 +3,8 @@ layout: example
 base_url: "../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
-<script src="{{ page.base_url }}dist/latest/extras/orbitControl.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/extras/orbitControl.js"></script>
 
 <script>
 
@@ -28,14 +28,14 @@ base_url: "../../../"
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     // Create scene
     var scene = SceneJS.createScene({
         nodes:[
 
-            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:30,
@@ -62,7 +62,7 @@ base_url: "../../../"
 
                                 nodes:[
 
-                                    // Teapot primitive, implemented by plugin at http://scenejs.org/dist/latest/plugins/node/prims/teapot.js
+                                    // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
                                     {
                                         type:"prims/teapot"
                                     }
@@ -86,7 +86,7 @@ base_url: "../../../"
                                         y:0.4,
                                         z:0.4,
                                         nodes:[
-                                            // Teapot primitive, implemented by plugin at http://scenejs.org/dist/latest/plugins/node/prims/sphere.js
+                                            // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
                                             {
                                                 type:"prims/sphere"
                                             }

@@ -3,7 +3,7 @@ layout: example
 base_url: "../../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
 <script>
 
@@ -11,14 +11,14 @@ base_url: "../../../../"
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     // Create scene
     var scene = SceneJS.createScene({
         nodes:[
             // Mouse-orbited camera,
-            // http://scenejs.org/dist/latest/plugins/node/prims/plane.js
+            // http://scenejs.org/api/latest/plugins/node/prims/plane.js
             {
                 type:"cameras/orbit",
                 yaw:340,
@@ -36,7 +36,7 @@ base_url: "../../../../"
                         nodes:[
 
                             // Node type implemented by plugin at
-                            // http://scenejs.org/dist/latest/plugins/node/prims/grid.js
+                            // http://scenejs.org/api/latest/plugins/node/prims/grid.js
                             {
                                 type:"prims/grid",
                                 size:{ x:10000, z:10000 },
@@ -48,7 +48,7 @@ base_url: "../../../../"
 
                     // Drinking Bird,
                     // implemented by plugin at
-                    // http://scenejs.org/dist/latest/plugins/node/objects/toys/drinkingBird.js
+                    // http://scenejs.org/api/latest/plugins/node/objects/toys/drinkingBird.js
                     // Author: Moritz Kornher
                     {
                         type:"objects/toys/drinkingBird",

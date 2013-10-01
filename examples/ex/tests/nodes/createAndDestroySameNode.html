@@ -3,8 +3,8 @@ layout: example
 base_url: "../../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
-<script src="{{ page.base_url }}dist/latest/extras/gui.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/extras/gui.js"></script>
 
 <script>
 
@@ -13,7 +13,7 @@ base_url: "../../../../"
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     // Alert any errors

@@ -3,13 +3,13 @@ layout: example
 base_url: "../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
 <script>
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"{{ page.base_url }}dist/latest/plugins"
+    pluginPath:"{{ page.base_url }}api/latest/plugins"
 });
 
 var scene;
@@ -23,7 +23,7 @@ function createScene() {
     scene = SceneJS.createScene({
         nodes:[
 
-            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:340,
@@ -59,7 +59,7 @@ function createScene() {
                                 nodes:[
 
                                     // Grid ground, implemented by plugin at
-                                    // http://scenejs.org/dist/latest/plugins/node/prims/grid.js
+                                    // http://scenejs.org/api/latest/plugins/node/prims/grid.js
                                     {
                                         type:"prims/grid",
                                         size:{ x:1000, z:1000 },
@@ -70,7 +70,7 @@ function createScene() {
                             },
 
                             // Cloudy sea skybox, implemented by plugin at
-                            // http://scenejs.org/dist/latest/plugins/node/skyboxes/miramarClouds.js
+                            // http://scenejs.org/api/latest/plugins/node/skyboxes/miramarClouds.js
                             {
                                 type:"skyboxes/cloudySea"
                             },
@@ -252,7 +252,7 @@ function createBubbles() {
                             angle:0
                         });
                         this.rotate.addNode(
-                                // Sphere geometry node implemented by plugin at http://scenejs.org/dist/latest/plugins/node/prims/sphere.js
+                                // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
                                 {
                                     type:"prims/sphere"
                                 });

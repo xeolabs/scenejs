@@ -23,13 +23,13 @@ base_url: "../../../"
 <div id="info">
 </div>
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
 <script>
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"{{ page.base_url }}dist/latest/plugins"
+    pluginPath:"{{ page.base_url }}api/latest/plugins"
 });
 
 // Create a scene with a bubble cloud, something dynamic to show
@@ -48,7 +48,7 @@ function createScene() {
                 nodes:[
 
                     // Mouse-orbited camera, implemented by plugin at
-                    // http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
+                    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
                     {
                         type:"cameras/orbit",
                         yaw:340,
@@ -80,7 +80,7 @@ function createScene() {
                                 nodes:[
 
                                     // Miramar Clouds Skybox, implemented by plugin at
-                                    // http://scenejs.org/dist/latest/plugins/node/skyboxes/miramarClouds.js
+                                    // http://scenejs.org/api/latest/plugins/node/skyboxes/miramarClouds.js
                                     {
                                         type:"skyboxes/miramarClouds",
                                         size:5000 // Box half-size on each axis - default is 5000
@@ -121,7 +121,7 @@ function createScene() {
                                                                 nodes:[
 
                                                                     // Plane primitive implemented by plugin at
-                                                                    // http://scenejs.org/dist/latest/plugins/node/prims/plane.js
+                                                                    // http://scenejs.org/api/latest/plugins/node/prims/plane.js
                                                                     {
                                                                         type:"prims/plane",
                                                                         width:1,
@@ -320,7 +320,7 @@ function createBubbles() {
                             angle:0
                         });
                         this.rotate.addNode(
-                                // Sphere geometry node implemented by plugin at http://scenejs.org/dist/latest/plugins/node/prims/sphere.js
+                                // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
                                 {
                                     type:"prims/sphere"
                                 });

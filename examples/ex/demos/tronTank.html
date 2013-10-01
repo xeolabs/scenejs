@@ -3,7 +3,7 @@ layout: example
 base_url: "../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
     <script src="{{ page.base_url }}assets/models/sky.js"></script>
     <script src="{{ page.base_url }}assets/models/wireGrid.js"></script>
@@ -18,7 +18,7 @@ base_url: "../../../"
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"{{ page.base_url }}dist/latest/plugins"
+    pluginPath:"{{ page.base_url }}api/latest/plugins"
 });
 
 // Create scene
@@ -106,7 +106,7 @@ var scene = SceneJS.createScene({
                     ]
                 },
 
-                // Skybox with custom texture, implemented by plugin at http://scenejs.org/dist/latest/plugins/node/skyboxes/clouds.js
+                // Skybox with custom texture, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
                 {
                     type:"skyboxes/clouds"
                 }

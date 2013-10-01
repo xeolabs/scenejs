@@ -14,7 +14,6 @@ This fork by Lucas Doyle basically applied modern javascript development practic
 * SceneJS website and examples compiled with [jekyll](http://jekyllrb.com/) that play nice with [github pages](http://pages.github.com/)... it cut down ~4000 lines (see the website for this repo at [http://stonelinks.github.io/scenejs/](http://stonelinks.github.io/scenejs/))
 * Website dependencies managed with [bower](http://bower.io/)
 * A [Vagrant](http://www.vagrantup.com/) dev environment for developing everything above
-* Moved builds to the `dist` folder for consistency with other libraries
 
 ![Tron Tank Demo](http://scenejs.org/images/tron-tank.jpg)
 
@@ -33,7 +32,7 @@ This fork by Lucas Doyle basically applied modern javascript development practic
 
 ## Downloads
 Get started fast by hotlinking to the latest library build:
-* **[scenejs.js](http://xeolabs.github.com/scenejs/dist/latest/scenejs.js)**
+* **[scenejs.js](http://xeolabs.github.com/scenejs/api/latest/scenejs.js)**
 
 SceneJS uses plugins for many features, dynamically loading those as you need them. By default, the library will
 load plugins from this repository. That's OK for playing around, but for production you'll probably want to serve the
@@ -74,7 +73,7 @@ var myGeometry = myNode.addNode({
  });
 ```
 
-This ```geometry``` node will create its sphere geometry with the help of the [sphere](./dist/latest/plugins/geometry/sphere.js) plugin.
+This ```geometry``` node will create its sphere geometry with the help of the [sphere](./api/latest/plugins/geometry/sphere.js) plugin.
 
 Essentially, the plugin's code looks like the listing below. The plugin provides geometry factory objects (called "sources"), each with
 a ```configure``` method to configure the sphere shape and a ```subscribe``` method to collect the generated geometry data. SceneJS plugins
@@ -309,10 +308,10 @@ SceneJS.Types.addType("demos/color", {
 
 This plugin happens to be deployed within the default SceneJS plugins directory, at this location:
 
-[http://scenejs.org/dist/latest/plugins/node/demos/color.js](http://scenejs.org/dist/latest/plugins/node/demos/color.js)
+[http://scenejs.org/api/latest/plugins/node/demos/color.js](http://scenejs.org/api/latest/plugins/node/demos/color.js)
 
 Note that the plugin script installs the custom node type as "demos/color", and see how that type name maps to the script's location
-within the ```http://scenejs.org/dist/latest/plugins/node``` directory.
+within the ```http://scenejs.org/api/latest/plugins/node``` directory.
 
 ### Using a Custom Node Type
 
@@ -321,7 +320,7 @@ bother doing this if you're hotlinking to the SceneJS lib and just want to use t
 
 ```javascript
 SceneJS.configure({
-     pluginPath: "http://scenejs.org/dist/latest/plugins"
+     pluginPath: "http://scenejs.org/api/latest/plugins"
  });
 ```
 
@@ -337,7 +336,7 @@ var scene = SceneJS.createScene({
                 nodes:[
 
                     // Node type defined by plugin
-                    // http://scenejs.org/dist/latest/plugins/node/demos/color.js
+                    // http://scenejs.org/api/latest/plugins/node/demos/color.js
                     {
                         type:"demos/color",
                         id: "myColor",
@@ -400,7 +399,7 @@ See that setColor method, which is defined by our node type?
 
 SceneJS bundles RequireJS, so that plugins can dynamically load support libraries, such as those from 3rd-party vendors.
 
-Support libraries used by custom node types are kept in a [lib directory inside the plugins directory](https://github.com/xeolabs/scenejs/tree/V3.1/dist/latest/plugins/lib).
+Support libraries used by custom node types are kept in a [lib directory inside the plugins directory](https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins/lib).
 
 Custom node types can then require the dependencies using a *scenejsPluginDeps* prefix:
 
@@ -425,7 +424,7 @@ require([
 
 SceneJS synchronises that RequireJS ```scenejsPluginDeps``` path with the current [pluginPath configuration](#serving-plugins-yourself).
 
-As an example, the bundled [canvas/capture](https://github.com/xeolabs/scenejs/blob/V3.1/dist/latest/plugins/node/canvas/capture.js) node type
+As an example, the bundled [canvas/capture](https://github.com/xeolabs/scenejs/blob/V3.1/api/latest/plugins/node/canvas/capture.js) node type
  uses the 3rd-party ```canvas2image``` library to capture the canvas to an image. Run a demo of that node
  [here](http://scenejs.org/examples.html?page=canvasCapture).
 

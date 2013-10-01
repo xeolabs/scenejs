@@ -3,7 +3,7 @@ layout: example
 base_url: "../../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
 <script>
 
@@ -12,7 +12,7 @@ base_url: "../../../../"
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     // Create scene containing our custom node types
@@ -25,7 +25,7 @@ base_url: "../../../../"
                 nodes:[
 
                     // Demo custom node,
-                    // implemented by plugin at http://scenejs.org/dist/latest/plugins/node/demos/color.js
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/demos/color.js
                     {
                         type:"demos/color",
                         id: "myColor",
@@ -34,7 +34,7 @@ base_url: "../../../../"
                         nodes:[
 
                             // Teapot primitive,
-                            // implemented by plugin at http://scenejs.org/dist/latest/plugins/node/prims/teapot.js
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
                             {
                                 type:"prims/teapot"
                             }

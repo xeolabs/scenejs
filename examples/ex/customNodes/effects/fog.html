@@ -3,7 +3,7 @@ layout: example
 base_url: "../../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
 <script src="{{ page.base_url }}assets/js/dat.gui.min.js"></script>
 
@@ -15,7 +15,7 @@ base_url: "../../../../"
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     // Create a scene
@@ -23,7 +23,7 @@ base_url: "../../../../"
         nodes:[
 
             // Mouse-orbited camera,
-            // implemented by plugin at ../../../../dist/latest/plugins/node/cameras/orbit.js
+            // implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:10,
@@ -40,7 +40,7 @@ base_url: "../../../../"
                         nodes:[
 
                             // Fog effect, implemented by plugin at
-                            // http://scenejs.org/dist/latest/plugins/node/effects/fog.js
+                            // http://scenejs.org/api/latest/plugins/node/effects/fog.js
                             {
                                 type:"effects/fog",
                                 id:"myFog",
@@ -52,7 +52,7 @@ base_url: "../../../../"
 
                                 nodes:[
                                     // Teapot primitives,
-                                    // implemented by plugin at http://scenejs.org/dist/latest/plugins/node/prims/teapot.js
+                                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
                                     {
                                         type:"translate",
                                         z:-10,

@@ -3,7 +3,7 @@ layout: example
 base_url: "../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
 <script>
 
@@ -17,7 +17,7 @@ base_url: "../../../"
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     // Create scene
@@ -25,7 +25,7 @@ base_url: "../../../"
         nodes:[
 
             // Orbiting camera node, implemented by plugin at
-            // http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:60,
@@ -51,7 +51,7 @@ base_url: "../../../"
                                         nodes:[
 
                                             // Box primitive implemented by plugin at
-                                            // http://scenejs.org/dist/latest/plugins/node/prims/box.js
+                                            // http://scenejs.org/api/latest/plugins/node/prims/box.js
                                             {
                                                 type:"prims/box"
                                             }
@@ -78,7 +78,7 @@ base_url: "../../../"
                                         nodes:[
 
                                             // Sphere geometry node implemented by plugin at
-                                            // http://scenejs.org/dist/latest/plugins/node/prims/sphere.js
+                                            // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
                                             {
                                                 type:"prims/sphere"
                                             }
@@ -110,7 +110,7 @@ base_url: "../../../"
                                                 nodes:[
 
                                                     // Node type implemented by plugin at
-                                                    // http://scenejs.org/dist/latest/plugins/node/prims/teapot.js
+                                                    // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
                                                     {
                                                         type:"prims/teapot"
                                                     }
@@ -139,7 +139,7 @@ base_url: "../../../"
                                         nodes:[
 
                                             // Node type implemented by plugin at
-                                            // http://scenejs.org/dist/latest/plugins/node/prims/torus.js
+                                            // http://scenejs.org/api/latest/plugins/node/prims/torus.js
                                             {
                                                 type:"prims/torus"
                                             }

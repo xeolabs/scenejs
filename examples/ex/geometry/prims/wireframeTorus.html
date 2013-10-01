@@ -3,15 +3,15 @@ layout: example
 base_url: "../../../../"
 ---
 
-<script src="{{ page.base_url }}dist/latest/scenejs.js"></script>
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
 
-<script src="{{ page.base_url }}dist/latest/extras/orbitControl.js"></script>
+<script src="{{ page.base_url }}api/latest/extras/orbitControl.js"></script>
 
 <script>
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"{{ page.base_url }}dist/latest/plugins"
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
     });
 
     // Create scene
@@ -19,7 +19,7 @@ base_url: "../../../../"
         nodes:[
 
             // Mouse-orbited camera, implemented by plugin at
-            // http://scenejs.org/dist/latest/plugins/node/cameras/orbit.js
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
                 type:"cameras/orbit",
                 yaw:30,
@@ -35,7 +35,7 @@ base_url: "../../../../"
                         color:{ r:0.5, g:0.5, b:0.6 },
                         nodes:[
 
-                            // Torus geometry using plugin in http://scenejs.org/dist/latest/plugins/geometry/torus.js
+                            // Torus geometry using plugin in http://scenejs.org/api/latest/plugins/geometry/torus.js
                             // This torus is in wireframe mode, which is also supported by most prim types
                             {
                                 type:"geometry",
