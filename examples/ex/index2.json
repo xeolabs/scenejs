@@ -618,21 +618,21 @@
                         "title":"Perspective projection",
                         "tip":"Defining a perspective camera",
                         "tags":[],
-                        "path":"viewing/camera/perspective.html",
+                        "path":"transformation/projection/perspective.html",
                         "id":"perspectiveProjection"
                     },
                     {
                         "title":"Orthographic projection",
                         "tip":"Defining an orthographic camera",
                         "tags":[],
-                        "path":"viewing/camera/ortho.html",
+                        "path":"transformation/projection/ortho.html",
                         "id":"orthoProjection"
                     },
                     {
                         "title":"Frustum projection",
                         "tip":"Defining a camera via frustum extents",
                         "tags":[],
-                        "path":"viewing/camera/frustum.html",
+                        "path":"transformation/projection/frustum.html",
                         "id":"frustumProjection"
                     }
                 ]
@@ -646,7 +646,7 @@
                         "title":"Basic viewing transform",
                         "tip":"",
                         "tags":[],
-                        "path":"viewing/lookat/lookat.html",
+                        "path":"transformation/viewing/lookat.html",
                         "id":"viewTransform"
                     }
                 ]
@@ -658,31 +658,31 @@
                 "nodes":[
                     {
                         "title":"Rotate",
-                        "path":"transforms/rotate.html",
+                        "path":"transformation/modelling/rotate.html",
                         "tags":[],
                         "id":"rotateTransform"
                     },
                     {
                         "title":"Translate",
-                        "path":"transforms/translate.html",
+                        "path":"transformation/modelling/translate.html",
                         "tags":[],
                         "id":"translateTransform"
                     },
                     {
                         "title":"Scale",
-                        "path":"transforms/scale.html",
+                        "path":"transformation/modelling/scale.html",
                         "tags":[],
                         "id":"scaleTransform"
                     },
                     {
                         "title":"Matrix",
-                        "path":"transforms/matrix.html",
+                        "path":"transformation/modelling/matrix.html",
                         "tags":[],
                         "id":"matrixTransform"
                     },
                     {
                         "title":"Transform hierarchy",
-                        "path":"transforms/transformHierarchy.html",
+                        "path":"transformation/modelling/transformHierarchy.html",
                         "tags":[],
                         "id":"transformHierarchy"
                     }
