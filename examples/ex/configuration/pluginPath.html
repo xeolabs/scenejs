@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<script src="../../../api/latest/scenejs.js"></script>
+
+<script>
+
+
+    // To keep the core library small, SceneJS dynamically loads it's non-core functionality from a directory of
+    // plugins. In these examples SceneJS loads them on-demand from the plugins directory within its repository on
+    // GitHub.
+    //
+    // When you'd rather serve the plugins yourself, or run a scene offline, then you'll need to configure
+    // SceneJS to load the plugins from your own location, as shown in this example.
+    //
+
+    // Point SceneJS to the plugins bundled with these examples:
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera,
+            // implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:5,
+                zoomSensitivity:10.0,
+
+                nodes:[
+                    {
+                        type:"material",
+                        color:{ r:0.6, g:0.6, b:0.9 },
+                        nodes:[
+
+                            // Torus primitive,
+                            // implemented by plugin at ../../../../api/latest/plugins/node/prims/torus.js
+                            {
+                                type:"prims/torus",
+                                radius:1.0,
+                                tube:0.30,
+                                segmentsR:60,
+                                segmentsT:40,
+                                arc:Math.PI * 2
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    })
+
+</script>
+</body>
+</html>

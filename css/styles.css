@@ -104,6 +104,7 @@ body {
     font-weight: bold;
     text-align: left;
     text-shadow: 0 0 2px #c8c8c8;
+    margin-top:10px !important;
     color: #676767;
     /*text-transform: uppercase;*/
 }

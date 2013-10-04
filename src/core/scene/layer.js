@@ -57,6 +57,22 @@
         return this._core.enabled;
     };
 
+    SceneJS.Layer.prototype.getEnabled = function() {
+        return this._core.enabled;
+    };
+
+    SceneJS.Layer.prototype.setClearDepth = function(clearDepth) {
+        clearDepth = clearDepth || 0;
+        if (this._core.clearDepth != clearDepth) {
+            this._core.clearDepth = clearDepth;
+            this._engine.display.drawListDirty = true;
+        }
+    };
+
+    SceneJS.Layer.prototype.getClearDepth = function() {
+        return this._core.clearDepth;
+    };
+
     SceneJS.Layer.prototype._compile = function() {
         this._engine.display.layer = coreStack[stackLen++] = this._core;
         this._compileNodes();

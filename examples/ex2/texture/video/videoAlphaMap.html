@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Texture Animation</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:5,
+                zoomSensitivity:1.0,
+
+                nodes:[
+
+                    // Outer green box with alpha map
+                    {
+                        type:"flags",
+                        flags:{
+                            transparent:true
+                        },
+                        nodes:[
+                            {
+                                type:"material",
+                                color:{
+                                    r:0.5, g:1, b:0.5
+                                },
+                                alpha:1.0,
+                                nodes:[
+                                    {
+                                        type:"texture",
+                                        id:"theTexture",
+                                        layers:[
+                                            {
+                                                source:{
+                                                    type:"video",
+                                                    src:"../../../movies/testVideo.ogv"
+                                                },
+                                                applyTo:"alpha"
+                                            }
+                                        ],
+                                        nodes:[
+
+                                            // Box primitive implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                            {
+                                                type:"prims/box"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    // Inner blue sphere
+                    {
+                        type:"scale",
+                        x:0.3,
+                        y:0.3,
+                        z:0.3,
+                        nodes:[
+                            {
+                                type:"material",
+                                color:{
+                                    r:0.3, g:0.3, b:1
+                                },
+                                nodes:[
+
+                                    // Sphere geometry node implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                    {
+                                        type:"prims/sphere"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

@@ -183,7 +183,7 @@ var SceneJS_modelXFormStack = new (function () {
                     SceneJS_math_inverseMat4(matrix, SceneJS_math_mat4())));
             //}
 
-            core.dirty = false;
+           core.dirty = false;
         };
     };
 
@@ -208,6 +208,7 @@ var SceneJS_modelXFormStack = new (function () {
     this.pop = function () {
 
         this.top = (--stackLen > 0) ? transformStack[stackLen - 1] : defaultCore;
+
 
         dirty = true;
     };
