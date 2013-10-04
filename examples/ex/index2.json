@@ -618,21 +618,21 @@
                         "title":"Perspective projection",
                         "tip":"Defining a perspective camera",
                         "tags":[],
-                        "path":"transformation/projection/perspective.html",
+                        "path":"transformation/projection/cameraPerspective.html",
                         "id":"perspectiveProjection"
                     },
                     {
                         "title":"Orthographic projection",
                         "tip":"Defining an orthographic camera",
                         "tags":[],
-                        "path":"transformation/projection/ortho.html",
+                        "path":"transformation/projection/cameraOrtho.html",
                         "id":"orthoProjection"
                     },
                     {
                         "title":"Frustum projection",
                         "tip":"Defining a camera via frustum extents",
                         "tags":[],
-                        "path":"transformation/projection/frustum.html",
+                        "path":"transformation/projection/cameraFrustum.html",
                         "id":"frustumProjection"
                     }
                 ]
