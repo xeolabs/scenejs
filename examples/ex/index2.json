@@ -1134,6 +1134,13 @@
                         "id":"city"
                     },
                     {
+                        "title":"Earth in 26 lines of JSON",
+                        "path":"demos/earth.html",
+                        "editor":false,
+                        "tags":[],
+                        "id":"earth"
+                    },
+                    {
                         "title":"Ghost Trees",
                         "path":"demos/ghostTrees.html",
                         "editor":false,
