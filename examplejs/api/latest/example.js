@@ -234,7 +234,7 @@ var ExampleJS = function (cfg) {
     this._iframe.style.width = "100%";
     document.body.appendChild(this._iframe);
 
-    this._iframe.src = (cfg.exampleJSHome || "http://xeolabs.github.io/examplejs") + "/index.html";
+    this._iframe.src = (cfg.exampleJSHome || "http://scenejs.org/examplejs") + "/index.html";
 
     // True once connected
     this._connected = false;

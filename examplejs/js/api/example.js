@@ -16,7 +16,7 @@ var ExampleJS = function (cfg) {
     // Option to use our own instance of the "in-the-cloud" instance
     // This would be done if the client's container page is on HTTPS,
     // where ExampleJS is served over HTTPS from GitHub
-    this._iframe.src = (cfg.exampleJSHome || "http://xeolabs.github.io/examplejs") + "/index.html";
+    this._iframe.src = (cfg.exampleJSHome || "http://scenejs.org/examplejs") + "/index.html";
 
     // True once connected
     this._connected = false;
