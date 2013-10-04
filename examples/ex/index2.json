@@ -556,7 +556,7 @@
                 "nodes":[
                     {
                         "title":"Ambient light",
-                        "path":"lights/ambient/ambient.html",
+                        "path":"lights/ambient.html",
                         "id":"ambientLight"
                     }
                 ]
@@ -568,18 +568,18 @@
                 "nodes":[
                     {
                         "title":"Directional lights in View space",
-                        "path":"lights/directional/directionalView.html",
+                        "path":"lights/directionalView.html",
                         "tags":["specularLight", "diffuseLight"]
                     },
                     {
                         "title":"Directional lights in World space",
-                        "path":"lights/directional/directionalWorld.html",
+                        "path":"lights/directionalWorld.html",
                         "tags":["specularLight", "diffuseLight"],
                         "id":"directionalWorldLight"
                     },
                     {
                         "title":"Directional lights in World space with color map",
-                        "path":"lights/directional/directionalWorldWithColorMap.html",
+                        "path":"lights/directionalWorldWithColorMap.html",
                         "tags":["texture", "specularLight", "diffuseLight"]
                     }
                 ]
@@ -591,12 +591,12 @@
                 "nodes":[
                     {
                         "title":"Point lights in View space",
-                        "path":"lights/point/pointView.html",
+                        "path":"lights/pointView.html",
                         "tags":["specularLight", "diffuseLight"]
                     },
                     {
                         "title":"Point lights in World space",
-                        "path":"lights/point/pointWorld.html",
+                        "path":"lights/pointWorld.html",
                         "tags":["specularLight", "diffuseLight"],
                         "id":"pointWorldLight"
                     }
