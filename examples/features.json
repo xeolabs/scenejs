@@ -1,7 +1,36 @@
 [
     {
+        "title":"Scene graph",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":"Transform hierarchies",
+                        "page":"transformHierarchy"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"Multiple scenes",
+                        "page":"multipleScenes"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"Auto WebGLContextLost recovery",
+                        "page":"webglContextLost"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "title":"Physics",
-        "status": "alpha",
+        "status":"alpha",
         "nodes":[
             {
                 "nodes":[
@@ -22,7 +51,7 @@
         ]
     },
     {
-        "title":"Culling",
+        "title":"Optimization",
         "nodes":[
             {
                 "nodes":[
@@ -37,6 +66,30 @@
                     {
                         "title":"Level-of-Detail",
                         "page":"frustumDetailCulling"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"Instancing",
+                        "page":"sharedNodeCores"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"Vertex sharing",
+                        "page":"vertexSharing"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"Texture atlases",
+                        "page":"textureAtlas"
                     }
                 ]
             }
@@ -314,35 +367,6 @@
         ]
     },
     {
-        "title":"Scene graph",
-        "nodes":[
-            {
-                "nodes":[
-                    {
-                        "title":"Transform hierarchies",
-                        "page":"transformHierarchy"
-                    }
-                ]
-            },
-            {
-                "nodes":[
-                    {
-                        "title":"Multiple scenes",
-                        "page":"multipleScenes"
-                    }
-                ]
-            },
-            {
-                "nodes":[
-                    {
-                        "title":"Auto WebGLContextLost recovery",
-                        "page":"webglContextLost"
-                    }
-                ]
-            }
-        ]
-    },
-    {
         "title":"Custom nodes, eg:",
         "nodes":[
             {
@@ -370,35 +394,6 @@
                     {
                         "title":"Earth",
                         "page":"customNodesEarth"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"Optimization",
-        "nodes":[
-            {
-                "nodes":[
-                    {
-                        "title":"Instancing",
-                        "page":"sharedNodeCores"
-                    }
-                ]
-            },
-            {
-                "nodes":[
-                    {
-                        "title":"Vertex sharing",
-                        "page":"vertexSharing"
-                    }
-                ]
-            },
-            {
-                "nodes":[
-                    {
-                        "title":"Texture atlases",
-                        "page":"textureAtlas"
                     }
                 ]
             }
