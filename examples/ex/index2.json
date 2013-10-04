@@ -939,7 +939,7 @@
                 "nodes":[
                     {
                         "title":"Instancing geometry, texture and material nodes",
-                        "path":"scene/instancing/sharedNodeCores.html",
+                        "path":"instancing/sharedNodeCores.html",
                         "tags":[ "nodes", "geometry", "material", "texture"],
                         "id":"sharedNodeCores"
                     }
