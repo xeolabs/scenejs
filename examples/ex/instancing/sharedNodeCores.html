@@ -1,0 +1,167 @@
+---
+layout: example
+base_url: "../../../../"
+---
+
+<script src="{{ page.base_url }}api/latest/scenejs.js"></script>
+
+<script>
+
+    // Demonstrates scene node instancing.
+    //
+    // SceneJS uses an instancing technique called "node core sharing", taken from OpenSG, 
+    // in which multiple nodes of the same type can share the same state through a shared core object.
+    //
+    // This is supported for almost all scene node types, but for this demo we'll
+    // just instance geometry, material and texture nodes.
+    //
+    // Aside from the obvious reuse benefit, node cores can provide a significant performance
+    // boost because SceneJS is able to sort the draw list into runs that take state from the
+    // same node cores, thus reducing GPU state changes.
+    //
+    // Node cores are also great for pushing efficient state updates to multiple
+    // nodes at the same time, ie. through the shared core objects.
+    //
+    // More info here: https://github.com/xeolabs/scenejs/wiki/Node-Cores
+
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"{{ page.base_url }}api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Library of nodes whose cores we'll share
+            {
+                type:"library",
+                nodes:[
+
+                    // Red material
+                    {
+                        type:"material",
+                        color:{ r:0.6, g:0.6, b:0.9 },
+                        coreId:"myMaterial"
+                    },
+
+                    // Red material
+                    {
+                        type:"material",
+                        color:{ r:0.9, g:0.6, b:0.6 },
+                        coreId:"myOtherMaterial"
+                    },
+
+                    // Texture
+                    {
+                        type:"texture",
+                        layers:[
+                            {
+                                src:"{{ page.base_url }}assets/textures/BrickWall.jpg",
+                                scale:{
+                                    x:.2,
+                                    y:.2
+                                }
+                            }
+                        ],
+                        coreId:"myTexture"
+                    },
+
+                    // Box geometry
+                    {
+                        type:"geometry",
+                        primitive:"triangles",
+                        positions:[
+                            5, 5, 5, -5, 5, 5, -5, -5, 5, 5, -5, 5,
+                            5, 5, 5, 5, -5, 5, 5, -5, -5, 5, 5, -5,
+                            5, 5, 5, 5, 5, -5, -5, 5, -5, -5, 5, 5,
+                            -5, 5, 5, -5, 5, -5, -5, -5, -5, -5, -5, 5,
+                            -5, -5, -5, 5, -5, -5, 5, -5, 5, -5, -5, 5,
+                            5, -5, -5, -5, -5, -5, -5, 5, -5, 5, 5, -5
+                        ],
+                        normals:[
+                            0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+                            1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+                            0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+                            -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
+                            0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+                            0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1
+                        ],
+                        uv:[
+                            5, 5, 0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 5, 0, 5, 5,
+                            5, 0, 5, 5, 0, 5, 0, 0, 5, 5, 0, 5, 0, 0, 5, 0,
+                            0, 0, 5, 0, 5, 5, 0, 5, 0, 0, 5, 0, 5, 5, 0, 5
+                        ],
+                        indices:[
+                            0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15,
+                            16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23
+
+                        ],
+                        coreId:"myGeometry"
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Now instance those cores
+
+    scene.addNodes([
+
+        // Mouse-orbited camera, implemented by plugin at
+        // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+        {
+            type:"cameras/orbit",
+            yaw:30,
+            pitch:-30,
+            zoom:30,
+            zoomSensitivity:10.0,
+            nodes:[
+
+                // First object, uses the blue material, the texture, and the box geometry
+                {
+                    type:"translate",
+                    x:-6,
+                    nodes:[
+                        {
+                            type:"material",
+                            coreId:"myMaterial",
+                            nodes:[
+                                {
+                                    type:"texture",
+                                    coreId:"myTexture",
+                                    nodes:[
+                                        {
+                                            type:"geometry",
+                                            coreId:"myGeometry"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+
+                // Second object, uses the red material and the box geometry
+                {
+                    type:"translate",
+                    x:6,
+                    nodes:[
+                        {
+                            type:"material",
+                            coreId:"myOtherMaterial",
+                            nodes:[
+                                {
+                                    type:"geometry",
+                                    coreId:"myGeometry"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]);
+
+</script>

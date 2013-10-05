@@ -5,7 +5,7 @@ base_url: "./"
 permalink: "examples.html"
 ---
 
-<script src="https://raw.github.com/xeolabs/examplejs/master/api/v0/example.js"></script>
+<script src="examplejs/api/v0/example.js"></script>
 
 <style>
     html, body {
@@ -19,36 +19,39 @@ permalink: "examples.html"
 
 <script>
 
-    $(document).ready(function () {
+    jQuery(document).ready(
+            function ($) {
 
-        // Load our examples index
-        $.getJSON("{{ page.base_url }}examples/ex/index.json", function (index) {
+                // Load our examples index
+                $.getJSON("examples/ex/index2.json",
+                        function (index) {
 
-            // Create an examples browser
-            var examplejs = new ExampleJS({
+                            // Create an examples browser
+                            var examplejs = new ExampleJS({
 
                 title: "SceneJS {{ site.current_version }}",
 
-                logo:"http://xeolabs.github.io/scenejs/images/scenejs.png",
+                                logo:"http://scenejs.org/images/scenejs.png",
 
                 // Stick this under the logo:
                 caption: "Examples (V{{ site.current_version }})",
 
-                // Provide our JSON examples index
-                index: index,
+                                // Provide our JSON examples index
+                                index:index,
 
-                // Our directory of example pages
-                pageBase: "{{ page.base_url }}examples/ex/",
+                                // Our directory of example pages
+                                pageBase:"{{ page.base_url }}examples/ex/",
 
-                // Initially hide code
-                showCode: false
+                                // Initially hide code
+                                showCode:false
+                            });
+
+                            // Go to SceneJS.org when the home link (ie. logo) is clicked
+                            examplejs.once("home",
+                                    function () {
+                                        window.location = "{{ page.base_url }}"
+                                    });
+                        });
             });
-
-            // Go to SceneJS.org when the home link (ie. logo) is clicked
-            examplejs.once("home", function () {
-                window.location = "{{ page.base_url }}"
-            });
-        });
-    });
 
 </script>

@@ -5,12 +5,13 @@
 var SceneJS_ChunkFactory = function() {
 
     this._chunks = {};
+    this.chunkTypes = SceneJS_ChunkFactory.chunkTypes;
 };
 
 /**
  * Sub-classes of {@link SceneJS_Chunk} provided by this factory
  */
-SceneJS_ChunkFactory._chunkTypes = {};    // Supported chunk classes, installed by #createChunkType
+SceneJS_ChunkFactory.chunkTypes = {};    // Supported chunk classes, installed by #createChunkType
 
 /**
  * Free pool of unused {@link SceneJS_Chunk} instances
@@ -46,7 +47,7 @@ SceneJS_ChunkFactory.createChunkType = function(params) {
         params.draw = params.pick = params.drawAndPick;
     }
 
-    SceneJS_ChunkFactory._chunkTypes[params.type] = chunkClass;
+    SceneJS_ChunkFactory.chunkTypes[params.type] = chunkClass;
 
     SceneJS._apply(params, chunkClass.prototype);   // Augment subclass
 
@@ -63,7 +64,7 @@ SceneJS_ChunkFactory.createChunkType = function(params) {
  */
 SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core) {
 
-    var chunkClass = SceneJS_ChunkFactory._chunkTypes[type]; // Check type supported
+    var chunkClass = SceneJS_ChunkFactory.chunkTypes[type]; // Check type supported
 
     if (!chunkClass) {
         throw "chunk type not supported: '" + type + "'";

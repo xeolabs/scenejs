@@ -1,85 +1,124 @@
 [
     {
-        "title":"Transformation",
-        "tip":"Defining transforms",
-        "tags":[],
+        "title":"Scenes",
+        "tip":"",
+        "tags":["scene"],
         "nodes":[
             {
-                "title":"Viewing",
-                "tip":"Working with camera projection types",
-                "tags":["viewTransform"],
-                "nodes":[
-                    {
-                        "title":"Basic viewing transform",
-                        "tip":"Defining a basic viewing transform",
-                        "tags":[],
-                        "path":"viewing/lookat/lookat.html",
-                        "id":"viewTransform"
-                    }
-                ]
-            },
-            {
-                "title":"Projection",
-                "tip":"Working with camera projection types",
-                "tags":["projectionTransform"],
-                "nodes":[
-                    {
-                        "title":"Perspective camera",
-                        "tip":"Defining a perspective camera",
-                        "tags":[],
-                        "path":"viewing/camera/perspective.html",
-                        "id":"perspectiveProjection"
-                    },
-                    {
-                        "title":"Orthographic camera",
-                        "tip":"Defining an orthographic camera",
-                        "tags":[],
-                        "path":"viewing/camera/ortho.html",
-                        "id":"orthoProjection"
-                    },
-                    {
-                        "title":"Frustum camera",
-                        "tip":"Defining a camera via frustum extents",
-                        "tags":[],
-                        "path":"viewing/camera/frustum.html",
-                        "id":"frustumProjection"
-                    }
-                ]
-            },
-            {
-                "title":"Modelling",
+                "title":"Creating scenes",
                 "tip":"",
-                "tags":["modelTransform"],
+                "tags":[],
                 "nodes":[
                     {
-                        "title":"Rotate",
-                        "path":"transforms/rotate.html",
-                        "tags":[],
-                        "id":"rotateTransform"
+                        "title":"Using an external Canvas",
+                        "path":"scene/linkToCanvas.html",
+                        "tags":["canvas"]
                     },
                     {
-                        "title":"Translate",
-                        "path":"transforms/translate.html",
-                        "tags":[],
-                        "id":"translateTransform"
+                        "title":"Multiple scenes on same page",
+                        "path":"scene/multipleScenes.html",
+                        "tags":["multipleScenes"],
+                        "id":"multipleScenes"
                     },
                     {
-                        "title":"Scale",
-                        "path":"transforms/scale.html",
+                        "title":"Adding nodes",
+                        "path":"scene/addingNodes.html",
                         "tags":[],
-                        "id":"scaleTransform"
+                        "id":"addingNodes"
+                    }
+                ]
+            },
+            {
+                "title":"Instancing",
+                "tip":"",
+                "tags":["instancing"],
+                "nodes":[
+                    {
+                        "title":"Instancing geometry, texture and material",
+                        "path":"instancing/sharedNodeCores.html",
+                        "tags":["nodes", "geometry", "material", "texture"],
+                        "id":"sharedNodeCores"
+                    }
+                ]
+            },
+            {
+                "title":"Flags",
+                "tags":["flags"],
+                "tip":"Switching modes for sub-nodes using a parent flags node",
+                "nodes":[
+                    {
+                        "title":"Switch visibility",
+                        "tags":["culling"],
+                        "tip":"Using a flags node to switch visibility of child geometries",
+                        "path":"flags/enabled.html"
                     },
                     {
-                        "title":"Matrix",
-                        "path":"transforms/matrix.html",
-                        "tags":[],
-                        "id":"matrixTransform"
+                        "title":"Switch pickability",
+                        "tags":["picking"],
+                        "tip":"Using a flags node to switch ability to pick child geometries",
+                        "path":"flags/picking.html"
                     },
                     {
-                        "title":"Transform hierarchy",
-                        "path":"transforms/transformHierarchy.html",
+                        "title":"Switch transparency",
+                        "tags":["transparency"],
+                        "tip":"Using a flags node to switch transparency of child geometries",
+                        "path":"flags/transparent.html"
+                    },
+                    {
+                        "title":"Switch backfaces",
                         "tags":[],
-                        "id":"transformHierarchy"
+                        "tip":"Using a flags node to switch visibility of backfaces on child geometries",
+                        "path":"flags/backfaces.html"
+                    },
+                    {
+                        "title":"Switch front face winding order",
+                        "tags":[],
+                        "tip":"Using a flags node to set winding order of front faces on child geometries",
+                        "path":"flags/frontface.html"
+                    },
+                    {
+                        "title":"Switch backface lighting",
+                        "tags":["lighting"],
+                        "tip":"Using a flags node to switch lighting of faces on child geometries",
+                        "path":"flags/backfaceLighting.html"
+                    },
+                    {
+                        "title":"Switch backface texturing",
+                        "tags":["texture"],
+                        "tip":"Using a flags node to switch lighting of back faces of child geometries",
+                        "path":"flags/backfaceTexturing.html",
+                        "id":"flagsToggleBackfaces"
+                    },
+                    {
+                        "title":"Switch diffuse lighting",
+                        "tags":["diffuseLight"],
+                        "tip":"Using a flags node to switch diffuse lighting of child geometries",
+                        "path":"flags/diffuse.html"
+                    },
+                    {
+                        "title":"Switch specular lighting",
+                        "tags":["specularLight"],
+                        "tip":"Using a flags node to switch specular lighting of child geometries",
+                        "path":"flags/specular.html"
+                    },
+                    {
+                        "title":"Switch ambient lighting",
+                        "tags":["ambientLight"],
+                        "tip":"Switch ambient lighting of child geometries",
+                        "path":"flags/ambient.html"
+                    }
+                ]
+            },
+            {
+                "title":"Layers",
+                "tip":"",
+                "tags":["layers"],
+                "nodes":[
+                    {
+                        "title":"Transparency sorting",
+                        "path":"layers/alphaSort.html",
+                        "tags":["transparency"],
+                        "id":"transparencySorting"
                     }
                 ]
             }
@@ -91,55 +130,7 @@
         "tip":"The scene graph 'geometry' node is the principle node type in SceneJS",
         "nodes":[
             {
-                "title":"Primitives",
-                "tip":"Creating primitives using the bundled core geometry plugins",
-                "tags":["prims", "plugins"],
-                "nodes":[
-                    {
-                        "title":"Plane",
-                        "tip":"Creating a solid plane geometry using the plane primitive plugin",
-                        "path":"geometry/prims/plane.html",
-                        "tags":[],
-                        "id":"planePrim"
-                    },
-                    {
-                        "title":"Box",
-                        "path":"geometry/prims/box.html",
-                        "tip":"Creating a solid box geometry using the box primitive plugin",
-                        "tags":[],
-                        "id":"boxPrim"
-                    },
-                    {
-                        "title":"Sphere",
-                        "path":"geometry/prims/sphere.html",
-                        "tip":"Creating a solid sphere geometry using the sphere primitive plugin",
-                        "tags":[],
-                        "id":"spherePrim"
-                    },
-                    {
-                        "title":"Torus",
-                        "tip":"Creating a solid torus geometry using the torus primitive plugin",
-                        "path":"geometry/prims/torus.html",
-                        "tags":[],
-                        "id":"torusPrim"
-                    },
-                    {
-                        "title":"Teapot",
-                        "tip":"Creating a solid teapot geometry using the teapot primitive plugin",
-                        "path":"geometry/prims/teapot.html",
-                        "tags":[],
-                        "id":"teapotPrim"
-                    },
-                    {
-                        "title":"Wireframe torus",
-                        "tip":"Creating a wireframe torus geometry using the torus primitive plugin",
-                        "path":"geometry/prims/wireframeTorus.html",
-                        "tags":[]
-                    }
-                ]
-            },
-            {
-                "title":"Custom",
+                "title":"Defining",
                 "tip":"Defining custom Geometry",
                 "tags":[],
                 "nodes":[
@@ -176,21 +167,70 @@
                 ]
             },
             {
-                "title":"Plugins",
-                "tip":"Defining geometry plugins",
-                "tags":["plugins"],
+                "title":"Primitives",
+                "tip":"Creating primitives using the bundled node type plugins",
+                "tags":["prims"],
                 "nodes":[
                     {
-                        "title":"Custom geometry pull plugin",
-                        "path":"geometry/plugins/pluginPullStream.html",
-                        "tags":["plugins"],
-                        "id":"geometryPluginPullStream"
+                        "title":"Plane",
+                        "tip":"Creating a solid plane geometry using the plane primitive plugin",
+                        "path":"customNodes/prims/plane.html",
+                        "tags":[],
+                        "id":"planeNodePrim"
                     },
                     {
-                        "title":"Custom geometry push plugin",
-                        "path":"geometry/plugins/pluginPushStream.html",
-                        "tags":["plugins"],
-                        "id":"geometryPluginPushStream"
+                        "title":"Box",
+                        "path":"customNodes/prims/box.html",
+                        "tip":"Creating a solid box geometry using the box primitive plugin",
+                        "tags":[],
+                        "id":"boxNodePrim"
+                    },
+                    {
+                        "title":"Cylinder",
+                        "tip":"Creating a solid cylinder geometry using the cylinder primitive plugin",
+                        "path":"customNodes/prims/cylinder.html",
+                        "tags":[],
+                        "id":"cylinderNodePrim"
+                    },
+                    {
+                        "title":"Sphere",
+                        "path":"customNodes/prims/sphere.html",
+                        "tip":"Creating a solid sphere geometry using the sphere primitive plugin",
+                        "tags":[],
+                        "id":"sphereNodePrim"
+                    },
+                    {
+                        "title":"Torus",
+                        "tip":"Creating a solid torus geometry using the torus primitive plugin",
+                        "path":"customNodes/prims/torus.html",
+                        "tags":[],
+                        "id":"torusNodePrim"
+                    },
+                    {
+                        "title":"Teapot",
+                        "tip":"Creating a solid teapot geometry using the teapot primitive plugin",
+                        "path":"customNodes/prims/teapot.html",
+                        "tags":[],
+                        "id":"teapotNodePrim"
+                    },
+                    {
+                        "title":"Wireframe torus",
+                        "tip":"Creating a wireframe torus geometry using the torus primitive plugin",
+                        "path":"customNodes/prims/wireframeTorus.html",
+                        "id":"wireTorusNodePrim"
+                    }
+                ]
+            },
+            {
+                "title":"Text",
+                "tip":"Creating text using the vector text core plugin",
+                "tags":["text"],
+                "nodes":[
+                    {
+                        "title":"Vector text",
+                        "path":"geometry/vectorText.html",
+                        "tags":[],
+                        "id":"vectorText"
                     }
                 ]
             },
@@ -214,19 +254,6 @@
                 ]
             },
             {
-                "title":"Text",
-                "tip":"Creating text using the vector text core plugin",
-                "tags":["text"],
-                "nodes":[
-                    {
-                        "title":"Vector text",
-                        "path":"geometry/vectorText.html",
-                        "tags":[],
-                        "id":"vectorText"
-                    }
-                ]
-            },
-            {
                 "title":"Optimization",
                 "tip":"Supported geometry optimization techniques",
                 "tags":["optimization"],
@@ -236,6 +263,92 @@
                         "path":"geometry/vertexSharing.html",
                         "tags":[],
                         "id":"vertexSharing"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Transformation",
+        "tags":["transforms"],
+        "tip":"",
+        "nodes":[
+            {
+                "title":"Projection Transformation",
+                "tip":"",
+                "tags":["projectionTransform"],
+                "nodes":[
+                    {
+                        "title":"Perspective projection",
+                        "tip":"Defining a perspective camera",
+                        "tags":[],
+                        "path":"projectionTransforms/perspective.html",
+                        "id":"perspectiveProjection"
+                    },
+                    {
+                        "title":"Orthographic projection",
+                        "tip":"Defining an orthographic camera",
+                        "tags":[],
+                        "path":"projectionTransforms/ortho.html",
+                        "id":"orthoProjection"
+                    },
+                    {
+                        "title":"Frustum projection",
+                        "tip":"Defining a camera via frustum extents",
+                        "tags":[],
+                        "path":"projectionTransforms/frustum.html",
+                        "id":"frustumProjection"
+                    }
+                ]
+            },
+            {
+                "title":"Viewing Transformation",
+                "tip":"",
+                "tags":["viewTransform"],
+                "nodes":[
+                    {
+                        "title":"Basic viewing transform",
+                        "tip":"",
+                        "tags":[],
+                        "path":"viewingTransforms/lookat.html",
+                        "id":"viewTransform"
+                    }
+                ]
+            },
+            {
+                "title":"Modelling Transformation",
+                "tip":"",
+                "tags":["modelTransform"],
+                "nodes":[
+                    {
+                        "title":"Rotate",
+                        "path":"modellingTransforms/rotate.html",
+                        "tags":[],
+                        "id":"rotateTransform"
+                    },
+                    {
+                        "title":"Translate",
+                        "path":"modellingTransforms/translate.html",
+                        "tags":[],
+                        "id":"translateTransform"
+                    },
+                    {
+                        "title":"Scale",
+                        "path":"modellingTransforms/scale.html",
+                        "tags":[],
+                        "id":"scaleTransform"
+                    },
+                    {
+                        "title":"Matrix",
+                        "path":"modellingTransforms/matrix.html",
+                        "tags":[],
+                        "id":"matrixTransform"
+                    },
+                    {
+                        "title":"Transform hierarchy",
+                        "path":"modellingTransforms/transformHierarchy.html",
+                        "tags":[],
+                        "id":"transformHierarchy"
                     }
                 ]
             }
@@ -514,7 +627,7 @@
                     {
                         "title":"Texture atlas",
                         "tags":["textureAtlas"],
-                        "path":"texture/textureAtlas.html",
+                        "path":"texture/optimization/textureAtlas.html",
                         "id":"textureAtlas"
                     }
                 ]
@@ -522,7 +635,7 @@
         ]
     },
     {
-        "title":"Custom Shaders",
+        "title":"Shaders",
         "tip":"",
         "tags":[],
         "nodes":[
@@ -631,151 +744,6 @@
         ]
     },
     {
-        "title":"Rendering Control",
-        "tags":[],
-        "tip":"The scene graph 'flags' node is used to configure appearance and functionality for scene sub-graphs. It's commonly used to toggle things like visibility and other aspects of appearance, without having to update     the individual nodes within the sub-graphs.",
-        "nodes":[
-            {
-                "title":"Flags",
-                "tags":["flags"],
-                "tip":"Toggling modes for sub-nodes using a parent flags node",
-                "nodes":[
-                    {
-                        "title":"Toggle visibility",
-                        "tags":["culling"],
-                        "tip":"Using a flags node to toggle visibility of child geometries",
-                        "path":"flags/enabled.html"
-                    },
-                    {
-                        "title":"Toggle pickability",
-                        "tags":["picking"],
-                        "tip":"Using a flags node to toggle ability to pick child geometries",
-                        "path":"flags/picking.html"
-                    },
-                    {
-                        "title":"Toggle transparency",
-                        "tags":["transparency"],
-                        "tip":"Using a flags node to toggle transparency of child geometries",
-                        "path":"flags/transparent.html"
-                    },
-                    {
-                        "title":"Toggle backfaces",
-                        "tags":[],
-                        "tip":"Using a flags node to toggle visibility of backfaces on child geometries",
-                        "path":"flags/backfaces.html"
-                    },
-                    {
-                        "title":"Toggle front face winding order",
-                        "tags":[],
-                        "tip":"Using a flags node to set winding order of front faces on child geometries",
-                        "path":"flags/frontface.html"
-                    },
-                    {
-                        "title":"Toggle backface lighting",
-                        "tags":["lighting"],
-                        "tip":"Using a flags node to toggle lighting of faces on child geometries",
-                        "path":"flags/backfaceLighting.html"
-                    },
-                    {
-                        "title":"Toggle backface texturing",
-                        "tags":["texture"],
-                        "tip":"Using a flags node to toggle lighting of back faces of child geometries",
-                        "path":"flags/backfaceTexturing.html",
-                        "id":"flagsToggleBackfaces"
-                    },
-                    {
-                        "title":"Toggle diffuse lighting",
-                        "tags":["diffuseLight"],
-                        "tip":"Using a flags node to toggle diffuse lighting of child geometries",
-                        "path":"flags/diffuse.html"
-                    },
-                    {
-                        "title":"Toggle specular lighting",
-                        "tags":["specularLight"],
-                        "tip":"Using a flags node to toggle specular lighting of child geometries",
-                        "path":"flags/specular.html"
-                    },
-                    {
-                        "title":"Toggle ambient lighting",
-                        "tags":["ambientLight"],
-                        "tip":"Toggle ambient lighting of child geometries",
-                        "path":"flags/ambient.html"
-                    }
-                ]
-            },
-            {
-                "title":"Layers",
-                "tip":"",
-                "tags":["layers"],
-                "nodes":[
-                    {
-                        "title":"Transparency sorting",
-                        "path":"layers/alphaSort.html",
-                        "tags":["transparency"],
-                        "id":"transparencySorting"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"Scenes",
-        "tip":"",
-        "tags":["scene"],
-        "nodes":[
-            {
-                "title":"Page Integration",
-                "tip":"",
-                "tags":[],
-                "nodes":[
-                    {
-                        "title":"Using an external Canvas",
-                        "path":"scene/integration/externalCanvas.html",
-                        "tags":["canvas"]
-                    },
-                    {
-                        "title":"Multiple scenes on same page",
-                        "path":"scene/multipleScenes/multipleScenes.html",
-                        "tags":["multipleScenes"],
-                        "id":"multipleScenes"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"Nodes",
-        "tip":"",
-        "tags":["nodes"],
-        "nodes":[
-            {
-                "title":"Connectivity",
-                "tip":"",
-                "tags":[],
-                "nodes":[
-                    {
-                        "title":"Create nodes",
-                        "path":"scene/nodes/createNodes.html",
-                        "tags":[]
-                    }
-                ]
-            },
-            {
-                "title":"Core Sharing",
-                "tip":"",
-                "tags":["instancing"],
-                "nodes":[
-                    {
-                        "title":"Instancing geometry, texture and material",
-                        "path":"scene/instancing/sharedNodeCores.html",
-                        "tags":["nodes", "geometry", "material", "texture"],
-                        "id":"sharedNodeCores"
-                    }
-                ]
-            }
-        ]
-    },
-    {
         "title":"Custom Node Types",
         "tip":"",
         "tags":["nodes", "plugins", "customNodes"],
@@ -878,61 +846,7 @@
                     }
                 ]
             },
-            {
-                "title":"Primitives",
-                "tip":"Creating primitives using the bundled node type plugins",
-                "tags":["prims"],
-                "nodes":[
-                    {
-                        "title":"Plane",
-                        "tip":"Creating a solid plane geometry using the plane primitive plugin",
-                        "path":"customNodes/prims/plane.html",
-                        "tags":[],
-                        "id":"planeNodePrim"
-                    },
-                    {
-                        "title":"Box",
-                        "path":"customNodes/prims/box.html",
-                        "tip":"Creating a solid box geometry using the box primitive plugin",
-                        "tags":[],
-                        "id":"boxNodePrim"
-                    },
-                    {
-                        "title":"Cylinder",
-                        "tip":"Creating a solid cylinder geometry using the cylinder primitive plugin",
-                        "path":"customNodes/prims/cylinder.html",
-                        "tags":[],
-                        "id":"cylinderNodePrim"
-                    },
-                    {
-                        "title":"Sphere",
-                        "path":"customNodes/prims/sphere.html",
-                        "tip":"Creating a solid sphere geometry using the sphere primitive plugin",
-                        "tags":[],
-                        "id":"sphereNodePrim"
-                    },
-                    {
-                        "title":"Torus",
-                        "tip":"Creating a solid torus geometry using the torus primitive plugin",
-                        "path":"customNodes/prims/torus.html",
-                        "tags":[],
-                        "id":"torusNodePrim"
-                    },
-                    {
-                        "title":"Teapot",
-                        "tip":"Creating a solid teapot geometry using the teapot primitive plugin",
-                        "path":"customNodes/prims/teapot.html",
-                        "tags":[],
-                        "id":"teapotNodePrim"
-                    },
-                    {
-                        "title":"Wireframe torus",
-                        "tip":"Creating a wireframe torus geometry using the torus primitive plugin",
-                        "path":"customNodes/prims/wireframeTorus.html",
-                        "id":"wireTorusNodePrim"
-                    }
-                ]
-            },
+
             {
                 "title":"Heightmaps",
                 "tip":"",
@@ -1079,17 +993,17 @@
                 "tags":[],
                 "nodes":[
                     {
-                        "title":"Toggle visibility using the 'enable' node",
+                        "title":"Switch visibility using the 'enable' node",
                         "path":"culling/enableNode.html",
                         "id":"cullingWithEnableNode"
                     },
                     {
-                        "title":"Toggle visibility using the 'flags' node",
+                        "title":"Switch visibility using the 'flags' node",
                         "path":"flags/enabled.html",
                         "id":"cullingWithFlagsNode"
                     },
                     {
-                        "title":"Toggle visibility using regular expression matching",
+                        "title":"Switch visibility using regular expression matching",
                         "path":"culling/tagNode.html",
                         "id":"regexShowHide"
                     }
@@ -1109,7 +1023,7 @@
                     {
                         "title":"Level-of-Detail",
                         "tags":["LOD"],
-                        "path":"culling/frustum/detailCulling.html",
+                        "path":"culling/detailCulling.html",
                         "id":"frustumDetailCulling"
                     }
                 ]
@@ -1122,7 +1036,7 @@
                     {
                         "title":"Switch LOD for distance",
                         "tags":["LOD", "frustumCulling"],
-                        "path":"culling/frustum/detailCulling.html",
+                        "path":"culling/detailCulling.html",
                         "id":"proximityCullingLOD"
                     }
                 ]
@@ -1167,7 +1081,7 @@
                 "nodes":[
                     {
                         "title":"Configure path to plugins",
-                        "path":"configuration/paths/pluginPath.html",
+                        "path":"configuration/pluginPath.html",
                         "tags":["plugins"],
                         "id":"pluginPathConfig"
                     }
@@ -1180,7 +1094,7 @@
                 "nodes":[
                     {
                         "title":"Disable default status popups",
-                        "path":"configuration/statusPopups/statusPopups.html",
+                        "path":"configuration/statusPopups.html",
                         "tags":[],
                         "id":"statusPopupsConfig"
                     }

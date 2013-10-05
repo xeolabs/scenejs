@@ -3,7 +3,7 @@
  * WebGL Scene Graph Library for JavaScript
  * http://scenejs.org/
  *
- * Built on 2013-10-01
+ * Built on 2013-10-05
  *
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * Copyright 2013, Lindsay Kay
@@ -11282,6 +11282,22 @@ new (function () {
         return this._core.enabled;
     };
 
+    SceneJS.Layer.prototype.getEnabled = function() {
+        return this._core.enabled;
+    };
+
+    SceneJS.Layer.prototype.setClearDepth = function(clearDepth) {
+        clearDepth = clearDepth || 0;
+        if (this._core.clearDepth != clearDepth) {
+            this._core.clearDepth = clearDepth;
+            this._engine.display.drawListDirty = true;
+        }
+    };
+
+    SceneJS.Layer.prototype.getClearDepth = function() {
+        return this._core.clearDepth;
+    };
+
     SceneJS.Layer.prototype._compile = function() {
         this._engine.display.layer = coreStack[stackLen++] = this._core;
         this._compileNodes();
@@ -15244,7 +15260,7 @@ var SceneJS_modelXFormStack = new (function () {
                     SceneJS.math.inverseMat4(matrix, SceneJS.math.mat4())));
             //}
 
-            core.dirty = false;
+           core.dirty = false;
         };
     };
 
@@ -15269,6 +15285,7 @@ var SceneJS_modelXFormStack = new (function () {
     this.pop = function () {
 
         this.top = (--stackLen > 0) ? transformStack[stackLen - 1] : defaultCore;
+
 
         dirty = true;
     };
@@ -15439,6 +15456,24 @@ var SceneJS_Display = function (cfg) {
     this.renderer = null;
 
     /**
+     * Node state core for the last {@link SceneJS.DepthBuf} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.depthbuf = null;
+
+    /**
+     * Node state core for the last {@link SceneJS.ColorBuf} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.colorbuf = null;
+
+    /**
+     * Node state core for the last {@link SceneJS.View} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.view = null;
+
+    /**
      * Node state core for the last {@link SceneJS.Lights} visited during scene graph compilation traversal
      * @type Object
      */
@@ -15521,6 +15556,12 @@ var SceneJS_Display = function (cfg) {
      * @type Object
      */
     this.shaderParams = null;
+
+    /**
+     * Node state core for the last {@link SceneJS.Style} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.style = null;
 
     /**
      * Node state core for the last {@link SceneJS.Geometry} visited during scene graph compilation traversal
@@ -15710,28 +15751,34 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 4, "flags", this.flags);
     this._setChunk(object, 5, "shader", this.shader);
     this._setChunk(object, 6, "shaderParams", this.shaderParams);
-    //  this._setChunk(object, 7, this.renderer, true);
-    this._setChunk(object, 7, "name", this.name);
-    this._setChunk(object, 8, "lights", this.lights);
-    this._setChunk(object, 9, "material", this.material);
-    this._setChunk(object, 10, "texture", this.texture);
-    this._setChunk(object, 11, "framebuf", this.framebuf);
-    this._setChunk(object, 12, "clips", this.clips);
-    this._setChunk(object, 13, "morphGeometry", this.morphGeometry);
-    this._setChunk(object, 14, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 15, "geometry", this.geometry); // Must be last
+    this._setChunk(object, 7, "style", this.style);
+    this._setChunk(object, 8, "depthbuf", this.depthbuf);
+    this._setChunk(object, 9, "colorbuf", this.colorbuf);
+    this._setChunk(object, 10, "view", this.view);
+    this._setChunk(object, 11, "name", this.name);
+    this._setChunk(object, 12, "lights", this.lights);
+    this._setChunk(object, 13, "material", this.material);
+    this._setChunk(object, 14, "texture", this.texture);
+    this._setChunk(object, 15, "framebuf", this.framebuf);
+    this._setChunk(object, 16, "clips", this.clips);
+    this._setChunk(object, 17, "morphGeometry", this.morphGeometry);
+    this._setChunk(object, 18, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 19, "geometry", this.geometry); // Must be last
 };
 
 SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, unique) {
 
     var chunkId;
+    var chunkClass = this._chunkFactory.chunkTypes[chunkType];
 
-    if (unique) {
+    if (chunkClass.unique) {
 
+        // Suppress run culling for this core type
         chunkId = core.stateId + 1;
 
     } else if (core) {
 
+        // Core supplied
         if (core.empty) { // Only set default cores for state types that have them
 
             var oldChunk = object.chunks[order];
@@ -15745,10 +15792,14 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
             return;
         }
 
-        chunkId = ((object.program.id + 1) * 50000) + core.stateId + 1;
+        chunkId = chunkClass.programGlobal
+            ? core.stateId + 1
+            : ((object.program.id + 1) * 50000) + core.stateId + 1;
 
     } else {
 
+        // No core supplied, probably a program.
+        // Only one chunk of this type per program.
         chunkId = ((object.program.id + 1) * 50000);
     }
 
@@ -15999,12 +16050,13 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
             if (chunk) {
 
-                /*
-                 * As we apply the state chunk lists we track the ID of most types of chunk in order
-                 * to cull redundant re-applications of runs of the same chunk - except for those chunks with a
-                 * 'unique' flag. We don't want to cull runs of geometry chunks because they contain the GL
-                 * drawElements calls which render the objects.
-                 */
+                // As we apply the state chunk lists we track the ID of most types of chunk in order
+                // to cull redundant re-applications of runs of the same chunk - except for those chunks with a
+                // 'unique' flag. We don't want to cull runs of geometry chunks because they contain the GL
+                // drawElements calls which render the objects.
+
+                // Chunk IDs are only considered unique within the same program. Therefore, whenever we do a
+                // program switch, we'll be applying all the different types of chunk again.
 
                 if (!transparent && chunk.draw) {
                     if (chunk.unique || this._lastStateId[j] != chunk.id) {
@@ -16027,7 +16079,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
     if (this._xpBufLen > 0) {
 
-        for (var i = 0; i < 20; i++) {
+        for (var i = 0; i < 20; i++) {  // TODO: magic number!
             this._lastStateId[i] = null;
         }
 
@@ -16176,12 +16228,23 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     var frameCtx = this._frameCtx;                                                // Reset rendering context
 
+    var gl = this._canvas.gl;
+
     frameCtx.program = null;
     frameCtx.framebuf = null;
     frameCtx.viewMat = null;
     frameCtx.modelMat = null;
     frameCtx.cameraMat = null;
     frameCtx.renderer = null;
+
+    frameCtx.depthbufEnabled = null;
+    frameCtx.clearDepth = null;
+    frameCtx.depthFunc = gl.LESS;
+
+    frameCtx.scissorTestEnabled = false;
+
+    frameCtx.blendEnabled = false;
+
     frameCtx.vertexBuf = false;
     frameCtx.normalBuf = false;
     frameCtx.uvBuf = false;
@@ -16191,12 +16254,13 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     frameCtx.frontface = "ccw";
     frameCtx.pick = !!pick;
 
-    var gl = this._canvas.gl;
+    frameCtx.lineWidth = 1;
+
+    frameCtx.transparencyPass = false;
 
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
     gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
-    gl.lineWidth(2);
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);
 
@@ -16217,14 +16281,25 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
         if (this._transparentDrawListLen > 0) {
 
-            gl.enable(gl.BLEND);                                            // Enable blending
+            // Disables some types of state changes during
+            // transparency pass, such as blending disable
+            frameCtx.transparencyPass = true;
+
+            //  Enable blending
+            gl.enable(gl.BLEND);
+            frameCtx.blendEnabled = true;
+
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
             for (var i = 0, len = this._transparentDrawListLen; i < len; i++) { // Push transparent rendering chunks
                 this._transparentDrawList[i].draw(frameCtx);
             }
 
-            gl.disable(gl.BLEND);                                           //  Disable blending
+            //  Disable blending
+            gl.disable(gl.BLEND);
+            frameCtx.blendEnabled = false;
+
+            frameCtx.transparencyPass = false;
         }
     }
 
@@ -17679,12 +17754,13 @@ SceneJS_Chunk.prototype.init = function(id, program, core) {
 var SceneJS_ChunkFactory = function() {
 
     this._chunks = {};
+    this.chunkTypes = SceneJS_ChunkFactory.chunkTypes;
 };
 
 /**
  * Sub-classes of {@link SceneJS_Chunk} provided by this factory
  */
-SceneJS_ChunkFactory._chunkTypes = {};    // Supported chunk classes, installed by #createChunkType
+SceneJS_ChunkFactory.chunkTypes = {};    // Supported chunk classes, installed by #createChunkType
 
 /**
  * Free pool of unused {@link SceneJS_Chunk} instances
@@ -17720,7 +17796,7 @@ SceneJS_ChunkFactory.createChunkType = function(params) {
         params.draw = params.pick = params.drawAndPick;
     }
 
-    SceneJS_ChunkFactory._chunkTypes[params.type] = chunkClass;
+    SceneJS_ChunkFactory.chunkTypes[params.type] = chunkClass;
 
     SceneJS._apply(params, chunkClass.prototype);   // Augment subclass
 
@@ -17737,7 +17813,7 @@ SceneJS_ChunkFactory.createChunkType = function(params) {
  */
 SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core) {
 
-    var chunkClass = SceneJS_ChunkFactory._chunkTypes[type]; // Check type supported
+    var chunkClass = SceneJS_ChunkFactory.chunkTypes[type]; // Check type supported
 
     if (!chunkClass) {
         throw "chunk type not supported: '" + type + "'";
@@ -18031,6 +18107,9 @@ SceneJS_ChunkFactory.createChunkType({
 
     type: "framebuf",
 
+    // Avoid reapplication of a chunk after a program switch.
+    programGlobal:true,
+
     build: function() {
     },
 
@@ -18241,6 +18320,9 @@ SceneJS_ChunkFactory.createChunkType({
 SceneJS_ChunkFactory.createChunkType({
 
     type: "listeners",
+
+    // Avoid reapplication of a chunk after a program switch.
+    programGlobal:true,
 
     build : function() {
     },

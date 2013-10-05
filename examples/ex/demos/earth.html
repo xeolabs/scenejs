@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS V3 Texture Layers</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../../../api/latest/scenejs.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30, pitch:-30, zoom:10, zoomSensitivity:1.0,
+
+                nodes:[
+
+                    // Custom lighting to simulate the Sun
+                    {
+                        type:"lights",
+                        lights:[
+                            {
+                                mode:"dir",
+                                color:{ r:1.0, g:1.0, b:1.0 },
+                                diffuse:true, specular:true,
+                                dir:{ x:-0.5, y:-0.5, z:-0.75 }
+                            }
+                        ],
+
+                        nodes:[
+
+                            // Earth, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/objects/space/planets/earth.js
+                            {
+                                type:"objects/space/planets/earth"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

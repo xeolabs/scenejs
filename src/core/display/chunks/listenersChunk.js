@@ -5,6 +5,9 @@ SceneJS_ChunkFactory.createChunkType({
 
     type: "listeners",
 
+    // Avoid reapplication of a chunk after a program switch.
+    programGlobal:true,
+
     build : function() {
     },
 
