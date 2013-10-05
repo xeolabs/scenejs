@@ -11309,6 +11309,286 @@ new (function() {
         //this._engine.display.renderer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 })();
+(function () {
+
+    var lookup = {
+        less:"LESS",
+        equal:"EQUAL",
+        lequal:"LEQUAL",
+        greater:"GREATER",
+        notequal:"NOTEQUAL",
+        gequal:"GEQUAL"
+    };
+
+    // The default state core singleton for {@link SceneJS.DepthBuf} nodes
+    var defaultCore = {
+        type:"depthbuf",
+        stateId:SceneJS._baseStateId++,
+        enabled:true,
+        clearDepth:1,
+        depthFunc:null, // Lazy init depthFunc when we can get a context
+        _depthFuncName:"less"
+    };
+
+    var coreStack = [];
+    var stackLen = 0;
+
+    SceneJS_events.addListener(
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            if (defaultCore.depthFunc === null) { // Lazy-init depthFunc now we can get a context
+                defaultCore.depthFunc = params.engine.canvas.gl.LESS;
+            }
+            params.engine.display.depthbuf = defaultCore;
+            stackLen = 0;
+        });
+
+    /**
+     * @class Scene graph node which configures the depth buffer for its subgraph
+     * @extends SceneJS.Node
+     */
+    SceneJS.DepthBuf = SceneJS_NodeFactory.createNodeType("depthbuf");
+
+    SceneJS.DepthBuf.prototype._init = function (params) {
+
+        if (params.enabled != undefined) {
+            this.setEnabled(params.enabled);
+        } else if (this._core.useCount == 1) { // This node defines the core
+            this.setEnabled(true);
+        }
+
+        if (params.clearDepth != undefined) {
+            this.setClearDepth(params.clearDepth);
+        } else if (this._core.useCount == 1) {
+            this.setClearDepth(1);
+        }
+
+        if (params.depthFunc != undefined) {
+            this.setDepthFunc(params.depthFunc);
+        } else if (this._core.useCount == 1) {
+            this.setDepthFunc("less");
+        }
+    };
+
+    /**
+     * Enable or disable the depth buffer
+     *
+     * @param enabled Specifies whether depth buffer is enabled or not
+     * @return {*}
+     */
+    SceneJS.DepthBuf.prototype.setEnabled = function (enabled) {
+        if (this._core.enabled != enabled) {
+            this._core.enabled = enabled;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Get whether or not the depth buffer is enabled
+     *
+     * @return Boolean
+     */
+    SceneJS.DepthBuf.prototype.getEnabled = function () {
+        return this._core.enabled;
+    };
+
+    /**
+     * Specify the clear value for the depth buffer.
+     * Initial value is 1, and the given value will be clamped to [0..1].
+     * @param clearDepth
+     * @return {*}
+     */
+    SceneJS.DepthBuf.prototype.setClearDepth = function (clearDepth) {
+        if (this._core.clearDepth != clearDepth) {
+            this._core.clearDepth = clearDepth;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Get the clear value for the depth buffer
+     *
+     * @return Number
+     */
+    SceneJS.DepthBuf.prototype.getClearDepth = function () {
+        return this._core.clearDepth;
+    };
+
+    /**
+     * Sets the depth comparison function.
+     * Supported values are 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'
+     * @param {String} depthFunc The depth comparison function
+     * @return {*}
+     */
+    SceneJS.DepthBuf.prototype.setDepthFunc = function (depthFunc) {
+        if (this._core._depthFuncName != depthFunc) {
+            var enumName = lookup[depthFunc];
+            if (enumName == undefined) {
+                throw "unsupported value for 'clearFunc' attribute on depthbuf node: '" + depthFunc
+                    + "' - supported values are 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
+            }
+            this._core.depthFunc = this._engine.canvas.gl[enumName];
+            this._core._depthFuncName = depthFunc;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Returns the depth comparison function
+     * @return {*}
+     */
+    SceneJS.DepthBuf.prototype.getDepthFunc = function () {
+        return this._core._depthFuncName;
+    };
+
+    SceneJS.DepthBuf.prototype._compile = function () {
+        this._engine.display.depthbuf = coreStack[stackLen++] = this._core;
+        this._compileNodes();
+        this._engine.display.depthbuf = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+    };
+
+})();
+(function () {
+
+    // The default state core singleton for {@link SceneJS.ColorBuf} nodes
+    var defaultCore = {
+        type:"colorbuf",
+        stateId:SceneJS._baseStateId++,
+        blendEnabled:false
+    };
+
+    var coreStack = [];
+    var stackLen = 0;
+
+    SceneJS_events.addListener(
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.colorbuf = defaultCore;
+            stackLen = 0;
+        });
+
+    /**
+     * @class Scene graph node which configures the color buffer for its subgraph
+     * @extends SceneJS.Node
+     */
+    SceneJS.ColorBuf = SceneJS_NodeFactory.createNodeType("colorbuf");
+
+    SceneJS.ColorBuf.prototype._init = function (params) {
+
+        if (params.blendEnabled != undefined) {
+            this.setBlendEnabled(params.blendEnabled);
+        } else if (this._core.useCount == 1) { // This node defines the core
+            this.setBlendEnabled(false);
+        }
+    };
+
+    /**
+     * Enable or disable blending
+     *
+     * @param blendEnabled Specifies whether depth buffer is blendEnabled or not
+     * @return {*}
+     */
+    SceneJS.ColorBuf.prototype.setBlendEnabled = function (blendEnabled) {
+        if (this._core.blendEnabled != blendEnabled) {
+            this._core.blendEnabled = blendEnabled;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Get whether or not blending is enabled
+     *
+     * @return Boolean
+     */
+    SceneJS.ColorBuf.prototype.getBlendEnabled = function () {
+        return this._core.blendEnabled;
+    };
+
+    SceneJS.ColorBuf.prototype._compile = function () {
+        this._engine.display.colorbuf = coreStack[stackLen++] = this._core;
+        this._compileNodes();
+        this._engine.display.colorbuf = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+    };
+
+})();
+(function () {
+
+    // The default state core singleton for {@link SceneJS.View} nodes
+    var defaultCore = {
+        type:"view",
+        stateId:SceneJS._baseStateId++,
+        scissorTestEnabled:false
+    };
+
+    var coreStack = [];
+    var stackLen = 0;
+
+    SceneJS_events.addListener(
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.view = defaultCore;
+            stackLen = 0;
+        });
+
+    /**
+     * @class Scene graph node which configures view parameters such as depth range, scissor test and viewport
+     * @extends SceneJS.Node
+     * void depthRange(floatzNear, floatzFar)
+     zNear: Clamped to the range 0 to 1 Must be <= zFar
+     zFar: Clamped to the range 0 to 1.
+     void scissor(int x, int y, long width, long height)
+     void viewport(int x, int y, long width, long height)
+     */
+    SceneJS.View = SceneJS_NodeFactory.createNodeType("view");
+
+    SceneJS.View.prototype._init = function (params) {
+
+        if (params.scissorTestEnabled != undefined) {
+            this.setScissorTestEnabled(params.scissorTestEnabled);
+        } else if (this._core.useCount == 1) { // This node defines the core
+            this.setScissorTestEnabled(false);
+        }
+    };
+
+    /**
+     * Enable or disables scissor test.
+     *
+     * When enabled, the scissor test will discards fragments that are outside the scissor box.
+     *
+     * Scissor test is initially disabled.
+     *
+     * @param scissorTestEnabled Specifies whether scissor test is enabled or not
+     * @return {*}
+     */
+    SceneJS.View.prototype.setScissorTestEnabled = function (scissorTestEnabled) {
+        if (this._core.scissorTestEnabled != scissorTestEnabled) {
+            this._core.scissorTestEnabled = scissorTestEnabled;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Get whether or not scissor test is enabled.
+     * Initial value will be false.
+     *
+     * @return Boolean
+     */
+    SceneJS.View.prototype.getScissorTestEnabled = function () {
+        return this._core.scissorTestEnabled;
+    };
+
+    SceneJS.View.prototype._compile = function () {
+        this._engine.display.view = coreStack[stackLen++] = this._core;
+        this._compileNodes();
+        this._engine.display.view = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+    };
+
+})();
 /**
  * @class The root node of a scenegraph
  * @extends SceneJS.Node
@@ -11837,6 +12117,70 @@ new (function() {
 
         stackLen--;
         dirty = true;
+    };
+
+})();
+(function () {
+
+    // The default state core singleton for {@link SceneJS.Line} nodes
+    var defaultCore = {
+        type:"style",
+        stateId:SceneJS._baseStateId++,
+        lineWidth:1.0
+    };
+
+    var coreStack = [];
+    var stackLen = 0;
+
+    SceneJS_events.addListener(
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.style = defaultCore;
+            stackLen = 0;
+        });
+
+    /**
+     * @class Scene graph node which configures style parameters such as line width for subnodes
+     * @extends SceneJS.Node
+     */
+    SceneJS.Style = SceneJS_NodeFactory.createNodeType("style");
+
+    SceneJS.Style.prototype._init = function (params) {
+        if (params.lineWidth != undefined) {
+            this.setLineWidth(params.lineWidth);
+        }
+    };
+
+    /**
+     * Sets the line width
+     *
+     * Line width is initially 1.
+     *
+     * @param lineWidth The line width
+     * @return {*}
+     */
+    SceneJS.Style.prototype.setLineWidth = function (lineWidth) {
+        if (this._core.lineWidth != lineWidth) {
+            this._core.lineWidth = lineWidth;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Gets the line width
+     * Initial value will be 1.
+     *
+     * @return Boolean
+     */
+    SceneJS.Style.prototype.getLineWidth = function () {
+        return this._core.lineWidth;
+    };
+
+    SceneJS.Style.prototype._compile = function () {
+        this._engine.display.style = coreStack[stackLen++] = this._core;
+        this._compileNodes();
+        this._engine.display.style = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
 })();
@@ -16677,6 +17021,107 @@ SceneJS_ChunkFactory.createChunkType({
  */
 SceneJS_ChunkFactory.createChunkType({
 
+    type:"depthbuf",
+
+    // Avoid reapplication of a chunk after a program switch.
+    programGlobal:true,
+
+    drawAndPick:function (ctx) {
+
+        var enabled = this.core.enabled;
+
+        if (ctx.depthbufEnabled != enabled) {
+            var gl = this.program.gl;
+            if (enabled) {
+                gl.enable(gl.DEPTH_TEST);
+            } else {
+                gl.disable(gl.DEPTH_TEST);
+            }
+            ctx.depthbufEnabled = enabled;
+        }
+
+        var clearDepth = this.core.clearDepth;
+
+        if (ctx.clearDepth != clearDepth) {
+            gl.clearDepth(clearDepth);
+            ctx.clearDepth = clearDepth;
+        }
+
+        var depthFunc = this.core.depthFunc;
+
+        if (ctx.depthFunc != depthFunc) {
+            gl.depthFunc(depthFunc);
+            ctx.depthFunc = depthFunc;
+        }
+    }
+});
+
+/**
+ *
+ */
+SceneJS_ChunkFactory.createChunkType({
+
+    type:"colorbuf",
+
+    // Avoid reapplication of a chunk after a program switch.
+    programGlobal:true,
+
+    build:function () {
+    },
+
+    drawAndPick:function (ctx) {
+
+        if (!ctx.transparencyPass) { // Blending forced when rendering transparent bin
+
+            var blendEnabled = this.core.blendEnabled;
+
+            if (ctx.blendEnabled != blendEnabled) {
+                var gl = this.program.gl;
+                if (blendEnabled) {
+                    gl.enable(gl.BLEND);
+                } else {
+                    gl.disable(gl.BLEND);
+                }
+                ctx.blendEnabled = blendEnabled;
+            }
+        }
+    }
+});
+
+/**
+ *
+ */
+SceneJS_ChunkFactory.createChunkType({
+
+    type:"view",
+
+    // Avoid reapplication of a chunk after a program switch.
+    programGlobal:true,
+
+    build:function () {
+    },
+
+    drawAndPick:function (ctx) {
+
+        var scissorTestEnabled = this.core.scissorTestEnabled;
+
+        if (ctx.scissorTestEnabled != scissorTestEnabled) {
+            var gl = this.program.gl;
+            if (scissorTestEnabled) {
+                gl.enable(gl.SCISSOR_TEST);
+            } else {
+                gl.disable(gl.SCISSOR_TEST);
+            }
+            ctx.scissorTestEnabled = scissorTestEnabled;
+        }
+    }
+});
+
+/**
+ *
+ */
+SceneJS_ChunkFactory.createChunkType({
+
     type: "shader",
 
     build : function() {
@@ -16734,6 +17179,28 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });
+/**
+ *
+ */
+SceneJS_ChunkFactory.createChunkType({
+
+    type:"style",
+
+    // Avoid reapplication of a chunk after a program switch.
+    programGlobal:true,
+
+    drawAndPick:function (ctx) {
+
+        var lineWidth = this.core.lineWidth;
+
+        if (ctx.lineWidth != lineWidth) {
+            var gl = this.program.gl;
+            gl.lineWidth(lineWidth);
+            ctx.lineWidth = lineWidth;
+        }
+    }
+});
+
 SceneJS_ChunkFactory.createChunkType({
 
     type: "texture",

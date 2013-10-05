@@ -51,9 +51,13 @@ var sjsFiles = [
     'src/core/scene/morphGeometry.js',
     'src/core/scene/name.js',
     'src/core/scene/renderer.js',
+    'src/core/scene/depthbuf.js',
+    'src/core/scene/colorbuf.js',
+    'src/core/scene/view.js',
     'src/core/scene/scene.js',
     'src/core/scene/shader.js',
     'src/core/scene/shaderParams.js',
+    'src/core/scene/style.js',
     'src/core/scene/tag.js',
     'src/core/scene/texture.js',
     'src/core/scene/xform.js',
@@ -93,8 +97,12 @@ var sjsFiles = [
     'src/core/display/chunks/nameChunk.js',
     'src/core/display/chunks/programChunk.js',
     'src/core/display/chunks/rendererChunk.js',
+    'src/core/display/chunks/depthbufChunk.js',
+    'src/core/display/chunks/colorbufChunk.js',
+    'src/core/display/chunks/viewChunk.js',
     'src/core/display/chunks/shaderChunk.js',
     'src/core/display/chunks/shaderParamsChunk.js',
+    'src/core/display/chunks/styleChunk.js',
     'src/core/display/chunks/textureChunk.js',
     'src/core/display/chunks/xformChunk.js'
 ];
@@ -103,9 +111,9 @@ module.exports = function(grunt) {
 
     // load all grunt tasks
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
-    
+
     // read package.json
-    var pkg = grunt.file.readJSON('package.json')
+    var pkg = grunt.file.readJSON('package.json');
 
     grunt.initConfig({
 
@@ -190,7 +198,7 @@ module.exports = function(grunt) {
                     dest: '_site'
                 }
             },
-            
+
             apiVersionFolder: {
                 options: {
                     src: apiDir,
