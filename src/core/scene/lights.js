@@ -21,7 +21,7 @@
                 diffuse:true,
                 specular:true,
                 dir:[-0.5, -0.5, -1.0 ],
-                space:"world"
+                space:"view"
             },
             {
                 mode:"dir",
@@ -29,7 +29,7 @@
                 diffuse:false,
                 specular:true,
                 dir:[1.0, -0.9, -0.7 ],
-                space:"world"
+                space:"view"
             }
         ]
     };

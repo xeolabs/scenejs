@@ -860,8 +860,8 @@
                 "tags":["wavefront"],
                 "nodes":[
                     {
-                        "title":"Import .OBJ",
-                        "path":"plugins/import/obj.html",
+                        "title":"Duck mesh from .OBJ",
+                        "path":"plugins/import/obj/duck.html",
                         "tags":[],
                         "id":"importObj"
                     }

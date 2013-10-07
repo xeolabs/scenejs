@@ -3,7 +3,7 @@
  * WebGL Scene Graph Library for JavaScript
  * http://scenejs.org/
  *
- * Built on 2013-10-05
+ * Built on 2013-10-07
  *
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * Copyright 2013, Lindsay Kay
@@ -11339,7 +11339,7 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
                 diffuse:true,
                 specular:true,
                 dir:[-0.5, -0.5, -1.0 ],
-                space:"world"
+                space:"view"
             },
             {
                 mode:"dir",
@@ -11347,7 +11347,7 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
                 diffuse:false,
                 specular:true,
                 dir:[1.0, -0.9, -0.7 ],
-                space:"world"
+                space:"view"
             }
         ]
     };
