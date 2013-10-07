@@ -871,7 +871,7 @@
         "nodes":[
             {
                 "title":"Wavefront",
-                "tags":["wavefront"],
+                "tags":["OBJ"],
                 "nodes":[
                     {
                         "title":"Raptor imported from .OBJ",
@@ -889,13 +889,25 @@
             },
             {
                 "title":"3DS",
-                "tags":["3ds"],
+                "tags":["3DS"],
                 "nodes":[
                     {
                         "title":"Lexus imported from .3DS",
                         "path":"plugins/import/3ds/lexus.html",
                         "tags":[],
                         "id":"import3ds"
+                    }
+                ]
+            },
+            {
+                "title":"MD2",
+                "tags":["MD2"],
+                "nodes":[
+                    {
+                        "title":"Running lion imported from .MD2",
+                        "path":"plugins/import/md2/lion.html",
+                        "tags":[],
+                        "id":"importMd2"
                     }
                 ]
             }

@@ -62,6 +62,10 @@
                     {
                         "title":"3DS",
                         "page":"import3ds"
+                    },
+                    {
+                        "title":"MD2",
+                        "page":"importMd2"
                     }
                 ]
             }
