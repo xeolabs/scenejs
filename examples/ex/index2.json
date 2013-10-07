@@ -896,12 +896,6 @@
                         "path":"plugins/import/3ds/lexus.html",
                         "tags":[],
                         "id":"import3DSLexus"
-                    },
-                    {
-                        "title":"Teapot imported from .3DS",
-                        "path":"plugins/import/3ds/teapot.html",
-                        "tags":[],
-                        "id":"import3ds"
                     }
                 ]
             }
