@@ -895,7 +895,7 @@
                         "title":"Lexus imported from .3DS",
                         "path":"plugins/import/3ds/lexus.html",
                         "tags":[],
-                        "id":"import3DSLexus"
+                        "id":"import3ds"
                     }
                 ]
             }
