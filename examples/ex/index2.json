@@ -901,7 +901,7 @@
             },
             {
                 "title":".MD2",
-                "tags":["MD2", "animation"],
+                "tags":["MD2"],
                 "nodes":[
                     {
                         "title":"Running lion imported from .MD2",
