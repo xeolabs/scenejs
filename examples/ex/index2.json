@@ -871,7 +871,7 @@
         "nodes":[
             {
                 "title":"Wavefront",
-                "tags":["OBJ"],
+                "tags":[".OBJ"],
                 "nodes":[
                     {
                         "title":"Raptor imported from .OBJ",
@@ -888,7 +888,7 @@
                 ]
             },
             {
-                "title":"3DS",
+                "title":".3DS",
                 "tags":["3DS"],
                 "nodes":[
                     {
@@ -900,7 +900,7 @@
                 ]
             },
             {
-                "title":"MD2",
+                "title":".MD2",
                 "tags":["MD2", "animation"],
                 "nodes":[
                     {

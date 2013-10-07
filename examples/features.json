@@ -56,15 +56,15 @@
             {
                 "nodes":[
                     {
-                        "title":"OBJ",
+                        "title":".OBJ",
                         "page":"importObj"
                     },
                     {
-                        "title":"3DS",
+                        "title":".3DS",
                         "page":"import3ds"
                     },
                     {
-                        "title":"MD2",
+                        "title":".MD2",
                         "page":"importMd2"
                     }
                 ]
