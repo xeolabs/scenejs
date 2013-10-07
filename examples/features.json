@@ -51,6 +51,23 @@
         ]
     },
     {
+        "title":"Importers",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":"OBJ",
+                        "page":"importObj"
+                    },
+                    {
+                        "title":"3DS",
+                        "page":"import3ds"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "title":"Optimization",
         "nodes":[
             {
@@ -348,19 +365,6 @@
                     {
                         "title":"Ray picking",
                         "page":"rayPicking"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"Importers",
-        "nodes":[
-            {
-                "nodes":[
-                    {
-                        "title":"Wavefront .OBJ",
-                        "page":"importObj"
                     }
                 ]
             }

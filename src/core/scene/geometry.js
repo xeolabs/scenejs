@@ -232,12 +232,13 @@ new (function () {
 
         options = options || {};
 
-        this._core.primitive = this._getPrimitiveType(data.primitive || "triangles");
+        var primitive = data.primitive || "triangles";
+        this._core.primitive = this._getPrimitiveType(primitive);
 
         var normals;
 
         if (data.normals) {
-            if (data.normals == "auto" && data.primitive == "triangles") {
+            if (data.normals == "auto" && primitive == "triangles") {
                 if (data.positions && data.indices) {
                     // Auto normal generation
                     normals = this._buildNormals(data.positions, data.indices);
