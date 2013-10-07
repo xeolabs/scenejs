@@ -173,7 +173,7 @@
         open-source license.</p>
 
     <!--<p>Though it's got a nice friendly API, don't let that fool you - internally it's **optimised to death** with things like-->
-        <!--scene compilation and GL state sorting. SceneJS is designed to eat long lists of draw calls for breakfast.-->
+    <!--scene compilation and GL state sorting. SceneJS is designed to eat long lists of draw calls for breakfast.-->
     <!--</p>-->
 </div>
 
@@ -325,15 +325,10 @@ scene.getNode("myRotate", function(myRotate) {
                                             .attr('href', 'examples.html?page=' + feature.page)
                                             .text(feature.title)
                                             .appendTo(subCategoryElem);
-                                    if (j < lenj - 2) {
-                                        $('<span/>')
-                                                .text(", ")
-                                                .appendTo(featureElem);
-                                    } else if (j < lenj - 1) {
-                                        $('<span/>')
-                                                .text(" and ")
-                                                .appendTo(featureElem);
-                                    }
+
+                                    $('<span/>')
+                                            .text(", ")
+                                            .appendTo(featureElem);
                                 }
                             }
                         }
