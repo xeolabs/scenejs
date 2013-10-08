@@ -1055,7 +1055,7 @@
         ]
     },
     {
-        "title":"High-level Scene Objects",
+        "title":"Features library",
         "tip":"",
         "tags":["plugins"],
         "nodes":[
@@ -1128,6 +1128,25 @@
                         "tags":["heightMap"],
                         "path":"plugins/heightmaps/custom.html",
                         "id":"customHeightmap"
+                    }
+                ]
+            },
+            {
+                "title":"Things",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Planet Earth",
+                        "path":"customNodes/objects/earth.html",
+                        "tags":[],
+                        "id":"customNodesEarth"
+                    },
+                    {
+                        "title":"Tron Tank",
+                        "path":"customNodes/bundled/tank.html",
+                        "tags":[],
+                        "id":"customNodesTank"
                     }
                 ]
             }
