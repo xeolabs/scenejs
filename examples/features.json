@@ -117,7 +117,28 @@
         ]
     },
     {
-        "title":"Lights",
+        "title":"Picking",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":"Object picking",
+                        "page":"picking"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"3D ray picking",
+                        "page":"rayPicking"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Unlimited lights",
         "nodes":[
             {
                 "nodes":[
@@ -354,28 +375,7 @@
         ]
     },
     {
-        "title":"Interaction",
-        "nodes":[
-            {
-                "nodes":[
-                    {
-                        "title":"Picking",
-                        "page":"picking"
-                    }
-                ]
-            },
-            {
-                "nodes":[
-                    {
-                        "title":"Ray picking",
-                        "page":"rayPicking"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"Custom nodes, eg:",
+        "title":"Features library, eg:",
         "nodes":[
             {
                 "nodes":[
