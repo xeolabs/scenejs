@@ -326,9 +326,15 @@ scene.getNode("myRotate", function(myRotate) {
                                             .text(feature.title)
                                             .appendTo(subCategoryElem);
 
-                                    $('<span/>')
-                                            .text(", ")
-                                            .appendTo(featureElem);
+                                    if (j < lenj - 2) {
+                                        $('<span/>')
+                                                .text(", ")
+                                                .appendTo(featureElem);
+                                    } else if (j < lenj - 1) {
+                                        $('<span/>')
+                                                .text(" ")
+                                                .appendTo(featureElem);
+                                    }
                                 }
                             }
                         }
