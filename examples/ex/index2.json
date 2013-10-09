@@ -541,6 +541,20 @@
                         "id":"uvLayers"
                     }
                 ]
+            },
+            {
+                "title":"Animation",
+                "tip":"",
+                "tags":["animation"],
+                "nodes":[
+                    {
+                        "title":"Layered color maps with animation",
+                        "tip":"Animating a color map's transform and blend factors",
+                        "tags":["colorMap", "animation"],
+                        "path":"texture/color/colorMapAnimation.html",
+                        "id":"colorMapAnimation2"
+                    }
+                ]
             }
         ]
     },
@@ -857,13 +871,43 @@
         "nodes":[
             {
                 "title":"Wavefront",
-                "tags":["wavefront"],
+                "tags":[".OBJ"],
                 "nodes":[
                     {
-                        "title":"Duck mesh from .OBJ",
-                        "path":"plugins/import/obj/duck.html",
+                        "title":"Raptor imported from .OBJ",
+                        "path":"plugins/import/obj/raptor.html",
                         "tags":[],
                         "id":"importObj"
+                    },
+                    {
+                        "title":"Duck imported from .OBJ",
+                        "path":"plugins/import/obj/duck.html",
+                        "tags":[],
+                        "id":"importDuckObj"
+                    }
+                ]
+            },
+            {
+                "title":".3DS",
+                "tags":["3DS"],
+                "nodes":[
+                    {
+                        "title":"Lexus imported from .3DS",
+                        "path":"plugins/import/3ds/lexus.html",
+                        "tags":[],
+                        "id":"import3ds"
+                    }
+                ]
+            },
+            {
+                "title":".MD2",
+                "tags":["MD2"],
+                "nodes":[
+                    {
+                        "title":"Running lion imported from .MD2",
+                        "path":"plugins/import/md2/lion.html",
+                        "tags":[],
+                        "id":"importMd2"
                     }
                 ]
             }
@@ -1011,7 +1055,7 @@
         ]
     },
     {
-        "title":"High-level Scene Objects",
+        "title":"Features library",
         "tip":"",
         "tags":["plugins"],
         "nodes":[
@@ -1084,6 +1128,25 @@
                         "tags":["heightMap"],
                         "path":"plugins/heightmaps/custom.html",
                         "id":"customHeightmap"
+                    }
+                ]
+            },
+            {
+                "title":"Things",
+                "tip":"",
+                "tags":[],
+                "nodes":[
+                    {
+                        "title":"Planet Earth",
+                        "path":"customNodes/objects/earth.html",
+                        "tags":[],
+                        "id":"customNodesEarth"
+                    },
+                    {
+                        "title":"Tron Tank",
+                        "path":"customNodes/bundled/tank.html",
+                        "tags":[],
+                        "id":"customNodesTank"
                     }
                 ]
             }

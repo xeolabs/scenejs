@@ -3,7 +3,7 @@
  * WebGL Scene Graph Library for JavaScript
  * http://scenejs.org/
  *
- * Built on 2013-10-07
+ * Built on 2013-10-09
  *
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * Copyright 2013, Lindsay Kay
@@ -8640,12 +8640,13 @@ new (function () {
 
         options = options || {};
 
-        this._core.primitive = this._getPrimitiveType(data.primitive || "triangles");
+        var primitive = data.primitive || "triangles";
+        this._core.primitive = this._getPrimitiveType(primitive);
 
         var normals;
 
         if (data.normals) {
-            if (data.normals == "auto" && data.primitive == "triangles") {
+            if (data.normals == "auto" && primitive == "triangles") {
                 if (data.positions && data.indices) {
                     // Auto normal generation
                     normals = this._buildNormals(data.positions, data.indices);
@@ -12518,8 +12519,8 @@ new (function () {
             texture:texture, // WebGL texture object
             minFilter:this._getGLOption("minFilter", gl, layer, gl.LINEAR_MIPMAP_NEAREST),
             magFilter:this._getGLOption("magFilter", gl, layer, gl.LINEAR),
-            wrapS:this._getGLOption("wrapS", gl, layer, gl.CLAMP_TO_EDGE),
-            wrapT:this._getGLOption("wrapT", gl, layer, gl.CLAMP_TO_EDGE),
+            wrapS:this._getGLOption("wrapS", gl, layer, gl.REPEAT),
+            wrapT:this._getGLOption("wrapT", gl, layer, gl.REPEAT),
             isDepth:this._getOption(layer.isDepth, false),
             depthMode:this._getGLOption("depthMode", gl, layer, gl.LUMINANCE),
             depthCompareMode:this._getGLOption("depthCompareMode", gl, layer, gl.COMPARE_R_TO_TEXTURE),

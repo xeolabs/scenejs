@@ -31,12 +31,31 @@ require([
 
                         var m = K3D.parse.fromOBJ(data);	// done !
 
+                        // unwrap simply duplicates some values, so they can be indexed with indices [0,1,2,3 ... ]
+                        // In some rendering engines, you can have only one index value for vertices, UVs, normals ...,
+                        // so "unwrapping" is a simple solution.
+
+                        var positions = K3D.edit.unwrap(m.i_verts, m.c_verts, 3);
+                        var normals = K3D.edit.unwrap(m.i_norms, m.c_norms, 3);
+                        var uv = K3D.edit.unwrap(m.i_uvt, m.c_uvt, 2);
+
+                        var indices = [];
+                        for (var i = 0; i < m.i_verts.length; i++) {
+                            indices.push(i);
+                        }
+
+                        // Need to flip the UV coordinates on Y-axis for SceneJS geometry
+                        for (var i = 1, len = uv.length; i < len; i += 2) {
+                            uv[i] *= -1.0;
+                        }
+
                         self.addNode({
                             type:"geometry",
-                            positions:m.c_verts,
-                            uv:m.c_uvt && m.c_uvt.length > 0 ? m.c_uvt : undefined,
-                            normals:m.c_norms && m.c_norms.length > 0 ? m.c_norms : undefined,
-                            indices:m.i_verts
+                            primitive:"triangles",
+                            positions:positions,
+                            uv:uv.length > 0 ? uv : undefined,
+                            normals:normals.length > 0 ? normals : undefined,
+                            indices:indices
                         });
 
                         self._taskId = self.taskFinished(self._taskId);

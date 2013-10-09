@@ -21,7 +21,8 @@
 
 <script>
 
-    // Demo of the "import/obj" custom node type, which imports geometry from Wavefront .OBJ files
+    // Using the "import/obj" node to import a duck mesh from .OBJ format
+    // Internally, the node uses the K3D library for parsing - http://k3d.ivank.net/
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -50,11 +51,18 @@
 
                                 nodes:[
 
-                                    // Geometry imported from a Wavefront .OBJ file, implemented by plugin at
+                                    // Import the .OBJ mesh
+                                    //
+                                    // This node is implemented by plugin at:
                                     // http://scenejs.org/api/latest/plugins/node/import/obj.js
+                                    //
+                                    //
+                                    // The OBJ file is loaded from:
+                                    // http://scenejs.org/examples/models/obj/duck.obj
+
                                     {
                                         type:"import/obj",
-                                        src:"../../../../models/duck.obj"
+                                        src:"../../../../models/obj/duck.obj"
                                     }
 
                                 ]

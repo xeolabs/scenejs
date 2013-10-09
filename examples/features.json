@@ -51,6 +51,27 @@
         ]
     },
     {
+        "title":"Importers",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":".OBJ",
+                        "page":"importObj"
+                    },
+                    {
+                        "title":".3DS",
+                        "page":"import3ds"
+                    },
+                    {
+                        "title":".MD2",
+                        "page":"importMd2"
+                    }
+                ]
+            }
+        ]
+    },
+    {
         "title":"Optimization",
         "nodes":[
             {
@@ -96,7 +117,28 @@
         ]
     },
     {
-        "title":"Lights",
+        "title":"Picking",
+        "nodes":[
+            {
+                "nodes":[
+                    {
+                        "title":"Object picking",
+                        "page":"picking"
+                    }
+                ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"3D ray picking",
+                        "page":"rayPicking"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "title":"Unlimited lights",
         "nodes":[
             {
                 "nodes":[
@@ -333,41 +375,7 @@
         ]
     },
     {
-        "title":"Interaction",
-        "nodes":[
-            {
-                "nodes":[
-                    {
-                        "title":"Picking",
-                        "page":"picking"
-                    }
-                ]
-            },
-            {
-                "nodes":[
-                    {
-                        "title":"Ray picking",
-                        "page":"rayPicking"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"Importers",
-        "nodes":[
-            {
-                "nodes":[
-                    {
-                        "title":"Wavefront .OBJ",
-                        "page":"importObj"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "title":"Custom nodes, eg:",
+        "title":"Features library, eg:",
         "nodes":[
             {
                 "nodes":[
