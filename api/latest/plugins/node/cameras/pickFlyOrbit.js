@@ -189,7 +189,7 @@ require([
                 var flightDist;
                 var flightDuration;
                 var flying = false;
-                var orbiting = false;
+                var orbiting = true;
 
                 function mouseDown(event) {
                     lastX = downX = event.clientX;
