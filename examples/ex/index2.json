@@ -825,9 +825,15 @@
                 "nodes":[
                     {
                         "title":"Mouse-orbited camera",
-                        "path":"plugins/camera/cameraOrbit.html",
+                        "path":"plugins/camera/orbit.html",
                         "tags":[],
                         "id":"customNodesCameraOrbit"
+                    },
+                    {
+                        "title":"Fly to and orbit ray-picked point",
+                        "path":"plugins/camera/orbitPick.html",
+                        "tags":[],
+                        "id":"cameraOrbitPick"
                     }
                 ]
             },
