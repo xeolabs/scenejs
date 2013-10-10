@@ -830,10 +830,16 @@
                         "id":"customNodesCameraOrbit"
                     },
                     {
-                        "title":"Fly to and orbit ray-picked point",
-                        "path":"plugins/camera/orbitPick.html",
+                        "title":"Pick-fly-orbit city",
+                        "path":"plugins/camera/pickFlyOrbitCity.html",
                         "tags":[],
                         "id":"cameraPickFlyOrbit"
+                    },
+                    {
+                        "title":"Pick-fly-orbit terrain",
+                        "path":"plugins/camera/pickFlyOrbitTerrain.html",
+                        "tags":[],
+                        "id":"cameraPickFlyOrbitTerrain"
                     }
                 ]
             },

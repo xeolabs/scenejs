@@ -41,7 +41,7 @@
 <body>
 
 <div id="info">
-    <b>SceneJS experimental <a href="http://scenejs.org/api/latest/plugins/node/alpha/orbitPick.js" target="other">camera plugin</a></b>
+    <b>SceneJS experimental <a href="http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js" target="other">camera plugin</a></b>
     <ul>
         <li>Click on a building to fly to it</li>
         <li>Mouse drag to orbit</li>
@@ -64,16 +64,16 @@
         nodes:[
 
             // Mouse-orbited camera, implemented by plugin at
-            // http://scenejs.org/api/latest/plugins/node/alpha/orbitPick.js
+            // http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js
             {
-                type:"alpha/orbitPick",
+                type:"cameras/pickFlyOrbit",
                 yaw:-100,
-                pitch:-10,
-                zoom:500,
+                pitch:-40,
+                zoom:100,
                 eye:{ x:0, y:150, z:-1000 },
                 look:{ x:0, y:150, z:0 },
                 zoomSensitivity:20.0,
-                showPick:true,
+                showCursor:true,
                 cursorSize:2.0,
 
                 nodes:[

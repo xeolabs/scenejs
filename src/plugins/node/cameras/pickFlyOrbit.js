@@ -5,14 +5,14 @@
  * -------------
  *
  * someNode.addNode({
- *      type: "alpha/orbitPick",
+ *      type: "cameras/pickFlyOrbit",
  *      eye:{ x: y:0 },
  *      look:{ y:0 },
  *      yaw: 340,,
  *      pitch: -20,
  *      zoom: 350,
  *      zoomSensitivity:10.0,
- *      showPick: true
+ *      showCursor: true
  * });
  *
  * The camera is initially positioned at the given 'eye' and 'look', then the distance of 'eye' is zoomed out
@@ -65,7 +65,7 @@ require([
             }
         })();
 
-        SceneJS.Types.addType("alpha/orbitPick", {
+        SceneJS.Types.addType("cameras/pickFlyOrbit", {
 
             construct:function (params) {
 
@@ -88,7 +88,7 @@ require([
                 var indicatorVis;
                 var indicatorSize;
 
-                if (params.showPick) {
+                if (params.showCursor) {
 
                     // Red sphere to indicate current point-of-interest. We'll update the
                     // position of this whenever a new 3D position has been ray-picked.
@@ -318,7 +318,6 @@ require([
 //                                    label.setShown(false);
                                 }
                             } else {
-
 
                                 var easedTime = easeOut((timeNow - flightStartTime) / flightDuration, 0, 1, 1);
 
