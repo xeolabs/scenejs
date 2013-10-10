@@ -180,8 +180,12 @@
             {
                 "nodes":[
                     {
-                        "title":"Orbiting camera",
+                        "title":"Orbiting",
                         "page":"customNodesCameraOrbit"
+                    },
+                    {
+                        "title":"Pick-Fly-Orbit",
+                        "page":"cameraPickFlyOrbit"
                     }
                 ]
             }
