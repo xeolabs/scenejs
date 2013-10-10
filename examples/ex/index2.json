@@ -833,7 +833,7 @@
                         "title":"Fly to and orbit ray-picked point",
                         "path":"plugins/camera/orbitPick.html",
                         "tags":[],
-                        "id":"cameraOrbitPick"
+                        "id":"cameraPickFlyOrbit"
                     }
                 ]
             },
