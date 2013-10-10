@@ -13,9 +13,42 @@
             -khtml-user-select: none;
             -webkit-user-select: none;
         }
+
+        a {
+            color: #ffffff;
+            padding-top:20px;
+            font-family: Helvetica;
+            font-size: 16px;
+        }
+
+        #info {
+            position: absolute;
+            top: 50px;
+            left: 100px;
+            width: auto;
+            color: #ffffff;
+            padding: 10px;
+            padding-top:20px;
+            font-family: Helvetica;
+            font-size: 16px;
+            text-align: left;
+            background: black;
+            opacity: 0.6;
+            z-index: 100000;
+        }
     </style>
 </head>
 <body>
+
+<div id="info">
+    <b>SceneJS experimental <a href="http://scenejs.org/api/latest/plugins/node/alpha/orbitPick.js" target="other">camera plugin</a></b>
+    <ul>
+        <li>Click on a building to fly to it</li>
+        <li>Mouse drag to orbit</li>
+        <li>Mouse wheel to zoom</li>
+        <li>Try clicking on the horizon</li>
+    </ul>
+</div>
 
 <script src="../../../../api/latest/scenejs.js"></script>
 
@@ -30,17 +63,17 @@
         nodes:[
 
             // Mouse-orbited camera, implemented by plugin at
-            // http://scenejs.org/api/latest/plugins/node/cameras/orbitPick.js
+            // http://scenejs.org/api/latest/plugins/node/alpha/orbitPick.js
             {
                 type:"alpha/orbitPick",
                 yaw:-100,
                 pitch:-10,
                 zoom:500,
-                eye:{ x: 0, y:150, z: -1000 },
-                look:{ x: 0, y:150, z: 0 },
+                eye:{ x:0, y:150, z:-1000 },
+                look:{ x:0, y:150, z:0 },
                 zoomSensitivity:20.0,
-                showPick: true,
-                cursorSize: 2.0,
+                showPick:true,
+                cursorSize:2.0,
 
                 nodes:[
                     {
