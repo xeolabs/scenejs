@@ -5795,7 +5795,7 @@ var SceneJS_nodeEventsModule = new (function () {
         var projPosSubs = node._topicSubs["projPos"];
         var canvasPosSubs = node._topicSubs["canvasPos"];
 
-        if (worldPosSubs || viewPosSubs || cameraPosSubs || projPosSubs || canvasPosSubs) {
+        if (renderedSubs || worldPosSubs || viewPosSubs || cameraPosSubs || projPosSubs || canvasPosSubs) {
             idStack[stackLen] = node.id;
 
             listenerStack[stackLen] = function (event) {
@@ -6681,6 +6681,9 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
     }
 
     // Create node
+
+    node.type = node.type || "node";
+
     if (node.type == "node" || this._engine.hasNodeType(node.type)) {
 
         // Root node's type is already loaded, so we are able
@@ -14247,7 +14250,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 20; i++) {
+    for (var i = 0; i < 22; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
@@ -14361,7 +14364,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
     if (this._xpBufLen > 0) {
 
-        for (var i = 0; i < 20; i++) {  // TODO: magic number!
+        for (var i = 0; i < 22; i++) {  // TODO: magic number!
             this._lastStateId[i] = null;
         }
 

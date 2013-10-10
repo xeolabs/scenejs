@@ -617,7 +617,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 20; i++) {
+    for (var i = 0; i < 22; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
@@ -731,7 +731,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
     if (this._xpBufLen > 0) {
 
-        for (var i = 0; i < 20; i++) {  // TODO: magic number!
+        for (var i = 0; i < 22; i++) {  // TODO: magic number!
             this._lastStateId[i] = null;
         }
 

@@ -626,6 +626,9 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
     }
 
     // Create node
+
+    node.type = node.type || "node";
+
     if (node.type == "node" || this._engine.hasNodeType(node.type)) {
 
         // Root node's type is already loaded, so we are able
