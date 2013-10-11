@@ -5845,7 +5845,7 @@ var SceneJS_nodeEventsModule = new (function () {
  * <p>Each {@link SceneJS.Node} has a state core to hold its state, and the core may be shared by other
  * {@link SceneJS.Nodes}s of the same type.</p>
  *
- * <p>The state held by core is rendered by a {@link SceneJS_Chunk}  
+ * <p>The state held by core is rendered by a {@link SceneJS_Chunk}
  *
  * @private
  */
@@ -5869,7 +5869,7 @@ var SceneJS_Core = function(type) {
     /**
      * Uniquely identifies this state core within a {@link SceneJS_Display}.
      *
-     * This ID is used by a {@link SceneJS_Display} to reduce redundant state changes when rendering a sequence of cores, 
+     * This ID is used by a {@link SceneJS_Display} to reduce redundant state changes when rendering a sequence of cores,
      * where as a {@link SceneJS_Display} renders a frame it avoids applying consecutive cores that have the
      * same value for this ID.
      *
@@ -5929,7 +5929,7 @@ SceneJS_CoreFactory.addCoreBuilder = function (type, factory) {
 
 };
 
-/* HACK - allows different types of node to have same type of core, eg. "rotate" and "translate" nodes can both have an "xform" core    
+/* HACK - allows different types of node to have same type of core, eg. "rotate" and "translate" nodes can both have an "xform" core
  */
 SceneJS_CoreFactory.coreAliases = {
     "rotate":"xform",
@@ -5950,7 +5950,7 @@ SceneJS_CoreFactory.coreAliases = {
  */
 SceneJS_CoreFactory.prototype.getCore = function (type, coreId) {
 
-    /* HACK - allows different types of node to have same type of core, eg. "rotate" and "translate" nodes can both have an "xform" core    
+    /* HACK - allows different types of node to have same type of core, eg. "rotate" and "translate" nodes can both have an "xform" core
      */
     var alias = SceneJS_CoreFactory.coreAliases[type];
     if (alias) {
@@ -7364,9 +7364,11 @@ SceneJS.Node.prototype._compileNodes = function () {
         child.branchDirty = child.branchDirty || this.branchDirty; // Compile subnodes if scene branch dirty
 
         if (child.dirty || child.branchDirty || this._engine.sceneDirty) {  // Compile nodes that are flagged dirty
+
             child._compile();
             child.dirty = false;
             child.branchDirty = false;
+
         }
     }
 
@@ -7773,7 +7775,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     var defaultCore = {
         type: "clips",
         stateId: SceneJS._baseStateId++,
-        empty: true,        
+        empty: true,
         hash: "",
         clips : []
     };
@@ -8197,7 +8199,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     SceneJS.Flags.prototype.getSpecular = function() {
         return this._core.specular;
     };
-    
+
     SceneJS.Flags.prototype.setAmbient = function(ambient) {
         ambient = !!ambient;
         if (this._core.ambient != ambient) {
@@ -12926,7 +12928,7 @@ SceneJS.Rotate.prototype._init = function(params) {
     if (this._core.useCount == 1) { // This node is the resource definer
 
         SceneJS_modelXFormStack.buildCore(this._core);
-        
+
         this.setMultOrder(params.multOrder);
 
         this.setAngle(params.angle);
@@ -13074,7 +13076,7 @@ SceneJS.Translate.prototype._init = function(params) {
     if (this._core.useCount == 1) { // This node is the resource definer
 
         SceneJS_modelXFormStack.buildCore(this._core);
-        
+
         this.setMultOrder(params.multOrder);
 
         this.setXYZ({
@@ -15597,7 +15599,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 })();/**
  * @class Source code for pick and draw shader programs, to be compiled into one or more {@link SceneJS_Program}s
  * @private
- * 
+ *
  * @param {String} hash Hash code identifying the rendering capabilities of the programs
  * @param {String} pickVertexSrc Source code of the pick vertex shader
  * @param {String} pickFragmentSrc Source code of the pick fragment shader
@@ -15643,7 +15645,7 @@ var SceneJS_ProgramSource = function(hash, pickVertexSrc, pickFragmentSrc, drawV
     this.useCount = 0;
 };
 
-/**  
+/**
  * @class Manages creation, sharing and recycle of {@link SceneJS_Program} instances
  * @private
  */
@@ -15719,7 +15721,7 @@ SceneJS_ProgramFactory.prototype.destroy = function() {
  * @param {Number} id ID unique among all programs in the owner {@link SceneJS_ProgramFactory}
  * @param {String} hash Hash code which uniquely identifies the capabilities of the program, computed from hashes on the {@link Scene_Core}s that the {@link SceneJS_ProgramSource} composed to render
  * @param {SceneJS_ProgramSource} source Sourcecode from which the the program is compiled in {@link #build}
- * @param {WebGLRenderingContext} gl WebGL context 
+ * @param {WebGLRenderingContext} gl WebGL context
  */
 var SceneJS_Program = function(id, hash, source, gl) {
 
@@ -16982,7 +16984,7 @@ SceneJS_ChunkFactory.createChunkType({
  *
  */
 SceneJS_ChunkFactory.createChunkType({
-    
+
     type: "renderer",
 
     build : function() {
