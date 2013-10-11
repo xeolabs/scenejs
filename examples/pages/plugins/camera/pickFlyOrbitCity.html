@@ -16,7 +16,7 @@
 
         a {
             color: #ffffff;
-            padding-top:20px;
+            padding-top: 20px;
             font-family: Helvetica;
             font-size: 16px;
         }
@@ -28,7 +28,7 @@
             width: auto;
             color: #ffffff;
             padding: 10px;
-            padding-top:20px;
+            padding-top: 20px;
             font-family: Helvetica;
             font-size: 16px;
             text-align: left;
@@ -41,7 +41,8 @@
 <body>
 
 <div id="info">
-    <b>SceneJS experimental <a href="http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js" target="other">camera plugin</a></b>
+    <b>SceneJS experimental <a href="http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js" target="other">camera
+        plugin</a></b>
     <ul>
         <li>Click on a building to fly to it</li>
         <li>Mouse drag to orbit</li>
@@ -67,10 +68,10 @@
             // http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js
             {
                 type:"cameras/pickFlyOrbit",
-                yaw:0,
-                pitch:-0,
-                eye:{ x:0, y:50, z:-1000 },
-                look:{ x:0, y:50, z:-800 },
+                yaw:-0,
+                pitch:-40,
+                eye:{ x:-10, y:50, z:-100 },
+                look:{ x:-10, y:50, z:0 },
                 zoomSensitivity:20.0,
                 showCursor:true,
                 cursorSize:2.0,
@@ -104,17 +105,18 @@
                             // Fog effect, implemented by plugin at
                             // http://scenejs.org/api/latest/plugins/node/effects/fog.js
                             {
-                                type:"effects/fog",
+                                //     type:"effects/fog",
                                 mode:"exp2", // Quadratic
                                 density:0.1, // Fog density
                                 start:30.0, // Near starting point
-                                end:800.0, // Far ending point
+                                end:1500.0, // Far ending point
                                 color:{ r:1.0, g:1.0, b:0.8 }, // Yellowish fog color
 
                                 nodes:[
                                     {
                                         type:"material",
                                         color:{ r:0.5, g:1.0, b:0.5 },
+                                        emit: 0.1,
                                         nodes:[
 
                                             // Grid ground, implemented by plugin at
@@ -126,6 +128,32 @@
                                                 height:10000,
                                                 widthSegments:100,
                                                 heightSegments:100
+                                            }
+                                        ]
+                                    },
+
+                                    {
+                                        type:"translate",
+                                        y:-3,
+                                        nodes:[
+                                            {
+                                                type:"material",
+                                                color:{ r:0.5, g:1.0, b:0.5 },
+                                                emit: 0.01,
+                                                nodes:[
+
+                                                    // Solid green surface under the grid, implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/object/ground/grid.js
+                                                    {
+                                                        type:"prims/grid",
+                                                        size:{ x:10000, z:10000 },
+                                                        width:10000,
+                                                        height:10000,
+                                                        widthSegments:10,
+                                                        heightSegments:10,
+                                                        wire:false
+                                                    }
+                                                ]
                                             }
                                         ]
                                     },
