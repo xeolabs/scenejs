@@ -7364,11 +7364,9 @@ SceneJS.Node.prototype._compileNodes = function () {
         child.branchDirty = child.branchDirty || this.branchDirty; // Compile subnodes if scene branch dirty
 
         if (child.dirty || child.branchDirty || this._engine.sceneDirty) {  // Compile nodes that are flagged dirty
-
+            child._compile();
             child.dirty = false;
             child.branchDirty = false;
-
-            child._compile();
         }
     }
 
@@ -7376,6 +7374,7 @@ SceneJS.Node.prototype._compileNodes = function () {
         SceneJS_nodeEventsModule.postVisitNode(this);
     }
 };
+
 
 
 /**
@@ -10542,7 +10541,7 @@ new (function () {
     SceneJS.Name.prototype._compile = function () {
 
         this._engine.display.name = coreStack[stackLen++] = this._core;
-        
+
         // (Re)build name path
         var path = [];
         var name;
