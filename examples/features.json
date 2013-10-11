@@ -123,7 +123,7 @@
                 "nodes":[
                     {
                         "title":"Object picking",
-                        "page":"picking"
+                        "page":"pickNameHierarchy"
                     }
                 ]
             },

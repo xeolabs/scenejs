@@ -807,7 +807,9 @@ SceneJS_Display.prototype.pick = function (params) {
     if (pickName) {
 
         hit = {
-            name:pickName,
+            name:pickName.name,
+            path:pickName.path,
+            nodeId:pickName.nodeId,
             canvasPos:[canvasX, canvasY]
         };
 

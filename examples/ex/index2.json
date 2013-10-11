@@ -855,6 +855,12 @@
                         "id":"picking"
                     },
                     {
+                        "title":"Pick name hierarchy",
+                        "path":"picking/pickNameHierarchy.html",
+                        "tags":[],
+                        "id":"pickNameHierarchy"
+                    },
+                    {
                         "title":"Ray-pick objects with mouse",
                         "path":"picking/rayPicking.html",
                         "tags":["rayPicking"],
