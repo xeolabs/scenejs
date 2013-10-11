@@ -5,7 +5,7 @@
  * -------------
  *
  * someNode.addNode({
- *      type: "alpha/orbitPick",
+ *      type: "cameras/pickFlyOrbit",
  *      eye:{ x: y:0 },
  *      look:{ y:0 },
  *      yaw: 340,,
@@ -65,12 +65,13 @@ require([
             }
         })();
 
-        SceneJS.Types.addType("alpha/orbitPick", {
+        SceneJS.Types.addType("cameras/pickFlyOrbit", {
 
             construct:function (params) {
 
                 var lookat = this.addNode({
                     type:"lookAt",
+
 
                     nodes:[
                         {

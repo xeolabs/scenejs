@@ -41,7 +41,7 @@
 <body>
 
 <div id="info">
-    <b>SceneJS experimental <a href="http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js" target="other">camera plugin</a></b>
+    <b><a href="http://scenejs.org">SceneJS</a> experimental <a href="http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js" target="other">camera plugin</a></b>
     <ul>
         <li>Click on a building to fly to it</li>
         <li>Mouse drag to orbit</li>
@@ -51,13 +51,13 @@
     </ul>
 </div>
 
-<script src="../../../../api/latest/scenejs.js"></script>
+<script src="../../../api/latest/scenejs.js"></script>
 
 <script>
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../../../../api/latest/plugins"
+        pluginPath:"../../../api/latest/plugins"
     });
 
     var scene = SceneJS.createScene({
@@ -67,10 +67,10 @@
             // http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js
             {
                 type:"cameras/pickFlyOrbit",
-                yaw:0,
-                pitch:-0,
-                eye:{ x:0, y:50, z:-1000 },
-                look:{ x:0, y:50, z:-800 },
+                yaw:-0,
+                pitch:-40,
+                eye:{ x:-10, y:50, z:-100 },
+                look:{ x:-10, y:50, z:0 },
                 zoomSensitivity:20.0,
                 showCursor:true,
                 cursorSize:2.0,
