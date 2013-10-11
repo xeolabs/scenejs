@@ -825,9 +825,21 @@
                 "nodes":[
                     {
                         "title":"Mouse-orbited camera",
-                        "path":"plugins/camera/cameraOrbit.html",
+                        "path":"plugins/camera/orbit.html",
                         "tags":[],
                         "id":"customNodesCameraOrbit"
+                    },
+                    {
+                        "title":"Pick-fly-orbit city",
+                        "path":"plugins/camera/pickFlyOrbitCity.html",
+                        "tags":[],
+                        "id":"cameraPickFlyOrbit"
+                    },
+                    {
+                        "title":"Pick-fly-orbit terrain",
+                        "path":"plugins/camera/pickFlyOrbitTerrain.html",
+                        "tags":[],
+                        "id":"cameraPickFlyOrbitTerrain"
                     }
                 ]
             },
@@ -841,6 +853,12 @@
                         "path":"picking/picking.html",
                         "tags":[],
                         "id":"picking"
+                    },
+                    {
+                        "title":"Pick name hierarchy",
+                        "path":"picking/pickNameHierarchy.html",
+                        "tags":[],
+                        "id":"pickNameHierarchy"
                     },
                     {
                         "title":"Ray-pick objects with mouse",

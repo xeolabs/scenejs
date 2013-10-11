@@ -51,7 +51,7 @@ var SceneJS_nodeEventsModule = new (function () {
         var projPosSubs = node._topicSubs["projPos"];
         var canvasPosSubs = node._topicSubs["canvasPos"];
 
-        if (worldPosSubs || viewPosSubs || cameraPosSubs || projPosSubs || canvasPosSubs) {
+        if (renderedSubs || worldPosSubs || viewPosSubs || cameraPosSubs || projPosSubs || canvasPosSubs) {
             idStack[stackLen] = node.id;
 
             listenerStack[stackLen] = function (event) {

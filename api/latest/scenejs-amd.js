@@ -3,7 +3,7 @@
  * WebGL Scene Graph Library for JavaScript
  * http://scenejs.org/
  *
- * Built on 2013-10-09
+ * Built on 2013-10-11
  *
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * Copyright 2013, Lindsay Kay
@@ -5762,7 +5762,7 @@ var SceneJS_nodeEventsModule = new (function () {
         var projPosSubs = node._topicSubs["projPos"];
         var canvasPosSubs = node._topicSubs["canvasPos"];
 
-        if (worldPosSubs || viewPosSubs || cameraPosSubs || projPosSubs || canvasPosSubs) {
+        if (renderedSubs || worldPosSubs || viewPosSubs || cameraPosSubs || projPosSubs || canvasPosSubs) {
             idStack[stackLen] = node.id;
 
             listenerStack[stackLen] = function (event) {
@@ -6651,6 +6651,9 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
     }
 
     // Create node
+
+    node.type = node.type || "node";
+
     if (node.type == "node" || this._engine.hasNodeType(node.type)) {
 
         // Root node's type is already loaded, so we are able
@@ -7331,11 +7334,9 @@ SceneJS.Node.prototype._compileNodes = function () {
         child.branchDirty = child.branchDirty || this.branchDirty; // Compile subnodes if scene branch dirty
 
         if (child.dirty || child.branchDirty || this._engine.sceneDirty) {  // Compile nodes that are flagged dirty
-
+            child._compile();
             child.dirty = false;
             child.branchDirty = false;
-
-            child._compile();
         }
     }
 
@@ -7343,6 +7344,7 @@ SceneJS.Node.prototype._compileNodes = function () {
         SceneJS_nodeEventsModule.postVisitNode(this);
     }
 };
+
 
 
 /**
@@ -10482,26 +10484,26 @@ new (function () {
     };
 
 })();
-(function() {
+(function () {
 
     /**
      * The default state core singleton for {@link SceneJS.Name} nodes
      */
     var defaultCore = {
-        type: "name",
-        stateId: SceneJS._baseStateId++,
-        name: null
+        type:"name",
+        stateId:SceneJS._baseStateId++,
+        name:null
     };
 
     var coreStack = [];
     var stackLen = 0;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function(params) {
-                params.engine.display.name = defaultCore;
-                stackLen = 0;
-            });
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.name = defaultCore;
+            stackLen = 0;
+        });
 
     /**
      * @class Scene graph node which assigns a pick name to the {@link SceneJS.Geometry} nodes in its subgraph.
@@ -10509,23 +10511,35 @@ new (function () {
      */
     SceneJS.Name = SceneJS_NodeFactory.createNodeType("name");
 
-    SceneJS.Name.prototype._init = function(params) {
-        if (this._core.useCount == 1) {
-            this.setName(params.name);
-        }
+    SceneJS.Name.prototype._init = function (params) {
+        this.setName(params.name);
+        this._core.nodeId = this.id;
     };
 
-    SceneJS.Name.prototype.setName = function(name) {
+    SceneJS.Name.prototype.setName = function (name) {
         this._core.name = name || "unnamed";
         this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Name.prototype.getName = function() {
+    SceneJS.Name.prototype.getName = function () {
         return this._core.name;
     };
 
-    SceneJS.Name.prototype._compile = function() {
+    SceneJS.Name.prototype._compile = function () {
+
         this._engine.display.name = coreStack[stackLen++] = this._core;
+
+        // (Re)build name path
+        var path = [];
+        var name;
+        for (var i = 0; i < stackLen; i++) {
+            name = coreStack[i].name;
+            if (name) {
+                path.push(name);
+            }
+        }
+        this._core.path = path.join(".");
+
         this._compileNodes();
         this._engine.display.name = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
@@ -14253,7 +14267,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 20; i++) {
+    for (var i = 0; i < 22; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
@@ -14367,7 +14381,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
     if (this._xpBufLen > 0) {
 
-        for (var i = 0; i < 20; i++) {  // TODO: magic number!
+        for (var i = 0; i < 22; i++) {  // TODO: magic number!
             this._lastStateId[i] = null;
         }
 
@@ -14443,7 +14457,9 @@ SceneJS_Display.prototype.pick = function (params) {
     if (pickName) {
 
         hit = {
-            name:pickName,
+            name:pickName.name,
+            path:pickName.path,
+            nodeId:pickName.nodeId,
             canvasPos:[canvasX, canvasY]
         };
 
@@ -16907,7 +16923,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this._uPickColor && this.core.name) {
 
-            ctx.pickNames[ctx.pickIndex++] = this.core.name;
+            ctx.pickNames[ctx.pickIndex++] = this.core;
 
             var b = ctx.pickIndex >> 16 & 0xFF;
             var g = ctx.pickIndex >> 8 & 0xFF;

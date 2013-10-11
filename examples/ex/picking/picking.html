@@ -98,7 +98,10 @@ base_url: "../../../"
 
     scene.on("pick",
             function (hit) {
-                scene.getNode(hit.name + "-material").setColor({r:0.7, g:0.7, b:0.5});
+                scene.getNode(hit.name + "-material",
+                        function (material) {
+                            material.setColor({r:0.7, g:0.7, b:0.5});
+                        });
                 info.innerHTML = "Pick hit: " + JSON.stringify(hit);
 
                 // To illustrate, these are the params to expect on the pick hit:
