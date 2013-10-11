@@ -204,10 +204,15 @@ require([
                 }
 
                 function mouseUp(event) {
-                    if (dragging && event.clientX == downX && event.clientY == downY) {
+
+                    if (dragging && closeEnough(event.clientX, downX) && closeEnough(event.clientY, downY)) {
                         pick(event.clientX, event.clientY);
                     }
                     dragging = false;
+                }
+
+                function closeEnough(x, y) {
+                    return (x > y) ? (x - y < 5) : (y - x < 5);
                 }
 
                 function touchEnd(event) {
