@@ -152,7 +152,7 @@ require([
 
                 var eye = params.eye || { x:0, y:0, z:0 };
                 var look = params.look || { x:0, y:0, z:0};
-                var zoom = params.zoom || 1000;
+                var zoom = params.zoom || 100;
                 var zoomSensitivity = params.zoomSensitivity || 1.0;
 
                 lookat.set({
@@ -204,10 +204,15 @@ require([
                 }
 
                 function mouseUp(event) {
-                    if (dragging && event.clientX == downX && event.clientY == downY) {
+
+                    if (dragging && closeEnough(event.clientX, downX) && closeEnough(event.clientY, downY)) {
                         pick(event.clientX, event.clientY);
                     }
                     dragging = false;
+                }
+
+                function closeEnough(x, y) {
+                    return (x > y) ? (x - y < 5) : (y - x < 5);
                 }
 
                 function touchEnd(event) {
@@ -271,6 +276,8 @@ require([
                 scene.on("pick",
                     function (hit) {
 
+                        // Some plugins wrap things in this name to
+                        // avoid them being picked, such as skyboxes
                         if (hit.name == "__SceneJS_dontPickMe") {
                             return;
                         }

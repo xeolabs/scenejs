@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<body>
+
+<script src="../../../api/latest/scenejs.js"></script>
+<script src="../../libs/gl-matrix.js"></script>
+
+<script>
+
+
+// Point SceneJS to the bundled plugins
+SceneJS.setConfigs({
+    pluginPath:"../../../api/latest/plugins"
+});
+
+// Create scene
+var scene = SceneJS.createScene({
+    nodes:[
+
+        // View transform, with ID so we can update it.
+        // Don't bother setting initial attributes on it since we'll
+        // do that in the scene "tick" handler, defined further down.
+        {
+            type:"lookAt",
+            id:"myLookat",
+
+            nodes:[
+
+                // Red sphere to indicate current point-of-interest. We'll update the
+                // position of this whenever a new 3D position has been ray-picked.
+                // This will be the position about which we'll orbit.
+
+//                {
+//                    type:"material",
+//                    color:{ r:1, g:0.3, b:0.3 },
+//                    nodes:[
+//
+//                        // Sphere position, with a ID so we can update this node:
+//                        {
+//                            type:"translate",
+//                            id:"spherePOI",
+//                            x:look[0],
+//                            y:look[1],
+//                            z:look[2],
+//                            nodes:[
+//                                {
+//                                    type:"scale",
+//                                    x:0.1,
+//                                    y:0.1,
+//                                    z:0.1,
+//                                    nodes:[
+//
+//                                        // Sphere primitive implemented by plugin at
+//                                        // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+//                                        {
+//                                            type:"prims/sphere"
+//                                        }
+//                                    ]
+//                                }
+//                            ]
+//                        }
+//                    ]
+//                },
+//
+//                // Red sphere to indicate current point-of-interest. We'll update the
+//                // position of this whenever a new 3D position has been ray-picked.
+//                // This will be the position about which we'll orbit.
+//
+//                {
+//                    type:"material",
+//                    color:{ r:0.3, g:1.0, b:0.3 },
+//                    nodes:[
+//
+//                        // Sphere position, with a ID so we can update this node:
+//                        {
+//                            type:"translate",
+//                            id:"lastSpherePOI",
+//                            x:look[0],
+//                            y:look[1],
+//                            z:look[2],
+//                            nodes:[
+//                                {
+//                                    type:"scale",
+//                                    x:0.1,
+//                                    y:0.1,
+//                                    z:0.1,
+//                                    nodes:[
+//
+//                                        // Sphere primitive implemented by plugin at
+//                                        // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+//                                        {
+//                                            type:"prims/sphere"
+//                                        }
+//                                    ]
+//                                }
+//                            ]
+//                        }
+//                    ]
+//                },
+
+
+                // Wrap everything else in a pick name.
+                // For this demo, this just ensures that they will be pickable.  We don't want to
+                // differentiate on the various objects, but since we're going to do a ray-pick
+                // we will get a 3D World-space intersection point on our pick events, which we'll
+                // set the camera to orbit, regardless of which object that's on.
+
+                {
+                    type:"name",
+                    name:"unnamed",
+                    nodes:[
+
+                        // Table
+                        {
+                            type:"translate",
+                            x:0, y:0, z:0,
+                            nodes:[
+                                // Table leg #1
+                                {
+                                    type:"translate",
+                                    x:-2.0, y:0.0, z:-2.0,
+                                    nodes:[
+                                        {
+                                            type:"scale",
+                                            x:0.2, y:1.0, z:0.2,
+                                            nodes:[
+                                                // Materials can appear anywhere in the hierarchy
+                                                {
+                                                    type:"material",
+                                                    color:{ r:1.0, g:0.4, b:0.4 },
+
+                                                    nodes:[
+
+                                                        // Box primitive, implemented by plugin at
+                                                        // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                                        {
+                                                            type:"prims/box"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                // Table leg #2
+                                {
+                                    type:"translate",
+                                    x:2.0, y:0.0, z:-2.0,
+                                    nodes:[
+                                        {
+                                            type:"scale",
+                                            x:0.2, y:1.0, z:0.2,
+                                            nodes:[
+                                                {
+                                                    type:"material",
+                                                    color:{ r:0.4, g:0.6, b:0.4 },
+
+                                                    nodes:[
+
+                                                        // Box primitive implemented by plugin at
+                                                        // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                                        {
+                                                            type:"prims/box"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                // Table leg #3
+                                {
+                                    type:"translate",
+                                    x:2.0, y:0.0, z:2.0,
+                                    nodes:[
+                                        {
+                                            type:"scale",
+                                            x:0.2, y:1.0, z:0.2,
+                                            nodes:[
+                                                {
+                                                    type:"material",
+                                                    color:{ r:0.4, g:0.4, b:0.6 },
+
+                                                    nodes:[
+
+                                                        // Box primitive implemented by plugin at
+                                                        // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                                        {
+                                                            type:"prims/box"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                // Table leg #4
+                                {
+                                    type:"translate",
+                                    x:-2.0, y:0.0, z:2.0,
+                                    nodes:[
+                                        {
+                                            type:"scale",
+                                            x:0.2, y:1.0, z:0.2,
+                                            nodes:[
+                                                {
+                                                    type:"material",
+                                                    color:{ r:0.6, g:0.4, b:0.6 },
+
+                                                    nodes:[
+
+                                                        // Box primitive implemented by plugin at
+                                                        // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                                        {
+                                                            type:"prims/box"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                // Table top
+                                {
+                                    type:"translate",
+                                    x:0.0, y:1.2, z:0.0,
+                                    nodes:[
+                                        {
+                                            type:"scale",
+                                            x:2.7, y:0.2, z:2.7,
+                                            nodes:[
+                                                {
+                                                    type:"material",
+                                                    color:{ r:0.6, g:0.6, b:0.4 },
+
+                                                    nodes:[
+
+                                                        // Box primitive implemented by plugin at
+                                                        // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                                        {
+                                                            type:"prims/box"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+
+                        // Stack of rings sitting on the table
+                        {
+                            type:"translate",
+                            x:-1.1, y:2.3, z:-1.1,
+                            nodes:[
+
+                                // Blue torus
+                                {
+                                    type:"translate",
+                                    y:0.8, x:0.2, z:0.2,
+                                    nodes:[
+                                        {
+                                            type:"rotate",
+                                            x:1, angle:90,
+                                            nodes:[
+                                                {
+                                                    type:"scale",
+                                                    x:0.6, y:0.6, z:0.6,
+                                                    nodes:[
+                                                        {
+                                                            type:"material",
+                                                            color:{ r:0.5, g:0.5, b:0.6 },
+
+                                                            nodes:[
+
+                                                                // Torus primitive implemented by plugin at
+                                                                // http://scenejs.org/api/latest/plugins/node/prims/torus.js
+                                                                {
+                                                                    type:"prims/torus"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                // Pink torus
+                                {
+                                    type:"translate",
+                                    y:0.42, x:0.2, z:0.3,
+                                    nodes:[
+                                        {
+                                            type:"rotate",
+                                            x:1, angle:90,
+                                            nodes:[
+                                                {
+                                                    type:"scale",
+                                                    x:0.7, y:0.7, z:0.7,
+                                                    nodes:[
+                                                        {
+                                                            type:"material",
+                                                            color:{ r:0.7, g:0.5, b:0.5 },
+
+                                                            nodes:[
+
+                                                                // Torus primitive implemented by plugin at
+                                                                // http://scenejs.org/api/latest/plugins/node/prims/torus.js
+                                                                {
+                                                                    type:"prims/torus"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                // Green torus
+                                {
+                                    type:"translate",
+                                    y:-0.055,
+                                    nodes:[
+                                        {
+                                            type:"rotate",
+                                            x:1, angle:90,
+                                            nodes:[
+                                                {
+                                                    type:"scale",
+                                                    x:0.8, y:0.8, z:0.8,
+                                                    nodes:[
+                                                        {
+                                                            type:"material",
+                                                            color:{ r:0.5, g:0.7, b:0.5 },
+
+                                                            nodes:[
+
+                                                                // Torus primitive implemented by plugin at
+                                                                // http://scenejs.org/api/latest/plugins/node/prims/torus.js
+                                                                {
+                                                                    type:"prims/torus"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                // Yellow torus
+                                {
+                                    type:"translate",
+                                    y:-0.6,
+                                    nodes:[
+                                        {
+                                            type:"rotate",
+                                            x:1, angle:90,
+                                            nodes:[
+                                                {
+                                                    type:"scale",
+                                                    x:0.9, y:0.9, z:0.9,
+                                                    nodes:[
+                                                        {
+                                                            type:"material",
+                                                            color:{ r:0.7, g:0.7, b:0.5 },
+
+                                                            nodes:[
+
+                                                                // Torus primitive implemented by plugin at
+                                                                // http://scenejs.org/api/latest/plugins/node/prims/torus.js
+                                                                {
+                                                                    type:"prims/torus"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+
+                        // Teapot
+                        {
+                            type:"translate",
+                            y:1.4, x:1.0, z:1.0,
+                            nodes:[
+                                { type:"rotate",
+                                    y:1,
+                                    angle:40,
+                                    nodes:[
+                                        {
+                                            type:"scale",
+                                            x:0.6, y:0.7, z:0.6,
+                                            nodes:[
+                                                {
+                                                    type:"material",
+                                                    color:{ r:0.6, g:0.7, b:0.6 },
+
+                                                    nodes:[
+
+                                                        // Teapot primitive implemented by plugin at
+                                                        // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                                        {
+                                                            type:"prims/teapot"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+
+                        // Transparent sphere
+                        {
+                            type:"translate",
+                            y:2.0, x:-1.4, z:1.4,
+                            nodes:[
+                                {
+                                    type:"scale",
+                                    x:0.3, y:0.3, z:0.3,
+                                    nodes:[
+                                        {
+                                            type:"flags",
+                                            flags:{ transparent:true },
+                                            nodes:[
+                                                {
+                                                    type:"material",
+                                                    color:{ r:0.4, g:0.5, b:0.4 },
+                                                    alpha:0.6,
+
+                                                    nodes:[
+
+                                                        // Sphere primitive implemented by plugin at
+                                                        // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                                        {
+                                                            type:"prims/sphere"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
+
+// Mouse event handling to do a pick on each mouse click
+
+var canvas = scene.getCanvas();
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+canvas.addEventListener('touchstart', touchStart, true);
+canvas.addEventListener('touchend', touchEnd, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('touchmove', touchMove, true);
+
+var downX;
+var downY;
+var lastX;
+var lastY;
+var dragging;
+
+var pitch = 0;
+var yaw = 0;
+
+var lastPitch = 0;
+var lastYaw = 0;
+
+var needUpdate = true;
+
+var currentPivot = [0, 0, 0];
+var targetPivot = [0, 0, 0];
+
+function mouseDown(event) {
+    lastX = downX = event.clientX;
+    lastY = downY = event.clientY;
+    dragging = true;
+}
+
+function touchStart(event) {
+    lastX = downX = event.targetTouches[0].clientX;
+    lastY = downY = event.targetTouches[0].clientY;
+    dragging = true;
+}
+
+function mouseUp(event) {
+    if (dragging && event.clientX == downX && event.clientY == downY) {
+        pick(event.clientX, event.clientY);
+    }
+    dragging = false;
+}
+
+function touchEnd(event) {
+    if (dragging && event.targetTouches[0].clientX == downX && event.targetTouches[0].clientY == downY) {
+        pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
+    }
+    dragging = false;
+}
+
+function mouseMove(event) {
+    var posX = event.clientX;
+    var posY = event.clientY;
+    actionMove(posX, posY);
+}
+
+function touchMove(event) {
+    var posX = event.targetTouches[0].clientX;
+    var posY = event.targetTouches[0].clientY;
+    actionMove(posX, posY);
+}
+
+function actionMove(posX, posY) {
+    if (dragging) {
+        yaw -= (posX - lastX) * 0.2;
+        pitch += (posY - lastY) * 0.2;
+        needUpdate = true;
+    }
+    lastX = posX;
+    lastY = posY;
+}
+
+function pick(canvasX, canvasY) {
+    scene.pick(canvasX, canvasY, { rayPick:true });
+}
+
+scene.getNode("myLookat",
+        function (myLookat) { // Get view transform node
+
+//            scene.getNode("spherePOI",
+//                    function (spherePOI) { // Get point-of-interest indicator
+//
+//                        scene.getNode("lastSpherePOI",
+//                                function (lastSpherePOI) { // Get point-of-interest indicator
+
+                                    scene.on("pick",
+                                            function (hit) {
+                                                targetPivot = hit.worldPos;
+                                                // Update location of point-of-interest indicator
+                                                //     spherePOI.setXYZ({x:targetPivot[0], y:targetPivot[1], z:targetPivot[2] });
+                                                needUpdate = true;
+                                            });
+
+                                    scene.on("tick",
+                                            function () {
+                                                
+                                                if (needUpdate) {
+
+                                                    var a = vec3.fromValues(targetPivot[0], targetPivot[1], targetPivot[2]);
+                                                    var b = vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
+                                                    var vec = vec3.create();
+                                                    vec3.sub(vec, a, b);
+                                                    var dist = vec3.length(vec);
+                                                    
+                                                    if (dist > 0.1) {
+                                                        var vel = vec3.normalize(vec, vec);
+                                                        currentPivot[0] += vec[0] * 0.2;
+                                                        currentPivot[1] += vec[1] * 0.2;
+                                                        currentPivot[2] += vec[2] * 0.2;
+                                                    } else {
+                                                        needUpdate = false;
+                                                    }
+
+                                                    var eye = vec3.fromValues(0, 0, 20);
+                                                    var look = vec3.fromValues(currentPivot[0], currentPivot[1], currentPivot[2]);
+                                                    var up = vec3.fromValues(0, 1, 0);
+
+                                                    var eyeVec = vec3.create();
+                                                    vec3.sub(eyeVec, eye, look);
+
+                                                    var axis = vec3.create();
+                                                    vec3.cross(axis, up, eyeVec);
+
+                                                    var mat = mat4.create();
+                                                    mat4.rotateY(mat, mat, yaw * 0.0174532925);
+                                                    mat4.rotateX(mat, mat, pitch * 0.0174532925);
+                                                    var eye3 = vec3.create();
+
+                                                    vec3.transformMat4(eyeVec, eyeVec, mat);
+
+                                                    // Update view transform
+                                                    myLookat.setLook({x:look[0], y:look[1], z:look[2] });
+                                                    myLookat.setEye({x:look[0] - eyeVec[0], y:look[1] - eyeVec[1], z:look[2] - eyeVec[2] });
+
+                                                    //    lastSpherePOI.setXYZ({x:look[0], y:look[1], z:look[2] });                                                 
+                                                }
+                                            });
+//                                });
+//                    });
+        });
+
+</script>
+</body>
+</html>

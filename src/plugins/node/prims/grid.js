@@ -19,7 +19,7 @@ SceneJS.Types.addType("prims/grid", {
                     nodes:[
                         {
                             type:"prims/plane",
-                            wire:true,
+                            wire:params.wire != false,
                             widthSegments:params.xSegments || 200,
                             heightSegments:params.zSegments || 200
                         }
