@@ -831,13 +831,13 @@
                     },
                     {
                         "title":"Pick-fly-orbit city",
-                        "path":"plugins/camera/pickFlyOrbitCity.html",
+                        "path":"demos/pickFlyOrbitCity.html",
                         "tags":[],
                         "id":"cameraPickFlyOrbit"
                     },
                     {
                         "title":"Pick-fly-orbit terrain",
-                        "path":"plugins/camera/pickFlyOrbitTerrain.html",
+                        "path":"demos/pickFlyOrbitTerrain.html",
                         "tags":[],
                         "id":"cameraPickFlyOrbitTerrain"
                     }
