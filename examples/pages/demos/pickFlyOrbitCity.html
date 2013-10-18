@@ -9,6 +9,8 @@
         body {
             background: white;
             margin: 0;
+            overflow: hidden;
+            height: 100%;
             -moz-user-select: -moz-none;
             -khtml-user-select: none;
             -webkit-user-select: none;
@@ -20,6 +22,32 @@
             font-size: 16px;
         }
 
+        #container {
+            color: white;
+            text-align: center;
+            position: absolute;
+            top: 30%;
+            left: 0px;
+            width: 100%;
+            height: 1px;
+            overflow: visible;
+            visibility: visible;
+            display: block;
+            z-index: 1000;
+            border: 0;
+        }
+
+        #clickme {
+            background: #0db107;
+            width: 250px;
+            margin: 0 auto;
+            padding: 10px;
+            font-family: Helvetica;
+            font-size: 22px;
+            border: 1px solid darkgreen;
+            box-shadow: 5px 5px 3px #545454;
+        }
+
         #info {
             position: absolute;
             top: 20px;
@@ -27,8 +55,8 @@
             width: auto;
             color: #ffffff;
             padding: 10px;
-            padding-right:20px;
-            padding-top:20px;
+            padding-right: 20px;
+            padding-top: 20px;
             font-family: Helvetica;
             font-size: 16px;
             text-align: left;
@@ -40,17 +68,27 @@
 </head>
 <body>
 
+
+<div id="container">
+    <div id="clickme">
+        Click on something!
+    </div>
+</div>
+
 <div id="info">
-    <b><a href="http://scenejs.org">SceneJS</a> experimental camera <a href="http://xeolabs.com/articles/scenejs-node-types/">plugin</a></b>
+    <b><a href="http://scenejs.org">SceneJS</a> camera <a
+            href="http://xeolabs.com/articles/scenejs-node-types/">plugin</a></b>
     <br>
     <ul>
         <li>Click somewhere to fly to that point</li>
         <li>Mouse drag to orbit</li>
         <li>Mouse wheel to zoom</li>
-        <li><a href="http://scenejs.org/examples/pages/demos/pickFlyOrbitTerrain.html">Height map terrain version</a></li>
+        <li><a href="http://scenejs.org/examples/pages/demos/pickFlyOrbitTerrain.html">Try the terrain version</a>
+        </li>
     </ul>
     <br>
-    <a href="http://www.chromeexperiments.com/detail/pickflyorbit-city/"><img src="../../images/chrome-experiment.png" alt="See my Experiment on ChromeExperiments.com" /></a>
+    <a href="http://www.chromeexperiments.com/detail/pickflyorbit-city/"><img src="../../images/chrome-experiment.png"
+                                                                              alt="See my Experiment on ChromeExperiments.com"/></a>
 </div>
 
 <script src="../../../api/latest/scenejs.js"></script>
@@ -117,7 +155,7 @@
                                     {
                                         type:"material",
                                         color:{ r:0.5, g:1.0, b:0.5 },
-                                        emit: 0.1,
+                                        emit:0.1,
                                         nodes:[
 
                                             // Grid ground, implemented by plugin at
@@ -140,7 +178,7 @@
                                             {
                                                 type:"material",
                                                 color:{ r:0.5, g:1.0, b:0.5 },
-                                                emit: 0.01,
+                                                emit:0.01,
                                                 nodes:[
 
                                                     // Solid green surface under the grid, implemented by plugin at
@@ -183,6 +221,11 @@
                 ]
             }
         ]
+    });
+
+    // Hide the prompt on first pick
+    scene.on("pick", function () {
+        document.getElementById("clickme").style.display = 'none';
     });
 
 </script>
