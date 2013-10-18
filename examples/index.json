@@ -1144,7 +1144,7 @@
                     {
                         "title":"Heightmap with custom texture and fog",
                         "tags":["heightMap"],
-                        "path":"plugins/heightmaps/custom.html",
+                        "path":"demos/pickFlyOrbitTerrain.html",
                         "id":"customHeightmap"
                     }
                 ]
@@ -1209,10 +1209,17 @@
                     },
                     {
                         "title":"Procedural City",
-                        "path":"demos/city.html",
+                        "path":"demos/pickFlyOrbitCity.html",
                         "editor":false,
                         "tags":[],
                         "id":"city"
+                    },
+                    {
+                        "title":"Terrain",
+                        "path":"demos/pickFlyOrbitTerrain.html",
+                        "editor":false,
+                        "tags":[],
+                        "id":"funTerrain"
                     },
                     {
                         "title":"Earth in 26 lines of JSON",
