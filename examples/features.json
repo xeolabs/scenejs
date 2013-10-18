@@ -269,14 +269,6 @@
                         "page":"autoNormals"
                     }
                 ]
-            },
-            {
-                "nodes":[
-                    {
-                        "title":"Geometry plugin API",
-                        "page":"geometryPluginPullStream"
-                    }
-                ]
             }
         ]
     },

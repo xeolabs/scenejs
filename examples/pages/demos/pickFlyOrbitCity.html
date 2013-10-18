@@ -16,19 +16,19 @@
 
         a {
             color: #ffffff;
-            padding-top: 20px;
             font-family: Helvetica;
             font-size: 16px;
         }
 
         #info {
             position: absolute;
-            top: 50px;
-            left: 100px;
+            top: 20px;
+            left: 20px;
             width: auto;
             color: #ffffff;
             padding: 10px;
-            padding-top: 20px;
+            padding-right:20px;
+            padding-top:20px;
             font-family: Helvetica;
             font-size: 16px;
             text-align: left;
@@ -41,16 +41,16 @@
 <body>
 
 <div id="info">
-    <b><a href="http://scenejs.org">SceneJS</a> experimental <a
-            href="http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js" target="other">camera
-        plugin</a></b>
+    <b><a href="http://scenejs.org">SceneJS</a> experimental camera <a href="http://xeolabs.com/articles/scenejs-node-types/">plugin</a></b>
+    <br>
     <ul>
-        <li>Click on a building to fly to it</li>
+        <li>Click somewhere to fly to that point</li>
         <li>Mouse drag to orbit</li>
         <li>Mouse wheel to zoom</li>
-        <li>Try clicking on the horizon</li>
-        <li>Try clicking while zoomed-in close - trippy!</li>
+        <li><a href="http://scenejs.org/examples/pages/demos/pickFlyOrbitTerrain.html">Height map terrain version</a></li>
     </ul>
+    <br>
+    <a href="http://www.chromeexperiments.com/detail/pickflyorbit-city/"><img src="../../images/chrome-experiment.png" alt="See my Experiment on ChromeExperiments.com" /></a>
 </div>
 
 <script src="../../../api/latest/scenejs.js"></script>
@@ -69,8 +69,8 @@
             // http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js
             {
                 type:"cameras/pickFlyOrbit",
-                yaw:-0,
-                pitch:-40,
+                yaw:10,
+                pitch:-30,
                 eye:{ x:-10, y:50, z:-100 },
                 look:{ x:-10, y:50, z:0 },
                 zoomSensitivity:20.0,
@@ -106,7 +106,7 @@
                             // Fog effect, implemented by plugin at
                             // http://scenejs.org/api/latest/plugins/node/effects/fog.js
                             {
-                           //     type:"effects/fog",
+                                type:"effects/fog",
                                 mode:"exp2", // Quadratic
                                 density:0.1, // Fog density
                                 start:30.0, // Near starting point
