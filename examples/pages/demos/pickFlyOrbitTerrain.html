@@ -67,7 +67,7 @@
 
 <div id="container">
     <div id="clickme">
-        Click somewhere!
+        Loading, just a second...
     </div>
 </div>
 
@@ -172,9 +172,21 @@
             }
     );
 
+    var clickme = document.getElementById("clickme");
+
+    // Change prompt once everything loaded
+    var checkLoaded = window.setInterval(
+            function () {
+                var numTasks = scene.get("status").numTasks;
+                if (!numTasks || numTasks == 0) {
+                    window.clearInterval(checkLoaded);
+                    clickme.innerHTML = "Click on somewhere!";
+                }
+            }, 200);
+
     // Hide the prompt on first pick
     scene.on("pick", function () {
-        document.getElementById("clickme").style.display = 'none';
+        clickme.style.display = 'none';
     });
 
 </script>
