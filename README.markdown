@@ -9,7 +9,6 @@ articulated and pickable objects as required for high-detail visualisation appli
 SceneJS requires nodejs and ncp. To build, simply:
 
 ```npm install ncp```
-
 ```node build.js```
 
 Then the binaries will appear in ```./api```.
