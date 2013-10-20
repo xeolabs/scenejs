@@ -1,6 +1,6 @@
 ## SceneJS 3.1
 
-**[SceneJS](http://scenejs.org)** is an extensible WebGL-based engine for high-detail 3D visualisation.
+An extensible WebGL-based engine for high-detail 3D visualisation.
 
  * [SceneJS.org](http://scenejs.org)
 
