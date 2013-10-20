@@ -7,11 +7,15 @@
 
     <style>
         body {
+            background: white;
             margin: 0;
+            overflow: hidden;
+            height: 100%;
             -moz-user-select: -moz-none;
             -khtml-user-select: none;
             -webkit-user-select: none;
         }
+
         a {
             color: #ffffff;
             font-family: Helvetica;
@@ -61,24 +65,47 @@
             z-index: 100000;
             border: 1px white solid;
         }
+
+        .title {
+            font-size: 36px;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin: 0;
+            margin-top: 5px;
+            margin-bottom: 0;
+        }
+
+        ul {
+            padding-top: 0px;
+            padding-left: 20px;
+            padding-bottom:0px;
+        }
+
+        li {
+            padding-top: 5px;
+        }
     </style>
 </head>
 <body>
 
+
 <div id="container">
     <div id="clickme">
-        Loading, just a second...
+        Loading, just a second..
     </div>
 </div>
 
 <div id="info">
-    <b><a href="http://scenejs.org">SceneJS</a> camera <a href="http://xeolabs.com/articles/scenejs-node-types/">plugin</a></b>
+    <p class="title">PickFlyOrbit Terrain</p>
     <br>
     <ul>
         <li>Click somewhere to fly to that point</li>
         <li>Mouse drag to orbit</li>
         <li>Mouse wheel to zoom</li>
-        <li><a href="http://scenejs.org/examples/pages/demos/pickFlyOrbitCity.html">Try the city version</a></li>
+        <li>Powered by <a href="http://scenejs.org">SceneJS</a>
+        </li>
+        <li><a href="http://scenejs.org/examples/pages/demos/pickFlyOrbitCity.html">Try the city version!</a>
+        </li>
     </ul>
 </div>
 
