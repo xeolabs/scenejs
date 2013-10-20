@@ -8,7 +8,7 @@ An extensible WebGL-based engine for high-detail 3D visualisation.
  * [Issues](https://github.com/xeolabs/scenejs/issues)
 
 
-## Download
+## Downloads
 
  * [http://scenejs.org/api/latest/scenejs.js](http://scenejs.org/api/latest/scenejs.js)
 
