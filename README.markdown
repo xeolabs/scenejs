@@ -27,8 +27,7 @@ SceneJS.setConfigs({
 });
 ```
 
-
-SceneJS dynamihttp://xeolabs.com/articles/scenejs-quick-start/#plugins
+Read more in the [Quick Start tutorial](http://xeolabs.com/articles/scenejs-quick-start).
 
 ## Building
 SceneJS requires nodejs and ncp. To build, simply:
