@@ -177,7 +177,8 @@
                         "title":"Toggle pickability",
                         "tags":["picking"],
                         "tip":"Using a flags node to switch ability to pick child geometries",
-                        "path":"flags/picking.html"
+                        "path":"flags/picking.html",
+                        "id":"disablePicking"
                     }
                 ]
             },
