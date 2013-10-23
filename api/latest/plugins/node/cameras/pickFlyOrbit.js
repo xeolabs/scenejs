@@ -27,6 +27,7 @@ require([
         // Create target indicator div
 
         var label = (function () {
+            var text;
             var body = document.getElementsByTagName("body")[0];
             var div = document.createElement('div');
 
@@ -52,14 +53,21 @@ require([
             div.innerHTML += 'Foo';
             body.appendChild(div);
             return {
+
+                // Shows label, but only if text has been set
                 setShown:function (shown) {
-                    style.display = shown ? "" : "none";
+                    style.display = shown && text ? "" : "none";
                 },
+
+                // Sets canvas position of label
                 setPos:function (pos) {
                     style.left = "" + pos.x + "px";
                     style.top = "" + pos.y + "px";
                 },
-                setText:function (text) {
+
+                // Sets text in label
+                setText:function (t) {
+                    text = t;
                     div.innerHTML = "<span>" + text + "</span>";
                 }
             }
