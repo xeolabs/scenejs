@@ -30,11 +30,13 @@ SceneJS.setConfigs({
 Read more in the [Quick Start tutorial](http://xeolabs.com/articles/scenejs-quick-start).
 
 ## Building
-SceneJS requires nodejs and ncp. To build, simply:
+SceneJS requires nodejs, ncp and adm-zip (for Zipping the plugins directory). To build, simply:
 
 ```npm install ncp```
 
-```node build.js```
+```npm install adm-zip```
+
+```node build.js``
 
 Then the binaries will appear in ```./api```.
 
