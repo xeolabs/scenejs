@@ -15,7 +15,6 @@
     var sys = require('util');
     var fs = require('fs');
     var path = require('path');
-    var AdmZip = require('adm-zip');
 
     var TYPE = "all"; // Default Type
 
@@ -274,17 +273,6 @@
                                 output = output.join("");
                                 fs.writeFileSync(distDir + "/scenejs.js", output);
                             }
-
-                            // creating archives
-                            var zip = new AdmZip();
-
-                            // Add plugins dir to ZIP
-                            zip.addLocalFolder(distDir + "/plugins/");
-
-                            var willSendthis = zip.toBuffer();
-
-                            zip.writeZip(distDir + "/scenejs.plugins.zip");
-
 
                             var files = getFileList([], true);
 

@@ -21,24 +21,30 @@ serve the library and the plugins yourself.
 If that's the case, then
 
 1. get a copy of the library
-2. get the [ZIP archive of plugins](http://scenejs.org/api/latest/scenejs.plugins.zip)
-3. unzip that archive
-4. configure SceneJS to load the plugins from those unzipped plugins, like this:
+2. get the [ZIP archive of plugins](http://scenejs.org/api/latest/plugins.zip)
+3. unzip that archive, say to directory ```myDir```
+4. configure SceneJS to load the plugins from there, like this:
 
 ``` javascript
 SceneJS.setConfigs({
-    pluginPath: "./foo/myPluginsDir"
+    pluginPath: "./myDir/plugins"
+});
+```
+
+Then off you go, start building a scene:
+
+```javascript
+var myScene = SceneJS.createScene({
+    // ...
 });
 ```
 
 Read more in the [Quick Start tutorial](http://xeolabs.com/articles/scenejs-quick-start).
 
 ## Building
-SceneJS requires nodejs, ncp and adm-zip (for Zipping the plugins directory). To build, simply:
+SceneJS requires nodejs and ncp. To build, simply:
 
 ```npm install ncp```
-
-```npm install adm-zip```
 
 ```node build.js``
 
