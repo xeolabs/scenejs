@@ -18,8 +18,12 @@ To keep the core library small, SceneJS dynamically loads it’s non-core functi
 You can hotlink to this library if you're OK with using the plugins from this repo, however you'll probably want to
 serve the library and the plugins yourself.
 
-If that's the case, then get a copy of the library and the [plugins directory](https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins) and
-configure SceneJS to load the plugins from your location, like this:
+If that's the case, then
+
+1. get a copy of the library
+2. get the [ZIP archive of plugins](http://scenejs.org/api/latest/scenejs.plugins.zip)
+3. unzip that archive
+4. configure SceneJS to load the plugins from those unzipped plugins, like this:
 
 ``` javascript
 SceneJS.setConfigs({
