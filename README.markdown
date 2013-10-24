@@ -11,14 +11,17 @@ An extensible WebGL-based engine for high-detail 3D visualisation.
 ## Downloads
 
  * [http://scenejs.org/api/latest/scenejs.js](http://scenejs.org/api/latest/scenejs.js)
+ * [ZIP archive of plugins](http://scenejs.org/api/latest/plugins.zip)
+
+### Using the Plugins
 
 To keep the core library small, SceneJS dynamically loads it’s non-core functionality from a directory of plugins,
  which it loads on-demand from the plugins directory within this GitHub repository.
 
-You can hotlink to this library if you're OK with using the plugins from this repo, however you'll probably want to
-serve the library and the plugins yourself.
+You can hotlink to this library if you're OK with using the plugins from this repo and don't need any plugins that
+provide textures, (because those textures won't load cross-domain).
 
-If that's the case, then
+If not, then just do this:
 
 1. get a copy of the library
 2. get the [ZIP archive of plugins](http://scenejs.org/api/latest/plugins.zip)
