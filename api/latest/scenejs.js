@@ -2211,7 +2211,7 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
  */
 SceneJS_Engine.prototype._tryCompile = function () {
 
-   // this._doAddNodes();
+    // this._doAddNodes();
 
     if (this.display.imageDirty // Frame buffer needs redraw
         || this.display.drawListDirty // Draw list needs rebuild
@@ -2230,7 +2230,12 @@ SceneJS_Engine.prototype._tryCompile = function () {
                 engine:this                                            // Compilation support modules get ready
             });
 
-            this.scene._compileNodes(); // Begin depth-first compilation descent into scene sub-nodes
+            this.pubSubProxy = new SceneJS_PubSubProxy(this.scene, null);
+            var ctx = {
+                pubSubProxy : this.pubSubProxy
+            };
+
+            this.scene._compileNodes(ctx); // Begin depth-first compilation descent into scene sub-nodes
         }
 
         this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true
@@ -6289,6 +6294,9 @@ SceneJS.Node.prototype.on = function (topic, callback) {
     if (topic == "rendered") {
         this._engine.branchDirty(this);
     }
+//    if (topic == "tick") {
+//        this._engine.scene.on("tick",callback);
+//    }
     // }
     return handle;
 };
@@ -6310,6 +6318,9 @@ SceneJS.Node.prototype.off = function (handle) {
             this._engine.branchDirty(this);
         }
     }
+//    else {
+//        this._engine.scene.off(handle);
+//    }
 };
 
 /**
@@ -7337,23 +7348,31 @@ SceneJS.Node.prototype.getJSON = function () {
 };
 
 
-SceneJS.Node.prototype._compile = function () {
+SceneJS.Node.prototype._compile = function (ctx) {
     if (this.preCompile) {
         this.preCompile();
     }
-    this._compileNodes();
+    this._compileNodes(ctx);
     if (this.postCompile) {
         this.postCompile();
     }
 };
 
-SceneJS.Node.prototype._compileNodes = function () {
+SceneJS.Node.prototype._compileNodes = function (ctx) {
 
     var renderSubs = this._topicSubs["rendered"];
 
     if (renderSubs) {
         SceneJS_nodeEventsModule.preVisitNode(this);
     }
+
+//    var tickSubs = this._topicSubs["tick"];
+//
+//    if (tickSubs) {
+//        ctx.pubSubProxy.on("tick", function(event) {
+//            this.publish("tick", event);
+//        });
+//    }
 
     var child;
 
@@ -7364,7 +7383,7 @@ SceneJS.Node.prototype._compileNodes = function () {
         child.branchDirty = child.branchDirty || this.branchDirty; // Compile subnodes if scene branch dirty
 
         if (child.dirty || child.branchDirty || this._engine.sceneDirty) {  // Compile nodes that are flagged dirty
-            child._compile();
+            child._compile(ctx);
             child.dirty = false;
             child.branchDirty = false;
         }
@@ -7434,7 +7453,15 @@ SceneJS.Node.prototype._doDestroy = function () {
     }
 
     return this;
-};/**
+};SceneJS_PubSubProxy = function (scene, proxy) {
+    this.scene = scene;
+    this.proxy = proxy;
+
+};
+
+
+
+/**
  * @class Manages creation, recycle and destruction of {@link SceneJS.Node} instances
  * @private
  */
@@ -7755,9 +7782,9 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
      * Compiles this camera node, setting this node's state core on the display, compiling sub-nodes,
      * then restoring the previous camera state core back onto the display on exit.
      */
-    SceneJS.Camera.prototype._compile = function () {
+    SceneJS.Camera.prototype._compile = function (ctx) {
         this._engine.display.projTransform = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.projTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -7850,14 +7877,14 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._core.hash = null;
     };
 
-    SceneJS.Clips.prototype._compile = function() {
+    SceneJS.Clips.prototype._compile = function(ctx) {
 
         if (!this._core.hash) {
             this._core.hash = this._core.clips.length;
         }
 
         this._engine.display.clips = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.clips = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -7909,9 +7936,9 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         return this._core.enabled;
     };
 
-    SceneJS.Enable.prototype._compile = function () {
+    SceneJS.Enable.prototype._compile = function (ctx) {
         this._engine.display.enable = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.enable = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -8224,9 +8251,9 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         return this._core.ambient;
     };
 
-    SceneJS.Flags.prototype._compile = function() {
+    SceneJS.Flags.prototype._compile = function(ctx) {
         this._engine.display.flags = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.flags = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -8417,9 +8444,9 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         };
     };
 
-    SceneJS.Framebuf.prototype._compile = function() {
+    SceneJS.Framebuf.prototype._compile = function(ctx) {
         this._engine.display.framebuf = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.framebuf = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -9066,10 +9093,10 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         return this._boundary;
     };
 
-    SceneJS.Geometry.prototype._compile = function () {
+    SceneJS.Geometry.prototype._compile = function (ctx) {
 
         if (this._core._loading) { // TODO: Breaks with asynch loaded cores - this node needs to recompile when target core is loaded
-            this._compileNodes();
+            this._compileNodes(ctx);
             return;
         }
 
@@ -9113,7 +9140,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             coreStack[stackLen++] = this._core;
         }
 
-        this._compileNodes();
+        this._compileNodes(ctx);
 
         stackLen--;
     };
@@ -9264,9 +9291,9 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         return this._core.clearDepth;
     };
 
-    SceneJS.Layer.prototype._compile = function() {
+    SceneJS.Layer.prototype._compile = function(ctx) {
         this._engine.display.layer = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.layer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -9277,7 +9304,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
  * @extends SceneJS.Node
  */
 SceneJS.Library = SceneJS_NodeFactory.createNodeType("library");
-SceneJS.Library.prototype._compile = function() { // Bypass child nodes
+SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
 };
 
 (function () {
@@ -9534,14 +9561,14 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         this._core.hash = null;
     };
 
-    SceneJS.Lights.prototype._compile = function () {
+    SceneJS.Lights.prototype._compile = function (ctx) {
 
         if (!this._core.hash) {
             makeHash(this._core);
         }
 
         this._engine.display.lights = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.lights = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -9941,9 +9968,9 @@ SceneJS.Library.prototype._compile = function() { // Bypass child nodes
         };
     };
 
-    SceneJS.Lookat.prototype._compile = function () {
+    SceneJS.Lookat.prototype._compile = function (ctx) {
         this._engine.display.viewTransform = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.viewTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -10100,9 +10127,9 @@ new (function () {
         return this._core.alpha;
     };
 
-    SceneJS.Material.prototype._compile = function () {
+    SceneJS.Material.prototype._compile = function (ctx) {
         this._engine.display.material = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.material = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -10442,14 +10469,14 @@ new (function () {
         return this._core.targets;
     };
 
-    SceneJS.MorphGeometry.prototype._compile = function () {
+    SceneJS.MorphGeometry.prototype._compile = function (ctx) {
 
         if (!this._core.hash) {
             this._makeHash();
         }
 
         this._engine.display.morphGeometry = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.morphGeometry = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -10538,7 +10565,7 @@ new (function () {
         return this._core.name;
     };
 
-    SceneJS.Name.prototype._compile = function () {
+    SceneJS.Name.prototype._compile = function (ctx) {
 
         this._engine.display.name = coreStack[stackLen++] = this._core;
 
@@ -10553,7 +10580,7 @@ new (function () {
         }
         this._core.path = path.join(".");
 
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.name = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 })();new (function() {
@@ -11324,7 +11351,7 @@ new (function () {
         } : undefined;
     };
 
-    SceneJS.Renderer.prototype._compile = function() {
+    SceneJS.Renderer.prototype._compile = function(ctx) {
 
 //        if (this._core.dirty) {
 //            this._core.props = createProps(this._core);
@@ -11332,7 +11359,7 @@ new (function () {
 //        }
 //
 //        this._engine.display.renderer = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         //this._engine.display.renderer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 })();(function () {
@@ -11470,9 +11497,9 @@ new (function () {
         return this._core._depthFuncName;
     };
 
-    SceneJS.DepthBuf.prototype._compile = function () {
+    SceneJS.DepthBuf.prototype._compile = function (ctx) {
         this._engine.display.depthbuf = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.depthbuf = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -11533,9 +11560,9 @@ new (function () {
         return this._core.blendEnabled;
     };
 
-    SceneJS.ColorBuf.prototype._compile = function () {
+    SceneJS.ColorBuf.prototype._compile = function (ctx) {
         this._engine.display.colorbuf = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.colorbuf = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -11606,9 +11633,9 @@ new (function () {
         return this._core.scissorTestEnabled;
     };
 
-    SceneJS.View.prototype._compile = function () {
+    SceneJS.View.prototype._compile = function (ctx) {
         this._engine.display.view = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.view = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -11733,6 +11760,8 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     if (result) {
         this.publish("pick", result);
         return result;
+    } else {
+        this.publish("nopick");
     }
 };
 
@@ -12018,7 +12047,7 @@ new (function() {
         return params;
     };
 
-    SceneJS.Shader.prototype._compile = function() {
+    SceneJS.Shader.prototype._compile = function(ctx) {
 
         idStack[stackLen] = this._core.coreId; // Draw list node tied to core, not node
 
@@ -12038,7 +12067,7 @@ new (function() {
         stackLen++;
         dirty = true;
 
-        this._compileNodes();
+        this._compileNodes(ctx);
 
         stackLen--;
         dirty = true;
@@ -12127,14 +12156,14 @@ new (function() {
         return params;
     };
 
-    SceneJS.ShaderParams.prototype._compile = function() {
+    SceneJS.ShaderParams.prototype._compile = function(ctx) {
 
         idStack[stackLen] = this._core.coreId; // Tie draw list state to core, not to scene node
         shaderParamsStack[stackLen] = this._core.params;
         stackLen++;
         dirty = true;
 
-        this._compileNodes();
+        this._compileNodes(ctx);
 
         stackLen--;
         dirty = true;
@@ -12197,9 +12226,9 @@ new (function() {
         return this._core.lineWidth;
     };
 
-    SceneJS.Style.prototype._compile = function () {
+    SceneJS.Style.prototype._compile = function (ctx) {
         this._engine.display.style = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.style = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -12257,9 +12286,9 @@ new (function() {
         return this._core.tag;
     };
 
-    SceneJS.Tag.prototype._compile = function() {
+    SceneJS.Tag.prototype._compile = function(ctx) {
         this._engine.display.tag = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.tag = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 })();/**
@@ -12695,12 +12724,12 @@ new (function () {
         }
     };
 
-    SceneJS.Texture.prototype._compile = function () {
+    SceneJS.Texture.prototype._compile = function (ctx) {
         if (!this._core.hash) {
             this._makeHash();
         }
         this._engine.display.texture = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.texture = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
@@ -12825,9 +12854,9 @@ SceneJS.XForm.prototype.setElements = function (elements) {
     return this;
 };
 
-SceneJS.XForm.prototype._compile = function () {
+SceneJS.XForm.prototype._compile = function (ctx) {
     SceneJS_modelXFormStack.push(this._core);
-    this._compileNodes();
+    this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };
 
@@ -12910,9 +12939,9 @@ SceneJS.Matrix.prototype.setMatrix = function(elements) {
  */
 SceneJS.Matrix.prototype.setElements = SceneJS.Matrix.prototype.setMatrix;
 
-SceneJS.Matrix.prototype._compile = function() {
+SceneJS.Matrix.prototype._compile = function(ctx) {
     SceneJS_modelXFormStack.push(this._core);
-    this._compileNodes();
+    this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };
 /**
@@ -13058,9 +13087,9 @@ SceneJS.Rotate.prototype.incAngle = function(angle) {
     this._engine.display.imageDirty = true;
 };
 
-SceneJS.Rotate.prototype._compile = function() {
+SceneJS.Rotate.prototype._compile = function(ctx) {
     SceneJS_modelXFormStack.push(this._core);
-    this._compileNodes();
+    this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };
 /**
@@ -13216,9 +13245,9 @@ SceneJS.Translate.prototype.incZ = function(z) {
     return this;
 };
 
-SceneJS.Translate.prototype._compile = function() {
+SceneJS.Translate.prototype._compile = function(ctx) {
     SceneJS_modelXFormStack.push(this._core);
-    this._compileNodes();
+    this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };
 /**
@@ -13368,9 +13397,9 @@ SceneJS.Scale.prototype.incZ = function (z) {
     this._engine.display.imageDirty = true;
 };
 
-SceneJS.Scale.prototype._compile = function () {
+SceneJS.Scale.prototype._compile = function (ctx) {
     SceneJS_modelXFormStack.push(this._core);
-    this._compileNodes();
+    this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };
 /**

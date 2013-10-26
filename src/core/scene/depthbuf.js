@@ -133,9 +133,9 @@
         return this._core._depthFuncName;
     };
 
-    SceneJS.DepthBuf.prototype._compile = function () {
+    SceneJS.DepthBuf.prototype._compile = function (ctx) {
         this._engine.display.depthbuf = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.depthbuf = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

@@ -55,9 +55,9 @@
         return this._core.lineWidth;
     };
 
-    SceneJS.Style.prototype._compile = function () {
+    SceneJS.Style.prototype._compile = function (ctx) {
         this._engine.display.style = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.style = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

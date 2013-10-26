@@ -634,10 +634,10 @@ new (function () {
         return this._boundary;
     };
 
-    SceneJS.Geometry.prototype._compile = function () {
+    SceneJS.Geometry.prototype._compile = function (ctx) {
 
         if (this._core._loading) { // TODO: Breaks with asynch loaded cores - this node needs to recompile when target core is loaded
-            this._compileNodes();
+            this._compileNodes(ctx);
             return;
         }
 
@@ -681,7 +681,7 @@ new (function () {
             coreStack[stackLen++] = this._core;
         }
 
-        this._compileNodes();
+        this._compileNodes(ctx);
 
         stackLen--;
     };

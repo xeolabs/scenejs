@@ -3,6 +3,6 @@
  * @extends SceneJS.Node
  */
 SceneJS.Library = SceneJS_NodeFactory.createNodeType("library");
-SceneJS.Library.prototype._compile = function() { // Bypass child nodes
+SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
 };
 

@@ -165,7 +165,7 @@ new (function() {
         return params;
     };
 
-    SceneJS.Shader.prototype._compile = function() {
+    SceneJS.Shader.prototype._compile = function(ctx) {
 
         idStack[stackLen] = this._core.coreId; // Draw list node tied to core, not node
 
@@ -185,7 +185,7 @@ new (function() {
         stackLen++;
         dirty = true;
 
-        this._compileNodes();
+        this._compileNodes(ctx);
 
         stackLen--;
         dirty = true;

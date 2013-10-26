@@ -78,8 +78,8 @@ SceneJS.Matrix.prototype.setMatrix = function(elements) {
  */
 SceneJS.Matrix.prototype.setElements = SceneJS.Matrix.prototype.setMatrix;
 
-SceneJS.Matrix.prototype._compile = function() {
+SceneJS.Matrix.prototype._compile = function(ctx) {
     SceneJS_modelXFormStack.push(this._core);
-    this._compileNodes();
+    this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };

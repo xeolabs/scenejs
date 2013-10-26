@@ -45,9 +45,9 @@
         return this._core.enabled;
     };
 
-    SceneJS.Enable.prototype._compile = function () {
+    SceneJS.Enable.prototype._compile = function (ctx) {
         this._engine.display.enable = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.enable = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

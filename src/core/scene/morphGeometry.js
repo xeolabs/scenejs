@@ -334,14 +334,14 @@ new (function () {
         return this._core.targets;
     };
 
-    SceneJS.MorphGeometry.prototype._compile = function () {
+    SceneJS.MorphGeometry.prototype._compile = function (ctx) {
 
         if (!this._core.hash) {
             this._makeHash();
         }
 
         this._engine.display.morphGeometry = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.morphGeometry = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

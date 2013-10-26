@@ -151,8 +151,8 @@ SceneJS.Translate.prototype.incZ = function(z) {
     return this;
 };
 
-SceneJS.Translate.prototype._compile = function() {
+SceneJS.Translate.prototype._compile = function(ctx) {
     SceneJS_modelXFormStack.push(this._core);
-    this._compileNodes();
+    this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };

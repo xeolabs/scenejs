@@ -252,14 +252,14 @@
         this._core.hash = null;
     };
 
-    SceneJS.Lights.prototype._compile = function () {
+    SceneJS.Lights.prototype._compile = function (ctx) {
 
         if (!this._core.hash) {
             makeHash(this._core);
         }
 
         this._engine.display.lights = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.lights = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

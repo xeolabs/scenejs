@@ -394,9 +394,9 @@
         };
     };
 
-    SceneJS.Lookat.prototype._compile = function () {
+    SceneJS.Lookat.prototype._compile = function (ctx) {
         this._engine.display.viewTransform = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.viewTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

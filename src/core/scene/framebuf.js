@@ -185,9 +185,9 @@ new (function() {
         };
     };
 
-    SceneJS.Framebuf.prototype._compile = function() {
+    SceneJS.Framebuf.prototype._compile = function(ctx) {
         this._engine.display.framebuf = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.framebuf = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

@@ -416,7 +416,7 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
  */
 SceneJS_Engine.prototype._tryCompile = function () {
 
-   // this._doAddNodes();
+    // this._doAddNodes();
 
     if (this.display.imageDirty // Frame buffer needs redraw
         || this.display.drawListDirty // Draw list needs rebuild
@@ -435,7 +435,12 @@ SceneJS_Engine.prototype._tryCompile = function () {
                 engine:this                                            // Compilation support modules get ready
             });
 
-            this.scene._compileNodes(); // Begin depth-first compilation descent into scene sub-nodes
+            this.pubSubProxy = new SceneJS_PubSubProxy(this.scene, null);
+            var ctx = {
+                pubSubProxy : this.pubSubProxy
+            };
+
+            this.scene._compileNodes(ctx); // Begin depth-first compilation descent into scene sub-nodes
         }
 
         this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true

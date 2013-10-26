@@ -145,8 +145,8 @@ SceneJS.Scale.prototype.incZ = function (z) {
     this._engine.display.imageDirty = true;
 };
 
-SceneJS.Scale.prototype._compile = function () {
+SceneJS.Scale.prototype._compile = function (ctx) {
     SceneJS_modelXFormStack.push(this._core);
-    this._compileNodes();
+    this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };

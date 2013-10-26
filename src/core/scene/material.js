@@ -146,9 +146,9 @@ new (function () {
         return this._core.alpha;
     };
 
-    SceneJS.Material.prototype._compile = function () {
+    SceneJS.Material.prototype._compile = function (ctx) {
         this._engine.display.material = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.material = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

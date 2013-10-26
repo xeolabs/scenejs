@@ -129,6 +129,8 @@
 
                 // To illustrate, these are the params to expect on the pick hit:
                 var name = hit.name;
+                var path = hit.path; // Eg. "foo.object1"
+                var nodeId = hit.nodeId;
                 var canvasX = hit.canvasPos[0];
                 var canvasY = hit.canvasPos[1];
                 var worldX = hit.worldPos[0];
@@ -136,8 +138,13 @@
                 var worldZ = hit.worldPos[2];
             });
 
-    // Creates little red sphere at each given ray pick hit
+    // Called when nothing picked
+    scene.on("nopick",
+            function (hit) {
+                info.innerHTML = "Nothing picked.";
+            });
 
+    // Creates little red sphere at each given ray pick hit
     function showHit(hit) {
         scene.getNode("intersectIndicators")
                 .addNode({
@@ -169,48 +176,48 @@
                 });
     }
 
+
     // Mouse event handling to do a pick on each mouse click
 
     var canvas = scene.getCanvas();
-
-    canvas.addEventListener('mousedown', mouseDown, true);
-    canvas.addEventListener('mouseup', mouseUp, true);
-    canvas.addEventListener('touchstart', touchStart, true);
-    canvas.addEventListener('touchend', touchEnd, true);
 
     var lastX;
     var lastY;
     var dragging;
 
-    function mouseDown(event) {
-        lastX = event.clientX;
-        lastY = event.clientY;
-        dragging = true;
-    }
+    canvas.addEventListener('mousedown',
+            function (event) {
+                lastX = event.clientX;
+                lastY = event.clientY;
+                dragging = true;
+            }, true);
 
-    function touchStart(event) {
-        lastX = event.targetTouches[0].clientX;
-        lastY = event.targetTouches[0].clientY;
-        dragging = true;
-    }
+    canvas.addEventListener('mouseup',
+            function (event) {
+                if (dragging && Math.abs(event.clientX - lastX) < 3 && Math.abs(event.clientY - lastY) < 3) {
 
-    function mouseUp(event) {
-        if (dragging && event.clientX == lastX && event.clientY == lastY) {
-            pick(event.clientX, event.clientY);
-        }
-        dragging = false;
-    }
+                    // Do pick
+                    scene.pick(event.clientX, event.clientY, { rayPick: true });
+                }
+                dragging = false;
+            }, true);
 
-    function touchEnd(event) {
-        if (dragging && event.targetTouches[0].clientX == lastX && event.targetTouches[0].clientY == lastY) {
-            pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
-        }
-        dragging = false;
-    }
+    canvas.addEventListener('touchstart',
+            function touchStart(event) {
+                lastX = event.targetTouches[0].clientX;
+                lastY = event.targetTouches[0].clientY;
+                dragging = true;
+            }, true);
 
-    function pick(canvasX, canvasY) {
-        scene.pick(canvasX, canvasY, { rayPick:true });
-    }
+    canvas.addEventListener('touchend',
+            function touchEnd(event) {
+                if (dragging && event.targetTouches[0].clientX == lastX && event.targetTouches[0].clientY == lastY) {
+
+                    // Do pick
+                    scene.pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY, { rayPick: true });
+                }
+                dragging = false;
+            }, true);
 
 </script>
 </body>

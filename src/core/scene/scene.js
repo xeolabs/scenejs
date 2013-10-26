@@ -119,6 +119,8 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     if (result) {
         this.publish("pick", result);
         return result;
+    } else {
+        this.publish("nopick");
     }
 };
 

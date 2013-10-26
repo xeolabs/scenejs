@@ -65,9 +65,9 @@
         return this._core.scissorTestEnabled;
     };
 
-    SceneJS.View.prototype._compile = function () {
+    SceneJS.View.prototype._compile = function (ctx) {
         this._engine.display.view = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.view = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

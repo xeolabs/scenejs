@@ -141,8 +141,8 @@ SceneJS.Rotate.prototype.incAngle = function(angle) {
     this._engine.display.imageDirty = true;
 };
 
-SceneJS.Rotate.prototype._compile = function() {
+SceneJS.Rotate.prototype._compile = function(ctx) {
     SceneJS_modelXFormStack.push(this._core);
-    this._compileNodes();
+    this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };

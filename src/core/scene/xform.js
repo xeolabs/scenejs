@@ -73,8 +73,8 @@ SceneJS.XForm.prototype.setElements = function (elements) {
     return this;
 };
 
-SceneJS.XForm.prototype._compile = function () {
+SceneJS.XForm.prototype._compile = function (ctx) {
     SceneJS_modelXFormStack.push(this._core);
-    this._compileNodes();
+    this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };

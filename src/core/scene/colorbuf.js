@@ -55,9 +55,9 @@
         return this._core.blendEnabled;
     };
 
-    SceneJS.ColorBuf.prototype._compile = function () {
+    SceneJS.ColorBuf.prototype._compile = function (ctx) {
         this._engine.display.colorbuf = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.colorbuf = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

@@ -172,9 +172,9 @@
      * Compiles this camera node, setting this node's state core on the display, compiling sub-nodes,
      * then restoring the previous camera state core back onto the display on exit.
      */
-    SceneJS.Camera.prototype._compile = function () {
+    SceneJS.Camera.prototype._compile = function (ctx) {
         this._engine.display.projTransform = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.projTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

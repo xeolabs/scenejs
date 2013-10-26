@@ -307,9 +307,9 @@
         return this._core.ambient;
     };
 
-    SceneJS.Flags.prototype._compile = function() {
+    SceneJS.Flags.prototype._compile = function(ctx) {
         this._engine.display.flags = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.flags = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

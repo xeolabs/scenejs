@@ -52,9 +52,9 @@
         return this._core.tag;
     };
 
-    SceneJS.Tag.prototype._compile = function() {
+    SceneJS.Tag.prototype._compile = function(ctx) {
         this._engine.display.tag = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.tag = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 })();

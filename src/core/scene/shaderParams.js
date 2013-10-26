@@ -81,14 +81,14 @@ new (function() {
         return params;
     };
 
-    SceneJS.ShaderParams.prototype._compile = function() {
+    SceneJS.ShaderParams.prototype._compile = function(ctx) {
 
         idStack[stackLen] = this._core.coreId; // Tie draw list state to core, not to scene node
         shaderParamsStack[stackLen] = this._core.params;
         stackLen++;
         dirty = true;
 
-        this._compileNodes();
+        this._compileNodes(ctx);
 
         stackLen--;
         dirty = true;

@@ -39,7 +39,7 @@
         return this._core.name;
     };
 
-    SceneJS.Name.prototype._compile = function () {
+    SceneJS.Name.prototype._compile = function (ctx) {
 
         this._engine.display.name = coreStack[stackLen++] = this._core;
 
@@ -54,7 +54,7 @@
         }
         this._core.path = path.join(".");
 
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.name = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 })();

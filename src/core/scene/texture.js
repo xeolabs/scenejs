@@ -431,12 +431,12 @@ new (function () {
         }
     };
 
-    SceneJS.Texture.prototype._compile = function () {
+    SceneJS.Texture.prototype._compile = function (ctx) {
         if (!this._core.hash) {
             this._makeHash();
         }
         this._engine.display.texture = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.texture = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

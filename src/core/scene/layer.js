@@ -73,9 +73,9 @@
         return this._core.clearDepth;
     };
 
-    SceneJS.Layer.prototype._compile = function() {
+    SceneJS.Layer.prototype._compile = function(ctx) {
         this._engine.display.layer = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.layer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

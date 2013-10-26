@@ -83,14 +83,14 @@
         this._core.hash = null;
     };
 
-    SceneJS.Clips.prototype._compile = function() {
+    SceneJS.Clips.prototype._compile = function(ctx) {
 
         if (!this._core.hash) {
             this._core.hash = this._core.clips.length;
         }
 
         this._engine.display.clips = coreStack[stackLen++] = this._core;
-        this._compileNodes();
+        this._compileNodes(ctx);
         this._engine.display.clips = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 

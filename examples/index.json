@@ -850,19 +850,31 @@
                 "tags":[ "picking"],
                 "nodes":[
                     {
-                        "title":"Pick objects with mouse",
-                        "path":"picking/picking.html",
+                        "title":"Basic 2D picking",
+                        "path":"picking/basicPicking.html",
                         "tags":[],
                         "id":"picking"
                     },
                     {
-                        "title":"Pick name hierarchy",
-                        "path":"picking/pickNameHierarchy.html",
+                        "title":"Disable picking for some objects",
+                        "path":"picking/disablePicking.html",
                         "tags":[],
-                        "id":"pickNameHierarchy"
+                        "id":"disablePicking"
                     },
                     {
-                        "title":"Ray-pick objects with mouse",
+                        "title":"Picking through transparent objects",
+                        "path":"picking/pickThroughTransparentObject.html",
+                        "tags":[],
+                        "id":"pickThroughTransparentObject"
+                    },
+                    {
+                        "title":"Pick name hierarchies",
+                        "path":"picking/pickNameHierarchy.html",
+                        "tags":[],
+                        "id":"namePaths"
+                    },
+                    {
+                        "title":"3D ray-picking",
                         "path":"picking/rayPicking.html",
                         "tags":["rayPicking"],
                         "id":"rayPicking"

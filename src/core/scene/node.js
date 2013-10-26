@@ -234,6 +234,9 @@ SceneJS.Node.prototype.on = function (topic, callback) {
     if (topic == "rendered") {
         this._engine.branchDirty(this);
     }
+//    if (topic == "tick") {
+//        this._engine.scene.on("tick",callback);
+//    }
     // }
     return handle;
 };
@@ -255,6 +258,9 @@ SceneJS.Node.prototype.off = function (handle) {
             this._engine.branchDirty(this);
         }
     }
+//    else {
+//        this._engine.scene.off(handle);
+//    }
 };
 
 /**
@@ -1282,23 +1288,31 @@ SceneJS.Node.prototype.getJSON = function () {
 };
 
 
-SceneJS.Node.prototype._compile = function () {
+SceneJS.Node.prototype._compile = function (ctx) {
     if (this.preCompile) {
         this.preCompile();
     }
-    this._compileNodes();
+    this._compileNodes(ctx);
     if (this.postCompile) {
         this.postCompile();
     }
 };
 
-SceneJS.Node.prototype._compileNodes = function () {
+SceneJS.Node.prototype._compileNodes = function (ctx) {
 
     var renderSubs = this._topicSubs["rendered"];
 
     if (renderSubs) {
         SceneJS_nodeEventsModule.preVisitNode(this);
     }
+
+//    var tickSubs = this._topicSubs["tick"];
+//
+//    if (tickSubs) {
+//        ctx.pubSubProxy.on("tick", function(event) {
+//            this.publish("tick", event);
+//        });
+//    }
 
     var child;
 
@@ -1309,7 +1323,7 @@ SceneJS.Node.prototype._compileNodes = function () {
         child.branchDirty = child.branchDirty || this.branchDirty; // Compile subnodes if scene branch dirty
 
         if (child.dirty || child.branchDirty || this._engine.sceneDirty) {  // Compile nodes that are flagged dirty
-            child._compile();
+            child._compile(ctx);
             child.dirty = false;
             child.branchDirty = false;
         }
