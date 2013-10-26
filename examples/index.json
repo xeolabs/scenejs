@@ -177,7 +177,8 @@
                         "title":"Toggle pickability",
                         "tags":["picking"],
                         "tip":"Using a flags node to switch ability to pick child geometries",
-                        "path":"flags/picking.html"
+                        "path":"flags/picking.html",
+                        "id":"disablePicking"
                     }
                 ]
             },
@@ -831,13 +832,13 @@
                     },
                     {
                         "title":"Pick-fly-orbit city",
-                        "path":"plugins/camera/pickFlyOrbitCity.html",
+                        "path":"demos/pickFlyOrbitCity.html",
                         "tags":[],
                         "id":"cameraPickFlyOrbit"
                     },
                     {
                         "title":"Pick-fly-orbit terrain",
-                        "path":"plugins/camera/pickFlyOrbitTerrain.html",
+                        "path":"demos/pickFlyOrbitTerrain.html",
                         "tags":[],
                         "id":"cameraPickFlyOrbitTerrain"
                     }
@@ -1144,7 +1145,7 @@
                     {
                         "title":"Heightmap with custom texture and fog",
                         "tags":["heightMap"],
-                        "path":"plugins/heightmaps/custom.html",
+                        "path":"demos/pickFlyOrbitTerrain.html",
                         "id":"customHeightmap"
                     }
                 ]
@@ -1209,10 +1210,17 @@
                     },
                     {
                         "title":"Procedural City",
-                        "path":"demos/city.html",
+                        "path":"demos/pickFlyOrbitCity.html",
                         "editor":false,
                         "tags":[],
                         "id":"city"
+                    },
+                    {
+                        "title":"Terrain",
+                        "path":"demos/pickFlyOrbitTerrain.html",
+                        "editor":false,
+                        "tags":[],
+                        "id":"funTerrain"
                     },
                     {
                         "title":"Earth in 26 lines of JSON",
