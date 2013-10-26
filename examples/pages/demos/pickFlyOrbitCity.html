@@ -64,6 +64,7 @@
             opacity: 0.6;
             z-index: 100000;
             border: 1px white solid;
+            display: none;
         }
 
         .title {
@@ -130,9 +131,8 @@
                 type:"cameras/pickFlyOrbit",
                 yaw:10,
                 pitch:-30,
-                eye:{ x:-10, y:50, z:-100 },
                 look:{ x:-10, y:50, z:0 },
-                zoomSensitivity:20.0,
+                zoomSensitivity:-20.0,
                 showCursor:true,
                 cursorSize:2.0,
 
