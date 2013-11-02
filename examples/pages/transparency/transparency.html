@@ -46,8 +46,11 @@
     // Create scene
     var scene = SceneJS.createScene({
         nodes:[
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"lookAt", eye:{ x:7, y:5, z:10 }, look:{ x:0, y:1, z:0 },
+                type:"cameras/orbit", yaw:30, pitch:-30, zoom:15, zoomSensitivity:1.0,
                 nodes:[
 
                     // Opaque red teapot
@@ -65,7 +68,7 @@
 
                     // Transparent blue box
                     {
-                        type:"name", name:"blueTeapot",
+                        type:"name",
                         nodes:[
 
                             // Flags node enables transparency for our box.
@@ -74,18 +77,18 @@
                                 type:"flags", flags:{ transparent:true },
                                 nodes:[
 
-                                    // Material node's 'alpha' property makes teapot 60% transparent.
+                                    // Material node's 'alpha' property makes box 60% transparent.
                                     {
                                         type:"material", color:{ r:0.3, g:0.3, b:1.0 }, alpha:0.4,
                                         nodes:[
                                             {
-                                                type:"translate", x:1, y:2, z:1,
+                                                type:"translate", x:0.4, y:2, z:0.5,
                                                 nodes:[
 
                                                     // Box primitive, implemented by plugin at
                                                     // http://scenejs.org/api/latest/plugins/node/prims/box.js
                                                     {
-                                                        type:"prims/box", xSize:3, ySize:2, zSize:3
+                                                        type:"prims/box", xSize:3.5, ySize:2, zSize:3.5
                                                     }
                                                 ]
                                             }

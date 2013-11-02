@@ -54,6 +54,8 @@
                                 },
                                 alpha:1.0,
                                 nodes:[
+
+                                    // The alpha map
                                     {
                                         type:"texture",
                                         id:"theTexture",
@@ -80,24 +82,22 @@
                         ]
                     },
 
-                    // Inner blue sphere
+                    // Inner blue box
+
                     {
-                        type:"scale",
-                        x:0.3,
-                        y:0.3,
-                        z:0.3,
+                        type:"material",
+                        color:{
+                            r:0.3, g:0.3, b:1
+                        },
                         nodes:[
                             {
-                                type:"material",
-                                color:{
-                                    r:0.3, g:0.3, b:1
-                                },
+                                type:"scale", x:0.7, y:0.7, z:0.7,
                                 nodes:[
 
-                                    // Sphere geometry node implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                    // Box primitive implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/prims/box.js
                                     {
-                                        type:"prims/sphere"
+                                        type:"prims/box"
                                     }
                                 ]
                             }
@@ -107,6 +107,7 @@
             }
         ]
     });
+
 
 </script>
 </body>
