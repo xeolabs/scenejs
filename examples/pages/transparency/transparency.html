@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #info {
+            position: absolute;
+            top: 200px;
+            width: 100%;
+            color: #ffffff;
+            padding: 5px;
+            font-family: Monospace;
+            font-size: 18px;
+            text-align: center;
+            background: black;
+            opacity: 0.6;
+            z-index: 100000;
+        }
+    </style>
+</head>
+<body>
+
+
+<script src="../../../api/latest/scenejs.js"></script>
+
+<script>
+
+    // Basic transparency
+
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../../../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"lookAt", eye:{ x:7, y:5, z:10 }, look:{ x:0, y:1, z:0 },
+                nodes:[
+
+                    // Opaque red teapot
+                    {
+                        type:"material", color:{ r:1.0, g:0.3, b:0.3 },
+                        nodes:[
+
+                            // Teapot primitive, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            {
+                                type:"prims/teapot"
+                            }
+                        ]
+                    }                     ,
+
+                    // Transparent blue box
+                    {
+                        type:"name", name:"blueTeapot",
+                        nodes:[
+
+                            // Flags node enables transparency for our box.
+                            // This enables the material `alpha` to specify the degree of opacity.
+                            {
+                                type:"flags", flags:{ transparent:true },
+                                nodes:[
+
+                                    // Material node's 'alpha' property makes teapot 60% transparent.
+                                    {
+                                        type:"material", color:{ r:0.3, g:0.3, b:1.0 }, alpha:0.4,
+                                        nodes:[
+                                            {
+                                                type:"translate", x:1, y:2, z:1,
+                                                nodes:[
+
+                                                    // Box primitive, implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                                    {
+                                                        type:"prims/box", xSize:3, ySize:2, zSize:3
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

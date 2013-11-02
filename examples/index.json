@@ -107,12 +107,19 @@
             },
             {
                 "title":"Controlling transparency of subgraphs",
-                "tags":["flags"],
+                "tags":["flags", "transparency"],
                 "tip":"Toggling modes for sub-nodes using a parent flags node",
                 "nodes":[
                     {
+                        "title":"Basic transparency",
+                        "tags":[],
+                        "tip":"Using a flags node in combination with material alpha to make an object transparent",
+                        "path":"transparency/transparency.html",
+                        "id":"basicTransparency"
+                    },
+                    {
                         "title":"Toggle transparency",
-                        "tags":["transparency"],
+                        "tags":[],
                         "tip":"Using a flags node to switch transparency for child geometries",
                         "path":"flags/transparent.html"
                     }
@@ -864,7 +871,7 @@
                     {
                         "title":"Picking through transparent objects",
                         "path":"picking/pickThroughTransparentObject.html",
-                        "tags":[],
+                        "tags":["transparency"],
                         "id":"pickThroughTransparentObject"
                     },
                     {
