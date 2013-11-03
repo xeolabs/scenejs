@@ -572,6 +572,18 @@
         "tip":"",
         "nodes":[
             {
+                "title":"Defaults",
+                "tags":["defaults"],
+                "nodes":[
+                    {
+                        "title":"Default lights and  material",
+                        "tip":"What SceneJS provides by default whenever you omit lights and/or material around your geometry",
+                        "path":"lights/default.html",
+                        "id":"defaultLightAndMaterial"
+                    }
+                ]
+            },
+            {
                 "title":"Ambient",
                 "tip":"Defining an ambient light source",
                 "tags":["ambientLight"],
