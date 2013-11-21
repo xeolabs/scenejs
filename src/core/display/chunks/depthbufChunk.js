@@ -11,9 +11,9 @@ SceneJS_ChunkFactory.createChunkType({
     drawAndPick:function (ctx) {
 
         var enabled = this.core.enabled;
+        var gl = this.program.gl;
 
         if (ctx.depthbufEnabled != enabled) {
-            var gl = this.program.gl;
             if (enabled) {
                 gl.enable(gl.DEPTH_TEST);
             } else {

@@ -3,7 +3,7 @@
  * WebGL Scene Graph Library for JavaScript
  * http://scenejs.org/
  *
- * Built on 2013-10-26
+ * Built on 2013-12-03
  *
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * Copyright 2013, Lindsay Kay
@@ -17046,9 +17046,9 @@ SceneJS_ChunkFactory.createChunkType({
     drawAndPick:function (ctx) {
 
         var enabled = this.core.enabled;
+        var gl = this.program.gl;
 
         if (ctx.depthbufEnabled != enabled) {
-            var gl = this.program.gl;
             if (enabled) {
                 gl.enable(gl.DEPTH_TEST);
             } else {
