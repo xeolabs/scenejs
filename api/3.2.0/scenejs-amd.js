@@ -13911,6 +13911,8 @@ var SceneJS_Display = function (cfg) {
      */
     this._frameCtx = {
         pickNames:[], // Pick names of objects hit during pick render
+        pickViewMats:[],
+        pickCameraMats:[],
         canvas:this._canvas            // The canvas
     };
 
@@ -14057,7 +14059,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 8, "depthbuf", this.depthbuf);
     this._setChunk(object, 9, "colorbuf", this.colorbuf);
     this._setChunk(object, 10, "view", this.view);
-    this._setChunk(object, 11, "name", this.name);
+    this._setChunk(object, 11, "name", this.name);          // Must be after "lookAt" and "camera"
     this._setChunk(object, 12, "lights", this.lights);
     this._setChunk(object, 13, "material", this.material);
     this._setChunk(object, 14, "texture", this.texture);
@@ -14499,8 +14501,8 @@ SceneJS_Display.prototype.pick = function (params) {
             var x = (canvasX - w / 2) / (w / 2);           // Calculate clip space coordinates
             var y = -(canvasY - h / 2) / (h / 2);
 
-            var projMat = this._frameCtx.cameraMat;
-            var viewMat = this._frameCtx.viewMat;
+            var projMat = this._frameCtx.pickCameraMats[pickIndex];
+            var viewMat = this._frameCtx.pickViewMats[pickIndex];
 
             var pvMat = SceneJS.math.mulMat4(projMat, viewMat, []);
             var pvMatInverse = SceneJS.math.inverseMat4(pvMat, []);
@@ -16921,10 +16923,12 @@ SceneJS_ChunkFactory.createChunkType({
     },
 
     pick : function(ctx) {
-
         if (this._uPickColor && this.core.name) {
 
-            ctx.pickNames[ctx.pickIndex++] = this.core;
+            ctx.pickNames[ctx.pickIndex] = this.core;
+            ctx.pickViewMats[ctx.pickIndex] = ctx.viewMat;
+            ctx.pickCameraMats[ctx.pickIndex] = ctx.cameraMat;
+            ++ctx.pickIndex;
 
             var b = ctx.pickIndex >> 16 & 0xFF;
             var g = ctx.pickIndex >> 8 & 0xFF;
@@ -16934,6 +16938,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });
+
 SceneJS_ChunkFactory.createChunkType({
 
     type: "program",

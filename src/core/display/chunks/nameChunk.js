@@ -10,10 +10,12 @@ SceneJS_ChunkFactory.createChunkType({
     },
 
     pick : function(ctx) {
-
         if (this._uPickColor && this.core.name) {
 
-            ctx.pickNames[ctx.pickIndex++] = this.core;
+            ctx.pickNames[ctx.pickIndex] = this.core;
+            ctx.pickViewMats[ctx.pickIndex] = ctx.viewMat;
+            ctx.pickCameraMats[ctx.pickIndex] = ctx.cameraMat;
+            ++ctx.pickIndex;
 
             var b = ctx.pickIndex >> 16 & 0xFF;
             var g = ctx.pickIndex >> 8 & 0xFF;
