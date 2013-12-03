@@ -35,5 +35,15 @@ SceneJS_ChunkFactory.createChunkType({
             gl.depthFunc(depthFunc);
             ctx.depthFunc = depthFunc;
         }
+
+        var stateId = this.core.stateId;
+        
+        if (ctx.depthbufStateId != stateId) {
+            ctx.depthbufStateId = stateId;
+
+            if (enabled) {
+                this.program.gl.clear(this.program.gl.DEPTH_BUFFER_BIT);
+            }
+        }
     }
 });

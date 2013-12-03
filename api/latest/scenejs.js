@@ -16602,6 +16602,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     frameCtx.depthbufEnabled = null;
     frameCtx.clearDepth = null;
     frameCtx.depthFunc = gl.LESS;
+    frameCtx.depthbufStateId = null;
 
     frameCtx.scissorTestEnabled = false;
 
@@ -19127,6 +19128,16 @@ SceneJS_ChunkFactory.createChunkType({
         if (ctx.depthFunc != depthFunc) {
             gl.depthFunc(depthFunc);
             ctx.depthFunc = depthFunc;
+        }
+
+        var stateId = this.core.stateId;
+        
+        if (ctx.depthbufStateId != stateId) {
+            ctx.depthbufStateId = stateId;
+
+            if (enabled) {
+                this.program.gl.clear(this.program.gl.DEPTH_BUFFER_BIT);
+            }
         }
     }
 });

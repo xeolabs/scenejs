@@ -894,6 +894,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     frameCtx.depthbufEnabled = null;
     frameCtx.clearDepth = null;
     frameCtx.depthFunc = gl.LESS;
+    frameCtx.depthbufStateId = null;
 
     frameCtx.scissorTestEnabled = false;
 
