@@ -49,7 +49,7 @@
                         "title":"Moving nodes - disconnect then add",
                         "path":"scene/movingNodes.html",
                         "tags":["nodes"],
-                        "id":"moveNodes"
+                        "id":"moveNodes" 
                     },
                     {
                         "title":"Multiple scenes on a page",
