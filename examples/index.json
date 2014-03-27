@@ -46,6 +46,11 @@
                         "tags":["canvas"]
                     },
                     {
+                        "title":"Moving nodes - disconnect then add",
+                        "path":"scene/movingNodes.html",
+                        "tags":["moveNodes"]
+                    },
+                    {
                         "title":"Multiple scenes on a page",
                         "path":"scene/multipleScenes.html",
                         "tags":["multipleScenes"],
