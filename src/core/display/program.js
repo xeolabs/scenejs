@@ -51,6 +51,12 @@ var SceneJS_Program = function(id, hash, source, gl) {
      */
     this.useCount = 0;
 
+    /**
+     * Current draw uniform state cached as a bitfield to avoid costly extra uniform1i calls
+     * @type Number
+     */
+    this.drawUniformFlags = 0;
+
     this.build(gl);
 };
 

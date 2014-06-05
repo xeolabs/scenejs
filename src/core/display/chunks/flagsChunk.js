@@ -51,12 +51,21 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniform1i(this._uClippingPick, this.core.clipping);
 
         } else {
-            gl.uniform1i(this._uBackfaceTexturingDraw, this.core.backfaceTexturing);
-            gl.uniform1i(this._uBackfaceLightingDraw, this.core.backfaceLighting);
-            gl.uniform1i(this._uSpecularLightingDraw, this.core.specular);
-            gl.uniform1i(this._uClippingDraw, this.core.clipping);
-            gl.uniform1i(this._uAmbientDraw, this.core.ambient);
-            gl.uniform1i(this._uDiffuseDraw, this.core.diffuse);
+            var drawUniforms = (this.core.backfaceTexturing ? 1 : 0) +
+                               (this.core.backfaceLighting ? 2 : 0) +
+                               (this.core.specular ? 4 : 0) +
+                               (this.core.clipping ? 8 : 0) +
+                               (this.core.ambient ? 16 : 0) +
+                               (this.core.diffuse ? 32 : 0);
+            if (this.program.drawUniformFlags != drawUniforms) {
+                gl.uniform1i(this._uBackfaceTexturingDraw, this.core.backfaceTexturing);
+                gl.uniform1i(this._uBackfaceLightingDraw, this.core.backfaceLighting);
+                gl.uniform1i(this._uSpecularLightingDraw, this.core.specular);
+                gl.uniform1i(this._uClippingDraw, this.core.clipping);
+                gl.uniform1i(this._uAmbientDraw, this.core.ambient);
+                gl.uniform1i(this._uDiffuseDraw, this.core.diffuse);
+                this.program.drawUniformFlags = drawUniforms;
+            }
         }
     }
 });
