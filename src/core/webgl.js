@@ -207,6 +207,14 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
     this._samplers = {};
     this._attributes = {};
 
+    this.materialSettings = {
+        specularColor: [0, 0, 0],
+        specular: 0,
+        shine: 0,
+        emit: 0,
+        alpha: 0
+    };
+
     /* Create shaders from sources
      */
     this._shaders = [];
