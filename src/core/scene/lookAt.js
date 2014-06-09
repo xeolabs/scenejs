@@ -371,7 +371,7 @@
             this._core.rebuild();
         }
 
-        return  this._mat.slice(0);
+        return  this._core.matrix.slice(0);
     };
 
     SceneJS.Lookat.prototype.getAttributes = function () {
