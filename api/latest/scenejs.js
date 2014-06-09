@@ -4939,6 +4939,14 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
     this._samplers = {};
     this._attributes = {};
 
+    this.materialSettings = {
+        specularColor: [0, 0, 0],
+        specular: 0,
+        shine: 0,
+        emit: 0,
+        alpha: 0
+    };
+
     /* Create shaders from sources
      */
     this._shaders = [];
@@ -5123,10 +5131,6 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
         } else {
             return false;
         }
-    };
-
-    this.unbind = function () {
-        //     gl.useProgram(0);
     };
 
     this.destroy = function () {
@@ -5603,9 +5607,9 @@ var SceneJS_sceneStatusModule = new (function () {
     /** Notifies that a node has begun loading some data
      */
     this.taskStarted = function (node, description) {
-        if (false === SceneJS_configsModule.configs.statusPopups) {
-            return -1;
-        }
+
+        var popups = !!SceneJS_configsModule.configs.statusPopups;
+
         var scene = node.getScene();
         var sceneId = scene.getId();
         var nodeId = node.getId();
@@ -5617,7 +5621,7 @@ var SceneJS_sceneStatusModule = new (function () {
         var status = this.sceneStatus[sceneId];
         if (!status) {
             status = this.sceneStatus[sceneId] = {
-                numTasks:0
+                numTasks: 0
             };
         }
         status.numTasks++;
@@ -5626,11 +5630,11 @@ var SceneJS_sceneStatusModule = new (function () {
         var sceneState = sceneStates[sceneId];
         if (!sceneState) {
             sceneState = sceneStates[sceneId] = {
-                sceneId:sceneId,
-                nodeStates:{},
-                scene:scene,
-                popupContainer:createPopupContainer(canvas),
-                descCounts:{}
+                sceneId: sceneId,
+                nodeStates: {},
+                scene: scene,
+                popupContainer: popups ? createPopupContainer(canvas) : null,
+                descCounts: {}
             };
         }
         var descCount = sceneState.descCounts[description];
@@ -5641,18 +5645,18 @@ var SceneJS_sceneStatusModule = new (function () {
         var nodeState = sceneState.nodeStates[nodeId];
         if (!nodeState) {
             nodeState = sceneState.nodeStates[nodeId] = {
-                nodeId:nodeId,
-                numTasks:0,
-                tasks:{}
+                nodeId: nodeId,
+                numTasks: 0,
+                tasks: {}
             };
         }
         description = description + " " + sceneState.descCounts[description] + "...";
         nodeState.numTasks++;
         var task = {
-            sceneState:sceneState,
-            nodeState:nodeState,
-            description:description,
-            element:createPopup(sceneState.popupContainer, description)
+            sceneState: sceneState,
+            nodeState: nodeState,
+            description: description,
+            element: popups ? createPopup(sceneState.popupContainer, description) : null
         };
         nodeState.tasks[taskId] = task;
         tasks[taskId] = task;
@@ -5703,9 +5707,12 @@ var SceneJS_sceneStatusModule = new (function () {
         if (!task) {
             return null;
         }
+        var popups = !!SceneJS_configsModule.configs.statusPopups;
         var sceneState = task.sceneState;
         this.sceneStatus[sceneState.sceneId].numTasks--;
-        dismissPopup(task.element);
+        if (popups) {
+            dismissPopup(task.element);
+        }
         var nodeState = task.nodeState;
         nodeState.numTasks--;
         delete nodeState.tasks[taskId];
@@ -5739,16 +5746,25 @@ var SceneJS_sceneStatusModule = new (function () {
         if (!task) {
             return null;
         }
-        failPopup(task.element);
+        var popups = !!SceneJS_configsModule.configs.statusPopups;
+        var sceneState = task.sceneState;
+        this.sceneStatus[sceneState.sceneId].numTasks--;
+        if (popups) {
+            failPopup(task.element);
+        }
+        var nodeState = task.nodeState;
+        nodeState.numTasks--;
+        delete nodeState.tasks[taskId];
+        if (nodeState.numTasks == 0) {
+            delete task.sceneState.nodeStates[nodeState.nodeId];
+        }
         return null;
     };
 
     function failPopup(element) {
         element.style.background = "#FFAAAA";
     }
-})();
-
-/**
+})();/**
  * Manages scene node event listeners
  * @private
  */
@@ -8961,6 +8977,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
 
     SceneJS.Geometry.prototype.setPositions = function (data) {
         if (data.positions && this._core.vertexBuf) {
+            this._boundary = null;
             var core = this._core;
             core.vertexBuf.bind();
             core.vertexBuf.setData(new Float32Array(data.positions), data.positionsOffset || 0);
@@ -9217,7 +9234,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     };
 
 })
-    ();(function() {
+    ();
+(function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Layer} nodes
@@ -9946,7 +9964,7 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
             this._core.rebuild();
         }
 
-        return  this._mat.slice(0);
+        return  this._core.matrix.slice(0);
     };
 
     SceneJS.Lookat.prototype.getAttributes = function () {
@@ -14558,7 +14576,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     var gl = this._canvas.gl;
 
-    frameCtx.program = null;
     frameCtx.framebuf = null;
     frameCtx.viewMat = null;
     frameCtx.modelMat = null;
@@ -14632,10 +14649,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     }
 
     gl.flush();                                                         // Flush GL
-
-    if (frameCtx.program) {                                                  // Unbind remaining program
-        //frameCtx.program.unbind();
-    }
 
     if (frameCtx.framebuf) {                                                 // Unbind remaining frame buffer
         gl.finish();
@@ -15795,6 +15808,12 @@ var SceneJS_Program = function(id, hash, source, gl) {
      */
     this.useCount = 0;
 
+    /**
+     * Current draw uniform state cached as a bitfield to avoid costly extra uniform1i calls
+     * @type Number
+     */
+    this.drawUniformFlags = 0;
+
     this.build(gl);
 };
 
@@ -15806,7 +15825,8 @@ SceneJS_Program.prototype.build = function(gl) {
     this.gl = gl;
     this.draw = new SceneJS_webgl_Program(gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
     this.pick = new SceneJS_webgl_Program(gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
-};/**
+};
+/**
  * @class Manages creation and recycle of {@link SceneJS_Object} instances
  * @private
  */
@@ -16406,15 +16426,25 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniform1i(this._uClippingPick, this.core.clipping);
 
         } else {
-            gl.uniform1i(this._uBackfaceTexturingDraw, this.core.backfaceTexturing);
-            gl.uniform1i(this._uBackfaceLightingDraw, this.core.backfaceLighting);
-            gl.uniform1i(this._uSpecularLightingDraw, this.core.specular);
-            gl.uniform1i(this._uClippingDraw, this.core.clipping);
-            gl.uniform1i(this._uAmbientDraw, this.core.ambient);
-            gl.uniform1i(this._uDiffuseDraw, this.core.diffuse);
+            var drawUniforms = (this.core.backfaceTexturing ? 1 : 0) +
+                               (this.core.backfaceLighting ? 2 : 0) +
+                               (this.core.specular ? 4 : 0) +
+                               (this.core.clipping ? 8 : 0) +
+                               (this.core.ambient ? 16 : 0) +
+                               (this.core.diffuse ? 32 : 0);
+            if (this.program.drawUniformFlags != drawUniforms) {
+                gl.uniform1i(this._uBackfaceTexturingDraw, this.core.backfaceTexturing);
+                gl.uniform1i(this._uBackfaceLightingDraw, this.core.backfaceLighting);
+                gl.uniform1i(this._uSpecularLightingDraw, this.core.specular);
+                gl.uniform1i(this._uClippingDraw, this.core.clipping);
+                gl.uniform1i(this._uAmbientDraw, this.core.ambient);
+                gl.uniform1i(this._uDiffuseDraw, this.core.diffuse);
+                this.program.drawUniformFlags = drawUniforms;
+            }
         }
     }
-});/**
+});
+/**
  *   Create display state chunk type for draw and pick render of framebuf
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -16720,32 +16750,44 @@ SceneJS_ChunkFactory.createChunkType({
     draw : function() {
 
         var gl = this.program.gl;
+        var materialSettings = this.program.draw.materialSettings;
 
         if (this._uMaterialBaseColor) {
             gl.uniform3fv(this._uMaterialBaseColor, this.core.baseColor);
         }
 
-        if (this._uMaterialSpecularColor) {
+        if (this._uMaterialSpecularColor &&
+            (materialSettings.specularColor[0] != this.core.specularColor[0] ||
+             materialSettings.specularColor[1] != this.core.specularColor[1] ||
+             materialSettings.specularColor[2] != this.core.specularColor[2])) {
             gl.uniform3fv(this._uMaterialSpecularColor, this.core.specularColor);
+            materialSettings.specularColor[0] = this.core.specularColor[0];
+            materialSettings.specularColor[1] = this.core.specularColor[1];
+            materialSettings.specularColor[2] = this.core.specularColor[2];
         }
 
-        if (this._uMaterialSpecular) {
+        if (this._uMaterialSpecular && materialSettings.specular != this.core.specular) {
             gl.uniform1f(this._uMaterialSpecular, this.core.specular);
+            materialSettings.specular = this.core.specular;
         }
 
-        if (this._uMaterialShine) {
+        if (this._uMaterialShine && materialSettings.shine != this.core.shine) {
             gl.uniform1f(this._uMaterialShine, this.core.shine);
+            materialSettings.shine = this.core.shine;
         }
 
-        if (this._uMaterialEmit) {
+        if (this._uMaterialEmit && materialSettings.emit != this.core.emit) {
             gl.uniform1f(this._uMaterialEmit, this.core.emit);
+            materialSettings.emit = this.core.emit;
         }
 
-        if (this._uMaterialAlpha) {
+        if (this._uMaterialAlpha && materialSettings.alpha != this.core.alpha) {
             gl.uniform1f(this._uMaterialAlpha, this.core.alpha);
+            materialSettings.alpha = this.core.alpha;
         }
     }
-});/**
+});
+/**
  * Create display state chunk type for draw render of material transform
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -16947,13 +16989,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         var drawProgram = this.program.draw;
 
-        if (frameCtx.program) {
-            frameCtx.program.unbind();
-        }
-
         drawProgram.bind();
-
-        frameCtx.program = drawProgram;
 
         /*
          * HACK until we have distinct chunk for each VBO (maybe)
@@ -16977,17 +17013,11 @@ SceneJS_ChunkFactory.createChunkType({
 
         var pickProgram = this.program.pick;
 
-        if (frameCtx.program) {
-            frameCtx.program.unbind();
-        }
-
         pickProgram.bind();
 
         var gl = this.program.gl;
 
         gl.uniform1i(this._rayPickMode, frameCtx.rayPick);
-
-        frameCtx.program = pickProgram;
 
         /*
         * HACK until we have distinct chunk for each VBO (maybe)
