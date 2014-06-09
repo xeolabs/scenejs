@@ -153,6 +153,10 @@ var SceneJS_webgl_ProgramAttribute = function (gl, program, name, type, size, lo
         }
     };
 
+    this.bindInterleavedFloatArrayBuffer = function (components, stride, byteOffset) {
+        gl.enableVertexAttribArray(location);
+        gl.vertexAttribPointer(location, components, gl.FLOAT, false, stride, byteOffset);   // Vertices are not homogeneous - no w-element
+    };
 };
 
 /**

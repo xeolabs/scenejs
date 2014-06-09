@@ -341,6 +341,46 @@ new (function () {
     };
 
     /**
+     * Destroy vertex buffers associated with given core
+     */
+    var destroyBuffers = function (core) {
+        if (core.vertexBuf) {
+            core.vertexBuf.destroy();
+            core.vertexBuf = null;
+        }
+
+        if (core.normalBuf) {
+            core.normalBuf.destroy();
+            core.normalBuf = null;
+        }
+
+        if (core.uvBuf) {
+            core.uvBuf.destroy();
+            core.uvBuf = null;
+        }
+
+        if (core.uvBuf2) {
+            core.uvBuf2.destroy();
+            core.uvBuf2 = null;
+        }
+
+        if (core.colorBuf) {
+            core.colorBuf.destroy();
+            core.colorBuf = null;
+        }
+
+        if (core.indexBuf) {
+            core.indexBuf.destroy();
+            core.indexBuf = null;
+        }
+
+        if (core.interleavedBuf) {
+            core.interleavedBuf.destroy();
+            core.interleavedBuf = null;
+        }
+    };
+
+    /**
      * Allocates WebGL buffers for geometry arrays
      *
      * In addition to initially allocating those, this is called to reallocate them after
@@ -353,24 +393,46 @@ new (function () {
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
             var arrays = core.arrays;
+            var canInterleave = true;
+            var dataLength = 0;
+            var interleavedValues = 0;
+            var interleavedArrays = [];
+            var interleavedArrayStrides = [];
+
+            var prepareInterleaveBuffer = function(array, strideInElements) {
+                if (dataLength == 0) {
+                    dataLength = array.length / strideInElements;
+                } else if (array.length / strideInElements != dataLength) {
+                    canInterleave = false;
+                }
+                interleavedArrays.push(array);
+                interleavedArrayStrides.push(strideInElements);
+                interleavedValues += strideInElements;
+                return (interleavedValues - strideInElements) * 4;
+            };
 
             if (arrays.positions) {
+                core.interleavedPositionOffset = prepareInterleaveBuffer(arrays.positions, 3);
                 core.vertexBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.positions, arrays.positions.length, 3, usage);
             }
 
             if (arrays.normals) {
+                core.interleavedNormalOffset = prepareInterleaveBuffer(arrays.normals, 3);
                 core.normalBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.normals, arrays.normals.length, 3, usage);
             }
 
             if (arrays.uv) {
+                core.interleavedUVOffset = prepareInterleaveBuffer(arrays.uv, 2);
                 core.uvBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv, arrays.uv.length, 2, usage);
             }
 
             if (arrays.uv2) {
+                core.interleavedUV2Offset = prepareInterleaveBuffer(arrays.uv2, 2);
                 core.uvBuf2 = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv2, arrays.uv2.length, 2, usage);
             }
 
             if (arrays.colors) {
+                core.interleavedColorOffset = prepareInterleaveBuffer(arrays.colors, 4);
                 core.colorBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.colors, arrays.colors.length, 4, usage);
             }
 
@@ -378,38 +440,28 @@ new (function () {
                 core.indexBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, arrays.indices, arrays.indices.length, 1, usage);
             }
 
+            if (interleavedValues > 0 && canInterleave) {
+                // We'll place the vertex attribute data interleaved in this array.
+                // This will enable us to use less bindBuffer calls and make the data
+                // efficient to address on the GPU.
+                var interleaved = [];
+
+                var arrayCount = interleavedArrays.length;
+                for (var i = 0; i < dataLength; ++i) {
+                    for (var j = 0; j < arrayCount; ++j) {
+                        var stride = interleavedArrayStrides[j];
+                        for (var k = 0; k < stride; ++k) {
+                            interleaved.push(interleavedArrays[j][i * stride + k]);
+                        }
+                    }
+                }
+                core.interleavedStride = interleavedValues * 4; // in bytes
+                core.interleavedBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(interleaved), interleaved.length, interleavedValues, usage);
+                core.interleavedBuf.dirty = false;
+            }
+
         } catch (e) { // Allocation failure - delete whatever buffers got allocated
-
-            if (core.vertexBuf) {
-                core.vertexBuf.destroy();
-                core.vertexBuf = null;
-            }
-
-            if (core.normalBuf) {
-                core.normalBuf.destroy();
-                core.normalBuf = null;
-            }
-
-            if (core.uvBuf) {
-                core.uvBuf.destroy();
-                core.uvBuf = null;
-            }
-
-            if (core.uvBuf2) {
-                core.uvBuf2.destroy();
-                core.uvBuf2 = null;
-            }
-
-            if (core.colorBuf) {
-                core.colorBuf.destroy();
-                core.colorBuf = null;
-            }
-
-            if (core.indexBuf) {
-                core.indexBuf.destroy();
-                core.indexBuf = null;
-            }
-
+            destroyBuffers(core);
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ERROR,
                 "Failed to allocate geometry: " + e);
@@ -507,6 +559,9 @@ new (function () {
             core.vertexBuf.setData(new Float32Array(data.positions), data.positionsOffset || 0);
             core.arrays.positions.set(data.positions, data.positionsOffset || 0);
             this._engine.display.imageDirty = true;
+            if (core.interleavedBuf) {
+                core.interleavedBuf.dirty = true;
+            }
         }
     };
 
@@ -521,6 +576,9 @@ new (function () {
             core.normalBuf.setData(new Float32Array(data.normals), data.normalsOffset || 0);
             core.arrays.normals.set(data.normals, data.normalsOffset || 0);
             this._engine.display.imageDirty = true;
+            if (core.interleavedBuf) {
+                core.interleavedBuf.dirty = true;
+            }
         }
     };
 
@@ -535,6 +593,9 @@ new (function () {
             core.colorBuf.setData(new Float32Array(data.colors), data.colorsOffset || 0);
             core.arrays.colors.set(data.colors, data.colorsOffset || 0);
             this._engine.display.imageDirty = true;
+            if (core.interleavedBuf) {
+                core.interleavedBuf.dirty = true;
+            }
         }
     };
 
@@ -553,6 +614,9 @@ new (function () {
             core.colorBuf.setData(new Float32Array(data.uv), data.uvOffset || 0);
             core.arrays.uv.set(data.uv, data.uvOffset || 0);
             this._engine.display.imageDirty = true;
+            if (core.interleavedBuf) {
+                core.interleavedBuf.dirty = true;
+            }
         }
     };
 
@@ -567,6 +631,9 @@ new (function () {
             core.colorBuf.setData(new Float32Array(data.uv2), data.uv2Offset || 0);
             core.arrays.uv2.set(data.uv2, data.uv2Offset || 0);
             this._engine.display.imageDirty = true;
+            if (core.interleavedBuf) {
+                core.interleavedBuf.dirty = true;
+            }
         }
     };
 
@@ -696,6 +763,7 @@ new (function () {
             uvBuf:core.uvBuf,
             uvBuf2:core.uvBuf2,
             colorBuf:core.colorBuf,
+            interleavedBuf:core.interleavedBuf,
             indexBuf:core.indexBuf
         };
 
@@ -707,6 +775,7 @@ new (function () {
                 core2.uvBuf = coreStack[i].uvBuf;           // Vertex and UVs are a package
                 core2.uvBuf2 = coreStack[i].uvBuf2;
                 core2.colorBuf = coreStack[i].colorBuf;
+                core2.interleavedBuf = coreStack[i].interleavedBuf;
                 return core2;
             }
         }
@@ -733,27 +802,7 @@ new (function () {
     SceneJS.Geometry.prototype._destroyNodeCore = function () {
 
         if (document.getElementById(this._engine.canvas.canvasId)) { // Context won't exist if canvas has disappeared
-
-            var core = this._core;
-
-            if (core.vertexBuf) {
-                core.vertexBuf.destroy();
-            }
-            if (core.normalBuf) {
-                core.normalBuf.destroy();
-            }
-            if (core.uvBuf) {
-                core.uvBuf.destroy();
-            }
-            if (core.uvBuf2) {
-                core.uvBuf2.destroy();
-            }
-            if (core.colorBuf) {
-                core.colorBuf.destroy();
-            }
-            if (core.indexBuf) {
-                core.indexBuf.destroy();
-            }
+            destroyBuffers(this._core);
         }
     };
 
