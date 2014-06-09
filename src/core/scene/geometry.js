@@ -501,6 +501,7 @@ new (function () {
 
     SceneJS.Geometry.prototype.setPositions = function (data) {
         if (data.positions && this._core.vertexBuf) {
+            this._boundary = null;
             var core = this._core;
             core.vertexBuf.bind();
             core.vertexBuf.setData(new Float32Array(data.positions), data.positionsOffset || 0);
