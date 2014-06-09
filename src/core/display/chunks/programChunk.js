@@ -10,13 +10,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         var drawProgram = this.program.draw;
 
-        if (frameCtx.program) {
-            frameCtx.program.unbind();
-        }
-
         drawProgram.bind();
-
-        frameCtx.program = drawProgram;
 
         /*
          * HACK until we have distinct chunk for each VBO (maybe)
@@ -40,17 +34,11 @@ SceneJS_ChunkFactory.createChunkType({
 
         var pickProgram = this.program.pick;
 
-        if (frameCtx.program) {
-            frameCtx.program.unbind();
-        }
-
         pickProgram.bind();
 
         var gl = this.program.gl;
 
         gl.uniform1i(this._rayPickMode, frameCtx.rayPick);
-
-        frameCtx.program = pickProgram;
 
         /*
         * HACK until we have distinct chunk for each VBO (maybe)
