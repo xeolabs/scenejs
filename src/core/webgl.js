@@ -401,10 +401,6 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
         }
     };
 
-    this.unbind = function () {
-        //     gl.useProgram(0);
-    };
-
     this.destroy = function () {
 
         if (this.valid) {
