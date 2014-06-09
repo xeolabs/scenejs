@@ -33,9 +33,9 @@ var SceneJS_sceneStatusModule = new (function () {
     /** Notifies that a node has begun loading some data
      */
     this.taskStarted = function (node, description) {
-        if (false === SceneJS_configsModule.configs.statusPopups) {
-            return -1;
-        }
+
+        var popups = !!SceneJS_configsModule.configs.statusPopups;
+
         var scene = node.getScene();
         var sceneId = scene.getId();
         var nodeId = node.getId();
@@ -47,7 +47,7 @@ var SceneJS_sceneStatusModule = new (function () {
         var status = this.sceneStatus[sceneId];
         if (!status) {
             status = this.sceneStatus[sceneId] = {
-                numTasks:0
+                numTasks: 0
             };
         }
         status.numTasks++;
@@ -56,11 +56,11 @@ var SceneJS_sceneStatusModule = new (function () {
         var sceneState = sceneStates[sceneId];
         if (!sceneState) {
             sceneState = sceneStates[sceneId] = {
-                sceneId:sceneId,
-                nodeStates:{},
-                scene:scene,
-                popupContainer:createPopupContainer(canvas),
-                descCounts:{}
+                sceneId: sceneId,
+                nodeStates: {},
+                scene: scene,
+                popupContainer: popups ? createPopupContainer(canvas) : null,
+                descCounts: {}
             };
         }
         var descCount = sceneState.descCounts[description];
@@ -71,18 +71,18 @@ var SceneJS_sceneStatusModule = new (function () {
         var nodeState = sceneState.nodeStates[nodeId];
         if (!nodeState) {
             nodeState = sceneState.nodeStates[nodeId] = {
-                nodeId:nodeId,
-                numTasks:0,
-                tasks:{}
+                nodeId: nodeId,
+                numTasks: 0,
+                tasks: {}
             };
         }
         description = description + " " + sceneState.descCounts[description] + "...";
         nodeState.numTasks++;
         var task = {
-            sceneState:sceneState,
-            nodeState:nodeState,
-            description:description,
-            element:createPopup(sceneState.popupContainer, description)
+            sceneState: sceneState,
+            nodeState: nodeState,
+            description: description,
+            element: popups ? createPopup(sceneState.popupContainer, description) : null
         };
         nodeState.tasks[taskId] = task;
         tasks[taskId] = task;
@@ -133,9 +133,12 @@ var SceneJS_sceneStatusModule = new (function () {
         if (!task) {
             return null;
         }
+        var popups = !!SceneJS_configsModule.configs.statusPopups;
         var sceneState = task.sceneState;
         this.sceneStatus[sceneState.sceneId].numTasks--;
-        dismissPopup(task.element);
+        if (popups) {
+            dismissPopup(task.element);
+        }
         var nodeState = task.nodeState;
         nodeState.numTasks--;
         delete nodeState.tasks[taskId];
@@ -169,7 +172,18 @@ var SceneJS_sceneStatusModule = new (function () {
         if (!task) {
             return null;
         }
-        failPopup(task.element);
+        var popups = !!SceneJS_configsModule.configs.statusPopups;
+        var sceneState = task.sceneState;
+        this.sceneStatus[sceneState.sceneId].numTasks--;
+        if (popups) {
+            failPopup(task.element);
+        }
+        var nodeState = task.nodeState;
+        nodeState.numTasks--;
+        delete nodeState.tasks[taskId];
+        if (nodeState.numTasks == 0) {
+            delete task.sceneState.nodeStates[nodeState.nodeId];
+        }
         return null;
     };
 
@@ -177,4 +191,3 @@ var SceneJS_sceneStatusModule = new (function () {
         element.style.background = "#FFAAAA";
     }
 })();
-
