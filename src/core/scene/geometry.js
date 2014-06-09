@@ -558,7 +558,9 @@ new (function () {
             core.vertexBuf.setData(new Float32Array(data.positions), data.positionsOffset || 0);
             core.arrays.positions.set(data.positions, data.positionsOffset || 0);
             this._engine.display.imageDirty = true;
-            core.interleavedBuf.dirty = true;
+            if (core.interleavedBuf) {
+                core.interleavedBuf.dirty = true;
+            }
         }
     };
 
@@ -573,7 +575,9 @@ new (function () {
             core.normalBuf.setData(new Float32Array(data.normals), data.normalsOffset || 0);
             core.arrays.normals.set(data.normals, data.normalsOffset || 0);
             this._engine.display.imageDirty = true;
-            core.interleavedBuf.dirty = true;
+            if (core.interleavedBuf) {
+                core.interleavedBuf.dirty = true;
+            }
         }
     };
 
@@ -588,7 +592,9 @@ new (function () {
             core.colorBuf.setData(new Float32Array(data.colors), data.colorsOffset || 0);
             core.arrays.colors.set(data.colors, data.colorsOffset || 0);
             this._engine.display.imageDirty = true;
-            core.interleavedBuf.dirty = true;
+            if (core.interleavedBuf) {
+                core.interleavedBuf.dirty = true;
+            }
         }
     };
 
@@ -607,7 +613,9 @@ new (function () {
             core.colorBuf.setData(new Float32Array(data.uv), data.uvOffset || 0);
             core.arrays.uv.set(data.uv, data.uvOffset || 0);
             this._engine.display.imageDirty = true;
-            core.interleavedBuf.dirty = true;
+            if (core.interleavedBuf) {
+                core.interleavedBuf.dirty = true;
+            }
         }
     };
 
@@ -622,7 +630,9 @@ new (function () {
             core.colorBuf.setData(new Float32Array(data.uv2), data.uv2Offset || 0);
             core.arrays.uv2.set(data.uv2, data.uv2Offset || 0);
             this._engine.display.imageDirty = true;
-            core.interleavedBuf.dirty = true;
+            if (core.interleavedBuf) {
+                core.interleavedBuf.dirty = true;
+            }
         }
     };
 
