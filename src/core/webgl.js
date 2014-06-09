@@ -53,10 +53,12 @@ var SceneJS_webgl_enumMap = {
     unsignedByte:"UNSIGNED_BYTE"
 };
 
-var SceneJS_webgl_ProgramUniform = function (gl, program, name, type, size, location, logging) {
+var SceneJS_webgl_ProgramUniform = function (gl, program, name, type, size, location, index, logging) {
 
     var func = null;
+    this.numberValue = false;
     if (type == gl.BOOL) {
+        this.numberValue = true;
         func = function (v) {
             gl.uniform1i(location, v);
         };
@@ -73,6 +75,7 @@ var SceneJS_webgl_ProgramUniform = function (gl, program, name, type, size, loca
             gl.uniform4iv(location, v);
         };
     } else if (type == gl.INT) {
+        this.numberValue = true;
         func = function (v) {
             gl.uniform1iv(location, v);
         };
@@ -89,6 +92,7 @@ var SceneJS_webgl_ProgramUniform = function (gl, program, name, type, size, loca
             gl.uniform4iv(location, v);
         };
     } else if (type == gl.FLOAT) {
+        this.numberValue = true;
         func = function (v) {
             gl.uniform1f(location, v);
         };
@@ -130,6 +134,9 @@ var SceneJS_webgl_ProgramUniform = function (gl, program, name, type, size, loca
     this.getLocation = function () {
         return location;
     };
+
+    // This is just an integer key for caching the uniform's value, more efficient than caching by name.
+    this.index = index;
 };
 
 var SceneJS_webgl_ProgramSampler = function (gl, program, name, type, size, location) {
@@ -280,6 +287,9 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
 
     var numUniforms = gl.getProgramParameter(handle, gl.ACTIVE_UNIFORMS);
 
+    this.uniformValues = [];
+    var valueIndex = 0;
+
     for (i = 0; i < numUniforms; ++i) {
         u = gl.getActiveUniform(handle, i);
         if (u) {
@@ -304,7 +314,10 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
                     u_name,
                     u.type,
                     u.size,
-                    location);
+                    location,
+                    valueIndex);
+                this.uniformValues[valueIndex] = null;
+                ++valueIndex;
             }
         }
     }
@@ -359,9 +372,12 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
     this.setUniform = function (name, value) {
         var u = this._uniforms[name];
         if (u) {
-            u.setValue(value);
-            if (this._profile) {
-                this._profile.uniform++;
+            if (this.uniformValues[u.index] !== value || !u.numberValue) {
+                u.setValue(value);
+                if (this._profile) {
+                    this._profile.uniform++;
+                }
+                this.uniformValues[u.index] = value;
             }
         } else {
             //      SceneJS.log.warn("Shader uniform load failed - uniform not found in shader : " + name);
