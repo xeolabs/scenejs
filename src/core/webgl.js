@@ -152,6 +152,10 @@ var SceneJS_webgl_ProgramSampler = function (gl, program, name, type, size, loca
 /** An attribute within a shader
  */
 var SceneJS_webgl_ProgramAttribute = function (gl, program, name, type, size, location) {
+
+    this.gl = gl;
+    this.location = location;
+
     this.bindFloatArrayBuffer = function (buffer) {
         if (buffer) {
             buffer.bind();
@@ -159,12 +163,13 @@ var SceneJS_webgl_ProgramAttribute = function (gl, program, name, type, size, lo
             gl.vertexAttribPointer(location, buffer.itemSize, gl.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
         }
     };
-
-    this.bindInterleavedFloatArrayBuffer = function (components, stride, byteOffset) {
-        gl.enableVertexAttribArray(location);
-        gl.vertexAttribPointer(location, components, gl.FLOAT, false, stride, byteOffset);   // Vertices are not homogeneous - no w-element
-    };
 };
+
+SceneJS_webgl_ProgramAttribute.prototype.bindInterleavedFloatArrayBuffer = function (components, stride, byteOffset) {
+    this.gl.enableVertexAttribArray(this.location);
+    this.gl.vertexAttribPointer(this.location, components, this.gl.FLOAT, false, stride, byteOffset);   // Vertices are not homogeneous - no w-element
+};
+
 
 /**
  * A vertex/fragment shader in a program
@@ -373,21 +378,6 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
         }
     };
 
-    this.setUniform = function (name, value) {
-        var u = this._uniforms[name];
-        if (u) {
-            if (this.uniformValues[u.index] !== value || !u.numberValue) {
-                u.setValue(value);
-                if (this._profile) {
-                    this._profile.uniform++;
-                }
-                this.uniformValues[u.index] = value;
-            }
-        } else {
-            //      SceneJS.log.warn("Shader uniform load failed - uniform not found in shader : " + name);
-        }
-    };
-
     this.getAttribute = function (name) {
         var attr = this._attributes[name];
         if (attr) {
@@ -437,6 +427,22 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
         }
     };
 };
+
+SceneJS_webgl_Program.prototype.setUniform = function (name, value) {
+    var u = this._uniforms[name];
+    if (u) {
+        if (this.uniformValues[u.index] !== value || !u.numberValue) {
+            u.setValue(value);
+            if (this._profile) {
+                this._profile.uniform++;
+            }
+            this.uniformValues[u.index] = value;
+        }
+    } else {
+        //      SceneJS.log.warn("Shader uniform load failed - uniform not found in shader : " + name);
+    }
+};
+
 
 var SceneJS_webgl_Texture2D = function (gl, cfg) {
 
@@ -552,7 +558,7 @@ function SceneJS_webgl_nextHighestPowerOfTwo(x) {
 
 var SceneJS_webgl_ArrayBuffer = function (gl, type, values, numItems, itemSize, usage) {
 
-
+    this.gl = gl;
     this.type = type;
     this.itemSize = itemSize;
 
@@ -569,10 +575,6 @@ var SceneJS_webgl_ArrayBuffer = function (gl, type, values, numItems, itemSize, 
     };
 
     this._allocate(values, numItems);
-
-    this.bind = function () {
-        gl.bindBuffer(type, this.handle);
-    };
 
     this.setData = function (data, offset) {
 
@@ -597,6 +599,10 @@ var SceneJS_webgl_ArrayBuffer = function (gl, type, values, numItems, itemSize, 
     this.destroy = function () {
         gl.deleteBuffer(this.handle);
     };
+};
+
+SceneJS_webgl_ArrayBuffer.prototype.bind = function () {
+    this.gl.bindBuffer(this.type, this.handle);
 };
 
 
