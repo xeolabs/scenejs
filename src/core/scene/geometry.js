@@ -608,10 +608,10 @@ new (function () {
     };
 
     SceneJS.Geometry.prototype.setUV = function (data) {
-        if (data.uv && this._core.colorBuf) {
+        if (data.uv && this._core.uvBuf) {
             var core = this._core;
-            core.colorBuf.bind();
-            core.colorBuf.setData(new Float32Array(data.uv), data.uvOffset || 0);
+            core.uvBuf.bind();
+            core.uvBuf.setData(new Float32Array(data.uv), data.uvOffset || 0);
             core.arrays.uv.set(data.uv, data.uvOffset || 0);
             this._engine.display.imageDirty = true;
             if (core.interleavedBuf) {
@@ -625,10 +625,10 @@ new (function () {
     };
 
     SceneJS.Geometry.prototype.setUV2 = function (data) {
-        if (data.uv2 && this._core.colorBuf) {
+        if (data.uv2 && this._core.uv2Buf) {
             var core = this._core;
-            core.colorBuf.bind();
-            core.colorBuf.setData(new Float32Array(data.uv2), data.uv2Offset || 0);
+            core.uv2Buf.bind();
+            core.uv2Buf.setData(new Float32Array(data.uv2), data.uv2Offset || 0);
             core.arrays.uv2.set(data.uv2, data.uv2Offset || 0);
             this._engine.display.imageDirty = true;
             if (core.interleavedBuf) {
