@@ -9,7 +9,7 @@
  *      type: "objects/toys/drinkingBird",
  *      rotate: true // Default false - causes bird to drink when true
  *  });
- *  
+ *
  */
 SceneJS.Types.addType("objects/toys/drinkingBird", {
 
