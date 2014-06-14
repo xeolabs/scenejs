@@ -1,7 +1,7 @@
 /**
  * MD2 importer
  *
- * Uses the K3D library to parse Md2
+ * Uses the K3D library to parse .MD2
  * © 2012 Ivan Kuckir
  * http://k3d.ivank.net/
  *
