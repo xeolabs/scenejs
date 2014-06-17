@@ -583,7 +583,7 @@
                         "id":"cubeMap"
                     },
                     {
-                        "title":"tron tank with environmental reflection",
+                        "title":"Tron tank with environmental reflection",
                         "tip":"A Tron tank reflecting a London street scene",
                         "tags":["reflection"],
                         "path":"texture/cubemap/tankWithCubeMap.html",
