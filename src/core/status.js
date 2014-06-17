@@ -34,7 +34,7 @@ var SceneJS_sceneStatusModule = new (function () {
      */
     this.taskStarted = function (node, description) {
 
-        var popups = !!SceneJS_configsModule.configs.statusPopups;
+        var popups = SceneJS_configsModule.configs.statusPopups !== false;
 
         var scene = node.getScene();
         var sceneId = scene.getId();
@@ -133,10 +133,9 @@ var SceneJS_sceneStatusModule = new (function () {
         if (!task) {
             return null;
         }
-        var popups = !!SceneJS_configsModule.configs.statusPopups;
         var sceneState = task.sceneState;
         this.sceneStatus[sceneState.sceneId].numTasks--;
-        if (popups) {
+        if (task.element) {
             dismissPopup(task.element);
         }
         var nodeState = task.nodeState;
