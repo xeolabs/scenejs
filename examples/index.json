@@ -576,11 +576,18 @@
                 "tags":["cubeMap"],
                 "nodes":[
                     {
-                        "title":"Environmental reflection",
+                        "title":"Teapot with environmental reflection",
                         "tip":"A teapot reflecting a London street scene",
                         "tags":["reflection"],
                         "path":"texture/cubemap/cubeMap.html",
                         "id":"cubeMap"
+                    },
+                    {
+                        "title":"tron tank with environmental reflection",
+                        "tip":"A Tron tank reflecting a London street scene",
+                        "tags":["reflection"],
+                        "path":"texture/cubemap/tankWithCubeMap.html",
+                        "id":"tankCubeMap"
                     }
                 ]
             }
