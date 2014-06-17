@@ -159,6 +159,7 @@
             "src/core/scene/style.js",
             "src/core/scene/tag.js",
             "src/core/scene/texture.js",
+            "src/core/scene/cubemap.js",
             "src/core/scene/xform.js",
             "src/core/scene/matrix.js",
             "src/core/scene/rotate.js",
@@ -203,6 +204,7 @@
             "src/core/display/chunks/shaderParamsChunk.js",
             "src/core/display/chunks/styleChunk.js",
             "src/core/display/chunks/textureChunk.js",
+            "src/core/display/chunks/cubemapChunk.js",
             "src/core/display/chunks/xformChunk.js"
         ]
     };

@@ -60,9 +60,9 @@
                 var u = 1- (longNumber / longitudeBands);
                 var v = latNumber / latitudeBands;
 
-                normals.push(x);
-                normals.push(y);
-                normals.push(z);
+                normals.push(-x);
+                normals.push(-y);
+                normals.push(-z);
                 uvs.push(u);
                 uvs.push(v);
                 positions.push(radius * x);

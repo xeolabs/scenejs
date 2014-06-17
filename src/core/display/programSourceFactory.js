@@ -644,6 +644,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
+        if (!states.cubemap.empty && normals) {
+            src.push("uniform samplerCube SCENEJS_uEnvSampler;");
+        }
+
         /* True when lighting
          */
         src.push("uniform bool  SCENEJS_uBackfaceTexturing;");
@@ -672,7 +676,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
+        src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of world-space vertex from eye
 
         if (normals) {
 
@@ -875,6 +879,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 src.push("}");
             }
         }
+
+        if (!states.cubemap.empty && normals) {
+            src.push("vec3 envLookup = reflect(normalize(SCENEJS_vWorldEyeVec), normalize(SCENEJS_vWorldNormal));");
+            src.push("envLookup.y = envLookup.y * -1.0;");
+            src.push("vec4 envColor = textureCube(SCENEJS_uEnvSampler, envLookup);");
+            src.push("color = color * envColor.rgb;");
+        }
+
 
         src.push("  vec4    fragColor;");
 

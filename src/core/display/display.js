@@ -144,6 +144,12 @@ var SceneJS_Display = function (cfg) {
     this.texture = null;
 
     /**
+     * Node state core for the last {@link SceneJS.CubeMap} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.cubemap = null;
+
+    /**
      * Node state core for the last {@link SceneJS.XForm} visited during scene graph compilation traversal
      * @type Object
      */
@@ -363,6 +369,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
 
     object.layer = this.layer;
     object.texture = this.texture;
+    object.cubemap = this.cubemap;
     object.geometry = this.geometry;
     object.enable = this.enable;
     object.flags = this.flags;
@@ -376,6 +383,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.clips.hash,
         this.morphGeometry.hash,
         this.texture.hash,
+        this.cubemap.hash,
         this.lights.hash
 
     ]).join(";");
@@ -411,11 +419,12 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 12, "lights", this.lights);
     this._setChunk(object, 13, "material", this.material);
     this._setChunk(object, 14, "texture", this.texture);
-    this._setChunk(object, 15, "framebuf", this.framebuf);
-    this._setChunk(object, 16, "clips", this.clips);
-    this._setChunk(object, 17, "morphGeometry", this.morphGeometry);
-    this._setChunk(object, 18, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 19, "geometry", this.geometry); // Must be last
+    this._setChunk(object, 15, "cubemap", this.cubemap);
+    this._setChunk(object, 16, "framebuf", this.framebuf);
+    this._setChunk(object, 17, "clips", this.clips);
+    this._setChunk(object, 18, "morphGeometry", this.morphGeometry);
+    this._setChunk(object, 19, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 20, "geometry", this.geometry); // Must be last
 };
 
 SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, unique) {
@@ -581,10 +590,9 @@ SceneJS_Display.prototype._makeStateSortKeys = function () { // TODO: state sort
     for (var i = 0, len = this._objectListLen; i < len; i++) {
         object = this._objectList[i];
         object.sortKey = object.program
-            ? (((object.layer.priority + 1) * 100000000)
-            + ((object.program.id + 1) * 100000)
-            + (object.texture.stateId * 1000))
-            //    + i // Force stability among same-priority objects across multiple sorts
+            ? (((object.layer.priority + 1) * 1000000)
+            + ((object.program.id + 1) * 1000)
+            + (object.texture.stateId))
             : -1;   // Non-visual object (eg. sound)
     }
 };
@@ -731,7 +739,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
     if (this._xpBufLen > 0) {
 
-        for (var i = 0; i < 22; i++) {  // TODO: magic number!
+        for (var i = 0; i < 23; i++) {  // TODO: magic number!
             this._lastStateId[i] = null;
         }
 
