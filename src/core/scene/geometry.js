@@ -764,7 +764,13 @@ new (function () {
             uvBuf2:core.uvBuf2,
             colorBuf:core.colorBuf,
             interleavedBuf:core.interleavedBuf,
-            indexBuf:core.indexBuf
+            indexBuf:core.indexBuf,
+            interleavedStride:core.interleavedStride,
+            interleavedPositionOffset:core.interleavedPositionOffset,
+            interleavedNormalOffset:core.interleavedNormalOffset,
+            interleavedUVOffset:core.interleavedUVOffset,
+            interleavedUV2Offset:core.interleavedUV2Offset,
+            interleavedColorOffset:core.interleavedColorOffset
         };
 
         for (var i = stackLen - 1; i >= 0; i--) {
@@ -776,6 +782,12 @@ new (function () {
                 core2.uvBuf2 = coreStack[i].uvBuf2;
                 core2.colorBuf = coreStack[i].colorBuf;
                 core2.interleavedBuf = coreStack[i].interleavedBuf;
+                core2.interleavedStride = coreStack[i].interleavedStride;
+                core2.interleavedPositionOffset = coreStack[i].interleavedPositionOffset;
+                core2.interleavedNormalOffset = coreStack[i].interleavedNormalOffset;
+                core2.interleavedUVOffset = coreStack[i].interleavedUVOffset;
+                core2.interleavedUV2Offset = coreStack[i].interleavedUV2Offset;
+                core2.interleavedColorOffset = coreStack[i].interleavedColorOffset;
                 return core2;
             }
         }

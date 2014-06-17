@@ -280,19 +280,6 @@
     SceneJS.Flags.prototype.getSpecular = function() {
         return this._core.specular;
     };
-    
-    SceneJS.Flags.prototype.setAmbient = function(ambient) {
-        ambient = !!ambient;
-        if (this._core.ambient != ambient) {
-            this._core.ambient = ambient;
-            this._engine.display.imageDirty = true;
-        }
-        return this;
-    };
-
-    SceneJS.Flags.prototype.getAmbient = function() {
-        return this._core.ambient;
-    };
 
     SceneJS.Flags.prototype.setAmbient = function(ambient) {
         ambient = !!ambient;

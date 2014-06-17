@@ -8266,19 +8266,6 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     SceneJS.Flags.prototype.getSpecular = function() {
         return this._core.specular;
     };
-    
-    SceneJS.Flags.prototype.setAmbient = function(ambient) {
-        ambient = !!ambient;
-        if (this._core.ambient != ambient) {
-            this._core.ambient = ambient;
-            this._engine.display.imageDirty = true;
-        }
-        return this;
-    };
-
-    SceneJS.Flags.prototype.getAmbient = function() {
-        return this._core.ambient;
-    };
 
     SceneJS.Flags.prototype.setAmbient = function(ambient) {
         ambient = !!ambient;
@@ -8299,7 +8286,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.flags = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();new (function() {
+})();
+new (function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Framebuf} nodes
@@ -14127,7 +14115,7 @@ var SceneJS_Display = function (cfg) {
     /**
      * Ambient color, which must be given to gl.clearColor before draw list iteration
      */
-    this._ambientColor = [0, 0, 0];
+    this._ambientColor = [0, 0, 0, 1.0];
 
     /**
      * The object list, containing all elements of #_objects, kept in GL state-sorted order
@@ -14379,7 +14367,12 @@ SceneJS_Display.prototype._setAmbient = function (core) {
     for (var i = 0, len = lights.length; i < len; i++) {
         light = lights[i];
         if (light.mode == "ambient") {
-            this._ambientColor = light.color;
+            this._ambientColor[0] = light.color[0];
+            this._ambientColor[1] = light.color[1];
+            this._ambientColor[2] = light.color[2];
+            if (light.color.length === 4) {
+                this._ambientColor[3] = light.color[3];
+            }
         }
     }
 };
@@ -14808,7 +14801,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     frameCtx.transparencyPass = false;
 
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
-    gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
+    gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], this._ambientColor[3]);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);
@@ -14867,7 +14860,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 SceneJS_Display.prototype.destroy = function () {
     this._programFactory.destroy();
 };
-
 /**
  * @class Manages creation, sharing and recycle of {@link SceneJS_ProgramSource} instances
  * @private
