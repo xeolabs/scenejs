@@ -579,7 +579,7 @@
                         "title":"Environmental reflection",
                         "tip":"A teapot reflecting a London street scene",
                         "tags":["reflection"],
-                        "path":"texture/cubemap/cubeMapWithTexturedObject.html",
+                        "path":"texture/cubemap/cubeMap.html",
                         "id":"cubeMap"
                     }
                 ]
