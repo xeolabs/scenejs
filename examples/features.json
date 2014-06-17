@@ -338,6 +338,14 @@
                         "page":"videoAlphaMap"
                     }
                 ]
+            },
+            {
+                "nodes":[
+                    {
+                        "title":"Cube maps",
+                        "page":"cubeMap"
+                    }
+                ]
             }
         ]
     },

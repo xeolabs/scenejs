@@ -569,6 +569,20 @@
                         "id":"colorMapAnimation2"
                     }
                 ]
+            },
+            {
+                "title":"Cube mapping",
+                "tip":"",
+                "tags":["cubeMap"],
+                "nodes":[
+                    {
+                        "title":"Environmental reflection",
+                        "tip":"A teapot reflecting a London street scene",
+                        "tags":["reflection"],
+                        "path":"texture/cubemap/cubeMapWithTexturedObject.html",
+                        "id":"cubeMap"
+                    }
+                ]
             }
         ]
     },
