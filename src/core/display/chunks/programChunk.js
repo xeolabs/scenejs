@@ -20,6 +20,7 @@ SceneJS_ChunkFactory.createChunkType({
         frameCtx.uvBuf = false;
         frameCtx.uvBuf2 = false;
         frameCtx.colorBuf = false;
+        frameCtx.textureUnit = 0;
 
         frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
 
@@ -48,6 +49,7 @@ SceneJS_ChunkFactory.createChunkType({
         frameCtx.uvBuf = false;
         frameCtx.uvBuf2 = false;
         frameCtx.colorBuf = false;
+        frameCtx.textureUnit = 0;
 
         frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
 

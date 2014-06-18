@@ -919,6 +919,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     frameCtx.backfaces = true;
     frameCtx.frontface = "ccw";
     frameCtx.pick = !!pick;
+    frameCtx.textureUnit = 0;
 
     frameCtx.lineWidth = 1;
 

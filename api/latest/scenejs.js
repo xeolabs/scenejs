@@ -9253,7 +9253,13 @@ new (function() {
             uvBuf2:core.uvBuf2,
             colorBuf:core.colorBuf,
             interleavedBuf:core.interleavedBuf,
-            indexBuf:core.indexBuf
+            indexBuf:core.indexBuf,
+            interleavedStride:core.interleavedStride,
+            interleavedPositionOffset:core.interleavedPositionOffset,
+            interleavedNormalOffset:core.interleavedNormalOffset,
+            interleavedUVOffset:core.interleavedUVOffset,
+            interleavedUV2Offset:core.interleavedUV2Offset,
+            interleavedColorOffset:core.interleavedColorOffset
         };
 
         for (var i = stackLen - 1; i >= 0; i--) {
@@ -9265,6 +9271,12 @@ new (function() {
                 core2.uvBuf2 = coreStack[i].uvBuf2;
                 core2.colorBuf = coreStack[i].colorBuf;
                 core2.interleavedBuf = coreStack[i].interleavedBuf;
+                core2.interleavedStride = coreStack[i].interleavedStride;
+                core2.interleavedPositionOffset = coreStack[i].interleavedPositionOffset;
+                core2.interleavedNormalOffset = coreStack[i].interleavedNormalOffset;
+                core2.interleavedUVOffset = coreStack[i].interleavedUVOffset;
+                core2.interleavedUV2Offset = coreStack[i].interleavedUV2Offset;
+                core2.interleavedColorOffset = coreStack[i].interleavedColorOffset;
                 return core2;
             }
         }
@@ -14795,6 +14807,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     frameCtx.backfaces = true;
     frameCtx.frontface = "ccw";
     frameCtx.pick = !!pick;
+    frameCtx.textureUnit = 0;
 
     frameCtx.lineWidth = 1;
 
@@ -16016,12 +16029,6 @@ var SceneJS_Program = function(id, hash, source, gl) {
      */
     this.useCount = 0;
 
-    /**
-     * Current draw uniform state cached as a bitfield to avoid costly extra uniform1i calls
-     * @type Number
-     */
-    this.drawUniformFlags = 0;
-
     this.build(gl);
 };
 
@@ -16030,6 +16037,12 @@ var SceneJS_Program = function(id, hash, source, gl) {
  * This is also re-called to re-create them after WebGL context loss.
  */
 SceneJS_Program.prototype.build = function(gl) {
+    /**
+     * Current draw uniform state cached as a bitfield to avoid costly extra uniform1i calls
+     * @type Number
+     */
+    this.drawUniformFlags = 0;
+
     this.gl = gl;
     this.draw = new SceneJS_webgl_Program(gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
     this.pick = new SceneJS_webgl_Program(gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
@@ -17227,6 +17240,7 @@ SceneJS_ChunkFactory.createChunkType({
         frameCtx.uvBuf = false;
         frameCtx.uvBuf2 = false;
         frameCtx.colorBuf = false;
+        frameCtx.textureUnit = 0;
 
         frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
 
@@ -17255,6 +17269,7 @@ SceneJS_ChunkFactory.createChunkType({
         frameCtx.uvBuf = false;
         frameCtx.uvBuf2 = false;
         frameCtx.colorBuf = false;
+        frameCtx.textureUnit = 0;
 
         frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
 
@@ -17502,7 +17517,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     },
 
-    draw : function() {
+    draw : function(ctx) {
 
         var layers = this.core.layers;
 
@@ -17517,7 +17532,7 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (this._uTexSampler[i] && layer.texture) {    // Lazy-loads
 
-                    draw.bindTexture(this._uTexSampler[i], layer.texture, i);
+                    draw.bindTexture(this._uTexSampler[i], layer.texture, ctx.textureUnit++);
 
                     if (layer._matrixDirty && layer.buildMatrix) {
                         layer.buildMatrix.call(layer);
@@ -17541,9 +17556,9 @@ SceneJS_ChunkFactory.createChunkType({
 
     type: "cubemap",
 
-    draw: function () {
+    draw: function (ctx) {
         if (this.core.texture) {
-            this.program.draw.bindTexture("SCENEJS_uEnvSampler", this.core.texture, 0);
+            this.program.draw.bindTexture("SCENEJS_uEnvSampler", this.core.texture, ctx.textureUnit++);
         }
     }
 });SceneJS_ChunkFactory.createChunkType({
