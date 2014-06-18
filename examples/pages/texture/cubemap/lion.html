@@ -72,38 +72,20 @@
 
                                                 nodes: [
 
-                                                    // Texture our lion - the "import.md2" node merely imports meshes, so
-                                                    // it's our job to apply any materials and textures. This tends to be OK
-                                                    // because for efficiency we would usually have one big baked texture
-                                                    // like this one.
+
+                                                    // Import the .MD2
                                                     //
-                                                    // Texture is loaded from:
-                                                    // http://scenejs.org/examples/models/md2/lion.jpg
+                                                    // This node is implemented by plugin at:
+                                                    // http://scenejs.org/api/latest/plugins/node/import/md2.js
+                                                    //
+                                                    //
+                                                    // The MD2 file is loaded from:
+                                                    // http://scenejs.org/examples/models/md2/lion.md2
 
                                                     {
-                                                        type: "texture",
-                                                        layers: [
-                                                            {
-                                                                src: "../../../models/md2/lion.jpg"
-                                                            }
-                                                        ],
-                                                        nodes: [
-
-                                                            // Import the .MD2
-                                                            //
-                                                            // This node is implemented by plugin at:
-                                                            // http://scenejs.org/api/latest/plugins/node/import/md2.js
-                                                            //
-                                                            //
-                                                            // The MD2 file is loaded from:
-                                                            // http://scenejs.org/examples/models/md2/lion.md2
-
-                                                            {
-                                                                type: "import/md2",
-                                                                src: "../../../models/md2/lion.md2",
-                                                                rate: 0.015
-                                                            }
-                                                        ]
+                                                        type: "import/md2",
+                                                        src: "../../../models/md2/lion.md2",
+                                                        rate: 0.015
                                                     }
                                                 ]
                                             }
