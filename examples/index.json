@@ -588,6 +588,13 @@
                         "tags":["reflection"],
                         "path":"texture/cubemap/tankWithCubeMap.html",
                         "id":"tankCubeMap"
+                    },
+                    {
+                        "title":".MD2 animation with environmental reflection",
+                        "tip":".MD2 animation reflecting a London street scene",
+                        "tags":["reflection", "md2", "importing"],
+                        "path":"texture/cubemap/lion.html",
+                        "id":"md2CubeMap"
                     }
                 ]
             }
