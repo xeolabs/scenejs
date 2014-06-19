@@ -889,10 +889,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
                 layer = states.cubemap.layers[i];
-                if (layer.applyTo == "baseColor") {
+               // if (layer.applyTo == "baseColor") {
                     src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
                     src.push("color = color * SCENEJS_uCubeMapBlendFactor" + i + " * envColor.rgb;");
-                }
+               // }
             }
         }
 

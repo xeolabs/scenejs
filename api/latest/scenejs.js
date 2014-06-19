@@ -13034,8 +13034,6 @@ new (function () {
             for (var i = 0, len = layers.length; i < len; i++) {
                 texLayer = layers[i];
                 hashParts.push("/");
-                hashParts.push(texLayer.applyFrom);
-                hashParts.push("/");
                 hashParts.push(texLayer.applyTo);
                 hashParts.push("/");
                 hashParts.push(texLayer.blendMode);
@@ -15593,12 +15591,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-
-        if (!states.cubemap.empty && normals) {
-            src.push("uniform samplerCube SCENEJS_uEnvSampler;");
-            src.push("uniform float SCENEJS_uEnvBlendFactor;");
-        }
-
         /* True when lighting
          */
         src.push("uniform bool  SCENEJS_uBackfaceTexturing;");
@@ -15837,10 +15829,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
                 layer = states.cubemap.layers[i];
-                if (layer.applyTo == "baseColor") {
+               // if (layer.applyTo == "baseColor") {
                     src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
                     src.push("color = color * SCENEJS_uCubeMapBlendFactor" + i + " * envColor.rgb;");
-                }
+               // }
             }
         }
 
