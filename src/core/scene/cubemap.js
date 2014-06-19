@@ -6,7 +6,7 @@
         stateId: SceneJS._baseStateId++,
         empty: true,
         texture: null,
-        hash:""
+        hash: ""
     };
 
     var coreStack = [];
@@ -28,6 +28,17 @@
     SceneJS.CubeMap.prototype._init = function (params) {
         if (this._core.useCount == 1) { // This node is first to reference the state core, so sets it up
             this._core.hash = "y";
+
+            if (params.blendMode) {
+                if (params.blendMode != "add" && params.blendMode != "multiply") {
+                    throw SceneJS_error.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "texture layer blendMode value is unsupported - " +
+                            "should be either 'add' or 'multiply'");
+                }
+            }
+            this._core.blendMode = params.blendMode || "multiply";
+            this._core.blendFactor = (params.blendFactor != undefined && params.blendFactor != null) ? params.blendFactor : 1.0;
             var self = this;
             var gl = this._engine.canvas.gl;
             var texture = gl.createTexture();
@@ -57,12 +68,12 @@
                         //gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,  ensureImageSizePowerOfTwo(image));
                         if (++numImagesLoaded == faces.length) {
                             self._core.texture = new SceneJS_webgl_Texture2D(gl, {
-                                texture:texture,
+                                texture: texture,
                                 target: gl.TEXTURE_CUBE_MAP,
-                                minFilter:gl.LINEAR,
-                                magFilter:gl.LINEAR,
-                                wrapS:gl.CLAMP_TO_EDGE,
-                                wrapT:gl.CLAMP_TO_EDGE
+                                minFilter: gl.LINEAR,
+                                magFilter: gl.LINEAR,
+                                wrapS: gl.CLAMP_TO_EDGE,
+                                wrapT: gl.CLAMP_TO_EDGE
                             });
                             SceneJS_sceneStatusModule.taskFinished(taskId);
                             self._engine.display.imageDirty = true;
@@ -78,7 +89,7 @@
         }
     };
 
-    function ensureImageSizePowerOfTwo (image) {
+    function ensureImageSizePowerOfTwo(image) {
         if (!isPowerOfTwo(image.width) || !isPowerOfTwo(image.height)) {
             var canvas = document.createElement("canvas");
             canvas.width = nextHighestPowerOfTwo(image.width);
@@ -107,17 +118,51 @@
     }
 
     SceneJS.CubeMap.prototype._compile = function (ctx) {
-        this._engine.display.cubemap = coreStack[stackLen++] = this._core;
+        if (!this.__core) {
+            this.__core = this._engine._coreFactory.getCore("cubemap");
+        }
+        var parentCore = this._engine.display.cubemap;
+        if (!this._core.empty) {
+            this.__core.layers = (parentCore && parentCore.layers) ? parentCore.layers.concat([this._core]) : [this._core];
+        }
+        this._makeHash(this.__core);
+        coreStack[stackLen++] = this.__core;
+        this._engine.display.cubemap = this.__core;
         this._compileNodes(ctx);
         this._engine.display.cubemap = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+    };
+
+    SceneJS.CubeMap.prototype._makeHash = function (core) {
+        var hash;
+        if (core.layers && core.layers.length > 0) {
+            var layers = core.layers;
+            var hashParts = [];
+            var texLayer;
+            for (var i = 0, len = layers.length; i < len; i++) {
+                texLayer = layers[i];
+                hashParts.push("/");
+                hashParts.push(texLayer.applyTo);
+                hashParts.push("/");
+                hashParts.push(texLayer.blendMode);
+            }
+            hash = hashParts.join("");
+        } else {
+            hash = "";
+        }
+        if (core.hash != hash) {
+            core.hash = hash;
+        }
     };
 
     SceneJS.CubeMap.prototype._destroy = function () {
         if (this._core.useCount == 1) { // Last resource user
             if (this._core.texture) {
-                this._engine.display.gl.deleteTexture(this._core.texture);
+                this._core.texture.destroy();
                 this._core.texture = null;
             }
+        }
+        if (this._core) {
+            this._coreFactory.putCore(this._core);
         }
     }
 
