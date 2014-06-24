@@ -25,6 +25,8 @@ SceneJS.Types.addType("cubemaps/clouds", {
                 path + "c.png",
                 path + "d.png"
             ],
+            blendFactor: params.blendFactor,
+            intensity
 
             // Attach given child nodes
             nodes: params.nodes

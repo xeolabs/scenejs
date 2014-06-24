@@ -571,30 +571,51 @@
                 ]
             },
             {
-                "title":"Cube mapping",
+                "title":"Reflection mapping",
                 "tip":"",
-                "tags":["cubeMap"],
+                "tags":["cubeMap", "reflection"],
                 "nodes":[
                     {
-                        "title":"Teapot with environmental reflection",
-                        "tip":"A teapot reflecting a London street scene",
+                        "title":"Basic reflection map",
+                        "tip":"A basic reflection map",
                         "tags":["reflection"],
-                        "path":"texture/cubemap/cubeMap.html",
+                        "path":"texture/reflection/reflection.html",
                         "id":"cubeMap"
                     },
                     {
-                        "title":"Tron tank with environmental reflection",
-                        "tip":"A Tron tank reflecting a London street scene",
+                        "title":"Reflection intensity control",
+                        "tip":"Controlling how much reflection map is applied through the 'intensity' property",
                         "tags":["reflection"],
-                        "path":"texture/cubemap/tankWithCubeMap.html",
-                        "id":"tankCubeMap"
+                        "path":"texture/reflection/reflectionIntensity.html",
+                        "id":"reflectionIntensity"
                     },
                     {
-                        "title":".MD2 animation with environmental reflection",
-                        "tip":".MD2 animation reflecting a London street scene",
-                        "tags":["reflection", "md2", "importing"],
-                        "path":"texture/cubemap/lion.html",
-                        "id":"md2CubeMap"
+                        "title":"Controlling surface reflectivity",
+                        "tip":"Demonstrates how to control surface reflectivity",
+                        "tags":["reflection", "specularMap"],
+                        "path":"texture/reflection/reflectionWithVaryingSpecularity.html",
+                        "id":"reflectionWithVaryingSpecularity"
+                    },
+                    {
+                        "title":"Controlling surface reflectivity with a control map",
+                        "tip":"Demonstrates how to control reflectivity across a surface using a specular 'control' map",
+                        "tags":["reflection", "specularMap"],
+                        "path":"texture/reflection/reflectionWithControlMap.html",
+                        "id":"reflectionWithControlMap"
+                    },
+                    {
+                        "title":"Multiple reflections",
+                        "tip":"Applying multiple reflections to a surface",
+                        "tags":["reflection"],
+                        "path":"texture/reflection/reflectionWithLayers.html",
+                        "id":"reflectionWithLayers"
+                    },
+                    {
+                        "title":"Applying reflection to an .OBJ",
+                        "tip":"Applying a reflection map to a mesh imported from .OBJ",
+                        "tags":["reflection", "obj", "importing"],
+                        "path":"texture/reflection/reflectionWithOBJImport.html",
+                        "id":"reflectionWithOBJImport"
                     }
                 ]
             }

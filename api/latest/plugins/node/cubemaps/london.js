@@ -16,7 +16,7 @@ SceneJS.Types.addType("cubemaps/london", {
         var path = SceneJS.getConfigs("pluginPath") + "/node/cubemaps/textures/london/";
 
         this.addNode({
-            type: "cubemap",
+            type: "reflect",
             src: [
                 path + "pos-x.png",
                 path + "neg-x.png",

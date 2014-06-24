@@ -1,22 +1,22 @@
 /**
- * Customizable skybox node type, which allows you to customize its texture
+ * Reflection map of a street in London
  *
  * Usage example:
  *
  * someNode.addNode({
- *      type: "skyboxes/custom",
- *      texture: "foo/bar/mySkyboxTexture.jpg",
- *      size: 5000 // Box half-size on each axis - default is 5000
+ *      type: "reflections/london",
+ *      intensity: 0.2
  *  });
  */
-SceneJS.Types.addType("cubemaps/london", {
+SceneJS.Types.addType("reflections/london", {
 
     construct: function (params) {
 
-        var path = SceneJS.getConfigs("pluginPath") + "/node/cubemaps/textures/london/";
+        var path = SceneJS.getConfigs("pluginPath") + "/node/reflections/textures/london/";
 
         this.addNode({
-            type: "cubemap",
+            type: "reflect",
+            intensity: params.intensity,
             src: [
                 path + "pos-x.png",
                 path + "neg-x.png",

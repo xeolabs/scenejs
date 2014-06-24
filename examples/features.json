@@ -302,16 +302,16 @@
             {
                 "nodes":[
                     {
-                        "title":"Multitexturing",
-                        "page":"multitexturing"
+                        "title":"Reflection maps",
+                        "page":"cubeMap"
                     }
                 ]
             },
             {
                 "nodes":[
                     {
-                        "title":"UV layers",
-                        "page":"uvLayers"
+                        "title":"Multitexturing",
+                        "page":"multitexturing"
                     }
                 ]
             },
@@ -334,16 +334,16 @@
             {
                 "nodes":[
                     {
-                        "title":"Texture plugin API",
-                        "page":"videoAlphaMap"
+                        "title":"UV layers",
+                        "page":"uvLayers"
                     }
                 ]
             },
             {
                 "nodes":[
                     {
-                        "title":"Cube maps",
-                        "page":"cubeMap"
+                        "title":"Texture plugin API",
+                        "page":"videoAlphaMap"
                     }
                 ]
             }

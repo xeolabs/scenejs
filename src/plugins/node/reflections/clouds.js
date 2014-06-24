@@ -1,22 +1,22 @@
 /**
- * Customizable skybox node type, which allows you to customize its texture
+ * Reflection map of blue sky and white clouds
  *
  * Usage example:
  *
  * someNode.addNode({
- *      type: "skyboxes/custom",
- *      texture: "foo/bar/mySkyboxTexture.jpg",
- *      size: 5000 // Box half-size on each axis - default is 5000
+ *      type: "reflections/clouds",
+ *      intensity: 0.2
  *  });
  */
-SceneJS.Types.addType("cubemaps/clouds", {
+SceneJS.Types.addType("reflections/clouds", {
 
     construct: function (params) {
 
-        var path = SceneJS.getConfigs("pluginPath") + "/node/cubemaps/textures/clouds/";
+        var path = SceneJS.getConfigs("pluginPath") + "/node/reflections/textures/clouds/";
 
         this.addNode({
-            type: "cubemap",
+            type: "reflect",
+            intensity: params.intensity,
             src: [
                 path + "a.png",
                 path + "b.png",

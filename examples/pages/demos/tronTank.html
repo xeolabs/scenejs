@@ -32,64 +32,69 @@
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"../../../api/latest/plugins"
+    pluginPath: "../../../api/latest/plugins"
 });
 
 // Create scene
 var scene = SceneJS.createScene({
 
-    nodes:[
+    nodes: [
 
         // View transform - we've given it a globally-unique ID
         // so we can look it up and update it's properties from
         // mouse input.
 
         {
-            type:"lookAt",
-            id:"theLookAt",
-            eye:{ x:0, y:10, z:-50 },
+            type: "lookAt",
+            id: "theLookAt",
+            eye: { x: 0, y: 10, z: -50 },
 
-            nodes:[
+            nodes: [
                 {
-                    type:"lights",
-                    lights:[
+                    type: "lights",
+                    lights: [
                         {
-                            mode:"ambient",
-                            color:{ r:0.7, g:0.7, b:0.9 },
-                            diffuse:true,
-                            specular:false
+                            mode: "ambient",
+                            color: { r: 0.7, g: 0.7, b: 0.9 },
+                            diffuse: false,
+                            specular: false
                         },
                         {
-                            mode:"dir",
-                            color:{ r:1.0, g:1.0, b:1.0 },
-                            diffuse:true,
-                            specular:true,
-                            dir:{ x:1.0, y:-0.9, z:-0.7 },
-                            space:"world"
+                            mode: "dir",
+                            color: { r: 1.0, g: 1.0, b: 1.0 },
+                            diffuse: true,
+                            specular: false,
+                            dir: { x: 1.0, y: -0.9, z: -0.7 },
+                            space: "world"
                         },
                         {
-                            mode:"dir",
-                            color:{ r:1.0, g:1.0, b:1.0 },
-                            diffuse:true,
-                            specular:true,
-                            dir:{ x:-1.0, y:-0.9, z:0.7 },
-                            space:"world"
+                            mode: "dir",
+                            color: { r: 1.0, g: 1.0, b: 1.0 },
+                            diffuse: true,
+                            specular: false,
+                            dir: { x: -1.0, y: -0.9, z: 0.7 },
+                            space: "world"
                         }
                     ],
 
-                    nodes:[
+                    nodes: [
 
-                        // Shader node, injects a custom function into the SceneJS fragment shader
-                        // to apply a cool animated CRT scan line effect to the tank, giving the
-                        // impression of it materializing into existence on the Game Grid
-                        //
                         {
-                            type:"shader",
-                            id:"myShader",
-                            shaders:[
+                            type: "reflections/clouds",
+                            intensity: 0.1,
+                            nodes: [
+
+                                // Shader node, injects a custom function into the SceneJS fragment shader
+                                // to apply a cool animated CRT scan line effect to the tank, giving the
+                                // impression of it materializing into existence on the Game Grid
+                                //
                                 {
-                                    stage:"fragment",
-                                    code:"uniform float lineSpace;\n\
+                                    type: "shader",
+                                    id: "myShader",
+                                    shaders: [
+                                        {
+                                            stage: "fragment",
+                                            code: "uniform float lineSpace;\n\
                                     vec4 myPixelColorFunc(vec4 color) {\n\
                                         if (lineSpace < 20.0) {\n\
                                             float my = mod(gl_FragCoord.y, lineSpace);\n\
@@ -99,30 +104,32 @@ var scene = SceneJS.createScene({
                                         }\n\
                                         return color;\n\
                                     }",
-                                    hooks:{
-                                        pixelColor:"myPixelColorFunc"
-                                    }
-                                }
-                            ],
+                                            hooks: {
+                                                pixelColor: "myPixelColorFunc"
+                                            }
+                                        }
+                                    ],
 
-                            params:{
-                                lineSpace:8
-                            },
+                                    params: {
+                                        lineSpace: 8
+                                    },
 
-                            // Integrate our tank, defined in tank.js
-                            nodes:[
-                                tankJSON
+                                    // Integrate our tank, defined in tank.js
+                                    nodes: [
+                                        tankJSON
+                                    ]
+                                },
+
+                                // Integrate our grid floor, defined in wireGrid.js
+                                wireGrid
                             ]
-                        },
-
-                        // Integrate our grid floor, defined in wireGrid.js
-                        wireGrid
+                        }
                     ]
                 },
 
                 // Skybox with custom texture, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
                 {
-                    type:"skyboxes/clouds"
+                    type: "skyboxes/clouds"
                 }
             ]
         }
@@ -136,9 +143,9 @@ var scene = SceneJS.createScene({
 
 var needUpdate = true;
 var speed = 0;
-var tankPos = { x:0, y:0, z:-100 };
+var tankPos = { x: 0, y: 0, z: -80 };
 var eyeDir = 0;
-var eye = { x:0, y:10, z:-40 };
+var eye = { x: 0, y: 10, z: -10 };
 
 var lastX;
 var lastX2;
@@ -242,94 +249,99 @@ canvas.addEventListener('mousewheel', mouseWheel, true);
 canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
 var lookat = scene.getNode("theLookAt");
-var tankTranslate = scene.getNode("tankPos");
-var tankDir = scene.getNode("tankRotate");
-var tankGunDir = scene.getNode("tankGunRotate");
 
-scene.on("tick",
-        function () {
+scene.getNode("tankPos",
+        function (tankTranslate) {
 
-            if (!needUpdate && ( pitchInc == 0 && tankYawInc == 0 && speed == 0 && trailYaw == 0)) {
-                return;
-            }
-            needUpdate = false;
+            var tankDir = scene.getNode("tankRotate");
+            var tankGunDir = scene.getNode("tankGunRotate");
 
-            pitch += pitchInc;
+            scene.on("tick",
+                    function () {
 
-            if (pitch < 1) {
-                pitch = 1;
-            }
+                        if (!needUpdate && ( pitchInc == 0 && tankYawInc == 0 && speed == 0 && trailYaw == 0)) {
+                            return;
+                        }
+                        needUpdate = false;
 
-            if (pitch > 80) {
-                pitch = 80;
-            }
+                        pitch += pitchInc;
 
-            tankYaw += tankYawInc;
-            var tankYawMat = Matrix.Rotation(tankYaw * 0.0174532925, $V([0, 1, 0]));
+                        if (pitch < 1) {
+                            pitch = 1;
+                        }
 
-            var moveVec = [0, 0, 1];
+                        if (pitch > 80) {
+                            pitch = 80;
+                        }
 
-            moveVec = tankYawMat.multiply($V(moveVec)).elements;
+                        tankYaw += tankYawInc;
+                        var tankYawMat = Matrix.Rotation(tankYaw * 0.0174532925, $V([0, 1, 0]));
 
-            var trailVec = [0, 0, -1 - (pitch * 0.02)];
+                        var moveVec = [0, 0, 1];
 
-            var trailPitchMat = Matrix.Rotation(pitch * 0.0174532925, $V([1, 0, 0]));
-            var trailYawMat = Matrix.Rotation(trailYaw * 0.0174532925, $V([0, 1, 0]));
+                        moveVec = tankYawMat.multiply($V(moveVec)).elements;
 
-            trailVec = trailPitchMat.multiply($V(trailVec)).elements;
-            trailVec = trailYawMat.multiply($V(trailVec)).elements;
+                        var trailVec = [0, 0, -1 - (pitch * 0.02)];
 
-            if (speed) {
-                tankPos.x += moveVec[0] * speed;
-                tankPos.y += moveVec[1] * speed;
-                tankPos.z += moveVec[2] * speed;
-            }
+                        var trailPitchMat = Matrix.Rotation(pitch * 0.0174532925, $V([1, 0, 0]));
+                        var trailYawMat = Matrix.Rotation(trailYaw * 0.0174532925, $V([0, 1, 0]));
 
-            if (eye.y > 100.0) {
-                eye.y = 100.0;
-            }
+                        trailVec = trailPitchMat.multiply($V(trailVec)).elements;
+                        trailVec = trailYawMat.multiply($V(trailVec)).elements;
 
-            if (eye.y < 20.0) {
-                eye.y = 20.0;
-            }
+                        if (speed) {
+                            tankPos.x += moveVec[0] * speed;
+                            tankPos.y += moveVec[1] * speed;
+                            tankPos.z += moveVec[2] * speed;
+                        }
 
-            eye.x = tankPos.x + (trailVec[0] * 35);
-            eye.y = tankPos.y + (trailVec[1] * 35);
-            eye.z = tankPos.z + (trailVec[2] * 35);
+                        if (eye.y > 100.0) {
+                            eye.y = 100.0;
+                        }
 
-            lookat
-                    .setEye(eye)
-                    .setLook(tankPos);
+                        if (eye.y < 20.0) {
+                            eye.y = 20.0;
+                        }
 
-            tankTranslate
-                    .setX(tankPos.x)
-                    .setZ(tankPos.z);
+                        eye.x = tankPos.x + (trailVec[0] * 25);
+                        eye.y = tankPos.y + (trailVec[1] * 25);
+                        eye.z = tankPos.z + (trailVec[2] * 25);
 
-            tankDir.setAngle(tankYaw + 180 || 180);
+                        lookat
+                                .setEye(eye)
+                                .setLook(tankPos);
 
-            tankGunDir.setAngle(-tankYaw);
+                        tankTranslate
+                                .setX(tankPos.x)
+                                .setZ(tankPos.z);
 
-            if (trailYaw > tankYaw) {
-                trailYaw -= (((trailYaw - tankYaw) * 0.01)) + 0.1;
+                        tankDir.setAngle(tankYaw + 180 || 180);
 
-            } else if (trailYaw < tankYaw) {
-                trailYaw += (((tankYaw - trailYaw) * 0.01)) + 0.1;
-            }
-        });
+                        tankGunDir.setAngle(-tankYaw);
+
+                        if (trailYaw > tankYaw) {
+                            trailYaw -= (((trailYaw - tankYaw) * 0.01)) + 0.1;
+
+                        } else if (trailYaw < tankYaw) {
+                            trailYaw += (((tankYaw - trailYaw) * 0.01)) + 0.1;
+                        }
+                    });
 
 // Animate the scanline shader effect on the tank
-scene.getNode("myShader", function (myShader) {
+            scene.getNode("myShader", function (myShader) {
 
-    var lineSpace = 0;
+                var lineSpace = 0;
 
-    scene.on("tick",
-            function () {
-                myShader.setParams({
-                    lineSpace:lineSpace
-                });
-                lineSpace += 0.15;
+                scene.on("tick",
+                        function () {
+                            myShader.setParams({
+                                lineSpace: lineSpace
+                            });
+                            lineSpace += 0.15;
+                        });
             });
-});
+
+        });
 
 </script>
 </body>
