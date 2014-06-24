@@ -15836,7 +15836,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (cubeMapping) {
-            src.push("if (SCENEJS_uReflection) {");
+            src.push("if (SCENEJS_uReflection) {"); // Flag which can enable/disable reflection
             src.push("vec3 envLookup = reflect(normalize(SCENEJS_vWorldEyeVec), normalize(SCENEJS_vWorldNormal));");
             src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
             src.push("vec4 envColor;");

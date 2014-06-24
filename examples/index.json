@@ -94,6 +94,12 @@
                         "tags":["ambientLight"],
                         "tip":"Enable ambient lighting for child geometries",
                         "path":"flags/ambient.html"
+                    },
+                    {
+                        "title":"Toggle reflection",
+                        "tags":["reflection"],
+                        "tip":"Enable reflection for child geometries",
+                        "path":"flags/reflection.html"
                     }
                 ]
             },
