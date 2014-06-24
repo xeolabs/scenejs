@@ -627,6 +627,13 @@
                         "tags":["reflection", "obj", "importing"],
                         "path":"texture/reflection/reflectionWithOBJImport.html",
                         "id":"reflectionWithOBJImport"
+                    },
+                    {
+                        "title":"Reflection with multiple objects",
+                        "tip":"Applying a reflection map to a group of objects",
+                        "tags":["reflection", "obj"],
+                        "path":"texture/reflection/reflectionMultipleObjects.html",
+                        "id":"reflectionMultipleObjects"
                     }
                 ]
             }
