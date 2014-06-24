@@ -18,7 +18,8 @@
         backfaceTexturing: true,    // Texturing enabled for backfaces
         diffuse: true,              // Diffuse lighting enabled
         specular: true,             // Specular lighting enabled
-        ambient: true               // Ambient lighting enabled
+        ambient: true,              // Ambient lighting enabled
+        reflection : true           // Reflection enabled by default
     };
 
     var coreStack = [];
@@ -52,6 +53,7 @@
             this._core.diffuse = true;           // Diffuse lighting enabled by default
             this._core.specular = true;          // Specular lighting enabled by default
             this._core.ambient = true;           // Ambient lighting enabled by default
+            this._core.reflection = true;           // Reflection enabled by default
 
             if (params.flags) {                 // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
@@ -117,6 +119,11 @@
             core.ambient = !!flags.ambient;
             this._engine.display.imageDirty = true;
         }
+        
+        if (flags.reflection != undefined) {
+            core.reflection = !!flags.reflection;
+            this._engine.display.imageDirty = true;
+        }
 
         return this;
     };
@@ -148,7 +155,8 @@
             specular: core.specular,
             ambient: core.ambient,
             backfaceLighting: core.backfaceLighting,
-            backfaceTexturing: core.backfaceTexturing
+            backfaceTexturing: core.backfaceTexturing,
+            reflection: core.reflection
         };
     };
 
@@ -292,6 +300,19 @@
 
     SceneJS.Flags.prototype.getAmbient = function() {
         return this._core.ambient;
+    };
+
+    SceneJS.Flags.prototype.setReflection = function(reflection) {
+        reflection = !!reflection;
+        if (this._core.reflection != reflection) {
+            this._core.reflection = reflection;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getReflection = function() {
+        return this._core.reflection;
     };
 
     SceneJS.Flags.prototype._compile = function(ctx) {

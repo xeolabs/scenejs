@@ -8004,7 +8004,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         backfaceTexturing: true,    // Texturing enabled for backfaces
         diffuse: true,              // Diffuse lighting enabled
         specular: true,             // Specular lighting enabled
-        ambient: true               // Ambient lighting enabled
+        ambient: true,              // Ambient lighting enabled
+        reflection : true           // Reflection enabled by default
     };
 
     var coreStack = [];
@@ -8038,7 +8039,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             this._core.diffuse = true;           // Diffuse lighting enabled by default
             this._core.specular = true;          // Specular lighting enabled by default
             this._core.ambient = true;           // Ambient lighting enabled by default
-            this._core.cubemap = true;           // Cubemap enabled by default
+            this._core.reflection = true;           // Reflection enabled by default
 
             if (params.flags) {                 // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
@@ -8105,8 +8106,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             this._engine.display.imageDirty = true;
         }
         
-        if (flags.cubemap != undefined) {
-            core.cubemap = !!flags.cubemap;
+        if (flags.reflection != undefined) {
+            core.reflection = !!flags.reflection;
             this._engine.display.imageDirty = true;
         }
 
@@ -8141,7 +8142,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             ambient: core.ambient,
             backfaceLighting: core.backfaceLighting,
             backfaceTexturing: core.backfaceTexturing,
-            cubemap: core.cubemap
+            reflection: core.reflection
         };
     };
 
@@ -8287,17 +8288,17 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         return this._core.ambient;
     };
 
-    SceneJS.Flags.prototype.setCubemap = function(cubemap) {
-        cubemap = !!cubemap;
-        if (this._core.cubemap != cubemap) {
-            this._core.cubemap = cubemap;
+    SceneJS.Flags.prototype.setReflection = function(reflection) {
+        reflection = !!reflection;
+        if (this._core.reflection != reflection) {
+            this._core.reflection = reflection;
             this._engine.display.imageDirty = true;
         }
         return this;
     };
 
-    SceneJS.Flags.prototype.getCubemap = function() {
-        return this._core.cubemap;
+    SceneJS.Flags.prototype.getReflection = function() {
+        return this._core.reflection;
     };
 
     SceneJS.Flags.prototype._compile = function(ctx) {
@@ -12488,7 +12489,8 @@ new (function () {
                         layerParams.applyTo != "specular" && // Specular map
                         layerParams.applyTo != "emit" && // Emission map
                         layerParams.applyTo != "alpha" && // Alpha map
-                        layerParams.applyTo != "normals") {
+                        layerParams.applyTo != "normals" && // Normal map
+                        layerParams.applyTo != "shine") { // Shininess map
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + " applyTo value is unsupported - " +
@@ -12916,9 +12918,9 @@ new (function () {
      * @class Scene graph node which configures the color buffer for its subgraph
      * @extends SceneJS.Node
      */
-    SceneJS.CubeMap = SceneJS_NodeFactory.createNodeType("cubemap");
+    SceneJS.Reflect = SceneJS_NodeFactory.createNodeType("reflect");
 
-    SceneJS.CubeMap.prototype._init = function (params) {
+    SceneJS.Reflect.prototype._init = function (params) {
         if (this._core.useCount == 1) { // This node is first to reference the state core, so sets it up
             this._core.hash = "y";
 
@@ -12926,12 +12928,13 @@ new (function () {
                 if (params.blendMode != "add" && params.blendMode != "multiply") {
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "texture layer blendMode value is unsupported - " +
+                        "reflection blendMode value is unsupported - " +
                             "should be either 'add' or 'multiply'");
                 }
             }
             this._core.blendMode = params.blendMode || "multiply";
-            this._core.blendFactor = (params.blendFactor != undefined && params.blendFactor != null) ? params.blendFactor : 1.0;
+            this._core.intensity = (params.intensity != undefined && params.intensity != null) ? params.intensity : 1.0;
+            this._core.applyTo = "reflect";
             var self = this;
             var gl = this._engine.canvas.gl;
             var texture = gl.createTexture();
@@ -12943,7 +12946,7 @@ new (function () {
                 gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
                 gl.TEXTURE_CUBE_MAP_NEGATIVE_Z
             ];
-            var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading cubemap texture");
+            var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading reflection texture");
             var numImagesLoaded = 0;
             var loadFailed = false;
             for (var i = 0; i < faces.length; i++) {
@@ -13010,7 +13013,7 @@ new (function () {
         return x + 1;
     }
 
-    SceneJS.CubeMap.prototype._compile = function (ctx) {
+    SceneJS.Reflect.prototype._compile = function (ctx) {
         if (!this.__core) {
             this.__core = this._engine._coreFactory.getCore("cubemap");
         }
@@ -13025,7 +13028,7 @@ new (function () {
         this._engine.display.cubemap = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-    SceneJS.CubeMap.prototype._makeHash = function (core) {
+    SceneJS.Reflect.prototype._makeHash = function (core) {
         var hash;
         if (core.layers && core.layers.length > 0) {
             var layers = core.layers;
@@ -13047,7 +13050,7 @@ new (function () {
         }
     };
 
-    SceneJS.CubeMap.prototype._destroy = function () {
+    SceneJS.Reflect.prototype._destroy = function () {
         if (this._core.useCount == 1) { // Last resource user
             if (this._core.texture) {
                 this._core.texture.destroy();
@@ -14097,7 +14100,7 @@ var SceneJS_Display = function (cfg) {
     this.texture = null;
 
     /**
-     * Node state core for the last {@link SceneJS.CubeMap} visited during scene graph compilation traversal
+     * Node state core for the last {@link SceneJS.Reflect} visited during scene graph compilation traversal
      * @type Object
      */
     this.cubemap = null;
@@ -15587,7 +15590,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
                 layer = states.cubemap.layers[i];
                 src.push("uniform samplerCube SCENEJS_uCubeMapSampler" + i + ";");
-                src.push("uniform float SCENEJS_uCubeMapBlendFactor" + i + ";");
+                src.push("uniform float SCENEJS_uCubeMapIntensity" + i + ";");
             }
         }
 
@@ -15599,6 +15602,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform bool  SCENEJS_uClipping;");
         src.push("uniform bool  SCENEJS_uAmbient;");
         src.push("uniform bool  SCENEJS_uDiffuse;");
+        src.push("uniform bool  SCENEJS_uReflection;");
 
         /* True when rendering transparency
          */
@@ -15778,7 +15782,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
 
                 /* Alpha from Texture
-                 * */
+                 */
                 if (layer.applyTo == "alpha") {
                     if (layer.blendMode == "multiply") {
                         src.push("alpha = alpha * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
@@ -15813,6 +15817,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     }
                 }
 
+                if (layer.applyTo == "shine") {
+                    if (layer.blendMode == "multiply") {
+                        src.push("shine  = shine * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                    } else {
+                        src.push("shine = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * shine) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                    }
+                }
+
                 if (layer.applyTo == "normals" && normals) {
                     src.push("vec3 bump = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
                     src.push("viewNormalVec *= -bump;");
@@ -15824,16 +15836,20 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (cubeMapping) {
+            src.push("if (SCENEJS_uReflection) {");
             src.push("vec3 envLookup = reflect(normalize(SCENEJS_vWorldEyeVec), normalize(SCENEJS_vWorldNormal));");
             src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
                 layer = states.cubemap.layers[i];
-               // if (layer.applyTo == "baseColor") {
                     src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
-                    src.push("color = color * SCENEJS_uCubeMapBlendFactor" + i + " * envColor.rgb;");
-               // }
+                    src.push("color = mix(color, envColor.rgb, specular * SCENEJS_uCubeMapIntensity" + i + ");");
+//                if (layer.applyTo == "specular") {
+//                    src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
+//                    src.push("color = color * SCENEJS_uCubeMapBlendFactor" + i + " * envColor.rgb;");
+//                }
             }
+            src.push("}"); // if (SCENEJS_uReflection)
         }
 
         src.push("  vec4    fragColor;");
@@ -16684,7 +16700,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._uClippingDraw = draw.getUniformLocation("SCENEJS_uClipping");
         this._uAmbientDraw = draw.getUniformLocation("SCENEJS_uAmbient");
         this._uDiffuseDraw = draw.getUniformLocation("SCENEJS_uDiffuse");
-        this._uCubemapDraw = draw.getUniformLocation("SCENEJS_uCubemap");
+        this._uReflectionDraw = draw.getUniformLocation("SCENEJS_uReflection");
 
         var pick = this.program.pick;
 
@@ -16727,7 +16743,7 @@ SceneJS_ChunkFactory.createChunkType({
                                (this.core.clipping ? 8 : 0) +
                                (this.core.ambient ? 16 : 0) +
                                (this.core.diffuse ? 32 : 0) +
-                               (this.core.cubemap ? 64 : 0);
+                               (this.core.reflection ? 64 : 0);
             if (this.program.drawUniformFlags != drawUniforms) {
                 gl.uniform1i(this._uBackfaceTexturingDraw, this.core.backfaceTexturing);
                 gl.uniform1i(this._uBackfaceLightingDraw, this.core.backfaceLighting);
@@ -16735,7 +16751,7 @@ SceneJS_ChunkFactory.createChunkType({
                 gl.uniform1i(this._uClippingDraw, this.core.clipping);
                 gl.uniform1i(this._uAmbientDraw, this.core.ambient);
                 gl.uniform1i(this._uDiffuseDraw, this.core.diffuse);
-                gl.uniform1i(this._uCubemapDraw, this.core.cubemap);
+                gl.uniform1i(this._uReflectionDraw, this.core.reflection);
                 this.program.drawUniformFlags = drawUniforms;
             }
         }
@@ -17634,7 +17650,7 @@ SceneJS_ChunkFactory.createChunkType({
 
     build: function () {
         this._uCubeMapSampler = this._uCubeMapSampler || [];
-        this._uCubeMapBlendFactor = this._uCubeMapBlendFactor || [];
+        this._uCubeMapIntensity = this._uCubeMapIntensity || [];
         var layers = this.core.layers;
         if (layers) {
             var layer;
@@ -17642,24 +17658,22 @@ SceneJS_ChunkFactory.createChunkType({
             for (var i = 0, len = layers.length; i < len; i++) {
                 layer = layers[i];
                 this._uCubeMapSampler[i] = "SCENEJS_uCubeMapSampler" + i;
-                this._uCubeMapBlendFactor[i] = draw.getUniform("SCENEJS_uCubeMapBlendFactor" + i);
+                this._uCubeMapIntensity[i] = draw.getUniform("SCENEJS_uCubeMapIntensity" + i);
             }
         }
     },
 
     draw: function (ctx) {
-        if (this.core.layers) {
-            var layers = this.core.layers;
-            if (layers) {
-                var layer;
-                var draw = this.program.draw;
-                for (var i = 0, len = layers.length; i < len; i++) {
-                    layer = layers[i];
-                    if (this._uCubeMapSampler[i] && layer.texture) {
-                        draw.bindTexture(this._uCubeMapSampler[i], layer.texture, ctx.textureUnit++);
-                        if (this._uCubeMapBlendFactor[i]) {
-                            this._uCubeMapBlendFactor[i].setValue(layer.blendFactor);
-                        }
+        var layers = this.core.layers;
+        if (layers) {
+            var layer;
+            var draw = this.program.draw;
+            for (var i = 0, len = layers.length; i < len; i++) {
+                layer = layers[i];
+                if (this._uCubeMapSampler[i] && layer.texture) {
+                    draw.bindTexture(this._uCubeMapSampler[i], layer.texture, ctx.textureUnit++);
+                    if (this._uCubeMapIntensity[i]) {
+                        this._uCubeMapIntensity[i].setValue(layer.intensity);
                     }
                 }
             }

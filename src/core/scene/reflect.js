@@ -23,9 +23,9 @@
      * @class Scene graph node which configures the color buffer for its subgraph
      * @extends SceneJS.Node
      */
-    SceneJS.CubeMap = SceneJS_NodeFactory.createNodeType("cubemap");
+    SceneJS.Reflect = SceneJS_NodeFactory.createNodeType("reflect");
 
-    SceneJS.CubeMap.prototype._init = function (params) {
+    SceneJS.Reflect.prototype._init = function (params) {
         if (this._core.useCount == 1) { // This node is first to reference the state core, so sets it up
             this._core.hash = "y";
 
@@ -33,12 +33,13 @@
                 if (params.blendMode != "add" && params.blendMode != "multiply") {
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "texture layer blendMode value is unsupported - " +
+                        "reflection blendMode value is unsupported - " +
                             "should be either 'add' or 'multiply'");
                 }
             }
             this._core.blendMode = params.blendMode || "multiply";
-            this._core.blendFactor = (params.blendFactor != undefined && params.blendFactor != null) ? params.blendFactor : 1.0;
+            this._core.intensity = (params.intensity != undefined && params.intensity != null) ? params.intensity : 1.0;
+            this._core.applyTo = "reflect";
             var self = this;
             var gl = this._engine.canvas.gl;
             var texture = gl.createTexture();
@@ -50,7 +51,7 @@
                 gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
                 gl.TEXTURE_CUBE_MAP_NEGATIVE_Z
             ];
-            var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading cubemap texture");
+            var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading reflection texture");
             var numImagesLoaded = 0;
             var loadFailed = false;
             for (var i = 0; i < faces.length; i++) {
@@ -117,7 +118,7 @@
         return x + 1;
     }
 
-    SceneJS.CubeMap.prototype._compile = function (ctx) {
+    SceneJS.Reflect.prototype._compile = function (ctx) {
         if (!this.__core) {
             this.__core = this._engine._coreFactory.getCore("cubemap");
         }
@@ -132,7 +133,7 @@
         this._engine.display.cubemap = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-    SceneJS.CubeMap.prototype._makeHash = function (core) {
+    SceneJS.Reflect.prototype._makeHash = function (core) {
         var hash;
         if (core.layers && core.layers.length > 0) {
             var layers = core.layers;
@@ -154,7 +155,7 @@
         }
     };
 
-    SceneJS.CubeMap.prototype._destroy = function () {
+    SceneJS.Reflect.prototype._destroy = function () {
         if (this._core.useCount == 1) { // Last resource user
             if (this._core.texture) {
                 this._core.texture.destroy();

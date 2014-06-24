@@ -144,7 +144,7 @@ var SceneJS_Display = function (cfg) {
     this.texture = null;
 
     /**
-     * Node state core for the last {@link SceneJS.CubeMap} visited during scene graph compilation traversal
+     * Node state core for the last {@link SceneJS.Reflect} visited during scene graph compilation traversal
      * @type Object
      */
     this.cubemap = null;

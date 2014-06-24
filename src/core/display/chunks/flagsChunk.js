@@ -15,6 +15,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._uClippingDraw = draw.getUniformLocation("SCENEJS_uClipping");
         this._uAmbientDraw = draw.getUniformLocation("SCENEJS_uAmbient");
         this._uDiffuseDraw = draw.getUniformLocation("SCENEJS_uDiffuse");
+        this._uReflectionDraw = draw.getUniformLocation("SCENEJS_uReflection");
 
         var pick = this.program.pick;
 
@@ -56,7 +57,8 @@ SceneJS_ChunkFactory.createChunkType({
                                (this.core.specular ? 4 : 0) +
                                (this.core.clipping ? 8 : 0) +
                                (this.core.ambient ? 16 : 0) +
-                               (this.core.diffuse ? 32 : 0);
+                               (this.core.diffuse ? 32 : 0) +
+                               (this.core.reflection ? 64 : 0);
             if (this.program.drawUniformFlags != drawUniforms) {
                 gl.uniform1i(this._uBackfaceTexturingDraw, this.core.backfaceTexturing);
                 gl.uniform1i(this._uBackfaceLightingDraw, this.core.backfaceLighting);
@@ -64,6 +66,7 @@ SceneJS_ChunkFactory.createChunkType({
                 gl.uniform1i(this._uClippingDraw, this.core.clipping);
                 gl.uniform1i(this._uAmbientDraw, this.core.ambient);
                 gl.uniform1i(this._uDiffuseDraw, this.core.diffuse);
+                gl.uniform1i(this._uReflectionDraw, this.core.reflection);
                 this.program.drawUniformFlags = drawUniforms;
             }
         }
