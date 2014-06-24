@@ -49,7 +49,7 @@
                         "title":"Moving nodes - disconnect then add",
                         "path":"scene/movingNodes.html",
                         "tags":["nodes"],
-                        "id":"moveNodes" 
+                        "id":"moveNodes"
                     },
                     {
                         "title":"Multiple scenes on a page",
@@ -75,31 +75,36 @@
                         "title":"Toggle backface lighting",
                         "tags":["lighting"],
                         "tip":"Using a flags node to switch lighting of faces on child geometries",
-                        "path":"flags/backfaceLighting.html"
+                        "path":"flags/backfaceLighting.html",
+                        "id":"backfaceLightingFlag"
                     },
                     {
                         "title":"Toggle diffuse lighting",
                         "tags":["diffuseLight"],
                         "tip":"Using a flags node to switch diffuse lighting for child geometries",
-                        "path":"flags/diffuse.html"
+                        "path":"flags/diffuse.html",
+                        "id":"diffuseFlag"
                     },
                     {
                         "title":"Toggle specular lighting",
                         "tags":["specularLight"],
                         "tip":"Using a flags node to switch specular lighting for child geometries",
-                        "path":"flags/specular.html"
+                        "path":"flags/specular.html",
+                        "id":"specularFlag"
                     },
                     {
                         "title":"Toggle ambient lighting",
                         "tags":["ambientLight"],
                         "tip":"Enable ambient lighting for child geometries",
-                        "path":"flags/ambient.html"
+                        "path":"flags/ambient.html",
+                        "id":"ambientFlag"
                     },
                     {
                         "title":"Toggle reflection",
                         "tags":["reflection"],
                         "tip":"Enable reflection for child geometries",
-                        "path":"flags/reflection.html"
+                        "path":"flags/reflection.html",
+                        "id":"reflectionFlag"
                     }
                 ]
             },
