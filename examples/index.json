@@ -1302,7 +1302,7 @@
                         "title":"Tron Tank",
                         "path":"demos/tronTank.html",
                         "editor":false,
-                        "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "viewTransform", "animation"],
+                        "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "viewTransform", "animation", "reflection"],
                         "id":"tronTank"
                     },
                     {
