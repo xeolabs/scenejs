@@ -920,11 +920,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     frameCtx.blendEnabled = false;
 
-    frameCtx.vertexBuf = false;
-    frameCtx.normalBuf = false;
-    frameCtx.uvBuf = false;
-    frameCtx.uvBuf2 = false;
-    frameCtx.colorBuf = false;
     frameCtx.backfaces = true;
     frameCtx.frontface = "ccw";
     frameCtx.pick = !!pick;

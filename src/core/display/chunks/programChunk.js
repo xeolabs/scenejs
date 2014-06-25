@@ -12,14 +12,6 @@ SceneJS_ChunkFactory.createChunkType({
 
         drawProgram.bind();
 
-        /*
-         * HACK until we have distinct chunk for each VBO (maybe)
-         */
-        frameCtx.vertexBuf = false;
-        frameCtx.normalBuf = false;
-        frameCtx.uvBuf = false;
-        frameCtx.uvBuf2 = false;
-        frameCtx.colorBuf = false;
         frameCtx.textureUnit = 0;
 
         var gl = this.program.gl;
@@ -39,14 +31,6 @@ SceneJS_ChunkFactory.createChunkType({
 
         gl.uniform1i(this._rayPickMode, frameCtx.rayPick);
 
-        /*
-        * HACK until we have distinct chunk for each VBO (maybe)
-         */
-        frameCtx.vertexBuf = false;
-        frameCtx.normalBuf = false;
-        frameCtx.uvBuf = false;
-        frameCtx.uvBuf2 = false;
-        frameCtx.colorBuf = false;
         frameCtx.textureUnit = 0;
 
         for (var i = 0; i < 10; i++) {
