@@ -273,7 +273,8 @@ var SceneJS_Display = function (cfg) {
      */
     this._frameCtx = {
         pickNames:[], // Pick names of objects hit during pick render
-        canvas:this._canvas            // The canvas
+        canvas:this._canvas,           // The canvas
+        VAO:null                       // Vertex array object extension
     };
 
     /* The frame context has this facade which is given to scene node "rendered" listeners
@@ -929,6 +930,13 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     frameCtx.transparencyPass = false;
 
+    // The extension needs to be re-queried in case the context was lost and
+    // has been recreated.
+    var VAO = gl.getExtension("OES_vertex_array_object");
+    if (VAO) {
+        frameCtx.VAO = VAO;
+    }
+
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
     if (this.transparent) {
         gl.clearColor(0,0,0,0);
@@ -987,6 +995,10 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     if (frameCtx.renderer) {                           // Forget last call-time renderer properties
         //     frameCtx.renderer.props.restoreProps(gl);
+    }
+
+    if (frameCtx.VAO) {
+        frameCtx.VAO.bindVertexArrayOES(null);
     }
 };
 

@@ -29,9 +29,25 @@ SceneJS_ChunkFactory.createChunkType({
         this._aMorphVertexPick = pick.getAttribute("SCENEJS_aMorphVertex");
         this._aMorphNormalPick = pick.getAttribute("SCENEJS_aMorphNormal");
         this._uMorphFactorPick = pick.getUniformLocation("SCENEJS_uMorphFactor");
+
+        this.VAO = null;
+        this.VAOMorphKey1 = 0;
+        this.VAOMorphKey2 = 0;
+        this.VAOHasInterleavedBuf = false;
+    },
+
+    recycle:function () {
+        if (this.VAO) {
+            // Guarantee that the old VAO is deleted immediately when recycling the object.
+            var VAOExt = this.program.gl.getExtension("OES_vertex_array_object");
+            VAOExt.deleteVertexArrayOES(this.VAO);
+            this.VAO = null;
+        }
     },
 
     morphDraw:function () {
+        this.VAOMorphKey1 = this.core.key1;
+        this.VAOMorphKey2 = this.core.key2;
 
         var target1 = this.core.targets[this.core.key1]; // Keys will update
         var target2 = this.core.targets[this.core.key2];
@@ -62,6 +78,11 @@ SceneJS_ChunkFactory.createChunkType({
             this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
         }
 
+        this.setDrawMorphFactor();
+    },
+
+    setDrawMorphFactor:function () {
+
         if (this._uMorphFactorDraw) {
             this.program.gl.uniform1f(this._uMorphFactorDraw, this.core.factor); // Bind LERP factor
         }
@@ -69,12 +90,29 @@ SceneJS_ChunkFactory.createChunkType({
     },
 
     draw:function (ctx) {
+        var doMorph = this.core.targets && this.core.targets.length;
+        var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
-        if (this.core.targets && this.core.targets.length) {
+        if (this.VAO) {
+            ctx.VAO.bindVertexArrayOES(this.VAO);
+            if (doMorph) {
+                if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {
+                    this.setDrawMorphFactor();
+                    return;
+                }
+            } else if (cleanInterleavedBuf || !this.VAOHasInterleavedBuf) {
+                return;
+            }
+        } else if (ctx.VAO) {
+            this.VAO = ctx.VAO.createVertexArrayOES();
+            ctx.VAO.bindVertexArrayOES(this.VAO);
+        }
+
+        if (doMorph) {
             this.morphDraw();
         } else {
-
-            if (this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty) {
+            if (cleanInterleavedBuf) {
+                this.VAOHasInterleavedBuf = true;
                 this.core2.interleavedBuf.bind();
                 if (this._aVertexDraw) {
                     this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedPositionOffset);
@@ -92,6 +130,7 @@ SceneJS_ChunkFactory.createChunkType({
                     this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
                 }
             } else {
+                this.VAOHasInterleavedBuf = false;
                 if (this._aVertexDraw) {
                     this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
                 }
@@ -112,7 +151,6 @@ SceneJS_ChunkFactory.createChunkType({
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
                 }
             }
-
         }
 
         this.core2.indexBuf.bind();
