@@ -22,8 +22,6 @@ SceneJS_ChunkFactory.createChunkType({
         frameCtx.colorBuf = false;
         frameCtx.textureUnit = 0;
 
-        frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
-
         var gl = this.program.gl;
 
         for (var i = 0; i < 10; i++) {
@@ -50,8 +48,6 @@ SceneJS_ChunkFactory.createChunkType({
         frameCtx.uvBuf2 = false;
         frameCtx.colorBuf = false;
         frameCtx.textureUnit = 0;
-
-        frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
 
         for (var i = 0; i < 10; i++) {
             gl.disableVertexAttribArray(i);

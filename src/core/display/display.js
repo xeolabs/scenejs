@@ -430,7 +430,8 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 17, "clips", this.clips);
     this._setChunk(object, 18, "morphGeometry", this.morphGeometry);
     this._setChunk(object, 19, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 20, "geometry", this.geometry); // Must be last
+    this._setChunk(object, 20, "geometry", this.geometry);
+    this._setChunk(object, 21, "draw", this.geometry); // Must be last
 };
 
 SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, unique) {
@@ -467,6 +468,10 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
         // Only one chunk of this type per program.
         chunkId = 'p' + object.program.id;
     }
+
+    // This is needed so that chunkFactory can distinguish between draw and geometry
+    // chunks with the same core.
+    chunkId = order + '__' + chunkId;
 
     var oldChunk = object.chunks[order];
 
@@ -718,7 +723,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
                 // As we apply the state chunk lists we track the ID of most types of chunk in order
                 // to cull redundant re-applications of runs of the same chunk - except for those chunks with a
-                // 'unique' flag. We don't want to cull runs of geometry chunks because they contain the GL
+                // 'unique' flag. We don't want to cull runs of draw chunks because they contain the GL
                 // drawElements calls which render the objects.
 
                 // Chunk IDs are only considered unique within the same program. Therefore, whenever we do a
