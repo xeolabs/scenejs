@@ -36,8 +36,8 @@ SceneJS_ChunkFactory.createChunkType = function(params) {
     var supa = SceneJS_Chunk;
 
     var chunkClass = function() { // Create the class
-        supa.apply(this, arguments);
-        this.type = params.type;
+        this.useCount = 0;
+        this.init.apply(this, arguments);
     };
 
     chunkClass.prototype = new supa();              // Inherit from base class
@@ -89,7 +89,7 @@ SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core)
 
     } else {        // Instantiate a fresh chunk
 
-        chunk = new chunkClass(chunkId, type, program, core); // Create new chunk
+        chunk = new chunkClass(chunkId, program, core); // Create new chunk
     }
 
     chunk.useCount = 1;

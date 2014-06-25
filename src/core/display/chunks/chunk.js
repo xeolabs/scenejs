@@ -7,43 +7,7 @@
  *
  * @private
  */
-var SceneJS_Chunk = function(id, type, program, core) {
-
-    /**
-     * The type of the corresponding {@link SceneJS_Core}
-     * @type String
-     * @see {SceneJS_Core#type}
-     */
-    this.type = type;
-
-    /**
-     * The chunk ID
-     * @type Number
-     */
-    this.id = id;
-
-    /**
-     * The program this chunk will render with
-     * @type {SceneJS_Program}
-     */
-    this.program = program;
-
-    /**
-     * The state core rendered by this chunk
-     * @type {SceneJS_Core}
-     */
-    this.core = core;
-
-    /**
-     * Count of {@link SceneJS_Object} instances using this chunk
-     * @type Number
-     */
-    this.useCount = 0;
-
-    if (this.build) {
-        this.build();
-    }
-};
+var SceneJS_Chunk = function() {};
 
 /**
  * Initialises the chunk. This is called within the constructor, and also to by the owner {@link SceneJS_ChunkFactory}
