@@ -14,7 +14,7 @@ var SceneJS_Chunk = function() {};
  * when recycling a chunk from its free chunk pool. This method sets the given properties on the chunk, then calls the
  * chunk instance's <b>build</b> method if the chunk has been augmented with one.
  *
- * @param {Number} id Chunk ID
+ * @param {String} id Chunk ID
  * @param {SceneJS_Program} program Program to render the chunk
  * @param {SceneJS_Core} core The state core rendered by this chunk
  */
