@@ -999,6 +999,9 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     if (frameCtx.VAO) {
         frameCtx.VAO.bindVertexArrayOES(null);
+        for (var i = 0; i < 10; i++) {
+            gl.disableVertexAttribArray(i);
+        }
     }
 };
 

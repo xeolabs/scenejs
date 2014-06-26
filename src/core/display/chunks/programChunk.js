@@ -16,12 +16,10 @@ SceneJS_ChunkFactory.createChunkType({
 
         var gl = this.program.gl;
 
-        if (frameCtx.VAO) {
-            frameCtx.VAO.bindVertexArrayOES(null);
-        }
-
-        for (var i = 0; i < 10; i++) {
-            gl.disableVertexAttribArray(i);
+        if (!frameCtx.VAO) {
+            for (var i = 0; i < 10; i++) {
+                gl.disableVertexAttribArray(i);
+            }
         }
     },
 

@@ -104,8 +104,11 @@ SceneJS_ChunkFactory.createChunkType({
                 return;
             }
         } else if (ctx.VAO) {
+            // Start creating a new VAO by switching to the default VAO, which doesn't have attribs enabled.
+            ctx.VAO.bindVertexArrayOES(null);
             this.VAO = ctx.VAO.createVertexArrayOES();
             ctx.VAO.bindVertexArrayOES(this.VAO);
+            var gl = this.program.gl;
         }
 
         if (doMorph) {
