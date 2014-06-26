@@ -112,10 +112,6 @@ SceneJS_ChunkFactory.prototype.putChunk = function (chunk) {
 
     if (--chunk.useCount <= 0) {    // Release shared core if use count now zero
 
-        if (chunk.recycle) {
-            chunk.recycle();
-        }
-
         this._chunks[chunk.id] = null;
 
         var freeChunks = SceneJS_ChunkFactory._freeChunks[chunk.type];
@@ -125,7 +121,7 @@ SceneJS_ChunkFactory.prototype.putChunk = function (chunk) {
 };
 
 /**
- * Re-cache shader variable locations for each active chunk and reset VAOs if any
+ * Re-cache shader variable locations for each active chunk
  */
 SceneJS_ChunkFactory.prototype.webglRestored = function () {
 

@@ -273,8 +273,7 @@ var SceneJS_Display = function (cfg) {
      */
     this._frameCtx = {
         pickNames:[], // Pick names of objects hit during pick render
-        canvas:this._canvas,           // The canvas
-        VAO:null // Vertex array object extension
+        canvas:this._canvas            // The canvas
     };
 
     /* The frame context has this facade which is given to scene node "rendered" listeners
@@ -926,13 +925,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     frameCtx.lineWidth = 1;
 
     frameCtx.transparencyPass = false;
-
-    // The extension needs to be re-queried in case the context was lost and
-    // has been recreated.
-    var VAO = gl.getExtension("OES_vertex_array_object");
-    if (VAO) {
-        frameCtx.VAO = VAO;
-    }
 
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
     if (this.transparent) {

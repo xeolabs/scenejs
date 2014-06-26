@@ -24,9 +24,6 @@ SceneJS_ChunkFactory.createChunkType({
         this._aUV2Draw = draw.getAttribute("SCENEJS_aUVCoord2");
         this._aColorDraw = draw.getAttribute("SCENEJS_aVertexColor");
 
-        this.VAO = null;
-        this.VAOHasInterleavedBuf = false;
-
         var pick = this.program.pick;
 
         this._aVertexPick = pick.getAttribute("SCENEJS_aVertex");
@@ -36,89 +33,57 @@ SceneJS_ChunkFactory.createChunkType({
         this._aColorPick = pick.getAttribute("SCENEJS_aVertexColor");
     },
 
-    recycle:function () {
-        if (this.VAO) {
-            // Guarantee that the old VAO is deleted immediately when recycling the object.
-            var VAOExt = this.program.gl.getExtension("OES_vertex_array_object");
-            VAOExt.deleteVertexArrayOES(this.VAO);
-        }
-    },
-
     draw:function (ctx) {
 
         var gl = this.program.gl;
 
         if (ctx.geoChunkId != this.id) { // HACK until we have distinct state chunks for VBOs and draw call
-            var ctxBufsActive = ctx.vertexBuf || ctx.normalBuf || ctx.uvBuf || ctx.uvBuf2 || ctx.colorBuf;
-            if (this.VAO && (ctxBufsActive ||
-                this.core.interleavedBuf && this.core.interleavedBuf.dirty && this.VAOHasInterleavedBuf)) {
-                // Need to recreate VAO to refer to separate buffers, or can't use VAO due to buffers
-                // specified outside.
-                ctx.VAO.deleteVertexArrayOES(this.VAO);
-                this.VAO = null;
-            }
-            if (this.VAO) {
-                ctx.VAO.bindVertexArrayOES(this.VAO);
+
+            if (this.core.interleavedBuf && !this.core.interleavedBuf.dirty) {
+                this.core.interleavedBuf.bind();
+                if (this._aVertexDraw && !ctx.vertexBuf) {
+                    this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core.interleavedStride, this.core.interleavedPositionOffset);
+                }
+                if (this._aNormalDraw && !ctx.normalBuf) {
+                    this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core.interleavedStride, this.core.interleavedNormalOffset);
+                }
+                if (this._aUVDraw && !ctx.uvBuf) {
+                    this._aUVDraw.bindInterleavedFloatArrayBuffer(2, this.core.interleavedStride, this.core.interleavedUVOffset);
+                }
+                if (this._aUV2Draw && !ctx.uv2Buf) {
+                    this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core.interleavedStride, this.core.interleavedUV2Offset);
+                }
+                if (this._aColorDraw && !ctx.colorBuf) {
+                    this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core.interleavedStride, this.core.interleavedColorOffset);
+                }
             } else {
-                var useInterleavedBuf = (this.core.interleavedBuf && !this.core.interleavedBuf.dirty);
-                if (ctx.VAO && !ctxBufsActive) {
-                    this.VAO = ctx.VAO.createVertexArrayOES();
-                    ctx.VAO.bindVertexArrayOES(this.VAO);
-                    this.VAOHasInterleavedBuf = useInterleavedBuf;
+                if (this._aVertexDraw && !ctx.vertexBuf) {
+                    this._aVertexDraw.bindFloatArrayBuffer(this.core.vertexBuf);
                 }
 
-                if (useInterleavedBuf) {
-                    this.core.interleavedBuf.bind();
-                    if (this._aVertexDraw && !ctx.vertexBuf) {
-                        this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core.interleavedStride, this.core.interleavedPositionOffset);
-                    }
-                    if (this._aNormalDraw && !ctx.normalBuf) {
-                        this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core.interleavedStride, this.core.interleavedNormalOffset);
-                    }
-                    if (this._aUVDraw && !ctx.uvBuf) {
-                        this._aUVDraw.bindInterleavedFloatArrayBuffer(2, this.core.interleavedStride, this.core.interleavedUVOffset);
-                    }
-                    if (this._aUV2Draw && !ctx.uv2Buf) {
-                        this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core.interleavedStride, this.core.interleavedUV2Offset);
-                    }
-                    if (this._aColorDraw && !ctx.colorBuf) {
-                        this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core.interleavedStride, this.core.interleavedColorOffset);
-                    }
-                } else {
-                    if (this._aVertexDraw && !ctx.vertexBuf) {
-                        this._aVertexDraw.bindFloatArrayBuffer(this.core.vertexBuf);
-                    }
-
-                    if (this._aNormalDraw && !ctx.normalBuf) {
-                        this._aNormalDraw.bindFloatArrayBuffer(this.core.normalBuf);
-                    }
-
-                    if (this._aUVDraw && !ctx.uvBuf) {
-                        this._aUVDraw.bindFloatArrayBuffer(this.core.uvBuf);
-                    }
-
-                    if (this._aUV2Draw && !ctx.uvBuf2) {
-                        this._aUV2Draw.bindFloatArrayBuffer(this.core.uvBuf2);
-                    }
-
-                    if (this._aColorDraw && !ctx.colorBuf) {
-                        this._aColorDraw.bindFloatArrayBuffer(this.core.colorBuf);
-                    }
+                if (this._aNormalDraw && !ctx.normalBuf) {
+                    this._aNormalDraw.bindFloatArrayBuffer(this.core.normalBuf);
                 }
 
-                this.core.indexBuf.bind();
+                if (this._aUVDraw && !ctx.uvBuf) {
+                    this._aUVDraw.bindFloatArrayBuffer(this.core.uvBuf);
+                }
+
+                if (this._aUV2Draw && !ctx.uvBuf2) {
+                    this._aUV2Draw.bindFloatArrayBuffer(this.core.uvBuf2);
+                }
+
+                if (this._aColorDraw && !ctx.colorBuf) {
+                    this._aColorDraw.bindFloatArrayBuffer(this.core.colorBuf);
+                }
             }
+
+            this.core.indexBuf.bind();
+
+            ctx.geoChunkId = this.id;
         }
 
         gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, gl.UNSIGNED_SHORT, 0);
-
-        if (this.VAO) {
-            // We don't want following nodes that don't use their own VAOs to muck up
-            // this node's VAO, so we need to unbind it.
-            ctx.VAO.bindVertexArrayOES(null);
-        } else {
-            ctx.geoChunkId = this.id;
-        }
     },
 
     pick:function (ctx) {
