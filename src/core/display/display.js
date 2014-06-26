@@ -449,15 +449,18 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
             return;
         }
 
-        chunkId = chunkClass.programGlobal
-            ? core.stateId + 1
-            : ((object.program.id + 1) * 50000) + core.stateId + 1;
+        // Note that core.stateId can be either a number or a string, that's why we make
+        // chunkId a string here. String stateId can come from at least nodeEvents.js.
+        // TODO: Would it be better if all were numbers?
+        chunkId = chunkClass.prototype.programGlobal
+            ? '_' + core.stateId
+            : 'p' + object.program.id + '_' + core.stateId;
 
     } else {
 
         // No core supplied, probably a program.
         // Only one chunk of this type per program.
-        chunkId = ((object.program.id + 1) * 50000);
+        chunkId = 'p' + object.program.id;
     }
 
     var oldChunk = object.chunks[order];
