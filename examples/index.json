@@ -65,7 +65,7 @@
                     },
                     {
                         "title":"Transparent canvas - using external canvas in DOM ",
-                        "path":"scene/transparentAutoCanvas.html",
+                        "path":"scene/transparentCanvas.html",
                         "tags":["canvas", "transparency"],
                         "id":"transparentDOMCanvas"
                     }
