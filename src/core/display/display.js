@@ -84,6 +84,12 @@ var SceneJS_Display = function (cfg) {
     this._chunkFactory = new SceneJS_ChunkFactory();
 
     /**
+     * True when the background is to be transparent
+     * @type {boolean}
+     */
+    this.transparent = cfg.transparent === true;
+
+    /**
      * Node state core for the last {@link SceneJS.Enable} visited during scene graph compilation traversal
      * @type Object
      */
@@ -493,9 +499,6 @@ SceneJS_Display.prototype._setAmbient = function (core) {
             this._ambientColor[0] = light.color[0];
             this._ambientColor[1] = light.color[1];
             this._ambientColor[2] = light.color[2];
-            if (light.color.length === 4) {
-                this._ambientColor[3] = light.color[3];
-            }
         }
     }
 };
@@ -932,7 +935,11 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     }
 
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
-    gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], this._ambientColor[3]);
+    if (this.transparent) {
+        gl.clearColor(0,0,0,0);
+    } else {
+        gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
+    }
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);

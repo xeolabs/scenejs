@@ -1834,7 +1834,8 @@ var SceneJS_Engine = function (json, options) {
      * @type SceneJS_Display
      */
     this.display = new SceneJS_Display({
-        canvas:this.canvas
+        canvas:this.canvas,
+        transparent: json.transparent
     });
 
     /**
@@ -11768,6 +11769,12 @@ SceneJS.Scene.prototype._init = function (params) {
     }
 
     this._tagSelector = null;
+
+    /**
+     * Set false when canvas is to be transparent.
+     * @type {boolean}
+     */
+    this.transparent = (params.transparent === true);
 };
 
 
@@ -14040,6 +14047,12 @@ var SceneJS_Display = function (cfg) {
     this._chunkFactory = new SceneJS_ChunkFactory();
 
     /**
+     * True when the background is to be transparent
+     * @type {boolean}
+     */
+    this.transparent = cfg.transparent === true;
+
+    /**
      * Node state core for the last {@link SceneJS.Enable} visited during scene graph compilation traversal
      * @type Object
      */
@@ -14223,7 +14236,8 @@ var SceneJS_Display = function (cfg) {
      */
     this._frameCtx = {
         pickNames:[], // Pick names of objects hit during pick render
-        canvas:this._canvas            // The canvas
+        canvas:this._canvas,           // The canvas
+        VAO:null // Vertex array object extension
     };
 
     /* The frame context has this facade which is given to scene node "rendered" listeners
@@ -14388,12 +14402,7 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
     var chunkId;
     var chunkClass = this._chunkFactory.chunkTypes[chunkType];
 
-    if (chunkClass.unique) {
-
-        // Suppress run culling for this core type
-        chunkId = core.stateId + 1;
-
-    } else if (core) {
+    if (core) {
 
         // Core supplied
         if (core.empty) { // Only set default cores for state types that have them
@@ -14409,15 +14418,18 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
             return;
         }
 
-        chunkId = chunkClass.programGlobal
-            ? core.stateId + 1
-            : ((object.program.id + 1) * 50000) + core.stateId + 1;
+        // Note that core.stateId can be either a number or a string, that's why we make
+        // chunkId a string here. String stateId can come from at least nodeEvents.js.
+        // TODO: Would it be better if all were numbers?
+        chunkId = chunkClass.prototype.programGlobal
+            ? '_' + core.stateId
+            : 'p' + object.program.id + '_' + core.stateId;
 
     } else {
 
         // No core supplied, probably a program.
         // Only one chunk of this type per program.
-        chunkId = ((object.program.id + 1) * 50000);
+        chunkId = 'p' + object.program.id;
     }
 
     var oldChunk = object.chunks[order];
@@ -14450,9 +14462,6 @@ SceneJS_Display.prototype._setAmbient = function (core) {
             this._ambientColor[0] = light.color[0];
             this._ambientColor[1] = light.color[1];
             this._ambientColor[2] = light.color[2];
-            if (light.color.length === 4) {
-                this._ambientColor[3] = light.color[3];
-            }
         }
     }
 };
@@ -14881,8 +14890,19 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     frameCtx.transparencyPass = false;
 
+    // The extension needs to be re-queried in case the context was lost and
+    // has been recreated.
+    var VAO = gl.getExtension("OES_vertex_array_object");
+    if (VAO) {
+        frameCtx.VAO = VAO;
+    }
+
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
-    gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], this._ambientColor[3]);
+    if (this.transparent) {
+        gl.clearColor(0,0,0,0);
+    } else {
+        gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
+    }
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);
@@ -16339,50 +16359,14 @@ SceneJS.RenderContext.prototype.getWorldPos = function(offset) {
  *
  * @private
  */
-var SceneJS_Chunk = function(id, type, program, core) {
-
-    /**
-     * The type of the corresponding {@link SceneJS_Core}
-     * @type String
-     * @see {SceneJS_Core#type}
-     */
-    this.type = type;
-
-    /**
-     * The chunk ID
-     * @type Number
-     */
-    this.id = id;
-
-    /**
-     * The program this chunk will render with
-     * @type {SceneJS_Program}
-     */
-    this.program = program;
-
-    /**
-     * The state core rendered by this chunk
-     * @type {SceneJS_Core}
-     */
-    this.core = core;
-
-    /**
-     * Count of {@link SceneJS_Object} instances using this chunk
-     * @type Number
-     */
-    this.useCount = 0;
-
-    if (this.build) {
-        this.build();
-    }
-};
+var SceneJS_Chunk = function() {};
 
 /**
  * Initialises the chunk. This is called within the constructor, and also to by the owner {@link SceneJS_ChunkFactory}
  * when recycling a chunk from its free chunk pool. This method sets the given properties on the chunk, then calls the
  * chunk instance's <b>build</b> method if the chunk has been augmented with one.
  *
- * @param {Number} id Chunk ID
+ * @param {String} id Chunk ID
  * @param {SceneJS_Program} program Program to render the chunk
  * @param {SceneJS_Core} core The state core rendered by this chunk
  */
@@ -16434,8 +16418,8 @@ SceneJS_ChunkFactory.createChunkType = function(params) {
     var supa = SceneJS_Chunk;
 
     var chunkClass = function() { // Create the class
-        supa.apply(this, arguments);
-        this.type = params.type;
+        this.useCount = 0;
+        this.init.apply(this, arguments);
     };
 
     chunkClass.prototype = new supa();              // Inherit from base class
@@ -16487,7 +16471,7 @@ SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core)
 
     } else {        // Instantiate a fresh chunk
 
-        chunk = new chunkClass(chunkId, type, program, core); // Create new chunk
+        chunk = new chunkClass(chunkId, program, core); // Create new chunk
     }
 
     chunk.useCount = 1;
@@ -16510,6 +16494,10 @@ SceneJS_ChunkFactory.prototype.putChunk = function (chunk) {
 
     if (--chunk.useCount <= 0) {    // Release shared core if use count now zero
 
+        if (chunk.recycle) {
+            chunk.recycle();
+        }
+
         this._chunks[chunk.id] = null;
 
         var freeChunks = SceneJS_ChunkFactory._freeChunks[chunk.type];
@@ -16519,7 +16507,7 @@ SceneJS_ChunkFactory.prototype.putChunk = function (chunk) {
 };
 
 /**
- * Re-cache shader variable locations for each active chunk
+ * Re-cache shader variable locations for each active chunk and reset VAOs if any
  */
 SceneJS_ChunkFactory.prototype.webglRestored = function () {
 
@@ -16814,6 +16802,9 @@ SceneJS_ChunkFactory.createChunkType({
         this._aUV2Draw = draw.getAttribute("SCENEJS_aUVCoord2");
         this._aColorDraw = draw.getAttribute("SCENEJS_aVertexColor");
 
+        this.VAO = null;
+        this.VAOHasInterleavedBuf = false;
+
         var pick = this.program.pick;
 
         this._aVertexPick = pick.getAttribute("SCENEJS_aVertex");
@@ -16823,57 +16814,89 @@ SceneJS_ChunkFactory.createChunkType({
         this._aColorPick = pick.getAttribute("SCENEJS_aVertexColor");
     },
 
+    recycle:function () {
+        if (this.VAO) {
+            // Guarantee that the old VAO is deleted immediately when recycling the object.
+            var VAOExt = this.program.gl.getExtension("OES_vertex_array_object");
+            VAOExt.deleteVertexArrayOES(this.VAO);
+        }
+    },
+
     draw:function (ctx) {
 
         var gl = this.program.gl;
 
         if (ctx.geoChunkId != this.id) { // HACK until we have distinct state chunks for VBOs and draw call
-
-            if (this.core.interleavedBuf && !this.core.interleavedBuf.dirty) {
-                this.core.interleavedBuf.bind();
-                if (this._aVertexDraw && !ctx.vertexBuf) {
-                    this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core.interleavedStride, this.core.interleavedPositionOffset);
-                }
-                if (this._aNormalDraw && !ctx.normalBuf) {
-                    this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core.interleavedStride, this.core.interleavedNormalOffset);
-                }
-                if (this._aUVDraw && !ctx.uvBuf) {
-                    this._aUVDraw.bindInterleavedFloatArrayBuffer(2, this.core.interleavedStride, this.core.interleavedUVOffset);
-                }
-                if (this._aUV2Draw && !ctx.uv2Buf) {
-                    this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core.interleavedStride, this.core.interleavedUV2Offset);
-                }
-                if (this._aColorDraw && !ctx.colorBuf) {
-                    this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core.interleavedStride, this.core.interleavedColorOffset);
-                }
-            } else {
-                if (this._aVertexDraw && !ctx.vertexBuf) {
-                    this._aVertexDraw.bindFloatArrayBuffer(this.core.vertexBuf);
-                }
-
-                if (this._aNormalDraw && !ctx.normalBuf) {
-                    this._aNormalDraw.bindFloatArrayBuffer(this.core.normalBuf);
-                }
-
-                if (this._aUVDraw && !ctx.uvBuf) {
-                    this._aUVDraw.bindFloatArrayBuffer(this.core.uvBuf);
-                }
-
-                if (this._aUV2Draw && !ctx.uvBuf2) {
-                    this._aUV2Draw.bindFloatArrayBuffer(this.core.uvBuf2);
-                }
-
-                if (this._aColorDraw && !ctx.colorBuf) {
-                    this._aColorDraw.bindFloatArrayBuffer(this.core.colorBuf);
-                }
+            var ctxBufsActive = ctx.vertexBuf || ctx.normalBuf || ctx.uvBuf || ctx.uvBuf2 || ctx.colorBuf;
+            if (this.VAO && (ctxBufsActive ||
+                this.core.interleavedBuf && this.core.interleavedBuf.dirty && this.VAOHasInterleavedBuf)) {
+                // Need to recreate VAO to refer to separate buffers, or can't use VAO due to buffers
+                // specified outside.
+                ctx.VAO.deleteVertexArrayOES(this.VAO);
+                this.VAO = null;
             }
+            if (this.VAO) {
+                ctx.VAO.bindVertexArrayOES(this.VAO);
+            } else {
+                var useInterleavedBuf = (this.core.interleavedBuf && !this.core.interleavedBuf.dirty);
+                if (ctx.VAO && !ctxBufsActive) {
+                    this.VAO = ctx.VAO.createVertexArrayOES();
+                    ctx.VAO.bindVertexArrayOES(this.VAO);
+                    this.VAOHasInterleavedBuf = useInterleavedBuf;
+                }
 
-            this.core.indexBuf.bind();
+                if (useInterleavedBuf) {
+                    this.core.interleavedBuf.bind();
+                    if (this._aVertexDraw && !ctx.vertexBuf) {
+                        this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core.interleavedStride, this.core.interleavedPositionOffset);
+                    }
+                    if (this._aNormalDraw && !ctx.normalBuf) {
+                        this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core.interleavedStride, this.core.interleavedNormalOffset);
+                    }
+                    if (this._aUVDraw && !ctx.uvBuf) {
+                        this._aUVDraw.bindInterleavedFloatArrayBuffer(2, this.core.interleavedStride, this.core.interleavedUVOffset);
+                    }
+                    if (this._aUV2Draw && !ctx.uv2Buf) {
+                        this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core.interleavedStride, this.core.interleavedUV2Offset);
+                    }
+                    if (this._aColorDraw && !ctx.colorBuf) {
+                        this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core.interleavedStride, this.core.interleavedColorOffset);
+                    }
+                } else {
+                    if (this._aVertexDraw && !ctx.vertexBuf) {
+                        this._aVertexDraw.bindFloatArrayBuffer(this.core.vertexBuf);
+                    }
 
-            ctx.geoChunkId = this.id;
+                    if (this._aNormalDraw && !ctx.normalBuf) {
+                        this._aNormalDraw.bindFloatArrayBuffer(this.core.normalBuf);
+                    }
+
+                    if (this._aUVDraw && !ctx.uvBuf) {
+                        this._aUVDraw.bindFloatArrayBuffer(this.core.uvBuf);
+                    }
+
+                    if (this._aUV2Draw && !ctx.uvBuf2) {
+                        this._aUV2Draw.bindFloatArrayBuffer(this.core.uvBuf2);
+                    }
+
+                    if (this._aColorDraw && !ctx.colorBuf) {
+                        this._aColorDraw.bindFloatArrayBuffer(this.core.colorBuf);
+                    }
+                }
+
+                this.core.indexBuf.bind();
+            }
         }
 
         gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, gl.UNSIGNED_SHORT, 0);
+
+        if (this.VAO) {
+            // We don't want following nodes that don't use their own VAOs to muck up
+            // this node's VAO, so we need to unbind it.
+            ctx.VAO.bindVertexArrayOES(null);
+        } else {
+            ctx.geoChunkId = this.id;
+        }
     },
 
     pick:function (ctx) {

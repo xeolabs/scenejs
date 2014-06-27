@@ -13,6 +13,12 @@ SceneJS.Scene.prototype._init = function (params) {
     }
 
     this._tagSelector = null;
+
+    /**
+     * Set false when canvas is to be transparent.
+     * @type {boolean}
+     */
+    this.transparent = (params.transparent === true);
 };
 
 

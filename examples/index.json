@@ -41,7 +41,7 @@
                         "tags":[]
                     },
                     {
-                        "title":"Linking to a canvas",
+                        "title":"Linking to a canvas in the document",
                         "path":"scene/linkToCanvas.html",
                         "tags":["canvas"]
                     },
@@ -56,6 +56,18 @@
                         "path":"scene/multipleScenes.html",
                         "tags":["multipleScenes"],
                         "id":"multipleScenes"
+                    },
+                    {
+                        "title":"Transparent canvas",
+                        "path":"scene/transparentAutoCanvas.html",
+                        "tags":["canvas", "transparency"],
+                        "id":"transparentCanvas"
+                    },
+                    {
+                        "title":"Transparent canvas - using external canvas in DOM ",
+                        "path":"scene/transparentAutoCanvas.html",
+                        "tags":["canvas", "transparency"],
+                        "id":"transparentDOMCanvas"
                     }
                 ]
             }
