@@ -57,10 +57,8 @@
                             /*------------------------------------------------------
                              * The morphGeometry
                              *
-                             * We could morph everything on the geometry except
-                             * of course for the indices array. In this example, we're
-                             * just morphing the positions and normals between two
-                             * targets.
+                             * We can morph positions and normals. In this example,
+                             * we're just morphing them between two targets.
                              *
                              * The 'factor' attribute takes a value from 0.0 to 1.0
                              * to interpolate between the first and last target.
@@ -76,7 +74,7 @@
                                  */
                                 factor:0.0,
 
-                                keys:[0, 2],
+                                keys:[0, 1],
 
                                 /* Minimum of two morph targets required
                                  */
@@ -147,7 +145,7 @@
                 function () {
                     if (factor >= 1.0) {
                         factorInc *= -1;
-                    } else if (factor < -1) {
+                    } else if (factor < 0) {
                         factorInc *= -1;
                     }
                     factor += factorInc;
