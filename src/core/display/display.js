@@ -274,7 +274,7 @@ var SceneJS_Display = function (cfg) {
     this._frameCtx = {
         pickNames:[], // Pick names of objects hit during pick render
         canvas:this._canvas,           // The canvas
-        VAO:null // Vertex array object extension
+        VAO:null                       // Vertex array object extension
     };
 
     /* The frame context has this facade which is given to scene node "rendered" listeners
@@ -429,12 +429,12 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 15, "cubemap", this.cubemap);
     this._setChunk(object, 16, "framebuf", this.framebuf);
     this._setChunk(object, 17, "clips", this.clips);
-    this._setChunk(object, 18, "morphGeometry", this.morphGeometry);
+    this._setChunk(object, 18, "geometry", this.morphGeometry, this.geometry);
     this._setChunk(object, 19, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 20, "geometry", this.geometry); // Must be last
+    this._setChunk(object, 20, "draw", this.geometry); // Must be last
 };
 
-SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, unique) {
+SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, core2) {
 
     var chunkId;
     var chunkClass = this._chunkFactory.chunkTypes[chunkType];
@@ -462,12 +462,20 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
             ? '_' + core.stateId
             : 'p' + object.program.id + '_' + core.stateId;
 
+        if (core2) {
+            chunkId += '__' + core2.stateId;
+        }
+
     } else {
 
         // No core supplied, probably a program.
         // Only one chunk of this type per program.
         chunkId = 'p' + object.program.id;
     }
+
+    // This is needed so that chunkFactory can distinguish between draw and geometry
+    // chunks with the same core.
+    chunkId = order + '__' + chunkId;
 
     var oldChunk = object.chunks[order];
 
@@ -480,7 +488,7 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
         this._chunkFactory.putChunk(oldChunk); // Release previous chunk to pool
     }
 
-    object.chunks[order] = this._chunkFactory.getChunk(chunkId, chunkType, object.program, core); // Attach new chunk
+    object.chunks[order] = this._chunkFactory.getChunk(chunkId, chunkType, object.program, core, core2); // Attach new chunk
 
     // Ambient light is global across everything in display, and
     // can never be disabled, so grab it now because we want to
@@ -632,7 +640,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 22; i++) {
+    for (var i = 0; i < 21; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
@@ -719,7 +727,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
                 // As we apply the state chunk lists we track the ID of most types of chunk in order
                 // to cull redundant re-applications of runs of the same chunk - except for those chunks with a
-                // 'unique' flag. We don't want to cull runs of geometry chunks because they contain the GL
+                // 'unique' flag. We don't want to cull runs of draw chunks because they contain the GL
                 // drawElements calls which render the objects.
 
                 // Chunk IDs are only considered unique within the same program. Therefore, whenever we do a
@@ -746,7 +754,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
     if (this._xpBufLen > 0) {
 
-        for (var i = 0; i < 23; i++) {  // TODO: magic number!
+        for (var i = 0; i < this._lastStateId.length; i++) {
             this._lastStateId[i] = null;
         }
 
@@ -913,11 +921,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     frameCtx.blendEnabled = false;
 
-    frameCtx.vertexBuf = false;
-    frameCtx.normalBuf = false;
-    frameCtx.uvBuf = false;
-    frameCtx.uvBuf2 = false;
-    frameCtx.colorBuf = false;
     frameCtx.backfaces = true;
     frameCtx.frontface = "ccw";
     frameCtx.pick = !!pick;
@@ -992,6 +995,13 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     if (frameCtx.renderer) {                           // Forget last call-time renderer properties
         //     frameCtx.renderer.props.restoreProps(gl);
+    }
+
+    if (frameCtx.VAO) {
+        frameCtx.VAO.bindVertexArrayOES(null);
+        for (var i = 0; i < 10; i++) {
+            gl.disableVertexAttribArray(i);
+        }
     }
 };
 

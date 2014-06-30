@@ -62,7 +62,7 @@ SceneJS_ChunkFactory.createChunkType = function(params) {
 /**
  *
  */
-SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core) {
+SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core, core2) {
 
     var chunkClass = SceneJS_ChunkFactory.chunkTypes[type]; // Check type supported
 
@@ -85,11 +85,12 @@ SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core)
 
     if (chunk) {    // Reinitialise the recycled chunk
 
-        chunk.init(chunkId, program, core);
+        chunk.init(chunkId, program, core, core2);
 
     } else {        // Instantiate a fresh chunk
 
-        chunk = new chunkClass(chunkId, program, core); // Create new chunk
+        chunk = new chunkClass(chunkId, program, core, core2); // Create new chunk
+
     }
 
     chunk.useCount = 1;

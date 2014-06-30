@@ -193,7 +193,6 @@
             "src/core/display/chunks/listenersChunk.js",
             "src/core/display/chunks/lookAtChunk.js",
             "src/core/display/chunks/materialChunk.js",
-            "src/core/display/chunks/morphGeometryChunk.js",
             "src/core/display/chunks/nameChunk.js",
             "src/core/display/chunks/programChunk.js",
             "src/core/display/chunks/rendererChunk.js",

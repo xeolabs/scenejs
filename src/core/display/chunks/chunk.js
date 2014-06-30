@@ -17,12 +17,14 @@ var SceneJS_Chunk = function() {};
  * @param {String} id Chunk ID
  * @param {SceneJS_Program} program Program to render the chunk
  * @param {SceneJS_Core} core The state core rendered by this chunk
+ * @param {SceneJS_Core} core2 Another state core rendered by this chunk, only used for geometry
  */
-SceneJS_Chunk.prototype.init = function(id, program, core) {
+SceneJS_Chunk.prototype.init = function(id, program, core, core2) {
 
     this.id = id;
     this.program = program;
     this.core = core;
+    this.core2 = core2;
 
     if (this.build) {
         this.build();
