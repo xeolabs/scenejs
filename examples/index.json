@@ -1262,13 +1262,13 @@
                         "title":"Heightmap with fog",
                         "tags":["heightMap"],
                         "path":"demos/pickFlyOrbitTerrain.html",
-                        "id":"texturedHeightmap"
+                        "id":"customHeightmap"
                     },
                     {
                         "title":"Heightmap with texture",
-                        "tags":["heightMap"],
-                        "path":"demos/pickFlyOrbitTerrain.html",
-                        "id":"customHeightmap"
+                        "tags":["heightMap", "texture", "colorMap"],
+                        "path":"plugins/heightmaps/textured.html",
+                        "id":"texturedHeightmap"
                     }
                 ]
             },
