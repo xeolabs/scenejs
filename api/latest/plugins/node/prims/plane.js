@@ -74,6 +74,9 @@
                 normals.push(0);
                 normals.push(0);
                 normals.push(1);
+
+                uvs.push(ix / gridX);
+                uvs.push(1 - iz / gridZ);
             }
         }
 
@@ -97,30 +100,6 @@
                 indices.push(c);
                 indices.push(d);
                 indices.push(a);
-
-                // a
-                uvs.push(ix / gridX);
-                uvs.push(1 - iz / gridZ);
-
-                //b
-                uvs.push(ix / gridX);
-                uvs.push(1 - ( iz + 1 ) / gridZ);
-
-                //c
-                uvs.push(( ix + 1 ) / gridX);
-                uvs.push(1 - ( iz + 1 ) / gridZ);
-
-                //c
-                uvs.push(( ix + 1 ) / gridX);
-                uvs.push(1 - ( iz + 1 ) / gridZ);
-
-                //d
-                uvs.push(( ix + 1 ) / gridX, 1 - iz / gridZ);
-                uvs.push(1 - iz / gridZ);
-
-                //a
-                uvs.push(ix / gridX);
-                uvs.push(1 - iz / gridZ);
             }
         }
 

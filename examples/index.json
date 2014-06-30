@@ -1259,7 +1259,13 @@
                 "tags":["terrain"],
                 "nodes":[
                     {
-                        "title":"Heightmap with custom texture and fog",
+                        "title":"Heightmap with fog",
+                        "tags":["heightMap"],
+                        "path":"demos/pickFlyOrbitTerrain.html",
+                        "id":"texturedHeightmap"
+                    },
+                    {
+                        "title":"Heightmap with texture",
                         "tags":["heightMap"],
                         "path":"demos/pickFlyOrbitTerrain.html",
                         "id":"customHeightmap"
