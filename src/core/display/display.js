@@ -416,7 +416,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 2, "lookAt", this.viewTransform);
     this._setChunk(object, 3, "camera", this.projTransform);
     this._setChunk(object, 4, "flags", this.flags);
-    this._setChunk(object, 5, "shader", this.shader);
+    this._setChunk(object, 5, "shaderParams", this.shader);
     this._setChunk(object, 6, "shaderParams", this.shaderParams);
     this._setChunk(object, 7, "style", this.style);
     this._setChunk(object, 8, "depthbuf", this.depthbuf);

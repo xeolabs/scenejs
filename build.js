@@ -199,7 +199,6 @@
             "src/core/display/chunks/depthbufChunk.js",
             "src/core/display/chunks/colorbufChunk.js",
             "src/core/display/chunks/viewChunk.js",
-            "src/core/display/chunks/shaderChunk.js",
             "src/core/display/chunks/shaderParamsChunk.js",
             "src/core/display/chunks/styleChunk.js",
             "src/core/display/chunks/textureChunk.js",
