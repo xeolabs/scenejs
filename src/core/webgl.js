@@ -253,15 +253,15 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
     }
     gl.linkProgram(handle);
 
-    this.valid = (gl.getProgramParameter(handle, gl.LINK_STATUS) != 0);
+    //this.valid = (gl.getProgramParameter(handle, gl.LINK_STATUS) != 0);
 
     var debugCfg = SceneJS_configsModule.getConfigs("shading");
-    if (debugCfg.validate !== false) {
-        gl.validateProgram(handle);
-        this.valid = this.valid && (gl.getProgramParameter(handle, gl.VALIDATE_STATUS) != 0);
-    }
+//    if (debugCfg.validate !== false) {
+//        gl.validateProgram(handle);
+//        this.valid = this.valid && (gl.getProgramParameter(handle, gl.VALIDATE_STATUS) != 0);
+//    }
 
-    if (!this.valid) {
+    if (false && !this.valid) {
 
         if (!gl.isContextLost()) { // Handled explicitely elsewhere, so wont rehandle here
 
