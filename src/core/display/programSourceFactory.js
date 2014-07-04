@@ -70,17 +70,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-            src.push("varying   vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
-            src.push("varying   vec3 SCENEJS_vViewNormal;");   // Output world-space vertex normal
+            src.push("varying vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
+            src.push("varying vec3 SCENEJS_vViewNormal;");   // Output world-space vertex normal
         }
 
-        // if (clipping || fragmentHooks.worldPosClip) {
         src.push("varying vec4 SCENEJS_vWorldVertex;");
-        // }
-
-
-        src.push("varying vec4 SCENEJS_vViewVertex;\n");
-        src.push("varying vec4 SCENEJS_vProjVertex;\n");
+        src.push("varying vec4 SCENEJS_vViewVertex;");
+        src.push("varying vec4 SCENEJS_vProjVertex;");
 
         src.push("uniform vec3 SCENEJS_uWorldEye;");                     // World-space eye position
         src.push("varying vec3 SCENEJS_vWorldEyeVec;");
@@ -201,7 +197,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform bool  SCENEJS_uClipping;");
 
         if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-
             src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
             src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
         }
@@ -642,7 +637,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (cubeMapping) {
+        if (normals && cubeMapping) {
             var layer;
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
                 layer = states.cubemap.layers[i];
@@ -899,12 +894,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
                 layer = states.cubemap.layers[i];
-                    src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
-                    src.push("color = mix(color, envColor.rgb, specular * SCENEJS_uCubeMapIntensity" + i + ");");
-//                if (layer.applyTo == "specular") {
-//                    src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
-//                    src.push("color = color * SCENEJS_uCubeMapBlendFactor" + i + " * envColor.rgb;");
-//                }
+                src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
+                src.push("color = mix(color, envColor.rgb, specular * SCENEJS_uCubeMapIntensity" + i + ");");
             }
             src.push("}"); // if (SCENEJS_uReflection)
         }

@@ -4986,17 +4986,17 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
     }
     gl.linkProgram(handle);
 
-    this.valid = (gl.getProgramParameter(handle, gl.LINK_STATUS) != 0);
+    //this.valid = (gl.getProgramParameter(handle, gl.LINK_STATUS) != 0);
 
     var debugCfg = SceneJS_configsModule.getConfigs("shading");
-    if (debugCfg.validate !== false) {
-        gl.validateProgram(handle);
-        this.valid = this.valid && (gl.getProgramParameter(handle, gl.VALIDATE_STATUS) != 0);
-    }
+//    if (debugCfg.validate !== false) {
+//        gl.validateProgram(handle);
+//        this.valid = this.valid && (gl.getProgramParameter(handle, gl.VALIDATE_STATUS) != 0);
+//    }
 
-    if (!this.valid) {
+    if (false && !this.valid) {
 
-        if (!gl.isContextLost()) { // Handled explicitely elsewhere, so wont rehandle here
+        if (!gl.isContextLost()) { // Handled explicitly elsewhere, so wont rehandle here
 
             SceneJS.log.error("Shader program failed to link: " + gl.getProgramInfoLog(handle));
 
@@ -14237,7 +14237,7 @@ var SceneJS_Display = function (cfg) {
     this._frameCtx = {
         pickNames:[], // Pick names of objects hit during pick render
         canvas:this._canvas,           // The canvas
-        VAO:null // Vertex array object extension
+        VAO:null                       // Vertex array object extension
     };
 
     /* The frame context has this facade which is given to scene node "rendered" listeners
@@ -14392,12 +14392,12 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 15, "cubemap", this.cubemap);
     this._setChunk(object, 16, "framebuf", this.framebuf);
     this._setChunk(object, 17, "clips", this.clips);
-    this._setChunk(object, 18, "morphGeometry", this.morphGeometry);
+    this._setChunk(object, 18, "geometry", this.morphGeometry, this.geometry);
     this._setChunk(object, 19, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 20, "geometry", this.geometry); // Must be last
+    this._setChunk(object, 20, "draw", this.geometry); // Must be last
 };
 
-SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, unique) {
+SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, core2) {
 
     var chunkId;
     var chunkClass = this._chunkFactory.chunkTypes[chunkType];
@@ -14425,12 +14425,20 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
             ? '_' + core.stateId
             : 'p' + object.program.id + '_' + core.stateId;
 
+        if (core2) {
+            chunkId += '__' + core2.stateId;
+        }
+
     } else {
 
         // No core supplied, probably a program.
         // Only one chunk of this type per program.
         chunkId = 'p' + object.program.id;
     }
+
+    // This is needed so that chunkFactory can distinguish between draw and geometry
+    // chunks with the same core.
+    chunkId = order + '__' + chunkId;
 
     var oldChunk = object.chunks[order];
 
@@ -14443,7 +14451,7 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
         this._chunkFactory.putChunk(oldChunk); // Release previous chunk to pool
     }
 
-    object.chunks[order] = this._chunkFactory.getChunk(chunkId, chunkType, object.program, core); // Attach new chunk
+    object.chunks[order] = this._chunkFactory.getChunk(chunkId, chunkType, object.program, core, core2); // Attach new chunk
 
     // Ambient light is global across everything in display, and
     // can never be disabled, so grab it now because we want to
@@ -14595,7 +14603,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 22; i++) {
+    for (var i = 0; i < 21; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
@@ -14682,7 +14690,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
                 // As we apply the state chunk lists we track the ID of most types of chunk in order
                 // to cull redundant re-applications of runs of the same chunk - except for those chunks with a
-                // 'unique' flag. We don't want to cull runs of geometry chunks because they contain the GL
+                // 'unique' flag. We don't want to cull runs of draw chunks because they contain the GL
                 // drawElements calls which render the objects.
 
                 // Chunk IDs are only considered unique within the same program. Therefore, whenever we do a
@@ -14709,7 +14717,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
     if (this._xpBufLen > 0) {
 
-        for (var i = 0; i < 23; i++) {  // TODO: magic number!
+        for (var i = 0; i < this._lastStateId.length; i++) {
             this._lastStateId[i] = null;
         }
 
@@ -14876,11 +14884,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     frameCtx.blendEnabled = false;
 
-    frameCtx.vertexBuf = false;
-    frameCtx.normalBuf = false;
-    frameCtx.uvBuf = false;
-    frameCtx.uvBuf2 = false;
-    frameCtx.colorBuf = false;
     frameCtx.backfaces = true;
     frameCtx.frontface = "ccw";
     frameCtx.pick = !!pick;
@@ -14955,6 +14958,13 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     if (frameCtx.renderer) {                           // Forget last call-time renderer properties
         //     frameCtx.renderer.props.restoreProps(gl);
+    }
+
+    if (frameCtx.VAO) {
+        frameCtx.VAO.bindVertexArrayOES(null);
+        for (var i = 0; i < 10; i++) {
+            gl.disableVertexAttribArray(i);
+        }
     }
 };
 
@@ -15033,17 +15043,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-            src.push("varying   vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
-            src.push("varying   vec3 SCENEJS_vViewNormal;");   // Output world-space vertex normal
+            src.push("varying vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
+            src.push("varying vec3 SCENEJS_vViewNormal;");   // Output world-space vertex normal
         }
 
-        // if (clipping || fragmentHooks.worldPosClip) {
         src.push("varying vec4 SCENEJS_vWorldVertex;");
-        // }
-
-
-        src.push("varying vec4 SCENEJS_vViewVertex;\n");
-        src.push("varying vec4 SCENEJS_vProjVertex;\n");
+        src.push("varying vec4 SCENEJS_vViewVertex;");
+        src.push("varying vec4 SCENEJS_vProjVertex;");
 
         src.push("uniform vec3 SCENEJS_uWorldEye;");                     // World-space eye position
         src.push("varying vec3 SCENEJS_vWorldEyeVec;");
@@ -15164,7 +15170,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform bool  SCENEJS_uClipping;");
 
         if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-
             src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
             src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
         }
@@ -15605,7 +15610,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (cubeMapping) {
+        if (normals && cubeMapping) {
             var layer;
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
                 layer = states.cubemap.layers[i];
@@ -15862,12 +15867,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
                 layer = states.cubemap.layers[i];
-                    src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
-                    src.push("color = mix(color, envColor.rgb, specular * SCENEJS_uCubeMapIntensity" + i + ");");
-//                if (layer.applyTo == "specular") {
-//                    src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
-//                    src.push("color = color * SCENEJS_uCubeMapBlendFactor" + i + " * envColor.rgb;");
-//                }
+                src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
+                src.push("color = mix(color, envColor.rgb, specular * SCENEJS_uCubeMapIntensity" + i + ");");
             }
             src.push("}"); // if (SCENEJS_uReflection)
         }
@@ -16369,12 +16370,14 @@ var SceneJS_Chunk = function() {};
  * @param {String} id Chunk ID
  * @param {SceneJS_Program} program Program to render the chunk
  * @param {SceneJS_Core} core The state core rendered by this chunk
+ * @param {SceneJS_Core} core2 Another state core rendered by this chunk, only used for geometry
  */
-SceneJS_Chunk.prototype.init = function(id, program, core) {
+SceneJS_Chunk.prototype.init = function(id, program, core, core2) {
 
     this.id = id;
     this.program = program;
     this.core = core;
+    this.core2 = core2;
 
     if (this.build) {
         this.build();
@@ -16444,7 +16447,7 @@ SceneJS_ChunkFactory.createChunkType = function(params) {
 /**
  *
  */
-SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core) {
+SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core, core2) {
 
     var chunkClass = SceneJS_ChunkFactory.chunkTypes[type]; // Check type supported
 
@@ -16467,11 +16470,12 @@ SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core)
 
     if (chunk) {    // Reinitialise the recycled chunk
 
-        chunk.init(chunkId, program, core);
+        chunk.init(chunkId, program, core, core2);
 
     } else {        // Instantiate a fresh chunk
 
-        chunk = new chunkClass(chunkId, program, core); // Create new chunk
+        chunk = new chunkClass(chunkId, program, core, core2); // Create new chunk
+
     }
 
     chunk.useCount = 1;
@@ -16671,7 +16675,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, gl.UNSIGNED_SHORT, 0);
     }
-});/**
+});
+/**
  *  Create display state chunk type for draw and pick render of flags
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -16783,15 +16788,6 @@ SceneJS_ChunkFactory.createChunkType({
 
     type:"geometry",
 
-    /**
-     * As we apply a list of state chunks in a {@link SceneJS_Display}, we track the ID of each chunk
-     * in order to avoid redundantly re-applying the same chunk.
-     *
-     * We don't want that for draw chunks however, because they contain GL drawElements calls,
-     * which we need to do for each object.
-     */
-    unique:true,
-
     build:function () {
 
         var draw = this.program.draw;
@@ -16802,8 +16798,9 @@ SceneJS_ChunkFactory.createChunkType({
         this._aUV2Draw = draw.getAttribute("SCENEJS_aUVCoord2");
         this._aColorDraw = draw.getAttribute("SCENEJS_aVertexColor");
 
-        this.VAO = null;
-        this.VAOHasInterleavedBuf = false;
+        this._aMorphVertexDraw = draw.getAttribute("SCENEJS_aMorphVertex");
+        this._aMorphNormalDraw = draw.getAttribute("SCENEJS_aMorphNormal");
+        this._uMorphFactorDraw = draw.getUniformLocation("SCENEJS_uMorphFactor");
 
         var pick = this.program.pick;
 
@@ -16811,7 +16808,15 @@ SceneJS_ChunkFactory.createChunkType({
         this._aNormalPick = pick.getAttribute("SCENEJS_aNormal");
         this._aUVPick = pick.getAttribute("SCENEJS_aUVCoord");
         this._aUV2Pick = pick.getAttribute("SCENEJS_aUVCoord2");
-        this._aColorPick = pick.getAttribute("SCENEJS_aVertexColor");
+
+        this._aMorphVertexPick = pick.getAttribute("SCENEJS_aMorphVertex");
+        this._aMorphNormalPick = pick.getAttribute("SCENEJS_aMorphNormal");
+        this._uMorphFactorPick = pick.getUniformLocation("SCENEJS_uMorphFactor");
+
+        this.VAO = null;
+        this.VAOMorphKey1 = 0;
+        this.VAOMorphKey2 = 0;
+        this.VAOHasInterleavedBuf = false;
     },
 
     recycle:function () {
@@ -16819,114 +16824,183 @@ SceneJS_ChunkFactory.createChunkType({
             // Guarantee that the old VAO is deleted immediately when recycling the object.
             var VAOExt = this.program.gl.getExtension("OES_vertex_array_object");
             VAOExt.deleteVertexArrayOES(this.VAO);
+            this.VAO = null;
         }
     },
 
-    draw:function (ctx) {
+    morphDraw:function () {
+        this.VAOMorphKey1 = this.core.key1;
+        this.VAOMorphKey2 = this.core.key2;
 
-        var gl = this.program.gl;
+        var target1 = this.core.targets[this.core.key1]; // Keys will update
+        var target2 = this.core.targets[this.core.key2];
 
-        if (ctx.geoChunkId != this.id) { // HACK until we have distinct state chunks for VBOs and draw call
-            var ctxBufsActive = ctx.vertexBuf || ctx.normalBuf || ctx.uvBuf || ctx.uvBuf2 || ctx.colorBuf;
-            if (this.VAO && (ctxBufsActive ||
-                this.core.interleavedBuf && this.core.interleavedBuf.dirty && this.VAOHasInterleavedBuf)) {
-                // Need to recreate VAO to refer to separate buffers, or can't use VAO due to buffers
-                // specified outside.
-                ctx.VAO.deleteVertexArrayOES(this.VAO);
-                this.VAO = null;
-            }
-            if (this.VAO) {
-                ctx.VAO.bindVertexArrayOES(this.VAO);
-            } else {
-                var useInterleavedBuf = (this.core.interleavedBuf && !this.core.interleavedBuf.dirty);
-                if (ctx.VAO && !ctxBufsActive) {
-                    this.VAO = ctx.VAO.createVertexArrayOES();
-                    ctx.VAO.bindVertexArrayOES(this.VAO);
-                    this.VAOHasInterleavedBuf = useInterleavedBuf;
-                }
-
-                if (useInterleavedBuf) {
-                    this.core.interleavedBuf.bind();
-                    if (this._aVertexDraw && !ctx.vertexBuf) {
-                        this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core.interleavedStride, this.core.interleavedPositionOffset);
-                    }
-                    if (this._aNormalDraw && !ctx.normalBuf) {
-                        this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core.interleavedStride, this.core.interleavedNormalOffset);
-                    }
-                    if (this._aUVDraw && !ctx.uvBuf) {
-                        this._aUVDraw.bindInterleavedFloatArrayBuffer(2, this.core.interleavedStride, this.core.interleavedUVOffset);
-                    }
-                    if (this._aUV2Draw && !ctx.uv2Buf) {
-                        this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core.interleavedStride, this.core.interleavedUV2Offset);
-                    }
-                    if (this._aColorDraw && !ctx.colorBuf) {
-                        this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core.interleavedStride, this.core.interleavedColorOffset);
-                    }
-                } else {
-                    if (this._aVertexDraw && !ctx.vertexBuf) {
-                        this._aVertexDraw.bindFloatArrayBuffer(this.core.vertexBuf);
-                    }
-
-                    if (this._aNormalDraw && !ctx.normalBuf) {
-                        this._aNormalDraw.bindFloatArrayBuffer(this.core.normalBuf);
-                    }
-
-                    if (this._aUVDraw && !ctx.uvBuf) {
-                        this._aUVDraw.bindFloatArrayBuffer(this.core.uvBuf);
-                    }
-
-                    if (this._aUV2Draw && !ctx.uvBuf2) {
-                        this._aUV2Draw.bindFloatArrayBuffer(this.core.uvBuf2);
-                    }
-
-                    if (this._aColorDraw && !ctx.colorBuf) {
-                        this._aColorDraw.bindFloatArrayBuffer(this.core.colorBuf);
-                    }
-                }
-
-                this.core.indexBuf.bind();
-            }
+        if (this._aMorphVertexDraw) {
+            this._aVertexDraw.bindFloatArrayBuffer(target1.vertexBuf);
+            this._aMorphVertexDraw.bindFloatArrayBuffer(target2.vertexBuf);
+        } else if (this._aVertexDraw) {
+            this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
         }
 
-        gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, gl.UNSIGNED_SHORT, 0);
+        if (this._aMorphNormalDraw) {
+            this._aNormalDraw.bindFloatArrayBuffer(target1.normalBuf);
+            this._aMorphNormalDraw.bindFloatArrayBuffer(target2.normalBuf);
+        } else if (this._aNormalDraw) {
+            this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
+        }
+
+        if (this._aUVDraw) {
+            this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
+        }
+
+        if (this._aUV2Draw) {
+            this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
+        }
+
+        if (this._aColorDraw) {
+            this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
+        }
+
+        this.setDrawMorphFactor();
+    },
+
+    setDrawMorphFactor:function () {
+
+        if (this._uMorphFactorDraw) {
+            this.program.gl.uniform1f(this._uMorphFactorDraw, this.core.factor); // Bind LERP factor
+        }
+
+    },
+
+    draw:function (ctx) {
+        var doMorph = this.core.targets && this.core.targets.length;
+        var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
         if (this.VAO) {
-            // We don't want following nodes that don't use their own VAOs to muck up
-            // this node's VAO, so we need to unbind it.
+            ctx.VAO.bindVertexArrayOES(this.VAO);
+            if (doMorph) {
+                if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {
+                    this.setDrawMorphFactor();
+                    return;
+                }
+            } else if (cleanInterleavedBuf || !this.VAOHasInterleavedBuf) {
+                return;
+            }
+        } else if (ctx.VAO) {
+            // Start creating a new VAO by switching to the default VAO, which doesn't have attribs enabled.
             ctx.VAO.bindVertexArrayOES(null);
-        } else {
-            ctx.geoChunkId = this.id;
+            this.VAO = ctx.VAO.createVertexArrayOES();
+            ctx.VAO.bindVertexArrayOES(this.VAO);
+            var gl = this.program.gl;
         }
+
+        if (doMorph) {
+            this.morphDraw();
+        } else {
+            if (cleanInterleavedBuf) {
+                this.VAOHasInterleavedBuf = true;
+                this.core2.interleavedBuf.bind();
+                if (this._aVertexDraw) {
+                    this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedPositionOffset);
+                }
+                if (this._aNormalDraw) {
+                    this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedNormalOffset);
+                }
+                if (this._aUVDraw) {
+                    this._aUVDraw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUVOffset);
+                }
+                if (this._aUV2Draw) {
+                    this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUV2Offset);
+                }
+                if (this._aColorDraw) {
+                    this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
+                }
+            } else {
+                this.VAOHasInterleavedBuf = false;
+                if (this._aVertexDraw) {
+                    this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
+                }
+
+                if (this._aNormalDraw) {
+                    this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
+                }
+
+                if (this._aUVDraw) {
+                    this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
+                }
+
+                if (this._aUV2Draw) {
+                    this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
+                }
+
+                if (this._aColorDraw) {
+                    this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
+                }
+            }
+        }
+
+        this.core2.indexBuf.bind();
+
+    },
+
+    morphPick:function () {
+
+        var target1 = this.core.targets[this.core.key1]; // Keys will update
+        var target2 = this.core.targets[this.core.key2];
+
+        if (this._aMorphVertexPick) {
+            this._aVertexPick.bindFloatArrayBuffer(target1.vertexBuf);
+            this._aMorphVertexPick.bindFloatArrayBuffer(target2.vertexBuf);
+        } else if (this._aVertexPick) {
+            this._aVertexPick.bindFloatArrayBuffer(this.core2.vertexBuf);
+        }
+
+        if (this._aMorphNormalPick) {
+            this._aNormalPick.bindFloatArrayBuffer(target1.normalBuf);
+            this._aMorphNormalPick.bindFloatArrayBuffer(target2.normalBuf);
+        } else if (this._aNormalPick) {
+            this._aNormalPick.bindFloatArrayBuffer(this.core2.normalBuf);
+        }
+
+        if (this._aUVPick) {
+            this._aUVPick.bindFloatArrayBuffer(this.core2.uvBuf);
+        }
+
+        if (this._aUV2Pick) {
+            this._aUV2Pick.bindFloatArrayBuffer(this.core2.uvBuf2);
+        }
+
+        if (this._uMorphFactorPick) {
+            this.program.gl.uniform1f(this._uMorphFactorPick, this.core.factor); // Bind LERP factor
+        }
+
     },
 
     pick:function (ctx) {
 
-        var gl = this.program.gl;
+        if (this.core.targets && this.core.targets.length) {
+            this.morphPick();
+        } else {
 
-        if (ctx.geoChunkId != this.id) { // HACK until we have distinct state chunks for VBOs and draw call
-
-            if (this._aVertexPick && !ctx.vertexBuf) {
-                this._aVertexPick.bindFloatArrayBuffer(this.core.vertexBuf);
+            if (this._aVertexPick) {
+                this._aVertexPick.bindFloatArrayBuffer(this.core2.vertexBuf);
             }
 
-            if (this._aNormalPick && !ctx.normalBuf) {
-                this._aNormalPick.bindFloatArrayBuffer(this.core.normalBuf);
+            if (this._aNormalPick) {
+                this._aNormalPick.bindFloatArrayBuffer(this.core2.normalBuf);
             }
 
-            if (this._aUVPick && !ctx.uvBuf) {
-                this._aUVPick.bindFloatArrayBuffer(this.core.uvBuf);
+            if (this._aUVPick) {
+                this._aUVPick.bindFloatArrayBuffer(this.core2.uvBuf);
             }
 
-            if (this._aUV2Pick && !ctx.uvBuf2) {
-                this._aUV2Pick.bindFloatArrayBuffer(this.core.uvBuf2);
+            if (this._aUV2Pick) {
+                this._aUV2Pick.bindFloatArrayBuffer(this.core2.uvBuf2);
             }
 
-            this.core.indexBuf.bind();
-
-            ctx.geoChunkId = this.id;
         }
 
-        gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, gl.UNSIGNED_SHORT, 0);
+        this.core2.indexBuf.bind();
     }
 });
 /**
@@ -17148,172 +17222,6 @@ SceneJS_ChunkFactory.createChunkType({
  */
 SceneJS_ChunkFactory.createChunkType({
 
-    type:"morphGeometry",
-
-    build:function () {
-
-        var draw = this.program.draw;
-
-        this._aVertexDraw = draw.getAttribute("SCENEJS_aVertex");
-        this._aNormalDraw = draw.getAttribute("SCENEJS_aNormal");
-        this._aUVDraw = draw.getAttribute("SCENEJS_aUVCoord");
-        this._aUV2Draw = draw.getAttribute("SCENEJS_aUVCoord2");
-        this._aColorDraw = draw.getAttribute("SCENEJS_aVertexColor");
-
-        this._aMorphVertexDraw = draw.getAttribute("SCENEJS_aMorphVertex");
-        this._aMorphNormalDraw = draw.getAttribute("SCENEJS_aMorphNormal");
-        this._aMorphUVDraw = draw.getAttribute("SCENEJS_aMorphUVCoord");
-        this._aMorphUV2Draw = draw.getAttribute("SCENEJS_aMorphUVCoord2");
-        this._aMorphColorDraw = draw.getAttribute("SCENEJS_aMorphColor");
-        this._uMorphFactorDraw = draw.getUniformLocation("SCENEJS_uMorphFactor");
-
-        var pick = this.program.pick;
-
-        this._aVertexPick = pick.getAttribute("SCENEJS_aVertex");
-        this._aNormalPick = pick.getAttribute("SCENEJS_aNormal");
-        this._aUVPick = pick.getAttribute("SCENEJS_aUVCoord");
-        this._aUV2Pick = pick.getAttribute("SCENEJS_aUVCoord2");
-        this._aColorPick = pick.getAttribute("SCENEJS_aVertexColor");
-
-        this._aMorphVertexPick = pick.getAttribute("SCENEJS_aMorphVertex");
-        this._aMorphNormalPick = pick.getAttribute("SCENEJS_aMorphNormal");
-        this._aMorphUVPick = pick.getAttribute("SCENEJS_aMorphUVCoord");
-        this._aMorphUV2Pick = pick.getAttribute("SCENEJS_aMorphUVCoord2");
-        this._aMorphColorPick = pick.getAttribute("SCENEJS_aMorphColor");
-        this._uMorphFactorPick = pick.getUniformLocation("SCENEJS_uMorphFactor");
-    },
-
-    draw:function (ctx) {
-
-        var targets = this.core.targets;
-
-        if (!targets || targets.length == 0) {
-            ctx.vertexBuf = false;
-            ctx.normalBuf = false;
-            ctx.uvBuf = false;
-            ctx.uvBuf2 = false;
-            ctx.colorBuf = false;
-            return;
-        }
-
-        var gl = this.program.gl;
-
-        var target1 = this.core.targets[this.core.key1]; // Keys will update
-        var target2 = this.core.targets[this.core.key2];
-
-        if (this._aMorphVertexDraw) {
-            this._aVertexDraw.bindFloatArrayBuffer(target1.vertexBuf);
-            this._aMorphVertexDraw.bindFloatArrayBuffer(target2.vertexBuf);
-            ctx.vertexBuf = true;
-        } else {
-            ctx.vertexBuf = false;
-        }
-
-        if (this._aMorphNormalDraw) {
-            this._aNormalDraw.bindFloatArrayBuffer(target1.normalBuf);
-            this._aMorphNormalDraw.bindFloatArrayBuffer(target2.normalBuf);
-            ctx.normalBuf = true;
-        } else {
-            ctx.normalBuf = false;
-        }
-
-        if (this._aMorphUVDraw) {
-            this._aUVDraw.bindFloatArrayBuffer(target1.uvBuf);
-            this._aMorphUVDraw.bindFloatArrayBuffer(target2.uvBuf);
-            ctx.uvBuf = true;
-        } else {
-            ctx.uvBuf = false;
-        }
-
-        if (this._aMorphUV2Draw) {
-            this._aUV2Draw.bindFloatArrayBuffer(target1.uvBuf2);
-            this._aMorphUV2Draw.bindFloatArrayBuffer(target2.uvBuf2);
-            ctx.uvBuf2 = true;
-        } else {
-            ctx.uvBuf2 = false;
-        }
-
-        if (this._aMorphColorDraw) {
-            this._aColorDraw.bindFloatArrayBuffer(target1.colorBuf);
-            this._aMorphColorDraw.bindFloatArrayBuffer(target2.colorBuf);
-            ctx.colorBuf = true;
-        } else {
-            ctx.colorBuf = false;
-        }
-
-        if (this._uMorphFactorDraw) {
-            gl.uniform1f(this._uMorphFactorDraw, this.core.factor); // Bind LERP factor
-        }
-    },
-
-    pick:function (ctx) {
-
-        var targets = this.core.targets;
-
-        if (!targets || targets.length == 0) {
-            ctx.vertexBuf = false;
-            ctx.normalBuf = false;
-            ctx.uvBuf = false;
-            ctx.uvBuf2 = false;
-            ctx.colorBuf = false;
-            return;
-        }
-
-        var gl = this.program.gl;
-
-        var target1 = targets[this.core.key1]; // Keys will update
-        var target2 = targets[this.core.key2];
-
-        if (this._aMorphVertexPick) {
-            this._aVertexPick.bindFloatArrayBuffer(target1.vertexBuf);
-            this._aMorphVertexPick.bindFloatArrayBuffer(target2.vertexBuf);
-            ctx.vertexBuf = true;
-        } else {
-            ctx.vertexBuf = false;
-        }
-
-        if (this._aMorphNormalPick) {
-            this._aNormalPick.bindFloatArrayBuffer(target1.normalBuf);
-            this._aMorphNormalPick.bindFloatArrayBuffer(target2.normalBuf);
-            ctx.normalBuf = true;
-        } else {
-            ctx.normalBuf = false;
-        }
-
-        if (this._aMorphUVPick) {
-            this._aUVPick.bindFloatArrayBuffer(target1.uvBuf);
-            this._aMorphUVPick.bindFloatArrayBuffer(target2.uvBuf);
-            ctx.uvBuf = true;
-        } else {
-            ctx.uvBuf = false;
-        }
-
-        if (this._aMorphUV2Pick) {
-            this._aUV2Pick.bindFloatArrayBuffer(target1.uvBuf2);
-            this._aMorphUV2Pick.bindFloatArrayBuffer(target2.uvBuf2);
-            ctx.uvBuf2 = true;
-        } else {
-            ctx.uvBuf2 = false;
-        }
-
-        if (this._aMorphColorPick) {
-            this._aColorPick.bindFloatArrayBuffer(target1.colorBuf);
-            this._aMorphColorPick.bindFloatArrayBuffer(target2.colorBuf);
-            ctx.colorBuf = true;
-        } else {
-            ctx.colorBuf = false;
-        }
-
-        if (this._uMorphFactorPick) {
-            gl.uniform1f(this._uMorphFactorPick, this.core.factor); // Bind LERP factor
-        }
-    }
-});
-/**
- * Create display state chunk type for draw render of material transform
- */
-SceneJS_ChunkFactory.createChunkType({
-
     type: "name",
 
     build : function() {
@@ -17347,22 +17255,14 @@ SceneJS_ChunkFactory.createChunkType({
 
         drawProgram.bind();
 
-        /*
-         * HACK until we have distinct chunk for each VBO (maybe)
-         */
-        frameCtx.vertexBuf = false;
-        frameCtx.normalBuf = false;
-        frameCtx.uvBuf = false;
-        frameCtx.uvBuf2 = false;
-        frameCtx.colorBuf = false;
         frameCtx.textureUnit = 0;
-
-        frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
 
         var gl = this.program.gl;
 
-        for (var i = 0; i < 10; i++) {
-            gl.disableVertexAttribArray(i);
+        if (!frameCtx.VAO) {
+            for (var i = 0; i < 10; i++) {
+                gl.disableVertexAttribArray(i);
+            }
         }
     },
 
@@ -17376,17 +17276,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         gl.uniform1i(this._rayPickMode, frameCtx.rayPick);
 
-        /*
-        * HACK until we have distinct chunk for each VBO (maybe)
-         */
-        frameCtx.vertexBuf = false;
-        frameCtx.normalBuf = false;
-        frameCtx.uvBuf = false;
-        frameCtx.uvBuf2 = false;
-        frameCtx.colorBuf = false;
         frameCtx.textureUnit = 0;
-
-        frameCtx.geoChunkId = null; // HACK until we have distinct state chunks for VBOs and draw call
 
         for (var i = 0; i < 10; i++) {
             gl.disableVertexAttribArray(i);
