@@ -64,5 +64,9 @@ SceneJS_ChunkFactory.createChunkType({
                 }
             }
         }
+
+        if (ctx.textureUnit > 10) { // TODO: Find how many textures allowed
+            ctx.textureUnit = 0;
+        }
     }
 });
