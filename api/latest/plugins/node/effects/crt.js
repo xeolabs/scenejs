@@ -1,4 +1,4 @@
-SceneJS.Types.addType("effects/crt", {
+SceneJS.Types.addType("shader/crt", {
 
     construct:function (params) {
 

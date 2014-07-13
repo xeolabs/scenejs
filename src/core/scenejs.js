@@ -277,7 +277,7 @@ var SceneJS = new (function () {
             }
         }
         for (name in o) {
-            if (o.hasOwnProperty(name)) {
+            if (o.hasOwnProperty(name) && o[name] != undefined) {
                 o2[name] = o[name];
             }
         }

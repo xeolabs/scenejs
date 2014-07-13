@@ -104,10 +104,6 @@ SceneJS.Translate.prototype.setX = function(x) {
     return this;
 };
 
-SceneJS.Translate.prototype.getX = function() {
-    return this._core.x;
-};
-
 SceneJS.Translate.prototype.setY = function(y) {
     this._core.y = y;
     this._core.setDirty();
@@ -115,19 +111,11 @@ SceneJS.Translate.prototype.setY = function(y) {
     return this;
 };
 
-SceneJS.Translate.prototype.getY = function() {
-    return this._core.y;
-};
-
 SceneJS.Translate.prototype.setZ = function(z) {
     this._core.z = z;
     this._core.setDirty();
     this._engine.display.imageDirty = true;
     return this;
-};
-
-SceneJS.Translate.prototype.getZ = function() {
-    return this._core.z;
 };
 
 SceneJS.Translate.prototype.incX = function(x) {
@@ -149,6 +137,18 @@ SceneJS.Translate.prototype.incZ = function(z) {
     this._core.setDirty();
     this._engine.display.imageDirty = true;
     return this;
+};
+
+SceneJS.Translate.prototype.getX = function() {
+    return this._core.x;
+};
+
+SceneJS.Translate.prototype.getY = function() {
+    return this._core.y;
+};
+
+SceneJS.Translate.prototype.getZ = function() {
+    return this._core.z;
 };
 
 SceneJS.Translate.prototype._compile = function(ctx) {

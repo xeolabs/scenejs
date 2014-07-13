@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            //-------------------------------------------------------------------------------------------
+            // First subgraph renders our rotating teapot, with skybox, to a texture.
+            //
+            // The subgraph is wrapped in an frameBuf node, which captures each frame the subgraph
+            // renders and makes it available by ID as an image source for the texture node defined in the
+            // second subgraph, defined further down in this example.
+            //
+            // We're also wrapping it in a "layer" node with a low rendering priority to ensure that
+            // it renders first, so that the framebuf is ready for the textures that need it.
+            //
+            // The frameBuf captures the frames to a hidden frame buffer, so they will not render by
+            // themselves and will only be visible via the texture.
+            //------------------------------------------------------------------------------------------*/
+
+            {
+                type: "layer",
+                priority: 0,
+                nodes: [
+                    {
+                        type: "framebuf",
+                        id: "myFrameBuf",
+
+                        nodes: [
+
+                            // Cloudy sea skybox, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skyboxes/cloudySea.js
+                            // Skybox, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/skyboxes/cloudySea.js
+                            {
+                                type: "skyboxes/cloudySea",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+                            {
+                                type: "rotate",
+                                id: "teapot-pitch",
+                                angle: 180.0,
+                                x: 1.0,
+
+                                nodes: [
+                                    {
+                                        type: "rotate",
+                                        id: "teapot-yaw",
+                                        angle: 0.0,
+                                        y: 1.0,
+
+                                        nodes: [
+
+                                            {
+                                                type: "material",
+                                                emit: 0,
+                                                color: { r: 1.0, g: 0.5, b: 0.9 },
+                                                specularColor: { r: 0.9, g: 0.9, b: 0.9 },
+                                                specular: 0.9,
+                                                shine: 100.0,
+
+
+                                                nodes: [
+
+                                                    // Node type implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                                    {
+                                                        type: "prims/teapot"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+
+            },
+
+            //-------------------------------------------------------------------------------------------
+            // The second subgraph renders a heightmap with a texture that is dynamically sourced from
+            // the frameBuf defined in the subgraph above.
+            //
+            // We wrap it in a "layer" that has a lower rendering priority than the one we wrapped
+            // our frameBuf in earlier.
+            //------------------------------------------------------------------------------------------*/
+
+            {
+                type: "layer",
+                priority: 1,
+                nodes: [
+
+                    // Orbiting camera node, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                    {
+                        type: "cameras/orbit",
+                        yaw: 30,
+                        pitch: -30,
+                        zoom: 5,
+                        zoomSensitivity: 1.0,
+
+                        nodes: [
+
+                            // Color map texture, sourcing from the framebuf created earlier,
+                            // applying to the four geometry primitives in its subgraph
+                            {
+                                type: "textureMap",
+                                framebuf: "myFrameBuf",
+
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: { r: 1.0, g: 1.0, b: 1.0 },
+                                        specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                        specular: 0.2,
+                                        shine: 6.0,
+
+                                        nodes: [
+
+                                            // Heightmap, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/heightmaps/custom.js
+                                            {
+                                                type: "heightmaps/custom",
+
+                                                // Texture image
+                                                src: 'textures/heightmap.jpg',
+
+                                                // Wireframe or solid - default is false
+                                                wire: false,
+
+                                                // Dimensions
+                                                xSize: 3,
+                                                zSize: 3,
+                                                ySize: 0.2,
+
+                                                // Segments on X and Z axis
+                                                xSegments: 100,
+                                                zSegments: 100
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+
+    var teapotPitch = scene.getNode("teapot-pitch");
+    var teapotYaw = scene.getNode("teapot-yaw");
+
+    scene.on("tick",
+            function () {
+                teapotYaw.inc("angle", 1);
+                teapotPitch.inc("angle", .3);
+
+            });
+
+
+</script>
+</body>
+</html>

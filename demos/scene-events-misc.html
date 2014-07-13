@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background-color: #000000;
+            margin: 0px;
+            overflow: auto;
+            height: 100%;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: -100,
+                pitch: -10,
+                zoom: 5,
+                zoomSensitivity: 10.0,
+
+                nodes: [
+                    {
+                        type: "material",
+                        color: { r: 0.5, g: 0.5, b: 0.6 },
+
+                        nodes: [
+                            {
+                                type: "geometry",
+                                source: {
+                                    type: "torus"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    //----------------------------------------
+    // Subscribe and unsubscribe to an event.
+    //----------------------------------------
+
+    var idle = scene.on("tick",
+            function (params) {
+
+                // Fired on each render loop, regardless of whether or not a new view is rendered.
+                // Use this to update animations.
+
+                // ID of the scene
+                var sceneId = params.sceneId;
+
+                //  alert("Scene 'idle' event fired");
+
+                // Unsubscribe
+                scene.off(idle);
+
+            });
+
+    var rendered = scene.on("rendered",
+            function (params) {
+
+                // Fired each time a new view has been rendered for prior scene state updates.
+
+                // ID of the scene:
+                var sceneId = params.sceneId;
+
+                //  alert("Scene 'rendered' event fired");
+
+                // Unsubscribe
+                scene.off(rendered);
+            });
+
+    var destroyed = scene.on("destroyed",
+            function (params) {
+
+                // Fired when scene destroyed with #destroy
+
+                // ID of the scene
+                var sceneId = params.sceneId;
+
+                alert("Scene 'destroyed' event fired");
+
+                // Unsubscribe
+                scene.off(destroyed);
+            });
+
+
+    //---------------------------------------------
+    // Subscribe to single occurrence of an event.    
+    // This is equivalent to calling #off in the
+    // callback given to #on
+    //---------------------------------------------
+
+    scene.once("sleep",
+            function (params) {
+
+                // Fired each time the scene settles into "sleep" state, where it has rendered
+                // a new view and there are no more scene updates for which it needs to render another.
+
+                // ID of the scene:
+                var sceneId = params.sceneId;
+
+                //  alert("Scene 'sleep' event fired");
+            });
+
+</script>
+</body>
+</html>

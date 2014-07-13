@@ -49,7 +49,6 @@ SceneJS.Scale.prototype.getWorldMatrix = function () {
     return Array.apply([], this._core.mat);
 };
 
-
 /**
  * Sets the multiplication order of this node's transform matrix with respect to the parent modeling transform
  * in the scene graph.
@@ -71,10 +70,6 @@ SceneJS.Scale.prototype.setMultOrder = function (multOrder) {
 
     this._core.setDirty();
     this._engine.display.imageDirty = true;
-};
-
-SceneJS.Scale.prototype.getAngle = function () {
-    return this._core.angle;
 };
 
 SceneJS.Scale.prototype.setXYZ = function (xyz) {
@@ -104,24 +99,24 @@ SceneJS.Scale.prototype.setX = function (x) {
     this._engine.display.imageDirty = true;
 };
 
-SceneJS.Scale.prototype.getX = function () {
-    return this._core.x;
-};
-
 SceneJS.Scale.prototype.setY = function (y) {
     this._core.y = y;
     this._core.setDirty();
     this._engine.display.imageDirty = true;
 };
 
-SceneJS.Scale.prototype.getY = function () {
-    return this._core.y;
-};
-
 SceneJS.Scale.prototype.setZ = function (z) {
     this._core.z = z;
     this._core.setDirty();
     this._engine.display.imageDirty = true;
+};
+
+SceneJS.Scale.prototype.getX = function () {
+    return this._core.x;
+};
+
+SceneJS.Scale.prototype.getY = function () {
+    return this._core.y;
 };
 
 SceneJS.Scale.prototype.getZ = function () {

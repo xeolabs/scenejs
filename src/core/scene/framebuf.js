@@ -1,4 +1,4 @@
-new (function() {
+new (function () {
 
     /**
      * The default state core singleton for {@link SceneJS.Framebuf} nodes
@@ -7,8 +7,6 @@ new (function() {
 
         type: "framebuf",
         stateId: SceneJS._baseStateId++,
-        empty: true,
-
         framebuf: null
     };
 
@@ -18,35 +16,35 @@ new (function() {
     var stackLen = 0;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function(params) {
-                params.engine.display.framebuf = defaultCore;
-                stackLen = 0;
-            });
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.framebuf = defaultCore;
+            stackLen = 0;
+        });
 
     SceneJS_events.addListener(// Reallocate VBOs when context restored after loss
-            SceneJS_events.WEBGL_CONTEXT_RESTORED,
-            function() {
+        SceneJS_events.WEBGL_CONTEXT_RESTORED,
+        function () {
 
-                var node;
+            var node;
 
-                for (var nodeId in nodeCoreMap) {
-                    if (nodeCoreMap.hasOwnProperty(nodeId)) {
+            for (var nodeId in nodeCoreMap) {
+                if (nodeCoreMap.hasOwnProperty(nodeId)) {
 
-                        node = nodeCoreMap[nodeId];
+                    node = nodeCoreMap[nodeId];
 
-                        if (!node._core._loading) {
-                            node._buildNodeCore();
-                        }
+                    if (!node._core._loading) {
+                        node._buildNodeCore();
                     }
                 }
-            });
+            }
+        });
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_DESTROYED,
-            function(params) {
-                //     sceneBufs[params.sceneId] = null;
-            });
+        SceneJS_events.SCENE_DESTROYED,
+        function (params) {
+            //     sceneBufs[params.sceneId] = null;
+        });
 
     /**
      * @class Scene graph node which sets up a frame buffer to which the {@link SceneJS.Geometry} nodes in its subgraph will be rendered.
@@ -55,14 +53,14 @@ new (function() {
      */
     SceneJS.Framebuf = SceneJS_NodeFactory.createNodeType("framebuf");
 
-    SceneJS.Framebuf.prototype._init = function() {
+    SceneJS.Framebuf.prototype._init = function () {
 
         nodeCoreMap[this._core.coreId] = this; // Register for core rebuild on WEBGL_CONTEXT_RESTORED
 
         this._buildNodeCore();
     };
 
-    SceneJS.Framebuf.prototype._buildNodeCore = function() {
+    SceneJS.Framebuf.prototype._buildNodeCore = function () {
 
         var canvas = this._engine.canvas;
         var gl = canvas.gl;
@@ -71,7 +69,7 @@ new (function() {
 
         var framebuf = gl.createFramebuffer();
         var renderbuf = gl.createRenderbuffer();
-        var texture = gl.createTexture() ;
+        var texture = gl.createTexture();
 
         var rendered = false;
 
@@ -137,8 +135,8 @@ new (function() {
 
             /** Binds the image buffer as target for subsequent geometry renders
              */
-            bind: function() {
-             //   gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuf);
+            bind: function () {
+                //   gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuf);
                 gl.bindFramebuffer(gl.FRAMEBUFFER, framebuf);
                 gl.clearColor(0.0, 0.0, 0.0, 1.0);
                 gl.clearDepth(1.0);
@@ -152,31 +150,31 @@ new (function() {
 
             /** Unbinds image buffer, the default buffer then becomes the rendering target
              */
-            unbind:function() {
+            unbind: function () {
                 gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-               // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
                 gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuf);
                 rendered = true;
             },
 
             /** Returns true if this texture has been rendered
              */
-            isRendered: function() {
+            isRendered: function () {
                 return rendered;
             },
 
             /** Gets the texture from this image buffer
              */
-            getTexture: function() {
+            getTexture: function () {
 
                 return {
 
-                    bind: function(unit) {
+                    bind: function (unit) {
                         gl.activeTexture(gl["TEXTURE" + unit]);
                         gl.bindTexture(gl.TEXTURE_2D, texture);
                     },
 
-                    unbind : function(unit) {
+                    unbind: function (unit) {
                         gl.activeTexture(gl["TEXTURE" + unit]);
                         gl.bindTexture(gl.TEXTURE_2D, null);
                     }
@@ -185,13 +183,13 @@ new (function() {
         };
     };
 
-    SceneJS.Framebuf.prototype._compile = function(ctx) {
+    SceneJS.Framebuf.prototype._compile = function (ctx) {
         this._engine.display.framebuf = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.framebuf = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-    SceneJS.Framebuf.prototype._destroy = function() {
+    SceneJS.Framebuf.prototype._destroy = function () {
         if (this._core) {
             //destroyFrameBuffer(this._buf);
         }

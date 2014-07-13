@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <script src="../api/latest/extras/gui.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:5,
+
+                nodes:[
+
+                    // Override default lights with a single positional light source in View-space.
+                    // Since our light is in View-space, it will remain locked in alignment with
+                    // the view frustum and will therefore not change position relative to our
+                    // changing viewpoint. It will behave as if it were head-mounted.
+                    {
+                        type:"lights",
+                        id:"myLights", // So we can reference this lights node
+                        lights:[
+                            {
+                                mode:"point",
+                                color:{ r:0.8, g:1.0, b:0.8 },
+                                diffuse:true,
+                                specular:true,
+                                pos:{ x:100.0, y:-50.0, z:100.0 },
+                                constantAttenuation:0.2, // [0..1]
+                                linearAttenuation:0, // [0..1]
+                                quadraticAttenuation:0, // [0..1]
+                                space:"view"
+                            }
+                        ],
+
+                        nodes:[
+                            {
+                                type:"material",
+                                id:"myMaterial",
+                                color:{ r:0.5, g:0.5, b:0.6 },
+                                specularColor:{ r:1.0, g:1.0, b:1.0 },
+                                specular:1.0,
+                                shine:70.0,
+                                emit:0,
+                                alpha:1.0,
+
+                                nodes:[
+
+                                    // Teapot primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                    {
+                                        type:"prims/teapot"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Simple GUI for playing around with the lights and material nodes
+    new SceneJS.GUI(scene, ["myLights", "myMaterial"]);
+
+</script>
+</body>
+</html>

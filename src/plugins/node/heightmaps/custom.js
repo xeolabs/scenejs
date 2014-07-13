@@ -9,11 +9,11 @@
             }
 
             params.xSize = params.xSize || 1.0;
-            params.ySize = params.ySize || 1.0;
+            params.ySize = params.ySize || 0.25;
             params.zSize = params.zSize || 1.0;
 
-            params.xSegments = params.xSegments || 1;
-            params.zSegments = params.zSegments || 1;
+            params.xSegments = params.xSegments || 100;
+            params.zSegments = params.zSegments || 100;
 
             var self = this;
 
@@ -55,7 +55,7 @@
                                 normals:!wire ? "auto" : null, // Get SceneJS to compute the normals
                                 uv:!wire ? mesh.uv : null,
                                 indices:mesh.indices,
-                                coreId:"heightmap_" + (wire == true ? "wire_" : "") + params.zSize + "_" + params.xSize + "_" + params.xSegments + "_" + params.zSegments
+                                coreId:"heightmap_" + (wire == true ? "wire_" : "") + params.zSize + "_" + params.xSize + "_" + params.ySize + "_" + params.xSegments + "_" + params.zSegments
                             }
                         ]
                     });

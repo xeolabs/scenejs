@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Demonstrates how to enable and disable reflection for geometry.
+    //
+    // Reflection is governed by 'reflect' nodes working in conjunction with
+    // specular surface color defined by material nodes.
+    //
+    // The 'reflection' attribute of the flags node in the example below will
+    // govern whether or not specular light is applied to the geometry in its subgraph.
+    //
+    // As we periodically toggle the attribute, watch the reflection
+    // appear and disappear on the geometry accordingly.
+    //
+    // reflection will be enabled by default when no flags node
+    // is present, or if the 'reflection' flag is not specified and
+    // defaults to true.
+    //
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 10,
+                zoomSensitivity: 5,
+                nodes: [
+
+                    // Flags node which enables or disables reflection on our teapot
+                    {
+                        type: "flags",
+                        id: "myFlags",
+                        flags: {
+                            reflection: true // (default is true)
+                        },
+
+                        nodes: [
+
+                            // The reflection cube map
+                            // Images taken from: http://hristo.oskov.com/projects/cs418/mp3/
+                            {
+                                type: "reflect",
+                                src: [
+                                    "textures/reflection/london/pos-x.png",
+                                    "textures/reflection/london/neg-x.png",
+                                    "textures/reflection/london/pos-y.png",
+                                    "textures/reflection/london/neg-y.png",
+                                    "textures/reflection/london/pos-z.png",
+                                    "textures/reflection/london/neg-z.png"
+                                ],
+
+                                // 100% texture intensity
+                                intensity: 1.0,
+
+                                nodes: [
+
+                                    // Specular material
+                                    {
+                                        type: "material",
+                                        color: { r: 1, g: 0.9, b: 0 },
+
+                                        // Mirror-like reflection when specular == 1.0
+                                        // No reflection at all when specular == 0.0
+                                        specular: 0.8,
+
+                                        nodes: [
+
+                                            // Teapot primitive implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                            {
+                                                type: "prims/teapot"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    scene.getNode("myFlags", function (myFlags) {
+        setInterval(
+                function () {
+                    myFlags.setReflection(!myFlags.getReflection());
+                },
+                1000);
+    });
+
+
+</script>
+</body>
+</html>

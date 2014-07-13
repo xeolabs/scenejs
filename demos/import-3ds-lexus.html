@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Using the "import/3ds" node to import a Lexus car mesh from .3DS format
+    // Internally, the node uses the K3D library for parsing - http://k3d.ivank.net/
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene
+    SceneJS.createScene({
+                nodes: [
+
+                    // Mouse-orbited camera,implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                    {
+                        type: "cameras/orbit",
+                        yaw: -40,
+                        pitch: -20,
+                        zoom: 100,
+                        zoomSensitivity: 10.0,
+
+                        nodes: [
+
+                            // Rotate the Lexus
+                            {
+                                type: "rotate", x: 1, angle: -90,
+                                nodes: [
+
+                                    // Texture our Lexus - the "import.3ds" node merely imports meshes, so
+                                    // it's our job to apply any materials and textures. This tends to be OK
+                                    // because for efficiency we would usually have one big baked texture
+                                    // like this one.
+                                    //
+                                    // Texture is loaded from:
+                                    // http://scenejs.org/examples/models/3ds/lexus.jpg
+
+                                    {
+                                        type: "textureMap",
+                                        src: "models/3ds/lexus.jpg",
+
+                                        nodes: [
+
+                                            // Import the .3DS mesh
+                                            //
+                                            // This node is implemented by plugin at:
+                                            // http://scenejs.org/api/latest/plugins/node/import/3ds.js
+                                            //
+                                            // The 3DS file is loaded from:
+                                            // http://scenejs.org/examples/models/3ds/lexus.3ds
+
+                                            {
+                                                type: "import/3ds",
+                                                src: "models/3ds/lexus.3ds"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    );
+
+</script>
+</body>
+</html>

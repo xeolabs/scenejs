@@ -13,11 +13,15 @@ SceneJS_ChunkFactory.createChunkType({
 
     drawAndPick: function(ctx) {
 
+        var gl = this.program.gl;
+
         if (ctx.framebuf) {
 
-            this.program.gl.finish(); // Force framebuf to complete
+            gl.finish(); // Force framebuf to complete
 
             ctx.framebuf.unbind();
+
+            ctx.framebuf = null;
         }
 
         var framebuf = this.core.framebuf;
@@ -25,6 +29,8 @@ SceneJS_ChunkFactory.createChunkType({
         if (framebuf) {
 
             framebuf.bind();
+
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 
             ctx.framebuf = framebuf;  // Must flush on cleanup
         }

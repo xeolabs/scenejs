@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // When culling backfaces, SceneJS uses the vertex winding order of each geometry
+    // face to determine whether the face is oriented away from the eye (and should
+    // be culled) or oriented towards the eye (and should be rendered).
+    //
+    // The flags node's 'frontface' attribute is used to specify the winding order
+    // direction for geometries within its subgraph.
+    //
+    // This flags attribute only takes effect when the 'backfaces' flag is set false,
+    // which enables backface culling for the subgraph's geometries.
+    //
+    // In this example we're toggling the 'frontface' attribute back and forth between
+    // "ccw" and "cw", which toggles the winding order.
+    //
+    // The winding order will be counter-clockwise by default when no flags node
+    // is present, or if the 'frontface' attribute is not specified and
+    // defaults to "ccw".
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:5,
+                nodes:[
+
+                        // Flags node which sets the direction of vertex winding of front faces on our teapot
+                    {
+                        type:"flags",
+                        id:"myFlags",
+                        flags:{
+                            backfaces:false, // Default value, enables backface culling
+                            frontface:"ccw" // Default value, culls faces with clockwise vertex winding order
+                        },
+
+                        nodes:[
+
+                            // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            {
+                                type:"prims/teapot"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Flags node is within a custom node type, so will not exist until the plugin for that custom node has been loaded
+    // Therefore, we get the flags node asynchronously
+
+    scene.getNode("myFlags", function (myFlags) {
+        var counterClockwise = true;
+        setInterval(
+                function () {
+                    myFlags.setFrontface(counterClockwise ? "ccw" : "cw"); // Toggle
+                    counterClockwise = !counterClockwise;
+                },
+                1000);
+    });
+
+
+</script>
+</body>
+</html>

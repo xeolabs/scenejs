@@ -30,11 +30,11 @@
         // Thanks awfully to: http://www.e-reading-lib.com/bookreader.php/143437/Pike_-_DirectX_8_Programming_Tutorial.html
 
         /* config */
-        var radiusTop = params.radiusTop !== undefined ? params.radiusTop : 20;
-        var radiusBottom = params.radiusBottom !== undefined ? params.radiusBottom : 20;
-        var height = params.height !== undefined ? params.height : 100;
+        var radiusTop = params.radiusTop !== undefined ? params.radiusTop : 1;
+        var radiusBottom = params.radiusBottom !== undefined ? params.radiusBottom : 1;
+        var height = params.height !== undefined ? params.height : 1;
 
-        var radialSegments   = params.radialSegments  || 8;
+        var radialSegments   = params.radialSegments  || 60;
         var heightSegments   = params.heightSegments  || 1;
 
         var openEnded = params.openEnded || false;

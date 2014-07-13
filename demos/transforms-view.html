@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
+</head>
+<body>
+
+<script>
+
+    // A lookAt node defines the viewing transform as the position of the eye,
+    // the viewing direction, and the direction of "up".
+    //
+    // Each scene can have multiple lookAt nodes.
+    //
+    // If you omit the lookAt node, then the scene will fall back on internal
+    // default lookAt settings where the eye is at -10 on the Z-axis, looking
+    // towards 0,0,0, with up being 0,1,0.
+    //
+    // The scene below contains a lookAt that has the same properties as the
+    // one that SceneJS provides by default, and is defined here to show them.
+
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+            {
+                type:"lookAt",
+                id:"myLookat",
+                eye:{ x:0, y:0, z:10 },
+                look:{ x:0, y:0, z:0 },
+                up:{ x:0, y:1, z:0 },
+
+                nodes:[
+                    {
+                        type:"material",
+                        color:{ r:0.6, g:0.6, b:0.9 },
+                        nodes:[
+
+                            // Teapot primitive, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            {
+                                type:"prims/teapot"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Get lookat node and bind a GUI to it to play with it
+    scene.getNode("myLookat",
+            function (myLookAt) {
+
+                var Menu = function () {
+
+                    var eye = myLookAt.getEye();
+                    var look = myLookAt.getLook();
+                    var up = myLookAt.getUp();
+
+                    this["eye.x"] = eye.x;
+                    this["eye.y"] = eye.y;
+                    this["eye.z"] = eye.z;
+
+                    this["look.x"] = look.x;
+                    this["look.y"] = look.y;
+                    this["look.z"] = look.z;
+
+                    this["up.x"] = up.x;
+                    this["up.y"] = up.y;
+                    this["up.z"] = up.z;
+
+                    var self = this;
+
+                    // This is actually quite inefficient because it continually updates
+                    // the scene graph, forcing frames to continually re-render.
+                    // Your GPU's not going to like it, but it's just for a quick and dirty demo.
+                    var update = function () {
+
+                        myLookAt.setEye({
+                            x:self["eye.x"],
+                            y:self["eye.y"],
+                            z:self["eye.z"]
+                        });
+
+                        myLookAt.setLook({
+                            x:self["look.x"],
+                            y:self["look.y"],
+                            z:self["look.z"]
+                        });
+
+                        myLookAt.setUp({
+                            x:self["up.x"],
+                            y:self["up.y"],
+                            z:self["up.z"]
+                        });
+
+                        requestAnimationFrame(update);
+                    };
+                    update();
+                };
+
+                var gui = new dat.GUI();
+                var folder = gui.addFolder("lookAt '" + myLookAt.getId() + "'");
+                var menu = new Menu();
+                folder.add(menu, 'eye.x', -20.0, 20.0);
+                folder.add(menu, 'eye.y', -20.0, 20.0);
+                folder.add(menu, 'eye.z', -20.0, 20.0);
+                folder.add(menu, 'look.x', -20.0, 20.0);
+                folder.add(menu, 'look.y', -20.0, 20.0);
+                folder.add(menu, 'look.z', -20.0, 20.0);
+                folder.add(menu, 'up.x', -20.0, 20.0);
+                folder.add(menu, 'up.y', -20.0, 20.0);
+                folder.add(menu, 'up.z', -20.0, 20.0);
+                folder.open();
+            });
+
+</script>
+</body>
+</html>

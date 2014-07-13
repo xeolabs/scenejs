@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    // Demonstrates how to make SceneJS automatically generate normal vectors for geometry nodes.
+    //
+    // In this example we create a wavey surface using sine and cosine functions. Instead of
+    // specifying the normal vectors for our geometry, we specify "auto", which causes
+    // SceneJS to generate the normals.
+    //
+    // This will have limitations for closed geometries: on a cylinder, for example,
+    // SceneJS does not calculate the normals for vertices along a seam using the vertices
+    // on the other side of the seam.
+    //
+    // This should be quite suitable for heightmaps however.
+
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    var meshData = createMeshData({
+        width:5,
+        height:5,
+        widthSegments:40,
+        heightSegments:40
+    });
+
+    SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:40,
+                pitch:-20,
+                zoom:10,
+                zoomSensitivity:1.0,
+
+                nodes:[
+
+                    // Blue color
+                    {
+                        type:"material",
+                        color:{ r:0.5, g:0.5, b:0.6 },
+
+                        nodes:[
+
+                            // Geometry node with automatic normals
+                            {
+                                type:"geometry",
+                                primitive:"triangles",
+                                positions:meshData.positions,
+                                uv:meshData.uv,
+                                indices:meshData.indices,
+
+                                // Automatically create normals - only works with 'triangles' primitive
+                                normals:"auto"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Creates a wavey mesh, minus the normal vectors, which we'll get SceneJS to generate for us
+    function createMeshData(cfg) {
+
+        var positions = [];
+        var uvs = [];
+        var indices = [];
+
+        var width = cfg.width || 1.0;
+        var height = cfg.height || 1.0;
+
+        var widthSegments = cfg.widthSegments || 1;
+        var heightSegments = cfg.heightSegments || 1;
+
+        var ix, iz;
+        var halfWidth = width / 2;
+        var halfHeight = height / 2;
+
+        var gridX = widthSegments;
+        var gridZ = heightSegments;
+
+        var gridX1 = gridX + 1;
+        var gridZ1 = gridZ + 1;
+
+        var segWidth = width / gridX;
+        var segHeight = height / gridZ;
+
+        var x;
+        var y;
+
+        for (iz = 0; iz < gridZ1; iz++) {
+            for (ix = 0; ix < gridX1; ix++) {
+                x = ix * segWidth - halfWidth;
+                y = iz * segHeight - halfHeight;
+                positions.push(x);
+                positions.push(-y);
+                positions.push((Math.sin(x * 2) + Math.cos(y * 2)) * 0.3);
+            }
+        }
+
+        var a;
+        var b;
+        var c;
+        var d;
+
+        for (iz = 0; iz < gridZ; iz++) {
+            for (ix = 0; ix < gridX; ix++) {
+
+                a = ix + gridX1 * iz;
+                b = ix + gridX1 * ( iz + 1 );
+                c = ( ix + 1 ) + gridX1 * ( iz + 1 );
+                d = ( ix + 1 ) + gridX1 * iz;
+
+                indices.push(a);
+                indices.push(b);
+                indices.push(c);
+
+                indices.push(c);
+                indices.push(d);
+                indices.push(a);
+
+                // a
+                uvs.push(ix / gridX);
+                uvs.push(1 - iz / gridZ);
+
+                //b
+                uvs.push(ix / gridX);
+                uvs.push(1 - ( iz + 1 ) / gridZ);
+
+                //c
+                uvs.push(( ix + 1 ) / gridX);
+                uvs.push(1 - ( iz + 1 ) / gridZ);
+
+                //c
+                uvs.push(( ix + 1 ) / gridX);
+                uvs.push(1 - ( iz + 1 ) / gridZ);
+
+                //d
+                uvs.push(( ix + 1 ) / gridX, 1 - iz / gridZ);
+                uvs.push(1 - iz / gridZ);
+
+                //a
+                uvs.push(ix / gridX);
+                uvs.push(1 - iz / gridZ);
+            }
+        }
+
+        return {
+            positions:positions,
+            uv:uvs,
+            indices:indices
+        };
+    }
+
+</script>
+</body>
+</html>

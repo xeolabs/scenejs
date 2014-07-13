@@ -30,13 +30,9 @@ new (function () {
 
     SceneJS.TextureMap.prototype._init = function (params) {
 
-        if (this._core.useCount == 1) { // This node is the resource definer
+        var self = this;
 
-            if (!(params.uri || params.src || params.framebuf || params.image || params.video)) {
-                throw SceneJS_error.fatalError(
-                    SceneJS.errors.NODE_CONFIG_EXPECTED,
-                    "texture has no uri, src, framebuf, image or video property");
-            }
+        if (this._core.useCount == 1) { // This node is the resource definer
 
             if (params.applyFrom) {
                 if (params.applyFrom != "uv" &&
@@ -81,9 +77,9 @@ new (function () {
             this._core = SceneJS._apply(params, {
                 waitForLoad: params.waitForLoad == undefined ? true : params.waitForLoad,
                 texture: null,
-                applyFrom: params.applyFrom || "uv",
-                applyTo: params.applyTo || "baseColor",
-                blendMode: params.blendMode || "multiply",
+                applyFrom: !!params.applyFrom ? params.applyFrom : "uv",
+                applyTo: !!params.applyTo ? params.applyTo : "baseColor",
+                blendMode: !!params.blendMode ? params.blendMode : "multiply",
                 blendFactor: (params.blendFactor != undefined && params.blendFactor != null) ? params.blendFactor : 1.0,
                 translate: { x: 0, y: 0},
                 scale: { x: 1, y: 1 },
@@ -94,31 +90,36 @@ new (function () {
             });
 
             if (params.src) { // Load from URL
-                self._core.src = params.src;
+                this._core.src = params.src;
                 this._loadTexture(params.src);
 
             } else if (params.image) { // Create from image
-                self._core.image = params.image;
+                this._core.image = params.image;
                 this._initTexture(params.image);
 
             } else if (params.framebuf) { // Render to this texture
-                this.setFramebuf(params.framebuf);
+                this.getScene().getNode(params.framebuf,
+                    function (framebuf) {
+                        self.setFramebuf(framebuf);
+                    });
             }
+
+            this._core.webglRestored = function () {
+                if (self._core.src) {
+                    self._loadTexture(self._core.src);
+
+                } else if (self._core.image) {
+                    self._initTexture(self._core.image);
+
+                } else if (self._core.framebuf) {
+                    self.getScene().getNode(params.framebuf,
+                        function (framebuf) {
+                            self.setFramebuf(framebuf);
+                        });
+                    self.setFramebuf(self._core.framebuf);
+                }
+            };
         }
-
-        var self = this;
-
-        this._core.webglRestored = function () {
-            if (self._core.src) {
-                self._loadTexture(self._core.src);
-
-            } else if (self._core.image) {
-                self._initTexture(self._core.image);
-
-            } else if (self._core.framebuf) {
-                self.setFramebuf(self._core.framebuf);
-            }
-        };
     };
 
     function buildMatrix() {
@@ -142,7 +143,6 @@ new (function () {
             } else {
                 this.matrixAsArray.set(this.matrix);
             }
-            this.matrixAsArray = new Float32Array(this.matrix); // TODO - reinsert into array
         }
         this._matrixDirty = false;
     }

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Vertex Sharing</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+// Vertex Sharing is a performance optimization technique in which a parent geometry node defines vertices (consisting
+// of arrays of positions, normal vectors and UV coordinates) that are inherited by child geometry nodes, which supply
+// their own index arrays pointing into different portions of the vertices. The parent VBOs are then bound once across
+// the draw calls for all the children. Each child geometry can be wrapped by different texture or materials etc.
+// This is efficient to render as long as each child geometry inherits a similar combination of states and thus avoids
+// needing to switch shaders (SceneJS will generate a separate shader for each unique state combination).
+
+// Point SceneJS to the bundled plugins
+SceneJS.setConfigs({
+    pluginPath:"../api/latest/plugins"
+});
+
+// Create scene
+SceneJS.createScene({
+    nodes:[
+
+        // Mouse-orbited camera, implemented by plugin at
+        // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+        {
+            type:"cameras/orbit",
+            yaw:30,
+            pitch:-30,
+            zoom:-10,
+            zoomSensitivity:1.0,
+
+            nodes:[
+
+                // Root Geometry defines vertex and uv arrays which are shared
+                // among index arrays on sub-Geometry's
+                //
+                {
+                    type:"geometry",
+
+                    // The vertices - eight for our cube, each
+                    // one spanning three array elements for X,Y and Z
+                    //
+                    positions:[
+
+                        // v0-v1-v2-v3 front
+                        2, 2, 2,
+                        -2, 2, 2,
+                        -2, -2, 2,
+                        2, -2, 2,
+
+                        // v0-v3-v4-v2 right
+                        2, 2, 2,
+                        2, -2, 2,
+                        2, -2, -2,
+                        2, 2, -2,
+
+                        // v0-v2-v6-v1 top
+                        2, 2, 2,
+                        2, 2, -2,
+                        -2, 2, -2,
+                        -2, 2, 2,
+
+                        // v1-v6-v7-v2 left
+                        -2, 2, 2,
+                        -2, 2, -2,
+                        -2, -2, -2,
+                        -2, -2, 2,
+
+                        // v7-v4-v3-v2 bottom
+                        -2, -2, -2,
+                        2, -2, -2,
+                        2, -2, 2,
+                        -2, -2, 2,
+
+                        // v4-v7-v6-v2 back
+                        2, -2, -2,
+                        -2, -2, -2,
+                        -2, 2, -2,
+                        2, 2, -2
+                    ],
+
+                    // Normal vectors, one for each vertex
+                    normals:[
+
+                        // v0-v1-v2-v3 front
+                        0, 0, -1,
+                        0, 0, -1,
+                        0, 0, -1,
+                        0, 0, -1,
+
+                        // v0-v3-v4-v5 right
+                        -1, 0, 0,
+                        -1, 0, 0,
+                        -1, 0, 0,
+                        -1, 0, 0,
+
+                        // v0-v5-v6-v1 top
+                        0, -1, 0,
+                        0, -1, 0,
+                        0, -1, 0,
+                        0, -1, 0,
+
+                        // v1-v6-v7-v2 left
+                        1, 0, 0,
+                        1, 0, 0,
+                        1, 0, 0,
+                        1, 0, 0,
+
+                        // v7-v4-v3-v2 bottom
+                        0, 1, 0,
+                        0, 1, 0,
+                        0, 1, 0,
+                        0, 1, 0,
+
+                        // v4-v7-v6-v5 back
+                        0, 0, 1,
+                        0, 0, 1,
+                        0, 0, 1,
+                        0, 0, 1
+                    ],
+
+                    // 2D texture coordinates corresponding to the
+                    // 3D positions defined above - eight for our cube, each
+                    // one spaining two array elements for X and Y
+                    //
+                    uv:[
+
+                        // v0-v1-v2-v3 front
+                        5, 5,
+                        0, 5,
+                        0, 0,
+                        5, 0,
+
+                        // v0-v3-v4-v5 right
+                        0, 5,
+                        0, 0,
+                        5, 0,
+                        5, 5,
+
+                        // v0-v5-v6-v1 top
+                        5, 0,
+                        5, 5,
+                        0, 5,
+                        0, 0,
+
+                        // v1-v6-v7-v2 left
+                        5, 5,
+                        0, 5,
+                        0, 0,
+                        5, 0,
+
+                        // v7-v4-v3-v2 bottom
+                        0, 0,
+                        5, 0,
+                        5, 5,
+                        0, 5,
+
+                        // v4-v7-v6-v5 back
+                        0, 0,
+                        5, 0,
+                        5, 5,
+                        0, 5
+                    ],
+                    nodes:[
+
+                        // Brick wall color map
+                        {
+                            type:"texture",
+                            layers:[
+                                {
+                                    uri:"textures/BrickWall.jpg",
+                                    wrapS:"repeat",
+                                    wrapT:"repeat",
+
+                                    // Texture scale factors
+                                    scale:{
+                                        x:.1,
+                                        y:.05
+                                    }
+                                }
+                            ],
+
+                            nodes:[
+                                {
+                                    type:"geometry",
+
+                                    // Indices for first three faces
+                                    indices:[
+
+                                        // Front
+                                        0, 1, 2,
+                                        0, 2, 3,
+
+                                        // Right
+                                        4, 5, 6,
+                                        4, 6, 7,
+
+                                        // Top
+                                        8, 9, 10,
+                                        8, 10, 11
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            type:"texture",
+                            layers:[
+                                {
+                                    uri:"textures/general-zod.jpg",
+                                    wrapS:"repeat",
+                                    wrapT:"repeat"
+                                }
+                            ],
+                            nodes:[
+                                {
+                                    type:"geometry",
+
+                                    // Indices for remaining three faces
+                                    indices:[
+
+                                        // Left
+                                        12, 13, 14,
+                                        12, 14, 15,
+
+                                        // Bottom
+                                        16, 17, 18,
+                                        16, 18, 19,
+
+                                        // Back
+                                        20, 21, 22,
+                                        20, 22, 23
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
+</script>
+</body>
+</html>

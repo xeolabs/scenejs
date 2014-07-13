@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Using the "import/md2" node to import an animated lion from .MD2 format
+    // Internally, the node uses the K3D library for parsing - http://k3d.ivank.net/
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene
+    SceneJS.createScene({
+                nodes: [
+
+                    // Mouse-orbited camera,
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                    {
+                        type: "cameras/orbit",
+                        yaw: 110,
+                        pitch: 0,
+                        zoom: 80,
+                        zoomSensitivity: 10.0,
+
+                        nodes: [
+
+                            // Move the lion a bit to centre it
+                            {
+                                type: "translate", y: -20,
+                                nodes: [
+
+                                    // This particular lion is not shiny and not too brightly colored
+                                    {
+                                        type: "material",
+                                        color: { r: 0.6, g: 0.6, b: 0.6 },
+                                        specular: 0,
+
+                                        nodes: [
+
+                                            // Texture our lion - the "import.md2" node merely imports meshes, so
+                                            // it's our job to apply any materials and textures. This tends to be OK
+                                            // because for efficiency we would usually have one big baked texture
+                                            // like this one.
+                                            //
+                                            // Texture is loaded from:
+                                            // http://scenejs.org/examples/models/md2/lion.jpg
+
+                                            {
+                                                type: "textureMap",
+                                                src: "models/md2/lion.jpg",
+
+                                                nodes: [
+
+                                                    // Import the .MD2
+                                                    //
+                                                    // This node is implemented by plugin at:
+                                                    // http://scenejs.org/api/latest/plugins/node/import/md2.js
+                                                    //
+                                                    //
+                                                    // The MD2 file is loaded from:
+                                                    // http://scenejs.org/examples/models/md2/lion.md2
+
+                                                    {
+                                                        type: "import/md2",
+                                                        src: "models/md2/lion.md2",
+                                                        rate: 0.015
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    );
+
+</script>
+</body>
+</html>

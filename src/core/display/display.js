@@ -989,7 +989,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     gl.flush();                                                         // Flush GL
 
     if (frameCtx.framebuf) {                                                 // Unbind remaining frame buffer
-        gl.finish();
+        //gl.finish();
         // frameCtx.framebuf.unbind();
     }
 

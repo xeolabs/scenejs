@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    // Demo of the custom "effects/wobble" node type
+    // This node type causes objects in its subgraph to wobble
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera,
+            // implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: -150,
+                pitch: -40,
+                zoom: 40,
+
+                nodes: [
+                    {
+                        type: "material",
+                        color: { r: 0.3, g: 0.3, b: 1.0 },
+
+                        nodes: [
+
+                            // Wobble effect,
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/effects/wobble.js
+                            {
+                                type: "effects/wobble",
+
+                                nodes: [
+
+                                    // Tank vehicle,
+                                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/objects/vehicles/tank.js
+                                    {
+                                        type: "objects/vehicles/tank"
+                                    }
+                                ]
+                            },
+
+                            // Grid primitive,
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/grid.js
+                            {
+                                type: "prims/grid",
+                                size: { x: 1000, z: 1000 },
+                                xSegments: 200,
+                                zSegments: 200
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>
