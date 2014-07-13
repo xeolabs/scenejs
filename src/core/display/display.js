@@ -792,15 +792,11 @@ SceneJS_Display.prototype.pick = function (params) {
     var canvasX = params.canvasX;
     var canvasY = params.canvasY;
 
-    /*-------------------------------------------------------------
-     * Pick object using normal GPU colour-indexed pick
-     *-----------------------------------------------------------*/
-
-    var pickBuf = this.pickBuf;                                                   // Lazy-create pick buffer
+    var pickBuf = this.pickBuf;                                                     // Lazy-create pick buffer
 
     if (!pickBuf) {
-        pickBuf = this.pickBuf = new SceneJS_PickBuffer({ canvas:this._canvas });
-        this.pickBufDirty = true;                                                 // Freshly-created pick buffer is dirty
+        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({ canvas:this._canvas });
+        this.pickBufDirty = true;                                                   // Freshly-created pick buffer is dirty
     }
 
     this.render(); // Do any pending visible render
@@ -840,7 +836,7 @@ SceneJS_Display.prototype.pick = function (params) {
 
             var rayPickBuf = this.rayPickBuf; // Lazy-create Z-pick buffer
             if (!rayPickBuf) {
-                rayPickBuf = this.rayPickBuf = new SceneJS_PickBuffer({ canvas:this._canvas });
+                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({ canvas:this._canvas });
             }
 
             rayPickBuf.bind();

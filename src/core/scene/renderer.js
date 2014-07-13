@@ -182,7 +182,7 @@ new (function() {
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "Null SceneJS.State node config: \"" + name + "\"");
         }
-        var result = SceneJS_webgl_enumMap[name];
+        var result = SceneJS._webgl.enumMap[name];
         if (!result) {
             throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,

@@ -174,7 +174,7 @@ new (function () {
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._ensureImageSizePowerOfTwo(image));
         if (!exists) {
-            this._core.texture = new SceneJS_webgl_Texture2D(gl, {
+            this._core.texture = new SceneJS._webgl.Texture2D(gl, {
                 texture: texture, // WebGL texture object
                 minFilter: this._getGLOption("minFilter", gl.LINEAR_MIPMAP_NEAREST),
                 magFilter: this._getGLOption("magFilter", gl.LINEAR),
@@ -232,7 +232,7 @@ new (function () {
         if (value == undefined) {
             return defaultVal;
         }
-        var glName = SceneJS_webgl_enumMap[value];
+        var glName = SceneJS._webgl.enumMap[value];
         if (glName == undefined) {
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,

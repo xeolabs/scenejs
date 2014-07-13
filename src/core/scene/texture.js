@@ -268,7 +268,7 @@ new (function () {
 
     SceneJS.Texture.prototype._setLayerTexture = function (gl, layer, texture) {
 
-        layer.texture = new SceneJS_webgl_Texture2D(gl, {
+        layer.texture = new SceneJS._webgl.Texture2D(gl, {
             texture:texture, // WebGL texture object
             minFilter:this._getGLOption("minFilter", gl, layer, gl.LINEAR_MIPMAP_NEAREST),
             magFilter:this._getGLOption("magFilter", gl, layer, gl.LINEAR),
@@ -299,7 +299,7 @@ new (function () {
         if (value == undefined) {
             return defaultVal;
         }
-        var glName = SceneJS_webgl_enumMap[value];
+        var glName = SceneJS._webgl.enumMap[value];
         if (glName == undefined) {
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,

@@ -125,8 +125,20 @@
             "src/core/config.js",
             "src/core/log.js",
             "src/core/math.js",
-            "src/core/webgl.js",
             "src/core/status.js",
+
+            // WebGL wrappers
+
+            "src/core/webgl/webgl.js",
+            "src/core/webgl/arrayBuffer.js",
+            "src/core/webgl/attribute.js",
+            "src/core/webgl/enums.js",
+            "src/core/webgl/renderBuffer.js",
+            "src/core/webgl/program.js",
+            "src/core/webgl/sampler.js",
+            "src/core/webgl/shader.js",
+            "src/core/webgl/texture2d.js",
+            "src/core/webgl/uniform.js",
 
             // Scene graph classes
 

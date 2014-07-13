@@ -68,7 +68,7 @@
                         //self._core.texture = texture;
                         //gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,  ensureImageSizePowerOfTwo(image));
                         if (++numImagesLoaded == faces.length) {
-                            self._core.texture = new SceneJS_webgl_Texture2D(gl, {
+                            self._core.texture = new SceneJS._webgl.Texture2D(gl, {
                                 texture: texture,
                                 target: gl.TEXTURE_CUBE_MAP,
                                 minFilter: gl.LINEAR,

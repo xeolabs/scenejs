@@ -35,13 +35,13 @@ var SceneJS_Program = function(id, hash, source, gl) {
 
     /**
      * The drawing program
-     * @type SceneJS_webgl_Program
+     * @type SceneJS._webgl.Program
      */
     this.draw = null;
 
     /**
      * The picking program
-     * @type SceneJS_webgl_Program
+     * @type SceneJS._webgl.Program
      */
     this.pick = null;
 
@@ -66,6 +66,6 @@ SceneJS_Program.prototype.build = function(gl) {
     this.drawUniformFlags = 0;
 
     this.gl = gl;
-    this.draw = new SceneJS_webgl_Program(gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
-    this.pick = new SceneJS_webgl_Program(gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
+    this.draw = new SceneJS._webgl.Program(gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
+    this.pick = new SceneJS._webgl.Program(gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
 };

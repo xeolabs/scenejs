@@ -226,31 +226,31 @@ new (function () {
 
             if (arrays.positions) {
                 core.interleavedPositionOffset = prepareInterleaveBuffer(arrays.positions, 3);
-                core.vertexBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.positions, arrays.positions.length, 3, usage);
+                core.vertexBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.positions, arrays.positions.length, 3, usage);
             }
 
             if (arrays.normals) {
                 core.interleavedNormalOffset = prepareInterleaveBuffer(arrays.normals, 3);
-                core.normalBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.normals, arrays.normals.length, 3, usage);
+                core.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.normals, arrays.normals.length, 3, usage);
             }
 
             if (arrays.uv) {
                 core.interleavedUVOffset = prepareInterleaveBuffer(arrays.uv, 2);
-                core.uvBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv, arrays.uv.length, 2, usage);
+                core.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv, arrays.uv.length, 2, usage);
             }
 
             if (arrays.uv2) {
                 core.interleavedUV2Offset = prepareInterleaveBuffer(arrays.uv2, 2);
-                core.uvBuf2 = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv2, arrays.uv2.length, 2, usage);
+                core.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv2, arrays.uv2.length, 2, usage);
             }
 
             if (arrays.colors) {
                 core.interleavedColorOffset = prepareInterleaveBuffer(arrays.colors, 4);
-                core.colorBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.colors, arrays.colors.length, 4, usage);
+                core.colorBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.colors, arrays.colors.length, 4, usage);
             }
 
             if (arrays.indices) {
-                core.indexBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, arrays.indices, arrays.indices.length, 1, usage);
+                core.indexBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, arrays.indices, arrays.indices.length, 1, usage);
             }
 
             if (interleavedValues > 0 && canInterleave) {
@@ -269,7 +269,7 @@ new (function () {
                     }
                 }
                 core.interleavedStride = interleavedValues * 4; // in bytes
-                core.interleavedBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(interleaved), interleaved.length, interleavedValues, usage);
+                core.interleavedBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(interleaved), interleaved.length, interleavedValues, usage);
                 core.interleavedBuf.dirty = false;
             }
 
