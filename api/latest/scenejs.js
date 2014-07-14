@@ -5066,49 +5066,53 @@ SceneJS._webgl.RenderBuffer = function (cfg) {
     var canvas = cfg.canvas;
     var gl = canvas.gl;
 
-    var pickBuf;
+    var buf;
     var bound = false;
 
     /**
-     * Called when WebGL context restored
+     * Called after WebGL context is restored.
      */
     this.webglRestored = function (_gl) {
         gl = _gl;
-        pickBuf = null;
+        buf = null;
+    };
+
+    /** Binds this renderbuffer
+     */
+    this.bind = function () {
+        this._touch();
+        if (bound) {
+            return;
+        }
+        gl.bindFramebuffer(gl.FRAMEBUFFER, buf.framebuf);
+        bound = true;
     };
 
     this._touch = function () {
-
         var width = canvas.canvas.width;
         var height = canvas.canvas.height;
-
-        if (pickBuf) { // Currently have a pick buffer
-            if (pickBuf.width == width && pickBuf.height == height) { // Canvas size unchanged, buffer still good
+        if (buf) { // Currently have a pick buffer
+            if (buf.width == width && buf.height == height) { // Canvas size unchanged, buffer still good
                 return;
             } else { // Buffer needs reallocation for new canvas size
-
-                gl.deleteTexture(pickBuf.texture);
-                gl.deleteFramebuffer(pickBuf.framebuf);
-                gl.deleteRenderbuffer(pickBuf.renderbuf);
+                gl.deleteTexture(buf.texture);
+                gl.deleteFramebuffer(buf.framebuf);
+                gl.deleteRenderbuffer(buf.renderbuf);
             }
         }
-
-        pickBuf = {
+        buf = {
             framebuf: gl.createFramebuffer(),
             renderbuf: gl.createRenderbuffer(),
             texture: gl.createTexture(),
             width: width,
             height: height
         };
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
-
-        gl.bindTexture(gl.TEXTURE_2D, pickBuf.texture);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, buf.framebuf);
+        gl.bindTexture(gl.TEXTURE_2D, buf.texture);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
         try {
             // Do it the way the spec requires
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -5117,18 +5121,16 @@ SceneJS._webgl.RenderBuffer = function (cfg) {
             var textureStorage = new WebGLUnsignedByteArray(width * height * 3);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureStorage);
         }
-        gl.bindRenderbuffer(gl.RENDERBUFFER, pickBuf.renderbuf);
+        gl.bindRenderbuffer(gl.RENDERBUFFER, buf.renderbuf);
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, pickBuf.texture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, pickBuf.renderbuf);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, buf.texture, 0);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, buf.renderbuf);
         gl.bindTexture(gl.TEXTURE_2D, null);
         gl.bindRenderbuffer(gl.RENDERBUFFER, null);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-        /* Verify framebuffer is OK
-         */
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
-        if (!gl.isFramebuffer(pickBuf.framebuf)) {
+        // Verify framebuffer is OK
+        gl.bindFramebuffer(gl.FRAMEBUFFER, buf.framebuf);
+        if (!gl.isFramebuffer(buf.framebuf)) {
             throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Invalid framebuffer");
         }
         var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
@@ -5146,35 +5148,21 @@ SceneJS._webgl.RenderBuffer = function (cfg) {
             default:
                 throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: " + status);
         }
-
         bound = false;
     };
 
-    this.bind = function () {
-
-        this._touch();
-
-        if (bound) {
-            return;
-        }
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
-
-        bound = true;
-    };
-
+    /** Clears this renderbuffer
+     */
     this.clear = function () {
-
         if (!bound) {
             throw "Pick buffer not bound";
         }
-
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.disable(gl.BLEND);
     };
 
 
-    /** Reads pick buffer pixel at given coordinates, returns index of associated object else (-1)
+    /** Reads buffer pixel at given coordinates
      */
     this.read = function (pickX, pickY) {
         var x = pickX;
@@ -5184,9 +5172,27 @@ SceneJS._webgl.RenderBuffer = function (cfg) {
         return pix;
     };
 
+    /** Unbinds this renderbuffer
+     */
     this.unbind = function () {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         bound = false;
+    };
+
+    /** Returns the texture
+     */
+    this.getTexture = function () {
+        this._touch();
+        return {
+            bind: function (unit) {
+                gl.activeTexture(gl["TEXTURE" + unit]);
+                gl.bindTexture(gl.TEXTURE_2D, buf.texture);
+            },
+            unbind: function (unit) {
+                gl.activeTexture(gl["TEXTURE" + unit]);
+                gl.bindTexture(gl.TEXTURE_2D, null);
+            }
+        };
     };
 };
 
@@ -8188,17 +8194,14 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
 })();
 new (function () {
 
-    /**
-     * The default state core singleton for {@link SceneJS.Framebuf} nodes
-     */
     var defaultCore = {
-
         type: "framebuf",
         stateId: SceneJS._baseStateId++,
         framebuf: null
     };
 
-    var nodeCoreMap = {}; // Map of framebuf nodes to cores, for reallocation on WebGL context restore
+    // Map of framebuf nodes to cores, for reallocation on WebGL context restore
+    var nodeCoreMap = {};
 
     var coreStack = [];
     var stackLen = 0;
@@ -8213,25 +8216,11 @@ new (function () {
     SceneJS_events.addListener(// Reallocate VBOs when context restored after loss
         SceneJS_events.WEBGL_CONTEXT_RESTORED,
         function () {
-
-            var node;
-
             for (var nodeId in nodeCoreMap) {
                 if (nodeCoreMap.hasOwnProperty(nodeId)) {
-
-                    node = nodeCoreMap[nodeId];
-
-                    if (!node._core._loading) {
-                        node._buildNodeCore();
-                    }
+                    nodeCoreMap[nodeId]._buildNodeCore();
                 }
             }
-        });
-
-    SceneJS_events.addListener(
-        SceneJS_events.SCENE_DESTROYED,
-        function (params) {
-            //     sceneBufs[params.sceneId] = null;
         });
 
     /**
@@ -8242,133 +8231,15 @@ new (function () {
     SceneJS.Framebuf = SceneJS_NodeFactory.createNodeType("framebuf");
 
     SceneJS.Framebuf.prototype._init = function () {
-
-        nodeCoreMap[this._core.coreId] = this; // Register for core rebuild on WEBGL_CONTEXT_RESTORED
-
+        nodeCoreMap[this._core.coreId] = this;
         this._buildNodeCore();
     };
 
     SceneJS.Framebuf.prototype._buildNodeCore = function () {
-
-        var canvas = this._engine.canvas;
-        var gl = canvas.gl;
-        var width = canvas.canvas.width;
-        var height = canvas.canvas.height;
-
-        var framebuf = gl.createFramebuffer();
-        var renderbuf = gl.createRenderbuffer();
-        var texture = gl.createTexture();
-
-        var rendered = false;
-
         if (!this._core) {
             this._core = {};
         }
-
-        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuf);
-
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-        try {
-            // Do it the way the spec requires
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        } catch (exception) {
-            // Workaround for what appears to be a Minefield bug.
-            var textureStorage = new WebGLUnsignedByteArray(width * height * 4);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureStorage);
-        }
-        gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuf);
-        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuf);
-        gl.bindTexture(gl.TEXTURE_2D, null);
-        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-        /* Verify framebuffer is OK
-         */
-        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuf);
-
-        if (!gl.isFramebuffer(framebuf)) {
-            throw SceneJS_error.fatalError("Invalid framebuffer");
-        }
-
-        var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-
-        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-        switch (status) {
-            case gl.FRAMEBUFFER_COMPLETE:
-                break;
-            case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                throw SceneJS_error.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
-            case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                throw SceneJS_error.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
-            case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-                throw SceneJS_error.fatalError("Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
-            case gl.FRAMEBUFFER_UNSUPPORTED:
-                throw SceneJS_error.fatalError("Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED");
-            default:
-                throw SceneJS_error.fatalError("Incomplete framebuffer: " + status);
-        }
-
-        this._core.framebuf = {
-
-            id: this.id, // TODO: maybe unused?
-
-            /** Binds the image buffer as target for subsequent geometry renders
-             */
-            bind: function () {
-                //   gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuf);
-                gl.bindFramebuffer(gl.FRAMEBUFFER, framebuf);
-                gl.clearColor(0.0, 0.0, 0.0, 1.0);
-                gl.clearDepth(1.0);
-                gl.enable(gl.DEPTH_TEST);
-                gl.disable(gl.CULL_FACE);
-                gl.depthRange(0, 1);
-                gl.disable(gl.SCISSOR_TEST);
-                //  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                gl.disable(gl.BLEND);
-            },
-
-            /** Unbinds image buffer, the default buffer then becomes the rendering target
-             */
-            unbind: function () {
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-                // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuf);
-                rendered = true;
-            },
-
-            /** Returns true if this texture has been rendered
-             */
-            isRendered: function () {
-                return rendered;
-            },
-
-            /** Gets the texture from this image buffer
-             */
-            getTexture: function () {
-
-                return {
-
-                    bind: function (unit) {
-                        gl.activeTexture(gl["TEXTURE" + unit]);
-                        gl.bindTexture(gl.TEXTURE_2D, texture);
-                    },
-
-                    unbind: function (unit) {
-                        gl.activeTexture(gl["TEXTURE" + unit]);
-                        gl.bindTexture(gl.TEXTURE_2D, null);
-                    }
-                };
-            }
-        };
+        this._core.framebuf = new SceneJS._webgl.RenderBuffer({ canvas: this._engine.canvas });
     };
 
     SceneJS.Framebuf.prototype._compile = function (ctx) {
@@ -8379,11 +8250,9 @@ new (function () {
 
     SceneJS.Framebuf.prototype._destroy = function () {
         if (this._core) {
-            //destroyFrameBuffer(this._buf);
+            delete nodeCoreMap[this._core.coreId];
         }
     };
-
-
 })();new (function () {
 
     var coreStack = [];
@@ -14108,7 +13977,7 @@ var SceneJS_Display = function (cfg) {
     /* Factory which creates and recycles {@link SceneJS_Program} instances
      */
     this._programFactory = new SceneJS_ProgramFactory({
-        canvas:cfg.canvas
+        canvas: cfg.canvas
     });
 
     /* Factory which creates and recycles {@link SceneJS.Chunk} instances
@@ -14291,6 +14160,9 @@ var SceneJS_Display = function (cfg) {
      * rendered, then blending is enabled and the transparent list is rendered. The chunks in these lists
      * are held in the state-sorted order of their objects in #_objectList, with runs of duplicate states removed.
      */
+    this._drawList = [];                // State chunk list to render all objects
+    this._drawListLen = 0;
+
     this._opaqueDrawList = [];         // State chunk list to render opaque objects
     this._opaqueDrawListLen = 0;
 
@@ -14304,9 +14176,9 @@ var SceneJS_Display = function (cfg) {
      * the render, such as pick hits
      */
     this._frameCtx = {
-        pickNames:[], // Pick names of objects hit during pick render
-        canvas:this._canvas,           // The canvas
-        VAO:null                       // Vertex array object extension
+        pickNames: [], // Pick names of objects hit during pick render
+        canvas: this._canvas,           // The canvas
+        VAO: null                       // Vertex array object extension
     };
 
     /* The frame context has this facade which is given to scene node "rendered" listeners
@@ -14616,7 +14488,7 @@ SceneJS_Display.prototype.render = function (params) {
 
     if (this.imageDirty || params.force) {
 
-        this._doDrawList(false);        // Render, no pick
+        this._render({});           // Render, no pick
 
         this.imageDirty = false;
         this.pickBufDirty = true;       // Pick buff will now need rendering on next pick
@@ -14677,6 +14549,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
         this._lastPickStateId[i] = null;
     }
 
+    this._drawListLen = 0;
     this._opaqueDrawListLen = 0;
     this._pickDrawListLen = 0;
     this._transparentDrawListLen = 0;
@@ -14768,6 +14641,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
                 if (!transparent && chunk.draw) {
                     if (chunk.unique || this._lastStateId[j] != chunk.id) {
                         this._opaqueDrawList[this._opaqueDrawListLen++] = chunk;
+                        this._drawList[this._drawListLen++] = chunk;
                         this._lastStateId[j] = chunk.id;
                     }
                 }
@@ -14803,6 +14677,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
                     if (chunk.unique || this._lastStateId[j] != chunk.id) {
                         this._transparentDrawList[this._transparentDrawListLen++] = chunk;
+                        this._drawList[this._drawListLen++] = chunk;
                         this._lastStateId[j] = chunk.id;
                     }
                 }
@@ -14813,9 +14688,51 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this.drawListDirty = false;
 };
 
-SceneJS_Display.prototype.pick = function (params) {
+SceneJS_Display.prototype._render = function (params) {
 
-    //  return null;
+    if (params.dof) {
+
+        // Multi-pass depth-of-field (DOF) render
+
+        // DOF image
+
+        var dofImageBuf = this.dofImageBuf;                                                     // Lazy-create pick buffer
+        if (!dofImageBuf) {
+            dofImageBuf = this.dofImageBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+        }
+        dofImageBuf.bind();                                                                 // Bind pick buffer
+        dofImageBuf.clear();
+        this._doDrawList({});
+        this._canvas.gl.finish();
+
+        // DOF depth
+
+        var dofDepthBuf = this.dofDepthBuf;                                                     // Lazy-create pick buffer
+        if (!dofDepthBuf) {
+            dofDepthBuf = this.dofDepthBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+        }
+        dofDepthBuf.bind();                                                                 // Bind pick buffer
+        dofDepthBuf.clear();
+        this._doDrawList({
+            all: true
+        });
+        this._canvas.gl.finish();
+
+        // DOF blur
+        // .. TODO
+
+        // DOF image
+        // .. TODO
+
+    } else {
+
+        // Default render
+
+        this._doDrawList({});
+    }
+};
+
+SceneJS_Display.prototype.pick = function (params) {
 
     var canvas = this._canvas.canvas;
 
@@ -14824,15 +14741,11 @@ SceneJS_Display.prototype.pick = function (params) {
     var canvasX = params.canvasX;
     var canvasY = params.canvasY;
 
-    /*-------------------------------------------------------------
-     * Pick object using normal GPU colour-indexed pick
-     *-----------------------------------------------------------*/
-
-    var pickBuf = this.pickBuf;                                                   // Lazy-create pick buffer
+    var pickBuf = this.pickBuf;                                                     // Lazy-create pick buffer
 
     if (!pickBuf) {
-        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({ canvas:this._canvas });
-        this.pickBufDirty = true;                                                 // Freshly-created pick buffer is dirty
+        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+        this.pickBufDirty = true;                                                   // Freshly-created pick buffer is dirty
     }
 
     this.render(); // Do any pending visible render
@@ -14843,7 +14756,9 @@ SceneJS_Display.prototype.pick = function (params) {
 
         pickBuf.clear();
 
-        this._doDrawList(true);
+        this._doDrawList({
+            pick: true
+        });
 
         this._canvas.gl.finish();
 
@@ -14862,17 +14777,17 @@ SceneJS_Display.prototype.pick = function (params) {
     if (pickName) {
 
         hit = {
-            name:pickName.name,
-            path:pickName.path,
-            nodeId:pickName.nodeId,
-            canvasPos:[canvasX, canvasY]
+            name: pickName.name,
+            path: pickName.path,
+            nodeId: pickName.nodeId,
+            canvasPos: [canvasX, canvasY]
         };
 
         if (params.rayPick) { // Ray pick to find position
 
             var rayPickBuf = this.rayPickBuf; // Lazy-create Z-pick buffer
             if (!rayPickBuf) {
-                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({ canvas:this._canvas });
+                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
             }
 
             rayPickBuf.bind();
@@ -14881,7 +14796,10 @@ SceneJS_Display.prototype.pick = function (params) {
 
                 rayPickBuf.clear();
 
-                this._doDrawList(true, true); // pick, rayPick
+                this._doDrawList({
+                    pick: true,
+                    rayPick: true
+                });
 
                 this.rayPickBufDirty = false;
             }
@@ -14933,7 +14851,7 @@ SceneJS_Display.prototype._unpackDepth = function (depthZ) {
     return SceneJS_math_dotVector4(vec, bitShift);
 };
 
-SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
+SceneJS_Display.prototype._doDrawList = function (params) {
 
     var frameCtx = this._frameCtx;                                                // Reset rendering context
 
@@ -14955,7 +14873,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     frameCtx.backfaces = true;
     frameCtx.frontface = "ccw";
-    frameCtx.pick = !!pick;
+    frameCtx.pick = !!params.pick;
     frameCtx.textureUnit = 0;
 
     frameCtx.lineWidth = 1;
@@ -14971,7 +14889,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
     if (this.transparent) {
-        gl.clearColor(0,0,0,0);
+        gl.clearColor(0, 0, 0, 0);
     } else {
         gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
     }
@@ -14979,16 +14897,28 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);
 
-    if (pick) { // Pick
+    if (params.pick) {
+
+        // Render to pick buffer
 
         frameCtx.pickIndex = 0;
-        frameCtx.rayPick = !!rayPick;
+        frameCtx.rayPick = !!params.rayPick;
 
         for (var i = 0, len = this._pickDrawListLen; i < len; i++) {        // Push picking chunks
             this._pickDrawList[i].pick(frameCtx);
         }
 
-    } else { // Draw
+    } else if (params.all) {
+
+        // Render all
+
+        for (var i = 0, len = this._drawListLen; i < len; i++) {      // Push opaque rendering chunks
+            this._drawList[i].draw(frameCtx);
+        }
+
+    } else {
+
+        // Normal draw
 
         for (var i = 0, len = this._opaqueDrawListLen; i < len; i++) {      // Push opaque rendering chunks
             this._opaqueDrawList[i].draw(frameCtx);
@@ -15019,15 +14949,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     }
 
     gl.flush();                                                         // Flush GL
-
-    if (frameCtx.framebuf) {                                                 // Unbind remaining frame buffer
-        //gl.finish();
-        // frameCtx.framebuf.unbind();
-    }
-
-    if (frameCtx.renderer) {                           // Forget last call-time renderer properties
-        //     frameCtx.renderer.props.restoreProps(gl);
-    }
 
     if (frameCtx.VAO) {
         frameCtx.VAO.bindVertexArrayOES(null);
@@ -15093,7 +15014,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var customFragmentShader = customShaders.fragment || {};
         var fragmentHooks = customFragmentShader.hooks || {};
 
-        var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
         var normals = this._hasNormals(states);
 
@@ -15221,7 +15141,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("  res -= res.xxyz * bitMask;");
         src.push("  return res;");
         src.push("}");
-
 
         src.push("varying vec4 SCENEJS_vWorldVertex;");
         src.push("varying vec4 SCENEJS_vViewVertex;");                  // View-space vertex

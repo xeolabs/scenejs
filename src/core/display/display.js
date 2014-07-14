@@ -76,7 +76,7 @@ var SceneJS_Display = function (cfg) {
     /* Factory which creates and recycles {@link SceneJS_Program} instances
      */
     this._programFactory = new SceneJS_ProgramFactory({
-        canvas:cfg.canvas
+        canvas: cfg.canvas
     });
 
     /* Factory which creates and recycles {@link SceneJS.Chunk} instances
@@ -259,6 +259,9 @@ var SceneJS_Display = function (cfg) {
      * rendered, then blending is enabled and the transparent list is rendered. The chunks in these lists
      * are held in the state-sorted order of their objects in #_objectList, with runs of duplicate states removed.
      */
+    this._drawList = [];                // State chunk list to render all objects
+    this._drawListLen = 0;
+
     this._opaqueDrawList = [];         // State chunk list to render opaque objects
     this._opaqueDrawListLen = 0;
 
@@ -272,9 +275,9 @@ var SceneJS_Display = function (cfg) {
      * the render, such as pick hits
      */
     this._frameCtx = {
-        pickNames:[], // Pick names of objects hit during pick render
-        canvas:this._canvas,           // The canvas
-        VAO:null                       // Vertex array object extension
+        pickNames: [], // Pick names of objects hit during pick render
+        canvas: this._canvas,           // The canvas
+        VAO: null                       // Vertex array object extension
     };
 
     /* The frame context has this facade which is given to scene node "rendered" listeners
@@ -584,7 +587,7 @@ SceneJS_Display.prototype.render = function (params) {
 
     if (this.imageDirty || params.force) {
 
-        this._doDrawList(false);        // Render, no pick
+        this._render({});           // Render, no pick
 
         this.imageDirty = false;
         this.pickBufDirty = true;       // Pick buff will now need rendering on next pick
@@ -645,6 +648,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
         this._lastPickStateId[i] = null;
     }
 
+    this._drawListLen = 0;
     this._opaqueDrawListLen = 0;
     this._pickDrawListLen = 0;
     this._transparentDrawListLen = 0;
@@ -736,6 +740,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
                 if (!transparent && chunk.draw) {
                     if (chunk.unique || this._lastStateId[j] != chunk.id) {
                         this._opaqueDrawList[this._opaqueDrawListLen++] = chunk;
+                        this._drawList[this._drawListLen++] = chunk;
                         this._lastStateId[j] = chunk.id;
                     }
                 }
@@ -771,6 +776,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
                     if (chunk.unique || this._lastStateId[j] != chunk.id) {
                         this._transparentDrawList[this._transparentDrawListLen++] = chunk;
+                        this._drawList[this._drawListLen++] = chunk;
                         this._lastStateId[j] = chunk.id;
                     }
                 }
@@ -781,9 +787,51 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this.drawListDirty = false;
 };
 
-SceneJS_Display.prototype.pick = function (params) {
+SceneJS_Display.prototype._render = function (params) {
 
-    //  return null;
+    if (params.dof) {
+
+        // Multi-pass depth-of-field (DOF) render
+
+        // DOF image
+
+        var dofImageBuf = this.dofImageBuf;                                                     // Lazy-create pick buffer
+        if (!dofImageBuf) {
+            dofImageBuf = this.dofImageBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+        }
+        dofImageBuf.bind();                                                                 // Bind pick buffer
+        dofImageBuf.clear();
+        this._doDrawList({});
+        this._canvas.gl.finish();
+
+        // DOF depth
+
+        var dofDepthBuf = this.dofDepthBuf;                                                     // Lazy-create pick buffer
+        if (!dofDepthBuf) {
+            dofDepthBuf = this.dofDepthBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+        }
+        dofDepthBuf.bind();                                                                 // Bind pick buffer
+        dofDepthBuf.clear();
+        this._doDrawList({
+            all: true
+        });
+        this._canvas.gl.finish();
+
+        // DOF blur
+        // .. TODO
+
+        // DOF image
+        // .. TODO
+
+    } else {
+
+        // Default render
+
+        this._doDrawList({});
+    }
+};
+
+SceneJS_Display.prototype.pick = function (params) {
 
     var canvas = this._canvas.canvas;
 
@@ -795,7 +843,7 @@ SceneJS_Display.prototype.pick = function (params) {
     var pickBuf = this.pickBuf;                                                     // Lazy-create pick buffer
 
     if (!pickBuf) {
-        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({ canvas:this._canvas });
+        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
         this.pickBufDirty = true;                                                   // Freshly-created pick buffer is dirty
     }
 
@@ -807,7 +855,9 @@ SceneJS_Display.prototype.pick = function (params) {
 
         pickBuf.clear();
 
-        this._doDrawList(true);
+        this._doDrawList({
+            pick: true
+        });
 
         this._canvas.gl.finish();
 
@@ -826,17 +876,17 @@ SceneJS_Display.prototype.pick = function (params) {
     if (pickName) {
 
         hit = {
-            name:pickName.name,
-            path:pickName.path,
-            nodeId:pickName.nodeId,
-            canvasPos:[canvasX, canvasY]
+            name: pickName.name,
+            path: pickName.path,
+            nodeId: pickName.nodeId,
+            canvasPos: [canvasX, canvasY]
         };
 
         if (params.rayPick) { // Ray pick to find position
 
             var rayPickBuf = this.rayPickBuf; // Lazy-create Z-pick buffer
             if (!rayPickBuf) {
-                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({ canvas:this._canvas });
+                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
             }
 
             rayPickBuf.bind();
@@ -845,7 +895,10 @@ SceneJS_Display.prototype.pick = function (params) {
 
                 rayPickBuf.clear();
 
-                this._doDrawList(true, true); // pick, rayPick
+                this._doDrawList({
+                    pick: true,
+                    rayPick: true
+                });
 
                 this.rayPickBufDirty = false;
             }
@@ -897,7 +950,7 @@ SceneJS_Display.prototype._unpackDepth = function (depthZ) {
     return SceneJS_math_dotVector4(vec, bitShift);
 };
 
-SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
+SceneJS_Display.prototype._doDrawList = function (params) {
 
     var frameCtx = this._frameCtx;                                                // Reset rendering context
 
@@ -919,7 +972,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     frameCtx.backfaces = true;
     frameCtx.frontface = "ccw";
-    frameCtx.pick = !!pick;
+    frameCtx.pick = !!params.pick;
     frameCtx.textureUnit = 0;
 
     frameCtx.lineWidth = 1;
@@ -935,7 +988,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
     if (this.transparent) {
-        gl.clearColor(0,0,0,0);
+        gl.clearColor(0, 0, 0, 0);
     } else {
         gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
     }
@@ -943,16 +996,28 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);
 
-    if (pick) { // Pick
+    if (params.pick) {
+
+        // Render to pick buffer
 
         frameCtx.pickIndex = 0;
-        frameCtx.rayPick = !!rayPick;
+        frameCtx.rayPick = !!params.rayPick;
 
         for (var i = 0, len = this._pickDrawListLen; i < len; i++) {        // Push picking chunks
             this._pickDrawList[i].pick(frameCtx);
         }
 
-    } else { // Draw
+    } else if (params.all) {
+
+        // Render all
+
+        for (var i = 0, len = this._drawListLen; i < len; i++) {      // Push opaque rendering chunks
+            this._drawList[i].draw(frameCtx);
+        }
+
+    } else {
+
+        // Normal draw
 
         for (var i = 0, len = this._opaqueDrawListLen; i < len; i++) {      // Push opaque rendering chunks
             this._opaqueDrawList[i].draw(frameCtx);
@@ -983,15 +1048,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     }
 
     gl.flush();                                                         // Flush GL
-
-    if (frameCtx.framebuf) {                                                 // Unbind remaining frame buffer
-        //gl.finish();
-        // frameCtx.framebuf.unbind();
-    }
-
-    if (frameCtx.renderer) {                           // Forget last call-time renderer properties
-        //     frameCtx.renderer.props.restoreProps(gl);
-    }
 
     if (frameCtx.VAO) {
         frameCtx.VAO.bindVertexArrayOES(null);

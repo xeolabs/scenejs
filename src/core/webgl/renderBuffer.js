@@ -115,5 +115,21 @@ SceneJS._webgl.RenderBuffer = function (cfg) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         bound = false;
     };
+
+    /** Returns the texture
+     */
+    this.getTexture = function () {
+        this._touch();
+        return {
+            bind: function (unit) {
+                gl.activeTexture(gl["TEXTURE" + unit]);
+                gl.bindTexture(gl.TEXTURE_2D, buf.texture);
+            },
+            unbind: function (unit) {
+                gl.activeTexture(gl["TEXTURE" + unit]);
+                gl.bindTexture(gl.TEXTURE_2D, null);
+            }
+        };
+    };
 };
 
