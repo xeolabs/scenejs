@@ -90,6 +90,12 @@ var SceneJS_Display = function (cfg) {
     this.transparent = cfg.transparent === true;
 
     /**
+     * True when WebGL shaders are to be validated (for debugging only)
+     * @type {boolean}
+     */
+    this.validateShaders = SceneJS.getConfigs("validateShaders");
+
+    /**
      * Node state core for the last {@link SceneJS.Enable} visited during scene graph compilation traversal
      * @type Object
      */
@@ -929,6 +935,8 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     frameCtx.lineWidth = 1;
 
     frameCtx.transparencyPass = false;
+
+    frameCtx.validateShaders = this.validateShaders;
 
     // The extension needs to be re-queried in case the context was lost and
     // has been recreated.
