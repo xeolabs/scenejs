@@ -14053,6 +14053,12 @@ var SceneJS_Display = function (cfg) {
     this.validateShaders = SceneJS.getConfigs("validateShaders");
 
     /**
+     * True when the "OES_vertex_array_object" WebGL extension is allowed, if existing
+     * @type {boolean}
+     */
+    this.enableVAO = (SceneJS.getConfigs("enableVAO") !== false);
+
+    /**
      * Node state core for the last {@link SceneJS.Enable} visited during scene graph compilation traversal
      * @type Object
      */
@@ -14897,7 +14903,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     // The extension needs to be re-queried in case the context was lost and
     // has been recreated.
-    var VAO = (SceneJS.getConfigs("enableVAO") !== false) && gl.getExtension("OES_vertex_array_object");
+    var VAO = this.enableVAO && gl.getExtension("OES_vertex_array_object");
     if (VAO) {
         frameCtx.VAO = VAO;
     }
