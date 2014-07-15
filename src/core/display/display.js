@@ -940,7 +940,7 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     // The extension needs to be re-queried in case the context was lost and
     // has been recreated.
-    var VAO = gl.getExtension("OES_vertex_array_object");
+    var VAO = (SceneJS.getConfigs("enableVAO") !== false) && gl.getExtension("OES_vertex_array_object");
     if (VAO) {
         frameCtx.VAO = VAO;
     }
