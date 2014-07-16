@@ -8898,7 +8898,7 @@ new (function() {
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
             var arrays = core.arrays;
-            var canInterleave = true;
+            var canInterleave = (SceneJS.getConfigs("enableInterleaving") !== false);
             var dataLength = 0;
             var interleavedValues = 0;
             var interleavedArrays = [];
@@ -8917,27 +8917,37 @@ new (function() {
             };
 
             if (arrays.positions) {
-                core.interleavedPositionOffset = prepareInterleaveBuffer(arrays.positions, 3);
+                if (canInterleave) {
+                    core.interleavedPositionOffset = prepareInterleaveBuffer(arrays.positions, 3);
+                }
                 core.vertexBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.positions, arrays.positions.length, 3, usage);
             }
 
             if (arrays.normals) {
-                core.interleavedNormalOffset = prepareInterleaveBuffer(arrays.normals, 3);
+                if (canInterleave) {
+                    core.interleavedNormalOffset = prepareInterleaveBuffer(arrays.normals, 3);
+                }
                 core.normalBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.normals, arrays.normals.length, 3, usage);
             }
 
             if (arrays.uv) {
-                core.interleavedUVOffset = prepareInterleaveBuffer(arrays.uv, 2);
+                if (canInterleave) {
+                    core.interleavedUVOffset = prepareInterleaveBuffer(arrays.uv, 2);
+                }
                 core.uvBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv, arrays.uv.length, 2, usage);
             }
 
             if (arrays.uv2) {
-                core.interleavedUV2Offset = prepareInterleaveBuffer(arrays.uv2, 2);
+                if (canInterleave) {
+                    core.interleavedUV2Offset = prepareInterleaveBuffer(arrays.uv2, 2);
+                }
                 core.uvBuf2 = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv2, arrays.uv2.length, 2, usage);
             }
 
             if (arrays.colors) {
-                core.interleavedColorOffset = prepareInterleaveBuffer(arrays.colors, 4);
+                if (canInterleave) {
+                    core.interleavedColorOffset = prepareInterleaveBuffer(arrays.colors, 4);
+                }
                 core.colorBuf = new SceneJS_webgl_ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.colors, arrays.colors.length, 4, usage);
             }
 
@@ -15517,7 +15527,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                         /* World space light - transform position to View space
                          */
-                        src.push("tmpVec3 = ((SCENEJS_uVMatrix * vec4(SCENEJS_uLightPos" + i + ", 1.0)).xyz - worldVertex.xyz);");
+                        src.push("tmpVec3 = ((SCENEJS_uVMatrix * vec4(SCENEJS_uLightPos" + i + ", 1.0)).xyz - viewVertex.xyz);");
                         src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(normalize(tmpVec3), length(tmpVec3));");
 
                     } else {
