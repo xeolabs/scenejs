@@ -536,7 +536,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                         /* World space light - transform position to View space
                          */
-                        src.push("tmpVec3 = ((SCENEJS_uVMatrix * vec4(SCENEJS_uLightPos" + i + ", 1.0)).xyz - worldVertex.xyz);");
+                        src.push("tmpVec3 = ((SCENEJS_uVMatrix * vec4(SCENEJS_uLightPos" + i + ", 1.0)).xyz - viewVertex.xyz);");
                         src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(normalize(tmpVec3), length(tmpVec3));");
 
                     } else {
