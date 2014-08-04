@@ -14,7 +14,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._uvMatrixPick = this.program.pick.getUniformLocation("SCENEJS_uVMatrix");
     },
 
-    draw : function(ctx) {
+    draw : function(frameCtx) {
 
         if (this.core.dirty) {
             this.core.rebuild();
@@ -34,10 +34,10 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniform3fv(this._uWorldEyeDraw, this.core.lookAt.eye);
         }
 
-        ctx.viewMat = this.core.mat;
+        frameCtx.viewMat = this.core.mat;
     },
 
-    pick : function(ctx) {
+    pick : function(frameCtx) {
 
         var gl = this.program.gl;
 
@@ -45,6 +45,6 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniformMatrix4fv(this._uvMatrixPick, gl.FALSE, this.core.mat);
         }
 
-        ctx.viewMat = this.core.mat;
+        frameCtx.viewMat = this.core.mat;
     }
 });

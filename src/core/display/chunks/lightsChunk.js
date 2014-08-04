@@ -42,9 +42,9 @@ SceneJS_ChunkFactory.createChunkType({
         }
     },
 
-    draw:function (ctx) {
+    draw:function (frameCtx) {
 
-        if (ctx.dirty) {
+        if (frameCtx.dirty) {
             this.build();
         }
 

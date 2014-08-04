@@ -11,18 +11,18 @@ SceneJS_ChunkFactory.createChunkType({
     build:function () {
     },
 
-    drawAndPick:function (ctx) {
+    drawAndPick:function (frameCtx) {
 
         var scissorTestEnabled = this.core.scissorTestEnabled;
 
-        if (ctx.scissorTestEnabled != scissorTestEnabled) {
+        if (frameCtx.scissorTestEnabled != scissorTestEnabled) {
             var gl = this.program.gl;
             if (scissorTestEnabled) {
                 gl.enable(gl.SCISSOR_TEST);
             } else {
                 gl.disable(gl.SCISSOR_TEST);
             }
-            ctx.scissorTestEnabled = scissorTestEnabled;
+            frameCtx.scissorTestEnabled = scissorTestEnabled;
         }
     }
 });

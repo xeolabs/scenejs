@@ -59,8 +59,7 @@
  *
  * <h2>Draw List</h2>
  * <p>The draw list is actually comprised of three lists of state chunks: a "pick" list to render a pick buffer
- * for colour-indexed GPU picking, along with an "opaque" list and "transparent" list for normal image rendering.
- * For normal rendering the opaque list is rendered, then blending is enabled and the transparent list is rendered.
+ * for colour-indexed GPU picking, along with an "draw" list for normal image rendering.
  * The chunks in these lists are held in the state-sorted order of their objects in #_objectList, with runs of
  * duplicate states removed, as mentioned.</p>
  *
@@ -106,6 +105,12 @@ var SceneJS_Display = function (cfg) {
      * @type Object
      */
     this.layer = null;
+
+    /**
+     * Node state core for the last {@link SceneJS.Pass} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.pass = null;
 
     /**
      * Node state core for the last {@link SceneJS.Renderer} visited during scene graph compilation traversal
@@ -174,10 +179,10 @@ var SceneJS_Display = function (cfg) {
     this.projTransform = null;
 
     /**
-     * Node state core for the last {@link SceneJS.Framebuf} visited during scene graph compilation traversal
+     * Node state core for the last {@link SceneJS.ColorTarget} visited during scene graph compilation traversal
      * @type Object
      */
-    this.framebuf = null;
+    this.renderTarget = null;
 
     /**
      * Node state core for the last {@link SceneJS.Clips} visited during scene graph compilation traversal
@@ -255,21 +260,17 @@ var SceneJS_Display = function (cfg) {
 
     /* The "draw list", comprised collectively of three lists of state chunks belong to visible objects
      * within #_objectList: a "pick" list to render a pick buffer for colour-indexed GPU picking, along with an
-     * "opaque" list and "transparent" list for normal image rendering. For normal rendering the opaque list is
-     * rendered, then blending is enabled and the transparent list is rendered. The chunks in these lists
-     * are held in the state-sorted order of their objects in #_objectList, with runs of duplicate states removed.
+     * "draw" list for normal image rendering.  The chunks in these lists are held in the state-sorted order of
+     * their objects in #_objectList, with runs of duplicate states removed.
      */
     this._drawList = [];                // State chunk list to render all objects
     this._drawListLen = 0;
 
-    this._opaqueDrawList = [];         // State chunk list to render opaque objects
-    this._opaqueDrawListLen = 0;
-
-    this._transparentDrawList = [];    // State chunk list to render transparent objects
-    this._transparentDrawListLen = 0;
-
-    this._pickDrawList = [];           // State chunk list to render scene to pick buffer
+    this._pickDrawList = [];            // State chunk list to render scene to pick buffer
     this._pickDrawListLen = 0;
+
+    this._targetList = [];
+    this._targetListLen = 0;
 
     /* The frame context holds state shared across a single render of the draw list, along with any results of
      * the render, such as pick hits
@@ -341,21 +342,15 @@ var SceneJS_Display = function (cfg) {
  * Reallocates WebGL resources for objects within this display
  */
 SceneJS_Display.prototype.webglRestored = function () {
-
     this._programFactory.webglRestored();// Reallocate programs
-
     this._chunkFactory.webglRestored(); // Recache shader var locations
-
     var gl = this._canvas.gl;
-
     if (this.pickBuf) {
         this.pickBuf.webglRestored(gl);          // Rebuild pick buffers
     }
-
     if (this.rayPickBuf) {
         this.rayPickBuf.webglRestored(gl);
     }
-
     this.imageDirty = true;             // Need redraw
 };
 
@@ -371,13 +366,13 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     var object = this._objects[objectId];
 
     if (!object) { // Create object
-
         object = this._objects[objectId] = this._objectFactory.getObject(objectId);
-
         this.objectListDirty = true;
     }
 
+    object.renderTarget = this.renderTarget;
     object.layer = this.layer;
+    object.pass = this.pass;
     object.texture = this.texture;
     object.cubemap = this.cubemap;
     object.geometry = this.geometry;
@@ -399,21 +394,17 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     ]).join(";");
 
     if (!object.program || hash != object.hash) {
-
-        /* Get new program for object if no program or hash mismatch
-         */
-
+        // Get new program for object if no program or hash mismatch
         if (object.program) {
             this._programFactory.putProgram(object.program);
         }
-
         object.program = this._programFactory.getProgram(hash, this);
         object.hash = hash;
     }
     //}
 
-    /* Build draw chunks for object
-     */
+    // Build draw chunks for object
+
     this._setChunk(object, 0, "program");          // Must be first
     this._setChunk(object, 1, "xform", this.modelTransform);
     this._setChunk(object, 2, "lookAt", this.viewTransform);
@@ -430,7 +421,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 13, "material", this.material);
     this._setChunk(object, 14, "texture", this.texture);
     this._setChunk(object, 15, "cubemap", this.cubemap);
-    this._setChunk(object, 16, "framebuf", this.framebuf);
+    this._setChunk(object, 16, "renderTarget", this.renderTarget);
     this._setChunk(object, 17, "clips", this.clips);
     this._setChunk(object, 18, "geometry", this.morphGeometry, this.geometry);
     this._setChunk(object, 19, "listeners", this.renderListeners);      // Must be after the above chunks
@@ -446,15 +437,11 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
 
         // Core supplied
         if (core.empty) { // Only set default cores for state types that have them
-
             var oldChunk = object.chunks[order];
-
             if (oldChunk) {
                 this._chunkFactory.putChunk(oldChunk); // Release previous chunk to pool
             }
-
             object.chunks[order] = null;
-
             return;
         }
 
@@ -483,11 +470,9 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
     var oldChunk = object.chunks[order];
 
     if (oldChunk) {
-
         if (oldChunk.id == chunkId) { // Avoid needless chunk reattachment
             return;
         }
-
         this._chunkFactory.putChunk(oldChunk); // Release previous chunk to pool
     }
 
@@ -520,22 +505,15 @@ SceneJS_Display.prototype._setAmbient = function (core) {
  * @param {String} objectId ID of object to remove
  */
 SceneJS_Display.prototype.removeObject = function (objectId) {
-
     var object = this._objects[objectId];
-
     if (!object) {
         return;
     }
-
     this._programFactory.putProgram(object.program);
-
     object.program = null;
     object.hash = null;
-
     this._objectFactory.putObject(object);
-
     delete this._objects[objectId];
-
     this.objectListDirty = true;
 };
 
@@ -555,40 +533,30 @@ SceneJS_Display.prototype.render = function (params) {
     params = params || {};
 
     if (this.objectListDirty) {
-
         this._buildObjectList();          // Build object render bin
-
         this.objectListDirty = false;
         this.stateOrderDirty = true;        // Now needs state ordering
     }
 
     if (this.stateOrderDirty) {
-
         this._makeStateSortKeys();       // Compute state sort order
-
         this.stateOrderDirty = false;
         this.stateSortDirty = true;     // Now needs state sorting
     }
 
     if (this.stateSortDirty) {
-
         this._stateSort();              // State sort the object render bin
-
         this.stateSortDirty = false;
         this.drawListDirty = true;      // Now needs new visible object bin
     }
 
     if (this.drawListDirty) {           // Render visible list while building transparent list
-
         this._buildDrawList();
-
         this.imageDirty = true;
     }
 
     if (this.imageDirty || params.force) {
-
-        this._render({});           // Render, no pick
-
+        this._doDrawList({});           // Render, no pick
         this.imageDirty = false;
         this.pickBufDirty = true;       // Pick buff will now need rendering on next pick
     }
@@ -607,27 +575,20 @@ SceneJS_Display.prototype._makeStateSortKeys = function () { // TODO: state sort
     var object;
     for (var i = 0, len = this._objectListLen; i < len; i++) {
         object = this._objectList[i];
-        object.sortKey = object.program
-            ? (((object.layer.priority + 1) * 1000000)
-            + ((object.program.id + 1) * 1000)
-            + (object.texture.stateId))
-            : -1;   // Non-visual object (eg. sound)
+        if (!object.program) {
+            // Non-visual object (eg. sound)
+            object.sortKey = -1;
+        } else {
+            object.sortKey =
+                (object.pass.priority * 100000000)
+                    + ((object.flags.transparent ? 1 : 0 ) * 10000000)
+                    + ((object.layer.priority + 1) * 100000)
+                    + ((object.program.id + 1) * 1000)
+                    + object.texture.stateId
+            ;
+        }
     }
 };
-
-//SceneJS_Display.prototype._makeStateSortKeys = function () { // TODO: state sort for sound objects?
-//    var object;
-//    for (var i = 0, len = this._objectListLen; i < len; i++) {
-//        object = this._objectList[i];
-//        object.sortKey = object.program
-//            ? (((object.layer.priority + 1) * 1000000000)
-//            + ((object.program.id + 1) * 1000000)
-//            + (object.texture.stateId * 10000)
-//            + (object.geometry.stateId))
-//            //    + i // Force stability among same-priority objects across multiple sorts
-//            : -1;   // Non-visual object (eg. sound)
-//    }
-//};
 
 SceneJS_Display.prototype._stateSort = function () {
     this._objectList.length = this._objectListLen;
@@ -643,15 +604,18 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 21; i++) {
+    for (var i = 0; i < 22; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
 
     this._drawListLen = 0;
-    this._opaqueDrawListLen = 0;
     this._pickDrawListLen = 0;
-    this._transparentDrawListLen = 0;
+
+    var targetObjectLists = {};
+    var targetListList = [];
+
+    this._targetListLen = 0;
 
     var object;
     var tagMask;
@@ -660,7 +624,6 @@ SceneJS_Display.prototype._buildDrawList = function () {
     var flags;
     var chunks;
     var chunk;
-    var transparent;
     var picking;
 
     if (this._tagSelector) {
@@ -668,10 +631,8 @@ SceneJS_Display.prototype._buildDrawList = function () {
         tagRegex = this._tagSelector.regex;
     }
 
-    if (!this._xpBuf) {
-        this._xpBuf = [];
-    }
-    this._xpBufLen = 0;
+    this._objectDrawList = this._objectDrawList || [];
+    this._objectDrawListLen = 0;
 
     for (var i = 0, len = this._objectListLen; i < len; i++) {
 
@@ -689,157 +650,103 @@ SceneJS_Display.prototype._buildDrawList = function () {
             continue;
         }
 
-        if (!object.layer.enabled) { // Skip disabled layers
+        // Cull objects in disabled layers
+        if (!object.layer.enabled) {
             continue;
         }
 
-        if (tagMask) { // Skip unmatched tags. No tag matching in visible bin prevent this being done on every frame.
-
+        // Cull objects with unmatched tags
+        if (tagMask) {
             tagCore = object.tag;
-
             if (tagCore.tag) {
-
                 if (tagCore.mask != tagMask) { // Scene tag mask was updated since last render
                     tagCore.mask = tagMask;
                     tagCore.matches = tagRegex.test(tagCore.tag);
                 }
-
                 if (!tagCore.matches) {
                     continue;
                 }
             }
         }
 
-        transparent = flags.transparent;
-
-        if (transparent) {
-            this._xpBuf[this._xpBufLen++] = object;
-        }
-
-        /* Add object's chunks to appropriate chunk list
-         */
-
-        chunks = object.chunks;
-
-        picking = flags.picking;
-
-        for (var j = 0, lenj = chunks.length; j < lenj; j++) {
-
-            chunk = chunks[j];
-
-            if (chunk) {
-
-                // As we apply the state chunk lists we track the ID of most types of chunk in order
-                // to cull redundant re-applications of runs of the same chunk - except for those chunks with a
-                // 'unique' flag. We don't want to cull runs of draw chunks because they contain the GL
-                // drawElements calls which render the objects.
-
-                // Chunk IDs are only considered unique within the same program. Therefore, whenever we do a
-                // program switch, we'll be applying all the different types of chunk again.
-
-                if (!transparent && chunk.draw) {
-                    if (chunk.unique || this._lastStateId[j] != chunk.id) {
-                        this._opaqueDrawList[this._opaqueDrawListLen++] = chunk;
-                        this._drawList[this._drawListLen++] = chunk;
-                        this._lastStateId[j] = chunk.id;
-                    }
+        // Put objects with render targets into a bin for each target
+        if (object.renderTarget.targets) {
+            var targets = object.renderTarget.targets;
+            var target;
+            var coreId;
+            var list;
+            for (var j = 0, lenj = targets.length; j < lenj; j++) {
+                target = targets[j];
+                coreId = target.coreId;
+                list = targetObjectLists[coreId];
+                if (!list) {
+                    list = [];
+                    targetObjectLists[coreId] = list;
+                    targetListList.push(list);
+                    this._targetList[this._targetListLen++] = target;
                 }
-
-                if (chunk.pick) { // Transparent objects are pickable
-                    if (picking) { // Don't pick unpickable objects
-                        if (chunk.unique || this._lastPickStateId[j] != chunk.id) {
-                            this._pickDrawList[this._pickDrawListLen++] = chunk;
-                            this._lastPickStateId[j] = chunk.id;
-                        }
-                    }
-                }
+                list.push(object);
             }
+        } else {
+
+            //
+            this._objectDrawList[this._objectDrawListLen++] = object;
         }
     }
 
-    if (this._xpBufLen > 0) {
-
-        for (var i = 0; i < this._lastStateId.length; i++) {
-            this._lastStateId[i] = null;
+    // Append chunks for objects within render targets first
+    for (var i = 0, len = targetListList.length; i < len; i++) {
+        var list = targetListList[i];
+        for (var j = 0, lenj = list.length; j < lenj; j++) {
+            this._appendObjectToDrawLists(list[j]);
         }
+    }
 
-        for (var i = 0; i < this._xpBufLen; i++) {
-
-            object = this._xpBuf[i];
-            chunks = object.chunks;
-
-            for (var j = 0, lenj = chunks.length; j < lenj; j++) {
-
-                chunk = chunks[j];
-
-                if (chunk && chunk.draw) {
-
-                    if (chunk.unique || this._lastStateId[j] != chunk.id) {
-                        this._transparentDrawList[this._transparentDrawListLen++] = chunk;
-                        this._drawList[this._drawListLen++] = chunk;
-                        this._lastStateId[j] = chunk.id;
-                    }
-                }
-            }
-        }
+    // Append chunks for objects not in render targets
+    for (var i = 0, len = this._objectDrawListLen; i < len; i++) {
+        this._appendObjectToDrawLists(this._objectDrawList[i]);
     }
 
     this.drawListDirty = false;
 };
 
-SceneJS_Display.prototype._render = function (params) {
-
-    if (params.dof) {
-
-        // Multi-pass depth-of-field (DOF) render
-
-        // DOF image
-
-        var dofImageBuf = this.dofImageBuf;                                                     // Lazy-create pick buffer
-        if (!dofImageBuf) {
-            dofImageBuf = this.dofImageBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+SceneJS_Display.prototype._appendObjectToDrawLists = function(object) {
+    var chunks = object.chunks;
+    var picking = object.flags.picking;
+    var chunck;
+    for (var k = 0, lenk = chunks.length; k < lenk; k++) {
+        chunk = chunks[k];
+        if (chunk) {
+            // As we apply the state chunk lists we track the ID of most types of chunk in order
+            // to cull redundant re-applications of runs of the same chunk - except for those chunks with a
+            // 'unique' flag. We don't want to cull runs of draw chunks because they contain the GL
+            // drawElements calls which render the objects.
+            // Chunk IDs are only considered unique within the same program. Therefore, whenever we do a
+            // program switch, we'll be applying all the different types of chunk again.
+            if (chunk.draw) {
+                if (chunk.unique || this._lastStateId[k] != chunk.id) {
+                    this._drawList[this._drawListLen++] = chunk;
+                    this._lastStateId[k] = chunk.id;
+                }
+            }
+            if (chunk.pick) { // Transparent objects are pickable
+                if (picking) { // Don't pick unpickable objects
+                    if (chunk.unique || this._lastPickStateId[k] != chunk.id) {
+                        this._pickDrawList[this._pickDrawListLen++] = chunk;
+                        this._lastPickStateId[k] = chunk.id;
+                    }
+                }
+            }
         }
-        dofImageBuf.bind();                                                                 // Bind pick buffer
-        dofImageBuf.clear();
-        this._doDrawList({});
-        this._canvas.gl.finish();
-
-        // DOF depth
-
-        var dofDepthBuf = this.dofDepthBuf;                                                     // Lazy-create pick buffer
-        if (!dofDepthBuf) {
-            dofDepthBuf = this.dofDepthBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
-        }
-        dofDepthBuf.bind();                                                                 // Bind pick buffer
-        dofDepthBuf.clear();
-        this._doDrawList({
-            all: true
-        });
-        this._canvas.gl.finish();
-
-        // DOF blur
-        // .. TODO
-
-        // DOF image
-        // .. TODO
-
-    } else {
-
-        // Default render
-
-        this._doDrawList({});
     }
 };
 
 SceneJS_Display.prototype.pick = function (params) {
 
     var canvas = this._canvas.canvas;
-
     var hit = null;
-
     var canvasX = params.canvasX;
     var canvasY = params.canvasY;
-
     var pickBuf = this.pickBuf;                                                     // Lazy-create pick buffer
 
     if (!pickBuf) {
@@ -852,15 +759,11 @@ SceneJS_Display.prototype.pick = function (params) {
     pickBuf.bind();                                                                 // Bind pick buffer
 
     if (this.pickBufDirty) {                          // Render pick buffer
-
         pickBuf.clear();
-
         this._doDrawList({
             pick: true
         });
-
         this._canvas.gl.finish();
-
         this.pickBufDirty = false;                                                  // Pick buffer up to date
         this.rayPickBufDirty = true;                                                // Ray pick buffer now dirty
     }
@@ -868,7 +771,6 @@ SceneJS_Display.prototype.pick = function (params) {
     var pix = pickBuf.read(canvasX, canvasY);                                       // Read pick buffer
     var pickedObjectIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
     var pickIndex = (pickedObjectIndex >= 1) ? pickedObjectIndex - 1 : -1;
-
     pickBuf.unbind();                                                               // Unbind pick buffer
 
     var pickName = this._frameCtx.pickNames[pickIndex];                                   // Map pixel to name
@@ -883,7 +785,6 @@ SceneJS_Display.prototype.pick = function (params) {
         };
 
         if (params.rayPick) { // Ray pick to find position
-
             var rayPickBuf = this.rayPickBuf; // Lazy-create Z-pick buffer
             if (!rayPickBuf) {
                 rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
@@ -892,14 +793,11 @@ SceneJS_Display.prototype.pick = function (params) {
             rayPickBuf.bind();
 
             if (this.rayPickBufDirty) {
-
                 rayPickBuf.clear();
-
                 this._doDrawList({
                     pick: true,
                     rayPick: true
                 });
-
                 this.rayPickBufDirty = false;
             }
 
@@ -907,34 +805,24 @@ SceneJS_Display.prototype.pick = function (params) {
 
             rayPickBuf.unbind();
 
-            /* Read normalised device Z coordinate, which will be
-             * in range of [0..1] with z=0 at front
-             */
+            // Read normalised device Z coordinate, which will be
+            // in range of [0..1] with z=0 at front
             var screenZ = this._unpackDepth(pix);
-
             var w = canvas.width;
             var h = canvas.height;
-
-            /* Calculate clip space coordinates, which will be in range
-             * of x=[-1..1] and y=[-1..1], with y=(+1) at top
-             */
+            // Calculate clip space coordinates, which will be in range
+            // of x=[-1..1] and y=[-1..1], with y=(+1) at top
             var x = (canvasX - w / 2) / (w / 2);           // Calculate clip space coordinates
             var y = -(canvasY - h / 2) / (h / 2);
-
             var projMat = this._frameCtx.cameraMat;
             var viewMat = this._frameCtx.viewMat;
-
             var pvMat = SceneJS_math_mulMat4(projMat, viewMat, []);
             var pvMatInverse = SceneJS_math_inverseMat4(pvMat, []);
-
             var world1 = SceneJS_math_transformVector4(pvMatInverse, [x, y, -1, 1]);
             world1 = SceneJS_math_mulVec4Scalar(world1, 1 / world1[3]);
-
             var world2 = SceneJS_math_transformVector4(pvMatInverse, [x, y, 1, 1]);
             world2 = SceneJS_math_mulVec4Scalar(world2, 1 / world2[3]);
-
             var dir = SceneJS_math_subVec3(world2, world1, []);
-
             var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec4Scalar(dir, screenZ, []), []);
 
             hit.worldPos = vWorld;
@@ -952,35 +840,34 @@ SceneJS_Display.prototype._unpackDepth = function (depthZ) {
 
 SceneJS_Display.prototype._doDrawList = function (params) {
 
-    var frameCtx = this._frameCtx;                                                // Reset rendering context
-
     var gl = this._canvas.gl;
 
-    frameCtx.framebuf = null;
+    // Reset frame context
+    var frameCtx = this._frameCtx;
+
+    frameCtx.targetList = this._targetList;
+    frameCtx.targetIndex = 0;
+    frameCtx.renderBuf = null;
     frameCtx.viewMat = null;
     frameCtx.modelMat = null;
     frameCtx.cameraMat = null;
     frameCtx.renderer = null;
-
     frameCtx.depthbufEnabled = null;
     frameCtx.clearDepth = null;
     frameCtx.depthFunc = gl.LESS;
-
     frameCtx.scissorTestEnabled = false;
-
     frameCtx.blendEnabled = false;
-
     frameCtx.backfaces = true;
     frameCtx.frontface = "ccw";
     frameCtx.pick = !!params.pick;
+    frameCtx.rayPick = !!params.rayPick;
+    frameCtx.pickIndex = 0;
+    frameCtx.depthPass = false;
     frameCtx.textureUnit = 0;
-
     frameCtx.lineWidth = 1;
+    frameCtx.transparent = false;
 
-    frameCtx.transparencyPass = false;
-
-    // The extension needs to be re-queried in case the context was lost and
-    // has been recreated.
+    // The extension needs to be re-queried in case the context was lost and has been recreated.
     var VAO = gl.getExtension("OES_vertex_array_object");
     if (VAO) {
         frameCtx.VAO = VAO;
@@ -998,56 +885,25 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     if (params.pick) {
 
-        // Render to pick buffer
-
-        frameCtx.pickIndex = 0;
-        frameCtx.rayPick = !!params.rayPick;
-
-        for (var i = 0, len = this._pickDrawListLen; i < len; i++) {        // Push picking chunks
+        // Render for pick
+        for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
             this._pickDrawList[i].pick(frameCtx);
-        }
-
-    } else if (params.all) {
-
-        // Render all
-
-        for (var i = 0, len = this._drawListLen; i < len; i++) {      // Push opaque rendering chunks
-            this._drawList[i].draw(frameCtx);
         }
 
     } else {
 
-        // Normal draw
-
-        for (var i = 0, len = this._opaqueDrawListLen; i < len; i++) {      // Push opaque rendering chunks
-            this._opaqueDrawList[i].draw(frameCtx);
-        }
-
-        if (this._transparentDrawListLen > 0) {
-
-            // Disables some types of state changes during
-            // transparency pass, such as blending disable
-            frameCtx.transparencyPass = true;
-
-            //  Enable blending
-            gl.enable(gl.BLEND);
-            frameCtx.blendEnabled = true;
-
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-            for (var i = 0, len = this._transparentDrawListLen; i < len; i++) { // Push transparent rendering chunks
-                this._transparentDrawList[i].draw(frameCtx);
-            }
-
-            //  Disable blending
-            gl.disable(gl.BLEND);
-            frameCtx.blendEnabled = false;
-
-            frameCtx.transparencyPass = false;
+        // Render for draw
+        for (var i = 0, len = this._drawListLen; i < len; i++) {      // Push opaque rendering chunks
+            this._drawList[i].draw(frameCtx);
         }
     }
 
-    gl.flush();                                                         // Flush GL
+    gl.flush();
+
+    if (frameCtx.renderBuf) {
+        gl.finish();
+        frameCtx.renderBuf.unbind();
+    }
 
     if (frameCtx.VAO) {
         frameCtx.VAO.bindVertexArrayOES(null);

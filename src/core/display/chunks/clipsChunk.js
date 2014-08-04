@@ -30,9 +30,9 @@ SceneJS_ChunkFactory.createChunkType({
         }
     },
 
-    drawAndPick: function(ctx) {
+    drawAndPick: function(frameCtx) {
 
-        var vars = (ctx.pick) ? this._pick : this._draw;
+        var vars = (frameCtx.pick) ? this._pick : this._draw;
 
         var mode;
         var normalAndDist;
@@ -42,7 +42,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         for (var i = 0, len = clips.length; i < len; i++) {
 
-            if (ctx.pick) {
+            if (frameCtx.pick) {
                 mode = vars[i].uClipMode;
                 normalAndDist = vars[i].uClipNormalAndDist;
             } else {

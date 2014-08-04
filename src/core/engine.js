@@ -40,7 +40,8 @@ var SceneJS_Engine = function (json, options) {
      */
     this.display = new SceneJS_Display({
         canvas:this.canvas,
-        transparent: json.transparent
+        transparent: json.transparent,
+        dof: json.dof
     });
 
     /**

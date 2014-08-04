@@ -8,32 +8,32 @@ SceneJS_ChunkFactory.createChunkType({
     // Avoid reapplication of a chunk after a program switch.
     programGlobal:true,
 
-    drawAndPick:function (ctx) {
+    drawAndPick:function (frameCtx) {
 
         var enabled = this.core.enabled;
 
-        if (ctx.depthbufEnabled != enabled) {
+        if (frameCtx.depthbufEnabled != enabled) {
             var gl = this.program.gl;
             if (enabled) {
                 gl.enable(gl.DEPTH_TEST);
             } else {
                 gl.disable(gl.DEPTH_TEST);
             }
-            ctx.depthbufEnabled = enabled;
+            frameCtx.depthbufEnabled = enabled;
         }
 
         var clearDepth = this.core.clearDepth;
 
-        if (ctx.clearDepth != clearDepth) {
+        if (frameCtx.clearDepth != clearDepth) {
             gl.clearDepth(clearDepth);
-            ctx.clearDepth = clearDepth;
+            frameCtx.clearDepth = clearDepth;
         }
 
         var depthFunc = this.core.depthFunc;
 
-        if (ctx.depthFunc != depthFunc) {
+        if (frameCtx.depthFunc != depthFunc) {
             gl.depthFunc(depthFunc);
-            ctx.depthFunc = depthFunc;
+            frameCtx.depthFunc = depthFunc;
         }
     }
 });

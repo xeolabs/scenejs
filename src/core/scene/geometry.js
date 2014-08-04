@@ -28,10 +28,10 @@ new (function () {
                 autoNormals: params.normals == "auto"
             });
 
-            SceneJS.Geometry._buildNodeCore(this._engine.canvas.gl, this._core);
+            this._buildNodeCore(this._engine.canvas.gl, this._core);
 
             this._core.webglRestored = function () {
-                SceneJS.Geometry._buildNodeCore(self._engine.canvas.gl, self._core);
+                this._buildNodeCore(self._engine.canvas.gl, self._core);
             };
 
         }
@@ -199,20 +199,20 @@ new (function () {
      * In addition to initially allocating those, this is called to reallocate them after
      * WebGL context is regained after being lost.
      */
-    SceneJS.Geometry._buildNodeCore = function (gl, core) {
+    SceneJS.Geometry.prototype._buildNodeCore = function (gl, core) {
 
         var usage = gl.STATIC_DRAW; //var usage = (!arrays.fixed) ? gl.STREAM_DRAW : gl.STATIC_DRAW;
 
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
             var arrays = core.arrays;
-            var canInterleave = true;
+            var canInterleave = (SceneJS.getConfigs("enableInterleaving") !== false);
             var dataLength = 0;
             var interleavedValues = 0;
             var interleavedArrays = [];
             var interleavedArrayStrides = [];
 
-            var prepareInterleaveBuffer = function (array, strideInElements) {
+            var prepareInterleaveBuffer = function(array, strideInElements) {
                 if (dataLength == 0) {
                     dataLength = array.length / strideInElements;
                 } else if (array.length / strideInElements != dataLength) {
@@ -225,27 +225,37 @@ new (function () {
             };
 
             if (arrays.positions) {
-                core.interleavedPositionOffset = prepareInterleaveBuffer(arrays.positions, 3);
+                if (canInterleave) {
+                    core.interleavedPositionOffset = prepareInterleaveBuffer(arrays.positions, 3);
+                }
                 core.vertexBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.positions, arrays.positions.length, 3, usage);
             }
 
             if (arrays.normals) {
-                core.interleavedNormalOffset = prepareInterleaveBuffer(arrays.normals, 3);
+                if (canInterleave) {
+                    core.interleavedNormalOffset = prepareInterleaveBuffer(arrays.normals, 3);
+                }
                 core.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.normals, arrays.normals.length, 3, usage);
             }
 
             if (arrays.uv) {
-                core.interleavedUVOffset = prepareInterleaveBuffer(arrays.uv, 2);
+                if (canInterleave) {
+                    core.interleavedUVOffset = prepareInterleaveBuffer(arrays.uv, 2);
+                }
                 core.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv, arrays.uv.length, 2, usage);
             }
 
             if (arrays.uv2) {
-                core.interleavedUV2Offset = prepareInterleaveBuffer(arrays.uv2, 2);
+                if (canInterleave) {
+                    core.interleavedUV2Offset = prepareInterleaveBuffer(arrays.uv2, 2);
+                }
                 core.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv2, arrays.uv2.length, 2, usage);
             }
 
             if (arrays.colors) {
-                core.interleavedColorOffset = prepareInterleaveBuffer(arrays.colors, 4);
+                if (canInterleave) {
+                    core.interleavedColorOffset = prepareInterleaveBuffer(arrays.colors, 4);
+                }
                 core.colorBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.colors, arrays.colors.length, 4, usage);
             }
 
@@ -458,6 +468,10 @@ new (function () {
         return this.primitive;
     };
 
+    /** Returns the Model-space boundary of this geometry
+     *
+      * @returns {*}
+     */
     SceneJS.Geometry.prototype.getBoundary = function () {
         if (this._boundary) {
             return this._boundary;
@@ -631,5 +645,4 @@ new (function () {
         }
     };
 
-})
-    ();
+})();

@@ -58,7 +58,7 @@ var SceneJS_configsModule = new (function () {
             for (var i = 0; cfg && i < parts.length; i++) {
                 cfg = cfg[parts[i]];
             }
-            return cfg || {};
+            return (cfg != undefined) ? cfg : {};
         }
     };
 

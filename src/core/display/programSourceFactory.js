@@ -51,12 +51,20 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var customFragmentShader = customShaders.fragment || {};
         var fragmentHooks = customFragmentShader.hooks || {};
 
+        // Do a full custom shader replacement if code supplied without hooks
+        if (customShaders.vertex
+            && customShaders.vertex.code
+            && customShaders.vertex.code != ""
+            && SceneJS._isEmpty(customShaders.vertex.hooks)) {
+            return [customShaders.vertex.code];
+        }
+
         var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
         var normals = this._hasNormals(states);
 
         var src = [
-            "precision mediump float;",
+            "precision highp float;",
             "attribute vec3 SCENEJS_aVertex;",
             "uniform mat4 SCENEJS_uMMatrix;",
             "uniform mat4 SCENEJS_uMNMatrix;",
@@ -164,12 +172,20 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var customFragmentShader = customShaders.fragment || {};
         var fragmentHooks = customFragmentShader.hooks || {};
 
+        // Do a full custom shader replacement if code supplied without hooks
+        if (customShaders.fragment
+            && customShaders.fragment.code
+            && customShaders.fragment.code != ""
+            && SceneJS._isEmpty(customShaders.fragment.hooks)) {
+            return [customShaders.fragment.code];
+        }
+
         var clipping = states.clips.clips.length > 0;
 
         var normals = this._hasNormals(states);
 
         var src = [
-            "precision mediump float;"
+            "precision highp float;"
         ];
 
         src.push("vec4 packDepth(const in float depth) {");
@@ -311,10 +327,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var customShaders = states.shader.shaders || {};
 
-        /* Do a full custom shader replacement if code supplied without hooks
-         */
-        if (customShaders.vertex && customShaders.vertex.code && !customShaders.vertex.hooks) {
-            return customShaders.vertex.code;
+        // Do a full custom shader replacement if code supplied without hooks
+        if (customShaders.vertex
+            && customShaders.vertex.code
+            && customShaders.vertex.code != ""
+            && SceneJS._isEmpty(customShaders.vertex.hooks)) {
+            return [customShaders.vertex.code];
         }
 
         var customVertexShader = customShaders.vertex || {};
@@ -329,7 +347,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var morphing = !!states.morphGeometry.targets;
 
         var src = [
-            "precision mediump float;"
+            "precision highp float;"
         ];
 
         src.push("attribute vec3 SCENEJS_aVertex;");                // Model coordinates
@@ -395,9 +413,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("varying vec4 SCENEJS_vWorldVertex;");         // Varying for fragment clip or world pos hook
         }
 
-        if (fragmentHooks.viewPos) {
-            src.push("varying vec4 SCENEJS_vViewVertex;");          // Varying for fragment view clip hook
-        }
+        //    if (fragmentHooks.viewPos) {
+        src.push("varying vec4 SCENEJS_vViewVertex;");          // Varying for fragment view clip hook
+        //  }
 
         if (texturing) {                                            // Varyings for fragment texturing
             if (states.geometry.uvBuf) {
@@ -483,9 +501,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("  SCENEJS_vWorldVertex = worldVertex;");                  // Varying for fragment world clip or hooks
         }
 
-        if (fragmentHooks.viewPos) {
-            src.push("  SCENEJS_vViewVertex = viewVertex;");                    // Varying for fragment hooks
-        }
+        // if (fragmentHooks.viewPos) {
+        src.push("  SCENEJS_vViewVertex = viewVertex;");                    // Varying for fragment hooks
+        //  }
 
         if (vertexHooks.projMatrix) {
             src.push("gl_Position = " + vertexHooks.projMatrix + "(SCENEJS_uPMatrix) * viewVertex;");
@@ -581,10 +599,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var customShaders = states.shader.shaders || {};
 
-        /* Do a full custom shader replacement if code supplied without hooks
-         */
-        if (customShaders.fragment && customShaders.fragment.code && !customShaders.fragment.hooks) {
-            return customShaders.fragment.code;
+        // Do a full custom shader replacement if code supplied without hooks
+        if (customShaders.fragment
+            && customShaders.fragment.code
+            && customShaders.fragment.code != ""
+            && SceneJS._isEmpty(customShaders.fragment.hooks)) {
+            return [customShaders.fragment.code];
         }
 
         var customFragmentShader = customShaders.fragment || {};
@@ -597,16 +617,20 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var src = ["\n"];
 
-        src.push("precision mediump float;");
+        src.push("precision highp float;");
 
 
         if (clipping || fragmentHooks.worldPos) {
             src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
         }
 
-        if (fragmentHooks.viewPos) {
-            src.push("varying vec4 SCENEJS_vViewVertex;");              // View-space vertex
-        }
+        //  if (fragmentHooks.viewPos) {
+        src.push("varying vec4 SCENEJS_vViewVertex;");              // View-space vertex
+        //  }
+
+        src.push("uniform float SCENEJS_uZNear;");                      // Used in Z-pick mode
+        src.push("uniform float SCENEJS_uZFar;");                       // Used in Z-pick mode
+
 
         /*-----------------------------------------------------------------------------------
          * Variables
@@ -656,6 +680,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform bool  SCENEJS_uDiffuse;");
         src.push("uniform bool  SCENEJS_uReflection;");
 
+        src.push("uniform bool  SCENEJS_uDepthMode;");
+
         /* True when rendering transparency
          */
         src.push("uniform bool  SCENEJS_uTransparent;");
@@ -668,7 +694,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         src.push("uniform vec3  SCENEJS_uAmbientColor;");                         // Scene ambient colour - taken from clear colour
 
-        src.push("uniform vec3  SCENEJS_uMaterialBaseColor;");
+        src.push("uniform vec3  SCENEJS_uMaterialColor;");
         src.push("uniform float SCENEJS_uMaterialAlpha;");
         src.push("uniform float SCENEJS_uMaterialEmit;");
         src.push("uniform vec3  SCENEJS_uMaterialSpecularColor;");
@@ -752,7 +778,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (states.geometry.colorBuf) {
             src.push("  vec3    color   = SCENEJS_vColor.rgb;");
         } else {
-            src.push("  vec3    color   = SCENEJS_uMaterialBaseColor;")
+            src.push("  vec3    color   = SCENEJS_uMaterialColor;")
         }
 
         src.push("  float alpha         = SCENEJS_uMaterialAlpha;");
@@ -783,6 +809,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (normals) {
             src.push("  float   attenuation = 1.0;");
             src.push("  vec3    viewNormalVec = SCENEJS_vViewNormal;");
+            src.push("  vec3    worldNormalVec = SCENEJS_vWorldNormal;");
         }
 
         var layer;
@@ -841,6 +868,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     } else if (layer.blendMode == "add") {
                         src.push("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
                     }
+
+                    //=====================================================================
+                    // TODO: "mix" blendMode
+                    //=====================================================================
                 }
 
                 /* Texture output
@@ -879,7 +910,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (layer.applyTo == "normals" && normals) {
                     src.push("vec3 bump = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
-                    src.push("viewNormalVec *= -bump;");
+                    src.push("worldNormalVec = bump;");
                 }
             }
             if (normals) {
@@ -889,7 +920,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (normals && cubeMapping) {
             src.push("if (SCENEJS_uReflection) {"); // Flag which can enable/disable reflection
-            src.push("vec3 envLookup = reflect(normalize(SCENEJS_vWorldEyeVec), normalize(SCENEJS_vWorldNormal));");
+            src.push("vec3 envLookup = reflect(normalize(SCENEJS_vWorldEyeVec), normalize(worldNormalVec));");
             src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
@@ -925,7 +956,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "point") {
 
-                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
+                    src.push("dotN = max(dot(worldNormalVec, viewLightVec), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
 
@@ -945,7 +976,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
+                            " * specular * pow(max(dot(reflect(-viewLightVec, -worldNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
                         src.push("}");
                     }
                     //src.push("}");
@@ -953,7 +984,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "dir") {
 
-                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
+                    src.push("dotN = max(dot(worldNormalVec, viewLightVec), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
@@ -965,7 +996,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+                            " * specular * pow(max(dot(reflect(-viewLightVec, -worldNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
                         src.push("}");
                     }
                     // src.push("}");
@@ -984,11 +1015,24 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (fragmentHooks.pixelColor) {
             src.push("fragColor=" + fragmentHooks.pixelColor + "(fragColor);");
         }
-
         if (false && debugCfg.whitewash === true) {
             src.push("    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
         } else {
-            src.push("    gl_FragColor = fragColor;");
+            src.push("    if (SCENEJS_uDepthMode) {");
+            src.push("          float depth = length(SCENEJS_vViewVertex) / (SCENEJS_uZFar - SCENEJS_uZNear);");
+            src.push("          const vec4 bias = vec4(1.0 / 255.0,");
+            src.push("          1.0 / 255.0,");
+            src.push("          1.0 / 255.0,");
+            src.push("          0.0);");
+            src.push("          float r = depth;");
+            src.push("          float g = fract(r * 255.0);");
+            src.push("          float b = fract(g * 255.0);");
+            src.push("          float a = fract(b * 255.0);");
+            src.push("          vec4 colour = vec4(r, g, b, a);");
+            src.push("          gl_FragColor = colour - (colour.yzww * bias);");
+            src.push("    } else {");
+            src.push("          gl_FragColor = fragColor;");
+            src.push("    };");
         }
         src.push("}");
 

@@ -16,7 +16,7 @@ SceneJS_ChunkFactory.createChunkType({
 
     build:function () {},
 
-    drawAndPick:function (ctx) {
+    drawAndPick:function (frameCtx) {
 
         var gl = this.program.gl;
 

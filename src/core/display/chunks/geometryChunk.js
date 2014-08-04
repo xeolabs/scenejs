@@ -89,12 +89,12 @@ SceneJS_ChunkFactory.createChunkType({
 
     },
 
-    draw:function (ctx) {
+    draw:function (frameCtx) {
         var doMorph = this.core.targets && this.core.targets.length;
         var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
         if (this.VAO) {
-            ctx.VAO.bindVertexArrayOES(this.VAO);
+            frameCtx.VAO.bindVertexArrayOES(this.VAO);
             if (doMorph) {
                 if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {
                     this.setDrawMorphFactor();
@@ -103,11 +103,11 @@ SceneJS_ChunkFactory.createChunkType({
             } else if (cleanInterleavedBuf || !this.VAOHasInterleavedBuf) {
                 return;
             }
-        } else if (ctx.VAO) {
+        } else if (frameCtx.VAO) {
             // Start creating a new VAO by switching to the default VAO, which doesn't have attribs enabled.
-            ctx.VAO.bindVertexArrayOES(null);
-            this.VAO = ctx.VAO.createVertexArrayOES();
-            ctx.VAO.bindVertexArrayOES(this.VAO);
+            frameCtx.VAO.bindVertexArrayOES(null);
+            this.VAO = frameCtx.VAO.createVertexArrayOES();
+            frameCtx.VAO.bindVertexArrayOES(this.VAO);
             var gl = this.program.gl;
         }
 
@@ -193,7 +193,7 @@ SceneJS_ChunkFactory.createChunkType({
 
     },
 
-    pick:function (ctx) {
+    pick:function (frameCtx) {
 
         if (this.core.targets && this.core.targets.length) {
             this.morphPick();

@@ -3,6 +3,7 @@ SceneJS_ChunkFactory.createChunkType({
     type: "program",
 
     build : function() {
+        this._depthMode = this.program.draw.getUniformLocation("SCENEJS_uDepthMode");
         this._rayPickMode = this.program.pick.getUniformLocation("SCENEJS_uRayPickMode");
     },
 
@@ -15,6 +16,8 @@ SceneJS_ChunkFactory.createChunkType({
         frameCtx.textureUnit = 0;
 
         var gl = this.program.gl;
+
+        gl.uniform1i(this._depthMode, frameCtx.depthMode);
 
         if (!frameCtx.VAO) {
             for (var i = 0; i < 10; i++) {

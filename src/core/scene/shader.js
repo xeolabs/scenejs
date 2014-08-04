@@ -47,11 +47,11 @@ new (function() {
 
                             shaders: {
                                 fragment: {
-                                    code: shaderFragmentCodeStack.slice(0, stackLen).join("\n"),
+                                    code: shaderFragmentCodeStack.slice(0, stackLen).join(""),
                                     hooks: combineMapStack(shaderFragmentHooksStack)
                                 },
                                 vertex: {
-                                    code: shaderVertexCodeStack.slice(0, stackLen).join("\n"),
+                                    code: shaderVertexCodeStack.slice(0, stackLen).join(""),
                                     hooks: combineMapStack(shaderVertexHooksStack)
                                 }
                             },

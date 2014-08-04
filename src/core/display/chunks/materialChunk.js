@@ -9,7 +9,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         var draw = this.program.draw;
 
-        this._uMaterialBaseColor = draw.getUniformLocation("SCENEJS_uMaterialBaseColor");
+        this._uMaterialBaseColor = draw.getUniformLocation("SCENEJS_uMaterialColor");
         this._uMaterialSpecularColor = draw.getUniformLocation("SCENEJS_uMaterialSpecularColor");
         this._uMaterialSpecular = draw.getUniformLocation("SCENEJS_uMaterialSpecular");
         this._uMaterialShine = draw.getUniformLocation("SCENEJS_uMaterialShine");

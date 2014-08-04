@@ -5,13 +5,15 @@ SceneJS_ChunkFactory.createChunkType({
     build : function() {
 
         this._uPMatrixDraw = this.program.draw.getUniformLocation("SCENEJS_uPMatrix");
+        this._uZNearDraw = this.program.draw.getUniformLocation("SCENEJS_uZNear");
+        this._uZFarDraw = this.program.draw.getUniformLocation("SCENEJS_uZFar");
 
         this._uPMatrixPick = this.program.pick.getUniformLocation("SCENEJS_uPMatrix");
         this._uZNearPick = this.program.pick.getUniformLocation("SCENEJS_uZNear");
         this._uZFarPick = this.program.pick.getUniformLocation("SCENEJS_uZFar");
     },
 
-    draw : function(ctx) {
+    draw : function(frameCtx) {
 
         if (this.core.dirty) {
             this.core.rebuild();
@@ -23,11 +25,19 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniformMatrix4fv(this._uPMatrixDraw, gl.FALSE, this.core.mat);
         }
 
-        ctx.cameraMat = this.core.mat; // Query only in draw pass
+        if (this._uZNearDraw) {
+            gl.uniform1f(this._uZNearDraw, this.core.optics.near);
+        }
+
+        if (this._uZFarDraw) {
+            gl.uniform1f(this._uZFarDraw, this.core.optics.far);
+        }
+
+        frameCtx.cameraMat = this.core.mat; // Query only in draw pass
     },
 
 
-    pick : function(ctx) {
+    pick : function(frameCtx) {
 
         var gl = this.program.gl;
 
@@ -35,7 +45,7 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniformMatrix4fv(this._uPMatrixPick, gl.FALSE, this.core.mat);
         }
 
-        if (ctx.rayPick) { // Z-pick pass: feed near and far clip planes into shader
+        if (frameCtx.rayPick) { // Z-pick pass: feed near and far clip planes into shader
 
             if (this._uZNearPick) {
                 gl.uniform1f(this._uZNearPick, this.core.optics.near);
@@ -46,6 +56,6 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
 
-        ctx.cameraMat = this.core.mat; // Query only in draw pass
+        frameCtx.cameraMat = this.core.mat; // Query only in draw pass
     }
 });

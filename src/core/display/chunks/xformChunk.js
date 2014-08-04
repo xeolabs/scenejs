@@ -15,7 +15,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._uNormalMatLocationPick = pick.getUniformLocation("SCENEJS_uMNMatrix");
     },
 
-    draw : function(ctx) {
+    draw : function(frameCtx) {
 
         /* Rebuild core's matrix from matrices at cores on path up to root
          */
@@ -33,10 +33,10 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniformMatrix4fv(this._uNormalMatLocationDraw, gl.FALSE, this.core.normalMat);
         }
 
-        ctx.modelMat = this.core.mat;
+        frameCtx.modelMat = this.core.mat;
     },
 
-    pick : function(ctx) {
+    pick : function(frameCtx) {
 
         /* Rebuild core's matrix from matrices at cores on path up to root
          */
@@ -54,6 +54,6 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniformMatrix4fv(this._uNormalMatLocationPick, gl.FALSE, this.core.normalMat);
         }
 
-        ctx.modelMat = this.core.mat;
+        frameCtx.modelMat = this.core.mat;
     }
 });

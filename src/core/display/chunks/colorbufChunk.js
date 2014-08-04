@@ -11,20 +11,20 @@ SceneJS_ChunkFactory.createChunkType({
     build:function () {
     },
 
-    drawAndPick:function (ctx) {
+    drawAndPick:function (frameCtx) {
 
-        if (!ctx.transparencyPass) { // Blending forced when rendering transparent bin
+        if (!frameCtx.transparent) { // Blending forced when rendering transparent bin
 
             var blendEnabled = this.core.blendEnabled;
 
-            if (ctx.blendEnabled != blendEnabled) {
+            if (frameCtx.blendEnabled != blendEnabled) {
                 var gl = this.program.gl;
                 if (blendEnabled) {
                     gl.enable(gl.BLEND);
                 } else {
                     gl.disable(gl.BLEND);
                 }
-                ctx.blendEnabled = blendEnabled;
+                frameCtx.blendEnabled = blendEnabled;
             }
         }
     }

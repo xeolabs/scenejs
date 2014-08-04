@@ -32,7 +32,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     },
 
-    draw : function(ctx) {
+    draw : function(frameCtx) {
 
         var layers = this.core.layers;
 
@@ -47,7 +47,7 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (this._uTexSampler[i] && layer.texture) {    // Lazy-loads
 
-                    draw.bindTexture(this._uTexSampler[i], layer.texture, ctx.textureUnit++);
+                    draw.bindTexture(this._uTexSampler[i], layer.texture, frameCtx.textureUnit++);
 
                     if (layer._matrixDirty && layer.buildMatrix) {
                         layer.buildMatrix.call(layer);
@@ -67,8 +67,8 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
 
-        if (ctx.textureUnit > 10) { // TODO: Find how many textures allowed
-            ctx.textureUnit = 0;
+        if (frameCtx.textureUnit > 10) { // TODO: Find how many textures allowed
+            frameCtx.textureUnit = 0;
         }
     }
 });

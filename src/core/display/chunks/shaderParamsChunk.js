@@ -8,13 +8,13 @@ SceneJS_ChunkFactory.createChunkType({
     build : function() {
     },
 
-    drawAndPick: function(ctx) {
+    drawAndPick: function(frameCtx) {
 
         var paramsStack = this.core.paramsStack;
 
         if (paramsStack) {
 
-            var program = ctx.pick ? this.program.pick : this.program.draw;
+            var program = frameCtx.pick ? this.program.pick : this.program.draw;
             var params;
             var name;
 

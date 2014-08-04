@@ -8,15 +8,15 @@ SceneJS_ChunkFactory.createChunkType({
     build : function() {
     },
 
-    drawAndPick : function(ctx) {
+    drawAndPick : function(frameCtx) {
 
         if (this.core.props) {
 
             var gl = this.program.gl;
 
-            if (ctx.renderer) {
-                ctx.renderer.props.restoreProps(gl);
-                ctx.renderer = this.core;
+            if (frameCtx.renderer) {
+                frameCtx.renderer.props.restoreProps(gl);
+                frameCtx.renderer = this.core;
             }
 
             this.core.props.setProps(gl);

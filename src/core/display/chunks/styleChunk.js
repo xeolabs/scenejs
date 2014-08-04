@@ -8,14 +8,14 @@ SceneJS_ChunkFactory.createChunkType({
     // Avoid reapplication of a chunk after a program switch.
     programGlobal:true,
 
-    drawAndPick:function (ctx) {
+    drawAndPick:function (frameCtx) {
 
         var lineWidth = this.core.lineWidth;
 
-        if (ctx.lineWidth != lineWidth) {
+        if (frameCtx.lineWidth != lineWidth) {
             var gl = this.program.gl;
             gl.lineWidth(lineWidth);
-            ctx.lineWidth = lineWidth;
+            frameCtx.lineWidth = lineWidth;
         }
     }
 });
