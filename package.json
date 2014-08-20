@@ -1,6 +1,6 @@
 {
   "name": "SceneJS",
-  "version": "3.1",
+  "version": "3.2.0",
   "description": "WebGL Scene Graph Library for JavaScript",
   "homepage": "http://scenejs.org/",
   "author": {
@@ -14,6 +14,9 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "ncp": "^0.6.0"
+    "grunt": "^0.4.5",
+    "load-grunt-tasks": "^0.6.0",
+    "ncp": "^0.6.0",
+    "time-grunt": "^0.4.0"
   }
 }
