@@ -1,0 +1,19 @@
+{
+  "name": "SceneJS",
+  "version": "3.1",
+  "description": "WebGL Scene Graph Library for JavaScript",
+  "homepage": "http://scenejs.org/",
+  "author": {
+    "name": "Lindsay Kay",
+    "email": "lindsay.kay@xeolabs.com"
+  },
+  "license": "Dual licensed under the MIT or GPL Version 2 licenses.",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/Stonelinks/scenejs.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "ncp": "^0.6.0"
+  }
+}
