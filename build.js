@@ -12,7 +12,6 @@
     var version = "3.1";
 
     var ncp = require('ncp').ncp;
-    var sys = require('util');
     var fs = require('fs');
     var path = require('path');
 
@@ -44,23 +43,23 @@
     process.argv.forEach(function (val, index, array) {
 
         if (val == "--help") {
-            sys.print('SceneJS Build Script\n');
-            sys.print('Usage:\n');
-            sys.print('build [type] [options]\n');
-            sys.print('eg building scripts without documentation,\n build SCRIPTS --without-documents\n');
-            sys.print('\n');
-            sys.print('Types:\n');
-            sys.print('all - (DEFAULT) build all options\n');
-            sys.print('scripts - build the compiled script and uglify\n');
-            sys.print('docs - build documents\n');
-            sys.print('dev - build development template\n');
-            sys.print('\n');
-            sys.print('Options:\n');
-            sys.print('--without-uglify  : builds without using the uglify JS compiler\n');
-            sys.print('--without-documents  : (DEFAULT) builds without creating docs using the node-jsdoc-toolkit\n');
-            sys.print('\n');
-            sys.print('--with-uglify  : (DEFAULT) builds using the uglify JS compiler\n');
-            sys.print('--with-documents  : builds the docs using the node-jsdoc-toolkit\n');
+            console.log('SceneJS Build Script\n');
+            console.log('Usage:\n');
+            console.log('build [type] [options]\n');
+            console.log('eg building scripts without documentation,\n build SCRIPTS --without-documents\n');
+            console.log('\n');
+            console.log('Types:\n');
+            console.log('all - (DEFAULT) build all options\n');
+            console.log('scripts - build the compiled script and uglify\n');
+            console.log('docs - build documents\n');
+            console.log('dev - build development template\n');
+            console.log('\n');
+            console.log('Options:\n');
+            console.log('--without-uglify  : builds without using the uglify JS compiler\n');
+            console.log('--without-documents  : (DEFAULT) builds without creating docs using the node-jsdoc-toolkit\n');
+            console.log('\n');
+            console.log('--with-uglify  : (DEFAULT) builds using the uglify JS compiler\n');
+            console.log('--with-documents  : builds the docs using the node-jsdoc-toolkit\n');
             isHelp = true;
             return;
         }
@@ -208,7 +207,7 @@
         ]
     };
 
-    sys.print("Generating file list\n");
+    console.log("Generating file list");
 
     var getFileList = function (list, all) {
 
@@ -233,7 +232,7 @@
 
     var output = [];
     for (var i = 0; i < fileList.length; i++) {
-        sys.print("Importing: " + fileList[i] + "\n");
+        console.log("Importing: " + fileList[i]);
         output.push(fs.readFileSync(fileList[i]));
     }
 
@@ -256,12 +255,12 @@
 
                             // Deep-copy an existing directory
 
-                            sys.print("Distributing plugins to: " + distPluginDir + "\n");
+                            console.log("Distributing plugins to: " + distPluginDir);
                             ncp("src/plugins", distPluginDir, function (err) {
 
                             });
 
-                            sys.print("Distributing extras to: " + distExtrasDir + "\n");
+                            console.log("Distributing extras to: " + distExtrasDir);
                             ncp("src/extras", distExtrasDir, function (err) {
 
                             });
@@ -269,7 +268,7 @@
                             fs.writeFileSync(distExtrasDir + "/gui.js", fs.readFileSync("src/extras/gui/dat.gui.min.js") + fs.readFileSync("src/extras/gui/gui.js"));
 
                             if (fileList.length > 0) {
-                                sys.print("Writing core library to: " + distDir + "/scenejs.js\n");
+                                console.log("Writing core library to: " + distDir + "/scenejs.js");
                                 output.push('SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/' + distDir + '/plugins" });');
                                 output = output.join("");
                                 fs.writeFileSync(distDir + "/scenejs.js", output);
@@ -286,19 +285,19 @@
                                         //"-p",
                                         "-t=external/jsdoc-toolkit/templates/jsdoc"].concat(files);
 
-                                    sys.print("cmdStr + " + cmdStr);
+                                    console.log("cmdStr + " + cmdStr);
 
                                     var cmd = spawn('node', cmdStr);
 
-                                    sys.print("Generating Documents\n");
+                                    console.log("Generating Documents");
                                     cmd.stdout.on('data', function (data) {
-                                        sys.print(data);
+                                        console.log(data);
                                     });
 
                                     // check exit-code
                                     cmd.on('exit', function (code) {
-                                        if (code == 0) sys.print("Build Complete!\n");
-                                        else sys.print("Build Complete! Exit with code: " + code + "\n");
+                                        if (code == 0) console.log("Build Complete!");
+                                        else console.log("Build Complete! Exit with code: " + code);
                                     });
 
                                     // check for errors
@@ -308,10 +307,10 @@
                                         }
                                     });
                                 } else {
-                                    sys.print("Build Complete!\n");
+                                    console.log("Build Complete!");
                                 }
                             } else {
-                                sys.print("Build Complete!\n");
+                                console.log("Build Complete!");
                             }
                         });
                 });
