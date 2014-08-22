@@ -6,7 +6,28 @@
  * Copyright 2010, Lindsay Kay
  *
  *
- */// Only define RequireJS if not already present
+ */(function(root, factory) {
+
+  // Set up SceneJS appropriately for the environment. Start with AMD.
+  if (typeof define === 'function' && define.amd) {
+    define(['exports'], function(exports) {
+      // Export global even in AMD case in case this script is loaded with
+      // others that may still expect a global SceneJS.
+      root.SceneJS = factory(root, exports);
+    });
+
+  // Next for Node.js or CommonJS.
+  } else if (typeof exports !== 'undefined') {
+    factory(root, exports);
+
+  // Finally, as a browser global.
+  } else {
+    root.SceneJS = factory(root, {});
+  }
+  
+}(this, function(root, SceneJS) {
+
+// Only define RequireJS if not already present
 if (undefined === require) {/*
  RequireJS 2.1.6 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
  Available via the MIT or new BSD license.
@@ -17689,4 +17710,5 @@ SceneJS_ChunkFactory.createChunkType({
         ctx.modelMat = this.core.mat;
     }
 });
-SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/api/latest/plugins" });
+SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/api/latest/plugins" });  return SceneJS;
+}));

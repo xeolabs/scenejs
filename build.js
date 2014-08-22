@@ -90,6 +90,8 @@
         core:[
 
             "licenses/license-header.js",
+            
+            "src/shimStart.js",
 
             //--------------------------------------------------------------------
             // Integrated 3rd party libs
@@ -270,6 +272,7 @@
                             if (fileList.length > 0) {
                                 console.log("Writing core library to: " + distDir + "/scenejs.js");
                                 output.push('SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/' + distDir + '/plugins" });');
+                                output.push(fs.readFileSync("src/shimEnd.js"));
                                 output = output.join("");
                                 fs.writeFileSync(distDir + "/scenejs.js", output);
                             }
