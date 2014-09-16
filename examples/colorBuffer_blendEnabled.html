@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+
+        nodes: [
+
+            // Mouse-orbit for camera,
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: -40,
+                pitch: -20,
+                zoom: 500,
+                eye: { x: 0, y: 150, z: -1000 },
+                look: { x: 0, y: 0, z: 0 },
+                zoomSensitivity: 10.0,
+
+                nodes: [
+
+                    // Color buffer
+                    {
+                        type: "colorBuffer",
+                        id: "myColorBuffer",
+
+                        blendEnabled: true,
+
+                        nodes: [
+
+                            // Cloudy sea skybox, implemented by plugin at:
+                            // http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            {
+                                type: "skybox/cloudySea",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+
+                            // Randomly scattered boxes, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/geometry/randomObjects.js
+                            {
+                                type: "geometry/randomObjects",
+                                numObjects: 1000
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+//
+//    //  Get colorBuffer node and bind a GUI to it to play with it
+//    scene.getNode("myColorBuffer",
+//            function (colorBuffer) {
+//
+//                var Menu = function () {
+//
+//                    var colorMask = colorBuffer.getColorMask();
+//
+//                    this["r"] = colorMask.r;
+//                    this["g"] = colorMask.g;
+//                    this["b"] = colorMask.b;
+//                    this["a"] = colorMask.a;
+//
+//                    var self = this;
+//
+//                    // This is actually quite inefficient because it continually updates
+//                    // the scene graph, forcing frames to continually re-render.
+//                    // Your GPU's not going to like it, but it's just for a quick and dirty demo.
+//
+//                    var update = function () {
+//                        colorBuffer.setColorMask({
+//                            r: self["r"],
+//                            g: self["g"],
+//                            b: self["b"],
+//                            a: self["a"]
+//                        });
+//                        requestAnimationFrame(update);
+//                    };
+//                    update();
+//                };
+//
+//                var gui = new dat.GUI();
+//                var folder = gui.addFolder("colorMask");
+//                var menu = new Menu();
+//                folder.add(menu, 'r');
+//                folder.add(menu, 'g');
+//                folder.add(menu, 'b');
+//                folder.add(menu, 'a');
+//                folder.open();
+//            });
+
+</script>
+</body>
+</html>

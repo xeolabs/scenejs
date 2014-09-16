@@ -91,9 +91,9 @@ function createScene() {
                                 nodes:[
 
                                     // Miramar Clouds Skybox, implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/skyboxes/miramarClouds.js
+                                    // http://scenejs.org/api/latest/plugins/node/skybox/miramarClouds.js
                                     {
-                                        type:"skyboxes/miramarClouds",
+                                        type:"skybox/miramarClouds",
                                         size:5000 // Box half-size on each axis - default is 5000
                                     },
 
@@ -132,9 +132,9 @@ function createScene() {
                                                                 nodes:[
 
                                                                     // Plane primitive implemented by plugin at
-                                                                    // http://scenejs.org/api/latest/plugins/node/prims/plane.js
+                                                                    // http://scenejs.org/api/latest/plugins/node/geometry/plane.js
                                                                     {
-                                                                        type:"prims/plane",
+                                                                        type:"geometry/plane",
                                                                         width:1,
                                                                         height:1,
                                                                         wire:true,
@@ -331,9 +331,9 @@ function createBubbles() {
                             angle:0
                         });
                         this.rotate.addNode(
-                                // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
                                 {
-                                    type:"prims/sphere"
+                                    type:"geometry/sphere"
                                 });
                         this.angle = 0;
                         this.angleInc = Math.random() - 0.5;

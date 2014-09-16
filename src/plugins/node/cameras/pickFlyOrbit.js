@@ -44,6 +44,7 @@ require([
             style.background = "#AAFFAA";
             style.opacity = "0.8";
             style["border-radius"] = "3px";
+            style["z-index"] = 100000;
             style["-moz-border-radius"] = "3px";
             style["box-shadow"] = "3px 3px 3px #444444";
             style.left = "0";
@@ -55,18 +56,18 @@ require([
             return {
 
                 // Shows label, but only if text has been set
-                setShown:function (shown) {
+                setShown: function (shown) {
                     style.display = shown && text ? "" : "none";
                 },
 
                 // Sets canvas position of label
-                setPos:function (pos) {
+                setPos: function (pos) {
                     style.left = "" + pos.x + "px";
                     style.top = "" + pos.y + "px";
                 },
 
                 // Sets text in label
-                setText:function (t) {
+                setText: function (t) {
                     text = t;
                     div.innerHTML = "<span>" + text + "</span>";
                 }
@@ -75,19 +76,21 @@ require([
 
         SceneJS.Types.addType("cameras/pickFlyOrbit", {
 
-            construct:function (params) {
+            construct: function (params) {
+
+                var self = this;
 
                 var lookat = this.addNode({
-                    type:"lookAt",
+                    type: "lookAt",
 
-                    nodes:[
+                    nodes: [
                         {
-                            type:"name",
-                            name:"noname",
+                            type: "name",
+                            name: "noname",
 
                             // A plugin node type is responsible for attaching specified
                             // child nodes within itself
-                            nodes:params.nodes
+                            nodes: params.nodes
                         }
                     ]
                 });
@@ -104,44 +107,44 @@ require([
 
                     // Sphere position, with a ID so we can update this node:
                     indicatorPos = lookat.addNode({
-                        type:"translate",
-                        id:"__spherePOI"
+                        type: "translate",
+                        id: "__spherePOI"
                     });
 
                     indicatorVis = indicatorPos.addNode({
-                        type:"flags",
-                        flags:{
-                            enabled:false,
-                            transparent:true,
-                            specular:true,
-                            diffuse:false
+                        type: "flags",
+                        flags: {
+                            enabled: false,
+                            transparent: true,
+                            specular: true,
+                            diffuse: false
                         }
                     });
 
                     var cursorSize = params.cursorSize || 1;
 
                     indicatorSize = indicatorVis.addNode({
-                        type:"scale",
-                        id:"__sphereSize",
-                        x:cursorSize,
-                        y:cursorSize,
-                        z:cursorSize,
-                        nodes:[
+                        type: "scale",
+                        id: "__sphereSize",
+                        x: cursorSize,
+                        y: cursorSize,
+                        z: cursorSize,
+                        nodes: [
                             {
-                                type:"material",
-                                color:{ r:0.4, g:1.0, b:0.4 },
-                                specularColor:{ r:1.0, g:1.0, b:1.0 },
-                                emit:0.2,
-                                nodes:[
+                                type: "material",
+                                color: { r: 0.4, g: 1.0, b: 0.4 },
+                                specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                emit: 0.2,
+                                nodes: [
                                     {
-                                        type:"style",
-                                        lineWidth:2,
-                                        nodes:[
+                                        type: "style",
+                                        lineWidth: 2,
+                                        nodes: [
 
                                             // Sphere primitive implemented by plugin at
-                                            // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
                                             {
-                                                type:"prims/sphere"
+                                                type: "geometry/sphere"
                                             }
                                         ]
                                     }
@@ -158,16 +161,18 @@ require([
                     });
                 }
 
-                var eye = params.eye || { x:0, y:0, z:0 };
-                var look = params.look || { x:0, y:0, z:0};
+                var eye = params.eye || { x: 0, y: 0, z: 0 };
+                var look = params.look || { x: 0, y: 0, z: 0};
                 var zoom = params.zoom || 100;
                 var zoomSensitivity = params.zoomSensitivity || 1.0;
 
-                lookat.set({
-                    eye:{ x:eye.x, y:eye.y, z:eye.z},
-                    look:{ x:look.x, y:look.y, z:look.z },
-                    up:{ x:0, y:1, z:0 }
-                });
+                var lookatArgs = {
+                    eye: { x: eye.x, y: eye.y, z: eye.z},
+                    look: { x: look.x, y: look.y, z: look.z },
+                    up: { x: 0, y: 1, z: 0 }
+                };
+                lookat.set(lookatArgs);
+                this.publish("updated", lookatArgs);
 
                 var canvas = this.getScene().getCanvas();
 
@@ -276,7 +281,7 @@ require([
                 }
 
                 function pick(canvasX, canvasY) {
-                    scene.pick(canvasX, canvasY, { rayPick:true });
+                    scene.pick(canvasX, canvasY, { rayPick: true });
                 }
 
                 var scene = this.getScene();
@@ -295,7 +300,7 @@ require([
 
                         if (indicatorVis) {
                             indicatorVis.setEnabled(true);
-                            indicatorPos.setXYZ({x:endPivot[0], y:endPivot[1], z:endPivot[2] });
+                            indicatorPos.setXYZ({x: endPivot[0], y: endPivot[1], z: endPivot[2] });
                             label.setShown(true);
                         }
 
@@ -372,8 +377,18 @@ require([
                             glmat.vec3.transformMat4(eye3, eye, mat);
 
                             // Update view transform
-                            lookat.setLook({x:look[0], y:look[1], z:look[2] });
-                            lookat.setEye({x:look[0] - eye3[0], y:look[1] - eye3[1], z:look[2] - eye3[2] });
+                            lookat.setLook({x: look[0], y: look[1], z: look[2] });
+                            lookat.setEye({x: look[0] - eye3[0], y: look[1] - eye3[1], z: look[2] - eye3[2] });
+
+                            var lookatArgs = {
+                                eye: {x: look[0], y: look[1], z: look[2] },
+                                look: {x: look[0] - eye3[0], y: look[1] - eye3[1], z: look[2] - eye3[2] }
+                            };
+
+//                            lookat.setLook(lookatArgs.look);
+//                            lookat.setEye(lookatArgs.eye);
+
+                            self.publish("updated", lookatArgs);
 
                             // Rotate complete
                             orbiting = false;
@@ -388,7 +403,7 @@ require([
                     });
             },
 
-            destruct:function () {
+            destruct: function () {
                 // TODO: remove mouse handlers
             }
         });

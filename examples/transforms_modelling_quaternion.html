@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Override default material to make teapot blue
+            {
+                type: "material",
+                color: { r: 0.5, g: 0.5, b: 0.6 },
+                nodes: [
+
+                    // Quaternion modelling transform, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/xform/quaternion.js
+                    {
+                        type: "xform/quaternion",
+                        id: "myQuaternion",
+
+                        // Base rotation
+                        x: 0.0, y: 0.0, z: 0.0, angle: 0.0,  // No rotation
+
+                        // Sequence of rotations to apply on top of the base rotation
+                        rotations: [
+                            { x: 0, y: 0, z: 1, angle: 45 }, // Rotate 45 degrees about Z the axis
+                            { x: 1, y: 0, z: 0, angle: 20 }, // Rotate 20 degrees about X the axis
+                            { x: 0, y: 1, z: 0, angle: 90 }, // Rotate 90 degrees about Y the axis
+                        ],
+
+                        nodes: [
+
+                            // Teapot primitive, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                            {
+                                type: "geometry/teapot"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Get the quaternion and hook it up to mouse rotation
+    scene.getNode("myQuaternion",
+            function (myQuaternion) {
+
+                var lastX;
+                var lastY;
+                var dragging;
+                var yaw;
+                var pitch;
+
+                var canvas = scene.getCanvas();
+                canvas.addEventListener('mousedown', mouseDown, true);
+                canvas.addEventListener('mousemove', mouseMove, true);
+                canvas.addEventListener('mouseup', mouseUp, true);
+                canvas.addEventListener('touchstart', touchStart, true);
+                canvas.addEventListener('touchmove', touchMove, true);
+                canvas.addEventListener('touchend', touchEnd, true);
+
+                function mouseDown(event) {
+                    lastX = event.clientX;
+                    lastY = event.clientY;
+                    dragging = true;
+                }
+
+                function touchStart(event) {
+                    lastX = event.targetTouches[0].clientX;
+                    lastY = event.targetTouches[0].clientY;
+                    dragging = true;
+                }
+
+                function mouseUp() {
+                    dragging = false;
+                }
+
+                function touchEnd() {
+                    dragging = false;
+                }
+
+                function mouseMove(event) {
+                    var posX = event.clientX;
+                    var posY = event.clientY;
+                    actionMove(posX, posY);
+                }
+
+                function touchMove(event) {
+                    var posX = event.targetTouches[0].clientX;
+                    var posY = event.targetTouches[0].clientY;
+                    actionMove(posX, posY);
+                }
+
+                function actionMove(posX, posY) {
+                    if (dragging) {
+
+                        // TODO
+
+//                        var yaw = (posX - lastX) * 0.1;
+//                        var pitch = (posY - lastY) * 0.1;
+
+//                        myQuaternion.addRotation({
+//                            x: yaw,
+//                            y: pitch,
+//                            z: 0,
+//                            angle: 1
+//                        });
+//
+//                        myQuaternion.normalize();
+                    }
+                }
+            });
+
+</script>
+</body>
+</html>

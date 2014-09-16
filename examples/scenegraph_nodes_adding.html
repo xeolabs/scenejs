@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+
+<script>
+
+    // Demonstrates creating nodes individually
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene();
+
+    // Add mouse-orbited camera, implemented by plugin at
+    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+    scene.addNode({
+        type: "cameras/orbit",
+        yaw: 30,
+        pitch: -30,
+        zoom: 7,
+        zoomSensitivity: 1.0,
+
+        nodes: [
+
+            // We can't use #addNode to add nodes to a "cameras/orbit" node,
+            // so we'll insert this container node that we can get by ID
+            {
+                id: "content"
+            }
+        ]
+    });
+
+    scene.getNode("content",
+            function (content) {
+
+                // Create blue torus
+
+                var material = content.addNode({
+                    type: "material",
+                    color: { r: 0.2, g: 0.2, b: 0.6 }
+                });
+
+                var translate = material.addNode({
+                    type: "translate",
+                    x: -2
+                });
+
+                // Torus primitive, implemented by plugin at
+                // http://scenejs.org/api/latest/plugins/node/geometry/torus.js
+                var geometry = translate.addNode({
+                    type: "geometry/torus"
+                });
+
+                // Create red torus
+
+                var material2 = content.addNode({
+                    type: "material",
+                    color: { r: 0.6, g: 0.2, b: 0.2 }
+                });
+
+                // This time we'll add a subgraph of nodes
+                material2.addNode({
+                    type: "translate",
+                    x: 2,
+                    nodes: [
+
+                        // Torus primitive, implemented by plugin at
+                        // http://scenejs.org/api/latest/plugins/node/geometry/torus.js
+                        {
+                            type: "geometry/torus"
+                        }
+                    ]
+                });
+            });
+
+</script>
+</body>
+</html>

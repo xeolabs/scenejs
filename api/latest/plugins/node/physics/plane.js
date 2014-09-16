@@ -31,7 +31,7 @@ SceneJS.Types.addType("physics/plane", {
                             angle:90,
                             nodes:[
                                 {
-                                    type:"prims/plane",
+                                    type:"geometry/plane",
                                     wire:params.wire,
                                     xSegments:params.xSegments || 100,
                                     zSegments:params.zSegments || 100

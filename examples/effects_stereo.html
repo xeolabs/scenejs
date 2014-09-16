@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    //-----------------------------------------------------------------------------------------------------------------
+    // Using an "effects/stereo" node in combination with a "cameras/orbit"
+    //-----------------------------------------------------------------------------------------------------------------
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 40,
+                pitch: -20,
+                zoom: 10,
+                zoomSensitivity: 1.0,
+                eye: { x: 0, y: 0, z: 10 },
+                look: { x: 0, y: 0, z: 0 },
+
+                nodes: [
+
+                    // Stereo effect, implemented by plugin at:
+                    // http://scenejs.org/api/latest/plugins/node/effects/stereo.js
+                    {
+                        type: "effects/stereo",
+                        id: "myStereo",
+                        eyeSep: 1.1,        // Eye separation
+                        focalLength: 500,    // Focal length
+
+                        nodes: [
+
+                            // Cloudy sea skybox, implemented by plugin at:
+                            // http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            {
+                                type: "skybox/numberedGrid",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+
+                            // The reflection cube map
+                            // Images taken from: http://hristo.oskov.com/projects/cs418/mp3/
+                            {
+                                type: "reflect/numberedGrid",
+                                intensity: 0.5,
+
+                                nodes: [
+
+                                    // Randomly scattered boxes, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/randomObjects.js
+                                    {
+                                        type: "geometry/randomObjects",
+                                        numObjects: 1000
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Get stereo effect node and bind a GUI to it to play with it
+    scene.getNode("myStereo",
+            function (myStereo) {
+
+                var Menu = function () {
+
+                    this["eyeSep"] = myStereo.getEyeSep();
+                    this["focalLength"] = myStereo.getFocalLength();
+
+                    var self = this;
+
+                    // This is actually quite inefficient because it continually updates
+                    // the scene graph, forcing frames to continually re-render.
+                    // Your GPU's not going to like it, but it's just for a quick and dirty demo.
+                    var update = function () {
+
+                        myStereo.setEyeSep(self["eyeSep"]);
+                        myStereo.setFocalLength(self["focalLength"]);
+
+                        requestAnimationFrame(update);
+                    };
+
+                    update();
+                };
+
+                var gui = new dat.GUI();
+                var folder = gui.addFolder("effects/stereo '" + myStereo.getId() + "'");
+                var menu = new Menu();
+                folder.add(menu, 'eyeSep', 0.0, 20.0);
+                folder.add(menu, 'focalLength', 1, 50.0);
+                folder.open();
+            });
+
+</script>
+</body>
+</html>

@@ -20,7 +20,7 @@ SceneJS.Types.addType("physics/sphere", {
 
             nodes:[
                 {
-                    type:"prims/radius",
+                    type:"geometry/radius",
                     latitudeBands: params.latitudeBands,
                     longitudeBands: params.longitudeBands,
                     radius: params.radius

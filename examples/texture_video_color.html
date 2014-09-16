@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    SceneJS.createScene({
+        nodes: [
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 1.0,
+
+                nodes: [
+
+                    // Video texture, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/texture/video.js
+                    {
+                        type: "texture/video",
+                        src: "movies/bunny.ogg",
+
+                        nodes: [
+
+                            // Box primitive, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                            {
+                                type: "geometry/box"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<canvas id="myCanvas0" width="400px" height="400px"></canvas>
+<canvas id="myCanvas1" width="400px" height="400px"></canvas>
+<canvas id="myCanvas2" width="400px" height="400px"></canvas>
+<canvas id="myCanvas3" width="400px" height="400px"></canvas>
+<canvas id="myCanvas4" width="400px" height="400px"></canvas>
+
+
+<script>
+
+    // Demonstrates multiple scenes on the same page.
+    //
+    // The maximum number of scenes is only limited by memory (GPU and browser).
+    //
+    // For this feature you need to provide each scene with an externally-created canvas,
+    // as opposed to relying on SceneJS to creat them by default. That's because you'll
+    // need to manage the size and layout of those canvases on the page, which SceneJS
+    // won't do when it creates canvases automatically. If you did rely on automatic
+    // canvasses, then SceneJS will just float them directly on top of each other,
+    // at 100% window size.
+    //
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    for (var i = 0; i < 5; i++) {
+
+        var scene = SceneJS.createScene({
+
+            // Link to a canvas element
+            canvasId:"myCanvas" + i,
+
+            nodes:[
+
+                // Mouse-orbited camera, implemented by plugin at
+                // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                {
+                    type:"cameras/orbit",
+                    yaw:30,
+                    pitch:-30,
+                    zoom:5,
+                    zoomSensitivity:1.0,
+                    nodes:[
+                        {
+                            type:"material",
+                            color:{ r:0.5, g:0.5, b:0.6 },
+                            nodes:[
+
+                                // A different primitive type for each scene
+                                {
+                                    type:[
+                                        "geometry/torus", // http://scenejs.org/api/latest/plugins/node/geometry/torus.js
+                                        "geometry/teapot", // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                        "geometry/box", // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                        "geometry/sphere"  // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                    ][i % 4]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        });
+    }
+
+</script>
+</body>
+</html>

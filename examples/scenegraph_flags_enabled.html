@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Demonstrates how to control the visibility of geometry.
+    //
+    // The 'enabled' flag of the flags node in the example below will
+    // govern whether or not geometry in its subgraph is visible.
+    //
+    // As we periodically toggle the flag, watch the geometry
+    // appear and disappear accordingly.
+    //
+    // The geometry will be visible by default when no flags node
+    // is present, or if the 'enabled' flag is not specified and
+    // defaults to true.
+
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:5,
+                nodes:[
+
+                        // Flags node which shows or hides our teapot
+                    {
+                        type:"flags",
+                        id:"myFlags",
+                        flags:{
+                            enabled:true
+                        },
+
+                        nodes:[
+                            {
+                                type:"material",
+                                color:{ r:0.5, g:0.5, b:0.6 },
+                                nodes:[
+
+                                    // Teapot primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                    {
+                                        type:"geometry/teapot"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Flags node is within a custom node type, so will not exist until the plugin for that custom node has been loaded
+    // Therefore, we get the flags node asynchronously
+
+    scene.getNode("myFlags", function (myFlags) {
+        setInterval(
+                function () {
+                    myFlags.setEnabled(!myFlags.getEnabled());
+                },
+                1000);
+    });
+
+</script>
+</body>
+</html>

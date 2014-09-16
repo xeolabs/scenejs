@@ -661,6 +661,30 @@ h3.feature-category {
     background: url("../images/bullet-point.png") no-repeat 8px 2px !important;
 }
 
+
+.feature-category-description {
+    color: #71705a;
+    text-decoration: none;
+    font-size: 14px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: normal;
+}
+
+/*.infoFirst {*/
+    /*color: #71705a;*/
+    /*text-decoration: none;*/
+    /*font-style: italic;*/
+    /*font-size: 14px;*/
+    /*background-color: aliceblue;*/
+    /*padding-top: 4px;*/
+    /*padding-bottom: 4px;*/
+    /*margin-top: 0;*/
+    /*margin-bottom: 4px;*/
+/*}*/
+
 pre {
     font-family: 'Droid Sans Mono', 'Courier New', monospace;
 

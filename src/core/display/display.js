@@ -1,9 +1,9 @@
 /**
- * @class Renders and picks a {@link SceneJS.Scene}
+ * @class Display compiled from a {@link SceneJS.Scene}, providing methods to render and pick.
  * @private
  *
  * <p>A Display is a container of {@link SceneJS_Object}s which are created (or updated) by a depth-first
- * <b>compilation traversal</b> of the nodes within a {@link SceneJS.Scene}.</b>
+ * <b>compilation traversal</b> of a {@link SceneJS.Scene}.</b>
  *
  * <h2>Rendering Pipeline</h2>
  *
@@ -58,28 +58,24 @@
  * in the branch.</p>
  *
  * <h2>Draw List</h2>
- * <p>The draw list is actually comprised of three lists of state chunks: a "pick" list to render a pick buffer
- * for colour-indexed GPU picking, along with an "draw" list for normal image rendering.
- * The chunks in these lists are held in the state-sorted order of their objects in #_objectList, with runs of
- * duplicate states removed, as mentioned.</p>
+ * <p>The draw list is actually comprised of two lists of state chunks: a "pick" list to render a pick buffer
+ * for colour-indexed GPU picking, along with a "draw" list for normal image rendering. The chunks in these lists
+ * are held in the state-sorted order of their objects in #_objectList, with runs of duplicate states removed.</p>
  *
  * <p>After a scene update, we set a flag on the display to indicate the stage we will need to redo from. The pipeline is
  * then lazy-redone on the next call to #render or #pick.</p>
  */
 var SceneJS_Display = function (cfg) {
 
-    /* Display is bound to the lifetime of an HTML5 canvas
-     */
+    // Display is bound to the lifetime of an HTML5 canvas
     this._canvas = cfg.canvas;
 
-    /* Factory which creates and recycles {@link SceneJS_Program} instances
-     */
+    // Factory which creates and recycles {@link SceneJS_Program} instances
     this._programFactory = new SceneJS_ProgramFactory({
         canvas: cfg.canvas
     });
 
-    /* Factory which creates and recycles {@link SceneJS.Chunk} instances
-     */
+    // Factory which creates and recycles {@link SceneJS.Chunk} instances
     this._chunkFactory = new SceneJS_ChunkFactory();
 
     /**
@@ -107,10 +103,10 @@ var SceneJS_Display = function (cfg) {
     this.layer = null;
 
     /**
-     * Node state core for the last {@link SceneJS.Pass} visited during scene graph compilation traversal
+     * Node state core for the last {@link SceneJS.Stage} visited during scene graph compilation traversal
      * @type Object
      */
-    this.pass = null;
+    this.stage = null;
 
     /**
      * Node state core for the last {@link SceneJS.Renderer} visited during scene graph compilation traversal
@@ -122,13 +118,13 @@ var SceneJS_Display = function (cfg) {
      * Node state core for the last {@link SceneJS.DepthBuf} visited during scene graph compilation traversal
      * @type Object
      */
-    this.depthbuf = null;
+    this.depthBuffer = null;
 
     /**
      * Node state core for the last {@link SceneJS.ColorBuf} visited during scene graph compilation traversal
      * @type Object
      */
-    this.colorbuf = null;
+    this.colorBuffer = null;
 
     /**
      * Node state core for the last {@link SceneJS.View} visited during scene graph compilation traversal
@@ -370,9 +366,9 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.objectListDirty = true;
     }
 
-    object.renderTarget = this.renderTarget;
+    object.stage = this.stage;
     object.layer = this.layer;
-    object.pass = this.pass;
+    object.renderTarget = this.renderTarget;
     object.texture = this.texture;
     object.cubemap = this.cubemap;
     object.geometry = this.geometry;
@@ -390,7 +386,6 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.texture.hash,
         this.cubemap.hash,
         this.lights.hash
-
     ]).join(";");
 
     if (!object.program || hash != object.hash) {
@@ -413,16 +408,16 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 5, "shader", this.shader);
     this._setChunk(object, 6, "shaderParams", this.shaderParams);
     this._setChunk(object, 7, "style", this.style);
-    this._setChunk(object, 8, "depthbuf", this.depthbuf);
-    this._setChunk(object, 9, "colorbuf", this.colorbuf);
+    this._setChunk(object, 8, "depthBuffer", this.depthBuffer);
+    this._setChunk(object, 9, "colorBuffer", this.colorBuffer);
     this._setChunk(object, 10, "view", this.view);
     this._setChunk(object, 11, "name", this.name);
     this._setChunk(object, 12, "lights", this.lights);
     this._setChunk(object, 13, "material", this.material);
     this._setChunk(object, 14, "texture", this.texture);
     this._setChunk(object, 15, "cubemap", this.cubemap);
-    this._setChunk(object, 16, "renderTarget", this.renderTarget);
-    this._setChunk(object, 17, "clips", this.clips);
+    this._setChunk(object, 16, "clips", this.clips);
+    this._setChunk(object, 17, "renderer", this.renderer);
     this._setChunk(object, 18, "geometry", this.morphGeometry, this.geometry);
     this._setChunk(object, 19, "listeners", this.renderListeners);      // Must be after the above chunks
     this._setChunk(object, 20, "draw", this.geometry); // Must be last
@@ -446,7 +441,7 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
         }
 
         // Note that core.stateId can be either a number or a string, that's why we make
-        // chunkId a string here. String stateId can come from at least nodeEvents.js.
+        // chunkId a string here.
         // TODO: Would it be better if all were numbers?
         chunkId = chunkClass.prototype.programGlobal
             ? '_' + core.stateId
@@ -527,6 +522,7 @@ SceneJS_Display.prototype.selectTags = function (tagSelector) {
 
 /**
  * Render this display. What actually happens in the method depends on what flags are set.
+ *
  */
 SceneJS_Display.prototype.render = function (params) {
 
@@ -548,15 +544,20 @@ SceneJS_Display.prototype.render = function (params) {
         this._stateSort();              // State sort the object render bin
         this.stateSortDirty = false;
         this.drawListDirty = true;      // Now needs new visible object bin
+        //this._logObjectList();
     }
 
     if (this.drawListDirty) {           // Render visible list while building transparent list
         this._buildDrawList();
         this.imageDirty = true;
+        //this._logDrawList();
+        //this._logPickList();
     }
 
     if (this.imageDirty || params.force) {
-        this._doDrawList({});           // Render, no pick
+        this._doDrawList({ // Render, no pick
+            clear: (params.clear !== false) // Clear buffers by default
+        });
         this.imageDirty = false;
         this.pickBufDirty = true;       // Pick buff will now need rendering on next pick
     }
@@ -571,7 +572,9 @@ SceneJS_Display.prototype._buildObjectList = function () {
     }
 };
 
-SceneJS_Display.prototype._makeStateSortKeys = function () { // TODO: state sort for sound objects?
+SceneJS_Display.prototype._makeStateSortKeys = function () {
+  //  console.log("--------------------------------------------------------------------------------------------------");
+   // console.log("SceneJS_Display_makeSortKeys");
     var object;
     for (var i = 0, len = this._objectListLen; i < len; i++) {
         object = this._objectList[i];
@@ -579,15 +582,25 @@ SceneJS_Display.prototype._makeStateSortKeys = function () { // TODO: state sort
             // Non-visual object (eg. sound)
             object.sortKey = -1;
         } else {
+
+//            console.log("object.stage.priority = " + ((object.stage.priority + 1) * 1000000000000));
+//            console.log("object.flags.transparent = " + ((object.flags.transparent ? 2 : 1) * 1000000000));
+//            console.log("object.layer.priority = " +  ((object.layer.priority + 1) * 1000000));
+//            console.log("object.program.id = " +  ((object.program.id + 1) * 1000));
+//            console.log("object.texture.stateId = " +  object.texture.stateId);
+
             object.sortKey =
-                (object.pass.priority * 100000000)
-                    + ((object.flags.transparent ? 1 : 0 ) * 10000000)
-                    + ((object.layer.priority + 1) * 100000)
+                ((object.stage.priority + 1) * 1000000000000)
+                    + ((object.flags.transparent ? 2 : 1) * 1000000000)
+                    + ((object.layer.priority + 1) * 1000000)
                     + ((object.program.id + 1) * 1000)
-                    + object.texture.stateId
-            ;
+                    + object.texture.stateId;
+
+            //console.log("object.sortKey = " +  object.sortKey);
+          //  console.log("");
         }
     }
+  //  console.log("--------------------------------------------------------------------------------------------------");
 };
 
 SceneJS_Display.prototype._stateSort = function () {
@@ -599,12 +612,22 @@ SceneJS_Display.prototype._stateSortObjects = function (a, b) {
     return a.sortKey - b.sortKey;
 };
 
+SceneJS_Display.prototype._logObjectList = function () {
+    console.log("--------------------------------------------------------------------------------------------------");
+    console.log(this._objectListLen + " objects");
+    for (var i = 0, len = this._objectListLen; i < len; i++) {
+        var object = this._objectList[i];
+        console.log("SceneJS_Display : object[" + i + "] sortKey = " + object.sortKey);
+    }
+    console.log("--------------------------------------------------------------------------------------------------");
+};
+
 SceneJS_Display.prototype._buildDrawList = function () {
 
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 22; i++) {
+    for (var i = 0; i < 23; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
@@ -612,19 +635,20 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._drawListLen = 0;
     this._pickDrawListLen = 0;
 
+    // For each render target, a list of objects to render to that target
     var targetObjectLists = {};
+
+    // A list of all the render target object lists
     var targetListList = [];
 
-    this._targetListLen = 0;
+    // List of all targets
+    var targetList = [];
 
     var object;
     var tagMask;
     var tagRegex;
     var tagCore;
     var flags;
-    var chunks;
-    var chunk;
-    var picking;
 
     if (this._tagSelector) {
         tagMask = this._tagSelector.mask;
@@ -683,7 +707,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
                     list = [];
                     targetObjectLists[coreId] = list;
                     targetListList.push(list);
-                    this._targetList[this._targetListLen++] = target;
+                    targetList.push(this._chunkFactory.getChunk(target.stateId, "renderTarget", object.program, target));
                 }
                 list.push(object);
             }
@@ -695,45 +719,80 @@ SceneJS_Display.prototype._buildDrawList = function () {
     }
 
     // Append chunks for objects within render targets first
+
+    var list;
+    var target;
+    var object;
+    var pickable;
+
     for (var i = 0, len = targetListList.length; i < len; i++) {
-        var list = targetListList[i];
+
+        list = targetListList[i];
+        target = targetList[i];
+
+        this._appendRenderTargetChunk(target);
+
         for (var j = 0, lenj = list.length; j < lenj; j++) {
-            this._appendObjectToDrawLists(list[j]);
+            object = list[j];
+            pickable = object.stage && object.stage.pickable; // We'll only pick objects in pickable stages
+            this._appendObjectToDrawLists(object, pickable);
         }
+    }
+
+    if (object) {
+
+        // Unbinds any render target bound previously
+        this._appendRenderTargetChunk(this._chunkFactory.getChunk(-1, "renderTarget", object.program, {}));
     }
 
     // Append chunks for objects not in render targets
     for (var i = 0, len = this._objectDrawListLen; i < len; i++) {
-        this._appendObjectToDrawLists(this._objectDrawList[i]);
+        object = this._objectDrawList[i];
+        pickable = !object.stage || (object.stage && object.stage.pickable); // We'll only pick objects in pickable stages
+        this._appendObjectToDrawLists(object, pickable);
     }
 
     this.drawListDirty = false;
 };
 
-SceneJS_Display.prototype._appendObjectToDrawLists = function(object) {
+
+SceneJS_Display.prototype._appendRenderTargetChunk = function (chunk) {
+    this._drawList[this._drawListLen++] = chunk;
+};
+
+/**
+ * Appends an object to the draw and pick lists.
+ * @param object
+ * @param pickable
+ * @private
+ */
+SceneJS_Display.prototype._appendObjectToDrawLists = function (object, pickable) {
     var chunks = object.chunks;
     var picking = object.flags.picking;
-    var chunck;
-    for (var k = 0, lenk = chunks.length; k < lenk; k++) {
-        chunk = chunks[k];
+    var chunk;
+    for (var i = 0, len = chunks.length; i < len; i++) {
+        chunk = chunks[i];
         if (chunk) {
+
             // As we apply the state chunk lists we track the ID of most types of chunk in order
             // to cull redundant re-applications of runs of the same chunk - except for those chunks with a
-            // 'unique' flag. We don't want to cull runs of draw chunks because they contain the GL
+            // 'unique' flag, because we don't want to cull runs of draw chunks because they contain the GL
             // drawElements calls which render the objects.
-            // Chunk IDs are only considered unique within the same program. Therefore, whenever we do a
-            // program switch, we'll be applying all the different types of chunk again.
+
             if (chunk.draw) {
-                if (chunk.unique || this._lastStateId[k] != chunk.id) {
+                if (chunk.unique || this._lastStateId[i] != chunk.id) { // Don't reapply repeated states
                     this._drawList[this._drawListLen++] = chunk;
-                    this._lastStateId[k] = chunk.id;
+                    this._lastStateId[i] = chunk.id;
                 }
             }
-            if (chunk.pick) { // Transparent objects are pickable
-                if (picking) { // Don't pick unpickable objects
-                    if (chunk.unique || this._lastPickStateId[k] != chunk.id) {
-                        this._pickDrawList[this._pickDrawListLen++] = chunk;
-                        this._lastPickStateId[k] = chunk.id;
+
+            if (chunk.pick) {
+                if (pickable !== false) {   // Don't pick objects in unpickable stages
+                    if (picking) {          // Don't pick unpickable objects
+                        if (chunk.unique || this._lastPickStateId[i] != chunk.id) { // Don't reapply repeated states
+                            this._pickDrawList[this._pickDrawListLen++] = chunk;
+                            this._lastPickStateId[i] = chunk.id;
+                        }
                     }
                 }
             }
@@ -741,6 +800,55 @@ SceneJS_Display.prototype._appendObjectToDrawLists = function(object) {
     }
 };
 
+/**
+ * Logs the contents of the draw list to the console.
+ * @private
+ */
+SceneJS_Display.prototype._logDrawList = function () {
+    console.log("--------------------------------------------------------------------------------------------------");
+    console.log(this._drawListLen + " draw list chunks");
+    for (var i = 0, len = this._drawListLen; i < len; i++) {
+        var chunk = this._drawList[i];
+        console.log("[chunk " + i + "] type = " + chunk.type);
+        switch (chunk.type) {
+            case "draw":
+                console.log("\n");
+                break;
+            case "renderTarget":
+                console.log(" bufType = " + chunk.core.bufType);
+                break;
+        }
+    }
+    console.log("--------------------------------------------------------------------------------------------------");
+};
+
+/**
+ * Logs the contents of the pick list to the console.
+ * @private
+ */
+SceneJS_Display.prototype._logPickList = function () {
+    console.log("--------------------------------------------------------------------------------------------------");
+    console.log(this._pickDrawListLen + " pick list chunks");
+    for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
+        var chunk = this._pickDrawList[i];
+        console.log("[chunk " + i + "] type = " + chunk.type);
+        switch (chunk.type) {
+            case "draw":
+                console.log("\n");
+                break;
+            case "renderTarget":
+                console.log(" bufType = " + chunk.core.bufType);
+                break;
+        }
+    }
+    console.log("--------------------------------------------------------------------------------------------------");
+};
+
+/**
+ * Performs a pick on the display graph and returns info on the result.
+ * @param {*} params
+ * @returns {*}
+ */
 SceneJS_Display.prototype.pick = function (params) {
 
     var canvas = this._canvas.canvas;
@@ -761,7 +869,8 @@ SceneJS_Display.prototype.pick = function (params) {
     if (this.pickBufDirty) {                          // Render pick buffer
         pickBuf.clear();
         this._doDrawList({
-            pick: true
+            pick: true,
+            clear: true
         });
         this._canvas.gl.finish();
         this.pickBufDirty = false;                                                  // Pick buffer up to date
@@ -796,7 +905,8 @@ SceneJS_Display.prototype.pick = function (params) {
                 rayPickBuf.clear();
                 this._doDrawList({
                     pick: true,
-                    rayPick: true
+                    rayPick: true,
+                    clear: true
                 });
                 this.rayPickBufDirty = false;
             }
@@ -832,20 +942,33 @@ SceneJS_Display.prototype.pick = function (params) {
     return hit;
 };
 
+/**
+ * Unpacks a color-encoded depth
+ * @param {Array(Number)} depthZ Depth encoded as an RGBA color value
+ * @returns {Number}
+ * @private
+ */
 SceneJS_Display.prototype._unpackDepth = function (depthZ) {
     var vec = [depthZ[0] / 256.0, depthZ[1] / 256.0, depthZ[2] / 256.0, depthZ[3] / 256.0];
     var bitShift = [1.0 / (256.0 * 256.0 * 256.0), 1.0 / (256.0 * 256.0), 1.0 / 256.0, 1.0];
     return SceneJS_math_dotVector4(vec, bitShift);
 };
 
+/** Renders either the draw or pick list.
+ *
+ * @param {*} params
+ * @param {Boolean} params.clear Set true to clear the color, depth and stencil buffers first
+ * @param {Boolean} params.pick Set true to render for picking
+ * @param {Boolean} params.rayPick Set true to render for ray-picking
+ * @private
+ */
 SceneJS_Display.prototype._doDrawList = function (params) {
 
     var gl = this._canvas.gl;
 
     // Reset frame context
     var frameCtx = this._frameCtx;
-
-    frameCtx.targetList = this._targetList;
+    frameCtx.renderTarget = null;
     frameCtx.targetIndex = 0;
     frameCtx.renderBuf = null;
     frameCtx.viewMat = null;
@@ -862,36 +985,36 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.pick = !!params.pick;
     frameCtx.rayPick = !!params.rayPick;
     frameCtx.pickIndex = 0;
-    frameCtx.depthPass = false;
     frameCtx.textureUnit = 0;
     frameCtx.lineWidth = 1;
     frameCtx.transparent = false;
+    frameCtx.ambientColor = this._ambientColor;
 
     // The extension needs to be re-queried in case the context was lost and has been recreated.
     var VAO = gl.getExtension("OES_vertex_array_object");
-    if (VAO) {
-        frameCtx.VAO = VAO;
-    }
+    frameCtx.VAO = (VAO) ? VAO : null;
 
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
+
     if (this.transparent) {
         gl.clearColor(0, 0, 0, 0);
     } else {
         gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
     }
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+
+   if (params.clear) {
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+    }
+
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);
 
     if (params.pick) {
-
         // Render for pick
         for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
             this._pickDrawList[i].pick(frameCtx);
         }
-
     } else {
-
         // Render for draw
         for (var i = 0, len = this._drawListLen; i < len; i++) {      // Push opaque rendering chunks
             this._drawList[i].draw(frameCtx);
@@ -911,6 +1034,13 @@ SceneJS_Display.prototype._doDrawList = function (params) {
             gl.disableVertexAttribArray(i);
         }
     }
+//
+//    var numTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+//    for (var ii = 0; ii < numTextureUnits; ++ii) {
+//        gl.activeTexture(gl.TEXTURE0 + ii);
+//        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+//        gl.bindTexture(gl.TEXTURE_2D, null);
+//    }
 };
 
 SceneJS_Display.prototype.destroy = function () {

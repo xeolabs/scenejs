@@ -20,7 +20,7 @@ SceneJS.Types.addType("physics/box", {
 
             nodes:[
                 {
-                    type:"prims/box",
+                    type:"geometry/box",
                     size: params.size
                 }
             ]

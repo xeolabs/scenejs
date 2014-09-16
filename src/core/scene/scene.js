@@ -49,9 +49,7 @@ SceneJS.Scene.prototype.getGL = function () {
 /** Returns the Z-buffer depth in bits of the webgl context that this scene is to bound to.
  */
 SceneJS.Scene.prototype.getZBufferDepth = function () {
-
     var gl = this._engine.canvas.gl;
-
     return gl.getParameter(gl.DEPTH_BITS);
 };
 
@@ -62,16 +60,12 @@ SceneJS.Scene.prototype.getZBufferDepth = function () {
  * @see SceneJS.Tag
  */
 SceneJS.Scene.prototype.setTagMask = function (tagMask) {
-
     tagMask = tagMask || "XXXXXXXXXXXXXXXXXXXXXXXXXX"; // HACK to select nothing by default
-
     if (!this._tagSelector) {
         this._tagSelector = {};
     }
-
     this._tagSelector.mask = tagMask;
     this._tagSelector.regex = tagMask ? new RegExp(tagMask) : null;
-
     this._engine.display.selectTags(this._tagSelector);
 };
 
@@ -86,11 +80,30 @@ SceneJS.Scene.prototype.getTagMask = function () {
 };
 
 /**
+ * Sets the number of times this scene is drawn on each render.
+ * <p>This is useful for when we need to do things like render for left and right eyes.
+ * @param {Number} numPasses The number of times the scene is drawn on each frame.
+ * @see #getTagMask
+ * @see SceneJS.Tag
+ */
+SceneJS.Scene.prototype.setNumPasses = function (numPasses) {
+    this._engine.setNumPasses(numPasses);
+};
+
+/**
  * Render a single frame if new frame pending, or force a new frame
  * Returns true if frame rendered
  */
 SceneJS.Scene.prototype.renderFrame = function (params) {
     return this._engine.renderFrame(params);
+};
+
+/**
+ * Signals that a new frame will be needed
+ * @param params
+ */
+SceneJS.Scene.prototype.needFrame = function () {
+    this._engine.display.imageDirty = true;
 };
 
 /**
@@ -121,7 +134,7 @@ SceneJS.Scene.prototype.isRunning = function () {
  */
 SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     var result = this._engine.pick(canvasX, canvasY, options);
-    this.renderFrame({force:true }); // HACK: canvas blanks after picking
+    this.renderFrame({force: true }); // HACK: canvas blanks after picking
     if (result) {
         this.publish("pick", result);
         return result;
@@ -135,12 +148,9 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
  * @private
  */
 SceneJS.Scene.prototype._destroy = function () {
-
     if (!this.destroyed) {
-
         delete SceneJS._engines[this.id];  // HACK: circular dependency
         SceneJS._engineIds.removeItem(this.id); // HACK: circular dependency
-
         this.destroyed = true;
     }
 };
@@ -240,7 +250,7 @@ SceneJS.Scene.prototype.getStatus = function () {
     var sceneStatus = SceneJS_sceneStatusModule.sceneStatus[this.id];
     if (!sceneStatus) {
         return {
-            destroyed:true
+            destroyed: true
         };
     }
     return SceneJS._shallowClone(sceneStatus);

@@ -152,8 +152,10 @@
             "src/core/scene/clips.js",
             "src/core/scene/enable.js",
             "src/core/scene/flags.js",
-            "src/core/scene/framebuf.js",
+            "src/core/scene/colorTarget.js",
+            "src/core/scene/depthTarget.js",
             "src/core/scene/geometry.js",
+            "src/core/scene/stage.js",
             "src/core/scene/layer.js",
             "src/core/scene/library.js",
             "src/core/scene/lights.js",
@@ -162,8 +164,8 @@
             "src/core/scene/morphGeometry.js",
             "src/core/scene/name.js",
             "src/core/scene/renderer.js",
-            "src/core/scene/depthbuf.js",
-            "src/core/scene/colorbuf.js",
+            "src/core/scene/depthBuffer.js",
+            "src/core/scene/colorBuffer.js",
             "src/core/scene/view.js",
             "src/core/scene/scene.js",
             "src/core/scene/shader.js",
@@ -200,7 +202,7 @@
             "src/core/display/chunks/clipsChunk.js",
             "src/core/display/chunks/drawChunk.js",
             "src/core/display/chunks/flagsChunk.js",
-            "src/core/display/chunks/framebufChunk.js",
+            "src/core/display/chunks/renderTargetChunk.js",
             "src/core/display/chunks/geometryChunk.js",
             "src/core/display/chunks/lightsChunk.js",
             "src/core/display/chunks/listenersChunk.js",
@@ -209,8 +211,8 @@
             "src/core/display/chunks/nameChunk.js",
             "src/core/display/chunks/programChunk.js",
             "src/core/display/chunks/rendererChunk.js",
-            "src/core/display/chunks/depthbufChunk.js",
-            "src/core/display/chunks/colorbufChunk.js",
+            "src/core/display/chunks/depthBufferChunk.js",
+            "src/core/display/chunks/colorBufferChunk.js",
             "src/core/display/chunks/viewChunk.js",
             "src/core/display/chunks/shaderChunk.js",
             "src/core/display/chunks/shaderParamsChunk.js",
@@ -253,6 +255,7 @@
     var productionBuild = true;
 
     var distDir = "api/" + (productionBuild ? "latest" : "dev");
+//  var distDir = "/media/lindsay/3d58a38b-6943-4956-9cd2-94656da3c188/xeolabs/human-web6/human-web/lib/scenejs";
     var distPluginDir = distDir + "/plugins";
     var distExtrasDir = distDir + "/extras";
 

@@ -20,14 +20,14 @@
  */
 SceneJS.Types.addType("cameras/orbit", {
 
-    construct:function (params) {
+    construct: function (params) {
 
         var lookat = this.addNode({
-            type:"lookAt",
+            type: "lookAt",
 
             // A plugin node type is responsible for attaching specified
             // child nodes within itself
-            nodes:params.nodes
+            nodes: params.nodes
         });
 
         var yaw = params.yaw || 0;
@@ -40,17 +40,24 @@ SceneJS.Types.addType("cameras/orbit", {
         var lastX;
         var lastY;
         var dragging = false;
+        var lookatDirty = false;
 
-        var eye = params.eye || { x:0, y:0, z:0 };
-        var look = params.look || { x:0, y:0, z:0};
+        var eye = params.eye || { x: 0, y: 0, z: 0 };
+        var look = params.look || { x: 0, y: 0, z: 0};
 
         lookat.set({
-            eye:{ x:eye.x, y:eye.y, z:-zoom },
-            look:{ x:look.x, y:look.y, z:look.z },
-            up:{ x:0, y:1, z:0 }
+            eye: { x: eye.x, y: eye.y, z: -zoom },
+            look: { x: look.x, y: look.y, z: look.z },
+            up: { x: 0, y: 1, z: 0 }
         });
 
-        update();
+//        this._tick = this.getScene().on("tick",
+//            function () {
+//                if (lookatDirty) {
+//                    update();
+//                    lookatDirty = false;
+//                }
+//            });
 
         var canvas = this.getScene().getCanvas();
 
@@ -157,16 +164,19 @@ SceneJS.Types.addType("cameras/orbit", {
             var eye3 = SceneJS_math_transformPoint3(pitchMat, eye);
             eye3 = SceneJS_math_transformPoint3(yawMat, eye3);
 
-            lookat.setEye({x:eye3[0], y:eye3[1], z:eye3[2] });
+            lookat.setEye({x: eye3[0], y: eye3[1], z: eye3[2] });
         }
+
+        update();
     },
 
-    setLook: function(l) {
+    setLook: function (l) {
 
 
     },
 
-    destruct:function () {
+    destruct: function () {
+        this.getScene().off(this.tick);
         // TODO: remove mouse handlers
     }
 });

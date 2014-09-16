@@ -23,7 +23,7 @@
 
 <script>
 
-    // Demo of the custom "effects/fog" node type
+    // Demo of the custom "shader/fog" node type
     // This node type immerses objects in its subgraph in a fog effect, in which their pixel colors are
     // blended with a fog color in proportion to their distance on the View-space Z-axis.
 
@@ -54,9 +54,9 @@
                         nodes:[
 
                             // Fog effect, implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/effects/fog.js
+                            // http://scenejs.org/api/latest/plugins/node/shader/fog.js
                             {
-                                type:"effects/fog",
+                                type:"shader/fog",
                                 id:"myFog",
                                 mode:"exp2", // Quadratic
                                 density:0.1, // Fog density
@@ -66,13 +66,13 @@
 
                                 nodes:[
                                     // Teapot primitives,
-                                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                     {
                                         type:"translate",
                                         z:-10,
                                         nodes:[
                                             {
-                                                type:"prims/teapot"
+                                                type:"geometry/teapot"
                                             }
                                         ]
                                     },
@@ -81,7 +81,7 @@
                                         z:-30,
                                         nodes:[
                                             {
-                                                type:"prims/teapot"
+                                                type:"geometry/teapot"
                                             }
                                         ]
                                     },
@@ -90,7 +90,7 @@
                                         z:-50,
                                         nodes:[
                                             {
-                                                type:"prims/teapot"
+                                                type:"geometry/teapot"
                                             }
                                         ]
                                     },
@@ -99,7 +99,7 @@
                                         z:-70,
                                         nodes:[
                                             {
-                                                type:"prims/teapot"
+                                                type:"geometry/teapot"
                                             }
                                         ]
                                     },
@@ -108,7 +108,7 @@
                                         z:-90,
                                         nodes:[
                                             {
-                                                type:"prims/teapot"
+                                                type:"geometry/teapot"
                                             }
                                         ]
                                     },
@@ -117,7 +117,7 @@
                                         z:-110,
                                         nodes:[
                                             {
-                                                type:"prims/teapot"
+                                                type:"geometry/teapot"
                                             }
                                         ]
                                     },
@@ -126,7 +126,7 @@
                                         z:-130,
                                         nodes:[
                                             {
-                                                type:"prims/teapot"
+                                                type:"geometry/teapot"
                                             }
                                         ]
                                     },
@@ -135,7 +135,7 @@
                                         z:-150,
                                         nodes:[
                                             {
-                                                type:"prims/teapot"
+                                                type:"geometry/teapot"
                                             }
                                         ]
                                     }
@@ -194,7 +194,7 @@
 
                 var gui = new dat.GUI();
                 var menu = new Menu();
-                var folder = gui.addFolder("Properties of the 'effects/myFog' node");
+                var folder = gui.addFolder("Properties of the 'postprocess/myFog' node");
 
                 folder.add(menu, 'start', 0.0, 100.0);
                 folder.add(menu, 'end', 0.0, 100.0);

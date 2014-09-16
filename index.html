@@ -46,14 +46,14 @@
             /*color: #2a2a2a;            */
         }
 
-            /*p {*/
-            /*padding-top: 0;*/
+        /*p {*/
+        /*padding-top: 0;*/
 
-            /*margin-top: 0px;*/
-            /*line-height: 20px;*/
-            /*color: #2a2a2a;*/
-            /*font: 400 14px/1.4 "Open Sans", sans-serif;*/
-            /*}*/
+        /*margin-top: 0px;*/
+        /*line-height: 20px;*/
+        /*color: #2a2a2a;*/
+        /*font: 400 14px/1.4 "Open Sans", sans-serif;*/
+        /*}*/
 
         .col {
             background-repeat: no-repeat;
@@ -75,13 +75,16 @@
             padding-right: 0;
         }
 
+
+
+
     </style>
 </head>
 <body>
 
 <div id="top">
     <div class="links">
-        <a href="examples.html?page=firstExample">Examples</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+        <a href="examples/_index.html#scenegraph_firstExample">Examples</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
             href="https://github.com/xeolabs/scenejs/releases">Downloads</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
             href="http://xeolabs.com/articles/learning-scenejs/">Tutorials</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
             href="https://github.com/xeolabs/scenejs/issues">Issues</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
@@ -180,7 +183,7 @@
 <div id="container">
     <div style="width:100%;">
         <div class="col left">
-            <p class="sectionHeading">Features in V3.2</p>
+            <p class="sectionHeading">Features in V4.0</p>
 
             <div id="featureList">
 
@@ -212,7 +215,7 @@ var scene = SceneJS.createScene({
 
                     nodes: [
                         {
-                            type:"prims/teapot"
+                            type:"geometry/teapot"
                         }
                     ]
                 }
@@ -248,7 +251,7 @@ scene.getNode("myRotate", function(myRotate) {
             <p>To keep the core library small, SceneJS dynamically loads it's non-core functionality from a directory of
                 plugins. In the example above, the <code>prims/teapot</code> node is a custom node type instantiated
                 from a <a
-                        href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins/node/prims/teapot.js">prims/teapot</a>
+                        href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins/node/geometry/teapot.js">prims/teapot</a>
                 plugin, which SceneJS
                 loaded on-demand from <a href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins">the
                     plugins directory</a> within its repository on
@@ -283,10 +286,10 @@ scene.getNode("myRotate", function(myRotate) {
 
     function addFeatures() {
         $.ajax({
-            type:'GET',
-            url:'examples/features.json',
-            dataType:'json',
-            success:function (features) {
+            type: 'GET',
+            url: 'examples/features.json',
+            dataType: 'json',
+            success: function (features) {
 
                 var featureList = $('#featureList');
 
@@ -310,6 +313,13 @@ scene.getNode("myRotate", function(myRotate) {
                                 .text(category.title)
                                 .appendTo(featureList);
 
+                        if (category.description) {
+                            $('<h3/>')
+                                    .addClass('feature-category-description')
+                                    .text(category.description)
+                                    .appendTo(featureList);
+                        }
+
                         for (var i = 0, len = category.nodes.length; i < len; i++) {
                             subCategory = category.nodes[i];
                             subCategoryElem = $('<div/>')
@@ -322,7 +332,7 @@ scene.getNode("myRotate", function(myRotate) {
                                     feature = subCategory.nodes[j];
                                     featureElem = $('<a/>')
                                             .addClass('feature-feature')
-                                            .attr('href', 'examples.html?page=' + feature.page)
+                                            .attr('href', 'examples/_index.html#' + feature.page)
                                             .text(feature.title)
                                             .appendTo(subCategoryElem);
 
@@ -362,15 +372,15 @@ scene.getNode("myRotate", function(myRotate) {
 
     function addSlider() {
         $('.bxslider').bxSlider({
-            mode:'fade',
-            pause:6000,
-            useCSS:false,
-            infiniteLoop:true,
-            hideControlOnEnd:true,
-            speed:1000,
-            captions:true,
-            auto:true,
-            pager:false
+            mode: 'fade',
+            pause: 6000,
+            useCSS: false,
+            infiniteLoop: true,
+            hideControlOnEnd: true,
+            speed: 1000,
+            captions: true,
+            auto: true,
+            pager: false
         });
     }
 

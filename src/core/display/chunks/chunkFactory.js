@@ -93,6 +93,8 @@ SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core,
 
     }
 
+    chunk.type = type;
+
     chunk.useCount = 1;
 
     this._chunks[chunkId] = chunk;

@@ -139,7 +139,9 @@ var SceneJS_sceneStatusModule = new (function () {
             dismissPopup(task.element);
         }
         var nodeState = task.nodeState;
-        nodeState.numTasks--;
+        if (--nodeState.numTasks < 0) {
+            nodeState.numTasks = 0;
+        }
         delete nodeState.tasks[taskId];
         if (nodeState.numTasks == 0) {
             delete sceneState.nodeStates[nodeState.nodeId];

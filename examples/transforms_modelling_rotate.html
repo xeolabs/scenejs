@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:1.0,
+
+                nodes:[
+
+                    // Override default material to make teapot blue
+                    {
+                        type:"material",
+                        color:{ r:0.5, g:0.5, b:0.6 },
+                        nodes:[
+                            {
+                                type:"rotate",
+                                id:"myRotate",
+                                x:0, y:-1, z:0, // Axis of rotation
+                                angle:90.0,
+
+                                nodes:[
+
+                                    // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                    {
+                                        type:"geometry/teapot"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Get rotate node and animate it
+    scene.getNode("myRotate",
+            function (myRotate) {
+                scene.on("tick",
+                        function () {
+                            var angle = myRotate.getAngle();
+                            angle += 0.5;
+                            myRotate.setAngle(angle);
+                        });
+            });
+
+</script>
+</body>
+</html>

@@ -21,7 +21,7 @@
 
 <script>
 
-    // Demo of the "skyboxes/custom" skybox
+    // Demo of the "skybox" skybox
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -42,9 +42,9 @@
 
                 nodes:[
 
-                    // Skybox with custom texture, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skyboxes/custom.js
+                    // Skybox with custom texture, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skybox/custom.js
                     {
-                        type:"skyboxes/custom",
+                        type:"skybox",
                         src:"../../../textures/clouds-box.jpg",
                         size:5000 // Box half-size on each axis - default is 5000
                     },
@@ -54,9 +54,9 @@
                         color:{ r:0.4, g:0.4, b:0.9 },
                         nodes:[
 
-                            // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                             {
-                                type:"prims/teapot"
+                                type:"geometry/teapot"
                             }
                         ]
                     }

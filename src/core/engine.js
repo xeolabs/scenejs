@@ -14,6 +14,14 @@ var SceneJS_Engine = function (json, options) {
      */
     this.id = json.id;
 
+
+    /**
+     * Number of times the scene is drawn each time it's rendered.
+     * <p>This is useful for when we need to do things like render for left and right eyes.
+     * @type {*|number}
+     */
+    this._numPasses = json.numPasses || 1;
+
     /**
      * Canvas and GL context for this engine
      */
@@ -39,7 +47,7 @@ var SceneJS_Engine = function (json, options) {
      * @type SceneJS_Display
      */
     this.display = new SceneJS_Display({
-        canvas:this.canvas,
+        canvas: this.canvas,
         transparent: json.transparent,
         dof: json.dof
     });
@@ -84,8 +92,8 @@ var SceneJS_Engine = function (json, options) {
      * The current scene graph status
      */
     this.sceneStatus = {
-        nodes:{}, // Status for each node
-        numTasks:0  // Number of loads currently in progress
+        nodes: {}, // Status for each node
+        numTasks: 0  // Number of loads currently in progress
     };
 
     var self = this;
@@ -107,7 +115,7 @@ var SceneJS_Engine = function (json, options) {
         function (event) {
             event.preventDefault();
             self.stop();
-            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_LOST, { scene:self.scene });
+            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_LOST, { scene: self.scene });
         },
         false);
 
@@ -117,12 +125,22 @@ var SceneJS_Engine = function (json, options) {
             self.canvas.initWebGL();
             self._coreFactory.webglRestored();  // Reallocate WebGL resources for node state cores
             self.display.webglRestored(); // Reallocate shaders and re-cache shader var locations for display state chunks
-            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_RESTORED, { scene:self.scene });
+            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_RESTORED, { scene: self.scene });
             self.start();
         },
         false);
 };
 
+/**
+ * Sets the number of times the scene is drawn on each render.
+ * <p>This is useful for when we need to do things like render for left and right eyes.
+ * @param {Number} numPasses The number of times the scene is drawn on each frame.
+ * @see #getTagMask
+ * @see SceneJS.Tag
+ */
+SceneJS_Engine.prototype.setNumPasses = function (numPasses) {
+    this._numPasses = numPasses;
+};
 
 /**
  * Simulate a lost WebGL context.
@@ -202,17 +220,11 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
  * node and core pools for reuse, respectively.
  */
 SceneJS_Engine.prototype._doDestroyNodes = function () {
-
     var node;
-
     while (this._numNodesToDestroy > 0) {
-
         node = this._nodesToDestroy[--this._numNodesToDestroy];
-
         node._doDestroy();
-
         this._coreFactory.putCore(node._core);    // Release state core for reuse
-
         this._nodeFactory.putNode(node);         // Release node for reuse
     }
 };
@@ -289,18 +301,49 @@ SceneJS_Engine.prototype.branchDirty = function (node) {
  * Ordinarily the frame is rendered only if compilations or draw graph updates were performed,
  * but may be forced to render the frame regardless.
  *
- * @param {{String:String}} params Rendering parameters
+ * @param {*} params Rendering parameters
+ * @param {Boolean} params.clear True to clear the display first (default)
  */
 SceneJS_Engine.prototype.renderFrame = function (params) {
 
-    if (this._tryCompile() || (params && params.force)) { // Do any pending (re)compilations
+    var rendered = false;
 
-        this.display.render(params);
+    if (this._needCompile() || (params && params.force)) {
 
-        return true;
+//        // Render display graph
+//        this.display.render(params);
+
+        var time = (new Date()).getTime();
+
+        // Render the scene once for each pass
+        for (var i = 0; i < this._numPasses; i++) {
+
+            // Notify that render is upcoming
+            this.scene.publish("rendering", {
+                pass: i
+            });
+
+            // Compile scene graph to display graph, if necessary
+            this._doCompile();
+
+            // Render display graph
+            // Clear buffers only on first frame
+            this.display.render({
+                clear: i == 0
+            });
+
+            // Notify that render completed
+            this.scene.publish("rendered", {
+                sceneId: this.id,
+                time: time,
+                pass: i
+            });
+
+            rendered = true;
+        }
     }
 
-    return false;
+    return rendered;
 };
 
 /**
@@ -308,78 +351,101 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
  */
 SceneJS_Engine.prototype.start = function () {
 
-    if (!this.running) {
+    if (!this.running) { // Do nothing if already started
 
         this.running = true;
         this.paused = false;
+        this.sceneDirty = true;
 
         var self = this;
         var fnName = "__scenejs_sceneLoop" + this.id;
-
         var sleeping = false;
-
-        this.sceneDirty = true;
-
-        var tick = {
-            sceneId:this.id,
-            startTime:(new Date()).getTime()
-        };
-
-        self.events.fireEvent("started", tick);
-
         var time = (new Date()).getTime();
-
+        var prevTime = time;
+        var startTime = time;
         var scene = this.scene;
+        var rendered = false;
 
+        // Notify started
+        this.events.fireEvent("started", {
+            sceneId: self.id,
+            startTime: startTime
+        });
+
+        // Animation frame callback
         window[fnName] = function () {
 
-            if (self.running && !self.paused) {  // idleFunc may have paused scene
+            if (self.running && !self.paused) {
 
-                tick.prevTime = time;
                 time = (new Date()).getTime();
-                tick.time = time;
 
-                scene.publish("tick", tick);
+                scene.publish("tick", {
+                    sceneId: self.id,
+                    startTime: startTime,
+                    prevTime: prevTime,
+                    time: time
+                });
 
-                if (!self.running) { // idleFunc may have destroyed scene
+                prevTime = time;
+
+                if (!self.running) { // "tick" handler have destroyed scene
                     return;
                 }
 
-                if (self._tryCompile()) {         // Attempt pending compile and redraw
+                rendered = false;
 
-                    sleeping = false;
+                // Render the scene once for each pass
+                for (var i = 0; i < self._numPasses; i++) {
 
-                    self.display.render();
+                    if (self._needCompile() || rendered) {
 
-                    scene.publish("rendered", tick);
+                        sleeping = false;
 
-                    if (self.running) {
-                        window.requestAnimationFrame(window[fnName]);
+                        // Notify we're about to do a render
+                        scene.publish("rendering", {
+                            pass: i
+                        });
+
+                        // Compile scene graph to display graph, if necessary
+                        self._doCompile();
+
+                        // Render display graph
+                        // Clear buffers only on first frame
+                        self.display.render({
+                            clear: i == 0
+                        });
+
+                        // Notify that we've just done a render
+                        scene.publish("rendered", {
+                            sceneId: self.id,
+                            time: time,
+                            pass: i
+                        });
+
+                        rendered = true;
                     }
+                }
 
-                } else {
-
+                // If any of the passes did not render anything, then put the render loop to sleep again
+                if (!rendered) {
                     if (!sleeping) {
-                        scene.publish("sleep", tick);
+                        scene.publish("sleep", {
+                            sceneId: self.id,
+                            startTime: startTime,
+                            prevTime: time,
+                            time: time
+                        });
                     }
-
                     sleeping = true;
-
-                    if (self.running) {
-                        window.requestAnimationFrame(window[fnName]);
-                    }
                 }
-            } else {
+            }
 
-                if (self.running) {
-                    window.requestAnimationFrame(window[fnName]);
-                }
+            if (self.running) {
+                window.requestAnimationFrame(window[fnName]);
             }
         };
 
-        if (self.running) {
-            window.requestAnimationFrame(window[fnName]);
-        }
+        window.requestAnimationFrame(window[fnName]);
     }
 };
 
@@ -399,59 +465,52 @@ SceneJS_Engine.prototype.start = function () {
  */
 SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
 
-    this._tryCompile();  // Do any pending scene compilations
+    // Do any pending scene compilations
+    if (this._needCompile()) {
+        this._doCompile();
+    }
 
     var hit = this.display.pick({
-        canvasX:canvasX,
-        canvasY:canvasY,
-        rayPick:options ? options.rayPick : false
+        canvasX: canvasX,
+        canvasY: canvasY,
+        rayPick: options ? options.rayPick : false
     });
 
     return hit;
 };
 
 /**
- * Performs any pending scene compilations or display rebuilds, returns true if any of those were done,
- * in which case a display re-render is then needed
- *
- * @returns {Boolean} True when any compilations or display rebuilds were done
+ * Returns true if view needs refreshing from scene
+ * @returns {Boolean}
+ * @private
  */
-SceneJS_Engine.prototype._tryCompile = function () {
-
-    // this._doAddNodes();
-
-    if (this.display.imageDirty // Frame buffer needs redraw
+SceneJS_Engine.prototype._needCompile = function () {
+    return (this.display.imageDirty // Frame buffer needs redraw
         || this.display.drawListDirty // Draw list needs rebuild
         || this.display.stateSortDirty // Draw list needs to redetermine state order
         || this.display.stateOrderDirty // Draw list needs state sort
         || this.display.objectListDirty // Draw list needs to be rebuilt
         || this._sceneBranchesDirty // One or more branches in scene graph need (re)compilation
-        || this.sceneDirty) { // Whole scene needs recompilation
+        || this.sceneDirty); // Whole scene needs recompilation
+};
 
-        if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
-
-            this._sceneBranchesDirty = false;
-
-            SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
-                engine:this                                            // Compilation support modules get ready
-            });
-
-            this.pubSubProxy = new SceneJS_PubSubProxy(this.scene, null);
-            var ctx = {
-                pubSubProxy : this.pubSubProxy
-            };
-
-            this.scene._compileNodes(ctx); // Begin depth-first compilation descent into scene sub-nodes
-
-            this.sceneDirty = false;
-        }
-
-        this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true
-
-        return true; // Compilation was performed, need frame redraw now
+/**
+ * Performs any pending scene compilations or display rebuilds
+ */
+SceneJS_Engine.prototype._doCompile = function () {
+    if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
+        this._sceneBranchesDirty = false;
+        SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
+            engine: this                                            // Compilation support modules get ready
+        });
+        this.pubSubProxy = new SceneJS_PubSubProxy(this.scene, null);
+        var ctx = {
+            pubSubProxy: this.pubSubProxy
+        };
+        this.scene._compileNodes(ctx); // Begin depth-first compilation descent into scene sub-nodes
+        this.sceneDirty = false;
     }
-
-    return false;
+    this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true
 };
 
 /**
@@ -466,14 +525,10 @@ SceneJS_Engine.prototype.pause = function (doPause) {
  * Stops the render loop
  */
 SceneJS_Engine.prototype.stop = function () {
-
     if (this.running) {
-
         this.running = false;
         this.paused = false;
-
         window["__scenejs_sceneLoop" + this.id] = null;
-
         //   this.events.fireEvent("stopped", { sceneId: this.id });
     }
 };
@@ -503,9 +558,7 @@ SceneJS_Engine.prototype.destroyNode = function (node) {
  * Destroys this engine
  */
 SceneJS_Engine.prototype.destroy = function () {
-
     this.destroyed = true;
-
     // this.events.fireEvent("destroyed", { sceneId: this.id });
 };
 

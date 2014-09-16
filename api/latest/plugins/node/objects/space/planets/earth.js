@@ -1,8 +1,8 @@
-SceneJS.Types.addType("objects/space/planets/earth", {
+SceneJS.Types.addType("models/space/planets/earth", {
 
     construct:function (params) {
 
-        var texturePath = SceneJS.getConfigs("pluginPath") + "/node/objects/space/planets/earth/";
+        var texturePath = SceneJS.getConfigs("pluginPath") + "/node/models/space/planets/earth/";
 
         var node = this.addNode({
             type:"rotate",

@@ -1,0 +1,281 @@
+{
+
+    "showcase": [
+        "#stuff made with SceneJS",
+        "scenegraph_firstExample",
+        "showcase_BioDigitalHuman",
+        "showcase_BioDigitalHuman_eye",
+        "showcase_earth",
+        "showcase_tronTank"
+    ],
+
+    "configuration": [
+        "#getting SceneJS ready",
+        "configuration_pluginPath",
+        "configuration_disableStatusPopups"
+    ],
+
+    "scenegraph": [
+        "#basic scene graph functionality",
+        "scenegraph_firstExample",
+        "scenegraph_events_misc",
+        "scenegraph_events_status",
+        "scenegraph_events_status2",
+        "scenegraph_nodes_adding",
+        "scenegraph_nodes_events_rendered",
+        "scenegraph_nodes_instancing",
+        "scenegraph_nodes_moving",
+        "scenegraph_multipleScenes",
+        "scenegraph_webglContextRecovery",
+
+        "#selectively enable rendering modes for subgraphs",
+        "scenegraph_enable",
+        "scenegraph_tags",
+        "scenegraph_flags",
+        "scenegraph_flags_ambient",
+        "scenegraph_flags_backfaceLighting",
+        "scenegraph_flags_backfaces",
+        "scenegraph_flags_backfaceTexturing",
+        "scenegraph_flags_diffuse",
+        "scenegraph_flags_enabled",
+        "scenegraph_flags_frontface",
+        "scenegraph_flags_picking",
+        "scenegraph_flags_reflection",
+        "scenegraph_flags_specular",
+        "scenegraph_flags_transparent"
+    ],
+
+    "canvas": [
+        "canvas_capture",
+        "canvas_capture_customSize",
+        "canvas_external",
+        "canvas_external_transparent",
+        "canvas_transparent"
+    ],
+
+    "cameras": [
+        "camera_orbit",
+        "camera_path",
+        "camera_pickFlyOrbit_city",
+        "camera_pickFlyOrbit_terrain",
+        "camera_stereo",
+        "camera_oculusRift",
+        "camera_anaglyph"
+    ],
+
+    "geometry": [
+        "geometry_autoNormals",
+        "geometry_box",
+        "geometry_cylinder",
+        "geometry_lines",
+        "geometry_morphTargets",
+        "geometry_morphTargets_typedArrays",
+        "geometry_plane",
+        "geometry_points",
+        "geometry_sphere",
+        "geometry_teapot",
+        "geometry_vectorText",
+        "geometry_torus",
+        "geometry_torus_wireframe",
+        "geometry_triangles",
+        "geometry_typedArrays",
+        "geometry_vertexColors",
+        "geometry_heightmap",
+        "geometry_heightmap_texture",
+        "geometry_heightmap_texture_video",
+        "geometry_heightmap_transparent"
+    ],
+
+    "transforms": [
+        "transforms_modelling_hierarchy",
+        "transforms_modelling_matrix",
+        "transforms_modelling_rotate",
+        "transforms_modelling_scale",
+        "transforms_modelling_translate",
+        "transforms_modelling_quaternion",
+        "transforms_projection_default",
+        "transforms_projection_frustum",
+        "transforms_projection_ortho",
+        "transforms_projection_perspective",
+        "transforms_viewing"
+    ],
+
+    "lighting": [
+        "lighting_material",
+        "lighting_ambient",
+        "lighting_default",
+        "lighting_directional_view",
+        "lighting_directional_world",
+        "lighting_directional_world_texture",
+        "lighting_point_view",
+        "lighting_point_world"
+    ],
+
+    "textures": [
+        "texture_alpha",
+        "texture_alpha_add",
+        "texture_alpha_mix",
+        "texture_alpha_multiply",
+        "texture_alpha_video",
+        "texture_atlas",
+        "texture_color",
+        "texture_color_add",
+        "texture_color_animated",
+        "texture_color_multiply",
+        "texture_color_video",
+        "texture_emit",
+        "texture_emit_add",
+        "texture_emit_multiply",
+        "texture_emit_video",
+        "texture_multiTexture",
+        "texture_normals",
+        "texture_normals_video",
+        "texture_rtt_color",
+        "texture_rtt_depth",
+        "texture_rtt_depthAndColor",
+        "texture_rtt_heightmap",
+        "texture_rtt_manyTextures",
+        "texture_rtt_shader",
+        "texture_rtt_withVideo",
+        "texture_specular",
+        "texture_specular_add",
+        "texture_specular_multiply",
+        "texture_specular_video",
+        "texture_uvLayers"
+    ],
+
+    "reflections": [
+        "#environmental reflection using cubemaps",
+        "reflections_custom",
+        "reflections_intensity",
+        "reflections_multipleSeparate",
+        "reflections_multipleCombined",
+        "reflections_shinyRaptor",
+        "reflections_manyObjects",
+        "reflections_withNormalMap",
+        "reflections_withTransparency",
+        "reflections_withSpecularMaterial",
+        "reflections_withSpecularMap"
+    ],
+
+    "skyboxes": [
+        "skyboxes_custom",
+        "skyboxes_clouds",
+        "skyboxes_cloudySea",
+        "skyboxes_grimmNight",
+        "skyboxes_interstellarClouds",
+        "skyboxes_miramarClouds",
+        "skyboxes_stormyDays",
+        "skyboxes_violentDays"
+    ],
+
+    "passes": [
+        "#multiple passes on each render",
+        "passes_twoPasses",
+        "passes_threePasses"
+    ],
+
+    "stages": [
+        "#custom effect pipelines",
+        "stages_twoStages",
+        "stages_threeStages",
+        "stages_withPicking",
+        "stages_withReflection",
+        "stages_withSharedShader",
+        "stages_withTransparencySort"
+    ],
+
+    "layers": [
+        "#prioritised render bins",
+        "layers_enableDisable",
+        "layers_transparencySort"
+    ],
+
+    "depthBuffer": [
+
+// "#Depth buffer control",
+        "depthBuf_clearDepth",
+        "depthBuf_depthFunc",
+        "depthBuf_enableDisable"
+    ],
+
+    "shaders": [
+        "shaders_xray",
+        "shaders_scanline",
+        "shaders_custom_material_color",
+        "shaders_custom_texture",
+        "shaders_custom_twoTextures",
+        "shaders_custom_threeTextures",
+        "shaders_custom_transforms",
+        "shaders_vertexDisplacement"
+    ],
+
+    "posteffects": [
+        "postEffects_blur",
+        "postEffects_depthOfField",
+        "postEffects_fog",
+        "postEffects_lens",
+        "postEffects_scanlines",
+        "postEffects_sepia",
+        "postEffects_scanlinesAndSepia"
+    ],
+
+    "physics": [
+        "physics_balls",
+        "physics_boxes",
+        "physics_materials",
+        "physics_multithreaded"
+    ],
+
+    "picking": [
+        "picking_basic",
+        "picking_disabling",
+        "picking_names",
+        "picking_spheres",
+        "picking_throughTransparency",
+        "picking_rayPicking",
+        "picking_rayPicking_performance"
+    ],
+
+    "importing": [
+        "importing_3ds_lexus",
+        "importing_md2_lion",
+        "importing_obj_duck",
+        "importing_obj_raptor"
+    ],
+
+    "optimization": [
+        "#optimizing your scene graphs",
+        "optimization_discreteLOD",
+        "optimization_frustumClipping",
+        "optimization_instancing",
+        "optimization_textureAtlas",
+        "optimization_vertexSharing"
+    ],
+
+    "benchmarks": [
+        "benchmarks_5000boxes"
+    ],
+
+    "extending": [
+        "#adding new node types to SceneJS",
+        "extending_nodes_custom",
+        "extending_nodes_custom_animation",
+        "extending_nodes_custom_pubSub",
+        "extending_nodes_custom_tasks"
+    ],
+
+    "environments": [
+        "#prebuilt scenes to drop your nodes into",
+        "environments_lawn",
+        "environments_gridRoom",
+        "environments_holoDeck"
+    ],
+
+    "models": [
+        "#a selection of models from the examples library",
+        "models_vehicles_tank",
+        "models_buildings_city",
+        "models_space_earth"
+    ]
+};

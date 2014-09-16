@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
     /**
      * The default state core singleton for {@link SceneJS.Layer} nodes
@@ -14,11 +14,11 @@
     var stackLen = 0;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function(params) {
-                params.engine.display.layer = defaultCore;
-                stackLen = 0;
-            });
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.layer = defaultCore;
+            stackLen = 0;
+        });
 
     /**
      * @class Scene graph node which assigns the {@link SceneJS.Geometry}s within its subgraph to a prioritised render bin
@@ -26,14 +26,14 @@
      */
     SceneJS.Layer = SceneJS_NodeFactory.createNodeType("layer");
 
-    SceneJS.Layer.prototype._init = function(params) {
+    SceneJS.Layer.prototype._init = function (params) {
         if (this._core.useCount == 1) { // This node defines the resource
             this._core.priority = params.priority || 0;
             this._core.enabled = params.enabled !== false;
         }
     };
 
-    SceneJS.Layer.prototype.setPriority = function(priority) {
+    SceneJS.Layer.prototype.setPriority = function (priority) {
         priority = priority || 0;
         if (this._core.priority != priority) {
             this._core.priority = priority;
@@ -41,11 +41,11 @@
         }
     };
 
-    SceneJS.Layer.prototype.getPriority = function() {
+    SceneJS.Layer.prototype.getPriority = function () {
         return this._core.priority;
     };
 
-    SceneJS.Layer.prototype.setEnabled = function(enabled) {
+    SceneJS.Layer.prototype.setEnabled = function (enabled) {
         enabled = !!enabled;
         if (this._core.enabled != enabled) {
             this._core.enabled = enabled;
@@ -53,15 +53,15 @@
         }
     };
 
-    SceneJS.Layer.prototype.getEnabled = function() {
+    SceneJS.Layer.prototype.getEnabled = function () {
         return this._core.enabled;
     };
 
-    SceneJS.Layer.prototype.getEnabled = function() {
+    SceneJS.Layer.prototype.getEnabled = function () {
         return this._core.enabled;
     };
 
-    SceneJS.Layer.prototype.setClearDepth = function(clearDepth) {
+    SceneJS.Layer.prototype.setClearDepth = function (clearDepth) {
         clearDepth = clearDepth || 0;
         if (this._core.clearDepth != clearDepth) {
             this._core.clearDepth = clearDepth;
@@ -69,7 +69,7 @@
         }
     };
 
-    SceneJS.Layer.prototype.getClearDepth = function() {
+    SceneJS.Layer.prototype.getClearDepth = function () {
         return this._core.clearDepth;
     };
 

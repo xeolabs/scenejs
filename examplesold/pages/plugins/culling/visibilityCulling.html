@@ -24,7 +24,7 @@
 <script>
 
     // Demonstrates frustum culling using the axis-aligned bounding box node defined
-    // by the plugin in http://scenejs.org/api/latest/plugins/node/frustum/cull.js
+    // by the plugin in http://scenejs.org/api/latest/plugins/node/cull/visibility.js
     //
     // This node lets you insert axis-aligned World-space boundaries into your scene
     // graph that will only allow the nodes in its subgraph to render when the boundary
@@ -88,9 +88,9 @@
             nodes.push(
 
                     // Frustum-culled bounding box, implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/frustum/cull.js
+                    // http://scenejs.org/api/latest/plugins/node/cull/visibility.js
                     {
-                        type:"frustum/cull",
+                        type:"cull/visibility",
                         min:[xPos - 8, yPos - 3, zPos - 5],
                         max:[xPos + 8, yPos + 6, zPos + 5],
                         showBoundary:true, // Shows boundary as wireframe box
@@ -117,9 +117,9 @@
                                                 nodes:[
 
                                                     // Teapot primitive, implemented by plugin at
-                                                    // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                                     {
-                                                        type:"prims/teapot"
+                                                        type:"geometry/teapot"
                                                     }
                                                 ]
                                             }

@@ -73,9 +73,9 @@ function createScene() {
                                 nodes:[
 
                                     // Grid ground, implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/prims/grid.js
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/grid.js
                                     {
-                                        type:"prims/grid",
+                                        type:"geometry/grid",
                                         size:{ x:1000, z:1000 },
                                         xSegments:200,
                                         zSegments:200
@@ -84,9 +84,9 @@ function createScene() {
                             },
 
                             // Cloudy sea skybox, implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/skyboxes/miramarClouds.js
+                            // http://scenejs.org/api/latest/plugins/node/skybox/miramarClouds.js
                             {
-                                type:"skyboxes/cloudySea"
+                                type:"skybox/cloudySea"
                             },
 
                             //--------------------------------------------------------------------------------
@@ -266,9 +266,9 @@ function createBubbles() {
                             angle:0
                         });
                         this.rotate.addNode(
-                                // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
                                 {
-                                    type:"prims/sphere"
+                                    type:"geometry/sphere"
                                 });
                         this.angle = 0;
                         this.angleInc = Math.random() - 0.5;

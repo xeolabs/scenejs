@@ -19,6 +19,7 @@ require([
 
                 if (!params.src) {
                     this.log("error", "Attribute expected: src");
+                    return;
                 }
 
                 // Notify SceneJS so it can support loading/busy indicators etc

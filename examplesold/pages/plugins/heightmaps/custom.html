@@ -21,7 +21,7 @@
 
 <script>
 
-    // Demo of the "heightmaps/custom" custom node type, with an "effects/fog" node thrown in for fun.
+    // Demo of the "geometry/heightmap" custom node type, with an "shader/fog" node thrown in for fun.
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -49,9 +49,9 @@
                         nodes:[
 
                             // Fog effect, implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/effects/fog.js
+                            // http://scenejs.org/api/latest/plugins/node/shader/fog.js
                             {
-                                type:"effects/fog",
+                                type:"shader/fog",
                                 mode:"exp2", // Quadratic
                                 density:0.1, // Fog density
                                 start:100.0, // Near starting point
@@ -69,9 +69,9 @@
                                         nodes:[
 
                                             // Heightmap, implemented by plugin at
-                                            // http://scenejs.org/api/latest/plugins/node/heightmaps/custom.js
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
                                             {
-                                                type:"heightmaps/custom",
+                                                type:"geometry/heightmap",
 
                                                 // Texture image
                                                 src:'../../../textures/heightmap.jpg',
@@ -90,9 +90,9 @@
                                             },
 
                                             // Skybox node, implemented by plugin at
-                                            // http://scenejs.org/api/latest/plugins/node/skyboxes/grimmNight.js
+                                            // http://scenejs.org/api/latest/plugins/node/skybox/grimmNight.js
                                             {
-                                                type:"skyboxes/clouds"
+                                                type:"skybox/clouds"
                                             }
                                         ]
                                     }

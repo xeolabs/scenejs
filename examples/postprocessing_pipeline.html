@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+
+        nodes: [
+
+            // Mouse-orbit for camera,
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: -40,
+                pitch: -20,
+                zoom: 500,
+                eye: { x: 0, y: 150, z: -1000 },
+                look: { x: 0, y: 0, z: 0 },
+                zoomSensitivity: 10.0,
+
+                nodes: [
+
+                    // Postprocessing effect pipeline, implemented by plugin at:
+                    // http://scenejs.org/api/latest/plugins/node/postprocess/pipeline.js
+                    {
+                        type: "postprocess/pipeline",
+                        id: "myEffectPipeline",
+
+                        effects: [
+
+                            // Depth-of-field
+                            {
+                                effectId: "dof",                // Unique ID to assign
+                                type: "postprocess/dof",        // SceneJS node to use for this effect
+                                displayName: "Depth-of-field",
+                                description: "Simulates photographic depth-of-field",
+
+                                // Effect parameters
+                                params: {
+                                    texelSize: 0.00022,             // Size of one texel (1 / width, 1 / height)
+                                    blurCoeff: 0.0084,	            // Calculated from the blur equation, b = ( f * ms / N )
+                                    autofocus: true                 // Automatically synch focusDist to "cameras/pickFlyOrbit"
+                                }
+                            },
+
+                            // Sepia effect
+                            {
+                                effectId: "sepia",
+                                type: "postprocess/sepia",
+                                displayName: "Sepia",
+                                description: "Sepia color filter"
+                            },
+
+                            // Scanlines effect
+                            {
+                                effectId: "scanlines",
+                                type: "postprocess/scanlines",
+                                displayName: "Scanlines",
+                                description: "Scan lines pattern"
+                            },
+
+                            // Film grain effect
+                            {
+                                effectId: "filmGrain",
+                                type: "postprocess/filmGrain",
+                                displayName: "Film Grain",
+                                description: "Film grain noise"
+                            },
+
+                            // Technicolor effect
+                            {
+                                effectId: "technicolor",
+                                type: "postprocess/technicolor",
+                                displayName: "Technicolor",
+                                description: "Technicolor color filter"
+                            },
+
+                            // Oculus Rift
+                            {
+                                effectId: "oculusRift",
+                                type: "effects/oculusRift",
+                                displayName: "Oculus Rift",
+                                description: "View using Oculus Rift"
+                            }
+                        ],
+
+                        nodes: [
+
+                            // Cloudy sea skybox, implemented by plugin at:
+                            // http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            {
+                                type: "skybox/cloudySea",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+
+                            // The reflection cube map
+                            // Images taken from: http://hristo.oskov.com/projects/cs418/mp3/
+                            {
+                                type: "reflect/london",
+                                intensity: 0.7,
+
+                                nodes: [
+
+                                    // Randomly scattered boxes, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/randomObjects.js
+                                    {
+                                        type: "geometry/randomObjects",
+                                        numObjects: 1000
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    //  Get the pipeline node and bind a GUI to it to play with it
+    scene.getNode("myEffectPipeline",
+            function (pipeline) {
+
+                pipeline.setEnabled({
+                    effectId : "dof",
+                    enable: true
+                });
+
+//                var Menu = function () {
+//
+//                    var texelSize = blur.getTexelSize();
+//                    var factor = blur.getFactor();
+//
+//                    this["texelSize"] = texelSize;
+//                    this["factor"] = factor;
+//
+//                    var self = this;
+//
+//                    // This is actually quite inefficient because it continually updates
+//                    // the scene graph, forcing frames to continually re-render.
+//                    // Your GPU's not going to like it, but it's just for a quick and dirty demo.
+//
+//                    var update = function () {
+//
+//                        blur.setTexelSize(self["texelSize"]);
+//                        blur.setFactor(self["factor"]);
+//
+//                        requestAnimationFrame(update);
+//                    };
+//
+//                    update();
+//                };
+//
+//                var gui = new dat.GUI();
+//                var folder = gui.addFolder("Depth-of-field");
+//                var menu = new Menu();
+//                folder.add(menu, 'texelSize', 0.0, 0.01);
+//                folder.add(menu, 'factor', 0.0, 1.0);
+//                folder.open();
+
+            });
+
+</script>
+</body>
+</html>

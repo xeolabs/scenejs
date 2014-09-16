@@ -1,4 +1,4 @@
-new (function() {
+new (function () {
 
     /**
      * The default state core singleton for {@link SceneJS.Renderer} nodes
@@ -14,10 +14,10 @@ new (function() {
     var stackLen = 0;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function(params) {
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
 
-                canvas = params.engine.canvas;
+            canvas = params.engine.canvas;
 
 //                // TODO: Below is a HACK
 //
@@ -52,10 +52,10 @@ new (function() {
 //                    }
 //                });
 
-                stackLen = 0;
+            stackLen = 0;
 
-                params.engine.display.renderer = coreStack[stackLen++] = defaultCore;
-            });
+            params.engine.display.renderer = coreStack[stackLen++] = defaultCore;
+        });
 
     function createProps(props) {
 
@@ -77,11 +77,11 @@ new (function() {
 
             props: props,
 
-            setProps: function(gl) {
+            setProps: function (gl) {
                 setProperties(gl, props);
             },
 
-            restoreProps : function(gl) {
+            restoreProps: function (gl) {
                 if (restore) {
                     restoreProperties(gl, restore);
                 }
@@ -89,14 +89,16 @@ new (function() {
         };
     }
 
-    var getSuperProperty = function(name) {
+    var getSuperProperty = function (name) {
         var props;
         var prop;
         for (var i = stackLen - 1; i >= 0; i--) {
             props = coreStack[i].props;
-            prop = props[name];
-            if (prop != undefined && prop != null) {
-                return props[name];
+            if (props) {
+                prop = props[name];
+                if (prop != undefined && prop != null) {
+                    return props[name];
+                }
             }
         }
         return null; // Cause default to be set
@@ -118,7 +120,7 @@ new (function() {
         }
     }
 
-    var setProperties = function(gl, props) {
+    var setProperties = function (gl, props) {
 
         for (var key in props) {        // Set order-insensitive properties (modes)
             if (props.hasOwnProperty(key)) {
@@ -146,7 +148,7 @@ new (function() {
      * Restores previous renderer properties, except for clear - that's the reason we
      * have a seperate set and restore semantic - we don't want to keep clearing the buffer.
      */
-    var restoreProperties = function(gl, props) {
+    var restoreProperties = function (gl, props) {
 
         var value;
 
@@ -176,23 +178,23 @@ new (function() {
      * Maps renderer node properties to WebGL gl enums
      * @private
      */
-    var glEnum = function(gl, name) {
+    var glEnum = function (gl, name) {
         if (!name) {
             throw SceneJS_error.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "Null SceneJS.State node config: \"" + name + "\"");
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Null SceneJS.State node config: \"" + name + "\"");
         }
         var result = SceneJS._webgl.enumMap[name];
         if (!result) {
             throw SceneJS_error.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "Unrecognised SceneJS.State node config value: \"" + name + "\"");
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "Unrecognised SceneJS.State node config value: \"" + name + "\"");
         }
         var value = gl[result];
         if (!value) {
             throw SceneJS_error.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "This browser's WebGL does not support renderer node config value: \"" + name + "\"");
         }
         return value;
     };
@@ -217,7 +219,7 @@ new (function() {
      */
     var glModeSetters = {
 
-        enableBlend: function(gl, flag) {
+        enableBlend: function (gl, flag) {
             if (!gl) {
                 if (flag == null || flag == undefined) {
                     flag = false;
@@ -231,7 +233,7 @@ new (function() {
             }
         },
 
-        blendColor: function(gl, color) {
+        blendColor: function (gl, color) {
             if (!gl) {
                 color = color || {};
                 return {
@@ -244,7 +246,7 @@ new (function() {
             gl.blendColor(color.r, color.g, color.b, color.a);
         },
 
-        blendEquation: function(gl, eqn) {
+        blendEquation: function (gl, eqn) {
             if (!gl) {
                 return eqn || "funcAdd";
             }
@@ -253,87 +255,87 @@ new (function() {
 
         /** Sets the RGB blend equation and the alpha blend equation separately
          */
-        blendEquationSeparate: function(gl, eqn) {
+        blendEquationSeparate: function (gl, eqn) {
             if (!gl) {
                 eqn = eqn || {};
                 return {
-                    rgb : eqn.rgb || "funcAdd",
-                    alpha : eqn.alpha || "funcAdd"
+                    rgb: eqn.rgb || "funcAdd",
+                    alpha: eqn.alpha || "funcAdd"
                 };
             }
             gl.blendEquation(glEnum(gl, eqn.rgb), glEnum(gl, eqn.alpha));
         },
 
-        blendFunc: function(gl, funcs) {
+        blendFunc: function (gl, funcs) {
             if (!gl) {
                 funcs = funcs || {};
                 return  {
-                    sfactor : funcs.sfactor || "srcAlpha",
-                    dfactor : funcs.dfactor || "oneMinusSrcAlpha"
+                    sfactor: funcs.sfactor || "srcAlpha",
+                    dfactor: funcs.dfactor || "oneMinusSrcAlpha"
                 };
             }
             gl.blendFunc(glEnum(gl, funcs.sfactor || "srcAlpha"), glEnum(gl, funcs.dfactor || "oneMinusSrcAlpha"));
         },
 
-        blendFuncSeparate: function(gl, func) {
+        blendFuncSeparate: function (gl, func) {
             if (!gl) {
                 func = func || {};
                 return {
-                    srcRGB : func.srcRGB || "zero",
-                    dstRGB : func.dstRGB || "zero",
-                    srcAlpha : func.srcAlpha || "zero",
-                    dstAlpha :  func.dstAlpha || "zero"
+                    srcRGB: func.srcRGB || "zero",
+                    dstRGB: func.dstRGB || "zero",
+                    srcAlpha: func.srcAlpha || "zero",
+                    dstAlpha: func.dstAlpha || "zero"
                 };
             }
             gl.blendFuncSeparate(
-                    glEnum(gl, func.srcRGB || "zero"),
-                    glEnum(gl, func.dstRGB || "zero"),
-                    glEnum(gl, func.srcAlpha || "zero"),
-                    glEnum(gl, func.dstAlpha || "zero"));
+                glEnum(gl, func.srcRGB || "zero"),
+                glEnum(gl, func.dstRGB || "zero"),
+                glEnum(gl, func.srcAlpha || "zero"),
+                glEnum(gl, func.dstAlpha || "zero"));
         },
 
-        clearColor: function(gl, color) {
+        clearColor: function (gl, color) {
             if (!gl) {
                 color = color || {};
                 return {
-                    r : color.r || 0,
-                    g : color.g || 0,
-                    b : color.b || 0,
-                    a : (color.a == undefined || color.a == null) ? 1 : color.a
+                    r: color.r || 0,
+                    g: color.g || 0,
+                    b: color.b || 0,
+                    a: (color.a == undefined || color.a == null) ? 1 : color.a
                 };
             }
             gl.clearColor(color.r, color.g, color.b, color.a);
         },
 
-        clearDepth: function(gl, depth) {
+        clearDepth: function (gl, depth) {
             if (!gl) {
                 return (depth == null || depth == undefined) ? 1 : depth;
             }
             gl.clearDepth(depth);
         },
 
-        clearStencil: function(gl, clearValue) {
+        clearStencil: function (gl, clearValue) {
             if (!gl) {
                 return  clearValue || 0;
             }
             gl.clearStencil(clearValue);
         },
 
-        colorMask: function(gl, color) {
+        colorMask: function (gl, color) {
             if (!gl) {
                 color = color || {};
                 return {
-                    r : color.r || 0,
-                    g : color.g || 0,
-                    b : color.b || 0,
-                    a : (color.a == undefined || color.a == null) ? 1 : color.a
+                    r: color.r || 0,
+                    g: color.g || 0,
+                    b: color.b || 0,
+                    a: (color.a == undefined || color.a == null) ? 1 : color.a
                 };
 
             }
             gl.colorMask(color.r, color.g, color.b, color.a);
         },
 
-        enableCullFace: function(gl, flag) {
+        enableCullFace: function (gl, flag) {
             if (!gl) {
                 return flag;
             }
@@ -344,14 +346,14 @@ new (function() {
             }
         },
 
-        cullFace: function(gl, mode) {
+        cullFace: function (gl, mode) {
             if (!gl) {
                 return mode || "back";
             }
             gl.cullFace(glEnum(gl, mode));
         },
 
-        enableDepthTest: function(gl, flag) {
+        enableDepthTest: function (gl, flag) {
             if (!gl) {
                 if (flag == null || flag == undefined) {
                     flag = true;
@@ -365,14 +367,14 @@ new (function() {
             }
         },
 
-        depthFunc: function(gl, func) {
+        depthFunc: function (gl, func) {
             if (!gl) {
                 return func || "less";
             }
             gl.depthFunc(glEnum(gl, func));
         },
 
-        enableDepthMask: function(gl, flag) {
+        enableDepthMask: function (gl, flag) {
             if (!gl) {
                 if (flag == null || flag == undefined) {
                     flag = true;
@@ -382,32 +384,32 @@ new (function() {
             gl.depthMask(flag);
         },
 
-        depthRange: function(gl, range) {
+        depthRange: function (gl, range) {
             if (!gl) {
                 range = range || {};
                 return {
-                    zNear : (range.zNear == undefined || range.zNear == null) ? 0 : range.zNear,
-                    zFar : (range.zFar == undefined || range.zFar == null) ? 1 : range.zFar
+                    zNear: (range.zNear == undefined || range.zNear == null) ? 0 : range.zNear,
+                    zFar: (range.zFar == undefined || range.zFar == null) ? 1 : range.zFar
                 };
             }
             gl.depthRange(range.zNear, range.zFar);
-        } ,
+        },
 
-        frontFace: function(gl, mode) {
+        frontFace: function (gl, mode) {
             if (!gl) {
                 return mode || "ccw";
             }
             gl.frontFace(glEnum(gl, mode));
         },
 
-        lineWidth: function(gl, width) {
+        lineWidth: function (gl, width) {
             if (!gl) {
                 return width || 1;
             }
             gl.lineWidth(width);
         },
 
-        enableScissorTest: function(gl, flag) {
+        enableScissorTest: function (gl, flag) {
             if (!gl) {
                 return flag;
             }
@@ -436,12 +438,12 @@ new (function() {
 
         /** Set viewport on the given gl
          */
-        viewport: function(gl, v) {
+        viewport: function (gl, v) {
             if (!gl) {
                 v = v || {};
                 return {
-                    x : v.x || 1,
-                    y : v.y || 1,
+                    x: v.x || 1,
+                    y: v.y || 1,
                     width: v.width || canvas.canvas.width,
                     height: v.height || canvas.canvas.height
                 };
@@ -451,12 +453,12 @@ new (function() {
 
         /** Sets scissor region on the given gl
          */
-        scissor: function(gl, s) {
+        scissor: function (gl, s) {
             if (!gl) {
                 s = s || {};
                 return {
-                    x : s.x || 0,
-                    y : s.y || 0,
+                    x: s.x || 0,
+                    y: s.y || 0,
                     width: s.width || 1.0,
                     height: s.height || 1.0
                 };
@@ -466,7 +468,7 @@ new (function() {
 
         /** Clears buffers on the given gl as specified in mask
          */
-        clear:function(gl, mask) {
+        clear: function (gl, mask) {
             if (!gl) {
                 mask = mask || {};
                 return mask;
@@ -482,14 +484,14 @@ new (function() {
                 m = m | gl.STENCIL_BUFFER_BIT;
             }
             if (m) {
-                //    gl.clear(m);
+               //     gl.clear(m);
             }
         }
     };
 
     SceneJS.Renderer = SceneJS_NodeFactory.createNodeType("renderer");
 
-    SceneJS.Renderer.prototype._init = function(params) {
+    SceneJS.Renderer.prototype._init = function (params) {
         if (this._core.useCount == 1) { // This node defines the resource
             for (var key in params) {
                 if (params.hasOwnProperty(key)) {
@@ -500,281 +502,288 @@ new (function() {
         }
     };
 
-    SceneJS.Renderer.prototype.setViewport = function(viewport) {
+    SceneJS.Renderer.prototype.setViewport = function (viewport) {
         this._core.viewport = viewport ? {
-            x : viewport.x || 1,
-            y : viewport.y || 1,
+            x: viewport.x || 1,
+            y: viewport.y || 1,
             width: viewport.width || 1000,
             height: viewport.height || 1000
         } : undefined;
         this._core.dirty = true;
+        this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Renderer.prototype.getViewport = function() {
+    SceneJS.Renderer.prototype.getViewport = function () {
         return this._core.viewport ? {
-            x : this._core.viewport.x,
-            y : this._core.viewport.y,
+            x: this._core.viewport.x,
+            y: this._core.viewport.y,
             width: this._core.viewport.width,
             height: this._core.viewport.height
         } : undefined;
     };
 
-    SceneJS.Renderer.prototype.setScissor = function(scissor) {
+    SceneJS.Renderer.prototype.setScissor = function (scissor) {
         this._core.scissor = scissor ? {
-            x : scissor.x || 1,
-            y : scissor.y || 1,
+            x: scissor.x || 1,
+            y: scissor.y || 1,
             width: scissor.width || 1000,
             height: scissor.height || 1000
         } : undefined;
         this._core.dirty = true;
+        this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Renderer.prototype.getScissor = function() {
+    SceneJS.Renderer.prototype.getScissor = function () {
         return this._core.scissor ? {
-            x : this._core.scissor.x,
-            y : this._core.scissor.y,
+            x: this._core.scissor.x,
+            y: this._core.scissor.y,
             width: this._core.scissor.width,
             height: this._core.scissor.height
         } : undefined;
     };
 
-    SceneJS.Renderer.prototype.setClear = function(clear) {
+    SceneJS.Renderer.prototype.setClear = function (clear) {
         this._core.clear = clear ? {
-            r : clear.r || 0,
-            g : clear.g || 0,
-            b : clear.b || 0
+            r: clear.r || 0,
+            g: clear.g || 0,
+            b: clear.b || 0
         } : undefined;
         this._core.dirty = true;
+        this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Renderer.prototype.getClear = function() {
+    SceneJS.Renderer.prototype.getClear = function () {
         return this._core.clear ? {
-            r : this._core.clear.r,
-            g : this._core.clear.g,
-            b : this._core.clear.b
+            r: this._core.clear.r,
+            g: this._core.clear.g,
+            b: this._core.clear.b
         } : null;
     };
 
-    SceneJS.Renderer.prototype.setEnableBlend = function(enableBlend) {
+    SceneJS.Renderer.prototype.setEnableBlend = function (enableBlend) {
         this._core.enableBlend = enableBlend;
         this._core.dirty = true;
+        this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Renderer.prototype.getEnableBlend = function() {
+    SceneJS.Renderer.prototype.getEnableBlend = function () {
         return this._core.enableBlend;
     };
 
-    SceneJS.Renderer.prototype.setBlendColor = function(color) {
+    SceneJS.Renderer.prototype.setBlendColor = function (color) {
         this._core.blendColor = color ? {
-            r : color.r || 0,
-            g : color.g || 0,
-            b : color.b || 0,
-            a : (color.a == undefined || color.a == null) ? 1 : color.a
+            r: color.r || 0,
+            g: color.g || 0,
+            b: color.b || 0,
+            a: (color.a == undefined || color.a == null) ? 1 : color.a
         } : undefined;
         this._core.dirty = true;
+        this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Renderer.prototype.getBlendColor = function() {
+    SceneJS.Renderer.prototype.getBlendColor = function () {
         return this._core.blendColor ? {
-            r : this._core.blendColor.r,
-            g : this._core.blendColor.g,
-            b : this._core.blendColor.b,
-            a : this._core.blendColor.a
+            r: this._core.blendColor.r,
+            g: this._core.blendColor.g,
+            b: this._core.blendColor.b,
+            a: this._core.blendColor.a
         } : undefined;
     };
 
-    SceneJS.Renderer.prototype.setBlendEquation = function(eqn) {
+    SceneJS.Renderer.prototype.setBlendEquation = function (eqn) {
         this._core.blendEquation = eqn;
         this._core.dirty = true;
+        this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Renderer.prototype.getBlendEquation = function() {
+    SceneJS.Renderer.prototype.getBlendEquation = function () {
         return this._core.blendEquation;
     };
 
-    SceneJS.Renderer.prototype.setBlendEquationSeparate = function(eqn) {
+    SceneJS.Renderer.prototype.setBlendEquationSeparate = function (eqn) {
         this._core.blendEquationSeparate = eqn ? {
-            rgb : eqn.rgb || "funcAdd",
-            alpha : eqn.alpha || "funcAdd"
+            rgb: eqn.rgb || "funcAdd",
+            alpha: eqn.alpha || "funcAdd"
         } : undefined;
         this._core.dirty = true;
+        this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Renderer.prototype.getBlendEquationSeparate = function() {
+    SceneJS.Renderer.prototype.getBlendEquationSeparate = function () {
         return this._core.blendEquationSeparate ? {
-            rgb : this._core.rgb,
-            alpha : this._core.alpha
+            rgb: this._core.rgb,
+            alpha: this._core.alpha
         } : undefined;
+        this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Renderer.prototype.setBlendFunc = function(funcs) {
+    SceneJS.Renderer.prototype.setBlendFunc = function (funcs) {
         this._core.blendFunc = funcs ? {
-            sfactor : funcs.sfactor || "srcAlpha",
-            dfactor : funcs.dfactor || "one"
+            sfactor: funcs.sfactor || "srcAlpha",
+            dfactor: funcs.dfactor || "one"
         } : undefined;
         this._core.dirty = true;
+        this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Renderer.prototype.getBlendFunc = function() {
+    SceneJS.Renderer.prototype.getBlendFunc = function () {
         return this._core.blendFunc ? {
-            sfactor : this._core.sfactor,
-            dfactor : this._core.dfactor
+            sfactor: this._core.sfactor,
+            dfactor: this._core.dfactor
         } : undefined;
     };
 
-    SceneJS.Renderer.prototype.setBlendFuncSeparate = function(eqn) {
+    SceneJS.Renderer.prototype.setBlendFuncSeparate = function (eqn) {
         this._core.blendFuncSeparate = eqn ? {
-            srcRGB : eqn.srcRGB || "zero",
-            dstRGB : eqn.dstRGB || "zero",
-            srcAlpha : eqn.srcAlpha || "zero",
-            dstAlpha : eqn.dstAlpha || "zero"
+            srcRGB: eqn.srcRGB || "zero",
+            dstRGB: eqn.dstRGB || "zero",
+            srcAlpha: eqn.srcAlpha || "zero",
+            dstAlpha: eqn.dstAlpha || "zero"
         } : undefined;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getBlendFuncSeparate = function() {
+    SceneJS.Renderer.prototype.getBlendFuncSeparate = function () {
         return this._core.blendFuncSeparate ? {
-            srcRGB : this._core.blendFuncSeparate.srcRGB,
-            dstRGB : this._core.blendFuncSeparate.dstRGB,
-            srcAlpha : this._core.blendFuncSeparate.srcAlpha,
-            dstAlpha : this._core.blendFuncSeparate.dstAlpha
+            srcRGB: this._core.blendFuncSeparate.srcRGB,
+            dstRGB: this._core.blendFuncSeparate.dstRGB,
+            srcAlpha: this._core.blendFuncSeparate.srcAlpha,
+            dstAlpha: this._core.blendFuncSeparate.dstAlpha
         } : undefined;
     };
 
-    SceneJS.Renderer.prototype.setEnableCullFace = function(enableCullFace) {
+    SceneJS.Renderer.prototype.setEnableCullFace = function (enableCullFace) {
         this._core.enableCullFace = enableCullFace;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getEnableCullFace = function() {
+    SceneJS.Renderer.prototype.getEnableCullFace = function () {
         return this._core.enableCullFace;
     };
 
 
-    SceneJS.Renderer.prototype.setCullFace = function(cullFace) {
+    SceneJS.Renderer.prototype.setCullFace = function (cullFace) {
         this._core.cullFace = cullFace;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getCullFace = function() {
+    SceneJS.Renderer.prototype.getCullFace = function () {
         return this._core.cullFace;
     };
 
-    SceneJS.Renderer.prototype.setEnableDepthTest = function(enableDepthTest) {
+    SceneJS.Renderer.prototype.setEnableDepthTest = function (enableDepthTest) {
         this._core.enableDepthTest = enableDepthTest;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getEnableDepthTest = function() {
+    SceneJS.Renderer.prototype.getEnableDepthTest = function () {
         return this._core.enableDepthTest;
     };
 
-    SceneJS.Renderer.prototype.setDepthFunc = function(depthFunc) {
+    SceneJS.Renderer.prototype.setDepthFunc = function (depthFunc) {
         this._core.depthFunc = depthFunc;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getDepthFunc = function() {
+    SceneJS.Renderer.prototype.getDepthFunc = function () {
         return this._core.depthFunc;
     };
 
-    SceneJS.Renderer.prototype.setEnableDepthMask = function(enableDepthMask) {
+    SceneJS.Renderer.prototype.setEnableDepthMask = function (enableDepthMask) {
         this._core.enableDepthMask = enableDepthMask;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getEnableDepthMask = function() {
+    SceneJS.Renderer.prototype.getEnableDepthMask = function () {
         return this._core.enableDepthMask;
     };
 
-    SceneJS.Renderer.prototype.setClearDepth = function(clearDepth) {
+    SceneJS.Renderer.prototype.setClearDepth = function (clearDepth) {
         this._core.clearDepth = clearDepth;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getClearDepth = function() {
+    SceneJS.Renderer.prototype.getClearDepth = function () {
         return this._core.clearDepth;
     };
 
-    SceneJS.Renderer.prototype.setDepthRange = function(range) {
+    SceneJS.Renderer.prototype.setDepthRange = function (range) {
         this._core.depthRange = range ? {
-            zNear : (range.zNear == undefined || range.zNear == null) ? 0 : range.zNear,
-            zFar : (range.zFar == undefined || range.zFar == null) ? 1 : range.zFar
+            zNear: (range.zNear == undefined || range.zNear == null) ? 0 : range.zNear,
+            zFar: (range.zFar == undefined || range.zFar == null) ? 1 : range.zFar
         } : undefined;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getDepthRange = function() {
+    SceneJS.Renderer.prototype.getDepthRange = function () {
         return this._core.depthRange ? {
-            zNear : this._core.depthRange.zNear,
-            zFar : this._core.depthRange.zFar
+            zNear: this._core.depthRange.zNear,
+            zFar: this._core.depthRange.zFar
         } : undefined;
     };
 
-    SceneJS.Renderer.prototype.setFrontFace = function(frontFace) {
+    SceneJS.Renderer.prototype.setFrontFace = function (frontFace) {
         this._core.frontFace = frontFace;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getFrontFace = function() {
+    SceneJS.Renderer.prototype.getFrontFace = function () {
         return this._core.frontFace;
     };
 
-    SceneJS.Renderer.prototype.setLineWidth = function(lineWidth) {
+    SceneJS.Renderer.prototype.setLineWidth = function (lineWidth) {
         this._core.lineWidth = lineWidth;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getLineWidth = function() {
+    SceneJS.Renderer.prototype.getLineWidth = function () {
         return this._core.lineWidth;
     };
 
-    SceneJS.Renderer.prototype.setEnableScissorTest = function(enableScissorTest) {
+    SceneJS.Renderer.prototype.setEnableScissorTest = function (enableScissorTest) {
         this._core.enableScissorTest = enableScissorTest;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getEnableScissorTest = function() {
+    SceneJS.Renderer.prototype.getEnableScissorTest = function () {
         return this._core.enableScissorTest;
     };
 
-    SceneJS.Renderer.prototype.setClearStencil = function(clearStencil) {
+    SceneJS.Renderer.prototype.setClearStencil = function (clearStencil) {
         this._core.clearStencil = clearStencil;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getClearStencil = function() {
+    SceneJS.Renderer.prototype.getClearStencil = function () {
         return this._core.clearStencil;
     };
 
-    SceneJS.Renderer.prototype.setColorMask = function(color) {
+    SceneJS.Renderer.prototype.setColorMask = function (color) {
         this._core.colorMask = color ? {
-            r : color.r || 0,
-            g : color.g || 0,
-            b : color.b || 0,
-            a : (color.a == undefined || color.a == null) ? 1 : color.a
+            r: color.r || 0,
+            g: color.g || 0,
+            b: color.b || 0,
+            a: (color.a == undefined || color.a == null) ? 1 : color.a
         } : undefined;
         this._core.dirty = true;
     };
 
-    SceneJS.Renderer.prototype.getColorMask = function() {
+    SceneJS.Renderer.prototype.getColorMask = function () {
         return this._core.colorMask ? {
-            r : this._core.colorMask.r,
-            g : this._core.colorMask.g,
-            b : this._core.colorMask.b,
-            a : this._core.colorMask.a
+            r: this._core.colorMask.r,
+            g: this._core.colorMask.g,
+            b: this._core.colorMask.b,
+            a: this._core.colorMask.a
         } : undefined;
     };
 
-    SceneJS.Renderer.prototype._compile = function(ctx) {
-
-//        if (this._core.dirty) {
-//            this._core.props = createProps(this._core);
-//            this._core.dirty = false;
-//        }
-//
-//        this._engine.display.renderer = coreStack[stackLen++] = this._core;
+    SceneJS.Renderer.prototype._compile = function (ctx) {
+        if (this._core.dirty) {
+            this._core.props = createProps(this._core);
+            this._core.dirty = false;
+        }
+        this._engine.display.renderer = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
-        //this._engine.display.renderer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        this._engine.display.renderer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 })();

@@ -21,7 +21,7 @@
 
 <script>
 
-    // Demo of the "skyboxes/stormyDays" skybox
+    // Demo of the "skybox/stormyDays" skybox
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -44,9 +44,9 @@
                 nodes:[
 
                     // Stormy Days skybox, implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/skyboxes/stormyDays.js
+                    // http://scenejs.org/api/latest/plugins/node/skybox/stormyDays.js
                     {
-                        type:"skyboxes/stormyDays",
+                        type:"skybox/stormyDays",
                         size:5000 // Box half-size on each axis - default is 5000
                     },
 
@@ -56,9 +56,9 @@
                         nodes:[
 
                             // Teapot primitive, implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                             {
-                                type:"prims/teapot"
+                                type:"geometry/teapot"
                             }
                         ]
                     }

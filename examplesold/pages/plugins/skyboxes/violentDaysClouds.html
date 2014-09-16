@@ -21,7 +21,7 @@
 
 <script>
 
-    // Demo of the "skyboxes/violentDays" skybox
+    // Demo of the "skybox/violentDays" skybox
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -43,9 +43,9 @@
                 nodes:[
 
                     // Violent Days skybox, implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/skyboxes/violentDays.js
+                    // http://scenejs.org/api/latest/plugins/node/skybox/violentDays.js
                     {
-                        type:"skyboxes/violentDays",
+                        type:"skybox/violentDays",
                         size:5000 // Box half-size on each axis - default is 5000
                     },
 
@@ -56,9 +56,9 @@
                         nodes:[
 
                             // Teapot primitive, implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                             {
-                                type:"prims/teapot"
+                                type:"geometry/teapot"
                             }
                         ]
                     }

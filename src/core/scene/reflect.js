@@ -65,8 +65,6 @@
                         gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
                         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
                         gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, ensureImageSizePowerOfTwo(image));
-                        //self._core.texture = texture;
-                        //gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,  ensureImageSizePowerOfTwo(image));
                         if (++numImagesLoaded == faces.length) {
                             self._core.texture = new SceneJS._webgl.Texture2D(gl, {
                                 texture: texture,

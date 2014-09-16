@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Demo of the "skybox/grimmNight" skybox
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    SceneJS.createScene({
+        nodes:[
+
+            // Override default lights to simulate the moon
+            {
+                type:"lights",
+                lights:[
+                    {
+                        mode:"dir",
+                        color:{ r:0.9, g:0.9, b:1.0 },
+                        diffuse:true,
+                        specular:true,
+                        dir:{ x:-0.1, y:-0.3, z:-0.5 },
+                        space:"world"
+                    }
+                ],
+
+                nodes:[
+
+                    // Mouse-orbited camera, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                    {
+                        type:"cameras/orbit",
+                        yaw:180,
+                        pitch:15,
+                        zoom:15,
+                        zoomSensitivity:10.0,
+
+                        nodes:[
+
+                            // Skybox, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/skybox/grimmNight.js
+                            {
+                                type:"skybox/grimmNight",
+                                size:5000 // Box half-size on each axis - default is 5000
+                            },
+
+                            // Blue material
+                            {
+                                type:"material",
+                                color:{ r:0.7, g:0.7, b:0.7 },
+                                nodes:[
+
+                                    // Teapot primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                    {
+                                        type:"geometry/teapot"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

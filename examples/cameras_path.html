@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+
+        a {
+            color: #ffffff;
+            padding-top: 20px;
+            font-family: Helvetica;
+            font-size: 16px;
+        }
+
+        #info {
+            position: absolute;
+            top: 50px;
+            left: 100px;
+            width: auto;
+            color: #ffffff;
+            padding: 10px;
+            padding-top: 20px;
+            font-family: Helvetica;
+            font-size: 16px;
+            text-align: left;
+            background: black;
+            opacity: 0.6;
+            z-index: 100000;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<div id="info">
+    <b>SceneJS experimental <a href="http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js" target="other">camera
+        plugin</a></b>
+    <ul>
+        <li>Click on a building to fly to it</li>
+        <li>Mouse drag to orbit</li>
+        <li>Mouse wheel to zoom</li>
+        <li>Try clicking on the horizon</li>
+        <li>Try clicking while zoomed-in close - trippy!</li>
+    </ul>
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Path camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/path.js
+            {
+                type: "cameras/path",
+                id: "myPathCamera",
+                path: [
+                    {
+                        time: 0,
+                        eye: {
+                            x: 0, y: 60, z: -2000
+                        },
+                        look: {
+                            x: 0, y: 0, z: 0
+                        },
+                        up: {
+                            x: 0, y: 1, z: 0
+                        }
+                    },
+                    {
+                        time: 5,
+                        eye: {
+                            x: -2000, y: 60, z: 0
+                        },
+                        look: {
+                            x: 0, y: 0, z: 0
+                        },
+                        up: {
+                            x: 0, y: 1, z: 0
+                        }
+                    },
+                    {
+                        time: 10,
+                        eye: {
+                            x: 0, y: 150, z: -10
+                        },
+                        look: {
+                            x: 0, y: 0, z: 0
+                        },
+                        up: {
+                            x: 0, y: 1, z: 0
+                        }
+                    },
+                    {
+                        time: 15,
+                        eye: {
+                            x: 100, y: 50, z: 100
+                        },
+                        look: {
+                            x: 100, y: 0, z: 0
+                        },
+                        up: {
+                            x: 0, y: 1, z: 0
+                        }
+                    }
+                ],
+
+                nodes: [
+                    {
+                        type: "lights",
+                        lights: [
+                            {
+                                mode: "ambient",
+                                color: { r: 0.5, g: 0.5, b: 0.6 }
+                            },
+                            {
+                                mode: "dir",
+                                color: { r: 1.0, g: 1.0, b: 1.0 },
+                                diffuse: true,
+                                specular: true,
+                                dir: { x: 0.5, y: 0.0, z: -1.0 },
+                                space: "view"
+                            }
+                        ],
+
+                        nodes: [
+
+                            // Clouds skybox, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/skybox/clouds.js
+                            {
+                                type: "skybox/clouds"
+                            },
+
+                            // Fog effect, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/shader/fog.js
+                            {
+                                //     type:"shader/fog",
+                                mode: "exp2", // Quadratic
+                                density: 0.1, // Fog density
+                                start: 30.0, // Near starting point
+                                end: 1500.0, // Far ending point
+                                color: { r: 1.0, g: 1.0, b: 0.8 }, // Yellowish fog color
+
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: { r: 0.5, g: 1.0, b: 0.5 },
+                                        emit: 0.1,
+                                        nodes: [
+
+                                            // Grid ground, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/models/ground/grid.js
+                                            {
+                                                type: "geometry/grid",
+                                                size: { x: 10000, z: 10000 },
+                                                width: 10000,
+                                                height: 10000,
+                                                widthSegments: 100,
+                                                heightSegments: 100
+                                            }
+                                        ]
+                                    },
+
+                                    {
+                                        type: "translate",
+                                        y: -3,
+                                        nodes: [
+                                            {
+                                                type: "material",
+                                                color: { r: 0.5, g: 1.0, b: 0.5 },
+                                                emit: 0.01,
+                                                nodes: [
+
+                                                    // Solid green surface under the grid, implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/models/ground/grid.js
+                                                    {
+                                                        type: "geometry/grid",
+                                                        size: { x: 10000, z: 10000 },
+                                                        width: 10000,
+                                                        height: 10000,
+                                                        widthSegments: 10,
+                                                        heightSegments: 10,
+                                                        wire: false
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+
+                                    // Flags to switch off backfaces
+                                    {
+                                        type: "flags",
+                                        flags: {
+                                            backfaces: false
+                                        },
+
+                                        nodes: [
+
+                                            // Reflection cube map
+                                            // Images taken from: http://hristo.oskov.com/projects/cs418/mp3/
+                                            {
+                                                type: "reflect/clouds",
+                                                intensity: 1.5,
+
+                                                nodes: [
+
+                                                    // City, implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
+                                                    {
+                                                        type: "models/buildings/city",
+                                                        width: 600
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    scene.getNode("myPathCamera",
+            function (path) {
+
+                scene.on("tick",
+                        function (tick) {
+
+                            var time = tick.time / 1000.0; // Millisecs to secs
+
+                            path.setTime(time % path.getTotalTime());
+                        });
+            });
+</script>
+</body>
+</html>

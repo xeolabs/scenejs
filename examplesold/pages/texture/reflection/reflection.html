@@ -28,7 +28,7 @@
     //
     //  1. a "reflect" node, which defines a cube map texture to be reflected on child geometries,
     //  2. a "material" node, which defines the amount of surface reflectivity via its "specular" property, and
-    //  3. one or more geometry nodes (eg. "prims/teapot"), which define the surface.
+    //  3. one or more geometry nodes (eg. "geometry/teapot"), which define the surface.
     //
     // The amount of reflectivity of the surface is controlled by the "specular" property
     // on the material, while the intensity of the cube map texture that is applied is
@@ -84,9 +84,9 @@
                                 nodes: [
 
                                     // Teapot primitive implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                     {
-                                        type: "prims/teapot"
+                                        type: "geometry/teapot"
                                     }
                                 ]
                             }

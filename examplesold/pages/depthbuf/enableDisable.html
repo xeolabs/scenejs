@@ -23,7 +23,7 @@
 <script>
 
     //
-    // Demonstrates how to enable and disable the depthbuf node, which configures the
+    // Demonstrates how to enable and disable the depthBuffer node, which configures the
     // depth buffer for the nodes in its subgraph.
     //
     //
@@ -66,9 +66,9 @@
                         color:{ r:0.6, g:0.6, b:0.9 },
                         nodes:[
 
-                            // Our depthbuf node, with an ID so we can find it in the scene
+                            // Our depthBuffer node, with an ID so we can find it in the scene
                             {
-                                type:"depthbuf",
+                                type:"depthBuffer",
                                 id: "myDepthbuf",
 
                                 enabled: true, // Default
@@ -78,9 +78,9 @@
                                 nodes:[
 
                                     // Teapot primitive, implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                     {
-                                        type:"prims/teapot"
+                                        type:"geometry/teapot"
                                     }
                                 ]
                             }
@@ -91,7 +91,7 @@
         ]
     });
 
-    // Get the depthbuf node and periodically switch it
+    // Get the depthBuffer node and periodically switch it
     // between enabled and disabled
 
     scene.getNode("myDepthbuf", function (myDepthbuf) {

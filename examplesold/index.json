@@ -221,7 +221,7 @@
             {
                 "title":"Configuring depth buffer for subgraphs",
                 "tip":"",
-                "tags":["depthbuf"],
+                "tags":["depthBuf"],
                 "nodes":[
                     {
                         "title":"Toggle depth testing",

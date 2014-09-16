@@ -24,9 +24,9 @@
 
 //
 // Demonstrates Detail Culling using the axis-aligned bounding box node defined
-// by the plugin in http://scenejs.org/api/latest/plugins/node/frustum/lod.js
+// by the plugin in http://scenejs.org/api/latest/plugins/node/cull/detail.js
 //
-// The frustum/lod node encloses its child nodes in an axis-aligned World-space bounding
+// The cull/detail node encloses its child nodes in an axis-aligned World-space bounding
 // box and enables the appropriate child for the box's current projected 2D canvas size.
 
 // As shown in the example below, we configure the node with a 2D size threshold for
@@ -97,12 +97,12 @@ function makeBodies(numBodies) {
 
 
         // Detail culling node, implemented by plugin at
-        // http://scenejs.org/api/latest/plugins/node/frustum/lod.js
+        // http://scenejs.org/api/latest/plugins/node/cull/detail.js
         //
         // More info at: https://github.com/xeolabs/scenejs/wiki/Detail-Culling
 
         nodes.push({
-            type:"frustum/lod",
+            type:"cull/detail",
 
             // World-space axis-aligned bounding box
             min:[xPos - 8, yPos - 3, zPos - 5],
@@ -151,9 +151,9 @@ function makeBodies(numBodies) {
                                     nodes:[
 
                                         // Box primitive, implemented by plugin at
-                                        // http://scenejs.org/api/latest/plugins/node/prims/box.js
+                                        // http://scenejs.org/api/latest/plugins/node/geometry/box.js
                                         {
-                                            type:"prims/box"
+                                            type:"geometry/box"
                                         }
                                     ]
                                 }
@@ -190,9 +190,9 @@ function makeBodies(numBodies) {
                                     nodes:[
 
                                         // Sphere primitive, implemented by plugin at
-                                        // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                        // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
                                         {
-                                            type:"prims/sphere",
+                                            type:"geometry/sphere",
                                             radius:5,
                                             latitudeBands:16, // A fairly low-rez sphere
                                             longitudeBands:16
@@ -228,9 +228,9 @@ function makeBodies(numBodies) {
                                     nodes:[
 
                                         // Teapot primitive, implemented by plugin at
-                                        // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                        // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                         {
-                                            type:"prims/teapot"
+                                            type:"geometry/teapot"
                                         }
                                     ]
                                 }

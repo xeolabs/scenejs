@@ -21,7 +21,7 @@
 
 <script>
 
-    // Demo of the "cameras/orbit", "skyboxes/clouds", "objects/ground/grid" and "objects/buildings/building" custom node types
+    // Demo of the "cameras/orbit", "skybox/clouds", "models/ground/grid" and "models/buildings/building" custom node types
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -44,15 +44,15 @@
                 nodes:[
 
                     // Skybox,
-                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/skybox/clouds.js
                     {
-                        type:"skyboxes/clouds"
+                        type:"skybox/clouds"
                     },
 
                     // Grid primitive,
-                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/grid.js
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/grid.js
                     {
-                        type:"prims/grid",
+                        type:"geometry/grid",
                         size:{ x:1000, z:1000 },
                         xSegments:200,
                         zSegments:200
@@ -70,9 +70,9 @@
         for (var x = -300; x < 300; x += 50) {
             for (var z = -300; z < 300; z += 50) {
 
-                // Node type implemented by plugin at http://scenejs.org/api/latest/plugins/node/objects/buildings/building.js
+                // Node type implemented by plugin at http://scenejs.org/api/latest/plugins/node/models/buildings/building.js
                 buildings.push({
-                    type:"objects/buildings/building",
+                    type:"models/buildings/building",
                     pos:{ x:x, y:0, z:z }
                 });
             }

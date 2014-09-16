@@ -32,7 +32,7 @@
 
     SceneJS.Name.prototype.setName = function (name) {
         this._core.name = name || "unnamed";
-        this._engine.display.imageDirty = true;
+        this._engine.branchDirty(this); // Need to recompile name path
     };
 
     SceneJS.Name.prototype.getName = function () {

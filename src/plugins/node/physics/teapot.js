@@ -20,7 +20,7 @@ SceneJS.Types.addType("physics/teapot", {
 
             nodes:[
                 {
-                    type:"prims/teapot"
+                    type:"geometry/teapot"
                 }
             ]
         });

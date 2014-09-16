@@ -35,6 +35,12 @@ SceneJS.Node.prototype._construct = function (engine, core, cfg, nodeId) {
     this._core = core;
 
     /**
+     * The core ID
+     * @type {String|Number}
+     */
+    this.coreId = core.coreId;
+
+    /**
      * ID of this node, unique within its scene. The ID is a string if it was defined by the application
      * via the node's JSON configuration, otherwise it is a number if it was left to SceneJS to automatically create.
      * @type String|Number
@@ -419,9 +425,12 @@ SceneJS.Node.prototype.disconnect = function () {
     if (this.parent) {
         for (var i = 0; i < this.parent.nodes.length; i++) {
             if (this.parent.nodes[i] === this) {
-                return this.parent.disconnectNodeAt(i);
+                var node = this.parent.disconnectNodeAt(i);
+                this.parent = null;
+                return node;
             }
         }
+        this.parent = null;
     }
     return null;
 };
@@ -479,19 +488,13 @@ SceneJS.Node.prototype.removeNode = function (node) {
 /** Disconnects all child nodes from their parent node and returns them in an array.
  */
 SceneJS.Node.prototype.disconnectNodes = function () {
-
     var len = this.nodes.length;
-
     for (var i = 0; i < len; i++) {  // Unlink nodes from this
         this.nodes[i].parent = null;
     }
-
     var nodes = this.nodes;
-
     this.nodes = [];
-
     this._engine.display.objectListDirty = true;
-
     return nodes;
 };
 

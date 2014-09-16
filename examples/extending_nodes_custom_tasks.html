@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    //
+    // This example demonstrates a custom node type that performs some sort of asynchronous task, 
+    // while notifying SceneJS when the task starts, and then when it completes. 
+    //   
+    // Watch the top left of the canvas for a status popup for the task.
+    //
+    // In this example, the task involves simply increasing the height of the teapot, then
+    // completing the task when the teapot has reached its target height.
+    //
+    // In practice, the task is more  likely to be a content load, such as texture or geometry data.
+    // 
+    // The task status will also be available in status reports queried with SceneJS.Scene.getStatus(),
+    // which were doing periodically within an interval and logging to the console.
+    //
+
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Define a new node type:
+    SceneJS.Types.addType("myGrowingTeapot", {
+
+        // Node constructor.        
+        init:function (params) {
+
+            // Our node will contain a teapot that grows in height on the Y-axis
+            var scale = this.addNode({
+                type:"scale",
+                x:1,
+                y:0,
+                z:1,
+                nodes:[
+
+                    // Green material
+                    {
+                        type:"material",
+                        color:{ r:0.6, g:0.6, b:1.0 },
+                        nodes:[
+
+                            // Teapot primitive,
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                            {
+                                type:"geometry/teapot"
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            // Notify that our node is starting its task
+            this._taskId = this.taskStarted("Teapot growing");
+
+            // Start growing the teapot within the scene animation loop
+            var ySize = 0;
+            var self = this;
+            this._tick = this.getScene().on("tick",
+                    function () {
+
+                        if (ySize >= 1) {
+
+                            // Notify that task has completed
+                            self._taskId = self.taskFinished(self._taskId);
+
+                            // Unsubscribe from scene render loop
+                            self.getScene().off(self._tick);
+
+                            return;
+                        }
+
+                        scale.setY(ySize += 0.002);
+                    });
+
+            //----------------------------------------------------------------
+            // If the task were to fail (not relevant to this example),
+            // we would notify of failure as shown in the commented-out 
+            // line below - uncomment that to see what happens when you
+            // notify of task failure.
+            //----------------------------------------------------------------
+
+            // this._taskId = this.taskFailed(this._taskId);
+        },
+
+        /**
+         * Node destructor, unsubscribes from scene tick
+         * Aborts task if still running, ie. where the node is destroyed while the task is in process
+         */
+        destroy:function () {
+            this.getScene().off(this._tick);
+            if (this._taskId != null) {
+                this._taskId = this.taskFinished(this._taskId);
+            }
+        }
+    });
+
+    // Create a scene that contains an instance of our node type
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:5,
+                nodes:[
+
+                    // An instance of our node type
+                    {
+                        type:"myGrowingTeapot"
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Periodically query and log scene loading status to console
+    setInterval(function () {
+        var status = scene.getStatus();
+        if (!status) {
+            console.log("Scene status not found");
+            return;
+        }
+        if (status.destroyed) {
+            console.log("Scene destroyed");
+            return;
+        }
+        console.log("Scene tasks in progress: " + status.numTasks);
+    }, 100);
+
+</script>
+</body>
+</html>

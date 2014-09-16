@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
     <script src="lib/jquery-1.8.3.min.js"></script>
-    <script src="examplejs/api/v0/example.js"></script>
 
 </head>
 <body>
@@ -16,6 +15,7 @@
     html, body {
         height: 100%;
     }
+
     body {
         margin: 0px;
         overflow: hidden;
@@ -24,40 +24,171 @@
 
 <script>
 
-    jQuery(document).ready(
-            function ($) {
+    var legacyIDs = {
+        "configuration_pluginPath": "configuration_pluginPath",
+        "configuration_disableStatusPopups": "configuration_disableStatusPopups",
+        "scenegraph_firstExample": "scenegraph_firstExample",
+        "scenegraph_nodes_moving": "scenegraph_nodes_moving",
+        "canvas_transparent": "canvas_transparent",
+        "canvas_external_transparent": "canvas_external_transparent",
+        "backfaceLightingFlag": "scenegraph_flags_backfaceLighting",
+        "diffuseFlag": "scenegraph_flags_diffuse",
+        "specularFlag": "scenegraph_flags_specular",
+        "ambientFlag": "scenegraph_flags_ambient",
+        "reflectionFlag": "scenegraph_flags_reflection",
+        "flagsToggleBackfaces": "scenegraph_flags_backfaces",
+        "basicTransparency": "scenegraph_flags_transparent",
+        "transparencySorting": "layers_transparencySort",
+        "enableDisableLayers": "layers_enableDisable",
+        "styleLineWidth": "",
+        "depthbufEnableDisable": "depthBuf_enableDisable",
+        "depthbufClearDepth": "depthBuf_clearDepth",
+        "depthbufDepthFunc": "depthBuf_depthFunc",
+        "customTriangles": "geometry_triangles",
+        "customLines": "geometry_lines",
+        "customVertexColors": "geometry_vertexColors",
+        "customTrianglesTypedArrays": "geometry_typedArrays",
+        "autoNormals": "geometry_autoNormals",
+        "geometryMorphing": "geometry_morphTargets",
+        "geometryMorphingTypedArrays": "geometry_morphTargets_typedArrays",
+        "planePrim": "geometry_plane",
+        "boxPrim": "geometry_box",
+        "spherePrim": "geometry_sphere",
+        "torusPrim": "geometry_torus",
+        "teapotPrim": "geometry_teapot",
+        "vectorText": "geometry_vectorText",
+        "colorMap": "texture_color",
+        "videoColorMap": "texture_color_video",
+        "bumpMap": "texture_normals",
+        "videoBumpMap": "texture_normals_video",
+        "alphaMap": "texture_alpha",
+        "videoAlphaMap": "texture_alpha_video",
+        "specularMap": "texture_specular",
+        "videoSpecularMap": "texture_specular_video",
+        "glowMap": "texture_emit",
+        "videoGlowMap": "texture_emit_video",
+        "colorMapAnimation": "texture_color_animated",
+        "multitexturing": "texture_multiTexture",
+        "uvLayers": "texture_uvLayers",
+        "colorMapAnimation2": "texture_color_animated",
+        "cubeMap": "reflections_custom",
+        "reflectionIntensity": "reflections_intensity",
+        "reflectionWithVaryingSpecularity": "reflections_withSpecularMaterial",
+        "reflectionWithControlMap": "reflections_withSpecularMap",
+        "reflectionWithLayers": "reflections_multipleCombined",
+        "reflectionWithOBJImport": "reflections_shinyRaptor",
+        "reflectionMultipleObjects": "reflections_manyObjects",
+        "defaultLightAndMaterial": "lighting_default",
+        "ambientLight": "lighting_ambient",
+        "directionalWorldLight": "lighting_directional_world",
+        "pointWorldLight": "lighting_point_world",
+        "perspectiveProjection": "transforms_projection_perspective",
+        "orthoProjection": "transforms_projection_ortho",
+        "frustumProjection": "transforms_projection_frustum",
+        "viewTransform": "transforms_viewing",
+        "rotateTransform": "transforms_modelling_rotate",
+        "translateTransform": "transforms_modelling_translate",
+        "scaleTransform": "transforms_modelling_scale",
+        "matrixTransform": "transforms_modelling_matrix",
+        "transformHierarchy": "transforms_modelling_hierarchy",
+        "vertexDisplaceShader": "shaders_vertexDisplacement",
+        "xrayShader": "shaders_xray",
+        "crtShader": "shaders_scanline",
+        "customNodesWobble": "shaders_vertexDisplacement",
+        "pluginsXRay": "shaders_xray",
+        "customNodesCRT": "shaders_scanline",
+        "customNodesFog": "postEffects_fog",
+        "customNodesCameraOrbit": "cameras_orbit",
+        "cameraPickFlyOrbit": "cameras_pickFlyOrbit_city",
+        "cameraPickFlyOrbitTerrain": "cameras_pickFlyOrbit_terrain",
+        "picking": "picking_basic",
+        "disablePicking": "picking_disabling",
+        "pickThroughTransparentObject": "picking_throughTransparency",
+        "namePaths": "picking_names",
+        "rayPicking": "picking_rayPicking",
+        "canvasCapture": "canvas_capture",
+        "importObj": "importing_obj_raptor",
+        "importDuckObj": "importing_obj_duck",
+        "import3ds": "importing_3ds_lexus",
+        "importMd2": "importing_md2_lion",
+        "physicsBouncingSpheres": "physics_balls",
+        "physicsBouncingSpheresMultiSystems": "physics_multithreaded",
+        "physicsBouncingBoxes": "physics_boxes",
+        "vertexSharing": "optimization_vertexSharing",
+        "textureAtlas": "optimization_textureAtlas",
+        "sharedNodeCores": "optimization_instancing",
+        "frustumVisibilityCulling": "optimization_frustumClipping",
+        "frustumDetailCulling": "optimization_discreteLOD",
+        "basicCustomNodeDef": "extending_nodes_custom",
+        "anotherCustomNodeDef": "extending_nodes_custom",
+        "animatedCustomNodeDef": "extending_nodes_custom_animation",
+        "customNodeDefWithTasks": "extending_nodes_custom_tasks",
+        "customNodeDefWithPublications": "extending_nodes_custom_pubSub",
+        "gradientBackground": "",
+        "customSkybox": "skyboxes_custom",
+        "cloudsSkybox": "skyboxes_clouds",
+        "cloudySeaSkybox": "skyboxes_cloudySea",
+        "grimmNightSkyBox": "skyboxes_grimmNight",
+        "interstellarCloudsSkyBox": "skyboxes_interstellarClouds",
+        "miramarCloudsSkyBox": "skyboxes_miramarClouds",
+        "stormyDaysCloudsSkyBox": "skyboxes_stormyDays",
+        "violentDaysCloudsSkyBox": "skyboxes_violentDays",
+        "customHeightmap": "geometry_heightmap",
+        "texturedHeightmap": "geometry_heightmap_texture",
+        "customNodesEarth": "models_space_earth",
+        "customNodesTank": "models_vehicles_tank",
+        "webglContextLost": "scenegraph_webglContextRecovery",
+        "secondExample": "scenegraph_secondExample",
+        "tronTank": "models_vehicles_tank",
+        "city": "models_buildings_city",
+        "funTerrain": "geometry_heightmap",
+        "earth": "models_space_earth",
+        "ghostTrees": "",
+        "bubbles": "scenegraph_webglContextRecovery"
+    };
 
-                // Load our examples index
-                $.getJSON("examples/index.json",
-                        function (index) {
+    var testLinks = true;
+    if (testLinks) {
+        for (var key in legacyIDs) {
+            if (legacyIDs.hasOwnProperty(key)) {
+                var button = document.createElement('div');
+                button.id = 'button';
+                button.textContent = legacyIDs[key];
+                button.addEventListener('click', (function () {
+                    var id = legacyIDs[key];
+                    return function (event) {
+                        window.location = "examples/_index.html#" + id;
+                    };
+                })(), false);
+                document.body.appendChild(button);
+            }
+        }
+    } else {
 
-                            // Create an examples browser
-                            var examplejs = new ExampleJS({
+        var examplesPage = "examples/_index.html";
 
-                                title:"SceneJS 3.2",
+        var page = gup("page");
 
-                                logo:"http://scenejs.org/images/scenejs.png",
+        if (page) {
+            var path = legacyIDs[page];
+            if (path) {
+                examplesPage += "#" + path
+            }
+        }
 
-                                // Stick this under the logo:
-                                caption:"Examples (V3.2)",
+        window.location = examplesPage;
 
-                                // Provide our JSON examples index
-                                index:index,
-
-                                // Our directory of example pages
-                                pageBase:"../examples/pages/",
-
-                                // Initially hide code
-                                showCode:false
-                            });
-
-                            // Go to SceneJS.org when the home link (ie. logo) is clicked
-                            examplejs.once("home",
-                                    function () {
-                                        window.location = "http://scenejs.org"
-                                    });
-                        });
-            });
+        function gup(name) {
+            name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+            var regexS = "[\\?&]" + name + "=([^&#]*)";
+            var regex = new RegExp(regexS);
+            var results = regex.exec(window.location.href);
+            if (results == null)
+                return null;
+            else
+                return results[1];
+        }
+    }
 
 </script>
 </body>

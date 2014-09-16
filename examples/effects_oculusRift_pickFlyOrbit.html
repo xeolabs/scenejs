@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    //-----------------------------------------------------------------------------------------------------------------
+    // Using an "effects/oculusRift" node in combination with a "cameras/pickFlyOrbit"
+    //-----------------------------------------------------------------------------------------------------------------
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js
+            {
+                type: "cameras/pickFlyOrbit",
+                yaw: -0,
+                pitch: -40,
+                eye: { x: -10, y: 50, z: -100 },
+                look: { x: -10, y: 50, z: 0 },
+                zoomSensitivity: 20.0,
+                showCursor: true,
+                cursorSize: 2.0,
+
+                nodes: [
+
+                    // Oculus Rift effect, implemented by plugin at:
+                    // http://scenejs.org/api/latest/plugins/node/effects/oculusRift.js
+                    {
+                        type: "effects/oculusRift",
+
+                        nodes: [
+
+                            // Cloudy sea skybox, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            {
+                                type: "skybox/cloudySea",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+
+                            // City demo scene
+                            // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
+                            {
+                                type: "models/buildings/city"
+                            },
+
+                            // Ground
+                            // http://scenejs.org/api/latest/plugins/node/ground/grid.js
+                            {
+                                type: "models/ground/grid"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

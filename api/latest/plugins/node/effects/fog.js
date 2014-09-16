@@ -1,159 +1,145 @@
-SceneJS.Types.addType("effects/fog", {
+/**
+ * Depth-of-Field postprocess effect
+ *
+ */
+SceneJS.Types.addType("postprocess/dof", {
 
-    construct:function (params) {
+    construct: function (params) {
 
-        // Holds params for custom shader node
-        this._shaderParams = {
-            fogMode:1.0, // 0.0 disabled, 1.0 linear, 2.0 exponential, 3.0 quadratic, 4.0 constant
-            fogDensity:0.05, // Fog density in range of [0.0..1.0]
-            fogStart:0.0, // Nearest point of fog in view space (receeding Z-axis is positive)
-            fogEnd:10000.0, // Furthest point of fog in view space
-            fogColor:[0.6, 0.0, 0.0]  // Colour of fog - the colour that objects blend into
-        };
+        // Unique IDs for the render target nodes
+        var colorTarget = this.id + ".colorTarget";
+        var colorTarget2 = this.id + ".colorTarget2";
+        var depthTarget = this.id + ".depthTarget";
 
-        // Custom shader node
-        this._shader = this.addNode({
-            type:"shader",
-            coreId:"effects/fog",
 
-            shaders:[
+        this.addNodes([
 
-                {
-                    stage:"fragment",
-                    code:[
+            // Pass 1
+            // Render scene to color and depth targets
+            {
+                type: "pass",
+                priority: 1,
+                nodes: [
 
-                        /* Parameter uniforms
-                         */
-                        "uniform float  fogMode;",
-                        "uniform float  fogDensity;",
-                        "uniform float  fogStart;",
-                        "uniform float  fogEnd;",
-                        "uniform vec3   fogColor;",
+                    // Output color target
+                    {
+                        type: "colorTarget",
+                        id: colorTarget,
 
-                        /* Collected view-space fragment position
-                         */
-                        "vec4 _viewPos;",
+                        nodes: [
 
-                        /* Collects view-space fragment position
-                         */
-                        "void fogViewPosFunc(vec4 viewPos) {",
-                        "   _viewPos = viewPos;",
-                        "}",
+                            // Output depth target
+                            {
+                                type: "depthTarget",
+                                id: depthTarget,
 
-                        /* Modifies fragment colour
-                         */
-                        "vec4 fogPixelColorFunc(vec4 color) {",
-                        "   if (fogMode != 0.0) {", // not "disabled"
-                        "       float fogFactor = (1.0 - fogDensity);",
-                        "       if (fogMode != 4.0) {", // not "constant"
-                        "           if (fogMode == 1.0) {", // "linear"
-                        "               fogFactor *= clamp(pow(max((fogEnd - length(- _viewPos.xyz)) / " +
-                            "                   (fogStart - fogEnd), 0.0), 2.0), 0.0, 1.0);",
-                        "           } else {", // "exp" or "exp2"
-                        "               fogFactor *= clamp((fogStart - length(- _viewPos.xyz)) / (fogStart - fogEnd), 0.0, 1.0);",
-                        "           }",
-                        "       }",
-                        "       return color * (fogFactor + vec4(fogColor, 1.0)) * (1.0 - fogFactor);",
-                        "   }",
-                        "   return color;",
-                        "}"
-                    ],
-
-                    /* Bind our functions to hooks
-                     */
-                    hooks:{
-                        viewPos:"fogViewPosFunc",
-                        pixelColor:"fogPixelColorFunc"
+                                // The scene nodes
+                                nodes: params.nodes
+                            }
+                        ]
                     }
-                }
-            ],
+                ]
+            },
 
-            // Declare parameters and set default values
-            params:this._shaderParams,
+            // Debug pass - renders the depth buffer to the canvas
+            {
+                type: "pass",
+                priority: 1.2,
+                nodes: [
+                    {
+                        //       type: "depthTarget/render",
+                        target: depthTarget
+                    }
+                ]
+            },
 
-            nodes:params.nodes
-        });
+            // Pass 2
+            // Render scene with custom shader using color and depth targets as textures
+            {
+                type: "pass",
+                priority: 2,
 
-        if (params.mode != undefined) {
-            this.setMode(params.mode);
-        }
-        if (params.density != undefined) {
-            this.setDensity(params.density);
-        }
-        if (params.start != undefined) {
-            this.setStart(params.start);
-        }
-        if (params.end != undefined) {
-            this.setEnd(params.end);
-        }
-        if (params.color != undefined) {
-            this.setColor(params.color);
-        }
-    },
+                nodes: [
 
-    setMode:function (mode) {
-        switch (mode) {
-            case "disabled":
-                this._shaderParams.fogMode = 0;
-                break;
-            case "linear":
-                this._shaderParams.fogMode = 1;
-                break;
-            case "exp":
-                this._shaderParams.fogMode = 2;
-                break;
-            case "exp2":
-                this._shaderParams.fogMode = 3;
-                break;
-            case "constant":
-                this._shaderParams.fogMode = 4;
-                break;
-        }
-        this._shader.setParams(this._shaderParams);
-    },
+                    // Input color target
+                    {
+                        type: "textureMap",
+                        target: colorTarget,
 
-    getMode:function () {
-        return ["disabled", "linear", "exp", "exp2", "constant"][this._shaderParams.fogMode]; // TODO: optimize
-    },
+                        nodes: [
 
-    setDensity:function (density) {
-        this._shaderParams.fogDensity = density;
-        this._shader.setParams(this._shaderParams);
-    },
+                            // Input depth target
+                            {
+                                type: "textureMap",
+                                target: depthTarget,
 
-    getDensity:function () {
-        return this._shaderParams.fogDensity;
-    },
+                                nodes: [
 
-    setStart:function (start) {
-        this._shaderParams.fogStart = start;
-        this._shader.setParams(this._shaderParams);
-    },
+                                    // Horizontal blur shader
+                                    {
+                                        type: "shader",
+                                        coreId: "xx",
+                                        shaders: [
 
-    getStart:function () {
-        return this._shaderParams.fogStart;
-    },
+                                            // Vertex shader simply passes through vertex position and UV
+                                            {
+                                                stage: "vertex",
+                                                code: [
+                                                    "attribute vec3 SCENEJS_aVertex;",
+                                                    "attribute vec2 SCENEJS_aUVCoord;",
+                                                    "varying vec2 vUv;",
+                                                    "void main () {",
+                                                    "    gl_Position = vec4(SCENEJS_aVertex, 1.0);",
+                                                    "    vUv = SCENEJS_aUVCoord;",
+                                                    "}"
+                                                ]
+                                            },
 
-    setEnd:function (end) {
-        this._shaderParams.fogEnd = end;
-        this._shader.setParams(this._shaderParams);
-    },
+                                            // Fragment shader
+                                            {
+                                                stage: "fragment",
+                                                code: [
+                                                    "precision highp float;",
 
-    getEnd:function () {
-        return this._shaderParams.fogEnd;
-    },
+                                                    "uniform sampler2D SCENEJS_uSampler0;", // Colour target's texture
+                                                    "uniform sampler2D SCENEJS_uSampler1;", // Depth target's texture
 
-    setColor:function (color) {
-        this._shaderParams.fogColor = [color.r || 0, color.g || 0, color.b || 0 ];
-        this._shader.setParams(this._shaderParams);
-    },
+                                                    /// Unpack an RGBA pixel to floating point value.
+                                                    "float unpack (vec4 colour) {",
+                                                    "   const vec4 bitShifts = vec4(1.0,",
+                                                    "   1.0 / 255.0,",
+                                                    "   1.0 / (255.0 * 255.0),",
+                                                    "   1.0 / (255.0 * 255.0 * 255.0));",
+                                                    "   return dot(colour, bitShifts);",
+                                                    "}",
 
-    getColor:function () {
-        var color = this._shaderParams.fogColor;
-        return { r:color[0], g:color[1], b:color[2] };
-    },
+                                                    "void main () {",
+                                                    "   float depth = unpack(texture2D(SCENEJS_uSampler1, vUv));",
+                                                    "   gl_FragColor = depth * texture2D(SCENEJS_uSampler0, vUv);",
+                                                    "}"
+                                                ]
+                                            }
+                                        ],
 
-    destruct:function () {
-        // Not used
+                                        params: {
+                                        },
+
+                                        nodes: [
+
+                                            // Quad primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/quad.js
+                                            {
+                                                type: "geometry/quad"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]);
     }
 });
+

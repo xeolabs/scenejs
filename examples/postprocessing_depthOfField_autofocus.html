@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+
+        nodes: [
+
+            // Pick-fly-orbit camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js
+            {
+                type: "cameras/pickFlyOrbit",
+                yaw: -40,
+                pitch: -20,
+                zoom: 400,
+                eye: { x: 0, y: 150, z: -1000 },
+                look: { x: 0, y: 150, z: 0 },
+                zoomSensitivity: 10.0,
+                showCursor: true,
+
+                nodes: [
+
+                    // Depth-of-field blur effect, implemented by plugin at:
+                    // http://scenejs.org/api/latest/plugins/node/postprocess/dof.js
+                    {
+                        type: "postprocess/dof",
+                        texelSize: 0.00022, // Size of one texel (1 / width, 1 / height)
+                        blurCoeff: 0.0084,	// Calculated from the blur equation, b = ( f * ms / N )
+                        focusDist: 500.0,	// The distance to the subject in perfect focus (= Ds)
+                        ppm: 10000,         // Pixels per millimetre
+                        near: 0.1,
+                        far: 10000.0,
+                        autofocus: true,    // Automatically synch focusDist to "cameras/pickFlyOrbit"
+
+                        nodes: [
+
+                            // Cloudy sea skybox, implemented by plugin at:
+                            // http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            {
+                                type: "skybox/cloudySea",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+
+                            // City, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
+                            {
+                                type: "models/buildings/city",
+                                width: 600
+                            },
+
+                            {
+                                type: "material",
+                                color: { r: 0.5, g: 1.0, b: 0.5 },
+                                emit: 0.1,
+                                nodes: [
+
+                                    // Grid ground, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/models/ground/grid.js
+                                    {
+                                        type: "geometry/grid",
+                                        size: { x: 10000, z: 10000 },
+                                        width: 10000,
+                                        height: 10000,
+                                        widthSegments: 100,
+                                        heightSegments: 100
+                                    }
+                                ]
+                            },
+
+                            {
+                                type: "translate",
+                                y: -3,
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: { r: 0.5, g: 1.0, b: 0.5 },
+                                        emit: 0.01,
+                                        nodes: [
+
+                                            // Solid green surface under the grid, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/models/ground/grid.js
+                                            {
+                                                type: "geometry/grid",
+                                                size: { x: 10000, z: 10000 },
+                                                width: 10000,
+                                                height: 10000,
+                                                widthSegments: 10,
+                                                heightSegments: 10,
+                                                wire: false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

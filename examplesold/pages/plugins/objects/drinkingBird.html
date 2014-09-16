@@ -21,7 +21,7 @@
 
 <script>
 
-    // Demo of the "cameras/orbit" and "objects/space/planets/earth" custom node types
+    // Demo of the "cameras/orbit" and "models/space/planets/earth" custom node types
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -32,7 +32,7 @@
     var scene = SceneJS.createScene({
         nodes:[
             // Mouse-orbited camera,
-            // http://scenejs.org/api/latest/plugins/node/prims/plane.js
+            // http://scenejs.org/api/latest/plugins/node/geometry/plane.js
             {
                 type:"cameras/orbit",
                 yaw:340,
@@ -50,9 +50,9 @@
                         nodes:[
 
                             // Node type implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/prims/grid.js
+                            // http://scenejs.org/api/latest/plugins/node/geometry/grid.js
                             {
-                                type:"prims/grid",
+                                type:"geometry/grid",
                                 size:{ x:10000, z:10000 },
                                 xSegments:200,
                                 zSegments:200
@@ -62,10 +62,10 @@
 
                     // Drinking Bird,
                     // implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/objects/toys/drinkingBird.js
+                    // http://scenejs.org/api/latest/plugins/node/models/toys/drinkingBird.js
                     // Author: Moritz Kornher
                     {
-                        type:"objects/toys/drinkingBird",
+                        type:"models/toys/drinkingBird",
                         rotate:true
                     }
                 ]

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    SceneJS.createScene({
+        nodes:[
+
+            // Asset viewing environment, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/environments/assetViewer.js
+            {
+                type:"environments/modelView",
+                yaw:30,
+                pitch:-30,
+                zoom:5,
+                zoomSensitivity:10.0,
+
+                nodes:[
+                    {
+                        type:"material",
+                        color:{ r:0.6, g:0.6, b:0.9 },
+                        nodes:[
+
+                            // Box primitive, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                            {
+                                type:"geometry/box",
+                                xSize: 1,
+                                ySize: 1,
+                                zSize: 1.2
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

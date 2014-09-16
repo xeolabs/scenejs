@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+
+        a {
+            color: #ffffff;
+            padding-top: 20px;
+            font-family: Helvetica;
+            font-size: 16px;
+        }
+
+        #info {
+            position: absolute;
+            top: 50px;
+            left: 100px;
+            width: auto;
+            color: #ffffff;
+            padding: 10px;
+            padding-top: 20px;
+            font-family: Helvetica;
+            font-size: 16px;
+            text-align: left;
+            background: black;
+            opacity: 0.6;
+            z-index: 100000;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<div id="info">
+    <b>SceneJS experimental <a href="http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js" target="other">camera
+        plugin</a></b>
+    <ul>
+        <li>Click on a building to fly to it</li>
+        <li>Mouse drag to orbit</li>
+        <li>Mouse wheel to zoom</li>
+        <li>Try clicking on the horizon</li>
+        <li>Try clicking while zoomed-in close - trippy!</li>
+    </ul>
+</div>
+
+<script>
+
+    // An "environment" is a higher-level node type that sets up a viewing environment
+    // that you can just drop your nodes into.
+    //
+    // In this example we're using a "environments/lawn" node, which gives us a camera that flies to
+    // where you ray-pick, plus a depth-of-field post-effect.
+    //
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Environment implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/environments/lawn.js
+            {
+                type: "environments/lawn",
+
+                nodes: [
+                    {
+                        type: "scale",
+                        x: 3, y: 4, z: 3,
+
+                        nodes: [
+
+                            // Procedurally-generated city, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
+                            {
+                                type: "models/buildings/city"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

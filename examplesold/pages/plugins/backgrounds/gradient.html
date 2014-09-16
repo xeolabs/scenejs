@@ -22,7 +22,7 @@
 
 <script>
 
-    // Demonstrates how to create a gradient background using the "backgrounds/gradient" node
+    // Demonstrates how to create a gradient background using the "background/gradient" node
     //
     // This node implements the background as a quad that sits at the back of the view frustum.
     //
@@ -73,7 +73,7 @@
             // Gradient background node, implemented by plugin at
             // http://scenejs.org/api/latest/plugins/node/backgrounds/gradient.js
             {
-                type:"backgrounds/gradient",
+                type:"background/gradient",
                 depth:-40,
                 color:[ // Default color
                     0.05, 0.06, 0.07, 1.0, // top left (R,G,B,A)
@@ -100,9 +100,9 @@
                         nodes:[
 
                             // Teapot primitive, implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                             {
-                                type:"prims/teapot"
+                                type:"geometry/teapot"
                             }
                         ]
                     }

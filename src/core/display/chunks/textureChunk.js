@@ -34,6 +34,8 @@ SceneJS_ChunkFactory.createChunkType({
 
     draw : function(frameCtx) {
 
+        frameCtx.textureUnit = 0;
+
         var layers = this.core.layers;
 
         if (layers) {
@@ -62,7 +64,7 @@ SceneJS_ChunkFactory.createChunkType({
                     }
 
                 } else {
-                   //   draw.bindTexture(this._uTexSampler[i], null, i); // Unbind
+                     // draw.bindTexture(this._uTexSampler[i], null, i); // Unbind
                 }
             }
         }

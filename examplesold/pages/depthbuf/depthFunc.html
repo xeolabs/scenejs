@@ -23,7 +23,7 @@
 <script>
 
     //
-    // Demonstrates how to set the comparison function (depthFunc) of the depthbuf node, which configures the
+    // Demonstrates how to set the comparison function (depthFunc) of the depthBuffer node, which configures the
     // depth buffer for the nodes in its subgraph.
     //
     //
@@ -75,9 +75,9 @@
                         color:{ r:0.6, g:0.6, b:0.9 },
                         nodes:[
 
-                            // Our depthbuf node, with an ID so we can find it in the scene
+                            // Our depthBuffer node, with an ID so we can find it in the scene
                             {
-                                type:"depthbuf",
+                                type:"depthBuffer",
                                 id:"myDepthbuf",
 
                                 enabled:true, // Default
@@ -87,9 +87,9 @@
                                 nodes:[
 
                                     // Teapot primitive, implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                     {
-                                        type:"prims/teapot"
+                                        type:"geometry/teapot"
                                     }
                                 ]
                             }
@@ -100,7 +100,7 @@
         ]
     });
 
-    // Get the depthbuf node and periodically cycle depthFunc through all support values.
+    // Get the depthBuffer node and periodically cycle depthFunc through all support values.
 
     var depthFuncs = ['less', 'equal', 'lequal', 'greater', 'notequal', 'gequal'];
     var i = 0;

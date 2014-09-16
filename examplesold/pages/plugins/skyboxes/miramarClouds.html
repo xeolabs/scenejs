@@ -21,7 +21,7 @@
 
 <script>
 
-    // Demo of the "skyboxes/miramarClouds" skybox
+    // Demo of the "skybox/miramarClouds" skybox
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -43,9 +43,9 @@
                 nodes:[
 
                     // Miramar Clouds Skybox, implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/skyboxes/miramarClouds.js
+                    // http://scenejs.org/api/latest/plugins/node/skybox/miramarClouds.js
                     {
-                        type:"skyboxes/miramarClouds",
+                        type:"skybox/miramarClouds",
                         size:5000 // Box half-size on each axis - default is 5000
                     },
 
@@ -55,9 +55,9 @@
                         nodes:[
 
                             // Teapot primitive, implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                             {
-                                type:"prims/teapot"
+                                type:"geometry/teapot"
                             }
                         ]
                     }

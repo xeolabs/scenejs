@@ -161,9 +161,9 @@ function makeSimulation(x, z, numBodies, systemId) {
                         nodes:[
 
                             // Grid ground plane geometry, implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/prims/grid.js
+                            // http://scenejs.org/api/latest/plugins/node/geometry/grid.js
                             {
-                                type:"prims/grid",
+                                type:"geometry/grid",
                                 size:{ x:50, z:50 },
                                 xSegments:100,
                                 zSegments:100
@@ -185,7 +185,7 @@ function makeSimulation(x, z, numBodies, systemId) {
 }
 
 
-// Returns a bunch of "prims/sphere" nodes, each wrapped by a spherical "physics/body" node
+// Returns a bunch of "geometry/sphere" nodes, each wrapped by a spherical "physics/body" node
 function makeBodies(numBodies, systemId) {
     var nodes = [];
 
@@ -239,9 +239,9 @@ function makeBodies(numBodies, systemId) {
                             nodes:[
 
                                 // Sphere primitive, implemented by plugin at
-                                // http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
                                 {
-                                    type:"prims/sphere",
+                                    type:"geometry/sphere",
                                     radius:1
                                 }
                             ]

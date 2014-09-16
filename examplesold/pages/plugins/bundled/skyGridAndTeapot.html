@@ -21,7 +21,7 @@
 
 <script>
 
-    // Demo of the "cameras/orbit", "skyboxes/clouds" and "demos/redTeapot" custom node types
+    // Demo of the "cameras/orbit", "skybox/clouds" and "demos/redTeapot" custom node types
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -43,15 +43,15 @@
                 nodes:[
 
                     // Cloudy skybox,
-                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/skybox/clouds.js
                     {
-                        type:"skyboxes/cloudySea"
+                        type:"skybox/cloudySea"
                     },
 
                     // Grid primitive,
-                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/grid.js
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/grid.js
                     {
-                        type:"prims/grid",
+                        type:"geometry/grid",
                         size:{ x:1000, z:1000 },
                         xSegments:200,
                         zSegments:200

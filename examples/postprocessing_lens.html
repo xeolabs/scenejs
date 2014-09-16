@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+
+        nodes: [
+
+            // Mouse-orbited camera,
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: -40,
+                pitch: -20,
+                zoom: 10,
+                zoomSensitivity: 1.0,
+
+                nodes: [
+
+                    // Lens effect, implemented by plugin at:
+                    // http://scenejs.org/api/latest/plugins/node/postprocess/lens.js
+                    {
+                        type: "postprocess/lens",
+                        direction: 0,
+
+                        nodes: [
+
+                            // Cloudy sea skybox, implemented by plugin at:
+                            // http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            {
+                                type: "skybox/cloudySea",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+                            {
+                                type: "material",
+                                color: { r: 0.3, g: 0.3, b: 0.4 },
+
+                                nodes: [
+
+                                    // Teapot primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                    {
+                                        type: "geometry/teapot"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+
+</script>
+</body>
+</html>

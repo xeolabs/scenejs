@@ -43,9 +43,9 @@
                 nodes:[
 
                     // Clouds skybox, implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
+                    // http://scenejs.org/api/latest/plugins/node/skybox/clouds.js
                     {
-                        type:"skyboxes/clouds"
+                        type:"skybox/clouds"
                     },
 
                     // Optional physics system configs, implemented by plugin at
@@ -101,9 +101,9 @@
                                 nodes:[
 
                                     // Grid ground plane geometry, implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/prims/grid.js
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/grid.js
                                     {
-                                        type:"prims/grid",
+                                        type:"geometry/grid",
                                         size:{ x:1000, z:1000 },
                                         xSegments:200,
                                         zSegments:200
@@ -151,7 +151,7 @@
 
                         nodes:[
                             {
-                                type:"objects/vehicles/tank",
+                                type:"models/vehicles/tank",
                                 id: "tank" + i
                             }
                         ]

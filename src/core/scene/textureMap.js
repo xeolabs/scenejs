@@ -268,6 +268,7 @@ new (function () {
         this._core.src = null;
         this._core.image = null;
         this._core.texture = target._core.renderBuf.getTexture(); // TODO: what happens when the target is destroyed?
+        this._core.texture.bufType = target._core.bufType;
         this._engine.display.imageDirty = true;
     };
 
@@ -379,7 +380,7 @@ new (function () {
             }
         }
         if (this._core) {
-            this._coreFactory.putCore(this._core);
+            this._engine._coreFactory.putCore(this._core);
         }
     };
 

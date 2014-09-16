@@ -97,15 +97,15 @@
                         nodes:[
 
                             // Clouds skybox, implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
+                            // http://scenejs.org/api/latest/plugins/node/skybox/clouds.js
                             {
-                                type:"skyboxes/clouds"
+                                type:"skybox/clouds"
                             },
 
                             // Fog effect, implemented by plugin at
-                            // http://scenejs.org/api/latest/plugins/node/effects/fog.js
+                            // http://scenejs.org/api/latest/plugins/node/shader/fog.js
                             {
-                                //     type:"effects/fog",
+                                //     type:"shader/fog",
                                 mode:"exp2", // Quadratic
                                 density:0.1, // Fog density
                                 start:30.0, // Near starting point
@@ -120,9 +120,9 @@
                                         nodes:[
 
                                             // Grid ground, implemented by plugin at
-                                            // http://scenejs.org/api/latest/plugins/node/object/ground/grid.js
+                                            // http://scenejs.org/api/latest/plugins/node/models/ground/grid.js
                                             {
-                                                type:"prims/grid",
+                                                type:"geometry/grid",
                                                 size:{ x:10000, z:10000 },
                                                 width:10000,
                                                 height:10000,
@@ -143,9 +143,9 @@
                                                 nodes:[
 
                                                     // Solid green surface under the grid, implemented by plugin at
-                                                    // http://scenejs.org/api/latest/plugins/node/object/ground/grid.js
+                                                    // http://scenejs.org/api/latest/plugins/node/models/ground/grid.js
                                                     {
-                                                        type:"prims/grid",
+                                                        type:"geometry/grid",
                                                         size:{ x:10000, z:10000 },
                                                         width:10000,
                                                         height:10000,
@@ -168,9 +168,9 @@
                                         nodes:[
 
                                             // City, implemented by plugin at
-                                            // http://scenejs.org/api/latest/plugins/node/object/buildings/city.js
+                                            // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
                                             {
-                                                type:"objects/buildings/city",
+                                                type:"models/buildings/city",
                                                 width:600
                                             }
                                         ]

@@ -30,8 +30,10 @@ new (function () {
 
             this._buildNodeCore(this._engine.canvas.gl, this._core);
 
+            var self = this;
+
             this._core.webglRestored = function () {
-                this._buildNodeCore(self._engine.canvas.gl, self._core);
+                self._buildNodeCore(self._engine.canvas.gl, self._core);
             };
 
         }

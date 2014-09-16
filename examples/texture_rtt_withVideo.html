@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Demonstrates how to render a scene containing a video texture to a render target, which is then
+    // applied as a texture to a second object.
+    //
+    // First pass renders our scene, containing a rotating box with a video texture, to a color render target.
+    //
+    // Second pass renders a box that's dynamically textured with the color target.
+    //    
+    // Note how we're using the "stage" node to ensure that the render target is rendered before
+    // it's used for the texture.
+    //
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // First pass renders our scene (rotating teapot and skybox) to a color render target.
+            {
+                type: "stage",
+                priority: 1,
+
+                nodes: [
+
+                    // The color target
+                    {
+                        type: "colorTarget",
+                        id: "myColorTarget",
+
+                        nodes: [
+
+                            // Skybox, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            {
+                                type: "skybox/cloudySea",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+
+                            {
+                                type: "rotate",
+                                id: "teapot-pitch",
+                                angle: 180.0,
+                                x: 1.0,
+
+                                nodes: [
+                                    {
+                                        type: "rotate",
+                                        id: "teapot-yaw",
+                                        angle: 0.0,
+                                        y: 1.0,
+
+                                        nodes: [
+                                            {
+                                                type: "material",
+                                                emit: 0,
+                                                color: { r: 1.0, g: 0.5, b: 0.9 },
+                                                specularColor: { r: 0.9, g: 0.9, b: 0.9 },
+                                                specular: 0.9,
+                                                shine: 100.0,
+
+                                                nodes: [
+
+                                                    // Video texture, implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/texture/video.js
+                                                    {
+                                                        type: "texture/video",
+                                                        src: "movies/bunny.ogg",
+                                                        nodes: [
+
+                                                            // Node type implemented by plugin at
+                                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                            {
+                                                                type: "geometry/box"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // Second pass renders a box that's dynamically textured with the color target from the previous pass.
+
+            {
+                type: "stage",
+                priority: 2,
+
+                nodes: [
+
+                    // Orbiting camera node, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                    {
+                        type: "cameras/orbit",
+                        yaw: 30,
+                        pitch: -30,
+                        zoom: 5,
+                        zoomSensitivity: 1.0,
+
+                        nodes: [
+
+                            // Texture node that references our color target
+                            {
+                                type: "textureMap",
+                                target: "myColorTarget",
+
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: { r: 1.0, g: 1.0, b: 1.0 },
+                                        specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                        specular: 0.2,
+                                        shine: 6.0,
+
+                                        nodes: [
+
+                                            // Box primitive implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            {
+                                                type: "geometry/box"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+
+    var teapotPitch = scene.getNode("teapot-pitch");
+    var teapotYaw = scene.getNode("teapot-yaw");
+
+    scene.on("tick",
+            function () {
+                teapotYaw.inc("angle", 1);
+                teapotPitch.inc("angle", .3);
+
+            });
+
+
+</script>
+</body>
+</html>

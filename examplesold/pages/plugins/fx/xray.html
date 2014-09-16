@@ -23,7 +23,7 @@
 
 <script>
 
-    // Demo of the custom "effects/xray" node type
+    // Demo of the custom "shader/xray" node type
     // This node type gives objects in its subgraph a glass-like transparency
 
     // Point SceneJS to the bundled plugins
@@ -53,9 +53,9 @@
                         nodes:[
 
                             // X-Ray effect,
-                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/effects/xray.js
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/postprocess/xray.js
                             {
-                                type:"effects/xray",
+                                type:"shader/xray",
                                 id:"myXRay",
                                 enabled:true, // default
                                 opacity:0.3, // default
@@ -63,9 +63,9 @@
                                 nodes:[
 
                                     // Teapot primitive,
-                                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                     {
-                                        type:"prims/teapot"
+                                        type:"geometry/teapot"
                                     }
                                 ]
                             }
@@ -87,9 +87,9 @@
                                         nodes:[
 
                                             // Sphere primitive,
-                                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/prims/sphere.js
+                                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
                                             {
-                                                type:"prims/sphere"
+                                                type:"geometry/sphere"
                                             }
                                         ]
                                     }
@@ -131,7 +131,7 @@
 
                 var gui = new dat.GUI();
                 var menu = new Menu();
-                var direction = gui.addFolder("Properties of the 'effects/xray' node");
+                var direction = gui.addFolder("Properties of the 'postprocess/xray' node");
 
                 direction.add(menu, 'enabled');
                 direction.add(menu, 'opacity', 0.0, 1.0);

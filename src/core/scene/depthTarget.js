@@ -35,10 +35,6 @@ new (function () {
     SceneJS.DepthTarget.prototype._init = function (params) {
         nodeCoreMap[this._core.coreId] = this;
         this._core.bufType = "depth";
-        this._buildNodeCore();
-    };
-
-    SceneJS.DepthTarget.prototype._buildNodeCore = function () {
         this._core.renderBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._engine.canvas });
     };
 

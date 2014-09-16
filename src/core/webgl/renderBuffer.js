@@ -28,7 +28,7 @@ SceneJS._webgl.RenderBuffer = function (cfg) {
     this._touch = function () {
         var width = canvas.canvas.width;
         var height = canvas.canvas.height;
-        if (buf) { // Currently have a pick buffer
+        if (buf) { // Currently have a buffer
             if (buf.width == width && buf.height == height) { // Canvas size unchanged, buffer still good
                 return;
             } else { // Buffer needs reallocation for new canvas size
@@ -92,7 +92,7 @@ SceneJS._webgl.RenderBuffer = function (cfg) {
      */
     this.clear = function () {
         if (!bound) {
-            throw "Pick buffer not bound";
+            throw "Render buffer not bound";
         }
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.disable(gl.BLEND);
@@ -119,15 +119,20 @@ SceneJS._webgl.RenderBuffer = function (cfg) {
     /** Returns the texture
      */
     this.getTexture = function () {
-        this._touch();
         return {
             bind: function (unit) {
-                gl.activeTexture(gl["TEXTURE" + unit]);
-                gl.bindTexture(gl.TEXTURE_2D, buf.texture);
+                if (buf && buf.texture) {
+                    gl.activeTexture(gl["TEXTURE" + unit]);
+                    gl.bindTexture(gl.TEXTURE_2D, buf.texture);
+                    return true;
+                }
+                return false;
             },
             unbind: function (unit) {
-                gl.activeTexture(gl["TEXTURE" + unit]);
-                gl.bindTexture(gl.TEXTURE_2D, null);
+                if (buf && buf.texture) {
+                    gl.activeTexture(gl["TEXTURE" + unit]);
+                    gl.bindTexture(gl.TEXTURE_2D, null);
+                }
             }
         };
     };

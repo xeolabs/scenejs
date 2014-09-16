@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    SceneJS.createScene({
+        nodes:[
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:15,
+                zoomSensitivity:1.0,
+
+                nodes:[
+
+                    // The camera node in this scene has the same properties
+                    // as the one that SceneJS provides by default, and is defined
+                    // here to show what those are.
+
+                    {
+                        type:"camera",
+                        optics:{
+                            type:"perspective",
+                            fovy:45.0,
+                            aspect:1.0,
+                            near:0.1,
+                            far:5000.0
+                        },
+
+                        nodes:[
+
+                            // Teapot primitive, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                            {
+                                type:"geometry/teapot"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

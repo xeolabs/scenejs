@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Demo of the "geometry/heightmap" custom node type, with a texture
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene
+    SceneJS.createScene({
+                nodes: [
+
+                    // Mouse-controlled camera that orbits a ray-picked point
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbitPick.js
+                    {
+                        type: "cameras/pickFlyOrbit",
+                        yaw: 40,
+                        pitch: -40,
+                        maxPitch: -10,
+                        minPitch: -80,
+                        zoom: 1800,
+                        eye: { x: 0, y: 150, z: -1000 },
+                        look: { x: 0, y: 150, z: 0 },
+                        zoomSensitivity: 20.0,
+                        showPick: true,
+
+                        nodes: [
+
+                            // Reddish material
+                            {
+                                type: "material",
+                                color: { r: 0.45, g: 0.3, b: 0.2 },
+                                specular: 0,
+
+                                nodes: [
+
+                                    // The color map
+                                    {
+                                        type: "textureMap",
+                                        src: "textures/superman.jpg",
+                                        applyTo: "color",  // Apply to material "color" property (default)
+
+                                        nodes: [
+
+                                            // Heightmap, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+                                            {
+                                                type: "geometry/heightmap",
+
+                                                // Texture image
+                                                src: 'textures/heightmap.jpg',
+
+                                                // Wireframe or solid - default is false
+                                                wire: false,
+
+                                                // Dimensions
+                                                xSize: 1000,
+                                                zSize: 1000,
+                                                ySize: 120,
+
+                                                // Segments on X and Z axis
+                                                xSegments: 100,
+                                                zSegments: 100
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    );
+
+</script>
+</body>
+</html>

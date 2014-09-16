@@ -22,7 +22,7 @@
 <script>
 
     //
-    // Demonstrates the clearDepth property of the depthbuf node, which configures
+    // Demonstrates the clearDepth property of the depthBuffer node, which configures
     // the depth buffer for the nodes in its subgraph
     //
     // What is the depth buffer?
@@ -72,10 +72,10 @@
                         color:{ r:0.6, g:0.6, b:0.9 },
                         nodes:[
 
-                            // Our depthbuf node, with a clearDepth at approximately
+                            // Our depthBuffer node, with a clearDepth at approximately
                             // half way through the teapot
                             {
-                                type:"depthbuf",
+                                type:"depthBuffer",
 
                                 enabled: true, // Default
                                 clearDepth:.989, // Default is 1.0 - clamped to [0..1]
@@ -84,9 +84,9 @@
                                 nodes:[
 
                                     // Teapot primitive, implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/prims/teapot.js
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                     {
-                                        type:"prims/teapot"
+                                        type:"geometry/teapot"
                                     }
                                 ]
                             }

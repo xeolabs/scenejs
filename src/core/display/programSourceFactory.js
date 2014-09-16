@@ -64,7 +64,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var normals = this._hasNormals(states);
 
         var src = [
-            "precision highp float;",
+            "precision mediump float;",
             "attribute vec3 SCENEJS_aVertex;",
             "uniform mat4 SCENEJS_uMMatrix;",
             "uniform mat4 SCENEJS_uMNMatrix;",
@@ -185,7 +185,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var normals = this._hasNormals(states);
 
         var src = [
-            "precision highp float;"
+            "precision mediump float;"
         ];
 
         src.push("vec4 packDepth(const in float depth) {");
@@ -347,7 +347,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var morphing = !!states.morphGeometry.targets;
 
         var src = [
-            "precision highp float;"
+            "precision mediump float;"
         ];
 
         src.push("attribute vec3 SCENEJS_aVertex;");                // Model coordinates
@@ -617,7 +617,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var src = ["\n"];
 
-        src.push("precision highp float;");
+        src.push("precision mediump float;");
 
 
         if (clipping || fragmentHooks.worldPos) {
@@ -680,6 +680,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform bool  SCENEJS_uDiffuse;");
         src.push("uniform bool  SCENEJS_uReflection;");
 
+        // Added in v4.0 to support depth targets
         src.push("uniform bool  SCENEJS_uDepthMode;");
 
         /* True when rendering transparency
@@ -956,7 +957,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "point") {
 
-                    src.push("dotN = max(dot(worldNormalVec, viewLightVec), 0.0);");
+                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
 
@@ -976,7 +977,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -worldNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
+                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
                         src.push("}");
                     }
                     //src.push("}");
@@ -984,7 +985,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "dir") {
 
-                    src.push("dotN = max(dot(worldNormalVec, viewLightVec), 0.0);");
+                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
@@ -996,7 +997,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -worldNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
                         src.push("}");
                     }
                     // src.push("}");
