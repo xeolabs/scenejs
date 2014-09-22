@@ -1008,6 +1008,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);
+    gl.disable(gl.BLEND);
 
     if (params.pick) {
         // Render for pick

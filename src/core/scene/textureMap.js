@@ -81,13 +81,15 @@ new (function () {
                 applyTo: !!params.applyTo ? params.applyTo : "baseColor",
                 blendMode: !!params.blendMode ? params.blendMode : "multiply",
                 blendFactor: (params.blendFactor != undefined && params.blendFactor != null) ? params.blendFactor : 1.0,
-                translate: { x: 0, y: 0},
-                scale: { x: 1, y: 1 },
-                rotate: 0,
+                translate: params.translate ? SceneJS._apply(params.translate, { x: 0, y: 0}) : {x: 0, y: 0},
+                scale: params.scale ? SceneJS._apply(params.scale, { x: 1, y: 1}) : {x: 1, y: 1},
+                rotate: params.rotate || 0,
                 matrix: null,
-                _matrixDirty: false,
+                _matrixDirty: true,
                 buildMatrix: buildMatrix
             });
+
+            this._core.buildMatrix.call(this._core);
 
             if (params.src) { // Load from URL
                 this._core.src = params.src;
@@ -325,7 +327,7 @@ new (function () {
 
     SceneJS.TextureMap.prototype.getMatrix = function () {
         if (this._core._matrixDirty) {
-            this._core.buildMatrix()
+            this._core.buildMatrix.call(this.core)()
         }
         return this.core.matrix;
     };

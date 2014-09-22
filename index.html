@@ -76,8 +76,6 @@
         }
 
 
-
-
     </style>
 </head>
 <body>
@@ -248,25 +246,19 @@ scene.getNode("myRotate", function(myRotate) {
 
             <p class="sectionHeading">Plugins</p>
 
-            <p>To keep the core library small, SceneJS dynamically loads it's non-core functionality from a directory of
-                plugins. In the example above, the <code>prims/teapot</code> node is a custom node type instantiated
-                from a <a
-                        href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins/node/geometry/teapot.js">prims/teapot</a>
-                plugin, which SceneJS
-                loaded on-demand from <a href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins">the
-                    plugins directory</a> within its repository on
-                GitHub.</p>
+            <p>Most of the node types you'll use with SceneJS are implemented by plugins, such as the <a
+                    href="./api/latest/plugins/node/geometry/teapot.js">geometry/teapot</a> in this example.
+                SceneJS will automatically load those types as required from <a
+                        href="https://github.com/xeolabs/scenejs/tree/V3.1/api/latest/plugins">the
+                    plugins directory</a> within its repository on GitHub.</p>
 
             <p>If you'd rather serve the plugins yourself, then just copy that directory to your server and configure
-                SceneJS to load them from there, like this:</p>
+                SceneJS to load them from there, like so:</p>
 
             <pre class="prettyprint lang-javascript">SceneJS.setConfigs({
     pluginPath: "./foo/myPluginsDir"
 });
             </pre>
-
-            <p>Want to write your own plugins? Excellent, please read more about the plugin API <a
-                    href="https://github.com/xeolabs/scenejs#plugin-api">here</a>.</p>
         </div>
     </div>
 </div>

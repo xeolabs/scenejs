@@ -82,7 +82,7 @@
 
         if (flags.transparent != undefined) {
             core.transparent = !!flags.transparent;
-            this._engine.display.drawListDirty = true;
+            this._engine.display.stateSortDirty = true;
         }
 
         if (flags.backfaces != undefined) {
@@ -203,7 +203,7 @@
         transparent = !!transparent;
         if (this._core.transparent != transparent) {
             this._core.transparent = transparent;
-            this._engine.display.drawListDirty = true;
+            this._engine.display.stateOrderDirty = true;
         }
         return this;
     };

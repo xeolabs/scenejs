@@ -234,11 +234,11 @@
             branchDirty = true;
         }
 
-        if (cfg.specular != light.specular) {
+        if (cfg.specular != undefined && cfg.specular != light.specular) {
             light.specular = cfg.specular;
             branchDirty = true;
         }
-        if (cfg.diffuse != light.diffuse) {
+        if (cfg.diffuse != undefined && cfg.diffuse != light.diffuse) {
             light.diffuse = cfg.diffuse;
             branchDirty = true;
         }
