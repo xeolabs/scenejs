@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - <a href="../api/latest/plugins/node/geometry/heightmap.js"
+                                                  target="_other">heightmap</a> geometry
+</div>
+
+<script>
+
+    // Demo of the "geometry/heightmap" custom node type, with an "shader/fog" node thrown in for fun.
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene
+    SceneJS.createScene({
+
+                nodes: [
+
+                    // Mouse-controlled camera that orbits a ray-picked point
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbitPick.js
+                    {
+                        type: "cameras/pickFlyOrbit",
+                        yaw: -40,
+                        pitch: -20,
+                        maxPitch: -10,
+                        minPitch: -80,
+                        zoom: 800,
+                        eye: { x: 0, y: 150, z: -1000 },
+                        look: { x: 0, y: 150, z: 0 },
+                        zoomSensitivity: 20.0,
+                        showCursor: true,
+                        cursorSize: 4.0,
+
+                        nodes: [
+
+                            // The clouds reflection cube map
+                            // http://scenejs.org/api/latest/plugins/node/reflect/clouds.js
+                            {
+                                type: "reflect/london",
+
+                                // 100% texture intensity
+                                intensity: 0.4,
+
+                                nodes: [
+
+                                    // Specular material
+                                    {
+                                    //    type: "material",
+                                        color: { r: 0, g: 0.0, b: 0 },
+
+                                        // Mirror-like reflection when specular == 1.0, no reflection at all
+                                        // when specular == 0.0. We have the value at 0.8 to allow some of the
+                                        // yellowness to show through, to simulate a gold-like material.
+                                        specular: 1.0,
+
+                                        nodes: [
+                                            // Dynamic grid texture, implemented by plugin at:
+                                            // http://scenejs.org/api/latest/plugins/node/texture/grid.js
+                                            {
+                                                type: "texture/procedural/grid",
+
+
+                                                nodes: [
+
+
+                                                    // Heightmap, implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+                                                    {
+                                                        type: "geometry/heightmap",
+
+                                                        // Texture image
+                                                        src: 'textures/heightmap.jpg',
+
+                                                        // Wireframe or solid - default is false
+                                                        wire: false,
+
+                                                        // Dimensions
+                                                        xSize: 5000,
+                                                        zSize: 5000,
+                                                        ySize: 400,
+
+                                                        // Segments on X and Z axis
+                                                        xSegments: 200,
+                                                        zSegments: 200
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    );
+
+</script>
+</body>
+</html>

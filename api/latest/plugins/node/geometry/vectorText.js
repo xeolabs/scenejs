@@ -1,8 +1,9 @@
 /**
  * Vector text node type
  *
- * Usage example:
+ * <p>Usage example:</p>
  *
+ * <pre>
  * someNode.addNode({
  *      type: "geometry/vectorText",
  *      text: "Fiery the angels fell, deep thunder rolled around their shores, burning with the fires of Ork.",
@@ -10,6 +11,7 @@
  *      yPos: -20,
  *      size: 1.5
  *  });
+ *  </pre>
  */
 (function () {
 

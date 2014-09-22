@@ -1,12 +1,16 @@
 /**
  A cloud of randomly-scattered boxes
 
- Usage example:
+ @author xeolabs / http://xeolabs.com
 
+ <p>Usage example:</p>
+
+ <pre>
  someNode.addNode({
        type: "geometry/randomObjects",
        numBoxes: 1000 // (default)
    });
+ </pre>
  */
 
 
@@ -37,6 +41,22 @@ SceneJS.Types.addType("geometry/randomObjects", {
                 angle: Math.random() * 360
             });
 
+            // Size
+//            node = node.addNode({
+//                type: "scale",
+//                x: 4.0,
+//                y: 4.0,
+//                z: 4.0
+//            });
+
+            // Size
+            node = node.addNode({
+                type: "scale",
+                x: 3.0,
+                y: 6.0,
+                z: 3.0
+            });
+
             if (materials) {
                 // Random material
                 node = node.addNode({
@@ -52,9 +72,6 @@ SceneJS.Types.addType("geometry/randomObjects", {
             // Geometry
             node.addNode({
                 type: "geometry/box",
-                xSize: 3,
-                ySize: 6,
-                zSize: 3,
                 coreId: "box"
             });
         }

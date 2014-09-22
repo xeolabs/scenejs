@@ -1,3 +1,16 @@
+/**
+ * Planet earth model
+ *
+ * @author xeolabs / http://xeolabs.com
+ *
+ * <p>Usage example:</p>
+ *
+ * <pre>
+ * someNode.addNode({
+ *      type: "models/space/planets/earth"
+ *  });
+ * </pre>
+ */
 SceneJS.Types.addType("models/space/planets/earth", {
 
     construct: function (params) {

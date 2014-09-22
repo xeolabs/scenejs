@@ -15,8 +15,20 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - stages demo <br>
+    'stages' let you to partition your scene objects into render bins that get processed in strict sequence,<br>
+    which is useful for building custom effects pipelines using <a href="/examples/_index.html#texture_rtt_color"
+                                                                   target="parent">render-to-texture</a> and <a
+        href="/examples/_index.html#shaders_custom_water" target="parent">custom shaders</a>.<br>
+    <a href="/examples/_index.html#layers_transparencySort" target="parent">layers</a> may be used if needed to further sub-prioritise the objects with the stages, which is<br>
+    what we're doing here to ensure the transparent boxes are correctly <a href="http://en.wikipedia.org/wiki/Order-independent_transparency"  target="_other">alpha sorted</a>.
+</div>
 
 <script>
 

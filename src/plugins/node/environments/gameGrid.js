@@ -1,5 +1,9 @@
 /**
- Scene template
+
+ Pre-made scene environment
+
+ @author xeolabs / http://xeolabs.com
+
  */
 SceneJS.Types.addType("environments/gameGrid", {
 

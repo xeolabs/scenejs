@@ -1,6 +1,26 @@
 /**
- * Scanline postprocess effect
- *
+  Scanlines postprocess effect
+
+  @author xeolabs / http://xeolabs.com
+
+  <pre>
+
+ // Create scanline effect around a procedurally-generated city
+
+ var dof = myScene.addNode({
+     type: "postprocess/scanlines",
+
+     nodes: [
+
+        // City, implemented by plugin at
+        // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
+        {
+            type: "models/buildings/city",
+            width: 600
+        }
+     ]
+ });
+  </pre>
  */
 SceneJS.Types.addType("postprocess/scanlines", {
 

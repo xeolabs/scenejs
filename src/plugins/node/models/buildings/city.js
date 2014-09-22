@@ -1,3 +1,40 @@
+/**
+ A simple procedurally-generated city model
+
+ @author xeolabs / http://xeolabs.com
+
+ <p>Usage example:</p>
+
+ <pre>
+ var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js
+            {
+                type: "cameras/pickFlyOrbit",
+                yaw: -30,
+                pitch: -20,
+                zoom: 300,
+                zoomSensitivity: 5.0,
+                showCursor: true,
+                cursorSize: 2.0,
+
+                nodes: [
+
+                    // City demo scene
+                    // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
+                    {
+                        type: "models/buildings/city",
+                        width: 1000.0
+                    }
+                ]
+            }
+        ]
+    });
+ </pre>
+
+ */
 SceneJS.Types.addType("models/buildings/city", {
 
     construct:function (params) {

@@ -1,6 +1,8 @@
 /**
  * Web worker containing a JigLibJS rigid-body physics system.
  *
+ * @author xeolabs / http://xeolabs.com
+ *
  * This worker accepts various commands to configure the system, add or
  * remove bodies, and integrate (which means run the system for one frame).
  *

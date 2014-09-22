@@ -1,6 +1,8 @@
 /**
  * Skybox node type, with firey apocalyptic clouds
  *
+ * @author xeolabs / http://xeolabs.com
+ *
  * Usage example:
  *
  * someNode.addNode({

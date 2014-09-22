@@ -15,8 +15,18 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
-</head>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - three <a href="../api/latest/plugins/node/geometry/heightmap.js" target="_other">heightmap</a> geometries with transparency<br>
+    uses a <a href="../api/latest/plugins/node/cameras/pickFlyOrbit.js" target="_other">cameras/pickFlyOrbit</a> node
+    <br>
+    click on something to fly to that point
+    <br>
+    drag mouse to orbit it, mouse wheel to zoom in and out
+</div>
 
 <script>
 
@@ -43,7 +53,8 @@
                 eye: { x: 0, y: 130, z: -1000 },
                 look: { x: 0, y: 130, z: 0 },
                 zoomSensitivity: 20.0,
-                showPick: true,
+                showCursor: true,
+                cursorSize: 2.0,
 
                 nodes: [
 

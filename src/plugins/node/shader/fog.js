@@ -1,3 +1,9 @@
+/**
+ Fog shader
+
+ @author xeolabs / http://xeolabs.com
+
+ */
 SceneJS.Types.addType("shader/fog", {
 
     construct:function (params) {

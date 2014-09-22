@@ -3,8 +3,9 @@
  *
  * @author Moritz Kornher
  *
- * Usage example:
+ * <p>Usage example:</p>
  *
+ * <pre>
  * someNode.addNode({
  *      type: "geometry/cylinder",
  *      radiusTop: 20, // Default
@@ -14,6 +15,7 @@
  *      heightSegments: 1, // Default
  *      openEnded: false // Default
  *  });
+ *  </pre>
  */
 
 (function () {

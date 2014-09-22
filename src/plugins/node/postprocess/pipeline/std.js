@@ -1,6 +1,8 @@
 /**
  * Standard pipeline
  *
+ * IN DEVELOPMENT
+ *
  * Usage example:
  *
  * someNode.addNode({
@@ -17,6 +19,30 @@ SceneJS.Types.addType("postprocess/pipeline/std", {
         var pipeline = this.addNode({
             type: "postprocess/pipeline",
             effects: [
+
+                // Oculus Rift
+                {
+                    effectId: "oculusRift",
+                    type: "effects/oculusRift",
+                    displayName: "Oculus Rift",
+                    description: "Render to Oculus Rift"
+                },
+
+                // Anaglyph
+                {
+                    effectId: "anaglyph",
+                    type: "effects/anaglyph",
+                    displayName: "Anaglyph 3D",
+                    description: "Render as Anaglyph 3D"
+                },
+
+                // Stereo
+                {
+                    effectId: "stereo",
+                    type: "effects/stereo",
+                    displayName: "Stereo",
+                    description: "Render in stereo"
+                },
 
                 // Depth-of-field
                 {

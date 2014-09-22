@@ -1,5 +1,7 @@
 /**
- * A backyard lawn environment.
+ * Pre-made scene environment
+ *
+ * @author xeolabs / http://xeolabs.com
  *
  * <p>This environment has:</p>
  *
@@ -104,20 +106,5 @@ SceneJS.Types.addType("environments/lawn", {
                 }
             ]
         });
-
-//        // Synch focusDist with length of eye->look vector
-//        var scene = this.getScene();
-//        scene.getNode(cameraId, function (camera) {
-//            scene.getNode(effectId, function (effect) {
-//                camera.on("updated", function (lookat) {
-//                    effect.setFocusDist(
-//                        SceneJS_math_lenVec3([
-//                            lookat.look.x - lookat.eye.x,
-//                            lookat.look.y - lookat.eye.y,
-//                            lookat.look.z - lookat.eye.z
-//                        ]));
-//                });
-//            });
-//        });
     }
 });

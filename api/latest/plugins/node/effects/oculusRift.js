@@ -1,6 +1,8 @@
 /**
  Oculus Rift effect node
 
+ @author xeolabs / http://xeolabs.com
+
  <p>Usage example:</p>
 
  <pre>
@@ -174,7 +176,7 @@ SceneJS.Types.addType("effects/oculusRift", {
 
                 // These params will remain constant for both eyes:
                 "Scale": [0.1469278, 0.2350845],
-                "ScaleIn": [5, 9.0],
+                "ScaleIn": [4, 5.0],
                 "HmdWarpParam": [ 1, 0.22, 0.24, 0],
 
                 // These params will be updated for each eye:
@@ -190,6 +192,11 @@ SceneJS.Types.addType("effects/oculusRift", {
         this._shader.addNode({
             type: "geometry/quad"
         });
+
+        // Eye separation
+        this._eyeSep = params.eyeSep || 0.2;
+
+        this._focalLength = params.focalLength || 20.0;
     },
 
     preCompile: function () {
@@ -220,13 +227,12 @@ SceneJS.Types.addType("effects/oculusRift", {
         scene.setNumPasses(2);
 
         var aperture = 45;
-        var focallength = 5.0;
         var near = 0.1;
         var DTOR = 0.0174532925;
         var radians = DTOR * aperture / 2;
         var wd2 = near * Math.tan(radians);
-        var ndfl = near / focallength;
-        var eyeSep = this._eyeSep || this._eyesep || 10.0;
+        var ndfl = near / this._focalLength;
+        var eyeSep = this._eyeSep || 10.0;
 
         // Eye separation vector, origin at left eye
         var sepVec;

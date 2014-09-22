@@ -2,6 +2,8 @@
 
  Depth-of-Field post-process effect.
 
+ @author xeolabs / http://xeolabs.com
+
  <p>Usage:</p>
 
  <pre>

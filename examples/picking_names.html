@@ -27,13 +27,22 @@
             z-index: 100000;
         }
     </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 </head>
 
-<script src="../api/latest/scenejs.js"></script>
 <body>
 
-<!-- Shows each pick hit -->
-<div id="info">Demo of pick name hierarchies<br><br>Click on an object...
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - picking - pick name hierarchies
+    <br>
+    click on an object to pick it
+    <br>
+    pickable objects are in hierarchical namespaces;
+    <br>
+    note how the pick results show the name paths
+    <br>
+    learn more about picking in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
 </div>
 
 <script>
@@ -47,65 +56,65 @@
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"../api/latest/plugins"
+    pluginPath: "../api/latest/plugins"
 });
 
 // Create scene
 var scene = SceneJS.createScene({
-    nodes:[
+    nodes: [
 
         // Orbiting camera node, implemented by plugin at
         // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
         {
-            type:"cameras/orbit",
-            yaw:30,
-            pitch:-30,
-            zoom:10,
-            zoomSensitivity:1.0,
+            type: "cameras/orbit",
+            yaw: 30,
+            pitch: -30,
+            zoom: 10,
+            zoomSensitivity: 1.0,
 
-            nodes:[
+            nodes: [
 
                 {
-                    type:"name",
-                    name:"myScene",
-                    nodes:[
+                    type: "name",
+                    name: "myScene",
+                    nodes: [
 
                         // Table
                         {
-                            type:"name",
-                            name:"table",
-                            id:"tableNameNode",
+                            type: "name",
+                            name: "table",
+                            id: "tableNameNode",
 
-                            nodes:[
+                            nodes: [
                                 {
-                                    type:"translate",
-                                    x:0, y:0, z:0,
-                                    nodes:[
+                                    type: "translate",
+                                    x: 0, y: 0, z: 0,
+                                    nodes: [
                                         // Table leg #1
                                         {
-                                            type:"name",
-                                            name:"leg1",
-                                            id:"leg1NameNode",
+                                            type: "name",
+                                            name: "leg1",
+                                            id: "leg1NameNode",
 
-                                            nodes:[
+                                            nodes: [
                                                 {
-                                                    type:"translate",
-                                                    x:-2.0, y:0.0, z:-2.0,
-                                                    nodes:[
+                                                    type: "translate",
+                                                    x: -2.0, y: 0.0, z: -2.0,
+                                                    nodes: [
                                                         {
-                                                            type:"scale",
-                                                            x:0.2, y:1.0, z:0.2,
-                                                            nodes:[
+                                                            type: "scale",
+                                                            x: 0.2, y: 1.0, z: 0.2,
+                                                            nodes: [
                                                                 // Materials can appear anywhere in the hierarchy
                                                                 {
-                                                                    type:"material",
-                                                                    color:{ r:1.0, g:0.4, b:0.4 },
+                                                                    type: "material",
+                                                                    color: { r: 1.0, g: 0.4, b: 0.4 },
 
-                                                                    nodes:[
+                                                                    nodes: [
 
                                                                         // Box primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/box.js
                                                                         {
-                                                                            type:"geometry/box"
+                                                                            type: "geometry/box"
                                                                         }
                                                                     ]
                                                                 }
@@ -118,28 +127,28 @@ var scene = SceneJS.createScene({
                                         },
                                         // Table leg #2
                                         {
-                                            type:"name",
-                                            name:"leg2",
-                                            id:"leg2NameNode",
+                                            type: "name",
+                                            name: "leg2",
+                                            id: "leg2NameNode",
 
-                                            nodes:[
+                                            nodes: [
                                                 {
-                                                    type:"translate",
-                                                    x:2.0, y:0.0, z:-2.0,
-                                                    nodes:[
+                                                    type: "translate",
+                                                    x: 2.0, y: 0.0, z: -2.0,
+                                                    nodes: [
                                                         {
-                                                            type:"scale",
-                                                            x:0.2, y:1.0, z:0.2,
-                                                            nodes:[
+                                                            type: "scale",
+                                                            x: 0.2, y: 1.0, z: 0.2,
+                                                            nodes: [
                                                                 {
-                                                                    type:"material",
-                                                                    color:{ r:0.4, g:0.6, b:0.4 },
+                                                                    type: "material",
+                                                                    color: { r: 0.4, g: 0.6, b: 0.4 },
 
-                                                                    nodes:[
+                                                                    nodes: [
 
                                                                         // Box primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/box.js
                                                                         {
-                                                                            type:"geometry/box"
+                                                                            type: "geometry/box"
                                                                         }
                                                                     ]
                                                                 }
@@ -151,28 +160,28 @@ var scene = SceneJS.createScene({
                                         },
                                         // Table leg #3
                                         {
-                                            type:"name",
-                                            name:"leg3",
-                                            id:"leg3NameNode",
+                                            type: "name",
+                                            name: "leg3",
+                                            id: "leg3NameNode",
 
-                                            nodes:[
+                                            nodes: [
                                                 {
-                                                    type:"translate",
-                                                    x:2.0, y:0.0, z:2.0,
-                                                    nodes:[
+                                                    type: "translate",
+                                                    x: 2.0, y: 0.0, z: 2.0,
+                                                    nodes: [
                                                         {
-                                                            type:"scale",
-                                                            x:0.2, y:1.0, z:0.2,
-                                                            nodes:[
+                                                            type: "scale",
+                                                            x: 0.2, y: 1.0, z: 0.2,
+                                                            nodes: [
                                                                 {
-                                                                    type:"material",
-                                                                    color:{ r:0.4, g:0.4, b:0.6 },
+                                                                    type: "material",
+                                                                    color: { r: 0.4, g: 0.4, b: 0.6 },
 
-                                                                    nodes:[
+                                                                    nodes: [
 
                                                                         // Box primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/box.js
                                                                         {
-                                                                            type:"geometry/box"
+                                                                            type: "geometry/box"
                                                                         }
                                                                     ]
                                                                 }
@@ -184,28 +193,28 @@ var scene = SceneJS.createScene({
                                         },
                                         // Table leg #4
                                         {
-                                            type:"name",
-                                            name:"leg4",
-                                            id:"leg4NameNode",
+                                            type: "name",
+                                            name: "leg4",
+                                            id: "leg4NameNode",
 
-                                            nodes:[
+                                            nodes: [
                                                 {
-                                                    type:"translate",
-                                                    x:-2.0, y:0.0, z:2.0,
-                                                    nodes:[
+                                                    type: "translate",
+                                                    x: -2.0, y: 0.0, z: 2.0,
+                                                    nodes: [
                                                         {
-                                                            type:"scale",
-                                                            x:0.2, y:1.0, z:0.2,
-                                                            nodes:[
+                                                            type: "scale",
+                                                            x: 0.2, y: 1.0, z: 0.2,
+                                                            nodes: [
                                                                 {
-                                                                    type:"material",
-                                                                    color:{ r:0.6, g:0.4, b:0.6 },
+                                                                    type: "material",
+                                                                    color: { r: 0.6, g: 0.4, b: 0.6 },
 
-                                                                    nodes:[
+                                                                    nodes: [
 
                                                                         // Box primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/box.js
                                                                         {
-                                                                            type:"geometry/box"
+                                                                            type: "geometry/box"
                                                                         }
                                                                     ]
                                                                 }
@@ -217,28 +226,28 @@ var scene = SceneJS.createScene({
                                         },
                                         // Table top
                                         {
-                                            type:"name",
-                                            name:"top",
-                                            id:"topNameNode",
+                                            type: "name",
+                                            name: "top",
+                                            id: "topNameNode",
 
-                                            nodes:[
+                                            nodes: [
                                                 {
-                                                    type:"translate",
-                                                    x:0.0, y:1.2, z:0.0,
-                                                    nodes:[
+                                                    type: "translate",
+                                                    x: 0.0, y: 1.2, z: 0.0,
+                                                    nodes: [
                                                         {
-                                                            type:"scale",
-                                                            x:2.7, y:0.2, z:2.7,
-                                                            nodes:[
+                                                            type: "scale",
+                                                            x: 2.7, y: 0.2, z: 2.7,
+                                                            nodes: [
                                                                 {
-                                                                    type:"material",
-                                                                    color:{ r:0.6, g:0.6, b:0.4 },
+                                                                    type: "material",
+                                                                    color: { r: 0.6, g: 0.6, b: 0.4 },
 
-                                                                    nodes:[
+                                                                    nodes: [
 
                                                                         // Box primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/box.js
                                                                         {
-                                                                            type:"geometry/box"
+                                                                            type: "geometry/box"
                                                                         }
                                                                     ]
                                                                 }
@@ -255,43 +264,43 @@ var scene = SceneJS.createScene({
                         },
                         // Stack of rings sitting on the table
                         {
-                            type:"name",
-                            name:"rings",
-                            id:"ringsNameNode",
+                            type: "name",
+                            name: "rings",
+                            id: "ringsNameNode",
 
-                            nodes:[
+                            nodes: [
                                 {
-                                    type:"translate",
-                                    x:-1.1, y:2.3, z:-1.1,
-                                    nodes:[
+                                    type: "translate",
+                                    x: -1.1, y: 2.3, z: -1.1,
+                                    nodes: [
                                         // Blue torus
                                         {
-                                            type:"name",
-                                            name:"blueTorus", id:"blueTorusNameNode",
+                                            type: "name",
+                                            name: "blueTorus", id: "blueTorusNameNode",
 
-                                            nodes:[
+                                            nodes: [
                                                 {
-                                                    type:"translate",
-                                                    y:0.8, x:0.2, z:0.2,
-                                                    nodes:[
+                                                    type: "translate",
+                                                    y: 0.8, x: 0.2, z: 0.2,
+                                                    nodes: [
                                                         {
-                                                            type:"rotate",
-                                                            x:1, angle:90,
-                                                            nodes:[
+                                                            type: "rotate",
+                                                            x: 1, angle: 90,
+                                                            nodes: [
                                                                 {
-                                                                    type:"scale",
-                                                                    x:0.6, y:0.6, z:0.6,
-                                                                    nodes:[
+                                                                    type: "scale",
+                                                                    x: 0.6, y: 0.6, z: 0.6,
+                                                                    nodes: [
                                                                         {
-                                                                            type:"material",
-                                                                            color:{ r:0.5, g:0.5, b:0.6 },
+                                                                            type: "material",
+                                                                            color: { r: 0.5, g: 0.5, b: 0.6 },
 
-                                                                            nodes:[
+                                                                            nodes: [
 
                                                                                 // Node type implemented by plugin at
                                                                                 // http://scenejs.org/api/latest/plugins/node/geometry/torus.js
                                                                                 {
-                                                                                    type:"geometry/torus"
+                                                                                    type: "geometry/torus"
                                                                                 }
                                                                             ]
                                                                         }
@@ -305,33 +314,33 @@ var scene = SceneJS.createScene({
                                         },
                                         // Pink torus
                                         {
-                                            type:"name",
-                                            name:"pinkTorus",
-                                            id:"pinkTorusNameNode",
+                                            type: "name",
+                                            name: "pinkTorus",
+                                            id: "pinkTorusNameNode",
 
-                                            nodes:[
+                                            nodes: [
                                                 {
-                                                    type:"translate",
-                                                    y:0.42, x:0.2, z:0.3,
-                                                    nodes:[
+                                                    type: "translate",
+                                                    y: 0.42, x: 0.2, z: 0.3,
+                                                    nodes: [
                                                         {
-                                                            type:"rotate",
-                                                            x:1, angle:90,
-                                                            nodes:[
+                                                            type: "rotate",
+                                                            x: 1, angle: 90,
+                                                            nodes: [
                                                                 {
-                                                                    type:"scale",
-                                                                    x:0.7, y:0.7, z:0.7,
-                                                                    nodes:[
+                                                                    type: "scale",
+                                                                    x: 0.7, y: 0.7, z: 0.7,
+                                                                    nodes: [
                                                                         {
-                                                                            type:"material",
-                                                                            color:{ r:0.7, g:0.5, b:0.5 },
+                                                                            type: "material",
+                                                                            color: { r: 0.7, g: 0.5, b: 0.5 },
 
-                                                                            nodes:[
+                                                                            nodes: [
 
                                                                                 // Node type implemented by plugin at
                                                                                 // http://scenejs.org/api/latest/plugins/node/geometry/torus.js
                                                                                 {
-                                                                                    type:"geometry/torus"
+                                                                                    type: "geometry/torus"
                                                                                 }
                                                                             ]
                                                                         }
@@ -345,33 +354,33 @@ var scene = SceneJS.createScene({
                                         },
                                         // Green torus
                                         {
-                                            type:"name",
-                                            name:"greenTorus",
-                                            id:"greenTorusNameNode",
+                                            type: "name",
+                                            name: "greenTorus",
+                                            id: "greenTorusNameNode",
 
-                                            nodes:[
+                                            nodes: [
                                                 {
-                                                    type:"translate",
-                                                    y:-0.055,
-                                                    nodes:[
+                                                    type: "translate",
+                                                    y: -0.055,
+                                                    nodes: [
                                                         {
-                                                            type:"rotate",
-                                                            x:1, angle:90,
-                                                            nodes:[
+                                                            type: "rotate",
+                                                            x: 1, angle: 90,
+                                                            nodes: [
                                                                 {
-                                                                    type:"scale",
-                                                                    x:0.8, y:0.8, z:0.8,
-                                                                    nodes:[
+                                                                    type: "scale",
+                                                                    x: 0.8, y: 0.8, z: 0.8,
+                                                                    nodes: [
                                                                         {
-                                                                            type:"material",
-                                                                            color:{ r:0.5, g:0.7, b:0.5 },
+                                                                            type: "material",
+                                                                            color: { r: 0.5, g: 0.7, b: 0.5 },
 
-                                                                            nodes:[
+                                                                            nodes: [
 
                                                                                 // Node type implemented by plugin at
                                                                                 // http://scenejs.org/api/latest/plugins/node/geometry/torus.js
                                                                                 {
-                                                                                    type:"geometry/torus"
+                                                                                    type: "geometry/torus"
                                                                                 }
                                                                             ]
                                                                         }
@@ -385,33 +394,33 @@ var scene = SceneJS.createScene({
                                         },
                                         // Yellow torus
                                         {
-                                            type:"name",
-                                            name:"yellowTorus",
-                                            id:"yellowTorusNameNode",
+                                            type: "name",
+                                            name: "yellowTorus",
+                                            id: "yellowTorusNameNode",
 
-                                            nodes:[
+                                            nodes: [
                                                 {
-                                                    type:"translate",
-                                                    y:-0.6,
-                                                    nodes:[
+                                                    type: "translate",
+                                                    y: -0.6,
+                                                    nodes: [
                                                         {
-                                                            type:"rotate",
-                                                            x:1, angle:90,
-                                                            nodes:[
+                                                            type: "rotate",
+                                                            x: 1, angle: 90,
+                                                            nodes: [
                                                                 {
-                                                                    type:"scale",
-                                                                    x:0.9, y:0.9, z:0.9,
-                                                                    nodes:[
+                                                                    type: "scale",
+                                                                    x: 0.9, y: 0.9, z: 0.9,
+                                                                    nodes: [
                                                                         {
-                                                                            type:"material",
-                                                                            color:{ r:0.7, g:0.7, b:0.5 },
+                                                                            type: "material",
+                                                                            color: { r: 0.7, g: 0.7, b: 0.5 },
 
-                                                                            nodes:[
+                                                                            nodes: [
 
                                                                                 // Node type implemented by plugin at
                                                                                 // http://scenejs.org/api/latest/plugins/node/geometry/torus.js
                                                                                 {
-                                                                                    type:"geometry/torus"
+                                                                                    type: "geometry/torus"
                                                                                 }
                                                                             ]
                                                                         }
@@ -430,33 +439,33 @@ var scene = SceneJS.createScene({
 
                         // Teapot
                         {
-                            type:"name",
-                            name:"teapot",
-                            id:"teapotNameNode",
+                            type: "name",
+                            name: "teapot",
+                            id: "teapotNameNode",
 
-                            nodes:[
+                            nodes: [
                                 {
-                                    type:"translate",
-                                    y:1.4, x:1.0, z:1.0,
-                                    nodes:[
-                                        { type:"rotate",
-                                            y:1,
-                                            angle:40,
-                                            nodes:[
+                                    type: "translate",
+                                    y: 1.4, x: 1.0, z: 1.0,
+                                    nodes: [
+                                        { type: "rotate",
+                                            y: 1,
+                                            angle: 40,
+                                            nodes: [
                                                 {
-                                                    type:"scale",
-                                                    x:0.6, y:0.7, z:0.6,
-                                                    nodes:[
+                                                    type: "scale",
+                                                    x: 0.6, y: 0.7, z: 0.6,
+                                                    nodes: [
                                                         {
-                                                            type:"material",
-                                                            color:{ r:0.6, g:0.7, b:0.6 },
+                                                            type: "material",
+                                                            color: { r: 0.6, g: 0.7, b: 0.6 },
 
-                                                            nodes:[
+                                                            nodes: [
 
                                                                 // Node type implemented by plugin at
                                                                 // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                                                 {
-                                                                    type:"geometry/teapot"
+                                                                    type: "geometry/teapot"
                                                                 }
                                                             ]
                                                         }
@@ -471,33 +480,33 @@ var scene = SceneJS.createScene({
 
                         // Transparent sphere
                         {
-                            type:"name",
-                            name:"sphere",
-                            id:"sphereNameNode",
+                            type: "name",
+                            name: "sphere",
+                            id: "sphereNameNode",
 
-                            nodes:[
+                            nodes: [
                                 {
-                                    type:"translate",
-                                    y:2.0, x:-1.4, z:1.4,
-                                    nodes:[
+                                    type: "translate",
+                                    y: 2.0, x: -1.4, z: 1.4,
+                                    nodes: [
                                         {
-                                            type:"scale",
-                                            x:0.3, y:0.3, z:0.3,
-                                            nodes:[
+                                            type: "scale",
+                                            x: 0.3, y: 0.3, z: 0.3,
+                                            nodes: [
                                                 {
-                                                    type:"flags",
-                                                    flags:{ transparent:true },
-                                                    nodes:[
+                                                    type: "flags",
+                                                    flags: { transparent: true },
+                                                    nodes: [
                                                         {
-                                                            type:"material",
-                                                            color:{ r:0.4, g:0.5, b:0.4 },
-                                                            alpha:0.6,
+                                                            type: "material",
+                                                            color: { r: 0.4, g: 0.5, b: 0.4 },
+                                                            alpha: 0.6,
 
-                                                            nodes:[
+                                                            nodes: [
 
                                                                 // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
                                                                 {
-                                                                    type:"geometry/sphere"
+                                                                    type: "geometry/sphere"
                                                                 }
                                                             ]
                                                         }

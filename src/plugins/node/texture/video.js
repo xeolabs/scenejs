@@ -1,6 +1,62 @@
 /**
- * Video texture
- *
+
+ Video texture
+
+ @author xeolabs / http://xeolabs.com
+
+ <p>Usage example:</p>
+
+ <pre>
+ myScene.addNode({
+     type: "texture/video",
+     src: "movies/bunny.ogg",
+     applyTo: "color",
+     id: "myTexture",
+
+     nodes: [
+         {
+             type: "material",
+             color: { r: 0.7, g: 0.7, b: 0.7 },
+             specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+             specular: 0.0,
+             shine: 50.0,
+
+             nodes: [
+
+                 // Heightmap node type implemented by plugin at
+                 // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+                 {
+                     type: "geometry/heightmap",
+                     src: 'textures/heightmap.jpg'
+                 }
+             ]
+         }
+     ]
+ });
+
+ // Get the texture and modify some properties
+
+ var myScene.getNode("myTexture",
+        function(texture) {
+
+            // Set UV coordinate scale
+            texture.setScale({
+                x: 0.5, y: 0.5
+            });
+
+            // Set UV coordinate translation
+            texture.setTranslate({
+                x: -0.2, y: 0.1
+            });
+
+            // Set UV coordinate rotation
+            texture.setRotate(45.0);
+
+            // Set blend factor, the amount by which the texture is blended
+            // with whatever is under it, eg. material color or another texture
+            texture.setBlendFactor(0.5);
+        });
+ </pre>
  */
 
 SceneJS.Types.addType("texture/video", {

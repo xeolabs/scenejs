@@ -1,6 +1,8 @@
 /**
  Path camera node type
 
+ @author xeolabs / http://xeolabs.com
+
  <pre>
 
  someNode.addNode({
@@ -21,8 +23,8 @@
 
  </pre>
 
- The camera is initially positioned at the given 'eye' and 'look', then the distance of 'eye' is zoomed out
- away from 'look' by the amount given in 'zoom', and then 'eye' is rotated by 'yaw' and 'pitch'.
+ <p>The camera is initially positioned at the given 'eye' and 'look', then the distance of 'eye' is zoomed out
+ away from 'look' by the amount given in 'zoom', and then 'eye' is rotated by 'yaw' and 'pitch'.</p>
 
  */
 SceneJS.Types.addType("cameras/path", {

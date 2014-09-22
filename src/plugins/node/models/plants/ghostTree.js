@@ -1,19 +1,20 @@
 /**
  * A procedurally-generated tree
  *
- * This is a quick bit of fun that borrows the procedural tree generation
- * code from the "Ghost Trees" Chrome Experiment by Marek Kapolka:
+ * @author xeolabs / http://xeolabs.com
  *
- * http://www.chromeexperiments.com/detail/ghost-trees/
+ * <p>This is a quick bit of fun that borrows the procedural tree generation
+ * code from the "Ghost Trees" Chrome Experiment by Marek Kapolka:</p>
  *
- * Tree generation code is wrapped in a custom SceneJS node type defined in:
- * http://scenejs.org/api/latest/plugins/node/models/plants/ghostTree.js
+ * <p>http://www.chromeexperiments.com/detail/ghost-trees/</p>
  *
- * All the parameters for the tree generator are exposed as configurations
- * for the node type.
+ * <p>Tree generation code is wrapped in a custom SceneJS node type defined in:
+ * http://scenejs.org/api/latest/plugins/node/models/plants/ghostTree.js</p>
+ *
+ * <p>All the parameters for the tree generator are exposed as configurations
+ * for the node type.</p>
  *
  */
-
 (function () {
 
     require([

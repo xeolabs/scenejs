@@ -33,6 +33,70 @@ body {
     width: auto;
 }
 
+#info {
+    position: relative;
+    top: 0px;
+    padding: 5px;
+    padding-top:20px;
+    z-index: 100;
+    font-size:16px;
+    text-align:center;
+}
+
+#info a {
+    font-size:16px;
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+#infoLight {
+    position: relative;
+    top: 0px;
+    padding: 5px;
+    padding-top:20px;
+    z-index: 1000;
+    font-size:16px;
+    text-align:center;
+    color: #ffffff;
+}
+
+#infoLight a {
+    font-size:16px;
+    color: #ffffff;
+    text-decoration: underline !important;
+}
+
+
+#infoDark {
+    position: relative;
+    top: 0px;
+    padding: 5px;
+    padding-top:20px;
+    z-index: 1000;
+    font-size:16px;
+    text-align:center;
+    color: black;
+
+}
+
+#infoDark a {
+    font-size:16px;
+    color: #000000;
+    text-decoration: underline !important;
+}
+
+#infoTxt {
+    position: relative;
+    top: 0px;
+    padding: 5px;
+    padding-top:20px;
+    z-index: 100;
+    font-size:20px;
+    text-align:center;
+    color: yellow;
+}
+
+
 #header {
     background: white;
     width: 100%;

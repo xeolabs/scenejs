@@ -1,5 +1,7 @@
 /**
- * A model viewing environment.
+ * A pre-made scene environment
+ *
+ *  @author xeolabs / http://xeolabs.com
  *
  * <p>This environment has:</p>
  *

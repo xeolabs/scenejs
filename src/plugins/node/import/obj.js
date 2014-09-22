@@ -1,6 +1,8 @@
 /**
  * WaveFront OBJ mesh importer
  *
+ * @author xeolabs / http://xeolabs.com
+ *
  * Uses the K3D library to parse OBJ
  * © 2012 Ivan Kuckir
  * http://k3d.ivank.net/

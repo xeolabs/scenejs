@@ -1,12 +1,18 @@
 /**
- * Teapot geometry node type
+ * Utah Teapot geometry node type
  *
- * Usage example:
+ * @author xeolabs / http://xeolabs.com
  *
+ * <p><a href="http://en.wikipedia.org/wiki/Utah_teapot">http://en.wikipedia.org/wiki/Utah_teapot</a></p>
+ *
+ * <p>Usage example:</p>
+ *
+ * <pre>
  * someNode.addNode({
  *      type: "geometry/teapot",
  *      wire: false // Default
  *  });
+ *  </pre>
  */
 (function () {
 

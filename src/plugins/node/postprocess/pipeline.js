@@ -1,6 +1,10 @@
 /**
  * Post-effects pipeline
  *
+ * @author xeolabs / http://xeolabs.com
+ *
+ * IN DEVELOPMENT
+ *
  * Usage example:
  *
  * someNode.addNode({

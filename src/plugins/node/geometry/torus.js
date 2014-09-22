@@ -1,13 +1,19 @@
 /**
  * Torus geometry node type
  *
- * Usage example:
+ * <p>Usage example showing defaults:</p>
  *
+ * <pre>
  * someNode.addNode({
  *      type: "geometry/torus",
- *
- *      wire: false // Default
+ *`     radius: 1,
+ *      tube: 0.3,
+ *      segmentsR: 32,
+ *      segmentsT: 24,
+ *      arc: Math.PI / 2.0,
+ *      wire: false
  *  });
+ *  </pre>
  */
 (function () {
 

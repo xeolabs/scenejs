@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // A simple multi-stage scene graph, demonstrating a two-stage effects pipeline. The first stage renders the scene (a teapot)
+    // to a color render target. The second stage uses a custom shader to apply that render target as a texture
+    // on a screen-aligned quad, while also applying a convolution effect in the shader's fragment stage.
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene graph
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // First stage
+            // Renders our scene (sky and teapot) to a color target.
+            {
+                type: "stage",
+                priority: 1,  // Perform this stage first
+
+                nodes: [
+
+                    // Color target
+                    {
+                        type: "colorTarget",
+                        id: "myColorTarget",
+
+                        nodes: [
+
+                            // Cloudy sea skybox, implemented by plugin at:
+                            // http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            {
+                                type: "skybox/cloudySea",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+
+                            // Rotating blue teapot
+                            {
+                                type: "rotate",
+                                id: "teapot-pitch",
+                                angle: 180.0,
+                                x: 1.0,
+
+                                nodes: [
+                                    {
+                                        type: "rotate",
+                                        id: "teapot-yaw",
+                                        angle: 0.0,
+                                        y: 1.0,
+
+                                        nodes: [
+                                            {
+                                                type: "material",
+                                                color: { r: 0.5, g: 0.5, b: 1.0 },
+
+                                                nodes: [
+
+                                                    // Node type implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                                    {
+                                                        type: "geometry/teapot"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // Second stage
+            // Using a custom shader, renders a geometry with the color target as texture,
+            // while applying a scanlines post-effect.
+            {
+                type: "stage",
+                priority: 2, // Perform this stage second
+
+                nodes: [
+
+                    // Texture using our color target
+                    {
+                        type: "textureMap",
+                        target: "myColorTarget",
+
+                        nodes: [
+
+                            // Custom convolution shader
+                            {
+                                type: "shader",
+                                coreId: "shader/convolution",
+                                shaders: [
+                                    {
+                                        stage: "vertex",
+                                        code: [
+                                            "uniform vec2 uImageIncrement;",
+                                            "varying vec2 vUv;",
+                                            "attribute vec2 SCENEJS_aUVCoord;",
+                                            "attribute vec3 SCENEJS_aVertex;",
+                                            "void main() {",
+                                            "   vUv = SCENEJS_aUVCoord - ( ( 25.0 - 1.0 ) / 2.0 ) * uImageIncrement;",
+                                            "   gl_Position = vec4( SCENEJS_aVertex, 1.0 );",
+                                            "}"
+                                        ]
+                                    },
+                                    {
+                                        stage: "fragment",
+                                        code: [
+                                            "precision highp float;",
+                                            "uniform float cKernel[25];",
+                                            "uniform sampler2D SCENEJS_uSampler0;",
+                                            "uniform vec2 uImageIncrement;",
+                                            "varying vec2 vUv;",
+                                            "void main() {",
+                                            "   vec2 imageCoord = vUv;",
+                                            "   vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );",
+                                            "   for(int i = 0; i < 25; i++) {",
+                                            "       sum += texture2D(SCENEJS_uSampler0, imageCoord) * cKernel[i];",
+                                            "       imageCoord += uImageIncrement;",
+                                            "   }",
+                                            "   gl_FragColor = sum;",
+                                            "}"
+                                        ]
+                                    }
+                                ],
+                                params: {
+                                    "cKernal": buildKernel(4.0),
+                                    "uImageIncrement": [0.001953125, 0.0]
+                                },
+
+                                // Child nodes
+                                nodes: [
+
+                                    // Geometry - a quad to display our color target texture, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/quad.js
+                                    {
+                                        type: "geometry/quad"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Build convolution kernel
+
+    function buildKernel(sigma) {
+        // We lop off the sqrt(2 * pi) * sigma term, since we're going to normalize anyway.
+        function gauss(x, sigma) {
+            return Math.exp(-( x * x ) / ( 2.0 * sigma * sigma ));
+        }
+
+        var i;
+        var kMaxKernelSize = 25;
+        var kernelSize = 2 * Math.ceil(sigma * 3.0) + 1;
+        if (kernelSize > kMaxKernelSize) {
+            kernelSize = kMaxKernelSize;
+        }
+        var halfWidth = ( kernelSize - 1 ) * 0.5;
+        var values = new Array(kernelSize);
+        var sum = 0.0;
+        for (i = 0; i < kernelSize; ++i) {
+            values[ i ] = gauss(i - halfWidth, sigma);
+            sum += values[ i ];
+        }
+        // normalize the kernel
+        for (i = 0; i < kernelSize; ++i) {
+            values[ i ] /= sum;
+        }
+        return values;
+    }
+
+
+    // Spin the teapot
+
+    var teapotPitch = scene.getNode("teapot-pitch");
+    var teapotYaw = scene.getNode("teapot-yaw");
+
+    scene.on("tick",
+            function () {
+                teapotYaw.inc("angle", 1);
+                teapotPitch.inc("angle", .3);
+
+            });
+
+
+</script>
+</body>
+</html>

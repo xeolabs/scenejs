@@ -1,3 +1,9 @@
+/**
+ Vertex displacement wobble shader
+
+ @author xeolabs / http://xeolabs.com
+
+ */
 SceneJS.Types.addType("shader/wobble", {
 
     construct:function (params) {

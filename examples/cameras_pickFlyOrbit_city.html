@@ -38,19 +38,17 @@
         }
     </style>
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
 
-<div id="info">
-    <b>SceneJS experimental <a href="http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js" target="other">camera
-        plugin</a></b>
-    <ul>
-        <li>Click on a building to fly to it</li>
-        <li>Mouse drag to orbit</li>
-        <li>Mouse wheel to zoom</li>
-        <li>Try clicking on the horizon</li>
-        <li>Try clicking while zoomed-in close - trippy!</li>
-    </ul>
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - pick-fly-orbit camera using a <a href="../api/latest/plugins/node/cameras/pickFlyOrbit.js" target="_other">cameras/pickFlyOrbit</a> node
+    <br>
+    click on something to fly to that point
+    <br>
+    drag mouse to orbit it, mouse wheel to zoom in and out
 </div>
 
 <script>
@@ -72,11 +70,10 @@
             // http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js
             {
                 type: "cameras/pickFlyOrbit",
-                yaw: -0,
-                pitch: -40,
-                eye: { x: -10, y: 50, z: -100 },
-                look: { x: -10, y: 50, z: 0 },
-                zoomSensitivity: 20.0,
+                yaw: -30,
+                pitch: -20,
+                zoom: 300,
+                zoomSensitivity: 25.0,
                 showCursor: true,
                 cursorSize: 2.0,
 
@@ -92,6 +89,12 @@
                     // http://scenejs.org/api/latest/plugins/node/ground/grid.js
                     {
                         type: "models/ground/grid"
+                    },
+
+                    // Skybox node, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/skybox/grimmNight.js
+                    {
+                        type: "skybox/clouds"
                     }
                 ]
             }

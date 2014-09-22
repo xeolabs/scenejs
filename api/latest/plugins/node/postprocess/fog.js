@@ -1,6 +1,8 @@
 /**
  * Depth-of-Field postprocess effect
  *
+ * IN DEVELOPMENT
+ *
  */
 SceneJS.Types.addType("postprocess/dof", {
 

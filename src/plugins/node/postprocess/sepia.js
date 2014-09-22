@@ -1,6 +1,26 @@
 /**
- * Depth-of-Field postprocess effect
- *
+ Sepia tone postprocess effect
+
+ @author xeolabs / http://xeolabs.com
+
+ <pre>
+
+ // Create sepia effect around a procedurally-generated city
+
+ var dof = myScene.addNode({
+     type: "postprocess/sepia",
+
+     nodes: [
+
+        // City, implemented by plugin at
+        // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
+        {
+            type: "models/buildings/city",
+            width: 600
+        }
+     ]
+ });
+ </pre>
  */
 SceneJS.Types.addType("postprocess/sepia", {
 

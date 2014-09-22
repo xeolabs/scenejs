@@ -1,0 +1,1 @@
+Library of various node type plugins that provide scene objects

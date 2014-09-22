@@ -1,6 +1,8 @@
 /**
  * Skybox node type, with a cloudy Miramar beachscape background
  *
+ * @author xeolabs / http://xeolabs.com
+ *
  * Usage example:
  *
  * someNode.addNode({

@@ -1,11 +1,15 @@
 /**
  * Slime ground node type
  *
- * Usage example:
+ * @author xeolabs / http://xeolabs.com
  *
+ * <p>Usage example:</p>
+ *
+ * <pre>
  * someNode.addNode({
  *      type: "models/ground/slime"
  *  });
+ * </pre>
  */
 SceneJS.Types.addType("models/ground/slime", {
     construct: function (params) {

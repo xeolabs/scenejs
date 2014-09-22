@@ -1,12 +1,26 @@
 /**
- * Reflection map of a street in London
- *
- * Usage example:
- *
- * someNode.addNode({
- *      type: "reflect/london",
- *      intensity: 0.2
- *  });
+ Reflection map of a London street scene
+
+ @author xeolabs / http://xeolabs.com
+
+ <p>Usage example:</p>
+
+ <pre>
+ someNode.addNode({
+       type: "reflect/london",
+       intensity: 0.2,
+
+       nodes: [
+
+            // Box, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+            {
+                type: "geometry/box",
+                width: 600
+            }
+        ]
+   });
+ </pre>
  */
 SceneJS.Types.addType("reflect/london", {
 

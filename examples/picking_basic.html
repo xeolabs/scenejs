@@ -27,14 +27,21 @@
             z-index: 100000;
         }
     </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 </head>
 
-<script src="../api/latest/scenejs.js"></script>
 <body>
 
-<!-- Shows each pick hit -->
-<div id="info">Click on an object to pick it
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - picking
+    <br>
+    click on a teapot to pick it
+    <br>
+    learn more in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
 </div>
+
+<div id="pickInfo"></div>
 
 <script>
 
@@ -113,12 +120,12 @@
     // Pick hit handler
     // Shows pick info in an HTML element
 
-    var info = document.getElementById("info");
+    var pickInfo = document.getElementById("pickInfo");
 
     myScene.on("pick",
             function (hit) {
 
-                info.innerHTML = "Pick hit: " + JSON.stringify(hit);
+                pickInfo.innerHTML = "Pick hit: " + JSON.stringify(hit);
 
                 // To illustrate, these are the params to expect on the pick hit:
                 var name = hit.name;
@@ -131,7 +138,7 @@
     // Called when nothing picked
     myScene.on("nopick",
             function (hit) {
-                info.innerHTML = "Nothing picked.";
+                pickInfo.innerHTML = "Nothing picked.";
             });
 
     // Mouse event handling to do a pick on each mouse click

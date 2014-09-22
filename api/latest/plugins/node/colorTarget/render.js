@@ -1,5 +1,9 @@
 /**
  * Renders a colorTarget to the entire canvas.
+ *
+ * @author xeolabs / http://xeolabs.com
+ *
+ * <p>This is really just for debugging effects pipelines that use colorTargets.</p>
  */
 SceneJS.Types.addType("colorTarget/render", {
 

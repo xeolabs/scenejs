@@ -1,3 +1,9 @@
+/**
+    A building model
+
+    @author xeolabs / http://xeolabs.com
+
+ */
 (function () {
 
     var buildingTypes = initBuildingTypes();

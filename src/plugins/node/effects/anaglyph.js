@@ -1,6 +1,8 @@
 /**
  Anaglyph effect node
 
+ @author xeolabs / http://xeolabs.com
+
  <p>Usage example:</p>
 
  <pre>

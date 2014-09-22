@@ -2,6 +2,10 @@
  * Web worker containing an instance of a frustum culling engine implemented
  * in frustumCullEngine.js
  *
+ *
+ * @author xeolabs / http://xeolabs.com
+ *
+ *
  * This worker accepts various commands to configure the engine, add or remove
  * bodies, and integrate, which means find and changes in frustum intersection
  * status and projected canvas size of the bodies.

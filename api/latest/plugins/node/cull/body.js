@@ -1,3 +1,9 @@
+/**
+ * Basic frustim visibility and detail clipping body
+ *
+ * @author xeolabs / http://xeolabs.com
+ *
+ */
 require([
     // Prefix routes to plugin support libs
     "scenejsPluginDeps/frustum/frustumCullSystemPool"

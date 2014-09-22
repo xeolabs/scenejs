@@ -15,8 +15,23 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - physics materials
+    <br>
+    four physics systems, each in its own web worker.
+    <br>
+    in each system, there is a single set of material attributes
+    <br>
+    (restitution, mass etc) that is shared by all the bodies in that system
+    <br>
+    learn more in <a href="http://xeolabs.com/articles/scenejs-physics/" target="_other">this tutorial</a>
+</div>
+div>
 
 <script>
 
@@ -33,59 +48,59 @@
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"../api/latest/plugins"
+    pluginPath: "../api/latest/plugins"
 });
 
 // Create scene
 var scene = SceneJS.createScene({
-    nodes:[
+    nodes: [
 
         // Mouse-orbited camera, implemented by plugin at
         // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
         {
-            type:"cameras/orbit",
-            yaw:30,
-            pitch:-30,
-            zoom:200,
-            zoomSensitivity:10.0,
+            type: "cameras/orbit",
+            yaw: 30,
+            pitch: -30,
+            zoom: 200,
+            zoomSensitivity: 10.0,
 
-            nodes:[
+            nodes: [
                 {
-                    type:"physics/material",
-                    restitution:2.0,
-                    friction:0.5,
+                    type: "physics/material",
+                    restitution: 2.0,
+                    friction: 0.5,
 
-                    nodes:[
+                    nodes: [
                         makeSimulation(-50, -50, 50, "mySystem1")
                     ]
                 },
 
                 {
-                    type:"physics/material",
-                    restitution:0.9,
-                    friction:0.4,
+                    type: "physics/material",
+                    restitution: 0.9,
+                    friction: 0.4,
 
-                    nodes:[
+                    nodes: [
                         makeSimulation(+50, -50, 50, "mySystem2")
                     ]
                 },
 
                 {
-                    type:"physics/material",
-                    restitution:0.5,
-                    friction:0.1,
+                    type: "physics/material",
+                    restitution: 0.5,
+                    friction: 0.1,
 
-                    nodes:[
+                    nodes: [
                         makeSimulation(+50, +50, 50, "mySystem3")
                     ]
                 },
 
                 {
-                    type:"physics/material",
-                    restitution:0.001,
-                    friction:1.0,
+                    type: "physics/material",
+                    restitution: 0.001,
+                    friction: 1.0,
 
-                    nodes:[
+                    nodes: [
                         makeSimulation(-50, +50, 50, "mySystem4")
                     ]
                 }
@@ -97,19 +112,19 @@ var scene = SceneJS.createScene({
 
 function makeSimulation(x, z, numBodies, systemId) {
     return {
-        type:"translate",
-        x:x,
-        z:z,
+        type: "translate",
+        x: x,
+        z: z,
 
-        nodes:[
+        nodes: [
 
             // Optional physics system configs, implemented by plugin at
             // http://scenejs.org/api/latest/plugins/node/physics/system.js
             {
-                type:"physics/system",
-                systemId:systemId,
-                gravity:[0, -9, 0, 0],
-                solver:"ACCUMULATED" // Options are "ACCUMULATED" (default) or "FAST", "NORMAL"
+                type: "physics/system",
+                systemId: systemId,
+                gravity: [0, -9, 0, 0],
+                solver: "ACCUMULATED" // Options are "ACCUMULATED" (default) or "FAST", "NORMAL"
             },
 
             // Ground plane
@@ -117,48 +132,48 @@ function makeSimulation(x, z, numBodies, systemId) {
             // Physics body, implemented by plugin at
             // http://scenejs.org/api/latest/plugins/node/physics/body.js
             {
-                type:"physics/body",
+                type: "physics/body",
 
-                systemId:systemId,
+                systemId: systemId,
 
-                shape:"plane",
+                shape: "plane",
 
                 // Points upwards
-                dir:[0, 1, 0],
-                width:100,
-                depth:100,
-                height:0,
+                dir: [0, 1, 0],
+                width: 100,
+                depth: 100,
+                height: 0,
 
                 // Fixed at origin
-                pos:[0, 0, 0],
+                pos: [0, 0, 0],
 
                 // Ground does not move
-                velocity:[0, 0, 0],
+                velocity: [0, 0, 0],
 
                 // Mass not relevant for unmoving object?
-                mass:0.0,
+                mass: 0.0,
 
                 // Specify that this body is not able to move
-                movable:false,
+                movable: false,
 
                 // Child nodes will be translated and rotated according to
                 // the body's behaviour within the physics system
 
-                nodes:[
+                nodes: [
 
                     // Blue color for ground plane
                     {
-                        type:"material",
-                        color:{ r:0.8, g:0.8, b:1.0 },
-                        nodes:[
+                        type: "material",
+                        color: { r: 0.8, g: 0.8, b: 1.0 },
+                        nodes: [
 
                             // Grid ground plane geometry, implemented by plugin at
                             // http://scenejs.org/api/latest/plugins/node/geometry/grid.js
                             {
-                                type:"geometry/grid",
-                                size:{ x:50, z:50 },
-                                xSegments:100,
-                                zSegments:100
+                                type: "geometry/grid",
+                                size: { x: 50, z: 50 },
+                                xSegments: 100,
+                                zSegments: 100
                             }
                         ]
                     }
@@ -169,8 +184,8 @@ function makeSimulation(x, z, numBodies, systemId) {
 
             // A bunch of physics bodies wrapping colored spheres
             {
-                type:"node",
-                nodes:makeBodies(numBodies, systemId)
+                type: "node",
+                nodes: makeBodies(numBodies, systemId)
             }
         ]
     };
@@ -187,54 +202,54 @@ function makeBodies(numBodies, systemId) {
                 // Physics body primitive, implemented by plugin at
                 // http://scenejs.org/api/latest/plugins/node/physics/body.js
                 {
-                    type:"physics/body",
+                    type: "physics/body",
 
-                    systemId:systemId,
+                    systemId: systemId,
 
-                    shape:"sphere",
+                    shape: "sphere",
 
                     // Sphere radius
-                    radius:1.0,
+                    radius: 1.0,
 
-                    pos:[
+                    pos: [
                         Math.random() * 5 - 2.5,
                         Math.random() * 200 + 50,
                         Math.random() * 5 - 2.5
                     ],
 
                     // Body is just passively falling from a height
-                    velocity:[0, 0, 0],
+                    velocity: [0, 0, 0],
 
                     //
-                    mass:1.0,
+                    mass: 1.0,
 
                     // Specify that this body is able to move
-                    movable:true,
+                    movable: true,
 
                     // The coefficient of restitution (COR) of two colliding objects is a
                     // fractional value representing the ratio of speeds after and before
                     // an impact, taken along the line of the impact.
                     //
                     // This body will be bouncy.
-                    restitution:0.9,
+                    restitution: 0.9,
 
                     // Low friction
-                    friction:0.1,
+                    friction: 0.1,
 
                     // Child node will be translated and rotated according to
                     // the body's behaviour within the physics system
-                    nodes:[
+                    nodes: [
                         {
-                            type:"material",
-                            color:{ r:Math.random(), g:Math.random(), b:Math.random() },
+                            type: "material",
+                            color: { r: Math.random(), g: Math.random(), b: Math.random() },
 
-                            nodes:[
+                            nodes: [
 
                                 // Sphere primitive, implemented by plugin at
                                 // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
                                 {
-                                    type:"geometry/sphere",
-                                    radius:1
+                                    type: "geometry/sphere",
+                                    radius: 1
                                 }
                             ]
                         }

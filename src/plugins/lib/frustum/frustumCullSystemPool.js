@@ -1,5 +1,8 @@
 /**
  * Container of frustum culling systems
+ *
+ * @author xeolabs / http://xeolabs.com
+ *
  */
 define([
     // Prefix routes to plugin support libs

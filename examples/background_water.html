@@ -15,9 +15,15 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
 <body>
+
+<div id="info">
+    SceneJS - Using the <a href="../api/latest/plugins/node/background/water.js" target="_other">background/water</a> node<br>
+    to create a procedurally-textured water background
+</div>
 
 <script>
 
@@ -35,7 +41,7 @@
             // Water background node, implemented by plugin at
             // http://scenejs.org/api/latest/plugins/node/backgrounds/water.js
             {
-                type:"background/water"
+                type:"models/backgrounds/water"
             },
 
             // Mouse-orbited camera, implemented by plugin at

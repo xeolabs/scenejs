@@ -1,6 +1,7 @@
 /**
  * Lens distortion blur
  *
+ * IN DEVELOPMENT
  */
 SceneJS.Types.addType("postprocess/lens", {
 

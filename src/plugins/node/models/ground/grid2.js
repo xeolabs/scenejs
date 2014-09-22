@@ -1,11 +1,15 @@
 /**
  * Grid ground node type
  *
- * Usage example:
+ * @author xeolabs / http://xeolabs.com
  *
+ * <p>Usage example:</p>
+ *
+ * <pre>
  * someNode.addNode({
  *      type: "models/ground/grid2"
  *  });
+ * </pre>
  */
 SceneJS.Types.addType("models/ground/grid2", {
     construct: function (params) {
@@ -20,12 +24,12 @@ SceneJS.Types.addType("models/ground/grid2", {
                 "        void main( void ) {",
                 "            vec2 pos = ( gl_FragCoord.xy / resolution.xy );",
                 "            if(min(fract(pos.x*100.0),fract(pos.y*100.0))<0.15){",
-                //"                gl_FragColor = vec4(fract(pos.x+pos.y-time));",
-                "                gl_FragColor =  vec4(1);",
+                "                gl_FragColor = vec4(fract(pos.x+pos.y-time*0.001));",
+                //"                gl_FragColor =  vec4(1);",
                 "            }",
                 "        }"
             ],
-            resolution:[10000,10000],
+            resolution:[1000,1000],
             nodes: [
                 {
                     type: "rotate",
@@ -35,9 +39,9 @@ SceneJS.Types.addType("models/ground/grid2", {
                     nodes: [
                         {
                             type: "scale",
-                            x: 10000,
-                            y: 10000,
-                            z: 10000,
+                            x: 1000,
+                            y: 1000,
+                            z: 1000,
 
                             nodes: [
 

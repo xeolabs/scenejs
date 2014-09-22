@@ -1,8 +1,11 @@
 /**
  * Box geometry node type
  *
- * Usage example:
+ * @author xeolabs / http://xeolabs.com
  *
+ * <p>Usage example:</p>
+ *
+ * <pre>
  * someNode.addNode({
  *      type: "geometry/box",
  *      xSize: 10,
@@ -10,6 +13,7 @@
  *      zSize: 1.5,
  *      wire: false // Default
  *  });
+ *  </pre>
  */
 (function () {
 

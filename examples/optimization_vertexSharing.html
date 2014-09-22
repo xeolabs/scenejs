@@ -15,8 +15,18 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - optimization - vertex sharing
+    <br>
+    two face index arrays (ie two objects) sharing same UV, normal and position arrays
+    <br>
+    resulting in less VBO binds per draw call
+</div>
 
 <script>
 
@@ -29,34 +39,34 @@
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"../api/latest/plugins"
+    pluginPath: "../api/latest/plugins"
 });
 
 // Create scene
 SceneJS.createScene({
-    nodes:[
+    nodes: [
 
         // Mouse-orbited camera, implemented by plugin at
         // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
         {
-            type:"cameras/orbit",
-            yaw:30,
-            pitch:-30,
-            zoom:-10,
-            zoomSensitivity:1.0,
+            type: "cameras/orbit",
+            yaw: 30,
+            pitch: -30,
+            zoom: -10,
+            zoomSensitivity: 1.0,
 
-            nodes:[
+            nodes: [
 
                 // Root Geometry defines vertex and uv arrays which are shared
                 // among index arrays on sub-Geometry's
                 //
                 {
-                    type:"geometry",
+                    type: "geometry",
 
                     // The vertices - eight for our cube, each
                     // one spanning three array elements for X,Y and Z
                     //
-                    positions:[
+                    positions: [
 
                         // v0-v1-v2-v3 front
                         2, 2, 2,
@@ -96,7 +106,7 @@ SceneJS.createScene({
                     ],
 
                     // Normal vectors, one for each vertex
-                    normals:[
+                    normals: [
 
                         // v0-v1-v2-v3 front
                         0, 0, -1,
@@ -139,7 +149,7 @@ SceneJS.createScene({
                     // 3D positions defined above - eight for our cube, each
                     // one spaining two array elements for X and Y
                     //
-                    uv:[
+                    uv: [
 
                         // v0-v1-v2-v3 front
                         5, 5,
@@ -177,31 +187,31 @@ SceneJS.createScene({
                         5, 5,
                         0, 5
                     ],
-                    nodes:[
+                    nodes: [
 
                         // Brick wall color map
                         {
-                            type:"texture",
-                            layers:[
+                            type: "texture",
+                            layers: [
                                 {
-                                    uri:"textures/BrickWall.jpg",
-                                    wrapS:"repeat",
-                                    wrapT:"repeat",
+                                    uri: "textures/BrickWall.jpg",
+                                    wrapS: "repeat",
+                                    wrapT: "repeat",
 
                                     // Texture scale factors
-                                    scale:{
-                                        x:.1,
-                                        y:.05
+                                    scale: {
+                                        x: .1,
+                                        y: .05
                                     }
                                 }
                             ],
 
-                            nodes:[
+                            nodes: [
                                 {
-                                    type:"geometry",
+                                    type: "geometry",
 
                                     // Indices for first three faces
-                                    indices:[
+                                    indices: [
 
                                         // Front
                                         0, 1, 2,
@@ -219,20 +229,20 @@ SceneJS.createScene({
                             ]
                         },
                         {
-                            type:"texture",
-                            layers:[
+                            type: "texture",
+                            layers: [
                                 {
-                                    uri:"textures/general-zod.jpg",
-                                    wrapS:"repeat",
-                                    wrapT:"repeat"
+                                    uri: "textures/general-zod.jpg",
+                                    wrapS: "repeat",
+                                    wrapT: "repeat"
                                 }
                             ],
-                            nodes:[
+                            nodes: [
                                 {
-                                    type:"geometry",
+                                    type: "geometry",
 
                                     // Indices for remaining three faces
-                                    indices:[
+                                    indices: [
 
                                         // Left
                                         12, 13, 14,

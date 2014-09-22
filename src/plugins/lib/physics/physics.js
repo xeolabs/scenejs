@@ -1,5 +1,8 @@
 /**
  * Container of physics systems
+ *
+ * @author xeolabs / http://xeolabs.com
+ *
  */
 define(
     function () {

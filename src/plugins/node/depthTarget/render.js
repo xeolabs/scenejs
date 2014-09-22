@@ -1,5 +1,7 @@
 /**
  * Renders a depthTarget to the entire canvas, drawing each pixel as greyscale.
+ *
+ * @author xeolabs / http://xeolabs.com
  */
 SceneJS.Types.addType("depthTarget/render", {
 

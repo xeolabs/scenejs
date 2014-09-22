@@ -16,9 +16,16 @@
 
     <script src="../api/latest/scenejs.js"></script>
     <script src="libs/dat.gui.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - Stereo effect with orbiting camera
+    <br>
+    drag mouse to orbit it, mouse wheel to zoom in and out
+</div>
 
 <script>
 
@@ -46,6 +53,7 @@
                 zoomSensitivity: 1.0,
                 eye: { x: 0, y: 0, z: 10 },
                 look: { x: 0, y: 0, z: 0 },
+                spin: 0.1, // Spin slowly
 
                 nodes: [
 

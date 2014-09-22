@@ -1,11 +1,15 @@
 /**
  * Water ground node type
  *
- * Usage example:
+ * @author xeolabs / http://xeolabs.com
  *
+ * <p>Usage example:</p>
+ *
+ * <pre>
  * someNode.addNode({
  *      type: "models/ground/water"
  *  });
+ * </pre>
  */
 SceneJS.Types.addType("models/ground/water", {
     construct: function (params) {

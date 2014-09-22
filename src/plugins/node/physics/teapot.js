@@ -1,8 +1,9 @@
 /**
- * A teapot geometry with rigid-body physics behavior
+ * A teapot with physics behaviour
  *
- * Documentation: https://github.com/xeolabs/scenejs/wiki/Physics
+ * @author xeolabs / http://xeolabs.com
  *
+ * <p>Documentation at: http://xeolabs.com/articles/scenejs-physics/</p>
  */
 SceneJS.Types.addType("physics/teapot", {
     construct:function (params) {

@@ -1,10 +1,11 @@
 /**
  * Camera that flies to ray-picked point on scene object
  *
- * Usage example
- * -------------
+ * @author xeolabs / http://xeolabs.com
  *
- * someNode.addNode({
+ * <p>Usage example</p>
+ *
+ * <pre>someNode.addNode({
  *      type: "cameras/pickFlyOrbit",
  *      eye:{ x: y:0 },
  *      look:{ y:0 },
@@ -14,9 +15,10 @@
  *      zoomSensitivity:10.0,
  *      showCursor: true
  * });
+ * </pre>
  *
- * The camera is initially positioned at the given 'eye' and 'look', then the distance of 'eye' is zoomed out
- * away from 'look' by the amount given in 'zoom', and then 'eye' is rotated by 'yaw' and 'pitch'.
+ * <p>The camera is initially positioned at the given 'eye' and 'look', then the distance of 'eye' is zoomed out
+ * away from 'look' by the amount given in 'zoom', and then 'eye' is rotated by 'yaw' and 'pitch'.</p>
  *
  */
 require([

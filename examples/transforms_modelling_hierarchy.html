@@ -13,8 +13,14 @@
         }
     </style>
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - modelling transform hierarchy demo
+</div>
 
 <script>
 
@@ -33,11 +39,11 @@ SceneJS.setConfigs({
 });
 
 // Create scene
-SceneJS.createScene({
+var scene = SceneJS.createScene({
     nodes: [
 
-        // Orbiting camera node, implemented by plugin at
-        // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+        // Model-viewing environment, implemented by plugin at:
+        // http://scenejs.org/api/latest/plugins/node/environments/modelView.js
         {
             type: "cameras/orbit",
             yaw: 30,
@@ -46,7 +52,6 @@ SceneJS.createScene({
             zoomSensitivity: 1.0,
 
             nodes: [
-
                 // Table
                 {
                     type: "translate",
@@ -168,9 +173,18 @@ SceneJS.createScene({
 
                                             nodes: [
 
-                                                // Box primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                // Procedural texture, implemented by plugin at:
+                                                // http://scenejs.org/api/latest/plugins/node/texture/procedural/fungus.js
                                                 {
-                                                    type: "geometry/box"
+                                                    type: "texture/procedural/fungus",
+
+                                                    nodes: [
+
+                                                        // Box primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                        {
+                                                            type: "geometry/box"
+                                                        }
+                                                    ]
                                                 }
                                             ]
                                         }
@@ -339,11 +353,12 @@ SceneJS.createScene({
                 // Transparent sphere
                 {
                     type: "translate",
-                    y: 2.0, x: -1.4, z: 1.4,
+                    id: "theSphere",
+                    y: 1.8, x: -1.4, z: 1.4,
                     nodes: [
                         {
                             type: "scale",
-                            x: 0.3, y: 0.3, z: 0.3,
+                            x: 0.5, y: 0.5, z: 0.5,
                             nodes: [
                                 {
                                     type: "flags",
@@ -352,13 +367,23 @@ SceneJS.createScene({
                                         {
                                             type: "material",
                                             color: { r: 0.4, g: 0.5, b: 0.4 },
-                                            alpha: 0.6,
+                                            specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                            alpha: 0.7,
 
                                             nodes: [
 
-                                                // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                // Procedural water texture, implemented by plugin at:
+                                                // http://scenejs.org/api/latest/plugins/node/texture/procedural/water.js
                                                 {
-                                                    type: "geometry/sphere"
+                                                    type: "texture/procedural/water",
+
+                                                    nodes: [
+
+                                                        // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                        {
+                                                            type: "geometry/sphere"
+                                                        }
+                                                    ]
                                                 }
                                             ]
                                         }
@@ -372,6 +397,17 @@ SceneJS.createScene({
         }
     ]
 });
+
+// Animate the bouncing sphere
+
+scene.getNode("theSphere",
+        function (theSphere) {
+
+            scene.on("tick",
+                    function (tick) {
+                        theSphere.setY(1.8 + Math.abs(Math.sin(tick.time * 0.001) * 3.0));
+                    });
+        });
 
 </script>
 </body>

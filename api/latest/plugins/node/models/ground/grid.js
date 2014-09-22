@@ -1,11 +1,35 @@
 /**
- * Grid ground node type
- *
- * Usage example:
- *
- * someNode.addNode({
- *      type: "models/ground/grid"
- *  });
+ A grid ground
+
+ @author xeolabs / http://xeolabs.com
+
+ <p>Usage example:</p>
+
+ <pre>
+ var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js
+            {
+                type: "cameras/pickFlyOrbit",
+                yaw: -30,
+                pitch: -20,
+                zoom: 300,
+                zoomSensitivity: 5.0,
+                showCursor: true,
+                cursorSize: 2.0,
+
+                nodes: [
+                    {
+                        type: "models/gound/grid"
+                    }
+                ]
+            }
+        ]
+    });
+ </pre>
+
  */
 SceneJS.Types.addType("models/ground/grid", {
     construct: function (params) {

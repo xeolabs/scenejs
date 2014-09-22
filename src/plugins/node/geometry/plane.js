@@ -1,14 +1,18 @@
 /**
  * Plane geometry node type
  *
- * Usage example:
+ * @author xeolabs / http://xeolabs.com
  *
+ * <p>Usage example:</p>
+ *
+ * <pre>
  * someNode.addNode({
  *      type: "geometry/plane",
  *      width: 10,
  *      height: 20,
  *      wire: false // Default
  *  });
+ *  </pre>
  */
 (function () {
 

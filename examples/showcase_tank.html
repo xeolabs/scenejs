@@ -16,13 +16,19 @@
 
     <script src="../api/latest/scenejs.js"></script>
 
-    <script type="application/x-javascript" src="models/sky.js"></script>
-    <script type="application/x-javascript" src="models/wireGrid.js"></script>
-    <script type="application/x-javascript" src="models/tank.js"></script>
     <script type="application/x-javascript" src="libs/sylvester.js"></script>
+
+    <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - Tank Program from the 1982 Disney motion picture "Tron" <br>
+    mouse wheel to control speed<br>
+    drag to orbit<br>
+    tank model by <a href="https://3dwarehouse.sketchup.com/user.html?id=1058361951245355501624136" target="_other">Katase</a>
+</div>
 
 <script>
 
@@ -42,8 +48,7 @@ var scene = SceneJS.createScene({
 
         // View transform - we've given it a globally-unique ID
         // so we can look it up and update it's properties from
-        // mouse input.
-
+        // mouse input
         {
             type: "lookAt",
             id: "theLookAt",
@@ -54,14 +59,12 @@ var scene = SceneJS.createScene({
                 // Depth-of-field blur effect, implemented by plugin at:
                 // http://scenejs.org/api/latest/plugins/node/postprocess/dof.js
                 {
-           //         type: "postprocess/dof",
+              //      type: "postprocess/dof",
                     id: "myDOF",
-                    texelSize: 0.00022,    // Size of one texel (1 / width, 1 / height)
-                    blurCoeff: 0.0084,	   // Calculated from the blur equation, b = ( f * ms / N )
-                    focusDist: 40.0,	   // The distance to the subject in perfect focus (= Ds)
-                    ppm: 10000,            // Pixels per millimetre
-                    near: 0.1,
-                    far: 10000.0,
+                    texelSize: 0.00022,     // Size of one texel (1 / width, 1 / height)
+                    blurCoeff: 0.0084,	    // Calculated from the blur equation, b = ( f * ms / N )
+                    ppm: 5000,              // Pixels per millimetre
+                    autofocus: true,        // Auto synch focus dist with lookat eye->look length
 
                     nodes: [
 
@@ -94,31 +97,111 @@ var scene = SceneJS.createScene({
 
                             nodes: [
 
+                                // Reflection of cloudy sky
+                                // http://scenejs.org/api/latest/plugins/node/reflect/clouds.js
                                 {
                                     type: "reflect/clouds",
-                                    intensity: 0.1,
+                                    intensity: 0.2,
+
                                     nodes: [
-                                        tankJSON,
-                                        wireGrid
+
+                                        // Tank,implemented by plugin at:
+                                        // http://scenejs.org/api/latest/plugins/node/models/vehicles/tank.js
+                                        {
+                                            type: "models/vehicles/tank",
+                                            id: "myTank"
+                                        }
                                     ]
-                                } ,
+                                },
+
+                                // Tank,implemented by plugin at:
+                                // http://scenejs.org/api/latest/plugins/node/models/ground/grid.js
                                 {
                                     type: "models/ground/grid"
                                 }
                             ]
-                        },
-
-                        // Skybox with custom texture, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
-                        {
-                            type: "skybox/clouds"
                         }
                     ]
+                },
+
+                // Skybox with custom texture, implemented by plugin at
+                // http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
+                {
+                    type: "skybox/clouds"
                 }
             ]
         }
     ]
 });
 
+
+function getBlocks() {
+    var nodes = [];
+    var extent = 4000;
+    var inc = extent / 20;
+    for (var x = -extent; x < extent; x += inc) {
+        for (var z = -extent; z < extent; z += inc) {
+            nodes.push({
+                type: "translate",
+                x: x,
+                y: 10,
+                z: z,
+                nodes: [
+                    {
+                        type: "scale", x: 20, y: 20, z: 20,
+                        nodes: [
+                            {
+                                type: "geometry/box"
+                            }
+                        ]
+                    }
+                ]
+            });
+        }
+    }
+
+    return  {
+        // Procedural color texture implemented by plugin at
+        // http://scenejs.org/api/latest/plugins/node/texture/procedural.js
+
+        type: "texture/procedural",
+        code: [
+            // Fragment shader from GLSL sandbox
+            "precision mediump float;",
+            "uniform vec2 resolution;",
+            "float hash(float x){",
+            "    return fract(sin(x) * 43758.23);",
+            "}",
+            "float hash21(vec2 uv) {",
+            "    return fract(sin(uv.x * 15.78 + uv.y * 35.14) * 43758.23);",
+            "}",
+            "mat2 m = mat2(15.78, 35.78, 75.39, 154.27);",
+            "vec2 hash22(vec2 uv){",
+            "    return fract(sin(m * uv) * 43758.23);",
+            "}",
+            "void main( void ) {",
+            "    vec2 uv = gl_FragCoord.xy / resolution  * 20.0; ",
+            "    vec2 g = floor(uv);",
+            "    vec2 f = fract(uv);",
+            "    float res = 1.0;",
+            "    for(int i = -1; i <= 1; i++){",
+            "        for(int j = -1; j <= 1; j++){",
+            "            vec2 b = vec2(i, j);",
+            "            vec2 v = b + hash22(g + b) - f;",
+            "            float d = length(v);",
+            "            res = min(d, res);",
+            "        }",
+            "    }",
+            "    float c = res;",
+            "    gl_FragColor = vec4(c*.4,c,c*.6,1.0);",
+            "}"
+        ],
+        nodes: [
+            { type: "material",
+                color: {r: 0.4, g: 0.4, b: 0.4 }, specular: 0.5, nodes: nodes }
+        ]
+    }
+}
 
 /*----------------------------------------------------------------------
  * Scene rendering loop and mouse handler stuff follows
@@ -233,11 +316,8 @@ canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
 scene.getNode("theLookAt", function (lookat) {
 
-    scene.getNode("tankPos",
-            function (tankTranslate) {
-
-                var tankDir = scene.getNode("tankRotate");
-                var tankGunDir = scene.getNode("tankGunRotate");
+    scene.getNode("myTank",
+            function (tank) {
 
                 scene.on("tick",
                         function () {
@@ -274,7 +354,7 @@ scene.getNode("theLookAt", function (lookat) {
 
                             if (speed) {
                                 tankPos.x += moveVec[0] * speed;
-                                tankPos.y += moveVec[1] * speed;
+                                //tankPos.y += moveVec[1] * speed;
                                 tankPos.z += moveVec[2] * speed;
                             }
 
@@ -290,17 +370,12 @@ scene.getNode("theLookAt", function (lookat) {
                             eye.y = tankPos.y + (trailVec[1] * 25);
                             eye.z = tankPos.z + (trailVec[2] * 25);
 
-                            lookat
-                                    .setEye(eye)
-                                    .setLook(tankPos);
+                            lookat.setEye(eye);
+                            lookat.setLook(tankPos);
 
-                            tankTranslate
-                                    .setX(tankPos.x)
-                                    .setZ(tankPos.z);
-
-                            tankDir.setAngle(tankYaw + 180 || 180);
-
-                            tankGunDir.setAngle(-tankYaw);
+                            tank.setPos(tankPos);
+                            tank.setDir(tankYaw + 180 || 180);
+                            tank.setGunDir(-tankYaw);
 
                             if (trailYaw > tankYaw) {
                                 trailYaw -= (((trailYaw - tankYaw) * 0.01)) + 0.1;

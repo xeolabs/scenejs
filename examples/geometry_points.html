@@ -15,9 +15,13 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 
-</head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - points geometry
+</div>
 
 <script>
 
@@ -42,8 +46,8 @@
                 nodes:[
                     {
                         type:"material",
-                        color:{ r:0.6, g:0.6, b:0.9 },
-                        emit:1.0,
+                        color:{ r:1.0, g:0.6, b:0.4 },
+                        emit:0.3,
                         nodes:[
 
                             // Geometry node which defines our point cloud
@@ -62,13 +66,13 @@
 
                                 // The vertices - eight for our cube, each
                                 // one spanning three array elements for X,Y and Z
-                                positions:createPoints(2000),
+                                positions:createPoints(6000),
 
                                 // Indices - these organise the
                                 // positions into geometric primitives in accordance
                                 // with the "primitive" parameter,
                                 // in this case an index for each point.
-                                indices:createIndices(2000)
+                                indices:createIndices(6000)
                             }
                         ]
                     }

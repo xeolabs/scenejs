@@ -1,7 +1,9 @@
 /**
- * Physics rigid-body
+ * A physics body
  *
- * Documentation: https://github.com/xeolabs/scenejs/wiki/Physics
+ * @author xeolabs / http://xeolabs.com
+ *
+ * <p>Documentation at: http://xeolabs.com/articles/scenejs-physics/</p>
  */
 require([
     // Prefix routes to plugin support libs

@@ -1,3 +1,9 @@
+/**
+ * Trivial example of a node type plugin
+ *
+ * @author xeolabs / http://xeolabs.com
+ *
+ */
 SceneJS.Types.addType("demos/color", {
 
     construct:function (params) {
@@ -25,6 +31,6 @@ SceneJS.Types.addType("demos/color", {
     },
 
     destruct:function () {
-        // Not used
+        // Not used in this example
     }
 });

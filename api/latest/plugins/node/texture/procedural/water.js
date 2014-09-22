@@ -1,6 +1,8 @@
 /**
  Procedural water texture
 
+ @author xeolabs / http://xeolabs.com
+
  <p>Usage: </p>
  <pre>
 

@@ -165,8 +165,7 @@ var files = {
     "configs": [
         "#SceneJS framework configs",
         "configs_pluginPath",
-        "configs_disableStatusPopups",
-        "configs_optimizations"
+        "configs_disableStatusPopups"
     ],
 
     "scenegraph": [
@@ -210,7 +209,7 @@ var files = {
 
         "#controlling the viewpoint",
         "cameras_orbit",
-        "cameras_path",
+        "cameras_orbit_spin",
         "cameras_pickFlyOrbit_city",
         "cameras_pickFlyOrbit_terrain"
     ],
@@ -337,6 +336,7 @@ var files = {
         "texture_procedural_color",
         "texture_procedural_color_mold",
         "texture_procedural_color_water",
+        "texture_procedural_color_grid",
         "texture_procedural_specular",
         "texture_procedural_alpha",
         "texture_procedural_emit",
@@ -346,6 +346,7 @@ var files = {
         "texture_rtt_depth",
         "texture_rtt_depthAndColor",
         "texture_rtt_heightmap",
+        "texture_rtt_sharedTexture",
         "texture_rtt_manyTextures",
         "texture_rtt_shader",
         "texture_rtt_withVideo",
@@ -366,6 +367,7 @@ var files = {
         "reflections_multipleCombined",
         "reflections_shinyRaptor",
         "reflections_manyObjects",
+        "reflections_heightmap",
         "reflections_withNormalMap",
         "reflections_withTransparency",
         "reflections_withSpecularMaterial",
@@ -435,6 +437,7 @@ var files = {
         "postprocessing_crt",
         "postprocessing_depthOfField",
         "postprocessing_depthOfField_autofocus",
+        "postprocessing_depthOfField_autofocus_grid",
         "postprocessing_filmGrain",
         "postprocessing_fog",
         "postprocessing_lens",
@@ -481,10 +484,9 @@ var files = {
 
     "benchmarks": [
         "#performance tests",
-        "benchmarks_5000boxes"
-//        ,
-//        "benchmarks_10000boxes",
-//        "benchmarks_40000boxes"
+        "benchmarks_5000boxes",
+        "benchmarks_10000boxes",
+        "benchmarks_40000boxes"
     ],
 
     "extending": [

@@ -14,8 +14,15 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - disabling status popups
+    <br>see, no popups!
+</div>
 
 <script>
 
@@ -25,41 +32,41 @@
     SceneJS.setConfigs({
 
         // Point SceneJS to the bundled plugins
-        pluginPath:"../api/latest/plugins",
+        pluginPath: "../api/latest/plugins",
 
         // Disable the default status popups
-        statusPopups:false
+        statusPopups: false
     });
 
     var scene = SceneJS.createScene({
-        nodes:[
+        nodes: [
 
             // Mouse-orbited camera,
             // implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
             {
-                type:"cameras/orbit",
-                yaw:30,
-                pitch:-30,
-                zoom:5,
-                zoomSensitivity:10.0,
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 2.0,
 
-                nodes:[
+                nodes: [
 
                     // Blue material
                     {
-                        type:"material",
-                        color:{ r:0.6, g:0.6, b:0.9 },
-                        nodes:[
+                        type: "material",
+                        color: { r: 0.6, g: 0.6, b: 0.9 },
+                        nodes: [
 
                             // Torus primitive,
                             // implemented by plugin at ../../../../api/latest/plugins/node/geometry/torus.js
                             {
-                                type:"geometry/torus",
-                                radius:1.0,
-                                tube:0.30,
-                                segmentsR:60,
-                                segmentsT:40,
-                                arc:Math.PI * 2
+                                type: "geometry/torus",
+                                radius: 1.0,
+                                tube: 0.30,
+                                segmentsR: 60,
+                                segmentsT: 40,
+                                arc: Math.PI * 2
                             }
                         ]
                     }

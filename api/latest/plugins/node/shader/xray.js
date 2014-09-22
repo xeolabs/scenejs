@@ -1,3 +1,9 @@
+/**
+ X-Ray shader
+
+ @author xeolabs / http://xeolabs.com
+
+ */
 SceneJS.Types.addType("shader/xray", {
 
     construct:function (params) {

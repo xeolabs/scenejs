@@ -1,13 +1,18 @@
 /**
- * Customizable skybox node type, which allows you to customize its texture
- *
- * Usage example:
- *
- * someNode.addNode({
- *      type: "skybox",
- *      texture: "foo/bar/mySkyboxTexture.jpg",
- *      size: 5000 // Box half-size on each axis - default is 5000
- *  });
+
+ Customizable skybox node type, which allows you to customize its texture
+
+ @author xeolabs / http://xeolabs.com
+
+ <p>Usage example:</p>
+
+ <pre>
+  someNode.addNode({
+       type: "skybox",
+       texture: "foo/bar/mySkyboxTexture.jpg",
+       size: 5000 // Box half-size on each axis - default is 5000
+   });
+ </pre>
  */
 SceneJS.Types.addType("skybox", {
 

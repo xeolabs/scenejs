@@ -15,9 +15,18 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
 <body>
+
+<div id="infoLight">
+    <a href="http://scenejs.org">SceneJS</a> - Oculus Rift effect with pick-fly-orbit camera
+    <br>
+    click on something to fly to that point
+    <br>
+    drag mouse to orbit it, mouse wheel to zoom in and out
+</div>
 
 <script>
 
@@ -52,6 +61,8 @@
                     // http://scenejs.org/api/latest/plugins/node/effects/oculusRift.js
                     {
                         type: "effects/oculusRift",
+                        eyeSep: 20.6,
+                        focalLength: 27,
 
                         nodes: [
 
@@ -70,12 +81,18 @@
 
                                 nodes: [
 
-                                    // Randomly scattered boxes, implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/geometry/randomObjects.js
+                                    // Tank,implemented by plugin at:
+                                    // http://scenejs.org/api/latest/plugins/node/models/vehicles/tank.js
                                     {
-                                        type: "geometry/randomObjects",
-                                        numObjects: 1000
+                                        type: "models/vehicles/tank"
                                     }
+//
+//                                    // Randomly scattered boxes, implemented by plugin at
+//                                    // http://scenejs.org/api/latest/plugins/node/geometry/randomObjects.js
+//                                    {
+//                                        type: "geometry/randomObjects",
+//                                        numObjects: 1000
+//                                    }
                                 ]
                             }
                         ]

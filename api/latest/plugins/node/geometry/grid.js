@@ -1,3 +1,19 @@
+/**
+  Grid geometry node type
+
+  @author xeolabs / http://xeolabs.com
+
+  <p>Usage example:</p>
+
+  <pre>
+  someNode.addNode({
+       type: "geometry/plane",
+       wire: false, // Default
+       widthSegments: 200, // Default
+       heightSegments: 200 // Default
+   });
+ </pre>
+ */
 SceneJS.Types.addType("geometry/grid", {
 
     construct:function (params) {

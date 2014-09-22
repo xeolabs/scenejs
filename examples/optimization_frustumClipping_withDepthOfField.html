@@ -16,9 +16,20 @@
 
     <script src="../api/latest/scenejs.js"></script>
     <script src="libs/stats.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - optimization - view frustum culling with depth-of-field
+    <br>
+    culling objects that fall outside the view frustum
+    <br>
+    culling engine runs in multiple web workers
+    <br>
+    learn more in <a href="http://xeolabs.com/articles/scenejs-detail-culling/"  target="_other">this tutorial</a>
+</div>
 
 
 <script>
@@ -50,12 +61,13 @@
                 pitch: -30,
                 zoom: 100,
                 zoomSensitivity: 20.0,
+                spin: 0.1, // Slowly spin about X axis
 
                 nodes: [
 
                         //
                     {
-                        type: "postprocess/dof",
+                        type: "effects/anaglyph",
                         texelSize: 0.00022,    // Size of one texel (1 / width, 1 / height)
                         blurCoeff: 0.0084,	   // Calculated from the blur equation, b = ( f * ms / N )
                         focusDist: 100.0,	   // The distance to the subject in perfect focus (= Ds)

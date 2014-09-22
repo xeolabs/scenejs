@@ -1,6 +1,8 @@
 /**
  Stereo effect node
 
+ @author xeolabs / http://xeolabs.com
+
  <p>Usage example:</p>
 
  <pre>
@@ -171,7 +173,6 @@ SceneJS.Types.addType("effects/stereo", {
         var DTOR = 0.0174532925;
         var radians = DTOR * aperture / 2;
         var wd2 = near * Math.tan(radians);
-        var countRenders = 0;
 
         // Eye separation vector, origin at left eye
         var sepVec;
@@ -264,8 +265,6 @@ SceneJS.Types.addType("effects/stereo", {
 
                         break;
                 }
-
-                countRenders++;
             });
     },
 

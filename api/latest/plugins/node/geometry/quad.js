@@ -1,12 +1,16 @@
 /**
  * Quad geometry node type
  *
- * Usage example:
+ *  @author xeolabs / http://xeolabs.com
  *
+ * <p>Usage example:</p>
+ *
+ * <pre>
  * someNode.addNode({
  *      type: "geometry/quad",
  *      wire: false // Default
  *  });
+ *  </pre>
  */
 (function () {
 

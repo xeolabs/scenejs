@@ -1,6 +1,8 @@
 /**
  * Skybox node type, with stormy clouds
  *
+ * @author xeolabs / http://xeolabs.com
+ *
  * Usage example:
  *
  * someNode.addNode({

@@ -1,8 +1,9 @@
 /**
  * Sphere geometry node type
  *
- * Usage example:
+ * <p>Usage example:</p>
  *
+ * <pre>
  * someNode.addNode({
  *      type: "geometry/sphere",
  *      latitudeBands: 30, // Default
@@ -10,6 +11,7 @@
  *      radius: 1, // Default
  *      wire: false // Default
  *  });
+ *  </pre>
  */
 (function () {
 
@@ -76,15 +78,6 @@
             for (var longNumber = 0; longNumber < longitudeBands; longNumber++) {
                 var first = (latNumber * (longitudeBands + 1)) + longNumber;
                 var second = first + longitudeBands + 1;
-//                indices.push(first);
-//                indices.push(second);
-//                indices.push(first + 1);
-//
-//                indices.push(second);
-//                indices.push(second + 1);
-//                indices.push(first + 1);
-
-
                 indices.push(first + 1);
                 indices.push(second + 1);
                 indices.push(second);

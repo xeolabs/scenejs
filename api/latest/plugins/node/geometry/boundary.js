@@ -1,14 +1,18 @@
 /**
  * Boundary geometry node type
  *
- * Usage example:
+ * @author xeolabs / http://xeolabs.com
  *
+ * <p>Usage example:</p>
+ *
+ * <pre>
  * someNode.addNode({
- *      type: "geometry/box",
+ *      type: "geometry/boundary",
  *      min: [-9, -3, -2],
  *      max: [2,3,12],
  *      wire: false // Default
  *  });
+ *  </pre>
  */
 (function () {
 

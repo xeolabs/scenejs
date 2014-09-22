@@ -1,6 +1,8 @@
 /**
  * Reflection map of a grid
  *
+ * @author xeolabs / http://xeolabs.com
+ *
  * Usage example:
  *
  * someNode.addNode({

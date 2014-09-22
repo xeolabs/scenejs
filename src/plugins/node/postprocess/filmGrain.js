@@ -2,6 +2,8 @@
 
  Film grain post-process effect
 
+ @author xeolabs / http://xeolabs.com
+
  <p>Usage:</p>
 
  <pre>

@@ -27,11 +27,21 @@
             z-index: 100000;
         }
     </style>
-</head>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 <body>
 
-<div id="info">
+<div id="infoLight">
+    <a href="http://scenejs.org">SceneJS</a> - automatic lost WebGL context recovery
+    <br>
+    learn more in <a href="http://xeolabs.com/articles/scenejs-webgl-context-lost/"  target="_other">this article</a>
+    <br>
+    <br>
+    <div id="infoTxt">
+    </div>
 </div>
+
+
 
 <script src="../api/latest/scenejs.js"></script>
 
@@ -394,7 +404,7 @@ scene.on("pick",
         });
 
 // Get message element
-var info = document.getElementById("info");
+var info = document.getElementById("infoTxt");
 
 // Subscribe to WebGL context loss and restore notifications from SceneJS
 SceneJS.on("webglcontextlost",

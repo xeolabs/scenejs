@@ -1,6 +1,8 @@
 /**
  * Reflection map of a holodeck
  *
+ * @author xeolabs / http://xeolabs.com
+ *
  * Usage example:
  *
  * someNode.addNode({

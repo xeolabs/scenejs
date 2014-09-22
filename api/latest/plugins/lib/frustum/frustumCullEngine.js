@@ -1,6 +1,8 @@
 //
 // 3D frustum culling engine
 //
+// @author xeolabs / http://xeolabs.com
+//
 // Has a view matrix, projection matrix, viewport and
 //
 // This file is supposed to  be loaded into a Web Worker, so everything's global

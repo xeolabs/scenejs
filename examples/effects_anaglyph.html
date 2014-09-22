@@ -16,9 +16,16 @@
 
     <script src="../api/latest/scenejs.js"></script>
     <script src="libs/dat.gui.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - Anaglyph 3D rendering<br>
+    uses the <a href="../api/latest/plugins/node/effects/anaglyph.js" target="_other">effects/anaglyph</a> node
+    <br>
+</div>
 
 <script>
 
@@ -44,6 +51,7 @@
                 pitch: -20,
                 zoom: 300,
                 zoomSensitivity: 10.0,
+                spin: 0.1, // Spin slowly about yaw
 
                 nodes: [
 

@@ -13,8 +13,13 @@
         }
     </style>
     <script src="../api/latest/scenejs.js"></script>
-</head>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 <body>
+
+<div id="infoLight">
+    <a href="http://scenejs.org">SceneJS</a> - <a href="../api/latest/plugins/node/texture/video.js" target="_other">video texture</a> applied to material emissivity
+</div>
 
 <script>
 
@@ -49,13 +54,21 @@
                                 color: { r: 0.2, g: 0.2, b: 0.2 },
                                 diffuse: true,
                                 specular: false
+                            },
+                            {
+                                mode: "dir",
+                                color: { r: 0.5, g: 0.5, b: 1.0 },
+                                diffuse: true,
+                                specular: true,
+                                dir: { x: 0.5, y: 0.5, z: -1.0 },
+                                space: "view"
                             }
                         ],
 
                         nodes: [
                             {
                                 type: "material",
-                                color: { r: 1.0, g: 1.0, b: 1.0 },
+                                color: { r: 1.0, g: 0.6, b: 0.6 },
                                 emit: 1.0,
                                 nodes: [
 

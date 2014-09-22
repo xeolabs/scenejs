@@ -1,8 +1,11 @@
 /**
  * Custom node which captures images of the scene canvas
  *
- * Usage example:
+ * @author xeolabs / http://xeolabs.com
  *
+ * <p>Usage example:</p>
+ *
+ * <pre>
  * someNode.addNode({
  *      type: "canvas/capture",
  *
@@ -37,6 +40,8 @@
  *             // or if not specified there, "jpeg"
  *             format: "jpeg"
  *        });
+ *
+ * </pre>
  */
 require([
 

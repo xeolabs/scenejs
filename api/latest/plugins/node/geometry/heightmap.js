@@ -1,8 +1,55 @@
+/**
+ Heightmap geometry
+
+ @author xeolabs / http://xeolabs.com
+
+ <p>Usage example:</p>
+
+ <pre>
+ myScene.addNode({
+     type: "material",
+     color: { r: 0.45, g: 0.3, b: 0.2 },
+
+     nodes: [
+
+         // Color map
+         {
+             type: "textureMap",
+             src: "textures/superman.jpg",
+             applyTo: "color",  // Apply to material "color" property (default)
+
+             nodes: [
+
+                 // Heightmap
+                 {
+                     type: "geometry/heightmap",
+
+                     // Texture image
+                     src: 'textures/heightmap.jpg',
+
+                     // Wireframe or solid - default is false
+                     wire: false,
+
+                     // Dimensions
+                     xSize: 1000,
+                     zSize: 1000,
+                     ySize: 120,
+
+                     // Segments on X and Z axis
+                     xSegments: 100,
+                     zSegments: 100
+                 }
+             ]
+         }
+     ]
+ });
+ </pre>
+ */
 (function () {
 
     SceneJS.Types.addType("geometry/heightmap", {
 
-        construct:function (params) {
+        construct: function (params) {
 
             if (!params.src) {
                 throw "heightmap param expected: src";
@@ -44,18 +91,18 @@
 
                     // Create geometry node
                     self.addNode({
-                        type:"rotate",
-                        x:1,
-                        angle:90,
-                        nodes:[
+                        type: "rotate",
+                        x: 1,
+                        angle: 90,
+                        nodes: [
                             {
-                                type:"geometry",
-                                primitive:wire ? "lines" : "triangles",
-                                positions:mesh.positions,
-                                normals:!wire ? "auto" : null, // Get SceneJS to compute the normals
-                                uv:!wire ? mesh.uv : null,
-                                indices:mesh.indices,
-                                coreId:"heightmap_" + (wire == true ? "wire_" : "") + params.zSize + "_" + params.xSize + "_" + params.ySize + "_" + params.xSegments + "_" + params.zSegments
+                                type: "geometry",
+                                primitive: wire ? "lines" : "triangles",
+                                positions: mesh.positions,
+                                normals: !wire ? "auto" : null, // Get SceneJS to compute the normals
+                                uv: !wire ? mesh.uv : null,
+                                indices: mesh.indices,
+                                coreId: "heightmap_" + (wire == true ? "wire_" : "") + params.zSize + "_" + params.xSize + "_" + params.ySize + "_" + params.xSegments + "_" + params.zSegments
                             }
                         ]
                     });
@@ -69,7 +116,7 @@
             image.src = params.src;
         },
 
-        destruct:function () {
+        destruct: function () {
             this._taskId = self.taskFinished(this._taskId);
         }
     });
@@ -156,9 +203,9 @@
         }
 
         return {
-            positions:positions,
-            uv:uvs,
-            indices:indices
+            positions: positions,
+            uv: uvs,
+            indices: indices
         };
     }
 })();

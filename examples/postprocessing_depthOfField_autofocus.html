@@ -50,10 +50,7 @@
                         type: "postprocess/dof",
                         texelSize: 0.00022, // Size of one texel (1 / width, 1 / height)
                         blurCoeff: 0.0084,	// Calculated from the blur equation, b = ( f * ms / N )
-                        focusDist: 500.0,	// The distance to the subject in perfect focus (= Ds)
                         ppm: 10000,         // Pixels per millimetre
-                        near: 0.1,
-                        far: 10000.0,
                         autofocus: true,    // Automatically synch focusDist to "cameras/pickFlyOrbit"
 
                         nodes: [

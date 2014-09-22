@@ -1,5 +1,8 @@
 /**
-  Quaternion transformation
+
+ Quaternion transformation
+
+ @author xeolabs / http://xeolabs.com
 
  <p>Usage: </p>
  <pre>

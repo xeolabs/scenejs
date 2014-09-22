@@ -1,6 +1,8 @@
 /**
  * Skybox node type, with an interstellar cloudy background
  *
+ * @author xeolabs / http://xeolabs.com
+ *
  * Usage example:
  *
  * someNode.addNode({

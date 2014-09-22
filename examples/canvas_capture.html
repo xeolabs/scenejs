@@ -15,8 +15,14 @@
         }
     </style>
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - periodic canvas capture
+</div>
 
 <!-- Canvas containing our scene -->
 <canvas id="mySceneCanvas" width="600px" height="600px"></canvas>
@@ -58,6 +64,7 @@
                 pitch:-30,
                 zoom:500,
                 zoomSensitivity:10.0,
+                spin: 0.1, // Slowly spin
 
                 nodes:[
 

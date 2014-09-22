@@ -1,6 +1,8 @@
 /**
  * 3DS importer plugin
  *
+ * @author xeolabs / http://xeolabs.com
+ *
  * Uses the K3D library to parse 3DS
  * © 2012 Ivan Kuckir
  * http://k3d.ivank.net/

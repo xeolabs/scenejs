@@ -1,17 +1,16 @@
 /**
+ Technicolor postprocess effect
 
- Technicolor post-process effect
-
- <p>Usage:</p>
+ @author xeolabs / http://xeolabs.com
 
  <pre>
 
  // Create technicolor effect around a procedurally-generated city
 
- var blur = myScene.addNode({
+ var dof = myScene.addNode({
      type: "postprocess/technicolor",
 
-      nodes: [
+     nodes: [
 
         // City, implemented by plugin at
         // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
@@ -21,9 +20,7 @@
         }
      ]
  });
-
  </pre>
-
  */
 SceneJS.Types.addType("postprocess/technicolor", {
 

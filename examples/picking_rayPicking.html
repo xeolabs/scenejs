@@ -27,44 +27,52 @@
             z-index: 100000;
         }
     </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 </head>
 
-<script src="../api/latest/scenejs.js"></script>
 <body>
 
-<!-- Shows each pick hit -->
-<div id="info">Click on an object to pick it
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - ray picking
+    <br>
+    click on an object to ray-pick it
+    <br>
+    uses a fast technique that uses the depth buffer to find 3D ray-object intersections
+    <br>
+    learn more in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
 </div>
 
 <script>
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // Define scene
     var scene = SceneJS.createScene({
-        nodes:[
+        nodes: [
             {
-                type:"lookAt", id:"myLookat", eye:{ x:10, y:5, z:15 }, look:{ x:0, y:1, z:0 },
-                nodes:[
+                type: "lookAt", id: "myLookat", eye: { x: 10, y: 5, z: 15 }, look: { x: 0, y: 1, z: 0 },
+                nodes: [
 
                     // Pickable blue teapot with name "blueTeapot"
                     {
-                        type:"name", name:"blueTeapot",
-                        nodes:[
+                        type: "name", name: "blueTeapot",
+                        nodes: [
                             {
-                                type:"material", color:{ r:0.3, g:0.3, b:1.0 },
-                                nodes:[
+                                type: "material", color: { r: 0.3, g: 0.3, b: 1.0 },
+                                nodes: [
                                     {
-                                        type:"translate", z:-4,
-                                        nodes:[
+                                        type: "translate", z: -4,
+                                        nodes: [
 
                                             // Teapot primitive, implemented by plugin at
                                             // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                             {
-                                                type:"geometry/teapot"
+                                                type: "geometry/teapot"
                                             }
                                         ]
                                     }
@@ -75,16 +83,16 @@
 
                     // Pickable yellow teapot with name "yellowTeapot"
                     {
-                        type:"name", name:"yellowTeapot",
-                        nodes:[
+                        type: "name", name: "yellowTeapot",
+                        nodes: [
                             {
-                                type:"material", color:{ r:1.0, g:1.0, b:0.3 },
-                                nodes:[
+                                type: "material", color: { r: 1.0, g: 1.0, b: 0.3 },
+                                nodes: [
 
                                     // Teapot primitive, implemented by plugin at
                                     // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                     {
-                                        type:"geometry/teapot"
+                                        type: "geometry/teapot"
                                     }
                                 ]
                             }
@@ -94,24 +102,24 @@
                     // Can't pick this teapot because it's wrapped with a flags
                     // node which disables picking. We'll give it a name anyway.
                     {
-                        type:"name", name:"unpickableTeapot",
-                        nodes:[
+                        type: "name", name: "unpickableTeapot",
+                        nodes: [
 
                             // Flag prevents picking on this teapot
                             {
-                                type:"flags", flags:{ picking:false, transparent: true },
-                                nodes:[
+                                type: "flags", flags: { picking: false, transparent: true },
+                                nodes: [
                                     {
-                                        type:"material", color:{ r:1.0, g:0.3, b:0.3 }, alpha: 0.5,
-                                        nodes:[
+                                        type: "material", color: { r: 1.0, g: 0.3, b: 0.3 }, alpha: 0.5,
+                                        nodes: [
                                             {
-                                                type:"translate", z:4,
-                                                nodes:[
+                                                type: "translate", z: 4,
+                                                nodes: [
 
                                                     // Teapot primitive, implemented by plugin at
                                                     // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                                     {
-                                                        type:"geometry/teapot"
+                                                        type: "geometry/teapot"
                                                     }
                                                 ]
                                             }
@@ -155,25 +163,25 @@
     function showHit(hit) {
         scene.getNode("myLookat")
                 .addNode({
-                    type:"material",
-                    color:{ r:1, g:0.3, b:0.3 },
-                    nodes:[
+                    type: "material",
+                    color: { r: 1, g: 0.3, b: 0.3 },
+                    nodes: [
                         {
-                            type:"translate",
-                            x:hit.worldPos[0],
-                            y:hit.worldPos[1],
-                            z:hit.worldPos[2],
-                            nodes:[
+                            type: "translate",
+                            x: hit.worldPos[0],
+                            y: hit.worldPos[1],
+                            z: hit.worldPos[2],
+                            nodes: [
                                 {
-                                    type:"scale",
-                                    x:0.1,
-                                    y:0.1,
-                                    z:0.1,
-                                    nodes:[
+                                    type: "scale",
+                                    x: 0.1,
+                                    y: 0.1,
+                                    z: 0.1,
+                                    nodes: [
 
                                         // Sphere primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
                                         {
-                                            type:"geometry/sphere"
+                                            type: "geometry/sphere"
                                         }
                                     ]
                                 }
@@ -223,7 +231,7 @@
     }
 
     function pick(canvasX, canvasY) {
-        scene.pick(canvasX, canvasY, { rayPick:true });
+        scene.pick(canvasX, canvasY, { rayPick: true });
     }
 
 </script>

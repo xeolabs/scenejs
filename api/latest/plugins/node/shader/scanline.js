@@ -1,3 +1,9 @@
+/**
+ Scanlines shader
+
+ @author xeolabs / http://xeolabs.com
+
+ */
 SceneJS.Types.addType("shader/scanline", {
 
     construct: function (params) {

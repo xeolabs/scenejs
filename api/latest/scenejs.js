@@ -8039,7 +8039,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
 
         if (flags.transparent != undefined) {
             core.transparent = !!flags.transparent;
-            this._engine.display.drawListDirty = true;
+            this._engine.display.stateSortDirty = true;
         }
 
         if (flags.backfaces != undefined) {
@@ -8160,7 +8160,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         transparent = !!transparent;
         if (this._core.transparent != transparent) {
             this._core.transparent = transparent;
-            this._engine.display.drawListDirty = true;
+            this._engine.display.stateOrderDirty = true;
         }
         return this;
     };
@@ -9449,11 +9449,11 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
             branchDirty = true;
         }
 
-        if (cfg.specular != light.specular) {
+        if (cfg.specular != undefined && cfg.specular != light.specular) {
             light.specular = cfg.specular;
             branchDirty = true;
         }
-        if (cfg.diffuse != light.diffuse) {
+        if (cfg.diffuse != undefined && cfg.diffuse != light.diffuse) {
             light.diffuse = cfg.diffuse;
             branchDirty = true;
         }
@@ -12845,13 +12845,15 @@ new (function () {
                 applyTo: !!params.applyTo ? params.applyTo : "baseColor",
                 blendMode: !!params.blendMode ? params.blendMode : "multiply",
                 blendFactor: (params.blendFactor != undefined && params.blendFactor != null) ? params.blendFactor : 1.0,
-                translate: { x: 0, y: 0},
-                scale: { x: 1, y: 1 },
-                rotate: 0,
+                translate: params.translate ? SceneJS._apply(params.translate, { x: 0, y: 0}) : {x: 0, y: 0},
+                scale: params.scale ? SceneJS._apply(params.scale, { x: 1, y: 1}) : {x: 1, y: 1},
+                rotate: params.rotate || 0,
                 matrix: null,
-                _matrixDirty: false,
+                _matrixDirty: true,
                 buildMatrix: buildMatrix
             });
+
+            this._core.buildMatrix.call(this._core);
 
             if (params.src) { // Load from URL
                 this._core.src = params.src;
@@ -13089,7 +13091,7 @@ new (function () {
 
     SceneJS.TextureMap.prototype.getMatrix = function () {
         if (this._core._matrixDirty) {
-            this._core.buildMatrix()
+            this._core.buildMatrix.call(this.core)()
         }
         return this.core.matrix;
     };
@@ -15212,6 +15214,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);
+    gl.disable(gl.BLEND);
 
     if (params.pick) {
         // Render for pick

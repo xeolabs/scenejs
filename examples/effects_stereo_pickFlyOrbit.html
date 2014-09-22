@@ -16,9 +16,18 @@
 
     <script src="../api/latest/scenejs.js"></script>
     <script src="libs/dat.gui.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - Stereo effect with pick-fly-orbit camera
+    <br>
+    click on something in the left view to fly to that point
+    <br>
+    drag mouse to orbit it, mouse wheel to zoom in and out
+</div>
 
 <script>
 
@@ -40,11 +49,10 @@
             // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
                 type: "cameras/pickFlyOrbit",
-                yaw: -0,
-                pitch: -40,
-                eye: { x: -10, y: 50, z: -100 },
-                look: { x: -10, y: 50, z: 0 },
-                zoomSensitivity: 20.0,
+                yaw: -30,
+                pitch: -20,
+                zoom: 300,
+                zoomSensitivity: 25.0,
                 showCursor: true,
                 cursorSize: 2.0,
 

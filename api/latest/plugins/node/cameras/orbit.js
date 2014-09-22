@@ -1,9 +1,10 @@
 /**
  * Orbiting camera node type
  *
- * Usage example
- * -------------
+ * @author xeolabs / http://xeolabs.com
  *
+ * <p>Usage</p>
+ * <pre>
  * someNode.addNode({
  *      type: "cameras/orbit",
  *      eye:{ x: y:0 },
@@ -13,9 +14,9 @@
  *      zoom: 350,
  *      zoomSensitivity:10.0,
  * });
- *
- * The camera is initially positioned at the given 'eye' and 'look', then the distance of 'eye' is zoomed out
- * away from 'look' by the amount given in 'zoom', and then 'eye' is rotated by 'yaw' and 'pitch'.
+ * </pre>
+ * <p>The camera is initially positioned at the given 'eye' and 'look', then the distance of 'eye' is zoomed out
+ * away from 'look' by the amount given in 'zoom', and then 'eye' is rotated by 'yaw' and 'pitch'.</p>
  *
  */
 SceneJS.Types.addType("cameras/orbit", {
@@ -51,13 +52,15 @@ SceneJS.Types.addType("cameras/orbit", {
             up: { x: 0, y: 1, z: 0 }
         });
 
-//        this._tick = this.getScene().on("tick",
-//            function () {
-//                if (lookatDirty) {
-//                    update();
-//                    lookatDirty = false;
-//                }
-//            });
+        var spin = params.spin;
+
+        if (spin) {
+            this._tick = this.getScene().on("tick",
+                function () {
+                    yaw -= spin;
+                    update();
+                });
+        }
 
         var canvas = this.getScene().getCanvas();
 

@@ -2,6 +2,8 @@
 
  Procedural green fungus texture
 
+ @author xeolabs / http://xeolabs.com
+
  <p>Usage: </p>
  <pre>
 
