@@ -29,13 +29,21 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
 <body>
 
-<!-- Shows each pick hit -->
-<div id="info">Click on an object to pick it
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - stages demo with picking<br>
+    'stages' let you to partition your scene objects into render bins that get processed in strict sequence,<br>
+    which is useful for building custom effects pipelines using <a href="/examples/_index.html#texture_rtt_color"
+                                                                   target="parent">render-to-texture</a> and <a
+        href="/examples/_index.html#shaders_custom_water" target="parent">custom shaders</a>.<br>
+    <a href="/examples/_index.html#layers_transparencySort" target="parent">layers</a> may be used if needed to further sub-prioritise the objects with stages.
 </div>
+
+<div id="pickInfo"></div>
 
 <script>
 
@@ -175,7 +183,7 @@ var scene = SceneJS.createScene({
 // Pick hit handler
 // Shows pick info in an HTML element
 
-var info = document.getElementById("info");
+var info = document.getElementById("pickInfo");
 
 scene.on("pick",
         function (hit) {

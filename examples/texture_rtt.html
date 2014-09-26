@@ -20,7 +20,7 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - render to color texture
+    <a href="http://scenejs.org">SceneJS</a> - render teapot to color texture, apply texture to box
 </div>
 
 <script>
@@ -31,7 +31,7 @@
     //
     // Second pass renders a box that's dynamically textured with the color target.
     //
-    // Note how we're using the "layer" node to ensure that the render target is rendered before
+    // Note how we're using the "stage" node to ensure that the render target is rendered before
     // it's used for the texture.
     //
 
@@ -45,7 +45,7 @@
 
             // First pass renders our scene (rotating teapot and skybox) to a color render target.
             {
-                type: "layer",
+                type: "stage",
                 priority: 1,
 
                 nodes: [
@@ -109,7 +109,7 @@
             // Second pass renders a box that's dynamically textured with the color target from the previous pass.
 
             {
-                type: "layer",
+                type: "stage",
                 priority: 2,
 
                 nodes: [

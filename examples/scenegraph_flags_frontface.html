@@ -15,8 +15,18 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - specifying the winding order of front-faces for a subgraph<br><br>
+    The teapot in this example is wrapped by a 'flags' node - we're toggling the 'frontface' property<br>
+    on that node between 'cw' and 'ccw', which controls whether or not the front faces are indicated by clockwise<br>
+    or counter-clockwise vertex order, respectively.<br><br>
+    Winding order: <span style="font-weight: bold;" id="windingOrder">ccw</span>
+</div>
 
 <script>
 
@@ -86,11 +96,16 @@
     // Flags node is within a custom node type, so will not exist until the plugin for that custom node has been loaded
     // Therefore, we get the flags node asynchronously
 
+    var indicator = document.getElementById("windingOrder");
+
     scene.getNode("myFlags", function (myFlags) {
         var counterClockwise = true;
         setInterval(
                 function () {
                     myFlags.setFrontface(counterClockwise ? "ccw" : "cw"); // Toggle
+
+                    indicator.innerHTML = counterClockwise ? "ccw" : "cw";
+
                     counterClockwise = !counterClockwise;
                 },
                 1000);

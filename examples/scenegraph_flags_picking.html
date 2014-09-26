@@ -15,8 +15,19 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - enabling and disabling picking for a subgraph<br><br>
+    The teapot in this example is wrapped in a 'name' node, which assigns it a symbolic name<br>
+    that will be reported when we pick it. It's also wrapped in a 'flags' node that has a 'picking' flag,<br>
+    which we're toggling every three seconds to enable or disable the ability to pick the teapot.<br><br>
+    Try clicking on the teapot in both cases.<br><br>
+    Picking enabled: <span style="font-weight: bold;" id="pickEnabled">TRUE</span>
+</div>
 
 <script>
 
@@ -136,12 +147,19 @@
     // Flags node is within a custom node type, so will not exist until the plugin for that custom node has been loaded
     // Therefore, we get the flags node asynchronously
 
+    var pickEnabledIndicator = document.getElementById("pickEnabled");
+
     scene.getNode("myFlags", function (myFlags) {
         setInterval(
                 function () {
-                    myFlags.setPicking(!myFlags.getPicking());
+
+                    var enable = !myFlags.getPicking();
+
+                    myFlags.setPicking(enable);
+
+                    pickEnabledIndicator.innerHTML = enable ? "TRUE" : "FALSE";
                 },
-                5000);
+                3000);
     });
 
 </script>

@@ -32,6 +32,9 @@
 // Second pass renders multiple geometries, each with their own texture that's dynamically sourced
 // from the color target.
 //
+// Note how we're using the "stage" node to ensure that the color target is rendered before
+// it's used for the textures.
+//
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
@@ -43,7 +46,7 @@ var scene = SceneJS.createScene({
 
         // First pass renders our scene (teapot and skybox) to a color target.
         {
-            type: "layer",
+            type: "stage",
             priority: 1,
 
             nodes: [
@@ -108,7 +111,7 @@ var scene = SceneJS.createScene({
         // Second pass renders multiple geometries, each with their own texture that's dynamically sourced
         // from the color target in the previous pass.
         {
-            type: "layer",
+            type: "stage",
             priority: 2,
 
             nodes: [

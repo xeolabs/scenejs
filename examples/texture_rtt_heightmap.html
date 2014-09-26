@@ -20,7 +20,7 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - render to texture, apply texture to height map
+    <a href="http://scenejs.org">SceneJS</a> - render teapot to texture, apply texture to height map
 </div>
 
 <script>
@@ -34,7 +34,9 @@
     // Note that since the depth target encodes depth values, it doesn't make a particularly nice texture when
     // used for a color map texture as in this example.
     //
-
+    // Note how we're using the "stage" node to ensure that the color target is rendered before
+    // it's used for the texture.
+    //
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
         pluginPath: "../api/latest/plugins"
@@ -46,7 +48,7 @@
             // First pass renders our rotating teapot, with skybox, to a color target
 
             {
-                type: "layer",
+                type: "stage",
                 priority: 1,
 
                 nodes: [
@@ -111,7 +113,7 @@
             // the colorTarget defined in the previous pass.
 
             {
-                type: "layer",
+                type: "stage",
                 priority: 2,
 
                 nodes: [

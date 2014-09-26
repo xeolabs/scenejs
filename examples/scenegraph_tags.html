@@ -15,8 +15,19 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - enabling and disabling subgraphs using regular expressions<br><br>
+    Each object in this example is wrapped in a 'tag' node, which assigns it a unique symbolic name.<br>
+    We can then pass a regular expression (we call a "mask") to the scene, to enable only the objects whose tags match the expression.<br>
+    In this example, we're periodically cycling through expressions that enable different subsets of the objects.
+    <br><br>
+    Enabling objects matching: <span style="font-weight: bold;" id="indicator">'.'</span>
+</div>
 
 <script>
 
@@ -137,6 +148,7 @@
                     },
 
                     // A torus tagged "rounded"
+                    // Note how multiple tag nodes can share the same tag.
                     {
                         type:"tag",
                         tag:"rounded",
@@ -167,8 +179,12 @@
         ]
     });
 
+    var indicator = document.getElementById("indicator");
+
     // Start by selecting all tags
     scene.setTagMask(".");
+
+    indicator.innerHTML = "'.'";
 
     // Cycle through a set of tag masks, for each one enabling tagged subtrees that match
 
@@ -183,9 +199,14 @@
 
     window.setInterval(
             function () {
-                scene.setTagMask(masks[ i % masks.length]);
+                var mask = masks[ i % masks.length];
+
+                scene.setTagMask(mask);
+
+                indicator.innerHTML = "'" + mask + "'";
+
                 i++;
-            }, 1000);
+            }, 2000);
 
 </script>
 </body>

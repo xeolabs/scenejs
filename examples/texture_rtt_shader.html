@@ -33,6 +33,9 @@
     // Second pass renders the quad with texture that's dynamically sourced from the color target,
     // using a custom shader.
     //
+    // Note how we're using the "stage" node to ensure that the color target is rendered before
+    // it's used for the texture.
+    //
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -44,7 +47,7 @@
 
             // First pass renders our scene (teapot and skybox) to a color target.
             {
-                type: "layer",
+                type: "stage",
                 priority: 1,
 
                 nodes: [
@@ -109,7 +112,7 @@
             // using a custom shader.
 
             {
-                type: "layer",
+                type: "stage",
                 priority: 2,
 
                 nodes: [

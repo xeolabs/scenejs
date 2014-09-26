@@ -348,21 +348,21 @@
                     {
                         "title":"Torus",
                         "tip":"Creating a solid torus geometry using the torus primitive plugin",
-                        "path":"plugins/prims/torus.html",
+                        "path":"plugins/geometry/torus.html",
                         "tags":[],
                         "id":"torusPrim"
                     },
                     {
                         "title":"Teapot",
                         "tip":"Creating a solid teapot geometry using the teapot primitive plugin",
-                        "path":"plugins/prims/teapot.html",
+                        "path":"plugins/geometry/teapot.html",
                         "tags":[],
                         "id":"teapotPrim"
                     },
                     {
                         "title":"Wireframe torus",
                         "tip":"Creating a wireframe torus geometry using the torus primitive plugin",
-                        "path":"plugins/prims/wireframeTorus.html",
+                        "path":"plugins/geometry/wireframeTorus.html",
                         "tags":[]
                     },
                     {

@@ -348,6 +348,7 @@ SceneJS.GUI = function (scene, nodeIds) {
             this.backfaceTexturing = attr.backfaceTexturing;
             this.specular = attr.specular;
             this.ambient = attr.ambient;
+            this.reflection = attr.reflection;
 
             var self = this;
             var update = function () {
@@ -360,7 +361,8 @@ SceneJS.GUI = function (scene, nodeIds) {
                     backfaceLighting:self.backfaceLighting,
                     backfaceTexturing:self.backfaceTexturing,
                     specular:self.specular,
-                    ambient:self.ambient
+                    ambient:self.ambient,
+                    reflection: self.reflection
                 });
                 requestAnimationFrame(update);
             };
@@ -377,6 +379,7 @@ SceneJS.GUI = function (scene, nodeIds) {
         folder.add(menu, 'backfaceTexturing');
         folder.add(menu, 'specular');
         folder.add(menu, 'ambient');
+        folder.add(menu, 'reflection');
         folder.open();
     }
 };

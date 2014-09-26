@@ -20,7 +20,7 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - render to color and depth textures, apply textures to objects
+    <a href="http://scenejs.org">SceneJS</a> - render teapot to color and depth textures, apply textures to boxes
 </div>
 
 <script>
@@ -37,7 +37,9 @@
 // Note that since the depth target encodes depth values, it doesn't make a particularly nice texture when
 // used for a color map texture as in this example.
 //
-
+// Note how we're using the "stage" node to ensure that the color and depth targets are rendered before
+// they're used for the textures.
+//
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
@@ -49,7 +51,7 @@ var scene = SceneJS.createScene({
 
         // First pass renders our scene (teapot and skybox) to separate color and depth render targets.
         {
-            type: "layer",
+            type: "stage",
             priority: 1,
 
             nodes: [
@@ -124,7 +126,7 @@ var scene = SceneJS.createScene({
         // with the color target.
 
         {
-            type: "layer",
+            type: "stage",
             priority: 2,
 
             nodes: [

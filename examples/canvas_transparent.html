@@ -23,8 +23,12 @@
 </head>
 <body>
 
-<div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - scene automatically transparent canvas element
+<div id="infoLight">
+    <a href="http://scenejs.org">SceneJS</a> - scene with transparent canvas<br><br>
+    This technique, in which we layer a transparent canvas over a div containing an image, is faster<br>
+    than creating the background in the 3D scene because it avoids having to render fragments<br>
+    via the GPU for the background, ie. avoids all those background pixels going down the GPU pipeline.<br><br>
+    Note that since we didn't specify a canvas ID for the scene, the scene creates one automatically.<br>
 </div>
 
 <script>

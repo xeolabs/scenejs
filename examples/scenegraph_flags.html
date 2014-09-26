@@ -16,8 +16,16 @@
 
     <script src="../api/latest/scenejs.js"></script>
     <script src="../api/latest/extras/gui.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - using a 'flags' node to toggle rendering modes for subgraphs<br><br>
+    the teapot in this example is wrapped by a 'flags' node, initially with default properties;<br>
+    tweak the various properties on that node using the GUI on the right
+</div>
 
 <script>
 
@@ -59,10 +67,10 @@
                         nodes:[
                             {
                                 type:"material",
-                                color:{ r:1.0, g:1.0, b:1.0 },
-                                specularColor:{ r:1.0, g:1.0, b:1.0 },
+                                color:{ r:0.4, g:0.4, b:1.0 },
+                                specularColor:{ r:0.5, g:0.5, b:1.0 },
                                 specular:1.0,
-                                shine:70.0,
+                                shine:7.0,
                                 emit:0,
                                 alpha:0.5,
 

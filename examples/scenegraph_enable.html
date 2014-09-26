@@ -15,8 +15,19 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - enabling and disabling a subgraph using an 'enable' node<br><br>
+    The teapot in this example is wrapped by an 'enable' node.<br><br>
+    We're periodically toggling the 'enabled' flag on that node, which controls whether the teapot is included<br>
+    in the render or not. You can also use a 'flags' node for the same purpose; the 'enabled' node is<br>
+    provided so that we have a means of doing this independently of 'flags' nodes, allowing the latter<br>
+    to be used exclusively for other things.
+</div>
 
 <script>
 

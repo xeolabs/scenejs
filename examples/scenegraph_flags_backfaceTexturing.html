@@ -15,9 +15,18 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - enabling and disabling texturing of backfaces for a subgraph<br><br>
+    The teapot in this example is wrapped by a 'flags' node - we're toggling the 'backfaceTexturing' flag<br>
+    on that node, which controls whether or not textures are applied to the teapot's backfaces.
+    <br>
+    Spin the object around to see the front face, which always shows texture.
+</div>
 
 <script>
 
@@ -59,7 +68,6 @@
                         type:"flags",
                         id:"myFlags",
                         flags:{
-                            transparent:true,
                             backfaceTexturing:true
                         },
 

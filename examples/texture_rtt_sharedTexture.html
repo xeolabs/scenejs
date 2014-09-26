@@ -39,7 +39,7 @@ var scene = SceneJS.createScene({
         //------------------------------------------------------------------------------------------
 
         {
-            type: "layer",
+            type: "stage",
             priority: 1,
 
             nodes: [
@@ -51,8 +51,6 @@ var scene = SceneJS.createScene({
 
 
                         // Cloudy sea skybox, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
-                        // Skybox, implemented by plugin at
-                        // http://scenejs.org/api/latest/plugins/node/skybox/grimmNight.js
                         {
                             type: "skybox/cloudySea",
                             size: 5000 // Box half-size on each axis - default is 5000
@@ -105,7 +103,7 @@ var scene = SceneJS.createScene({
         //------------------------------------------------------------------------------------------*/
 
         {
-            type: "layer",
+            type: "stage",
             priority: 2,
 
             nodes: [

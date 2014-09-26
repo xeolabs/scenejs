@@ -15,8 +15,17 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
 </head>
 <body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - enabling and disabling specular lighting for a subgraph<br><br>
+    The torus in this example is wrapped by a 'flags' node;<br>
+    we're toggling the 'specular' flag on that node, which controls whether<br>
+    or not specular lighting is applied to the torus.
+</div>
 
 <script>
 
@@ -79,7 +88,7 @@
 
                 nodes:[
 
-                    // Flags node which enables or disables specular light reflection on our teapot
+                    // Flags node which enables or disables specular light reflection on our torus
                     {
                         type:"flags",
                         id:"myFlags",
