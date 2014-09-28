@@ -36,13 +36,15 @@
 <div id="infoDark">
     <a href="http://scenejs.org" target="_other">SceneJS</a> - picking - pick name hierarchies
     <br>
-    click on an object to pick it
-    <br>
     pickable objects are in hierarchical namespaces;
     <br>
     note how the pick results show the name paths
     <br>
     learn more about picking in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
+    <br>
+    <br>
+    <div id="infoTxt">Click something!
+    </div>
 </div>
 
 <script>
@@ -529,7 +531,7 @@ var scene = SceneJS.createScene({
 // Pick hit handler
 // Shows pick info in an HTML element
 
-var info = document.getElementById("info");
+var info = document.getElementById("infoTxt");
 
 scene.on("pick",
         function (hit) {

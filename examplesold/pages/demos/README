@@ -1,8 +1,0 @@
-This directory contains examples that are liked from external sources like Chrome Experiments.
-
-Filename changes are cool in other areas of the example set because those pages are linked via the examples
-explorer, where you can update the explorer's index.json accordingly.
-
- Don't change filenames here because they are being linked directly to their files, eg.
-
- http://scenejs/examples/pages/bubbles.html

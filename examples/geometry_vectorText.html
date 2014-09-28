@@ -20,7 +20,8 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - <a href="../api/latest/plugins/node/geometry/vectorText.js" target="_other">vector text</a> geometry
+    <a href="http://scenejs.org">SceneJS</a> - <a href="../api/latest/plugins/node/geometry/vectorText.js"
+                                                  target="_other">vector text</a> geometry
 </div>
 
 <script>
@@ -57,10 +58,19 @@
                                 x: -10,
                                 nodes: [
 
-                                    // A line of vector text
+                                    // Set line width
                                     {
-                                        type: "geometry/vectorText",
-                                        text: "One line of vector text, please."
+                                        type: "style",
+                                        lineWidth: 3, // Default
+
+                                        nodes: [
+
+                                            // A line of vector text
+                                            {
+                                                type: "geometry/vectorText",
+                                                text: "One line of vector text, please."
+                                            }
+                                        ]
                                     }
                                 ]
                             }

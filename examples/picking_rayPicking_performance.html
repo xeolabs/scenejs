@@ -27,13 +27,23 @@
             z-index: 100000;
         }
     </style>
-</head>
 
-<script src="../api/latest/scenejs.js"></script>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+</head>
 <body>
 
 <!-- Shows each pick hit -->
-<div id="info">Click on an object to ray-pick it
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - ray picking performance demo
+    <br>
+    uses a fast technique that uses the depth buffer to find 3D ray-object intersections
+    <br>
+    learn more in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
+    <br>
+    <br>
+    <div id="infoTxt">click on an object to ray-pick it
+    </div>
 </div>
 
 <script>
@@ -119,7 +129,7 @@
     // 2. Shows pick info
     // 3. Creates red sphere showing 3D ray intersection
     //
-    var info = document.getElementById("info");
+    var info = document.getElementById("infoTxt");
 
     scene.on("pick",
             function (hit) {

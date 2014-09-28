@@ -16,6 +16,7 @@
             background-color: #ffffff;
             margin: 0px;
             font-family: 'inconsolata';
+            //font-family: Consolas, "Lucida Console", Monaco, monospace;
             font-size: 15px;
             overflow: hidden;
         }
@@ -154,6 +155,7 @@ var files = {
     "showcase": [
         "#stuff made with SceneJS",
         "scenegraph_firstExample",
+        "scenegraph_secondExample",
         "showcase_BioDigitalHuman",
         "showcase_BioDigitalHuman_eye",
         "models_space_earth",
@@ -171,9 +173,9 @@ var files = {
     "scenegraph": [
         "#basic scene graph functionality",
         "scenegraph_firstExample",
+        "scenegraph_secondExample",
         "scenegraph_events_misc",
-        "scenegraph_events_status",
-        "scenegraph_events_status2",
+        "scenegraph_status",
         "scenegraph_nodes_adding",
         "scenegraph_nodes_events_rendered",
         "scenegraph_nodes_instancing",
@@ -428,6 +430,7 @@ var files = {
     ],
 
     "shaders": [
+        "shaders_fog",
         "shaders_xray",
         "shaders_scanline",
         "shaders_vertexDisplacement",
@@ -446,7 +449,6 @@ var files = {
         "postprocessing_depthOfField_autofocus",
         "postprocessing_depthOfField_autofocus_grid",
         "postprocessing_filmGrain",
-        "postprocessing_fog",
         "postprocessing_lens",
         "postprocessing_scanlines",
         "postprocessing_sepia",
@@ -519,7 +521,8 @@ var files = {
         "models_buildings_city",
         "models_space_earth",
         "models_backgrounds_gradient",
-        "models_backgrounds_water"
+        "models_backgrounds_water",
+        "models_plants_ghostTree"
     ]
 };
 
@@ -628,6 +631,13 @@ var load = function (file) {
 if (window.location.hash !== '') {
     load(window.location.hash.substring(1));
 }
+
+//window.onhashchange = function () {
+//    if (window.location.hash !== '') {
+//        load(window.location.hash.substring(1));
+//    }
+//
+//};
 
 </script>
 

@@ -36,12 +36,14 @@
 <div id="infoDark">
     <a href="http://scenejs.org" target="_other">SceneJS</a> - picking
     <br>
-    click on a teapot to pick it
+    try clicking on either teapot, or the background
     <br>
     learn more in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
+    <br>
+    <br>
+    <div id="infoTxt">
+    </div>
 </div>
-
-<div id="pickInfo"></div>
 
 <script>
 
@@ -120,7 +122,7 @@
     // Pick hit handler
     // Shows pick info in an HTML element
 
-    var pickInfo = document.getElementById("pickInfo");
+    var pickInfo = document.getElementById("infoTxt");
 
     myScene.on("pick",
             function (hit) {

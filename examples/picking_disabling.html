@@ -27,13 +27,23 @@
             z-index: 100000;
         }
     </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 </head>
 
-<script src="../api/latest/scenejs.js"></script>
 <body>
 
 <!-- Shows each pick hit -->
-<div id="info">Demo of disabling picking for some objects<br><br>Click the red and green teapots...
+<div id="infoDark"><a href="http://scenejs.org" target="_other">SceneJS</a> - disabling picking for some scene objects
+    <br>
+    click on the red and green teapots
+    <br>
+    picking is disabled for the green teapot
+    <br>
+    learn more about picking in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
+    <br><br>
+    <div id="infoTxt">
+    </div>
 </div>
 
 <script>
@@ -114,7 +124,7 @@
     // Pick hit handler
     // Shows pick info in an HTML element
 
-    var info = document.getElementById("info");
+    var info = document.getElementById("infoTxt");
 
     scene.on("pick",
             function (hit) {

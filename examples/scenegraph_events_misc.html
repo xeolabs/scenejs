@@ -14,8 +14,19 @@
         }
     </style>
     <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 </head>
+
 <body>
+
+<div id="infoDark"><a href="http://scenejs.org" target="_other">SceneJS</a> - events - miscellaneous
+    <br><br>
+    This example demonstrates events that are fired by the scene graph root node<br>
+    at various stages of scene rendering and lifecycle.
+    <br><br>
+    There's not much to see in this example - see the source code for more info.
+    <br><br>
+</div>
 
 <script>
 
@@ -34,7 +45,7 @@
                 yaw: -100,
                 pitch: -10,
                 zoom: 15,
-                zoomSensitivity: 10.0,
+                zoomSensitivity: 1.0,
 
                 nodes: [
                     {
@@ -80,6 +91,11 @@
                 // ID of the scene:
                 var sceneId = params.sceneId;
 
+                // Number of this scene pass
+                // Will always be zero unless you configured the scene gor multi-pass.
+                // as demonstrated in ./multipass-twoPasses.html
+                var pass = params.pass;
+
                 //  alert("Scene 'rendered' event fired");
 
                 // Unsubscribe
@@ -94,7 +110,7 @@
                 // ID of the scene
                 var sceneId = params.sceneId;
 
-                alert("Scene 'destroyed' event fired");
+              //  alert("Scene 'destroyed' event fired");
 
                 // Unsubscribe
                 scene.off(destroyed);

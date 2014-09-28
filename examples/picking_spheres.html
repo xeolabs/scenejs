@@ -27,14 +27,23 @@
             z-index: 100000;
         }
     </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
 </head>
 
-<script src="../api/latest/scenejs.js"></script>
 <body>
 
-<!-- Shows each pick hit -->
-<div id="info">Click on an object to pick it
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - picking performance demo
+    <br>
+    learn more about picking in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
+    <br>
+    <br>
+    <div id="infoTxt">Click something!
+    </div>
 </div>
+
 
 <script>
 
@@ -104,7 +113,7 @@
     // 1. Highlights picked object,
     // 2. Shows pick info
     //
-    var info = document.getElementById("info");
+    var info = document.getElementById("infoTxt");
 
     scene.on("pick",
             function (hit) {
@@ -121,6 +130,12 @@
                 var canvasX = hit.canvasPos[0];
                 var canvasY = hit.canvasPos[1];
 
+            });
+
+    // Called when nothing picked
+    scene.on("nopick",
+            function (hit) {
+                info.innerHTML = "Nothing picked.";
             });
 
     // Mouse event handling to do a pick on each mouse click

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+</head>
+
+<body>
+
+<div id="infoLight"><a href="http://scenejs.org" target="_other">SceneJS</a> - getting scene status
+    <br><br>
+    Demonstrates how to query the status of a scene graph,<br>
+    such as how many things are currently loading.
+    <br><br>
+    There's not much to see in this example - see the source code for more info.
+    <br>
+    <br>
+
+    <div id="infoTxt">(status appears here)
+    </div>
+</div>
+
+
+<script>
+
+    // Demonstrates how to query a scene for progress on loading content.
+    // In this case, loaded content consists of various plugins for custom node types, along with textures
+    // for a procedurally-generated city.
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene with a rotating planet Earth
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: -100,
+                pitch: -10,
+                zoom: 6,
+                zoomSensitivity: 1.0,
+
+                nodes: [
+                    {
+                        type: "lights",
+                        lights: [
+                            {
+                                mode: "dir",
+                                color: { r: 1.0, g: 1.0, b: 1.0 },
+                                diffuse: true,
+                                specular: true,
+                                dir: { x: 0.5, y: 0.0, z: -0.5 },
+                                space: "view"
+                            }
+                        ],
+
+                        nodes: [
+
+                            // Planet Earth, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/models/space/planets/earth.js
+                            {
+                                type: "models/space/planets/earth"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Periodically query and log scene loading status to console
+
+    var info = document.getElementById("infoTxt");
+
+    var numTasks = 0;
+
+    setInterval(function () {
+        var status = scene.getStatus();
+        if (!status) {
+            info.innerHTML = "Scene status: not found";
+            return;
+        }
+        if (status.destroyed) {
+            info.innerHTML = "Scene status: destroyed";
+            return;
+        }
+        if (status.numTasks != numTasks) {
+            info.innerHTML = "Scene status: loads in progress: " + status.numTasks;
+            numTasks = status.numTasks;
+        }
+    }, 100);
+
+</script>
+</body>
+</html>
