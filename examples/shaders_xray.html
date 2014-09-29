@@ -112,6 +112,7 @@
                     this.enabled = xray.getEnabled();
                     this.opacity = xray.getOpacity();
                     this.monochrome = xray.getMonochrome();
+                    this.glassFactor = xray.getGlassFactor();
 
                     var self = this;
 
@@ -120,6 +121,7 @@
                         xray.setEnabled(self.enabled);
                         xray.setOpacity(self.opacity);
                         xray.setMonochrome(self.monochrome);
+                        xray.setGlassFactor(self.glassFactor);
 
                         requestAnimationFrame(update);
                     };
@@ -134,6 +136,7 @@
                 direction.add(menu, 'enabled');
                 direction.add(menu, 'opacity', 0.0, 1.0);
                 direction.add(menu, 'monochrome');
+                direction.add(menu, 'glassFactor', 0.0, 1.0);
 
                 direction.open();
             });

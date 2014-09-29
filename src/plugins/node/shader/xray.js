@@ -18,6 +18,7 @@ SceneJS.Types.addType("shader/xray", {
                         "uniform bool   xrayEnabled;",
                         "uniform float  xrayOpacity;",
                         "uniform bool   xrayMonochrome;",
+                        "uniform float   xrayGlassFactor;",
 
                         "vec3           myworldNormal = vec3(0.0, 0.0,  1.0);",
                         "vec3           myworldEyeVec = vec3(0.0, 0.0, -1.0);",
@@ -35,7 +36,7 @@ SceneJS.Types.addType("shader/xray", {
                         "       if (xrayMonochrome) {",
                         "           color = vec4(0.2, 0.2, 0.3, (xrayOpacity + 0.9 - abs(dot(myworldNormal, myworldEyeVec))));",
                         "       } else {",
-                        "           color.a = (xrayOpacity + 0.9 - abs(dot(myworldNormal, myworldEyeVec)));",                        
+                        "           color.a = xrayOpacity + (xrayGlassFactor * (1.0 - abs(dot(myworldNormal, myworldEyeVec))));",
                         "       }",
                         "   }",
                         "   return color;",
@@ -52,7 +53,8 @@ SceneJS.Types.addType("shader/xray", {
             params:{
                 xrayEnabled:true,
                 xrayOpacity:0.4,
-                xrayMonochrome:false
+                xrayMonochrome:false,
+                xrayGlassFactor:0.0
             }
         });
 
@@ -71,6 +73,7 @@ SceneJS.Types.addType("shader/xray", {
         this.setEnabled(params.enabled != undefined ? params.enabled : true);
         this.setOpacity(params.opacity != undefined ? params.opacity : 0.4);
         this.setMonochrome(params.monochrome != undefined ? params.monochrome : false);
+        this.setGlassFactor(params.glassFactor != undefined ? params.glassFactor : 1.0);
     },
 
     /**
@@ -123,6 +126,24 @@ SceneJS.Types.addType("shader/xray", {
      */
     getMonochrome:function () {
         return !!this._monochrome;
+    },
+
+    /**
+     * Sets the degree of glass factor for X-Ray effect, with 0 being no glass effect and 1 being full effect
+     * @param {Number} glassFactor
+     */
+    setGlassFactor:function (glassFactor) {
+        this._glassFactor = glassFactor;
+        this._shader.setParams({ xrayGlassFactor:glassFactor });
+    },
+
+    /**
+     * Gets the degree of glass factor
+     * @return {Number}
+     */
+    getGlassFactor:function () {
+        return this._glassFactor;
     }
+
 })
 ;

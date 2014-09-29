@@ -15334,7 +15334,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
             src.push("varying vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
-            src.push("varying vec3 SCENEJS_vViewNormal;");   // Output world-space vertex normal
+            src.push("varying vec3 SCENEJS_vViewNormal;");   // Output view-space vertex normal
         }
 
         src.push("varying vec4 SCENEJS_vWorldVertex;");

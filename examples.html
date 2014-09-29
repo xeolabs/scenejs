@@ -157,7 +157,7 @@
                 button.addEventListener('click', (function () {
                     var id = legacyIDs[key];
                     return function (event) {
-                        window.location = "examples/_index.html#" + id;
+                        window.location = "examples/index.html#" + id;
                     };
                 })(), false);
                 document.body.appendChild(button);
@@ -165,7 +165,7 @@
         }
     } else {
 
-        var examplesPage = "examples/_index.html";
+        var examplesPage = "examples/index.html";
 
         var page = gup("page");
 

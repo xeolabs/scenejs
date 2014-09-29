@@ -3,6 +3,10 @@
 <head>
     <meta charset="utf-8">
     <title>SceneJS v4.0 - Examples</title>
+
+    <!--Examples viewer based on the one over at THREE.js -->
+    <!-- threejs.com -->
+
     <style>
 
         @font-face {
@@ -16,13 +20,15 @@
             background-color: #ffffff;
             margin: 0px;
             font-family: 'inconsolata';
-            //font-family: Consolas, "Lucida Console", Monaco, monospace;
+            /*font-family: Consolas, "Lucida Console", Monaco, monospace;*/
+            /*font-family:   'futura', monospace;*/
             font-size: 15px;
             overflow: hidden;
         }
 
         a {
-            color: #2194CE;
+            /*color: #2194CE;*/
+            color: #3a7445;
             text-decoration: none;
         }
 
@@ -53,7 +59,8 @@
         }
 
         #panel #list .link {
-            color: #2194CE;
+            /*color: #2194CE;*/
+            color: #3d7749;
             text-decoration: none;
             cursor: pointer;
         }
@@ -99,17 +106,17 @@
             border: 0px;
         }
 
-        #button {
+        #sourceButton {
             position: fixed;
             top: 20px;
             right: 20px;
             padding: 8px;
             color: #fff;
-            background-color: #555;
+            background-color: #02550b;
             opacity: 0.7;
         }
 
-        #button:hover {
+        #sourceButton:hover {
             cursor: pointer;
             opacity: 1;
         }
@@ -143,7 +150,7 @@
     <div id="list">
         <h1><a href="../index.html">SceneJS</a> / examples</h1>
 
-        <p>v4.0 pre</p>
+        <p>v4.0</p>
     </div>
 </div>
 <iframe id="viewer"></iframe>
@@ -222,10 +229,11 @@ var files = {
         "effects_anaglyph",
         "effects_anaglyph_pickFlyOrbit",
         "effects_stereo",
-        "effects_stereo_pickFlyOrbit",
-        "effects_oculusRift",
-        "effects_oculusRift_pickFlyOrbit",
-        "effects_oculusRift_externalCanvas"
+        "effects_stereo_pickFlyOrbit"
+//        ,
+//        "effects_oculusRift",
+//        "effects_oculusRift_pickFlyOrbit",
+//        "effects_oculusRift_externalCanvas"
     ],
 
     "geometry": [
@@ -534,16 +542,16 @@ var viewer = document.getElementById('viewer');
 var container = document.createElement('div');
 list.appendChild(container);
 
-var button = document.createElement('div');
-button.id = 'button';
-button.textContent = 'View source';
-button.addEventListener('click', function (event) {
+var sourceButton = document.createElement('div');
+sourceButton.id = 'sourceButton';
+sourceButton.textContent = 'Source code';
+sourceButton.addEventListener('click', function (event) {
     var array = location.href.split('/');
     array.pop();
     window.open('view-source:' + array.join('/') + '/' + selected + '.html');
 }, false);
-button.style.display = 'none';
-document.body.appendChild(button);
+sourceButton.style.display = 'none';
+document.body.appendChild(sourceButton);
 
 var catDivs = {};
 var divs = {};
@@ -551,8 +559,7 @@ var selected = null;
 var index = 1;
 var indexStr;
 
-// Table of contents if we want it
-//if (false) {
+// Table of contents
 var div = document.createElement('h2');
 div.textContent = "contents";
 container.appendChild(div);
@@ -577,7 +584,6 @@ for (var key in files) {
 
 container.appendChild(document.createElement('hr'));
 container.appendChild(document.createElement('br'));
-//}
 
 index = 1;
 
@@ -624,7 +630,7 @@ var load = function (file) {
     window.location.hash = file;
     viewer.src = file + '.html';
     viewer.focus();
-    button.style.display = '';
+    sourceButton.style.display = '';
     selected = file;
 };
 
@@ -632,12 +638,6 @@ if (window.location.hash !== '') {
     load(window.location.hash.substring(1));
 }
 
-//window.onhashchange = function () {
-//    if (window.location.hash !== '') {
-//        load(window.location.hash.substring(1));
-//    }
-//
-//};
 
 </script>
 
