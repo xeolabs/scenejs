@@ -36,11 +36,6 @@ SceneJS.Types.addType("shader/xray", {
                         "       if (xrayMonochrome) {",
                         "           color = vec4(0.2, 0.2, 0.3, (xrayOpacity + 0.9 - abs(dot(myworldNormal, myworldEyeVec))));",
                         "       } else {",
-//                        //"           color.a = (xrayOpacity + 1.0 - abs(dot(myworldNormal, myworldEyeVec)));",
-//                        "           float a = xrayOpacity; ",
-//                        "           a += xrayGlassFactor * (1.0 - abs(dot(myworldNormal, myworldEyeVec)));",
-//                        "           color.a = a;",
-
                         "           color.a = xrayOpacity + (xrayGlassFactor * (1.0 - abs(dot(myworldNormal, myworldEyeVec))));",
                         "       }",
                         "   }",

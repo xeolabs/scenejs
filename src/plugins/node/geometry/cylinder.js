@@ -1,7 +1,7 @@
 /**
  * Sphere geometry node type
  *
- * @author Moritz Kornher
+ * @author Moritz Kornher / https://github.com/mrgrain
  *
  * <p>Usage example:</p>
  *
