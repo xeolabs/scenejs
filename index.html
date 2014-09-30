@@ -322,6 +322,10 @@ scene.getNode("myRotate", function(myRotate) {
                             if (nodes) {
                                 for (var j = 0, lenj = subCategory.nodes.length; j < lenj; j++) {
                                     feature = subCategory.nodes[j];
+                                    if (feature.status == "alpha") {
+                                        // Don't list alpha-status features
+                                        continue;
+                                    }
                                     featureElem = $('<a/>')
                                             .addClass('feature-feature')
                                             .attr('href', 'examples/index.html#' + feature.page)

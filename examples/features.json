@@ -97,7 +97,8 @@
                 "nodes": [
                     {
                         "title": "Oculus Rift",
-                        "page": "effects_oculusRift_pickFlyOrbit"
+                        "page": "effects_oculusRift_pickFlyOrbit",
+                        "status": "alpha"
                     },
                     {
                         "title": "Anaglyph 3D",
