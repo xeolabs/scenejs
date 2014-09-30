@@ -15,7 +15,6 @@
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
-    <script src="libs/dat.gui.min.js"></script>
     <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
@@ -59,9 +58,6 @@
                     // http://scenejs.org/api/latest/plugins/node/effects/anaglyph.js
                     {
                         type: "effects/anaglyph",
-                        id: "myAnaglyph",
-                        eyeSep: 1.1,        // Eye separation
-                        focalLength: 500,    // Focal length
 
                         nodes: [
 
@@ -94,39 +90,6 @@
             }
         ]
     });
-
-    // Get anaglyph effect node and bind a GUI to it to play with it
-    scene.getNode("myAnaglyph",
-            function (myAnaglyph) {
-
-                var Menu = function () {
-
-                    this["eyeSep"] = myAnaglyph.getEyeSep();
-                    this["focalLength"] = myAnaglyph.getFocalLength();
-
-                    var self = this;
-
-                    // This is actually quite inefficient because it continually updates
-                    // the scene graph, forcing frames to continually re-render.
-                    // Your GPU's not going to like it, but it's just for a quick and dirty demo.
-                    var update = function () {
-
-                        myAnaglyph.setEyeSep(self["eyeSep"]);
-                        myAnaglyph.setFocalLength(self["focalLength"]);
-
-                        requestAnimationFrame(update);
-                    };
-
-                    update();
-                };
-
-                var gui = new dat.GUI();
-                var folder = gui.addFolder("effects/anaglyph '" + myAnaglyph.getId() + "'");
-                var menu = new Menu();
-                folder.add(menu, 'eyeSep', 0.0, 20.0);
-                folder.add(menu, 'focalLength', 1, 2000.0);
-                folder.open();
-            });
 
 </script>
 </body>

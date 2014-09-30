@@ -30,9 +30,6 @@
                     // http://scenejs.org/api/latest/plugins/node/effects/anaglyph.js
                     {
                         type: "effects/anaglyph",
-                        id: "myAnaglyph",
-                        eyeSep: 10, // Eye separation
-                        focalLength: 100, // Focal length
 
                         nodes: [
 
@@ -48,15 +45,6 @@
         ]
     });
 
- // Modify anaglyph params
-
- scene.getNode("myAnaglyph",
- function(anaglyph) {
-
-            anaglyph.setEyeSep(20.0);
-            anaglyph.setFocalLength(150.0);
-
-        });
  </pre>
  */
 SceneJS.Types.addType("effects/anaglyph", {
@@ -106,56 +94,12 @@ SceneJS.Types.addType("effects/anaglyph", {
         if (params.nodes) {
             this._leaf.addNodes(params.nodes);
         }
-
-        // Eye separation
-        this._eyeSep = params.eyeSep || 0.2;
-
-        this._focalLength = params.focalLength || 20.0;
-    },
-
-    /**
-     * Set eye separation distance
-     * @param {Number} eyeSep
-     */
-    setEyeSep: function (eyeSep) {
-        this._eyeSep = eyeSep;
-
-        // Scene state is indirectly dependant on our new variable value
-        // but needs to be notified that a re-render is needed to update it
-        this.getScene().needFrame();
-    },
-
-    /**
-     * Get eye separation distance
-     * @returns {Number}
-     */
-    getEyeSep: function () {
-        return this._eyeSep;
-    },
-
-    /**
-     * Set focal length
-     * @param {Number} focalLength
-     */
-    setFocalLength: function (focalLength) {
-        this._focalLength = focalLength;
-
-        // Scene state is indirectly dependant on our new variable value
-        // but needs to be notified that a re-render is needed to update it
-        this.getScene().needFrame();
-    },
-
-    /**
-     * Get focal length
-     * @returns {Number}
-     */
-    getFocalLength: function () {
-        return this._focalLength;
     },
 
     preCompile: function () {
         this._build();
     },
+
 
     // Sets up multipass rendering for left and right eyes
     //
@@ -171,7 +115,7 @@ SceneJS.Types.addType("effects/anaglyph", {
             scene.off(this._renderingSub);
         }
 
-        this._lookat = this._findLookat();
+        this._initLookat();
 
         if (!this._lookat) {
             return;
@@ -218,6 +162,7 @@ SceneJS.Types.addType("effects/anaglyph", {
 
                         // Derive the two eye positions
                         var eyeVec = SceneJS_math_subVec3(_eye, _look, []);
+                     //   var eyeSepOnProjection = eyeSep * _near / focalLength;
 
                         sepVec = SceneJS_math_cross3Vec3(_up, eyeVec, []);
                         sepVec = SceneJS_math_normalizeVec3(sepVec, []);
@@ -282,11 +227,30 @@ SceneJS.Types.addType("effects/anaglyph", {
             });
     },
 
-    _findLookat: function () {
+    _initLookat: function () {
         var node = this.parent;
         while (node && node.type != "lookAt") {
             node = node.parent
         }
-        return node;
+        if (node && (!this._lookat || node.id != this._lookat.id)) {
+            if (this._lookat) {
+                this._lookat.off(this._lookatSub);
+            }
+            this._lookat = node;
+            var self = this;
+            // Synchronise focus length with length of eye->look vector
+            // Synch eye separation with focal length
+            this._lookatSub = (!node) ? null : node.on("matrix",
+                function () {
+                    var look = self._lookat.getLook();
+                    var eye = self._lookat.getEye();
+                    self._focalLength = SceneJS_math_lenVec3([ look.x - eye.x, look.y - eye.y, look.z - eye.z ]);
+                    self._eyeSep = self._focalLength / 45 * 0.5
+
+                    // Scene state is indirectly dependant on our new variable value
+                    // but needs to be notified that a re-render is needed to update it
+                    self.getScene().needFrame();
+                });
+        }
     }
 });
