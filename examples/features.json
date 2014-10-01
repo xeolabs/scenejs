@@ -52,10 +52,6 @@
                         "page": "shaders_xray"
                     },
                     {
-                        "title": "Film grain",
-                        "page": "postprocessing_filmGrain"
-                    },
-                    {
                         "title": "Vertex displacement",
                         "page": "shaders_vertexDisplacement"
                     }
