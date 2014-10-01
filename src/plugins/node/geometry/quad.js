@@ -22,6 +22,8 @@
 
     function build(params) {
 
+        // TODO: support size properties like 'geometry/plane'
+
         var coreId = "geometry/quad" + (params.wire ? "wire" : "_solid");
 
         // If a node core already exists for a prim with the given properties,
