@@ -12276,6 +12276,7 @@ new (function() {
     };
 })();/**
  * @class Scene graph node which defines textures to apply to the objects in its subgraph
+ * <p>This is the deprecated node type from SceneJS v3.2, which has been replaced by the "texture" node in ./texture.js</p>
  * @extends SceneJS.Node
  */
 new (function () {
@@ -12302,7 +12303,7 @@ new (function () {
      * @class Scene graph node which defines one or more textures to apply to the {@link SceneJS.Geometry} nodes in its subgraph
      * @extends SceneJS.Node
      */
-    SceneJS.Texture = SceneJS_NodeFactory.createNodeType("texture");
+    SceneJS.Texture = SceneJS_NodeFactory.createNodeType("_texture");
 
     SceneJS.Texture.prototype._init = function (params) {
 
@@ -12790,7 +12791,7 @@ new (function () {
      * @class Scene graph node which defines one or more textures to apply to the {@link SceneJS.Geometry} nodes in its subgraph
      * @extends SceneJS.Node
      */
-    SceneJS.TextureMap = SceneJS_NodeFactory.createNodeType("textureMap");
+    SceneJS.TextureMap = SceneJS_NodeFactory.createNodeType("texture");
 
     SceneJS.TextureMap.prototype._init = function (params) {
 

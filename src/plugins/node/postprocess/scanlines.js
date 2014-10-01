@@ -57,7 +57,7 @@ SceneJS.Types.addType("postprocess/scanlines", {
                 priority: 2,
                 nodes: [
                     {
-                        type: "textureMap",
+                        type: "texture",
                         target: colorTargetId,
                         nodes: [
                             {

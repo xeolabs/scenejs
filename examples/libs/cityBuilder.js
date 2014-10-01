@@ -115,7 +115,7 @@ var CityBuilder = function (cfg) {
                 },
 
                 texture:{
-                    type:"texture",
+                    type:"_texture",
                     coreId:"__type1",
                     layers:[
                         {
@@ -164,7 +164,7 @@ var CityBuilder = function (cfg) {
                 },
 
                 texture:{
-                    type:"texture",
+                    type:"_texture",
                     coreId:"__type2",
                     layers:[
                         {
@@ -224,7 +224,7 @@ var CityBuilder = function (cfg) {
                 },
 
                 texture:{
-                    type:"texture",
+                    type:"_texture",
                     coreId:"__type3",
                     layers:[
                         {

@@ -28,7 +28,7 @@ SceneJS.Types.addType("postprocess/crt", {
                 priority: 2,
                 nodes: [
                     {
-                        type: "textureMap",
+                        type: "texture",
                         target: colorTargetId,
                         nodes: [
                             {

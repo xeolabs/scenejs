@@ -151,7 +151,7 @@ SceneJS.Types.addType("texture/procedural", {
         // Wraps given child nodes in a texture sourced from the color target
 
         this._texture = this.addNode({
-            type: "textureMap",
+            type: "texture",
             target: colorTargetId,
             applyTo: params.applyTo,
             blendMode: params.blendMode,

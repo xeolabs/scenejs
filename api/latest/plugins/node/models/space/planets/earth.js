@@ -55,7 +55,7 @@ SceneJS.Types.addType("models/space/planets/earth", {
 
                                 // Color map
                                 {
-                                    type: "textureMap",
+                                    type: "texture",
                                     coreId: this.type + ".color",
                                     src: texturePath + "earth.jpg",
                                     applyTo: "color",
@@ -64,7 +64,7 @@ SceneJS.Types.addType("models/space/planets/earth", {
 
                                         // Specular map for shiny oceans
                                         {
-                                            type: "textureMap",
+                                            type: "texture",
                                             coreId: this.type + ".specular",
                                             src: texturePath + "earth-specular.png",
                                             applyTo: "specular",
@@ -73,7 +73,7 @@ SceneJS.Types.addType("models/space/planets/earth", {
 
                                                 // Glow map for lights on night side
                                                 {
-                                                    type: "textureMap",
+                                                    type: "texture",
                                                     coreId: this.type + ".emit",
                                                     src: texturePath + "earth-lights.gif",
                                                     applyTo: "emit",
@@ -132,7 +132,7 @@ SceneJS.Types.addType("models/space/planets/earth", {
 
                                             nodes: [
                                                 {
-                                                    type: "textureMap",
+                                                    type: "texture",
                                                     coreId: this.type + ".alpha",
                                                     src: texturePath + "earthclouds.jpg",
                                                     applyTo: "alpha",

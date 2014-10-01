@@ -46,8 +46,10 @@
                     specular: 0.4,
                     shine: 20.0
                 },
+
+                // FIXME - using deprecated "_texture" node, update to use new "texture"
                 texture: {
-                    type: "texture",
+                    type: "_texture",
                     coreId: "building.1.texture",
                     layers: [
                         {
@@ -91,8 +93,9 @@
                     specular: 1.0,
                     shine: 5.0
                 },
+                // FIXME - using deprecated "_texture" node, update to use new "texture"
                 texture: {
-                    type: "texture",
+                    type: "_texture",
                     coreId: "building.2.texture",
                     layers: [
                         {
@@ -148,8 +151,9 @@
                     specular: 0.4,
                     shine: 20.0
                 },
+                // FIXME - using deprecated "_texture" node, update to use new "texture"
                 texture: {
-                    type: "texture",
+                    type: "_texture",
                     coreId: "building.3.texture",
                     layers: [
                         {

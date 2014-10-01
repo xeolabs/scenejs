@@ -41,7 +41,7 @@ SceneJS.Types.addType("postprocess/lens", {
 
                     // Input color target
                     {
-                        type: "textureMap",
+                        type: "texture",
                         target: colorTarget,
                         nodes: [
 

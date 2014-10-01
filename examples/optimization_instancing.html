@@ -23,7 +23,7 @@
 <div id="infoDark">
     <a href="http://scenejs.org" target="_other">SceneJS</a> - optimization - node instancing
     <br>
-    material and geometry are shared by two objects<br>for memory and execution efficiency
+    material, texture and geometry are shared by two objects<br>for memory and execution efficiency
 </div>
 
 
@@ -49,52 +49,53 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // Create scene
     var scene = SceneJS.createScene({
-        nodes:[
+        nodes: [
 
             // Library of nodes whose cores we'll share
             {
-                type:"library",
-                nodes:[
+                type: "library",
+                nodes: [
 
                     // Red material
                     {
-                        type:"material",
-                        color:{ r:0.6, g:0.6, b:0.9 },
-                        coreId:"myMaterial"
+                        type: "material",
+                        color: { r: 0.6, g: 0.6, b: 0.9 },
+                        coreId: "myMaterial"
                     },
 
                     // Red material
                     {
-                        type:"material",
-                        color:{ r:0.9, g:0.6, b:0.6 },
-                        coreId:"myOtherMaterial"
+                        type: "material",
+                        color: { r: 0.9, g: 0.6, b: 0.6 },
+                        coreId: "myOtherMaterial"
                     },
 
                     // Texture
+                    // FIXME - using deprecated "_texture" because core sharing for "texture" nodes is broken
                     {
-                        type:"texture",
-                        layers:[
+                        type: "_texture",
+                        layers: [
                             {
-                                src:"textures/BrickWall.jpg",
-                                scale:{
-                                    x:.2,
-                                    y:.2
+                                src: "textures/BrickWall.jpg",
+                                scale: {
+                                    x: .2,
+                                    y: .2
                                 }
                             }
                         ],
-                        coreId:"myTexture"
+                        coreId: "myTexture"
                     },
 
                     // Box geometry
                     {
-                        type:"geometry",
-                        primitive:"triangles",
-                        positions:[
+                        type: "geometry",
+                        primitive: "triangles",
+                        positions: [
                             5, 5, 5, -5, 5, 5, -5, -5, 5, 5, -5, 5,
                             5, 5, 5, 5, -5, 5, 5, -5, -5, 5, 5, -5,
                             5, 5, 5, 5, 5, -5, -5, 5, -5, -5, 5, 5,
@@ -102,7 +103,7 @@
                             -5, -5, -5, 5, -5, -5, 5, -5, 5, -5, -5, 5,
                             5, -5, -5, -5, -5, -5, -5, 5, -5, 5, 5, -5
                         ],
-                        normals:[
+                        normals: [
                             0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
                             1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
                             0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
@@ -110,17 +111,17 @@
                             0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
                             0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1
                         ],
-                        uv:[
+                        uv: [
                             5, 5, 0, 5, 0, 0, 5, 0, 0, 5, 0, 0, 5, 0, 5, 5,
                             5, 0, 5, 5, 0, 5, 0, 0, 5, 5, 0, 5, 0, 0, 5, 0,
                             0, 0, 5, 0, 5, 5, 0, 5, 0, 0, 5, 0, 5, 5, 0, 5
                         ],
-                        indices:[
+                        indices: [
                             0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15,
                             16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23
 
                         ],
-                        coreId:"myGeometry"
+                        coreId: "myGeometry"
                     }
                 ]
             }
@@ -134,29 +135,29 @@
         // Mouse-orbited camera, implemented by plugin at
         // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
         {
-            type:"cameras/orbit",
-            yaw:30,
-            pitch:-30,
-            zoom:30,
-            zoomSensitivity:10.0,
-            nodes:[
+            type: "cameras/orbit",
+            yaw: 30,
+            pitch: -30,
+            zoom: 30,
+            zoomSensitivity: 10.0,
+            nodes: [
 
                 // First object, uses the blue material, the texture, and the box geometry
                 {
-                    type:"translate",
-                    x:-6,
-                    nodes:[
+                    type: "translate",
+                    x: -6,
+                    nodes: [
                         {
-                            type:"material",
-                            coreId:"myMaterial",
-                            nodes:[
+                            type: "material",
+                            coreId: "myMaterial",
+                            nodes: [
                                 {
-                                    type:"texture",
-                                    coreId:"myTexture",
-                                    nodes:[
+                                    type: "_texture",
+                                    coreId: "myTexture",
+                                    nodes: [
                                         {
-                                            type:"geometry",
-                                            coreId:"myGeometry"
+                                            type: "geometry",
+                                            coreId: "myGeometry"
                                         }
                                     ]
                                 }
@@ -167,16 +168,16 @@
 
                 // Second object, uses the red material and the box geometry
                 {
-                    type:"translate",
-                    x:6,
-                    nodes:[
+                    type: "translate",
+                    x: 6,
+                    nodes: [
                         {
-                            type:"material",
-                            coreId:"myOtherMaterial",
-                            nodes:[
+                            type: "material",
+                            coreId: "myOtherMaterial",
+                            nodes: [
                                 {
-                                    type:"geometry",
-                                    coreId:"myGeometry"
+                                    type: "geometry",
+                                    coreId: "myGeometry"
                                 }
                             ]
                         }

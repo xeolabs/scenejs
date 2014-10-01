@@ -294,13 +294,13 @@ SceneJS.Types.addType("postprocess/dof", {
 
                             // Input color target
                             {
-                                type: "textureMap",
+                                type: "texture",
                                 target: colorTarget,
                                 nodes: [
 
                                     // Input depth target
                                     {
-                                        type: "textureMap",
+                                        type: "texture",
                                         target: depthTarget,
                                         nodes: [
 
@@ -337,13 +337,13 @@ SceneJS.Types.addType("postprocess/dof", {
 
                     // Input second color target
                     {
-                        type: "textureMap",
+                        type: "texture",
                         target: colorTarget2,
                         nodes: [
 
                             // Input depth target
                             {
-                                type: "textureMap",
+                                type: "texture",
                                 target: depthTarget,
                                 nodes: [
 

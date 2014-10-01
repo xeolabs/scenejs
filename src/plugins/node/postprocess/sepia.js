@@ -57,7 +57,7 @@ SceneJS.Types.addType("postprocess/sepia", {
 
                 nodes: [
                     {
-                        type: "textureMap",
+                        type: "texture",
                         target: colorTargetId,
 
                         nodes: [

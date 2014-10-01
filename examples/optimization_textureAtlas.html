@@ -23,7 +23,7 @@
     <br>
     two objects using different regions of the same texture
     <br>
-    read more in <a href="http://en.wikipedia.org/wiki/Texture_atlas"  target="_other">this Wikipedia article</a>
+    read more in <a href="http://en.wikipedia.org/wiki/Texture_atlas" target="_other">this Wikipedia article</a>
 </div>
 
 <script>
@@ -38,36 +38,32 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // Create scene
     SceneJS.createScene({
-        nodes:[
+        nodes: [
 
             // Orbiting camera node, implemented by plugin at
             // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"cameras/orbit",
-                yaw:30,
-                pitch:-30,
-                zoom:7,
-                zoomSensitivity:1.0,
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 7,
+                zoomSensitivity: 1.0,
 
-                nodes:[
+                nodes: [
 
                     // Our texture atlas
                     // The atlas is the General Zod portrait and the brickwall pattern,
                     //arranged side-by-side within the same image file.
                     {
-                        type:"texture",
-                        layers:[
-                            {
-                                uri:"textures/texture-atlas.jpg"
-                            }
-                        ],
+                        type: "texture",
+                        src: "textures/texture-atlas.jpg",
 
-                        nodes:[
+                        nodes: [
 
                             // Two quads - geometry nodes that define a four-sided polygon.
                             //
@@ -82,36 +78,36 @@
 
                             // 1. General Zod
                             {
-                                type:"translate",
-                                x:1.5,
+                                type: "translate",
+                                x: 1.5,
 
-                                nodes:[
+                                nodes: [
                                     {
-                                        type:"geometry",
-                                        positions:[ 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0 ],
-                                        normals:[ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
+                                        type: "geometry",
+                                        positions: [ 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0 ],
+                                        normals: [ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
 
                                         // UV coords map to left half of texture image
-                                        uv:[ 1, 1, .5, 1, .5, 0, 1, 0 ],
-                                        indices:[ 0, 1, 2, 0, 2, 3]
+                                        uv: [ 1, 1, .5, 1, .5, 0, 1, 0 ],
+                                        indices: [ 0, 1, 2, 0, 2, 3]
                                     }
                                 ]
                             },
 
                             // 2. Brick wall
                             {
-                                type:"translate",
-                                x:-1.5,
+                                type: "translate",
+                                x: -1.5,
 
-                                nodes:[
+                                nodes: [
                                     {
-                                        type:"geometry",
-                                        positions:[ 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0 ],
-                                        normals:[ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
+                                        type: "geometry",
+                                        positions: [ 1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0 ],
+                                        normals: [ 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1 ],
 
                                         // UV coords map to right half of texture image
-                                        uv:[ .5, 1, 0, 1, 0, 0, .5, 0 ],
-                                        indices:[ 0, 1, 2, 0, 2, 3]
+                                        uv: [ .5, 1, 0, 1, 0, 0, .5, 0 ],
+                                        indices: [ 0, 1, 2, 0, 2, 3]
                                     }
                                 ]
                             }

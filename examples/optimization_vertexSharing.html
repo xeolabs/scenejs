@@ -192,19 +192,15 @@ SceneJS.createScene({
                         // Brick wall color map
                         {
                             type: "texture",
-                            layers: [
-                                {
-                                    uri: "textures/BrickWall.jpg",
-                                    wrapS: "repeat",
-                                    wrapT: "repeat",
+                            src: "textures/BrickWall.jpg",
+                            wrapS: "repeat",
+                            wrapT: "repeat",
 
-                                    // Texture scale factors
-                                    scale: {
-                                        x: .1,
-                                        y: .05
-                                    }
-                                }
-                            ],
+                            // Texture scale factors
+                            scale: {
+                                x: .1,
+                                y: .05
+                            },
 
                             nodes: [
                                 {
@@ -230,13 +226,10 @@ SceneJS.createScene({
                         },
                         {
                             type: "texture",
-                            layers: [
-                                {
-                                    uri: "textures/general-zod.jpg",
-                                    wrapS: "repeat",
-                                    wrapT: "repeat"
-                                }
-                            ],
+                            src: "textures/general-zod.jpg",
+                            wrapS: "repeat",
+                            wrapT: "repeat",
+
                             nodes: [
                                 {
                                     type: "geometry",

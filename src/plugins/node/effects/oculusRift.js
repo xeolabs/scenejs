@@ -51,6 +51,29 @@ SceneJS.Types.addType("effects/oculusRift", {
 
     construct: function (params) {
 
+        // worldFactor indicates how many units is 1 meter
+        this._worldFactor = params.worldFactor || 1.0;
+
+        // Specific HMD parameters
+        this._hmd = params.hmd || {
+
+            // Parameters from the Oculus Rift DK1
+            hResolution: 1280,
+            vResolution: 800,
+            hScreenSize: 0.14976,
+            vScreenSize: 0.0936,
+            interpupillaryDistance: 0.064,
+            lensSeparationDistance: 0.064,
+            eyeToScreenDistance: 0.041,
+            distortionK: [1.0, 0.22, 0.24, 0.0],
+            chromaAbParameter: [ 0.996, -0.004, 1.014, 0.0]
+        };
+
+        // Compute aspect ratio and FOV
+        this._aspect = this._hmd.hResolution / (2.0 * this._hmd.vResolution);
+        var r = -1.0 - (4 * (this._hmd.hScreenSize / 4 - this._hmd.lensSeparationDistance / 2) / this._hmd.hScreenSize);
+        this._distScale = (this._hmd.distortionK[0] + this._hmd.distortionK[1] * Math.pow(r, 2) + this._hmd.distortionK[2] * Math.pow(r, 4) + this._hmd.distortionK[3] * Math.pow(r, 6));
+
         // Reference lookat
         // initialised on pre-compile
         this._lookat = null;
@@ -99,7 +122,7 @@ SceneJS.Types.addType("effects/oculusRift", {
 
         // Feed color target into the second stage as a texture
         this._texture = this._stage2.addNode({
-            type: "textureMap",
+            type: "texture",
             target: this._colorTarget.getId()
         });
 
@@ -135,23 +158,24 @@ SceneJS.Types.addType("effects/oculusRift", {
                         "precision highp float;",
 
                         "uniform sampler2D SCENEJS_uSampler0;",
-                        "uniform vec2 LensCenter;",
-                        "uniform vec2 ScreenCenter;",
-                        "uniform vec2 Scale;",
-                        "uniform vec2 ScaleIn;",
-                        "uniform vec4 HmdWarpParam;",
+                        "uniform vec2 lensCenter;",
+                        "uniform vec2 screenCenter;",
+                        "uniform vec2 scale;",
+                        "uniform vec2 scaleIn;",
+                        "uniform vec4 hmdWarpParam;",
                         "uniform float eyeSign;",
 
                         "varying vec3 vPos;",
                         "varying vec2 vUv;",
 
-                        "vec2 HmdWarp(vec2 in01) {",
-                        "	vec2 theta = (in01 - LensCenter) * ScaleIn;",
+                        // Lens distortion
+                        "vec2 hmdWarp(vec2 in01) {",
+                        "	vec2 theta = (in01 - lensCenter) * scaleIn;",
                         "	float rSq = theta.x * theta.x + theta.y * theta.y;",
-                        "	vec2 rvector = theta * (HmdWarpParam.x + HmdWarpParam.y * rSq +",
-                        "		HmdWarpParam.z * rSq * rSq +",
-                        "		HmdWarpParam.w * rSq * rSq * rSq);",
-                        "	return LensCenter + Scale * rvector;",
+                        "	vec2 rvector = theta * (hmdWarpParam.x + hmdWarpParam.y * rSq +",
+                        "		hmdWarpParam.z * rSq * rSq +",
+                        "		hmdWarpParam.w * rSq * rSq * rSq);",
+                        "	return lensCenter + scale * rvector;",
                         "}",
 
                         "void main(){",
@@ -161,8 +185,8 @@ SceneJS.Types.addType("effects/oculusRift", {
                         "   if (eyeSign > 0.0 && vPos.x < 0.0) {",
                         "       discard;",
                         "   }",
-                        "	vec2 tc = HmdWarp(vUv);",
-                        "	if (any(bvec2(clamp(tc,ScreenCenter-vec2(0.25,0.5), ScreenCenter+vec2(0.25,0.5)) - tc))) {",
+                        "	vec2 tc = hmdWarp(vUv);",
+                        "	if (any(bvec2(clamp(tc,screenCenter-vec2(0.25,0.5), screenCenter+vec2(0.25,0.5)) - tc))) {",
                         "       gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);",
                         "	} else {",
                         "	    gl_FragColor = texture2D(SCENEJS_uSampler0, tc);",
@@ -175,13 +199,18 @@ SceneJS.Types.addType("effects/oculusRift", {
             params: {
 
                 // These params will remain constant for both eyes:
-                "Scale": [0.1469278, 0.2350845],
-                "ScaleIn": [4, 5.0],
-                "HmdWarpParam": [ 1, 0.22, 0.24, 0],
+                "scale": [1.0 / this._distScale, 1.0 * this._aspect / this._distScale],
+                "scaleIn": [1.0, 1.0 / this._aspect],
+
+                // Lens distortion parameters
+                "hmdWarpParam": this._hmd.distortionK,
+
+                // Chrome aberration 
+                "chromaAbParameter": this._hmd.chromaAbParameter,
 
                 // These params will be updated for each eye:
-                "LensCenter": [0.0, 0.0],
-                "ScreenCenter": [0.0, 0.0],
+                "lensCenter": [0.0, 0.0],
+                "screenCenter": [0.0, 0.0],
 
                 // Indicates which eye we're rendering: -1 == left, +1 == right
                 "eyeSign": 0
@@ -198,6 +227,14 @@ SceneJS.Types.addType("effects/oculusRift", {
 
         this._focalLength = params.focalLength || 20.0;
     },
+
+//    setHMD : function(hmd) {
+//        this._hmd = hmd;
+//    },
+//
+//    getHMD: function() {
+//        return this._hmd;
+//    },
 
     preCompile: function () {
         this._build();
@@ -249,7 +286,6 @@ SceneJS.Types.addType("effects/oculusRift", {
                 }
 
                 var canvas = scene.getCanvas();
-                var ratio = canvas.width / canvas.height;
 
                 switch (params.pass) {
 
@@ -262,6 +298,8 @@ SceneJS.Types.addType("effects/oculusRift", {
                         var _eye = [eye.x, eye.y, eye.z];
                         var _look = [look.x, look.y, look.z];
                         var _up = [0, 1, 0];
+
+                        var eyeSep = 4 * (self._hmd.hScreenSize/4 - self._hmd.lensSeparationDistance/2) / self._hmd.hScreenSize;
 
                         // Derive the two eye positions
                         var eyeVec = SceneJS_math_subVec3(_eye, _look, []);
@@ -278,16 +316,16 @@ SceneJS.Types.addType("effects/oculusRift", {
 
                         self._camera.set({
                             optics: {
-                                left: -ratio * wd2 - 0.5 * eyeSep * ndfl,
-                                right: ratio * wd2 - 0.5 * eyeSep * ndfl,
+                                left: -self._aspect * wd2 - 0.5 * eyeSep * ndfl,
+                                right: self._aspect * wd2 - 0.5 * eyeSep * ndfl,
                                 top: wd2,
                                 bottom: -wd2
                             }
                         });
 
                         self._shader.setParams({
-                            "LensCenter": [0.7136753, 0.5],
-                            "ScreenCenter": [0.75, 0.5],
+                            "lensCenter": [0.7136753, 0.5],
+                            "screenCenter": [0.75, 0.5],
                             "eyeSign": 1
                         });
 
@@ -307,16 +345,16 @@ SceneJS.Types.addType("effects/oculusRift", {
 
                         self._camera.set({
                             optics: {
-                                left: -ratio * wd2 + 0.5 * eyeSep * ndfl,
-                                right: ratio * wd2 + 0.5 * eyeSep * ndfl,
+                                left: -self._aspect * wd2 + 0.5 * eyeSep * ndfl,
+                                right: self._aspect * wd2 + 0.5 * eyeSep * ndfl,
                                 top: wd2,
                                 bottom: -wd2
                             }
                         });
 
                         self._shader.setParams({
-                            "LensCenter": [0.2863248, 0.5],
-                            "ScreenCenter": [ 0.25, 0.5],
+                            "lensCenter": [0.2863248, 0.5],
+                            "screenCenter": [ 0.25, 0.5],
                             "eyeSign": 0
                         });
 

@@ -172,8 +172,8 @@
             "src/core/scene/shaderParams.js",
             "src/core/scene/style.js",
             "src/core/scene/tag.js",
-            "src/core/scene/texture.js",
-            "src/core/scene/textureMap.js",
+            "src/core/scene/_texture.js", // Deprecated texture node
+            "src/core/scene/texture.js",  // New texture node
             "src/core/scene/reflect.js",
             "src/core/scene/xform.js",
             "src/core/scene/matrix.js",

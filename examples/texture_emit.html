@@ -66,13 +66,9 @@
                                     // The glow map
                                     {
                                         type: "texture",
-                                        id: "theTexture",
-                                        layers: [
-                                            {
-                                                src: "textures/weirdGlowMap.jpg",
-                                                applyTo: "emit" // Apply to material "emit" property
-                                            }
-                                        ],
+                                        src: "textures/weirdGlowMap.jpg",
+                                        applyTo: "emit", // Apply to material "emit" property
+
                                         nodes: [
 
                                             // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/torus.js

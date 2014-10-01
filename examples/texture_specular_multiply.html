@@ -25,73 +25,69 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // Create scene
     SceneJS.createScene({
-        nodes:[
+        nodes: [
 
             // Orbiting camera node, implemented by plugin at
             // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"cameras/orbit",
-                yaw:30,
-                pitch:-30,
-                zoom:5,
-                zoomSensitivity:1.0,
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 1.0,
 
-                nodes:[
+                nodes: [
 
                     // Override SceneJS' default lights to make specular reflection look nice
                     // for this example
                     {
-                        type:"lights",
-                        lights:[
+                        type: "lights",
+                        lights: [
                             {
-                                mode:"ambient",
-                                color:{ r:0.7, g:0.7, b:0.8 },
-                                diffuse:true,
-                                specular:false
+                                mode: "ambient",
+                                color: { r: 0.7, g: 0.7, b: 0.8 },
+                                diffuse: true,
+                                specular: false
                             },
                             {
-                                mode:"dir",
-                                color:{ r:0.5, g:0.5, b:1.0 },
-                                diffuse:true,
-                                specular:true,
-                                dir:{ x:0.5, y:0.5, z:-1.0 },
-                                space:"view"
+                                mode: "dir",
+                                color: { r: 0.5, g: 0.5, b: 1.0 },
+                                diffuse: true,
+                                specular: true,
+                                dir: { x: 0.5, y: 0.5, z: -1.0 },
+                                space: "view"
                             }
                         ],
 
-                        nodes:[
+                        nodes: [
 
                             // Specular material
                             {
-                                type:"material",
-                                color:{ r:0.5, g:0.5, b:0.6 },
-                                specularColor:{ r:0.7, g:0.7, b:0.8 },
-                                specular:1.0,
-                                shine:5.0,
-                                nodes:[
+                                type: "material",
+                                color: { r: 0.5, g: 0.5, b: 0.6 },
+                                specularColor: { r: 0.7, g: 0.7, b: 0.8 },
+                                specular: 1.0,
+                                shine: 5.0,
+                                nodes: [
 
                                     // Specular map
                                     {
-                                        type:"texture",
-                                        id:"theTexture",
-                                        layers:[
-                                            {
-                                                src:"textures/crossGridSpecularMap.jpg",
-                                                applyTo:"specular", // Apply to material's "specular" property
-                                                blendMode:"multiply" // Multiply the texture with that specular property
-                                            }
-                                        ],
-                                        nodes:[
+                                        type: "texture",
+                                        src: "textures/crossGridSpecularMap.jpg",
+                                        applyTo: "specular", // Apply to material's "specular" property
+                                        blendMode: "multiply", // Multiply the texture with that specular property
+
+                                        nodes: [
 
                                             // Torus primitive, implemented by plugin at
                                             // http://scenejs.org/api/latest/plugins/node/geometry/torus.js
                                             {
-                                                type:"geometry/torus"
+                                                type: "geometry/torus"
                                             }
                                         ]
                                     }

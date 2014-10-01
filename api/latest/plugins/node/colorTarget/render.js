@@ -9,7 +9,7 @@ SceneJS.Types.addType("colorTarget/render", {
 
     construct: function (params) {
         this.addNode({
-            type: "textureMap",
+            type: "texture",
             target: params.target,
             nodes: [
                 {

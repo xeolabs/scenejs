@@ -27,43 +27,39 @@
 
 // Point SceneJS to the bundled plugins
 SceneJS.setConfigs({
-    pluginPath:"../api/latest/plugins"
+    pluginPath: "../api/latest/plugins"
 });
 
 // Create scene
 SceneJS.createScene({
-    nodes:[
+    nodes: [
 
         // Mouse-orbited camera, implemented by plugin at
         // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
         {
-            type:"cameras/orbit",
-            yaw:30,
-            pitch:-30,
-            zoom:30,
-            zoomSensitivity:1.0,
+            type: "cameras/orbit",
+            yaw: 30,
+            pitch: -30,
+            zoom: 30,
+            zoomSensitivity: 1.0,
 
-            nodes:[
+            nodes: [
                 {
-                    type:"texture",
-                    layers:[
-                        {
-                            src:"textures/BrickWall.jpg",
+                    type: "texture",
+                    src: "textures/BrickWall.jpg",
 
-                            // Texture scale factors
-                            scale:{
-                                x:.1,
-                                y:.05
-                            }
-                        }
-                    ],
+                    // Texture scale factors
+                    scale: {
+                        x: .1,
+                        y: .05
+                    },
 
-                    nodes:[
+                    nodes: [
 
                         // Geometry node which defines our custom object, a simple cube.
                         {
 
-                            type:"geometry",
+                            type: "geometry",
 
                             // The primitive type - allowed values are
                             // "points", "lines", "line-loop", "line-strip",
@@ -72,11 +68,11 @@ SceneJS.createScene({
                             // See the OpenGL/WebGL specification docs for
                             // how the coordinate arrays are supposed to be laid out
                             // for them.
-                            primitive:"triangles",
+                            primitive: "triangles",
 
                             // The vertices - eight for our cube, each
                             // one spanning three array elements for X,Y and Z
-                            positions:[
+                            positions: [
 
                                 /* v0-v1-v2-v3 front
                                  */
@@ -123,7 +119,7 @@ SceneJS.createScene({
 
                             /* Normal vectors, one for each vertex
                              */
-                            normals:[
+                            normals: [
 
                                 /* v0-v1-v2-v3 front
                                  */
@@ -172,7 +168,7 @@ SceneJS.createScene({
                              * 3D positions defined above - eight for our cube, each
                              * one spaining two array elements for X and Y
                              */
-                            uv:[
+                            uv: [
 
                                 /* v0-v1-v2-v3 front
                                  */
@@ -232,7 +228,7 @@ SceneJS.createScene({
                              * node's frontFace property as "cw", instead of
                              * the default "ccw".
                              */
-                            indices:[
+                            indices: [
                                 0, 1, 2,
                                 0, 2, 3,
                                 // front

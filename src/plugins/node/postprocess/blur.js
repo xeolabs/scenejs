@@ -169,7 +169,7 @@ SceneJS.Types.addType("postprocess/blur", {
 
                             // Input color target
                             {
-                                type: "textureMap",
+                                type: "texture",
                                 target: colorTarget,
                                 nodes: [
 
@@ -203,7 +203,7 @@ SceneJS.Types.addType("postprocess/blur", {
 
                     // Input second color target
                     {
-                        type: "textureMap",
+                        type: "texture",
                         target: colorTarget2,
                         nodes: [
 

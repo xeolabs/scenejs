@@ -14,7 +14,7 @@
 
          // Color map
          {
-             type: "textureMap",
+             type: "texture",
              src: "textures/superman.jpg",
              applyTo: "color",  // Apply to material "color" property (default)
 

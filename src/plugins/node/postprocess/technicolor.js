@@ -55,7 +55,7 @@ SceneJS.Types.addType("postprocess/technicolor", {
 
                 nodes: [
                     {
-                        type: "textureMap",
+                        type: "texture",
                         target: colorTargetId,
 
                         nodes: [

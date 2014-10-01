@@ -68,7 +68,7 @@ SceneJS.Types.addType("texture/video", {
         }
 
         this._texture = this.addNode({
-            type: "textureMap",
+            type: "texture",
             minFilter: "linear",
             magFilter: "linear",
             wrapS: params.wrapS,

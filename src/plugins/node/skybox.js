@@ -7,7 +7,7 @@
  <p>Usage example:</p>
 
  <pre>
-  someNode.addNode({
+ someNode.addNode({
        type: "skybox",
        texture: "foo/bar/mySkyboxTexture.jpg",
        size: 5000 // Box half-size on each axis - default is 5000
@@ -92,7 +92,7 @@ SceneJS.Types.addType("skybox", {
 
                 // Front
                 {
-                    type: "textureMap",
+                    type: "texture",
                     src: src[0],
                     blendMode: "add",
                     nodes: [
@@ -107,7 +107,7 @@ SceneJS.Types.addType("skybox", {
 
                 // Right
                 {
-                    type: "textureMap",
+                    type: "texture",
                     src: src[1],
                     blendMode: "add",
                     nodes: [
@@ -122,7 +122,7 @@ SceneJS.Types.addType("skybox", {
 
                 // Top
                 {
-                    type: "textureMap",
+                    type: "texture",
                     src: src[2],
                     blendMode: "add",
                     nodes: [
@@ -137,7 +137,7 @@ SceneJS.Types.addType("skybox", {
 
                 // Left
                 {
-                    type: "textureMap",
+                    type: "texture",
                     src: src[3],
                     blendMode: "add",
                     nodes: [
@@ -152,7 +152,7 @@ SceneJS.Types.addType("skybox", {
 
                 // Bottom
                 {
-                    type: "textureMap",
+                    type: "texture",
                     src: src[4],
                     blendMode: "add",
                     nodes: [
@@ -167,7 +167,7 @@ SceneJS.Types.addType("skybox", {
 
                 // Back
                 {
-                    type: "textureMap",
+                    type: "texture",
                     src: src[5],
                     blendMode: "add",
                     nodes: [
@@ -187,12 +187,9 @@ SceneJS.Types.addType("skybox", {
 
             material.addNode({
                 type: "texture",
-                layers: [
-                    {
-                        src: src,
-                        blendMode: "add"
-                    }
-                ],
+                src: src,
+                blendMode: "add",
+
                 nodes: [
                     {
                         type: "scale",

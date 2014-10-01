@@ -7,7 +7,7 @@ SceneJS.Types.addType("depthTarget/render", {
 
     construct: function (params) {
         this.addNode({
-            type: "textureMap",
+            type: "texture",
             target: params.target,
             nodes: [
                 {

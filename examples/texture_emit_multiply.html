@@ -25,78 +25,74 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // Create scene
     SceneJS.createScene({
-        nodes:[
+        nodes: [
 
             // Orbiting camera node, implemented by plugin at
             // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"cameras/orbit",
-                yaw:30,
-                pitch:-30,
-                zoom:5,
-                zoomSensitivity:1.0,
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 1.0,
 
-                nodes:[
+                nodes: [
 
                     // Override SceneJS' default lights to define dull ambient light
                     // to accentuate our glow map
                     {
-                        type:"lights",
-                        lights:[
+                        type: "lights",
+                        lights: [
                             {
-                                mode:"ambient",
-                                color:{ r:0.2, g:0.2, b:0.2 },
-                                diffuse:true,
-                                specular:false
+                                mode: "ambient",
+                                color: { r: 0.2, g: 0.2, b: 0.2 },
+                                diffuse: true,
+                                specular: false
                             }
                         ],
 
-                        nodes:[
+                        nodes: [
                             {
-                                type:"rotate",
-                                id:"pitch",
-                                angle:-30.0,
-                                x:1.0,
+                                type: "rotate",
+                                id: "pitch",
+                                angle: -30.0,
+                                x: 1.0,
 
-                                nodes:[
+                                nodes: [
                                     {
-                                        type:"rotate",
-                                        id:"yaw",
-                                        angle:-30.0,
-                                        y:1.0,
+                                        type: "rotate",
+                                        id: "yaw",
+                                        angle: -30.0,
+                                        y: 1.0,
 
-                                        nodes:[
+                                        nodes: [
                                             {
-                                                type:"material",
-                                                color:{ r:1.0, g:0.3, b:0.3 },
-                                                emit:1.0,
-                                                nodes:[
+                                                type: "material",
+                                                color: { r: 1.0, g: 0.3, b: 0.3 },
+                                                emit: 1.0,
+                                                nodes: [
                                                     {
-                                                        type:"texture",
-                                                        id:"theTexture",
-                                                        layers:[
-                                                            {
-                                                                src:"textures/weirdGlowMap.jpg",
-                                                                applyTo:"emit", // Apply to material "emit" property
-                                                                blendMode:"multiply"
-                                                            }
-                                                        ],
-                                                        nodes:[
+                                                        type: "texture",
+                                                        src: "textures/weirdGlowMap.jpg",
+                                                        applyTo: "emit", // Apply to material "emit" property
+                                                        blendMode: "multiply",
+
+                                                        nodes: [
 
                                                             // Torus primitive, implemented by plugin at
                                                             // http://scenejs.org/api/latest/plugins/node/geometry/torus.js
                                                             {
-                                                                type:"geometry/torus",
-                                                                radius:1.0,
-                                                                tube:0.30,
-                                                                segmentsR:60,
-                                                                segmentsT:40,
-                                                                arc:Math.PI * 2
+                                                                type: "geometry/torus",
+                                                                radius: 1.0,
+                                                                tube: 0.30,
+                                                                segmentsR: 60,
+                                                                segmentsT: 40,
+                                                                arc: Math.PI * 2
                                                             }
                                                         ]
                                                     }

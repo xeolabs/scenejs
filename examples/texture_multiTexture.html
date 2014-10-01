@@ -109,7 +109,7 @@ var scene = SceneJS.createScene({
 
                                                                 // Color map
                                                                 {
-                                                                    type: "textureMap",
+                                                                    type: "texture",
                                                                     src: "textures/earth.jpg",
                                                                     applyTo: "color",
 
@@ -117,7 +117,7 @@ var scene = SceneJS.createScene({
 
                                                                         // Specular map for shiny oceans
                                                                         {
-                                                                            type: "textureMap",
+                                                                            type: "texture",
                                                                             src: "textures/earth-specular.png",
                                                                             applyTo: "specular",
 
@@ -125,7 +125,7 @@ var scene = SceneJS.createScene({
 
                                                                                 // Glow map for lights on night side
                                                                                 {
-                                                                                    type: "textureMap",
+                                                                                    type: "texture",
                                                                                     src: "textures/earth-lights.gif",
                                                                                     applyTo: "emit",
 
@@ -190,7 +190,7 @@ var scene = SceneJS.createScene({
 
                                                                         // Alpha map for clouds
                                                                         {
-                                                                            type: "textureMap",
+                                                                            type: "texture",
                                                                             src: "textures/earthclouds.jpg",
                                                                             applyTo: "alpha", // Apply to material "alpha" property
                                                                             flipY: false,

@@ -21,35 +21,35 @@
 
 <script>
 
-    alert ("FIXME");
+    alert("FIXME");
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // Create scene
     var scene = SceneJS.createScene({
-        nodes:[
+        nodes: [
 
             // Orbiting camera node, implemented by plugin at
             // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"cameras/orbit",
-                yaw:30,
-                pitch:30,
-                zoom:10,
-                zoomSensitivity:1.0,
-                nodes:[
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: 30,
+                zoom: 10,
+                zoomSensitivity: 1.0,
+                nodes: [
 
                     // Shader node which injects a custom function into SceneJS' auto-generated vertex shader
                     // to intercept the View matrix and remove translation from it
                     {
-                        type:"shader",
-                        shaders:[
+                        type: "shader",
+                        shaders: [
                             {
-                                stage:"vertex",
-                                code:[
+                                stage: "vertex",
+                                code: [
                                     "mat4 myViewMatrix(mat4 m) {",
                                     "   m[3][0] =m[3][1] = m[3][2] = 0.0;",
                                     "return m;",
@@ -58,44 +58,41 @@
 
                                 // Bind our custom function to hooks that
                                 // SceneJS provides in its vertex shader
-                                hooks:{
-                                    viewMatrix:"myViewMatrix"
+                                hooks: {
+                                    viewMatrix: "myViewMatrix"
                                 }
                             }
                         ],
-                        nodes:[
+                        nodes: [
                             {
-                                type:"flags",
-                                flags:{
-                                    specular:false,
-                                    diffuse:false,
-                                    ambient:false
+                                type: "flags",
+                                flags: {
+                                    specular: false,
+                                    diffuse: false,
+                                    ambient: false
                                 },
-                                nodes:[
+                                nodes: [
                                     {
-                                        type:"material",
-                                        color:{ r:1, g:1, b:1  },
-                                        emit:0.0,
-                                        nodes:[
+                                        type: "material",
+                                        color: { r: 1, g: 1, b: 1  },
+                                        emit: 0.0,
+                                        nodes: [
                                             {
-                                                type:"texture",
-                                                layers:[
+                                                type: "texture",
+                                                src: "textures/clouds-box.jpg",
+                                                blendMode: "multiply",
+
+                                                nodes: [
                                                     {
-                                                        src:"textures/clouds-box.jpg",
-                                                        blendMode:"multiply"
-                                                    }
-                                                ],
-                                                nodes:[
-                                                    {
-                                                        type:"scale",
-                                                        x:1000,
-                                                        y:1000,
-                                                        z:1000,
-                                                        nodes:[
+                                                        type: "scale",
+                                                        x: 1000,
+                                                        y: 1000,
+                                                        z: 1000,
+                                                        nodes: [
                                                             {
-                                                                type:"geometry",
-                                                                source:{
-                                                                    type:"skybox"
+                                                                type: "geometry",
+                                                                source: {
+                                                                    type: "skybox"
                                                                 }
                                                             }
                                                         ]
@@ -111,44 +108,44 @@
 
                     // Torus and ground
                     {
-                        type:"lights",
-                        lights:[
+                        type: "lights",
+                        lights: [
                             {
-                                mode:"ambient",
-                                color:{ r:1.0, g:1.0, b:1.0 },
-                                diffuse:true
+                                mode: "ambient",
+                                color: { r: 1.0, g: 1.0, b: 1.0 },
+                                diffuse: true
                             },
                             {
-                                mode:"dir",
-                                color:{r:1.0, g:1.0, b:1.0 },
-                                diffuse:true,
-                                specular:true,
-                                dir:{ x:0.5, y:-1.0, z:-0.6 }
+                                mode: "dir",
+                                color: {r: 1.0, g: 1.0, b: 1.0 },
+                                diffuse: true,
+                                specular: true,
+                                dir: { x: 0.5, y: -1.0, z: -0.6 }
                             },
                             {
-                                mode:"dir",
-                                color:{r:1.0, g:1.0, b:1.0 },
-                                diffuse:true,
-                                specular:true,
-                                dir:{ r:-1.0, g:0.0, b:0.0 }
+                                mode: "dir",
+                                color: {r: 1.0, g: 1.0, b: 1.0 },
+                                diffuse: true,
+                                specular: true,
+                                dir: { r: -1.0, g: 0.0, b: 0.0 }
                             }
                         ],
-                        nodes:[
+                        nodes: [
 
                             // Torus
 
                             {
-                                type:"material",
-                                color:{ r:0.5, g:0.5, b:0.6 },
-                                nodes:[
+                                type: "material",
+                                color: { r: 0.5, g: 0.5, b: 0.6 },
+                                nodes: [
                                     {
-                                        type:"translate",
-                                        y:1.5,
-                                        nodes:[
+                                        type: "translate",
+                                        y: 1.5,
+                                        nodes: [
 
                                             // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/torus.js
                                             {
-                                                type:"geometry/torus"
+                                                type: "geometry/torus"
                                             }
                                         ]
                                     }
@@ -158,30 +155,30 @@
                             // Ground
 
                             {
-                                type:"material",
-                                color:{ r:0.3, g:0.3, b:0.3 },
-                                emit:0,
-                                nodes:[
+                                type: "material",
+                                color: { r: 0.3, g: 0.3, b: 0.3 },
+                                emit: 0,
+                                nodes: [
                                     {
-                                        type:"scale",
-                                        x:500,
-                                        y:.5,
-                                        z:500,
-                                        nodes:[
+                                        type: "scale",
+                                        x: 500,
+                                        y: .5,
+                                        z: 500,
+                                        nodes: [
                                             {
-                                                type:"rotate",
-                                                x:1,
-                                                angle:90,
-                                                nodes:[
+                                                type: "rotate",
+                                                x: 1,
+                                                angle: 90,
+                                                nodes: [
 
                                                     // Plane primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/plane.js
                                                     {
-                                                        type:"geometry/plane",
-                                                        width:1,
-                                                        height:1,
+                                                        type: "geometry/plane",
+                                                        width: 1,
+                                                        height: 1,
                                                         wire: true,
-                                                        widthSegments:100,
-                                                        heightSegments:100
+                                                        widthSegments: 100,
+                                                        heightSegments: 100
                                                     }
                                                 ]
                                             }

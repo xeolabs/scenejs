@@ -48,81 +48,77 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // create scene
     var scene = SceneJS.createScene({
-        nodes:[
+        nodes: [
 
             // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"cameras/orbit",
-                yaw:30,
-                pitch:-30,
-                zoom:10,
-                zoomSensitivity:5,
-                nodes:[
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 10,
+                zoomSensitivity: 5,
+                nodes: [
 
                     // Override SceneJS' default lights to make specular reflection look nice
                     // for this example
                     {
-                        type:"lights",
-                        lights:[
+                        type: "lights",
+                        lights: [
                             {
-                                mode:"ambient",
-                                color:{ r:0.7, g:0.7, b:0.8 },
-                                diffuse:true,
-                                specular:false
+                                mode: "ambient",
+                                color: { r: 0.7, g: 0.7, b: 0.8 },
+                                diffuse: true,
+                                specular: false
                             },
                             {
-                                mode:"dir",
-                                color:{ r:0.5, g:0.5, b:1.0 },
-                                diffuse:true,
-                                specular:true,
-                                dir:{ x:0.5, y:0.5, z:-1.0 },
-                                space:"view"
+                                mode: "dir",
+                                color: { r: 0.5, g: 0.5, b: 1.0 },
+                                diffuse: true,
+                                specular: true,
+                                dir: { x: 0.5, y: 0.5, z: -1.0 },
+                                space: "view"
                             }
                         ],
 
-                        nodes:[
+                        nodes: [
 
                             // Flags node which enables or disables diffuse lighting of our teapot
                             {
-                                type:"flags",
-                                id:"myFlags",
-                                flags:{
-                                    diffuse:true // (default is true)
+                                type: "flags",
+                                id: "myFlags",
+                                flags: {
+                                    diffuse: true // (default is true)
                                 },
 
-                                nodes:[
+                                nodes: [
 
                                     // Some diffuse and specular material
                                     {
-                                        type:"material",
-                                        color:{ r:0.5, g:0.5, b:0.6 },
-                                        specularColor:{ r:0.7, g:0.7, b:0.8 },
-                                        specular:1.0,
-                                        shine:5.0,
+                                        type: "material",
+                                        color: { r: 0.5, g: 0.5, b: 0.6 },
+                                        specularColor: { r: 0.7, g: 0.7, b: 0.8 },
+                                        specular: 1.0,
+                                        shine: 5.0,
 
-                                        nodes:[
+                                        nodes: [
 
                                             // A specular map for completeness
                                             {
-                                                type:"texture",
-                                                id:"theTexture",
-                                                layers:[
-                                                    {
-                                                        src:"textures/crossGridSpecularMap.jpg",
-                                                        applyTo:"specular",
-                                                        blendMode:"multiply"
-                                                    }
-                                                ],
-                                                nodes:[
+                                                type: "texture",
+                                                src: "textures/crossGridSpecularMap.jpg",
+                                                applyTo: "specular",
+                                                blendMode: "multiply",
+
+                                                nodes: [
 
                                                     // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                                     {
-                                                        type:"geometry/teapot"
+                                                        type: "geometry/teapot"
                                                     }
                                                 ]
                                             }

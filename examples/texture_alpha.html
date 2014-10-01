@@ -22,62 +22,59 @@
 <div id="infoDark">
     <a href="http://scenejs.org">SceneJS</a> - alpha map - multiplicative blending mode
     <br>
-    learn more about alpha maps in <a href="http://xeolabs.com/articles/scenejs-alpha-mapping/"  target="_other">this tutorial</a>
+    learn more about alpha maps in <a href="http://xeolabs.com/articles/scenejs-alpha-mapping/" target="_other">this
+    tutorial</a>
 </div>
 
 <script>
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // Create scene
     var scene = SceneJS.createScene({
-        nodes:[
+        nodes: [
 
             // Orbiting camera node, implemented by plugin at
             // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"cameras/orbit",
-                yaw:30,
-                pitch:-30,
-                zoom:5,
-                zoomSensitivity:1.0,
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 1.0,
 
-                nodes:[
+                nodes: [
 
                     // Outer green box with alpha map
                     {
-                        type:"flags",
-                        flags:{
-                            transparent:true
+                        type: "flags",
+                        flags: {
+                            transparent: true
                         },
-                        nodes:[
+                        nodes: [
                             {
-                                type:"material",
-                                color:{
-                                    r:0.5, g:1, b:0.5
+                                type: "material",
+                                color: {
+                                    r: 0.5, g: 1, b: 0.5
                                 },
-                                alpha:1.0,
-                                nodes:[
+                                alpha: 1.0,
+                                nodes: [
 
                                     // The alpha map
                                     {
-                                        type:"texture",
-                                        id:"theTexture",
-                                        layers:[
-                                            {
-                                                src:"textures/leavesAlphaMap.jpg",
-                                                applyTo:"alpha"
-                                            }
-                                        ],
-                                        nodes:[
+                                        type: "texture",
+                                        src: "textures/leavesAlphaMap.jpg",
+                                        applyTo: "alpha",
+
+                                        nodes: [
 
                                             // Box primitive implemented by plugin at
                                             // http://scenejs.org/api/latest/plugins/node/geometry/box.js
                                             {
-                                                type:"geometry/box"
+                                                type: "geometry/box"
                                             }
                                         ]
                                     }
@@ -89,19 +86,19 @@
                     // Inner blue box
 
                     {
-                        type:"material",
-                        color:{
-                            r:0.3, g:0.3, b:1
+                        type: "material",
+                        color: {
+                            r: 0.3, g: 0.3, b: 1
                         },
-                        nodes:[
+                        nodes: [
                             {
-                                type:"scale", x:0.7, y:0.7, z:0.7,
-                                nodes:[
+                                type: "scale", x: 0.7, y: 0.7, z: 0.7,
+                                nodes: [
 
                                     // Box primitive implemented by plugin at
                                     // http://scenejs.org/api/latest/plugins/node/geometry/box.js
                                     {
-                                        type:"geometry/box"
+                                        type: "geometry/box"
                                     }
                                 ]
                             }

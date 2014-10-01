@@ -23,62 +23,65 @@
 <div id="infoDark">
     <a href="http://scenejs.org" target="_other">SceneJS</a> - second example
     <br>
-    learn how it's created in <a href="http://xeolabs.com/articles/scenejs-creating-a-scene-and-adding-nodes/"  target="_other">this tutorial</a>
+    learn how it's created in <a href="http://xeolabs.com/articles/scenejs-creating-a-scene-and-adding-nodes/"
+                                 target="_other">this tutorial</a>
 </div>
 
 <script>
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // Define scene
     var scene = SceneJS.createScene({
-        nodes:[
-            {
-                type:"lookAt",
-                eye:{ z:15, x:-8, y:7 },
-                nodes:[
-                    {
-                        type:"material",
-                        color:{ r:0.5, g:0.5, b:1.0 },
 
-                        nodes:[
+        nodes: [
+            {
+                type: "lookAt",
+                eye: { z: 15, x: -8, y: 7 },
+
+                nodes: [
+                    {
+                        type: "material",
+                        color: { r: 0.5, g: 0.5, b: 1.0 },
+
+                        nodes: [
                             {
-                                type:"texture",
-                                layers:[
+                                type: "texture",
+                                src: "textures/superman.jpg",
+
+                                nodes: [
                                     {
-                                        src:"textures/superman.jpg"
-                                    }
-                                ],
-                                nodes:[
-                                    {
-                                        type:"translate",
-                                        id:"firstBoxPos",
-                                        x:-3.0,
-                                        y:1.0,
-                                        z:5.0,
-                                        nodes:[
+                                        type: "translate",
+                                        id: "firstBoxPos",
+                                        x: -3.0,
+                                        y: 1.0,
+                                        z: 5.0,
+
+                                        nodes: [
                                             {
-                                                type:"geometry/box"
+                                                type: "geometry/box"
                                             }
                                         ]
                                     },
                                     {
-                                        type:"translate",
-                                        y:1.0,
-                                        z:5.0,
-                                        nodes:[
+                                        type: "translate",
+                                        y: 1.0,
+                                        z: 5.0,
+
+                                        nodes: [
                                             {
-                                                type:"geometry/box"
+                                                type: "geometry/box"
                                             }
                                         ]
                                     }
                                 ]
                             },
+
                             {
-                                type:"geometry/teapot"
+                                type: "geometry/teapot"
                             }
                         ]
                     }

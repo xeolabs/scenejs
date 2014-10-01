@@ -61,7 +61,7 @@ SceneJS.Types.addType("postprocess/filmGrain", {
 
                 nodes: [
                     {
-                        type: "textureMap",
+                        type: "texture",
                         target: colorTargetId,
 
                         nodes: [

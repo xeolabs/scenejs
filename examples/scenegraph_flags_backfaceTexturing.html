@@ -47,50 +47,47 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // Create scene
     var scene = SceneJS.createScene({
-        nodes:[
+        nodes: [
 
             // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"cameras/orbit",
-                yaw:140,
-                pitch:-30,
-                zoom:2,
-                zoomSensitivity:1,
-                nodes:[
+                type: "cameras/orbit",
+                yaw: 140,
+                pitch: -30,
+                zoom: 2,
+                zoomSensitivity: 1,
+                nodes: [
 
                     // Flags node which enables or disables backface texturing on our plane geometry
                     {
-                        type:"flags",
-                        id:"myFlags",
-                        flags:{
-                            backfaceTexturing:true
+                        type: "flags",
+                        id: "myFlags",
+                        flags: {
+                            backfaceTexturing: true
                         },
 
-                        nodes:[
+                        nodes: [
                             {
-                                type:"material",
-                                color:{ r:0.4, g:0.4, b:0.6 },
-                                alpha:0.8,
+                                type: "material",
+                                color: { r: 0.4, g: 0.4, b: 0.6 },
+                                alpha: 0.8,
 
-                                nodes:[
+                                nodes: [
                                     {
-                                        type:"texture",
-                                        layers:[
-                                            {
-                                                src:"textures/superman.jpg"
-                                            }
-                                        ],
-                                        nodes:[
+                                        type: "texture",
+                                        src: "textures/superman.jpg",
+
+                                        nodes: [
 
                                             // Plane primitive, implemented by plugin at
                                             // http://scenejs.org/api/latest/plugins/node/geometry/plane.js
                                             {
-                                                type:"geometry/plane"
+                                                type: "geometry/plane"
                                             }
                                         ]
                                     }

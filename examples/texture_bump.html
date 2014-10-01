@@ -27,62 +27,59 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // Create scene
     SceneJS.createScene({
-        nodes:[
+        nodes: [
 
             // Orbiting camera node, implemented by plugin at
             // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"cameras/orbit",
-                yaw:30,
-                pitch:-30,
-                zoom:5,
-                zoomSensitivity:1.0,
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 1.0,
 
-                nodes:[
+                nodes: [
 
                     // Override SceneJS' default lights for optimal bump map effect
                     {
-                        type:"lights",
-                        lights:[
+                        type: "lights",
+                        lights: [
                             {
-                                mode:"ambient",
-                                color:{ r:0.7, g:0.7, b:0.8 },
-                                diffuse:true,
-                                specular:false
+                                mode: "ambient",
+                                color: { r: 0.7, g: 0.7, b: 0.8 },
+                                diffuse: true,
+                                specular: false
                             },
                             {
-                                mode:"dir",
-                                color:{ r:1.0, g:1.0, b:1.0 },
-                                diffuse:true,
-                                specular:true,
-                                dir:{ x:-0.4, y:0.0, z:0.5 },
-                                space:"world"
+                                mode: "dir",
+                                color: { r: 1.0, g: 1.0, b: 1.0 },
+                                diffuse: true,
+                                specular: true,
+                                dir: { x: -0.4, y: 0.0, z: 0.5 },
+                                space: "world"
                             }
                         ],
-                        nodes:[
+                        nodes: [
 
                             // The normal map
                             {
-                                type:"texture",
-                                layers:[
-                                    {
-                                        uri:"textures/normalMap.png",
-                                        wrapS:"repeat",
-                                        wrapT:"repeat",
-                                        applyTo:"normals" // Apply to geometry normal vectors
-                                    }
-                                ],
-                                nodes:[
+                                type: "texture",
+                                src: "textures/normalMap.png",
+                                wrapS: "repeat",
+                                wrapT: "repeat",
+                                applyTo: "normals", // Apply to geometry normal vectors
+
+                                nodes: [
 
                                     // Box primitive implemented by plugin at
                                     // http://scenejs.org/api/latest/plugins/node/geometry/box.js
                                     {
-                                        type:"geometry/box"
+                                        type: "geometry/box"
                                     }
                                 ]
                             }
