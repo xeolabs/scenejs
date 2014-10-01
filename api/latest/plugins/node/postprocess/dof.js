@@ -4,6 +4,8 @@
 
  @author xeolabs / http://xeolabs.com
 
+ <p>Based on the article at Nutty Software: http://www.nutty.ca/?page_id=352&link=depth_of_field</p>
+
  <p>Usage:</p>
 
  <pre>
