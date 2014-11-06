@@ -83,9 +83,7 @@ SceneJS.log = new (function() {
     };
 
     this.__log = function(channel, message) {
-        message = activeSceneId
-                ? indentStr + activeSceneId + ": " + message
-                : indentStr + message;
+        message = indentStr + message;
 
         if (funcs && funcs[channel]) {
             funcs[channel](message);

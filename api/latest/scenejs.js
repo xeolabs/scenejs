@@ -1524,13 +1524,12 @@ var SceneJS_events = new (function () {
 
     this.ERROR = 0;
     this.RESET = 1;                         // SceneJS framework reset
-    this.NODE_CREATED = 2;                 // Scene has just been created
-    this.SCENE_CREATED = 3;                 // Scene has just been created
-    this.SCENE_COMPILING = 4;               // Scene about to be compiled and drawn
-    this.SCENE_DESTROYED = 5;               // Scene just been destroyed
-    this.OBJECT_COMPILING = 6;
-    this.WEBGL_CONTEXT_LOST = 7;
-    this.WEBGL_CONTEXT_RESTORED = 8;
+    this.SCENE_CREATED = 2;                 // Scene has just been created
+    this.SCENE_COMPILING = 3;               // Scene about to be compiled and drawn
+    this.SCENE_DESTROYED = 4;               // Scene just been destroyed
+    this.OBJECT_COMPILING = 5;
+    this.WEBGL_CONTEXT_LOST = 6;
+    this.WEBGL_CONTEXT_RESTORED = 7;
 
     /* Priority queue for each type of event
      */
@@ -1793,15 +1792,6 @@ SceneJS_Canvas.prototype.initWebGL = function () {
             SceneJS.errors.WEBGL_NOT_SUPPORTED,
             'Failed to get a WebGL context');
     }
-
-   // this.gl.enable(this.gl.SCISSOR_TEST);
-//    this.gl.clearColor(1.0, 1.0, 1.0, 1.0);
-//    this.gl.clearDepth(1.0);
-//    this.gl.enable(this.gl.DEPTH_TEST);
-//    this.gl.disable(this.gl.CULL_FACE);
-//    this.gl.depthRange(0, 1);
-//    this.gl.disable(this.gl.SCISSOR_TEST);
-//    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 };
 
 
@@ -2475,6 +2465,7 @@ var SceneJS_error = new (function() {
 })();
 
 (function() {
+
     SceneJS.errors = {};
 
     var n = 0;
@@ -2492,6 +2483,7 @@ var SceneJS_error = new (function() {
     SceneJS.errors.NODE_ILLEGAL_STATE = n++;
     SceneJS.errors.ID_CLASH = n++;
     SceneJS.errors.PLUGIN_INVALID = n++;
+
 })();
 
 SceneJS.errors._getErrorName = function(code) {
@@ -2683,9 +2675,7 @@ SceneJS.log = new (function() {
     };
 
     this.__log = function(channel, message) {
-        message = activeSceneId
-                ? indentStr + activeSceneId + ": " + message
-                : indentStr + message;
+        message = indentStr + message;
 
         if (funcs && funcs[channel]) {
             funcs[channel](message);
@@ -5015,50 +5005,92 @@ var SceneJS_sceneStatusModule = new (function () {
 
 SceneJS._webgl.ArrayBuffer = function (gl, type, values, numItems, itemSize, usage) {
 
+    /**
+     * True when this buffer is allocated and ready to go
+     * @type {boolean}
+     */
+    this.allocated = false;
+
     this.gl = gl;
     this.type = type;
+    this.numItems = numItems;
     this.itemSize = itemSize;
-
-    this._allocate = function (values, numItems) {
-        this.handle = gl.createBuffer();
-        this.handle.numItems = numItems;
-        this.handle.itemSize = itemSize;
-        gl.bindBuffer(type, this.handle);
-        gl.bufferData(type, values, usage);
-        this.handle.numItems = numItems;
-        gl.bindBuffer(type, null);
-        this.numItems = numItems;
-        this.length = values.length;
-    };
+    this.usage = usage;
 
     this._allocate(values, numItems);
-
-    this.setData = function (data, offset) {
-
-        if (data.length > this.length) {
-            this.destroy();
-            this._allocate(data, data.length);
-
-        } else {
-
-            if (offset || offset === 0) {
-                gl.bufferSubData(type, offset, data);
-            } else {
-                gl.bufferData(type, data);
-            }
-        }
-    };
-
-    this.unbind = function () {
-        gl.bindBuffer(type, null);
-    };
-
-    this.destroy = function () {
-        gl.deleteBuffer(this.handle);
-    };
 };
 
+/**
+ * Allocates this buffer
+ *
+ * @param values
+ * @param numItems
+ * @private
+ */
+SceneJS._webgl.ArrayBuffer.prototype._allocate = function (values, numItems) {
+    this.allocated = false;
+    this.handle = this.gl.createBuffer();
+    if (this.handle) {
+        this.gl.bindBuffer(this.type, this.handle);
+        this.gl.bufferData(this.type, values, this.usage);
+        this.gl.bindBuffer(this.type, null);
+        this.numItems = numItems;
+        this.length = values.length;
+        this.allocated = true;
+    }
+};
+
+/**
+ * Updates values within this buffer, reallocating if needed
+ *
+ * @param data
+ * @param offset
+ */
+SceneJS._webgl.ArrayBuffer.prototype.setData = function (data, offset) {
+    if (!this.allocated) {
+        return;
+    }
+    if (data.length > this.length) {
+        // Needs reallocation
+        this.destroy();
+        this._allocate(data, data.length);
+    } else {
+        // No reallocation needed
+        if (offset || offset === 0) {
+            this.gl.bufferSubData(this.type, offset, data);
+        } else {
+            this.gl.bufferData(this.type, data);
+        }
+    }
+};
+
+/**
+ * Unbinds this buffer on WebGL
+ */
+SceneJS._webgl.ArrayBuffer.prototype.unbind = function () {
+    if (!this.allocated) {
+        return;
+    }
+    this.gl.bindBuffer(this.type, null);
+};
+
+/**
+ * Destroys this buffer
+ */
+SceneJS._webgl.ArrayBuffer.prototype.destroy = function () {
+    if (!this.allocated) {
+        return;
+    }
+    this.gl.deleteBuffer(this.handle);
+    this.handle = null;
+    this.allocated = false;
+};
+
+
 SceneJS._webgl.ArrayBuffer.prototype.bind = function () {
+    if (!this.allocated) {
+        return;
+    }
     this.gl.bindBuffer(this.type, this.handle);
 };
 
@@ -5142,145 +5174,176 @@ SceneJS._webgl.enumMap = {
 
 SceneJS._webgl.RenderBuffer = function (cfg) {
 
-    var canvas = cfg.canvas;
-    var gl = canvas.gl;
-
-    var buf;
-    var bound = false;
-
     /**
-     * Called after WebGL context is restored.
+     * True as soon as this buffer is allocated and ready to go
+     * @type {boolean}
      */
-    this.webglRestored = function (_gl) {
-        gl = _gl;
-        buf = null;
-    };
+    this.allocated = false;
 
-    /** Binds this renderbuffer
-     */
-    this.bind = function () {
-        this._touch();
-        if (bound) {
-            return;
-        }
-        gl.bindFramebuffer(gl.FRAMEBUFFER, buf.framebuf);
-        bound = true;
-    };
-
-    this._touch = function () {
-        var width = canvas.canvas.width;
-        var height = canvas.canvas.height;
-        if (buf) { // Currently have a buffer
-            if (buf.width == width && buf.height == height) { // Canvas size unchanged, buffer still good
-                return;
-            } else { // Buffer needs reallocation for new canvas size
-                gl.deleteTexture(buf.texture);
-                gl.deleteFramebuffer(buf.framebuf);
-                gl.deleteRenderbuffer(buf.renderbuf);
-            }
-        }
-        buf = {
-            framebuf: gl.createFramebuffer(),
-            renderbuf: gl.createRenderbuffer(),
-            texture: gl.createTexture(),
-            width: width,
-            height: height
-        };
-        gl.bindFramebuffer(gl.FRAMEBUFFER, buf.framebuf);
-        gl.bindTexture(gl.TEXTURE_2D, buf.texture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        try {
-            // Do it the way the spec requires
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        } catch (exception) {
-            // Workaround for what appears to be a Minefield bug.
-            var textureStorage = new WebGLUnsignedByteArray(width * height * 3);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, textureStorage);
-        }
-        gl.bindRenderbuffer(gl.RENDERBUFFER, buf.renderbuf);
-        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, buf.texture, 0);
-        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, buf.renderbuf);
-        gl.bindTexture(gl.TEXTURE_2D, null);
-        gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        // Verify framebuffer is OK
-        gl.bindFramebuffer(gl.FRAMEBUFFER, buf.framebuf);
-        if (!gl.isFramebuffer(buf.framebuf)) {
-            throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Invalid framebuffer");
-        }
-        var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
-        switch (status) {
-            case gl.FRAMEBUFFER_COMPLETE:
-                break;
-            case gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
-            case gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
-            case gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-                throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
-            case gl.FRAMEBUFFER_UNSUPPORTED:
-                throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED");
-            default:
-                throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: " + status);
-        }
-        bound = false;
-    };
-
-    /** Clears this renderbuffer
-     */
-    this.clear = function () {
-        if (!bound) {
-            throw "Render buffer not bound";
-        }
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        gl.disable(gl.BLEND);
-    };
-
-
-    /** Reads buffer pixel at given coordinates
-     */
-    this.read = function (pickX, pickY) {
-        var x = pickX;
-        var y = canvas.canvas.height - pickY;
-        var pix = new Uint8Array(4);
-        gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pix);
-        return pix;
-    };
-
-    /** Unbinds this renderbuffer
-     */
-    this.unbind = function () {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        bound = false;
-    };
-
-    /** Returns the texture
-     */
-    this.getTexture = function () {
-        return {
-            bind: function (unit) {
-                if (buf && buf.texture) {
-                    gl.activeTexture(gl["TEXTURE" + unit]);
-                    gl.bindTexture(gl.TEXTURE_2D, buf.texture);
-                    return true;
-                }
-                return false;
-            },
-            unbind: function (unit) {
-                if (buf && buf.texture) {
-                    gl.activeTexture(gl["TEXTURE" + unit]);
-                    gl.bindTexture(gl.TEXTURE_2D, null);
-                }
-            }
-        };
-    };
+    this.canvas = cfg.canvas;
+    this.gl = cfg.canvas.gl;
+    this.buf = null;
+    this.bound = false;
 };
 
 /**
+ * Called after WebGL context is restored.
+ */
+SceneJS._webgl.RenderBuffer.prototype.webglRestored = function (_gl) {
+    this.gl = _gl;
+    this.buf = null;
+};
+
+/**
+ * Binds this buffer
+ */
+SceneJS._webgl.RenderBuffer.prototype.bind = function () {
+    this._touch();
+    if (this.bound) {
+        return;
+    }
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.buf.framebuf);
+    this.bound = true;
+};
+
+
+SceneJS._webgl.RenderBuffer.prototype._touch = function () {
+    var width = this.canvas.canvas.width;
+    var height = this.canvas.canvas.height;
+    if (this.buf) { // Currently have a buffer
+        if (this.buf.width == width && this.buf.height == height) { // Canvas size unchanged, buffer still good
+            return;
+        } else { // Buffer needs reallocation for new canvas size
+            this.gl.deleteTexture(this.buf.texture);
+            this.gl.deleteFramebuffer(this.buf.framebuf);
+            this.gl.deleteRenderbuffer(this.buf.renderbuf);
+        }
+    }
+    this.buf = {
+        framebuf: this.gl.createFramebuffer(),
+        renderbuf: this.gl.createRenderbuffer(),
+        texture: this.gl.createTexture(),
+        width: width,
+        height: height
+    };
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.buf.framebuf);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.buf.texture);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+    this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+    try {
+        // Do it the way the spec requires
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, width, height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
+    } catch (exception) {
+        // Workaround for what appears to be a Minefield bug.
+        var textureStorage = new WebGLUnsignedByteArray(width * height * 3);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, width, height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, textureStorage);
+    }
+    this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, this.buf.renderbuf);
+    this.gl.renderbufferStorage(this.gl.RENDERBUFFER, this.gl.DEPTH_COMPONENT16, width, height);
+    this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.buf.texture, 0);
+    this.gl.framebufferRenderbuffer(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT, this.gl.RENDERBUFFER, this.buf.renderbuf);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+    this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, null);
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+    // Verify framebuffer is OK
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.buf.framebuf);
+    if (!this.gl.isFramebuffer(this.buf.framebuf)) {
+
+
+        throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Invalid framebuffer");
+    }
+
+    var status = this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER);
+
+    switch (status) {
+
+        case this.gl.FRAMEBUFFER_COMPLETE:
+            break;
+
+        case this.gl.FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+            throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_ATTACHMENT");
+
+        case this.gl.FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+            throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT");
+
+        case this.gl.FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
+            throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_INCOMPLETE_DIMENSIONS");
+
+        case this.gl.FRAMEBUFFER_UNSUPPORTED:
+            throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: FRAMEBUFFER_UNSUPPORTED");
+
+        default:
+            throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Incomplete framebuffer: " + status);
+    }
+
+    this.bound = false;
+};
+
+/**
+ * Clears this renderbuffer
+ */
+SceneJS._webgl.RenderBuffer.prototype.clear = function () {
+    if (!this.bound) {
+        throw "Render buffer not bound";
+    }
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    this.gl.disable(this.gl.BLEND);
+};
+
+/**
+ * Reads buffer pixel at given coordinates
+ */
+SceneJS._webgl.RenderBuffer.prototype.read = function (pickX, pickY) {
+    var x = pickX;
+    var y = this.canvas.canvas.height - pickY;
+    var pix = new Uint8Array(4);
+    this.gl.readPixels(x, y, 1, 1, this.gl.RGBA, this.gl.UNSIGNED_BYTE, pix);
+    return pix;
+};
+
+/**
+ * Unbinds this renderbuffer
+ */
+SceneJS._webgl.RenderBuffer.prototype.unbind = function () {
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+    this.bound = false;
+};
+
+/** Returns the texture
+ */
+SceneJS._webgl.RenderBuffer.prototype.getTexture = function () {
+    var self = this;
+    return {
+        bind: function (unit) {
+            if (self.buf && self.buf.texture) {
+                self.gl.activeTexture(self.gl["TEXTURE" + unit]);
+                self.gl.bindTexture(self.gl.TEXTURE_2D, self.buf.texture);
+                return true;
+            }
+            return false;
+        },
+        unbind: function (unit) {
+            if (self.buf && self.buf.texture) {
+                self.gl.activeTexture(self.gl["TEXTURE" + unit]);
+                self.gl.bindTexture(self.gl.TEXTURE_2D, null);
+            }
+        }
+    };
+};
+
+/** Destroys this buffer
+ */
+SceneJS._webgl.RenderBuffer.prototype.destroy = function () {
+    if (this.buf) {
+        this.gl.deleteTexture(this.buf.texture);
+        this.gl.deleteFramebuffer(this.buf.framebuf);
+        this.gl.deleteRenderbuffer(this.buf.renderbuf);
+        this.buf = null;
+        this.bound = false;
+    }
+};/**
  * @class Wrapper for a WebGL program
  *
  * @param hash SceneJS-managed ID for program
@@ -5291,11 +5354,19 @@ SceneJS._webgl.RenderBuffer = function (cfg) {
  */
 SceneJS._webgl.Program = function (gl, vertexSources, fragmentSources) {
 
-    var a, i, u, u_name, location, shader;
+    /**
+     * True as soon as this program is allocated and ready to go
+     * @type {boolean}
+     */
+    this.allocated = false;
+
+    this.gl = gl;
 
     this._uniforms = {};
     this._samplers = {};
     this._attributes = {};
+
+    this.uniformValues = [];
 
     this.materialSettings = {
         specularColor: [0, 0, 0],
@@ -5305,218 +5376,164 @@ SceneJS._webgl.Program = function (gl, vertexSources, fragmentSources) {
         alpha: 0
     };
 
-    /* Create shaders from sources
-     */
+    // Create shaders from sources
+
     this._shaders = [];
+
+    var a, i, u, u_name, location, shader;
+
     for (i = 0; i < vertexSources.length; i++) {
         this._shaders.push(new SceneJS._webgl.Shader(gl, gl.VERTEX_SHADER, vertexSources[i]));
     }
+
     for (i = 0; i < fragmentSources.length; i++) {
         this._shaders.push(new SceneJS._webgl.Shader(gl, gl.FRAGMENT_SHADER, fragmentSources[i]));
     }
 
-    /* Create program, attach shaders, link and validate program
-     */
-    var handle = gl.createProgram();
+    // Create program, attach shaders, link and validate program
 
-    for (i = 0; i < this._shaders.length; i++) {
-        shader = this._shaders[i];
-        if (shader.valid) {
-            gl.attachShader(handle, shader.handle);
+    this.handle = gl.createProgram();
+
+    if (this.handle) {
+
+        for (i = 0; i < this._shaders.length; i++) {
+            shader = this._shaders[i];
+            if (shader.valid) {
+                gl.attachShader(this.handle, shader.handle);
+            }
         }
-    }
-    gl.linkProgram(handle);
 
-    //this.valid = (gl.getProgramParameter(handle, gl.LINK_STATUS) != 0);
+        gl.linkProgram(this.handle);
 
-    var debugCfg = SceneJS_configsModule.getConfigs("shading");
-//    if (debugCfg.validate !== false) {
-//        gl.validateProgram(handle);
-//        this.valid = this.valid && (gl.getProgramParameter(handle, gl.VALIDATE_STATUS) != 0);
-//    }
+        // Discover uniforms and samplers
 
-    if (false && !this.valid) {
-
-        if (!gl.isContextLost()) { // Handled explicitly elsewhere, so wont rehandle here
-
-            SceneJS.log.error("Shader program failed to link: " + gl.getProgramInfoLog(handle));
-
-            SceneJS.log.error("Vertex shader(s):");
-            for (i = 0; i < vertexSources.length; i++) {
-                SceneJS.log.error("Vertex shader #" + i + ":");
-                var lines = vertexSources[i].split('\n');
-                for (var j = 0; j < lines.length; j++) {
-                    SceneJS.log.error(lines[j]);
-
+        var numUniforms = gl.getProgramParameter(this.handle, gl.ACTIVE_UNIFORMS);
+        var valueIndex = 0;
+        for (i = 0; i < numUniforms; ++i) {
+            u = gl.getActiveUniform(this.handle, i);
+            if (u) {
+                u_name = u.name;
+                if (u_name[u_name.length - 1] == "\u0000") {
+                    u_name = u_name.substr(0, u_name.length - 1);
+                }
+                location = gl.getUniformLocation(this.handle, u_name);
+                if ((u.type == gl.SAMPLER_2D) || (u.type == gl.SAMPLER_CUBE) || (u.type == 35682)) {
+                    this._samplers[u_name] = new SceneJS._webgl.Sampler(gl, this.handle, u_name, u.type, u.size, location);
+                } else {
+                    this._uniforms[u_name] = new SceneJS._webgl.Uniform(gl, this.handle, u_name, u.type, u.size, location, valueIndex);
+                    this.uniformValues[valueIndex] = null;
+                    ++valueIndex;
                 }
             }
-
-            SceneJS.log.error("Fragment shader(s):");
-            for (i = 0; i < fragmentSources.length; i++) {
-                SceneJS.log.error("Fragment shader #" + i + ":");
-                var lines = fragmentSources[i].split('\n');
-                for (var j = 0; j < lines.length; j++) {
-                    SceneJS.log.error(lines[j]);
-                }
-            }
-
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.SHADER_LINK_FAILURE, "Shader program failed to link");
         }
-    }
 
-    /* Discover active uniforms and samplers
-     */
+        // Discover attributes
 
-    var numUniforms = gl.getProgramParameter(handle, gl.ACTIVE_UNIFORMS);
-
-    this.uniformValues = [];
-    var valueIndex = 0;
-
-    for (i = 0; i < numUniforms; ++i) {
-        u = gl.getActiveUniform(handle, i);
-        if (u) {
-            u_name = u.name;
-            if (u_name[u_name.length - 1] == "\u0000") {
-                u_name = u_name.substr(0, u_name.length - 1);
-            }
-            location = gl.getUniformLocation(handle, u_name);
-            if ((u.type == gl.SAMPLER_2D) || (u.type == gl.SAMPLER_CUBE) || (u.type == 35682)) {
-
-                this._samplers[u_name] = new SceneJS._webgl.Sampler(
-                    gl,
-                    handle,
-                    u_name,
-                    u.type,
-                    u.size,
-                    location);
-            } else {
-                this._uniforms[u_name] = new SceneJS._webgl.Uniform(
-                    gl,
-                    handle,
-                    u_name,
-                    u.type,
-                    u.size,
-                    location,
-                    valueIndex);
-                this.uniformValues[valueIndex] = null;
-                ++valueIndex;
+        var numAttribs = gl.getProgramParameter(this.handle, gl.ACTIVE_ATTRIBUTES);
+        for (i = 0; i < numAttribs; i++) {
+            a = gl.getActiveAttrib(this.handle, i);
+            if (a) {
+                location = gl.getAttribLocation(this.handle, a.name);
+                this._attributes[a.name] = new SceneJS._webgl.Attribute(gl, this.handle, a.name, a.type, a.size, location);
             }
         }
-    }
 
-    /* Discover attributes
-     */
+        // Program allocated
+        this.allocated = true;
 
-    var numAttribs = gl.getProgramParameter(handle, gl.ACTIVE_ATTRIBUTES);
-    for (i = 0; i < numAttribs; i++) {
-        a = gl.getActiveAttrib(handle, i);
-        if (a) {
-            location = gl.getAttribLocation(handle, a.name);
-            this._attributes[a.name] = new SceneJS._webgl.Attribute(
-                gl,
-                handle,
-                a.name,
-                a.type,
-                a.size,
-                location);
-        }
-    }
-
-    this.setProfile = function (profile) {
-        this._profile = profile;
-    };
-
-    this.bind = function () {
-        gl.useProgram(handle);
-        if (this._profile) {
-            this._profile.program++;
-        }
-    };
-
-    this.getUniformLocation = function (name) {
-        var u = this._uniforms[name];
-        if (u) {
-            return u.getLocation();
-        } else {
-            // SceneJS.log.warn("Uniform not found in shader : " + name);
-        }
-    };
-
-    this.getUniform = function (name) {
-        var u = this._uniforms[name];
-        if (u) {
-            return u;
-        } else {
-            //      SceneJS.log.warn("Shader uniform load failed - uniform not found in shader : " + name);
-        }
-    };
-
-    this.getAttribute = function (name) {
-        var attr = this._attributes[name];
-        if (attr) {
-            return attr;
-        } else {
-            //  logging.warn("Shader attribute bind failed - attribute not found in shader : " + name);
-        }
-    };
-
-    this.bindFloatArrayBuffer = function (name, buffer) {
-        var attr = this._attributes[name];
-        if (attr) {
-            attr.bindFloatArrayBuffer(buffer);
-            if (this._profile) {
-                this._profile.varying++;
-            }
-        } else {
-            //  logging.warn("Shader attribute bind failed - attribute not found in shader : " + name);
-        }
-    };
-
-    this.bindTexture = function (name, texture, unit) {
-        var sampler = this._samplers[name];
-        if (sampler) {
-            if (this._profile) {
-                this._profile.texture++;
-            }
-            return sampler.bindTexture(texture, unit);
-        } else {
-            return false;
-        }
-    };
-
-    this.destroy = function () {
-
-        if (this.valid) {
-
-            //   SceneJS.log.debug("Destroying shader program: '" + hash + "'");
-            gl.deleteProgram(handle);
-            for (var s in this._shaders) {
-                gl.deleteShader(this._shaders[s].handle);
-            }
-            this._attributes = null;
-            this._uniforms = null;
-            this._samplers = null;
-            this.valid = false;
-        }
-    };
+    } // if (this.handle)
 };
 
+
+SceneJS._webgl.Program.prototype.bind = function () {
+    if (!this.allocated) {
+        return;
+    }
+    this.gl.useProgram(this.handle);
+};
+
+SceneJS._webgl.Program.prototype.getUniformLocation = function (name) {
+    if (!this.allocated) {
+        return;
+    }
+    var u = this._uniforms[name];
+    if (u) {
+        return u.getLocation();
+    }
+};
+
+SceneJS._webgl.Program.prototype.getUniform = function (name) {
+    if (!this.allocated) {
+        return;
+    }
+    var u = this._uniforms[name];
+    if (u) {
+        return u;
+    }
+};
+
+SceneJS._webgl.Program.prototype.getAttribute = function (name) {
+    if (!this.allocated) {
+        return;
+    }
+    var attr = this._attributes[name];
+    if (attr) {
+        return attr;
+    }
+};
+
+SceneJS._webgl.Program.prototype.bindFloatArrayBuffer = function (name, buffer) {
+    if (!this.allocated) {
+        return;
+    }
+    var attr = this._attributes[name];
+    if (attr) {
+        attr.bindFloatArrayBuffer(buffer);
+    }
+};
+
+SceneJS._webgl.Program.prototype.bindTexture = function (name, texture, unit) {
+    if (!this.allocated) {
+        return false;
+    }
+    var sampler = this._samplers[name];
+    if (sampler) {
+        return sampler.bindTexture(texture, unit);
+    } else {
+        return false;
+    }
+};
+
+SceneJS._webgl.Program.prototype.destroy = function () {
+    if (!this.allocated) {
+        return;
+    }
+    this.gl.deleteProgram(this.handle);
+    for (var s in this._shaders) {
+        this.gl.deleteShader(this._shaders[s].handle);
+    }
+    this.handle = null;
+    this._attributes = null;
+    this._uniforms = null;
+    this._samplers = null;
+    this.allocated = false;
+};
+
+
 SceneJS._webgl.Program.prototype.setUniform = function (name, value) {
+    if (!this.allocated) {
+        return;
+    }
     var u = this._uniforms[name];
     if (u) {
         if (this.uniformValues[u.index] !== value || !u.numberValue) {
             u.setValue(value);
-            if (this._profile) {
-                this._profile.uniform++;
-            }
             this.uniformValues[u.index] = value;
         }
-    } else {
-        //      SceneJS.log.warn("Shader uniform load failed - uniform not found in shader : " + name);
     }
 };
 SceneJS._webgl.Sampler = function (gl, program, name, type, size, location) {
+
     this.bindTexture = function (texture, unit) {
         if (texture.bind(unit)) {
             gl.uniform1i(location, unit);
@@ -5536,7 +5553,17 @@ SceneJS._webgl.Sampler = function (gl, program, name, type, size, location) {
  */
 SceneJS._webgl.Shader = function (gl, type, source) {
 
+    /**
+     * True as soon as this shader is allocated and ready to go
+     * @type {boolean}
+     */
+    this.allocated = false;
+
     this.handle = gl.createShader(type);
+
+    if (!this.handle) {
+        return;
+    }
 
     gl.shaderSource(this.handle, source);
     gl.compileShader(this.handle);
@@ -5551,16 +5578,23 @@ SceneJS._webgl.Shader = function (gl, type, source) {
             SceneJS.log.error("Shader source:");
             var lines = source.split('\n');
             for (var j = 0; j < lines.length; j++) {
-                SceneJS.log.error(lines[j]);
+                SceneJS.log.error((j + 1) + ": " + lines[j]);
             }
 
             throw SceneJS_error.fatalError(
                 SceneJS.errors.SHADER_COMPILATION_FAILURE, "Shader program failed to compile");
         }
     }
+
+    this.allocated = true;
 };
 
 SceneJS._webgl.Texture2D = function (gl, cfg) {
+    /**
+     * True as soon as this texture is allocated and ready to go
+     * @type {boolean}
+     */
+    this.allocated = false;
 
     this.target = cfg.target || gl.TEXTURE_2D;
     this.minFilter = cfg.minFilter;
@@ -5603,11 +5637,16 @@ SceneJS._webgl.Texture2D = function (gl, cfg) {
 
         gl.bindTexture(this.target, null);
 
+        this.allocated = true;
+
     } catch (e) {
         throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Failed to create texture: " + e.message || e);
     }
 
     this.bind = function (unit) {
+        if (!this.allocated) {
+            return;
+        }
         if (this.texture) {
             gl.activeTexture(gl["TEXTURE" + unit]);
             gl.bindTexture(this.target, this.texture);
@@ -5620,6 +5659,9 @@ SceneJS._webgl.Texture2D = function (gl, cfg) {
     };
 
     this.unbind = function (unit) {
+        if (!this.allocated) {
+            return;
+        }
         if (this.texture) {
             gl.activeTexture(gl["TEXTURE" + unit]);
             gl.bindTexture(this.target, null);
@@ -5627,6 +5669,9 @@ SceneJS._webgl.Texture2D = function (gl, cfg) {
     };
 
     this.destroy = function () {
+        if (!this.allocated) {
+            return;
+        }
         if (this.texture) {
             gl.deleteTexture(this.texture);
             this.texture = null;
@@ -7125,14 +7170,14 @@ SceneJS.Node.prototype.findNodesByType = function (type, recursive) {
 
 SceneJS.Node.prototype._findNodesByType = function (type, list, recursive) {
     var i;
-    for (i = 0; i < this.nodes; i++) {
+    for (i = 0; i < this.nodes.length; i++) {
         var node = this.nodes[i];
         if (node.type == type) {
-            list.add(node);
+            list.push(node);
         }
     }
     if (recursive) {
-        for (i = 0; i < this.nodes; i++) {
+        for (i = 0; i < this.nodes.length; i++) {
             this.nodes[i]._findNodesByType(type, list, recursive);
         }
     }
@@ -8336,6 +8381,9 @@ new (function () {
 
     SceneJS.ColorTarget.prototype._destroy = function () {
         if (this._core) {
+            if (this._core.renderBuf) {
+                this._core.renderBuf.destroy();
+            }
             delete nodeCoreMap[this._core.coreId];
         }
     };
@@ -8451,18 +8499,18 @@ new (function () {
         var primitive = data.primitive || "triangles";
         this._core.primitive = this._getPrimitiveType(primitive);
 
-        var normals;
-
         if (data.normals) {
-            if (data.normals == "auto" && primitive == "triangles") {
-                if (data.positions && data.indices) {
-                    // Auto normal generation
-                    normals = this._buildNormals(data.positions, data.indices);
-                } else {
-                    // TODO: log warning?
+            if (primitive == "triangles") {
+                if (data.normals === "auto" || data.normals === true) {
+                    if (data.positions && data.indices) {
+                        this._buildNormals(data); // Auto normal generation - build normals array
+                    }
                 }
-            } else {
-                normals = data.normals;
+//                if (data.tangents === "auto" || data.tangents === true) {
+                    if (data.positions && data.indices && data.uv) {
+                        this._buildTangents(data); // Build tangents array
+                    }
+//                }
             }
         }
 
@@ -8471,8 +8519,8 @@ new (function () {
                 ? new Float32Array((options.scale || options.origin)
                 ? this._applyOptions(data.positions, options)
                 : data.positions) : undefined,
-
-            normals: normals ? new Float32Array(normals) : undefined,
+            normals: data.normals ? new Float32Array(data.normals) : undefined,
+            tangents: data.tangents ? new Float32Array(data.tangents) : undefined,
             uv: data.uv ? new Float32Array(data.uv) : undefined,
             uv2: data.uv2 ? new Float32Array(data.uv2) : undefined,
             colors: data.colors ? new Float32Array(data.colors) : undefined,
@@ -8513,7 +8561,7 @@ new (function () {
             default:
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "geometry primitive unsupported: '" +
+                        "geometry primitive unsupported: '" +
                         primitive +
                         "' - supported types are: 'points', 'lines', 'line-loop', " +
                         "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'");
@@ -8585,6 +8633,11 @@ new (function () {
             core.colorBuf = null;
         }
 
+        if (core.tangentBuf) {
+            core.tangentBuf.destroy();
+            core.tangentBuf = null;
+        }
+
         if (core.indexBuf) {
             core.indexBuf.destroy();
             core.indexBuf = null;
@@ -8609,13 +8662,13 @@ new (function () {
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
             var arrays = core.arrays;
-            var canInterleave = (SceneJS.getConfigs("enableInterleaving") !== false);
+            var canInterleave = (SceneJS.getConfigs("enableInterleaving") !== false) && !arrays.tangents;
             var dataLength = 0;
             var interleavedValues = 0;
             var interleavedArrays = [];
             var interleavedArrayStrides = [];
 
-            var prepareInterleaveBuffer = function(array, strideInElements) {
+            var prepareInterleaveBuffer = function (array, strideInElements) {
                 if (dataLength == 0) {
                     dataLength = array.length / strideInElements;
                 } else if (array.length / strideInElements != dataLength) {
@@ -8655,6 +8708,13 @@ new (function () {
                 core.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv2, arrays.uv2.length, 2, usage);
             }
 
+            if (arrays.tangents) {
+                if (canInterleave) {
+                    core.interleavedPositionOffset = prepareInterleaveBuffer(arrays.tangents, 3);
+                }
+                core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.tangents, arrays.tangents.length, 3, usage);
+            }
+
             if (arrays.colors) {
                 if (canInterleave) {
                     core.interleavedColorOffset = prepareInterleaveBuffer(arrays.colors, 4);
@@ -8690,7 +8750,7 @@ new (function () {
             destroyBuffers(core);
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ERROR,
-                "Failed to allocate geometry: " + e);
+                    "Failed to allocate geometry: " + e);
         }
     };
 
@@ -8709,11 +8769,13 @@ new (function () {
 
     };
 
-    /** (re)builds normal vectors from vertices
+    /** Builds normal vectors from positions and indices
      * @private
      */
-    SceneJS.Geometry.prototype._buildNormals = function (positions, indices) {
+    SceneJS.Geometry.prototype._buildNormals = function (data) {
 
+        var positions = data.positions;
+        var indices = data.indices;
         var nvecs = new Array(positions.length / 3);
         var j0;
         var j1;
@@ -8762,7 +8824,85 @@ new (function () {
             normals[i * 3 + 1] = (y / count);
             normals[i * 3 + 2] = (z / count);
         }
-        return normals;
+
+        data.normals = normals;
+    };
+
+
+    /**
+     * Builds vertex tangent vectors from positions, UVs and indices
+     *
+     * Based on code by @rollokb, in his fork of webgl-obj-loader:
+     * https://github.com/rollokb/webgl-obj-loader
+     *
+     * @private
+     **/
+    SceneJS.Geometry.prototype._buildTangents = function (data) {
+
+        var positions = data.positions;
+        var indices = data.indices;
+        var uv = data.uv;
+
+        var tangents = [];
+
+        // The vertex data needs to be calculated
+        // before the calculation of the tangents
+
+        for (var location = 0; location < indices.length; location += 3) {
+
+            // Recontructing each vertex and UV coordinate into the respective vectors
+
+            var index = indices[location];
+
+            var v0 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv0 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            index = indices[location + 1];
+
+            var v1 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv1 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            index = indices[location + 2];
+
+            var v2 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv2 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            var deltaPos1 = SceneJS_math_subVec3(v1, v0, []);
+            var deltaPos2 = SceneJS_math_subVec3(v2, v0, []);
+
+            var deltaUV1 = SceneJS_math_subVec2(uv1, uv0, []);
+            var deltaUV2 = SceneJS_math_subVec2(uv2, uv0, []);
+
+            var r = 1 / ((deltaUV1[0] * deltaUV2[1]) - (deltaUV1[1] * deltaUV2[0]));
+
+            var tangent = SceneJS_math_mulVec3Scalar(
+                SceneJS_math_subVec3(
+                    SceneJS_math_mulVec3Scalar(deltaPos1, deltaUV2[1], []),
+                    SceneJS_math_mulVec3Scalar(deltaPos2, deltaUV1[1], []),
+                    []
+                ),
+                r,
+                []
+            );
+
+            // Average the value of the vectors outs
+            for (var v = 0; v < 3; v++) {
+                var addTo = indices[location + v];
+                if (typeof tangents[addTo] != "undefined") {
+                    tangents[addTo] = SceneJS_math_addVec3(tangents[addTo], tangent, []);
+                } else {
+                    tangents[addTo] = tangent;
+                }
+            }
+        }
+
+        // Deconstruct the vectors back into 1D arrays for WebGL
+
+        data.tangents = [];
+
+        for (var i = 0; i < tangents.length; i++) {
+            data.tangents = data.tangents.concat(tangents[i]);
+        }
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
@@ -8873,7 +9013,7 @@ new (function () {
 
     /** Returns the Model-space boundary of this geometry
      *
-      * @returns {*}
+     * @returns {*}
      */
     SceneJS.Geometry.prototype.getBoundary = function () {
         if (this._boundary) {
@@ -9219,32 +9359,32 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
      * The default state core singleton for {@link SceneJS.Lights} nodes
      */
     var defaultCore = {
-        type:"lights",
-        stateId:SceneJS._baseStateId++,
-        hash:null,
-        empty:false,
-        lights:[
+        type: "lights",
+        stateId: SceneJS._baseStateId++,
+        hash: null,
+        empty: false,
+        lights: [
             {
-                mode:"ambient",
-                color:[0.7, 0.7, 0.8 ],
-                diffuse:true,
-                specular:false
+                mode: "ambient",
+                color: [0.7, 0.7, 0.8 ],
+                diffuse: true,
+                specular: false
             },
             {
-                mode:"dir",
-                color:[1.0, 1.0, 1.0 ],
-                diffuse:true,
-                specular:true,
-                dir:[-0.5, -0.5, -1.0 ],
-                space:"view"
+                mode: "dir",
+                color: [1.0, 1.0, 1.0 ],
+                diffuse: true,
+                specular: true,
+                dir: [-0.5, -0.5, -1.0 ],
+                space: "view"
             },
             {
-                mode:"dir",
-                color:[1.0, 1.0, 1.0 ],
-                diffuse:false,
-                specular:true,
-                dir:[1.0, -0.9, -0.7 ],
-                space:"view"
+                mode: "dir",
+                color: [1.0, 1.0, 1.0 ],
+                diffuse: false,
+                specular: true,
+                dir: [1.0, -0.9, -0.7 ],
+                space: "view"
             }
         ]
     };
@@ -9327,21 +9467,21 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
 
         var color = cfg.color;
         light.color = [
-            color.r != undefined ? color.r : 1.0,
-            color.g != undefined ? color.g : 1.0,
-            color.b != undefined ? color.b : 1.0
+                color.r != undefined ? color.r : 1.0,
+                color.g != undefined ? color.g : 1.0,
+                color.b != undefined ? color.b : 1.0
         ];
 
         // Ambient lights hardwired to contribute to diffuse lighting
         light.mode = mode;
         light.diffuse = (mode == "ambient") ? true : ((cfg.diffuse != undefined) ? cfg.diffuse : true);
         light.specular = (mode == "ambient") ? false : ((cfg.specular != undefined) ? cfg.specular : true);
-        light.pos = cfg.pos ? [ pos.x || 0, pos.y || 0, pos.z || 0 ] : undefined;
-        light.dir = cfg.dir ? [dir.x || 0, dir.y || 0, dir.z || 0] : undefined;
+        light.pos = cfg.pos ? [ pos.x || 0, pos.y || 0, pos.z || 0 ] : [0, 0, 0];
+        light.dir = cfg.dir ? [dir.x || 0, dir.y || 0, dir.z || 0] : [0, 0, 1];
         light.attenuation = [
-            cfg.constantAttenuation != undefined ? cfg.constantAttenuation : 0.0,
-            cfg.linearAttenuation || 0.0,
-            cfg.quadraticAttenuation || 0.0
+                cfg.constantAttenuation != undefined ? cfg.constantAttenuation : 0.0,
+                cfg.linearAttenuation || 0.0,
+                cfg.quadraticAttenuation || 0.0
         ];
 
         var space = cfg.space;
@@ -9354,7 +9494,7 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
 
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
+                    "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
         }
 
         light.space = space;
@@ -9372,7 +9512,7 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
                     if (indexNum < 0 || indexNum >= this._core.lights.length) {
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                            "Invalid argument to set 'lights': index out of range (" + this._core.lights.length + " lights defined)");
+                                "Invalid argument to set 'lights': index out of range (" + this._core.lights.length + " lights defined)");
                     }
                     this._setLight(indexNum, lights[index] || {});
                 }
@@ -9405,9 +9545,9 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
         if (cfg.color) {
             var color = cfg.color;
             light.color = [
-                color.r != undefined ? color.r : 1.0,
-                color.g != undefined ? color.g : 1.0,
-                color.b != undefined ? color.b : 1.0
+                    color.r != undefined ? color.r : 1.0,
+                    color.g != undefined ? color.g : 1.0,
+                    color.b != undefined ? color.b : 1.0
             ];
             imageDirty = true;
         }
@@ -9442,7 +9582,7 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
             if (space != "view" && space != "world") {
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
+                        "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
             }
             light.space = space;
             this._core.hash = null;
@@ -12806,7 +12946,7 @@ new (function () {
                     params.applyFrom != "geometry") {
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "texture applyFrom value is unsupported - " +
+                            "texture applyFrom value is unsupported - " +
                             "should be either 'uv', 'uv2', 'normal' or 'geometry'");
                 }
             }
@@ -12821,7 +12961,7 @@ new (function () {
                     params.applyTo != "shine") { // Shininess map
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "texture applyTo value is unsupported - " +
+                            "texture applyTo value is unsupported - " +
                             "should be either 'color', 'baseColor', 'specular' or 'normals'");
                 }
             }
@@ -12830,7 +12970,7 @@ new (function () {
                 if (params.blendMode != "add" && params.blendMode != "multiply") {
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "texture layer blendMode value is unsupported - " +
+                            "texture layer blendMode value is unsupported - " +
                             "should be either 'add' or 'multiply'");
                 }
             }
@@ -13002,7 +13142,7 @@ new (function () {
         if (glName == undefined) {
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Unrecognised value for texture node property '" + name + "' value: '" + value + "'");
+                    "Unrecognised value for texture node property '" + name + "' value: '" + value + "'");
         }
         return gl[glName];
     };
@@ -15200,6 +15340,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     // The extension needs to be re-queried in case the context was lost and has been recreated.
     var VAO = gl.getExtension("OES_vertex_array_object");
     frameCtx.VAO = (VAO) ? VAO : null;
+    frameCtx.VAO =  null;
 
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
 
@@ -15275,7 +15416,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         return this._sourceCache[hash] = new SceneJS_ProgramSource(
-
             hash,
 
             this._composePickingVertexShader(states), // pickVertexSrc
@@ -15298,123 +15438,34 @@ var SceneJS_ProgramSourceFactory = new (function () {
     };
 
     this._composePickingVertexShader = function (states) {
-
-        var customShaders = states.shader.shaders || {};
-
-        var customVertexShader = customShaders.vertex || {};
-        var vertexHooks = customVertexShader.hooks || {};
-
-        var customFragmentShader = customShaders.fragment || {};
-        var fragmentHooks = customFragmentShader.hooks || {};
-
-        // Do a full custom shader replacement if code supplied without hooks
-        if (customShaders.vertex
-            && customShaders.vertex.code
-            && customShaders.vertex.code != ""
-            && SceneJS._isEmpty(customShaders.vertex.hooks)) {
-            return [customShaders.vertex.code];
-        }
-
-        var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
-        var normals = this._hasNormals(states);
-
         var src = [
             "precision mediump float;",
             "attribute vec3 SCENEJS_aVertex;",
             "uniform mat4 SCENEJS_uMMatrix;",
-            "uniform mat4 SCENEJS_uMNMatrix;",
             "uniform mat4 SCENEJS_uVMatrix;",
             "uniform mat4 SCENEJS_uVNMatrix;",
             "uniform mat4 SCENEJS_uPMatrix;"
         ];
-
-        if (normals) {
-            src.push("attribute vec3 SCENEJS_aNormal;");
-        }
-
-        if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-            src.push("varying vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
-            src.push("varying vec3 SCENEJS_vViewNormal;");   // Output view-space vertex normal
-        }
-
         src.push("varying vec4 SCENEJS_vWorldVertex;");
         src.push("varying vec4 SCENEJS_vViewVertex;");
-        src.push("varying vec4 SCENEJS_vProjVertex;");
-
-        src.push("uniform vec3 SCENEJS_uWorldEye;");                     // World-space eye position
-        src.push("varying vec3 SCENEJS_vWorldEyeVec;");
-
-        if (customVertexShader.code) {
-            src.push("\n" + customVertexShader.code + "\n");
-        }
-
         if (morphing) {
             src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
             if (states.morphGeometry.targets[0].vertexBuf) {      // target2 has these arrays also
                 src.push("attribute vec3 SCENEJS_aMorphVertex;");
             }
         }
-
         src.push("void main(void) {");
         src.push("   vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
-
-        if (normals) {
-            src.push("  vec4 modelNormal = vec4(SCENEJS_aNormal, 0.0); ");
-        }
-
-        if (vertexHooks.modelPos) {
-            src.push("tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
-        }
-
         if (morphing) {
             if (states.morphGeometry.targets[0].vertexBuf) {
-                src.push("  vec4 vMorphVertex = vec4(SCENEJS_aMorphVertex, 1.0); ");
-
-                if (vertexHooks.modelPos) {
-                    src.push("vMorphVertex=" + vertexHooks.modelPos + "(vMorphVertex);");
-                }
-
-                src.push("  tmpVertex = vec4(mix(tmpVertex.xyz, vMorphVertex.xyz, SCENEJS_uMorphFactor), 1.0); ");
+                src.push("  tmpVertex = vec4(mix(tmpVertex.xyz, SCENEJS_aMorphVertex, SCENEJS_uMorphFactor), 1.0); ");
             }
         }
-
-
-        src.push("  tmpVertex = SCENEJS_uMMatrix * tmpVertex; ");
-
-        if (vertexHooks.worldPos) {
-            src.push("tmpVertex=" + vertexHooks.worldPos + "(tmpVertex);");
-        }
-
-        // if (clipping || fragmentHooks.worldPosClip) {
-        src.push("  SCENEJS_vWorldVertex = tmpVertex; ");
-        //    }
-
-        src.push("SCENEJS_vWorldEyeVec = normalize(SCENEJS_uWorldEye - tmpVertex.xyz);");
-
-        src.push("  tmpVertex = SCENEJS_uVMatrix * tmpVertex; ");
-
-        if (vertexHooks.viewPos) {
-            src.push("tmpVertex=" + vertexHooks.viewPos + "(tmpVertex);");
-        }
-
-        src.push("  SCENEJS_vViewVertex = tmpVertex;");
-
-        if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-            src.push("  vec3 worldNormal = normalize((SCENEJS_uMNMatrix * modelNormal).xyz); ");
-            src.push("  SCENEJS_vWorldNormal = worldNormal;");
-            src.push("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
-        }
-
-        src.push("  SCENEJS_vProjVertex = SCENEJS_uPMatrix * tmpVertex;");
-
-
-        src.push("  gl_Position = SCENEJS_vProjVertex;");
+        src.push("  SCENEJS_vWorldVertex = SCENEJS_uMMatrix * tmpVertex; ");
+        src.push("  SCENEJS_vViewVertex = SCENEJS_uVMatrix * SCENEJS_vWorldVertex;");
+        src.push("  gl_Position =  SCENEJS_uPMatrix * SCENEJS_vViewVertex;");
         src.push("}");
-
-        if (false && debugCfg.logScripts == true) {
-            SceneJS.log.info(src);
-        }
         return src;
     };
 
@@ -15424,26 +15475,30 @@ var SceneJS_ProgramSourceFactory = new (function () {
      */
     this._composePickingFragmentShader = function (states) {
 
-        var customShaders = states.shader.shaders || {};
-        var customFragmentShader = customShaders.fragment || {};
-        var fragmentHooks = customFragmentShader.hooks || {};
-
-        // Do a full custom shader replacement if code supplied without hooks
-        if (customShaders.fragment
-            && customShaders.fragment.code
-            && customShaders.fragment.code != ""
-            && SceneJS._isEmpty(customShaders.fragment.hooks)) {
-            return [customShaders.fragment.code];
-        }
-
         var clipping = states.clips.clips.length > 0;
-
-        var normals = this._hasNormals(states);
 
         var src = [
             "precision mediump float;"
         ];
 
+        src.push("varying vec4 SCENEJS_vWorldVertex;");
+        src.push("varying vec4  SCENEJS_vViewVertex;");                  // View-space vertex
+
+        src.push("uniform bool  SCENEJS_uRayPickMode;");                   // Z-pick mode when true else colour-pick
+        src.push("uniform vec3  SCENEJS_uPickColor;");                   // Used in colour-pick mode
+        src.push("uniform float SCENEJS_uZNear;");                      // Used in Z-pick mode
+        src.push("uniform float SCENEJS_uZFar;");                       // Used in Z-pick mode
+        src.push("uniform bool  SCENEJS_uClipping;");
+
+        if (clipping) {
+            // World-space clipping planes
+            for (var i = 0; i < states.clips.clips.length; i++) {
+                src.push("uniform float SCENEJS_uClipMode" + i + ";");
+                src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
+            }
+        }
+
+        // Pack depth function for ray-pick
         src.push("vec4 packDepth(const in float depth) {");
         src.push("  const vec4 bitShift = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);");
         src.push("  const vec4 bitMask  = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);");
@@ -15452,53 +15507,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("  return res;");
         src.push("}");
 
-
-        src.push("varying vec4 SCENEJS_vWorldVertex;");
-        src.push("varying vec4 SCENEJS_vViewVertex;");                  // View-space vertex
-        src.push("varying vec4 SCENEJS_vProjVertex;");
-
-        src.push("uniform bool SCENEJS_uRayPickMode;");                   // Z-pick mode when true else colour-pick
-
-        src.push("uniform vec3 SCENEJS_uPickColor;");                   // Used in colour-pick mode
-
-        src.push("uniform float SCENEJS_uZNear;");                      // Used in Z-pick mode
-        src.push("uniform float SCENEJS_uZFar;");                       // Used in Z-pick mode
-
-        src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
-
-        src.push("uniform bool  SCENEJS_uClipping;");
-
-        if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-            src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
-            src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
-        }
-        /*-----------------------------------------------------------------------------------
-         * Variables - Clipping
-         *----------------------------------------------------------------------------------*/
-
-        if (clipping) {
-            for (var i = 0; i < states.clips.clips.length; i++) {
-                src.push("uniform float SCENEJS_uClipMode" + i + ";");
-                src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
-            }
-        }
-
-        /*-----------------------------------------------------------------------------------
-         * Custom GLSL
-         *----------------------------------------------------------------------------------*/
-
-        if (customFragmentShader.code) {
-            src.push("\n" + customFragmentShader.code + "\n");
-        }
-
         src.push("void main(void) {");
-
-        if (fragmentHooks.worldPosClip) {
-            src.push("if (" + fragmentHooks.worldPosClip + "(SCENEJS_vWorldVertex) == false) { discard; };");
-        }
-        if (fragmentHooks.viewPosClip) {
-            src.push("if (!" + fragmentHooks.viewPosClip + "(SCENEJS_vViewVertex) == false) { discard; };");
-        }
 
         if (clipping) {
             src.push("if (SCENEJS_uClipping) {");
@@ -15517,39 +15526,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("}");
         }
 
-        if (fragmentHooks.worldPos) {
-            src.push(fragmentHooks.worldPos + "(SCENEJS_vWorldVertex);");
-        }
-
-        if (fragmentHooks.viewPos) {
-            src.push(fragmentHooks.viewPos + "(SCENEJS_vViewVertex);");
-        }
-
-        if (fragmentHooks.worldEyeVec) {
-            src.push(fragmentHooks.worldEyeVec + "(SCENEJS_vWorldEyeVec);");
-        }
-
-        if (normals && fragmentHooks.worldNormal) {
-            src.push(fragmentHooks.worldNormal + "(SCENEJS_vWorldNormal);");
-        }
-
-        if (normals && fragmentHooks.viewNormal) {
-            src.push(fragmentHooks.viewNormal + "(SCENEJS_vViewNormal);");
-        }
-
         src.push("    if (SCENEJS_uRayPickMode) {");
         src.push("          float zNormalizedDepth = abs((SCENEJS_uZNear + SCENEJS_vViewVertex.z) / (SCENEJS_uZFar - SCENEJS_uZNear));");
         src.push("          gl_FragColor = packDepth(zNormalizedDepth); ");
-
         src.push("    } else {");
         src.push("          gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
         src.push("    }");
         src.push("}");
 
-
-        if (false && debugCfg.logScripts == true) {
-            SceneJS.log.info(src);
-        }
         return src;
     };
 
@@ -15579,6 +15563,23 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return false;
     };
 
+    this._hasTangents = function (states) {
+        if (states.texture) {
+            var layers = states.texture.layers;
+            if (!layers) {
+                return false;
+            }
+            for (var i = 0, len = layers.length; i < len; i++) {
+                if (layers[i].applyTo == "normals") {
+                    if (states.geometry.tangentBuf) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    };
+
     this._composeRenderingVertexShader = function (states) {
 
         var customShaders = states.shader.shaders || {};
@@ -15599,6 +15600,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var texturing = this._isTexturing(states);
         var normals = this._hasNormals(states);
+        var tangents = this._hasTangents(states);
         var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
 
@@ -15606,23 +15608,23 @@ var SceneJS_ProgramSourceFactory = new (function () {
             "precision mediump float;"
         ];
 
-        src.push("attribute vec3 SCENEJS_aVertex;");                // Model coordinates
-
-        src.push("uniform vec3 SCENEJS_uWorldEye;");                     // World-space eye position
-        src.push("varying vec3 SCENEJS_vWorldEyeVec;");                  // Output world-space eye vector
-
-        /*-----------------------------------------------------------------------------------
-         * Variables - normals
-         *----------------------------------------------------------------------------------*/
+        src.push("attribute vec3 SCENEJS_aVertex;");            // Model coordinates
+        src.push("uniform vec3 SCENEJS_uWorldEye;");            // World-space eye position
+        src.push("varying vec3 SCENEJS_vViewEyeVec;");          // View-space vector from origin to eye
 
         if (normals) {
 
             src.push("attribute vec3 SCENEJS_aNormal;");        // Normal vectors
             src.push("uniform   mat4 SCENEJS_uMNMatrix;");      // Model normal matrix
             src.push("uniform   mat4 SCENEJS_uVNMatrix;");      // View normal matrix
-
-            src.push("varying   vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
             src.push("varying   vec3 SCENEJS_vViewNormal;");    // Output view-space vertex normal
+
+            if (tangents) {
+
+                // Input for tangents
+
+                src.push("attribute vec4 SCENEJS_aTangent;");
+            }
 
             for (var i = 0; i < states.lights.lights.length; i++) {
                 var light = states.lights.lights[i];
@@ -15639,9 +15641,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
 
-                /* Vector from vertex to light, packaged with the pre-computed length of that vector
-                 */
-                src.push("varying vec4 SCENEJS_vViewLightVecAndDist" + i + ";");    // varying for fragment lighting
+                // Vector from vertex to light, packaged with the pre-computed length of that vector
+                src.push("varying vec4 SCENEJS_vViewLightVecAndDist" + i + ";");
             }
         }
 
@@ -15669,22 +15670,18 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("varying vec4 SCENEJS_vWorldVertex;");         // Varying for fragment clip or world pos hook
         }
 
-        //    if (fragmentHooks.viewPos) {
-        src.push("varying vec4 SCENEJS_vViewVertex;");          // Varying for fragment view clip hook
-        //  }
+        src.push("varying vec4 SCENEJS_vViewVertex;");              // Varying for fragment view clip hook
 
         if (texturing) {                                            // Varyings for fragment texturing
+
             if (states.geometry.uvBuf) {
                 src.push("varying vec2 SCENEJS_vUVCoord;");
             }
+
             if (states.geometry.uvBuf2) {
                 src.push("varying vec2 SCENEJS_vUVCoord2;");
             }
         }
-
-        /*-----------------------------------------------------------------------------------
-         * Variables - Morphing
-         *----------------------------------------------------------------------------------*/
 
         if (morphing) {
             src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
@@ -15702,12 +15699,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("\n" + customVertexShader.code + "\n");
         }
 
-
         src.push("void main(void) {");
-        src.push("vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
+
+        src.push("  vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
 
         if (vertexHooks.modelPos) {
-            src.push("tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
+            src.push("  tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
         }
 
         src.push("  vec4 modelVertex = tmpVertex; ");
@@ -15715,9 +15712,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("  vec4 modelNormal = vec4(SCENEJS_aNormal, 0.0); ");
         }
 
-        /*
-         * Morphing - morph targets are in same model space as the geometry
-         */
+        // Morphing - morph targets are in same model space as the geometry
         if (morphing) {
             if (states.morphGeometry.targets[0].vertexBuf) {
                 src.push("  vec4 vMorphVertex = vec4(SCENEJS_aMorphVertex, 1.0); ");
@@ -15748,8 +15743,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals) {
-            src.push("  vec3 worldNormal = normalize((SCENEJS_uMNMatrix * modelNormal).xyz); ");
-            src.push("  SCENEJS_vWorldNormal = worldNormal;");
+            src.push("  vec3 worldNormal = (SCENEJS_uMNMatrix * modelNormal).xyz; ");
             src.push("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
         }
 
@@ -15757,9 +15751,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("  SCENEJS_vWorldVertex = worldVertex;");                  // Varying for fragment world clip or hooks
         }
 
-        // if (fragmentHooks.viewPos) {
         src.push("  SCENEJS_vViewVertex = viewVertex;");                    // Varying for fragment hooks
-        //  }
 
         if (vertexHooks.projMatrix) {
             src.push("gl_Position = " + vertexHooks.projMatrix + "(SCENEJS_uPMatrix) * viewVertex;");
@@ -15767,13 +15759,18 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("  gl_Position = SCENEJS_uPMatrix * viewVertex;");
         }
 
-        /*-----------------------------------------------------------------------------------
-         * Logic - normals
-         *
-         * Transform the world-space lights into view space
-         *----------------------------------------------------------------------------------*/
+        if (tangents) {
+
+            // Compute tangent-bitangent-normal matrix
+
+            src.push("vec3 tangent = normalize((SCENEJS_uVNMatrix * SCENEJS_uMNMatrix * SCENEJS_aTangent).xyz);");
+            src.push("vec3 viewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;"); // TODO: DRY
+            src.push("vec3 bitangent = cross(viewNormal, tangent);");
+            src.push("mat3 TBM = mat3(tangent, bitangent, viewNormal);");
+        }
 
         src.push("  vec3 tmpVec3;");
+
         if (normals) {
 
             for (var i = 0; i < states.lights.lights.length; i++) {
@@ -15786,50 +15783,92 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "dir") {
 
-                    /* Directional light
-                     */
+                    // Directional light
+
                     if (light.space == "world") {
 
-                        /* World space light - transform vector to View space
-                         */
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(-normalize((SCENEJS_uVMatrix * vec4(SCENEJS_uLightDir" + i + ", 0.0)).xyz), 0.0);");
+                        // World space light
+
+                        src.push("tmpVec3 = normalize(SCENEJS_uLightDir" + i + ");");
+
+                        // Transform to View space
+                        src.push("tmpVec3 = vec3(SCENEJS_uVMatrix * vec4(tmpVec3, 0.0)).xyz;");
+
+                        if (tangents) {
+
+                            // Transform to Tangent space
+                            src.push("tmpVec3 *= TBM;");
+                        }
 
                     } else {
 
-                        /* View space light
-                         */
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(-normalize(SCENEJS_uLightDir" + i + "), 0.0);");
+                        // View space light
+
+                        src.push("tmpVec3 = normalize(SCENEJS_uLightDir" + i + ");");
+
+                        if (tangents) {
+
+                            // Transform to Tangent space
+                            src.push("tmpVec3 *= TBM;");
+                        }
                     }
+
+                    // Output
+                    src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(-tmpVec3, 0.0);");
                 }
 
                 if (light.mode == "point") {
 
-                    /* Positional light
-                     */
+                    // Positional light
+
                     if (light.space == "world") {
 
-                        /* World space light - transform position to View space
-                         */
-                        src.push("tmpVec3 = ((SCENEJS_uVMatrix * vec4(SCENEJS_uLightPos" + i + ", 1.0)).xyz - worldVertex.xyz);");
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(normalize(tmpVec3), length(tmpVec3));");
+                        // World space 
+
+                        src.push("tmpVec3 = SCENEJS_uLightPos" + i + " - worldVertex.xyz;"); // Vector from World coordinate to light pos
+
+                        // Transform to View space
+                        src.push("tmpVec3 = vec3(SCENEJS_uVMatrix * vec4(tmpVec3, 0.0)).xyz;");
+
+                        if (tangents) {
+
+                            // Transform to Tangent space
+                            src.push("tmpVec3 *= TBM;");
+                        }
 
                     } else {
 
-                        /* View space light
-                         */
-                        src.push("tmpVec3 = (SCENEJS_uLightPos" + i + ".xyz - worldVertex.xyz);");
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(normalize(tmpVec3), length(tmpVec3));");
+                        // View space 
+
+                        src.push("tmpVec3 = SCENEJS_uLightPos" + i + ".xyz - viewVertex.xyz;"); // Vector from View coordinate to light pos
+
+                        if (tangents) {
+
+                            // Transform to tangent space
+                            src.push("tmpVec3 *= TBM;");
+                        }
                     }
+
+                    // Output
+                    src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(tmpVec3, length( SCENEJS_uLightPos" + i + " - worldVertex.xyz));");
                 }
             }
         }
 
-        src.push("SCENEJS_vWorldEyeVec = normalize(SCENEJS_uWorldEye - worldVertex.xyz);");
+        src.push("SCENEJS_vViewEyeVec = ((SCENEJS_uVMatrix * vec4(SCENEJS_uWorldEye, 0.0)).xyz  - viewVertex.xyz);");
+
+        if (tangents) {
+
+            // World eye vector to tangent space
+            src.push("SCENEJS_vViewEyeVec *= TBM;");
+        }
 
         if (texturing) {                                                        // varyings for fragment texturing
+
             if (states.geometry.uvBuf) {
                 src.push("SCENEJS_vUVCoord = SCENEJS_aUVCoord;");
             }
+
             if (states.geometry.uvBuf2) {
                 src.push("SCENEJS_vUVCoord2 = SCENEJS_aUVCoord2;");
             }
@@ -15840,12 +15879,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
         src.push("}");
 
-
-        if (false && debugCfg.logScripts === true) {
-            SceneJS.log.info(src);
-        }
         return src;
     };
+
 
     /*-----------------------------------------------------------------------------------------------------------------
      * Rendering Fragment shader
@@ -15869,6 +15905,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var texturing = this._isTexturing(states);
         var cubeMapping = this._isCubeMapping(states);
         var normals = this._hasNormals(states);
+        var tangents = this._hasTangents(states);
         var clipping = states.clips.clips.length > 0;
 
         var src = ["\n"];
@@ -15958,11 +15995,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of world-space vertex from eye
+        src.push("varying vec3 SCENEJS_vViewEyeVec;");                          // Direction of world-space vertex from eye
 
         if (normals) {
 
-            src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
             src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
 
             var light;
@@ -16020,14 +16056,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push(fragmentHooks.viewPos + "(SCENEJS_vViewVertex);");
         }
 
-        if (fragmentHooks.worldEyeVec) {
-            src.push(fragmentHooks.worldEyeVec + "(SCENEJS_vWorldEyeVec);");
-        }
-
-        if (normals && fragmentHooks.worldNormal) {
-            src.push(fragmentHooks.worldNormal + "(SCENEJS_vWorldNormal);");
-        }
-
         if (normals && fragmentHooks.viewNormal) {
             src.push(fragmentHooks.viewNormal + "(SCENEJS_vViewNormal);");
         }
@@ -16065,15 +16093,18 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (normals) {
             src.push("  float   attenuation = 1.0;");
-            src.push("  vec3    viewNormalVec = SCENEJS_vViewNormal;");
-            src.push("  vec3    worldNormalVec = SCENEJS_vWorldNormal;");
+            if (tangents) {
+                src.push("  vec3    viewNormalVec = vec3(0.0, 1.0, 0.0);");
+            } else {
+                src.push("  vec3    viewNormalVec = SCENEJS_vViewNormal;");
+            }
         }
 
         var layer;
         if (texturing) {
 
             if (normals) {
-                src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
+                src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vViewNormal, SCENEJS_vViewEyeVec) > 0.0) {");
             }
 
             src.push("  vec4    texturePos;");
@@ -16166,9 +16197,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
 
                 if (layer.applyTo == "normals" && normals) {
-                    src.push("vec3 bump = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
-                    src.push("worldNormalVec = bump;");
+                    src.push("viewNormalVec = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
                 }
+
             }
             if (normals) {
                 src.push("}");
@@ -16177,7 +16208,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (normals && cubeMapping) {
             src.push("if (SCENEJS_uReflection) {"); // Flag which can enable/disable reflection
-            src.push("vec3 envLookup = reflect(normalize(SCENEJS_vWorldEyeVec), normalize(worldNormalVec));");
+            src.push("vec3 envLookup = reflect(normalize(SCENEJS_vViewEyeVec), normalize(viewNormalVec));");
             src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
@@ -16185,14 +16216,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
                 src.push("color = mix(color, envColor.rgb, specular * SCENEJS_uCubeMapIntensity" + i + ");");
             }
-            src.push("}"); // if (SCENEJS_uReflection)
+            src.push("}");
         }
 
         src.push("  vec4    fragColor;");
 
         if (normals) {
 
-            src.push("if (SCENEJS_uBackfaceLighting || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
+            src.push("if (SCENEJS_uBackfaceLighting || dot(viewNormalVec, SCENEJS_vViewEyeVec) > 0.0) {");
 
             src.push("  vec3    lightValue      = vec3(0.0, 0.0, 0.0);");
             src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
@@ -16213,7 +16244,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "point") {
 
-                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
+                    src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
 
@@ -16233,7 +16264,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
+                            " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine) * attenuation;");
                         src.push("}");
                     }
                     //src.push("}");
@@ -16241,7 +16272,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "dir") {
 
-                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
+                    src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
@@ -16253,7 +16284,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+//                            " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine);");
+                            " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine);");
                         src.push("}");
                     }
                     // src.push("}");
@@ -17179,6 +17211,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._aNormalDraw = draw.getAttribute("SCENEJS_aNormal");
         this._aUVDraw = draw.getAttribute("SCENEJS_aUVCoord");
         this._aUV2Draw = draw.getAttribute("SCENEJS_aUVCoord2");
+        this._aTangentDraw = draw.getAttribute("SCENEJS_aTangent");
         this._aColorDraw = draw.getAttribute("SCENEJS_aVertexColor");
 
         this._aMorphVertexDraw = draw.getAttribute("SCENEJS_aMorphVertex");
@@ -17188,12 +17221,7 @@ SceneJS_ChunkFactory.createChunkType({
         var pick = this.program.pick;
 
         this._aVertexPick = pick.getAttribute("SCENEJS_aVertex");
-        this._aNormalPick = pick.getAttribute("SCENEJS_aNormal");
-        this._aUVPick = pick.getAttribute("SCENEJS_aUVCoord");
-        this._aUV2Pick = pick.getAttribute("SCENEJS_aUVCoord2");
-
         this._aMorphVertexPick = pick.getAttribute("SCENEJS_aMorphVertex");
-        this._aMorphNormalPick = pick.getAttribute("SCENEJS_aMorphNormal");
         this._uMorphFactorPick = pick.getUniformLocation("SCENEJS_uMorphFactor");
 
         this.VAO = null;
@@ -17316,6 +17344,10 @@ SceneJS_ChunkFactory.createChunkType({
                     this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
                 }
 
+                if (this._aTangentDraw) {
+                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf);
+                }
+
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
                 }
@@ -17338,21 +17370,6 @@ SceneJS_ChunkFactory.createChunkType({
             this._aVertexPick.bindFloatArrayBuffer(this.core2.vertexBuf);
         }
 
-        if (this._aMorphNormalPick) {
-            this._aNormalPick.bindFloatArrayBuffer(target1.normalBuf);
-            this._aMorphNormalPick.bindFloatArrayBuffer(target2.normalBuf);
-        } else if (this._aNormalPick) {
-            this._aNormalPick.bindFloatArrayBuffer(this.core2.normalBuf);
-        }
-
-        if (this._aUVPick) {
-            this._aUVPick.bindFloatArrayBuffer(this.core2.uvBuf);
-        }
-
-        if (this._aUV2Pick) {
-            this._aUV2Pick.bindFloatArrayBuffer(this.core2.uvBuf2);
-        }
-
         if (this._uMorphFactorPick) {
             this.program.gl.uniform1f(this._uMorphFactorPick, this.core.factor); // Bind LERP factor
         }
@@ -17363,24 +17380,12 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this.core.targets && this.core.targets.length) {
             this.morphPick();
+
         } else {
 
             if (this._aVertexPick) {
                 this._aVertexPick.bindFloatArrayBuffer(this.core2.vertexBuf);
             }
-
-            if (this._aNormalPick) {
-                this._aNormalPick.bindFloatArrayBuffer(this.core2.normalBuf);
-            }
-
-            if (this._aUVPick) {
-                this._aUVPick.bindFloatArrayBuffer(this.core2.uvBuf);
-            }
-
-            if (this._aUV2Pick) {
-                this._aUV2Pick.bindFloatArrayBuffer(this.core2.uvBuf2);
-            }
-
         }
 
         this.core2.indexBuf.bind();
@@ -17700,10 +17705,11 @@ SceneJS_ChunkFactory.createChunkType({
 
     drawAndPick:function (frameCtx) {
 
+        var gl = this.program.gl;
+
         var enabled = this.core.enabled;
 
         if (frameCtx.depthbufEnabled != enabled) {
-            var gl = this.program.gl;
             if (enabled) {
                 gl.enable(gl.DEPTH_TEST);
             } else {
@@ -18003,7 +18009,6 @@ SceneJS_ChunkFactory.createChunkType({
         var pick = this.program.pick;
 
         this._uMatLocationPick = pick.getUniformLocation("SCENEJS_uMMatrix");
-        this._uNormalMatLocationPick = pick.getUniformLocation("SCENEJS_uMNMatrix");
     },
 
     draw : function(frameCtx) {
@@ -18041,11 +18046,7 @@ SceneJS_ChunkFactory.createChunkType({
             gl.uniformMatrix4fv(this._uMatLocationPick, gl.FALSE, this.core.mat);
         }
 
-        if (this._uNormalMatLocationPick) {
-            gl.uniformMatrix4fv(this._uNormalMatLocationPick, gl.FALSE, this.core.normalMat);
-        }
-
         frameCtx.modelMat = this.core.mat;
     }
 });
-SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/api/latest/plugins" });
+SceneJS.configure({ pluginPath: "http://scenejs.org/api/latest/plugins" });
