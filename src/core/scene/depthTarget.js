@@ -55,6 +55,9 @@ new (function () {
 
     SceneJS.DepthTarget.prototype._destroy = function () {
         if (this._core) {
+            if (this._core.renderBuf) {
+                this._core.renderBuf.destroy();
+            }
             delete nodeCoreMap[this._core.coreId];
         }
     };
