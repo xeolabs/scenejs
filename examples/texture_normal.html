@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - bump mapping<br><br>
+    textures from <a href="http://kay-vriend.blogspot.de/2012/11/well-preserved-chesterfield.html">http://kay-vriend.blogspot.de/</a>
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    SceneJS.createScene({
+        nodes: [
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 4,
+                zoomSensitivity: 0.1,
+                spinYaw: 0.1,
+                spinPitch: -0.1,
+
+                nodes: [
+
+                    // The reflection cube map
+                    // Images taken from: http://hristo.oskov.com/projects/cs418/mp3/
+                    {
+                        type: "reflect/london",
+
+                        // 100% texture intensity
+                        intensity: 0.2,
+
+                        nodes: [
+                            {
+                                type: "material",
+                                color: { r: 1.0, g: 1.0, b: 1.0 },
+                                specular: 0.9,
+
+                                nodes: [
+
+                                    // The color map
+                                    {
+                                        type: "texture",
+                                        src: "textures/chesterfieldColorMap.png",
+                                        wrapS: "repeat",
+                                        wrapT: "repeat",
+                                        applyTo: "color", // Apply to diffuse color
+
+                                        nodes: [
+
+                                            // The specular map
+                                            {
+                                                type: "texture",
+                                                src: "textures/chesterfieldSpecularMap.png",
+                                                applyTo: "specular", // Apply to specularity
+
+                                                nodes: [
+
+                                                    // The normal map
+                                                    {
+                                                        type: "texture",
+                                                        src: "textures/chesterfieldNormalMap.png",
+                                                        wrapS: "repeat",
+                                                        wrapT: "repeat",
+                                                        applyTo: "normals", // Apply to geometry normal vectors
+
+                                                        nodes: [
+
+                                                            {
+                                                                type: "geometry/box",
+                                                                tangents: true
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+
+</script>
+</body>
+</html>

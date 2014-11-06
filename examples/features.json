@@ -92,11 +92,6 @@
             {
                 "nodes": [
                     {
-                        "title": "Oculus Rift",
-                        "page": "effects_oculusRift_pickFlyOrbit",
-                        "status": "alpha"
-                    },
-                    {
                         "title": "Anaglyph 3D",
                         "page": "effects_anaglyph_pickFlyOrbit"
                     },
@@ -370,7 +365,7 @@
                     },
                     {
                         "title": "Normal",
-                        "page": "texture_normals"
+                        "page": "texture_normal"
                     },
                     {
                         "title": "Glow",
