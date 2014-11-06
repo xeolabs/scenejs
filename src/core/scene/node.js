@@ -1055,14 +1055,14 @@ SceneJS.Node.prototype.findNodesByType = function (type, recursive) {
 
 SceneJS.Node.prototype._findNodesByType = function (type, list, recursive) {
     var i;
-    for (i = 0; i < this.nodes; i++) {
+    for (i = 0; i < this.nodes.length; i++) {
         var node = this.nodes[i];
         if (node.type == type) {
-            list.add(node);
+            list.push(node);
         }
     }
     if (recursive) {
-        for (i = 0; i < this.nodes; i++) {
+        for (i = 0; i < this.nodes.length; i++) {
             this.nodes[i]._findNodesByType(type, list, recursive);
         }
     }
