@@ -91,15 +91,6 @@ SceneJS_Canvas.prototype.initWebGL = function () {
             SceneJS.errors.WEBGL_NOT_SUPPORTED,
             'Failed to get a WebGL context');
     }
-
-   // this.gl.enable(this.gl.SCISSOR_TEST);
-//    this.gl.clearColor(1.0, 1.0, 1.0, 1.0);
-//    this.gl.clearDepth(1.0);
-//    this.gl.enable(this.gl.DEPTH_TEST);
-//    this.gl.disable(this.gl.CULL_FACE);
-//    this.gl.depthRange(0, 1);
-//    this.gl.disable(this.gl.SCISSOR_TEST);
-//    this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 };
 
 
