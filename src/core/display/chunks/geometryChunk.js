@@ -13,6 +13,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._aNormalDraw = draw.getAttribute("SCENEJS_aNormal");
         this._aUVDraw = draw.getAttribute("SCENEJS_aUVCoord");
         this._aUV2Draw = draw.getAttribute("SCENEJS_aUVCoord2");
+        this._aTangentDraw = draw.getAttribute("SCENEJS_aTangent");
         this._aColorDraw = draw.getAttribute("SCENEJS_aVertexColor");
 
         this._aMorphVertexDraw = draw.getAttribute("SCENEJS_aMorphVertex");
@@ -22,12 +23,7 @@ SceneJS_ChunkFactory.createChunkType({
         var pick = this.program.pick;
 
         this._aVertexPick = pick.getAttribute("SCENEJS_aVertex");
-        this._aNormalPick = pick.getAttribute("SCENEJS_aNormal");
-        this._aUVPick = pick.getAttribute("SCENEJS_aUVCoord");
-        this._aUV2Pick = pick.getAttribute("SCENEJS_aUVCoord2");
-
         this._aMorphVertexPick = pick.getAttribute("SCENEJS_aMorphVertex");
-        this._aMorphNormalPick = pick.getAttribute("SCENEJS_aMorphNormal");
         this._uMorphFactorPick = pick.getUniformLocation("SCENEJS_uMorphFactor");
 
         this.VAO = null;
@@ -150,6 +146,10 @@ SceneJS_ChunkFactory.createChunkType({
                     this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
                 }
 
+                if (this._aTangentDraw) {
+                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf);
+                }
+
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
                 }
@@ -172,21 +172,6 @@ SceneJS_ChunkFactory.createChunkType({
             this._aVertexPick.bindFloatArrayBuffer(this.core2.vertexBuf);
         }
 
-        if (this._aMorphNormalPick) {
-            this._aNormalPick.bindFloatArrayBuffer(target1.normalBuf);
-            this._aMorphNormalPick.bindFloatArrayBuffer(target2.normalBuf);
-        } else if (this._aNormalPick) {
-            this._aNormalPick.bindFloatArrayBuffer(this.core2.normalBuf);
-        }
-
-        if (this._aUVPick) {
-            this._aUVPick.bindFloatArrayBuffer(this.core2.uvBuf);
-        }
-
-        if (this._aUV2Pick) {
-            this._aUV2Pick.bindFloatArrayBuffer(this.core2.uvBuf2);
-        }
-
         if (this._uMorphFactorPick) {
             this.program.gl.uniform1f(this._uMorphFactorPick, this.core.factor); // Bind LERP factor
         }
@@ -197,24 +182,12 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this.core.targets && this.core.targets.length) {
             this.morphPick();
+
         } else {
 
             if (this._aVertexPick) {
                 this._aVertexPick.bindFloatArrayBuffer(this.core2.vertexBuf);
             }
-
-            if (this._aNormalPick) {
-                this._aNormalPick.bindFloatArrayBuffer(this.core2.normalBuf);
-            }
-
-            if (this._aUVPick) {
-                this._aUVPick.bindFloatArrayBuffer(this.core2.uvBuf);
-            }
-
-            if (this._aUV2Pick) {
-                this._aUV2Pick.bindFloatArrayBuffer(this.core2.uvBuf2);
-            }
-
         }
 
         this.core2.indexBuf.bind();

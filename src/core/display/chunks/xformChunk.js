@@ -12,7 +12,6 @@ SceneJS_ChunkFactory.createChunkType({
         var pick = this.program.pick;
 
         this._uMatLocationPick = pick.getUniformLocation("SCENEJS_uMMatrix");
-        this._uNormalMatLocationPick = pick.getUniformLocation("SCENEJS_uMNMatrix");
     },
 
     draw : function(frameCtx) {
@@ -48,10 +47,6 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this._uMatLocationPick) {
             gl.uniformMatrix4fv(this._uMatLocationPick, gl.FALSE, this.core.mat);
-        }
-
-        if (this._uNormalMatLocationPick) {
-            gl.uniformMatrix4fv(this._uNormalMatLocationPick, gl.FALSE, this.core.normalMat);
         }
 
         frameCtx.modelMat = this.core.mat;

@@ -50,18 +50,18 @@ new (function () {
         var primitive = data.primitive || "triangles";
         this._core.primitive = this._getPrimitiveType(primitive);
 
-        var normals;
-
         if (data.normals) {
-            if (data.normals == "auto" && primitive == "triangles") {
-                if (data.positions && data.indices) {
-                    // Auto normal generation
-                    normals = this._buildNormals(data.positions, data.indices);
-                } else {
-                    // TODO: log warning?
+            if (primitive == "triangles") {
+                if (data.normals === "auto" || data.normals === true) {
+                    if (data.positions && data.indices) {
+                        this._buildNormals(data); // Auto normal generation - build normals array
+                    }
                 }
-            } else {
-                normals = data.normals;
+//                if (data.tangents === "auto" || data.tangents === true) {
+                    if (data.positions && data.indices && data.uv) {
+                        this._buildTangents(data); // Build tangents array
+                    }
+//                }
             }
         }
 
@@ -70,8 +70,8 @@ new (function () {
                 ? new Float32Array((options.scale || options.origin)
                 ? this._applyOptions(data.positions, options)
                 : data.positions) : undefined,
-
-            normals: normals ? new Float32Array(normals) : undefined,
+            normals: data.normals ? new Float32Array(data.normals) : undefined,
+            tangents: data.tangents ? new Float32Array(data.tangents) : undefined,
             uv: data.uv ? new Float32Array(data.uv) : undefined,
             uv2: data.uv2 ? new Float32Array(data.uv2) : undefined,
             colors: data.colors ? new Float32Array(data.colors) : undefined,
@@ -112,7 +112,7 @@ new (function () {
             default:
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "geometry primitive unsupported: '" +
+                        "geometry primitive unsupported: '" +
                         primitive +
                         "' - supported types are: 'points', 'lines', 'line-loop', " +
                         "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'");
@@ -184,6 +184,11 @@ new (function () {
             core.colorBuf = null;
         }
 
+        if (core.tangentBuf) {
+            core.tangentBuf.destroy();
+            core.tangentBuf = null;
+        }
+
         if (core.indexBuf) {
             core.indexBuf.destroy();
             core.indexBuf = null;
@@ -208,13 +213,13 @@ new (function () {
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
             var arrays = core.arrays;
-            var canInterleave = (SceneJS.getConfigs("enableInterleaving") !== false);
+            var canInterleave = (SceneJS.getConfigs("enableInterleaving") !== false) && !arrays.tangents;
             var dataLength = 0;
             var interleavedValues = 0;
             var interleavedArrays = [];
             var interleavedArrayStrides = [];
 
-            var prepareInterleaveBuffer = function(array, strideInElements) {
+            var prepareInterleaveBuffer = function (array, strideInElements) {
                 if (dataLength == 0) {
                     dataLength = array.length / strideInElements;
                 } else if (array.length / strideInElements != dataLength) {
@@ -254,6 +259,13 @@ new (function () {
                 core.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv2, arrays.uv2.length, 2, usage);
             }
 
+            if (arrays.tangents) {
+                if (canInterleave) {
+                    core.interleavedPositionOffset = prepareInterleaveBuffer(arrays.tangents, 3);
+                }
+                core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.tangents, arrays.tangents.length, 3, usage);
+            }
+
             if (arrays.colors) {
                 if (canInterleave) {
                     core.interleavedColorOffset = prepareInterleaveBuffer(arrays.colors, 4);
@@ -289,7 +301,7 @@ new (function () {
             destroyBuffers(core);
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ERROR,
-                "Failed to allocate geometry: " + e);
+                    "Failed to allocate geometry: " + e);
         }
     };
 
@@ -308,11 +320,13 @@ new (function () {
 
     };
 
-    /** (re)builds normal vectors from vertices
+    /** Builds normal vectors from positions and indices
      * @private
      */
-    SceneJS.Geometry.prototype._buildNormals = function (positions, indices) {
+    SceneJS.Geometry.prototype._buildNormals = function (data) {
 
+        var positions = data.positions;
+        var indices = data.indices;
         var nvecs = new Array(positions.length / 3);
         var j0;
         var j1;
@@ -361,7 +375,85 @@ new (function () {
             normals[i * 3 + 1] = (y / count);
             normals[i * 3 + 2] = (z / count);
         }
-        return normals;
+
+        data.normals = normals;
+    };
+
+
+    /**
+     * Builds vertex tangent vectors from positions, UVs and indices
+     *
+     * Based on code by @rollokb, in his fork of webgl-obj-loader:
+     * https://github.com/rollokb/webgl-obj-loader
+     *
+     * @private
+     **/
+    SceneJS.Geometry.prototype._buildTangents = function (data) {
+
+        var positions = data.positions;
+        var indices = data.indices;
+        var uv = data.uv;
+
+        var tangents = [];
+
+        // The vertex data needs to be calculated
+        // before the calculation of the tangents
+
+        for (var location = 0; location < indices.length; location += 3) {
+
+            // Recontructing each vertex and UV coordinate into the respective vectors
+
+            var index = indices[location];
+
+            var v0 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv0 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            index = indices[location + 1];
+
+            var v1 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv1 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            index = indices[location + 2];
+
+            var v2 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv2 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            var deltaPos1 = SceneJS_math_subVec3(v1, v0, []);
+            var deltaPos2 = SceneJS_math_subVec3(v2, v0, []);
+
+            var deltaUV1 = SceneJS_math_subVec2(uv1, uv0, []);
+            var deltaUV2 = SceneJS_math_subVec2(uv2, uv0, []);
+
+            var r = 1 / ((deltaUV1[0] * deltaUV2[1]) - (deltaUV1[1] * deltaUV2[0]));
+
+            var tangent = SceneJS_math_mulVec3Scalar(
+                SceneJS_math_subVec3(
+                    SceneJS_math_mulVec3Scalar(deltaPos1, deltaUV2[1], []),
+                    SceneJS_math_mulVec3Scalar(deltaPos2, deltaUV1[1], []),
+                    []
+                ),
+                r,
+                []
+            );
+
+            // Average the value of the vectors outs
+            for (var v = 0; v < 3; v++) {
+                var addTo = indices[location + v];
+                if (typeof tangents[addTo] != "undefined") {
+                    tangents[addTo] = SceneJS_math_addVec3(tangents[addTo], tangent, []);
+                } else {
+                    tangents[addTo] = tangent;
+                }
+            }
+        }
+
+        // Deconstruct the vectors back into 1D arrays for WebGL
+
+        data.tangents = [];
+
+        for (var i = 0; i < tangents.length; i++) {
+            data.tangents = data.tangents.concat(tangents[i]);
+        }
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
@@ -472,7 +564,7 @@ new (function () {
 
     /** Returns the Model-space boundary of this geometry
      *
-      * @returns {*}
+     * @returns {*}
      */
     SceneJS.Geometry.prototype.getBoundary = function () {
         if (this._boundary) {

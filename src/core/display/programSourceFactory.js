@@ -19,7 +19,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         return this._sourceCache[hash] = new SceneJS_ProgramSource(
-
             hash,
 
             this._composePickingVertexShader(states), // pickVertexSrc
@@ -42,123 +41,34 @@ var SceneJS_ProgramSourceFactory = new (function () {
     };
 
     this._composePickingVertexShader = function (states) {
-
-        var customShaders = states.shader.shaders || {};
-
-        var customVertexShader = customShaders.vertex || {};
-        var vertexHooks = customVertexShader.hooks || {};
-
-        var customFragmentShader = customShaders.fragment || {};
-        var fragmentHooks = customFragmentShader.hooks || {};
-
-        // Do a full custom shader replacement if code supplied without hooks
-        if (customShaders.vertex
-            && customShaders.vertex.code
-            && customShaders.vertex.code != ""
-            && SceneJS._isEmpty(customShaders.vertex.hooks)) {
-            return [customShaders.vertex.code];
-        }
-
-        var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
-        var normals = this._hasNormals(states);
-
         var src = [
             "precision mediump float;",
             "attribute vec3 SCENEJS_aVertex;",
             "uniform mat4 SCENEJS_uMMatrix;",
-            "uniform mat4 SCENEJS_uMNMatrix;",
             "uniform mat4 SCENEJS_uVMatrix;",
             "uniform mat4 SCENEJS_uVNMatrix;",
             "uniform mat4 SCENEJS_uPMatrix;"
         ];
-
-        if (normals) {
-            src.push("attribute vec3 SCENEJS_aNormal;");
-        }
-
-        if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-            src.push("varying vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
-            src.push("varying vec3 SCENEJS_vViewNormal;");   // Output view-space vertex normal
-        }
-
         src.push("varying vec4 SCENEJS_vWorldVertex;");
         src.push("varying vec4 SCENEJS_vViewVertex;");
-        src.push("varying vec4 SCENEJS_vProjVertex;");
-
-        src.push("uniform vec3 SCENEJS_uWorldEye;");                     // World-space eye position
-        src.push("varying vec3 SCENEJS_vWorldEyeVec;");
-
-        if (customVertexShader.code) {
-            src.push("\n" + customVertexShader.code + "\n");
-        }
-
         if (morphing) {
             src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
             if (states.morphGeometry.targets[0].vertexBuf) {      // target2 has these arrays also
                 src.push("attribute vec3 SCENEJS_aMorphVertex;");
             }
         }
-
         src.push("void main(void) {");
         src.push("   vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
-
-        if (normals) {
-            src.push("  vec4 modelNormal = vec4(SCENEJS_aNormal, 0.0); ");
-        }
-
-        if (vertexHooks.modelPos) {
-            src.push("tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
-        }
-
         if (morphing) {
             if (states.morphGeometry.targets[0].vertexBuf) {
-                src.push("  vec4 vMorphVertex = vec4(SCENEJS_aMorphVertex, 1.0); ");
-
-                if (vertexHooks.modelPos) {
-                    src.push("vMorphVertex=" + vertexHooks.modelPos + "(vMorphVertex);");
-                }
-
-                src.push("  tmpVertex = vec4(mix(tmpVertex.xyz, vMorphVertex.xyz, SCENEJS_uMorphFactor), 1.0); ");
+                src.push("  tmpVertex = vec4(mix(tmpVertex.xyz, SCENEJS_aMorphVertex, SCENEJS_uMorphFactor), 1.0); ");
             }
         }
-
-
-        src.push("  tmpVertex = SCENEJS_uMMatrix * tmpVertex; ");
-
-        if (vertexHooks.worldPos) {
-            src.push("tmpVertex=" + vertexHooks.worldPos + "(tmpVertex);");
-        }
-
-        // if (clipping || fragmentHooks.worldPosClip) {
-        src.push("  SCENEJS_vWorldVertex = tmpVertex; ");
-        //    }
-
-        src.push("SCENEJS_vWorldEyeVec = normalize(SCENEJS_uWorldEye - tmpVertex.xyz);");
-
-        src.push("  tmpVertex = SCENEJS_uVMatrix * tmpVertex; ");
-
-        if (vertexHooks.viewPos) {
-            src.push("tmpVertex=" + vertexHooks.viewPos + "(tmpVertex);");
-        }
-
-        src.push("  SCENEJS_vViewVertex = tmpVertex;");
-
-        if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-            src.push("  vec3 worldNormal = normalize((SCENEJS_uMNMatrix * modelNormal).xyz); ");
-            src.push("  SCENEJS_vWorldNormal = worldNormal;");
-            src.push("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
-        }
-
-        src.push("  SCENEJS_vProjVertex = SCENEJS_uPMatrix * tmpVertex;");
-
-
-        src.push("  gl_Position = SCENEJS_vProjVertex;");
+        src.push("  SCENEJS_vWorldVertex = SCENEJS_uMMatrix * tmpVertex; ");
+        src.push("  SCENEJS_vViewVertex = SCENEJS_uVMatrix * SCENEJS_vWorldVertex;");
+        src.push("  gl_Position =  SCENEJS_uPMatrix * SCENEJS_vViewVertex;");
         src.push("}");
-
-        if (false && debugCfg.logScripts == true) {
-            SceneJS.log.info(src);
-        }
         return src;
     };
 
@@ -168,26 +78,30 @@ var SceneJS_ProgramSourceFactory = new (function () {
      */
     this._composePickingFragmentShader = function (states) {
 
-        var customShaders = states.shader.shaders || {};
-        var customFragmentShader = customShaders.fragment || {};
-        var fragmentHooks = customFragmentShader.hooks || {};
-
-        // Do a full custom shader replacement if code supplied without hooks
-        if (customShaders.fragment
-            && customShaders.fragment.code
-            && customShaders.fragment.code != ""
-            && SceneJS._isEmpty(customShaders.fragment.hooks)) {
-            return [customShaders.fragment.code];
-        }
-
         var clipping = states.clips.clips.length > 0;
-
-        var normals = this._hasNormals(states);
 
         var src = [
             "precision mediump float;"
         ];
 
+        src.push("varying vec4 SCENEJS_vWorldVertex;");
+        src.push("varying vec4  SCENEJS_vViewVertex;");                  // View-space vertex
+
+        src.push("uniform bool  SCENEJS_uRayPickMode;");                   // Z-pick mode when true else colour-pick
+        src.push("uniform vec3  SCENEJS_uPickColor;");                   // Used in colour-pick mode
+        src.push("uniform float SCENEJS_uZNear;");                      // Used in Z-pick mode
+        src.push("uniform float SCENEJS_uZFar;");                       // Used in Z-pick mode
+        src.push("uniform bool  SCENEJS_uClipping;");
+
+        if (clipping) {
+            // World-space clipping planes
+            for (var i = 0; i < states.clips.clips.length; i++) {
+                src.push("uniform float SCENEJS_uClipMode" + i + ";");
+                src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
+            }
+        }
+
+        // Pack depth function for ray-pick
         src.push("vec4 packDepth(const in float depth) {");
         src.push("  const vec4 bitShift = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);");
         src.push("  const vec4 bitMask  = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);");
@@ -196,53 +110,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("  return res;");
         src.push("}");
 
-
-        src.push("varying vec4 SCENEJS_vWorldVertex;");
-        src.push("varying vec4 SCENEJS_vViewVertex;");                  // View-space vertex
-        src.push("varying vec4 SCENEJS_vProjVertex;");
-
-        src.push("uniform bool SCENEJS_uRayPickMode;");                   // Z-pick mode when true else colour-pick
-
-        src.push("uniform vec3 SCENEJS_uPickColor;");                   // Used in colour-pick mode
-
-        src.push("uniform float SCENEJS_uZNear;");                      // Used in Z-pick mode
-        src.push("uniform float SCENEJS_uZFar;");                       // Used in Z-pick mode
-
-        src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
-
-        src.push("uniform bool  SCENEJS_uClipping;");
-
-        if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-            src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
-            src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
-        }
-        /*-----------------------------------------------------------------------------------
-         * Variables - Clipping
-         *----------------------------------------------------------------------------------*/
-
-        if (clipping) {
-            for (var i = 0; i < states.clips.clips.length; i++) {
-                src.push("uniform float SCENEJS_uClipMode" + i + ";");
-                src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
-            }
-        }
-
-        /*-----------------------------------------------------------------------------------
-         * Custom GLSL
-         *----------------------------------------------------------------------------------*/
-
-        if (customFragmentShader.code) {
-            src.push("\n" + customFragmentShader.code + "\n");
-        }
-
         src.push("void main(void) {");
-
-        if (fragmentHooks.worldPosClip) {
-            src.push("if (" + fragmentHooks.worldPosClip + "(SCENEJS_vWorldVertex) == false) { discard; };");
-        }
-        if (fragmentHooks.viewPosClip) {
-            src.push("if (!" + fragmentHooks.viewPosClip + "(SCENEJS_vViewVertex) == false) { discard; };");
-        }
 
         if (clipping) {
             src.push("if (SCENEJS_uClipping) {");
@@ -261,39 +129,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("}");
         }
 
-        if (fragmentHooks.worldPos) {
-            src.push(fragmentHooks.worldPos + "(SCENEJS_vWorldVertex);");
-        }
-
-        if (fragmentHooks.viewPos) {
-            src.push(fragmentHooks.viewPos + "(SCENEJS_vViewVertex);");
-        }
-
-        if (fragmentHooks.worldEyeVec) {
-            src.push(fragmentHooks.worldEyeVec + "(SCENEJS_vWorldEyeVec);");
-        }
-
-        if (normals && fragmentHooks.worldNormal) {
-            src.push(fragmentHooks.worldNormal + "(SCENEJS_vWorldNormal);");
-        }
-
-        if (normals && fragmentHooks.viewNormal) {
-            src.push(fragmentHooks.viewNormal + "(SCENEJS_vViewNormal);");
-        }
-
         src.push("    if (SCENEJS_uRayPickMode) {");
         src.push("          float zNormalizedDepth = abs((SCENEJS_uZNear + SCENEJS_vViewVertex.z) / (SCENEJS_uZFar - SCENEJS_uZNear));");
         src.push("          gl_FragColor = packDepth(zNormalizedDepth); ");
-
         src.push("    } else {");
         src.push("          gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
         src.push("    }");
         src.push("}");
 
-
-        if (false && debugCfg.logScripts == true) {
-            SceneJS.log.info(src);
-        }
         return src;
     };
 
@@ -323,6 +166,23 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return false;
     };
 
+    this._hasTangents = function (states) {
+        if (states.texture) {
+            var layers = states.texture.layers;
+            if (!layers) {
+                return false;
+            }
+            for (var i = 0, len = layers.length; i < len; i++) {
+                if (layers[i].applyTo == "normals") {
+                    if (states.geometry.tangentBuf) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    };
+
     this._composeRenderingVertexShader = function (states) {
 
         var customShaders = states.shader.shaders || {};
@@ -343,6 +203,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var texturing = this._isTexturing(states);
         var normals = this._hasNormals(states);
+        var tangents = this._hasTangents(states);
         var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
 
@@ -350,23 +211,23 @@ var SceneJS_ProgramSourceFactory = new (function () {
             "precision mediump float;"
         ];
 
-        src.push("attribute vec3 SCENEJS_aVertex;");                // Model coordinates
-
-        src.push("uniform vec3 SCENEJS_uWorldEye;");                     // World-space eye position
-        src.push("varying vec3 SCENEJS_vWorldEyeVec;");                  // Output world-space eye vector
-
-        /*-----------------------------------------------------------------------------------
-         * Variables - normals
-         *----------------------------------------------------------------------------------*/
+        src.push("attribute vec3 SCENEJS_aVertex;");            // Model coordinates
+        src.push("uniform vec3 SCENEJS_uWorldEye;");            // World-space eye position
+        src.push("varying vec3 SCENEJS_vViewEyeVec;");          // View-space vector from origin to eye
 
         if (normals) {
 
             src.push("attribute vec3 SCENEJS_aNormal;");        // Normal vectors
             src.push("uniform   mat4 SCENEJS_uMNMatrix;");      // Model normal matrix
             src.push("uniform   mat4 SCENEJS_uVNMatrix;");      // View normal matrix
-
-            src.push("varying   vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
             src.push("varying   vec3 SCENEJS_vViewNormal;");    // Output view-space vertex normal
+
+            if (tangents) {
+
+                // Input for tangents
+
+                src.push("attribute vec4 SCENEJS_aTangent;");
+            }
 
             for (var i = 0; i < states.lights.lights.length; i++) {
                 var light = states.lights.lights[i];
@@ -383,9 +244,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
 
-                /* Vector from vertex to light, packaged with the pre-computed length of that vector
-                 */
-                src.push("varying vec4 SCENEJS_vViewLightVecAndDist" + i + ";");    // varying for fragment lighting
+                // Vector from vertex to light, packaged with the pre-computed length of that vector
+                src.push("varying vec4 SCENEJS_vViewLightVecAndDist" + i + ";");
             }
         }
 
@@ -413,22 +273,18 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("varying vec4 SCENEJS_vWorldVertex;");         // Varying for fragment clip or world pos hook
         }
 
-        //    if (fragmentHooks.viewPos) {
-        src.push("varying vec4 SCENEJS_vViewVertex;");          // Varying for fragment view clip hook
-        //  }
+        src.push("varying vec4 SCENEJS_vViewVertex;");              // Varying for fragment view clip hook
 
         if (texturing) {                                            // Varyings for fragment texturing
+
             if (states.geometry.uvBuf) {
                 src.push("varying vec2 SCENEJS_vUVCoord;");
             }
+
             if (states.geometry.uvBuf2) {
                 src.push("varying vec2 SCENEJS_vUVCoord2;");
             }
         }
-
-        /*-----------------------------------------------------------------------------------
-         * Variables - Morphing
-         *----------------------------------------------------------------------------------*/
 
         if (morphing) {
             src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
@@ -446,12 +302,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("\n" + customVertexShader.code + "\n");
         }
 
-
         src.push("void main(void) {");
-        src.push("vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
+
+        src.push("  vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
 
         if (vertexHooks.modelPos) {
-            src.push("tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
+            src.push("  tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
         }
 
         src.push("  vec4 modelVertex = tmpVertex; ");
@@ -459,9 +315,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("  vec4 modelNormal = vec4(SCENEJS_aNormal, 0.0); ");
         }
 
-        /*
-         * Morphing - morph targets are in same model space as the geometry
-         */
+        // Morphing - morph targets are in same model space as the geometry
         if (morphing) {
             if (states.morphGeometry.targets[0].vertexBuf) {
                 src.push("  vec4 vMorphVertex = vec4(SCENEJS_aMorphVertex, 1.0); ");
@@ -492,8 +346,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals) {
-            src.push("  vec3 worldNormal = normalize((SCENEJS_uMNMatrix * modelNormal).xyz); ");
-            src.push("  SCENEJS_vWorldNormal = worldNormal;");
+            src.push("  vec3 worldNormal = (SCENEJS_uMNMatrix * modelNormal).xyz; ");
             src.push("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
         }
 
@@ -501,9 +354,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("  SCENEJS_vWorldVertex = worldVertex;");                  // Varying for fragment world clip or hooks
         }
 
-        // if (fragmentHooks.viewPos) {
         src.push("  SCENEJS_vViewVertex = viewVertex;");                    // Varying for fragment hooks
-        //  }
 
         if (vertexHooks.projMatrix) {
             src.push("gl_Position = " + vertexHooks.projMatrix + "(SCENEJS_uPMatrix) * viewVertex;");
@@ -511,13 +362,18 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("  gl_Position = SCENEJS_uPMatrix * viewVertex;");
         }
 
-        /*-----------------------------------------------------------------------------------
-         * Logic - normals
-         *
-         * Transform the world-space lights into view space
-         *----------------------------------------------------------------------------------*/
+        if (tangents) {
+
+            // Compute tangent-bitangent-normal matrix
+
+            src.push("vec3 tangent = normalize((SCENEJS_uVNMatrix * SCENEJS_uMNMatrix * SCENEJS_aTangent).xyz);");
+            src.push("vec3 viewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;"); // TODO: DRY
+            src.push("vec3 bitangent = cross(viewNormal, tangent);");
+            src.push("mat3 TBM = mat3(tangent, bitangent, viewNormal);");
+        }
 
         src.push("  vec3 tmpVec3;");
+
         if (normals) {
 
             for (var i = 0; i < states.lights.lights.length; i++) {
@@ -530,50 +386,92 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "dir") {
 
-                    /* Directional light
-                     */
+                    // Directional light
+
                     if (light.space == "world") {
 
-                        /* World space light - transform vector to View space
-                         */
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(-normalize((SCENEJS_uVMatrix * vec4(SCENEJS_uLightDir" + i + ", 0.0)).xyz), 0.0);");
+                        // World space light
+
+                        src.push("tmpVec3 = normalize(SCENEJS_uLightDir" + i + ");");
+
+                        // Transform to View space
+                        src.push("tmpVec3 = vec3(SCENEJS_uVMatrix * vec4(tmpVec3, 0.0)).xyz;");
+
+                        if (tangents) {
+
+                            // Transform to Tangent space
+                            src.push("tmpVec3 *= TBM;");
+                        }
 
                     } else {
 
-                        /* View space light
-                         */
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(-normalize(SCENEJS_uLightDir" + i + "), 0.0);");
+                        // View space light
+
+                        src.push("tmpVec3 = normalize(SCENEJS_uLightDir" + i + ");");
+
+                        if (tangents) {
+
+                            // Transform to Tangent space
+                            src.push("tmpVec3 *= TBM;");
+                        }
                     }
+
+                    // Output
+                    src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(-tmpVec3, 0.0);");
                 }
 
                 if (light.mode == "point") {
 
-                    /* Positional light
-                     */
+                    // Positional light
+
                     if (light.space == "world") {
 
-                        /* World space light - transform position to View space
-                         */
-                        src.push("tmpVec3 = ((SCENEJS_uVMatrix * vec4(SCENEJS_uLightPos" + i + ", 1.0)).xyz - worldVertex.xyz);");
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(normalize(tmpVec3), length(tmpVec3));");
+                        // World space 
+
+                        src.push("tmpVec3 = SCENEJS_uLightPos" + i + " - worldVertex.xyz;"); // Vector from World coordinate to light pos
+
+                        // Transform to View space
+                        src.push("tmpVec3 = vec3(SCENEJS_uVMatrix * vec4(tmpVec3, 0.0)).xyz;");
+
+                        if (tangents) {
+
+                            // Transform to Tangent space
+                            src.push("tmpVec3 *= TBM;");
+                        }
 
                     } else {
 
-                        /* View space light
-                         */
-                        src.push("tmpVec3 = (SCENEJS_uLightPos" + i + ".xyz - worldVertex.xyz);");
-                        src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(normalize(tmpVec3), length(tmpVec3));");
+                        // View space 
+
+                        src.push("tmpVec3 = SCENEJS_uLightPos" + i + ".xyz - viewVertex.xyz;"); // Vector from View coordinate to light pos
+
+                        if (tangents) {
+
+                            // Transform to tangent space
+                            src.push("tmpVec3 *= TBM;");
+                        }
                     }
+
+                    // Output
+                    src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(tmpVec3, length( SCENEJS_uLightPos" + i + " - worldVertex.xyz));");
                 }
             }
         }
 
-        src.push("SCENEJS_vWorldEyeVec = normalize(SCENEJS_uWorldEye - worldVertex.xyz);");
+        src.push("SCENEJS_vViewEyeVec = ((SCENEJS_uVMatrix * vec4(SCENEJS_uWorldEye, 0.0)).xyz  - viewVertex.xyz);");
+
+        if (tangents) {
+
+            // World eye vector to tangent space
+            src.push("SCENEJS_vViewEyeVec *= TBM;");
+        }
 
         if (texturing) {                                                        // varyings for fragment texturing
+
             if (states.geometry.uvBuf) {
                 src.push("SCENEJS_vUVCoord = SCENEJS_aUVCoord;");
             }
+
             if (states.geometry.uvBuf2) {
                 src.push("SCENEJS_vUVCoord2 = SCENEJS_aUVCoord2;");
             }
@@ -584,12 +482,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
         src.push("}");
 
-
-        if (false && debugCfg.logScripts === true) {
-            SceneJS.log.info(src);
-        }
         return src;
     };
+
 
     /*-----------------------------------------------------------------------------------------------------------------
      * Rendering Fragment shader
@@ -613,6 +508,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var texturing = this._isTexturing(states);
         var cubeMapping = this._isCubeMapping(states);
         var normals = this._hasNormals(states);
+        var tangents = this._hasTangents(states);
         var clipping = states.clips.clips.length > 0;
 
         var src = ["\n"];
@@ -702,11 +598,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of world-space vertex from eye
+        src.push("varying vec3 SCENEJS_vViewEyeVec;");                          // Direction of world-space vertex from eye
 
         if (normals) {
 
-            src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
             src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
 
             var light;
@@ -764,14 +659,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push(fragmentHooks.viewPos + "(SCENEJS_vViewVertex);");
         }
 
-        if (fragmentHooks.worldEyeVec) {
-            src.push(fragmentHooks.worldEyeVec + "(SCENEJS_vWorldEyeVec);");
-        }
-
-        if (normals && fragmentHooks.worldNormal) {
-            src.push(fragmentHooks.worldNormal + "(SCENEJS_vWorldNormal);");
-        }
-
         if (normals && fragmentHooks.viewNormal) {
             src.push(fragmentHooks.viewNormal + "(SCENEJS_vViewNormal);");
         }
@@ -809,15 +696,18 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (normals) {
             src.push("  float   attenuation = 1.0;");
-            src.push("  vec3    viewNormalVec = SCENEJS_vViewNormal;");
-            src.push("  vec3    worldNormalVec = SCENEJS_vWorldNormal;");
+            if (tangents) {
+                src.push("  vec3    viewNormalVec = vec3(0.0, 1.0, 0.0);");
+            } else {
+                src.push("  vec3    viewNormalVec = SCENEJS_vViewNormal;");
+            }
         }
 
         var layer;
         if (texturing) {
 
             if (normals) {
-                src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
+                src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vViewNormal, SCENEJS_vViewEyeVec) > 0.0) {");
             }
 
             src.push("  vec4    texturePos;");
@@ -910,9 +800,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
 
                 if (layer.applyTo == "normals" && normals) {
-                    src.push("vec3 bump = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
-                    src.push("worldNormalVec = bump;");
+                    src.push("viewNormalVec = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
                 }
+
             }
             if (normals) {
                 src.push("}");
@@ -921,7 +811,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (normals && cubeMapping) {
             src.push("if (SCENEJS_uReflection) {"); // Flag which can enable/disable reflection
-            src.push("vec3 envLookup = reflect(normalize(SCENEJS_vWorldEyeVec), normalize(worldNormalVec));");
+            src.push("vec3 envLookup = reflect(normalize(SCENEJS_vViewEyeVec), normalize(viewNormalVec));");
             src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
@@ -929,14 +819,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
                 src.push("color = mix(color, envColor.rgb, specular * SCENEJS_uCubeMapIntensity" + i + ");");
             }
-            src.push("}"); // if (SCENEJS_uReflection)
+            src.push("}");
         }
 
         src.push("  vec4    fragColor;");
 
         if (normals) {
 
-            src.push("if (SCENEJS_uBackfaceLighting || dot(SCENEJS_vWorldNormal, SCENEJS_vWorldEyeVec) > 0.0) {");
+            src.push("if (SCENEJS_uBackfaceLighting || dot(viewNormalVec, SCENEJS_vViewEyeVec) > 0.0) {");
 
             src.push("  vec3    lightValue      = vec3(0.0, 0.0, 0.0);");
             src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
@@ -957,7 +847,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "point") {
 
-                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
+                    src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
 
@@ -977,7 +867,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine) * attenuation;");
+                            " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine) * attenuation;");
                         src.push("}");
                     }
                     //src.push("}");
@@ -985,7 +875,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "dir") {
 
-                    src.push("dotN = max(dot(viewNormalVec, viewLightVec), 0.0);");
+                    src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
 
                     //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
@@ -997,7 +887,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-                            " * specular * pow(max(dot(reflect(-viewLightVec, -viewNormalVec), vec3(0.0,0.0,1.0)), 0.0), shine);");
+//                            " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine);");
+                            " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine);");
                         src.push("}");
                     }
                     // src.push("}");

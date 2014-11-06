@@ -993,6 +993,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     // The extension needs to be re-queried in case the context was lost and has been recreated.
     var VAO = gl.getExtension("OES_vertex_array_object");
     frameCtx.VAO = (VAO) ? VAO : null;
+    frameCtx.VAO =  null;
 
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
 
