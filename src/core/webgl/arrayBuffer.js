@@ -11,50 +11,92 @@
 
 SceneJS._webgl.ArrayBuffer = function (gl, type, values, numItems, itemSize, usage) {
 
+    /**
+     * True when this buffer is allocated and ready to go
+     * @type {boolean}
+     */
+    this.allocated = false;
+
     this.gl = gl;
     this.type = type;
+    this.numItems = numItems;
     this.itemSize = itemSize;
-
-    this._allocate = function (values, numItems) {
-        this.handle = gl.createBuffer();
-        this.handle.numItems = numItems;
-        this.handle.itemSize = itemSize;
-        gl.bindBuffer(type, this.handle);
-        gl.bufferData(type, values, usage);
-        this.handle.numItems = numItems;
-        gl.bindBuffer(type, null);
-        this.numItems = numItems;
-        this.length = values.length;
-    };
+    this.usage = usage;
 
     this._allocate(values, numItems);
-
-    this.setData = function (data, offset) {
-
-        if (data.length > this.length) {
-            this.destroy();
-            this._allocate(data, data.length);
-
-        } else {
-
-            if (offset || offset === 0) {
-                gl.bufferSubData(type, offset, data);
-            } else {
-                gl.bufferData(type, data);
-            }
-        }
-    };
-
-    this.unbind = function () {
-        gl.bindBuffer(type, null);
-    };
-
-    this.destroy = function () {
-        gl.deleteBuffer(this.handle);
-    };
 };
 
+/**
+ * Allocates this buffer
+ *
+ * @param values
+ * @param numItems
+ * @private
+ */
+SceneJS._webgl.ArrayBuffer.prototype._allocate = function (values, numItems) {
+    this.allocated = false;
+    this.handle = this.gl.createBuffer();
+    if (this.handle) {
+        this.gl.bindBuffer(this.type, this.handle);
+        this.gl.bufferData(this.type, values, this.usage);
+        this.gl.bindBuffer(this.type, null);
+        this.numItems = numItems;
+        this.length = values.length;
+        this.allocated = true;
+    }
+};
+
+/**
+ * Updates values within this buffer, reallocating if needed
+ *
+ * @param data
+ * @param offset
+ */
+SceneJS._webgl.ArrayBuffer.prototype.setData = function (data, offset) {
+    if (!this.allocated) {
+        return;
+    }
+    if (data.length > this.length) {
+        // Needs reallocation
+        this.destroy();
+        this._allocate(data, data.length);
+    } else {
+        // No reallocation needed
+        if (offset || offset === 0) {
+            this.gl.bufferSubData(this.type, offset, data);
+        } else {
+            this.gl.bufferData(this.type, data);
+        }
+    }
+};
+
+/**
+ * Unbinds this buffer on WebGL
+ */
+SceneJS._webgl.ArrayBuffer.prototype.unbind = function () {
+    if (!this.allocated) {
+        return;
+    }
+    this.gl.bindBuffer(this.type, null);
+};
+
+/**
+ * Destroys this buffer
+ */
+SceneJS._webgl.ArrayBuffer.prototype.destroy = function () {
+    if (!this.allocated) {
+        return;
+    }
+    this.gl.deleteBuffer(this.handle);
+    this.handle = null;
+    this.allocated = false;
+};
+
+
 SceneJS._webgl.ArrayBuffer.prototype.bind = function () {
+    if (!this.allocated) {
+        return;
+    }
     this.gl.bindBuffer(this.type, this.handle);
 };
 

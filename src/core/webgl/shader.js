@@ -9,7 +9,17 @@
  */
 SceneJS._webgl.Shader = function (gl, type, source) {
 
+    /**
+     * True as soon as this shader is allocated and ready to go
+     * @type {boolean}
+     */
+    this.allocated = false;
+
     this.handle = gl.createShader(type);
+
+    if (!this.handle) {
+        return;
+    }
 
     gl.shaderSource(this.handle, source);
     gl.compileShader(this.handle);
@@ -24,11 +34,13 @@ SceneJS._webgl.Shader = function (gl, type, source) {
             SceneJS.log.error("Shader source:");
             var lines = source.split('\n');
             for (var j = 0; j < lines.length; j++) {
-                SceneJS.log.error(lines[j]);
+                SceneJS.log.error((j + 1) + ": " + lines[j]);
             }
 
             throw SceneJS_error.fatalError(
                 SceneJS.errors.SHADER_COMPILATION_FAILURE, "Shader program failed to compile");
         }
     }
+
+    this.allocated = true;
 };

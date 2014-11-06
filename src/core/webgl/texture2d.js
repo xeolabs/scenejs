@@ -1,5 +1,10 @@
 
 SceneJS._webgl.Texture2D = function (gl, cfg) {
+    /**
+     * True as soon as this texture is allocated and ready to go
+     * @type {boolean}
+     */
+    this.allocated = false;
 
     this.target = cfg.target || gl.TEXTURE_2D;
     this.minFilter = cfg.minFilter;
@@ -42,11 +47,16 @@ SceneJS._webgl.Texture2D = function (gl, cfg) {
 
         gl.bindTexture(this.target, null);
 
+        this.allocated = true;
+
     } catch (e) {
         throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Failed to create texture: " + e.message || e);
     }
 
     this.bind = function (unit) {
+        if (!this.allocated) {
+            return;
+        }
         if (this.texture) {
             gl.activeTexture(gl["TEXTURE" + unit]);
             gl.bindTexture(this.target, this.texture);
@@ -59,6 +69,9 @@ SceneJS._webgl.Texture2D = function (gl, cfg) {
     };
 
     this.unbind = function (unit) {
+        if (!this.allocated) {
+            return;
+        }
         if (this.texture) {
             gl.activeTexture(gl["TEXTURE" + unit]);
             gl.bindTexture(this.target, null);
@@ -66,6 +79,9 @@ SceneJS._webgl.Texture2D = function (gl, cfg) {
     };
 
     this.destroy = function () {
+        if (!this.allocated) {
+            return;
+        }
         if (this.texture) {
             gl.deleteTexture(this.texture);
             this.texture = null;
