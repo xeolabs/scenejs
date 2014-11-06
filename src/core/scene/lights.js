@@ -4,32 +4,32 @@
      * The default state core singleton for {@link SceneJS.Lights} nodes
      */
     var defaultCore = {
-        type:"lights",
-        stateId:SceneJS._baseStateId++,
-        hash:null,
-        empty:false,
-        lights:[
+        type: "lights",
+        stateId: SceneJS._baseStateId++,
+        hash: null,
+        empty: false,
+        lights: [
             {
-                mode:"ambient",
-                color:[0.7, 0.7, 0.8 ],
-                diffuse:true,
-                specular:false
+                mode: "ambient",
+                color: [0.7, 0.7, 0.8 ],
+                diffuse: true,
+                specular: false
             },
             {
-                mode:"dir",
-                color:[1.0, 1.0, 1.0 ],
-                diffuse:true,
-                specular:true,
-                dir:[-0.5, -0.5, -1.0 ],
-                space:"view"
+                mode: "dir",
+                color: [1.0, 1.0, 1.0 ],
+                diffuse: true,
+                specular: true,
+                dir: [-0.5, -0.5, -1.0 ],
+                space: "view"
             },
             {
-                mode:"dir",
-                color:[1.0, 1.0, 1.0 ],
-                diffuse:false,
-                specular:true,
-                dir:[1.0, -0.9, -0.7 ],
-                space:"view"
+                mode: "dir",
+                color: [1.0, 1.0, 1.0 ],
+                diffuse: false,
+                specular: true,
+                dir: [1.0, -0.9, -0.7 ],
+                space: "view"
             }
         ]
     };
@@ -112,21 +112,21 @@
 
         var color = cfg.color;
         light.color = [
-            color.r != undefined ? color.r : 1.0,
-            color.g != undefined ? color.g : 1.0,
-            color.b != undefined ? color.b : 1.0
+                color.r != undefined ? color.r : 1.0,
+                color.g != undefined ? color.g : 1.0,
+                color.b != undefined ? color.b : 1.0
         ];
 
         // Ambient lights hardwired to contribute to diffuse lighting
         light.mode = mode;
         light.diffuse = (mode == "ambient") ? true : ((cfg.diffuse != undefined) ? cfg.diffuse : true);
         light.specular = (mode == "ambient") ? false : ((cfg.specular != undefined) ? cfg.specular : true);
-        light.pos = cfg.pos ? [ pos.x || 0, pos.y || 0, pos.z || 0 ] : undefined;
-        light.dir = cfg.dir ? [dir.x || 0, dir.y || 0, dir.z || 0] : undefined;
+        light.pos = cfg.pos ? [ pos.x || 0, pos.y || 0, pos.z || 0 ] : [0, 0, 0];
+        light.dir = cfg.dir ? [dir.x || 0, dir.y || 0, dir.z || 0] : [0, 0, 1];
         light.attenuation = [
-            cfg.constantAttenuation != undefined ? cfg.constantAttenuation : 0.0,
-            cfg.linearAttenuation || 0.0,
-            cfg.quadraticAttenuation || 0.0
+                cfg.constantAttenuation != undefined ? cfg.constantAttenuation : 0.0,
+                cfg.linearAttenuation || 0.0,
+                cfg.quadraticAttenuation || 0.0
         ];
 
         var space = cfg.space;
@@ -139,7 +139,7 @@
 
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
+                    "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
         }
 
         light.space = space;
@@ -157,7 +157,7 @@
                     if (indexNum < 0 || indexNum >= this._core.lights.length) {
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                            "Invalid argument to set 'lights': index out of range (" + this._core.lights.length + " lights defined)");
+                                "Invalid argument to set 'lights': index out of range (" + this._core.lights.length + " lights defined)");
                     }
                     this._setLight(indexNum, lights[index] || {});
                 }
@@ -190,9 +190,9 @@
         if (cfg.color) {
             var color = cfg.color;
             light.color = [
-                color.r != undefined ? color.r : 1.0,
-                color.g != undefined ? color.g : 1.0,
-                color.b != undefined ? color.b : 1.0
+                    color.r != undefined ? color.r : 1.0,
+                    color.g != undefined ? color.g : 1.0,
+                    color.b != undefined ? color.b : 1.0
             ];
             imageDirty = true;
         }
@@ -227,7 +227,7 @@
             if (space != "view" && space != "world") {
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
+                        "lights node invalid value for property 'space': '" + space + "' - should be 'view' or 'world'");
             }
             light.space = space;
             this._core.hash = null;
