@@ -1524,12 +1524,13 @@ var SceneJS_events = new (function () {
 
     this.ERROR = 0;
     this.RESET = 1;                         // SceneJS framework reset
-    this.SCENE_CREATED = 2;                 // Scene has just been created
-    this.SCENE_COMPILING = 3;               // Scene about to be compiled and drawn
-    this.SCENE_DESTROYED = 4;               // Scene just been destroyed
-    this.OBJECT_COMPILING = 5;
-    this.WEBGL_CONTEXT_LOST = 6;
-    this.WEBGL_CONTEXT_RESTORED = 7;
+    this.NODE_CREATED = 2;                 // Scene has just been created
+    this.SCENE_CREATED = 3;                 // Scene has just been created
+    this.SCENE_COMPILING = 4;               // Scene about to be compiled and drawn
+    this.SCENE_DESTROYED = 5;               // Scene just been destroyed
+    this.OBJECT_COMPILING = 6;
+    this.WEBGL_CONTEXT_LOST = 7;
+    this.WEBGL_CONTEXT_RESTORED = 8;
 
     /* Priority queue for each type of event
      */
@@ -2465,7 +2466,6 @@ var SceneJS_error = new (function() {
 })();
 
 (function() {
-
     SceneJS.errors = {};
 
     var n = 0;
@@ -2483,7 +2483,6 @@ var SceneJS_error = new (function() {
     SceneJS.errors.NODE_ILLEGAL_STATE = n++;
     SceneJS.errors.ID_CLASH = n++;
     SceneJS.errors.PLUGIN_INVALID = n++;
-
 })();
 
 SceneJS.errors._getErrorName = function(code) {
@@ -8444,6 +8443,9 @@ new (function () {
 
     SceneJS.DepthTarget.prototype._destroy = function () {
         if (this._core) {
+            if (this._core.renderBuf) {
+                this._core.renderBuf.destroy();
+            }
             delete nodeCoreMap[this._core.coreId];
         }
     };
@@ -12946,7 +12948,7 @@ new (function () {
                     params.applyFrom != "geometry") {
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture applyFrom value is unsupported - " +
+                        "texture applyFrom value is unsupported - " +
                             "should be either 'uv', 'uv2', 'normal' or 'geometry'");
                 }
             }
@@ -12961,7 +12963,7 @@ new (function () {
                     params.applyTo != "shine") { // Shininess map
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture applyTo value is unsupported - " +
+                        "texture applyTo value is unsupported - " +
                             "should be either 'color', 'baseColor', 'specular' or 'normals'");
                 }
             }
@@ -12970,7 +12972,7 @@ new (function () {
                 if (params.blendMode != "add" && params.blendMode != "multiply") {
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture layer blendMode value is unsupported - " +
+                        "texture layer blendMode value is unsupported - " +
                             "should be either 'add' or 'multiply'");
                 }
             }
@@ -13142,7 +13144,7 @@ new (function () {
         if (glName == undefined) {
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "Unrecognised value for texture node property '" + name + "' value: '" + value + "'");
+                "Unrecognised value for texture node property '" + name + "' value: '" + value + "'");
         }
         return gl[glName];
     };
