@@ -7,58 +7,24 @@
  *
  * @private
  */
-var SceneJS_Chunk = function(id, type, program, core) {
-
-    /**
-     * The type of the corresponding {@link SceneJS_Core}
-     * @type String
-     * @see {SceneJS_Core#type}
-     */
-    this.type = type;
-
-    /**
-     * The chunk ID
-     * @type Number
-     */
-    this.id = id;
-
-    /**
-     * The program this chunk will render with
-     * @type {SceneJS_Program}
-     */
-    this.program = program;
-
-    /**
-     * The state core rendered by this chunk
-     * @type {SceneJS_Core}
-     */
-    this.core = core;
-
-    /**
-     * Count of {@link SceneJS_Object} instances using this chunk
-     * @type Number
-     */
-    this.useCount = 0;
-
-    if (this.build) {
-        this.build();
-    }
-};
+var SceneJS_Chunk = function() {};
 
 /**
  * Initialises the chunk. This is called within the constructor, and also to by the owner {@link SceneJS_ChunkFactory}
  * when recycling a chunk from its free chunk pool. This method sets the given properties on the chunk, then calls the
  * chunk instance's <b>build</b> method if the chunk has been augmented with one.
  *
- * @param {Number} id Chunk ID
+ * @param {String} id Chunk ID
  * @param {SceneJS_Program} program Program to render the chunk
  * @param {SceneJS_Core} core The state core rendered by this chunk
+ * @param {SceneJS_Core} core2 Another state core rendered by this chunk, only used for geometry
  */
-SceneJS_Chunk.prototype.init = function(id, program, core) {
+SceneJS_Chunk.prototype.init = function(id, program, core, core2) {
 
     this.id = id;
     this.program = program;
     this.core = core;
+    this.core2 = core2;
 
     if (this.build) {
         this.build();

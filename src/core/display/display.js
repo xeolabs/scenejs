@@ -84,6 +84,24 @@ var SceneJS_Display = function (cfg) {
     this._chunkFactory = new SceneJS_ChunkFactory();
 
     /**
+     * True when the background is to be transparent
+     * @type {boolean}
+     */
+    this.transparent = cfg.transparent === true;
+
+    /**
+     * True when WebGL shaders are to be validated (for debugging only)
+     * @type {boolean}
+     */
+    this.validateShaders = SceneJS.getConfigs("validateShaders");
+
+    /**
+     * True when the "OES_vertex_array_object" WebGL extension is allowed, if existing
+     * @type {boolean}
+     */
+    this.enableVAO = (SceneJS.getConfigs("enableVAO") !== false);
+
+    /**
      * Node state core for the last {@link SceneJS.Enable} visited during scene graph compilation traversal
      * @type Object
      */
@@ -142,6 +160,12 @@ var SceneJS_Display = function (cfg) {
      * @type Object
      */
     this.texture = null;
+
+    /**
+     * Node state core for the last {@link SceneJS.Reflect} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.cubemap = null;
 
     /**
      * Node state core for the last {@link SceneJS.XForm} visited during scene graph compilation traversal
@@ -233,7 +257,7 @@ var SceneJS_Display = function (cfg) {
     /**
      * Ambient color, which must be given to gl.clearColor before draw list iteration
      */
-    this._ambientColor = [0, 0, 0];
+    this._ambientColor = [0, 0, 0, 1.0];
 
     /**
      * The object list, containing all elements of #_objects, kept in GL state-sorted order
@@ -261,7 +285,8 @@ var SceneJS_Display = function (cfg) {
      */
     this._frameCtx = {
         pickNames:[], // Pick names of objects hit during pick render
-        canvas:this._canvas            // The canvas
+        canvas:this._canvas,           // The canvas
+        VAO:null                       // Vertex array object extension
     };
 
     /* The frame context has this facade which is given to scene node "rendered" listeners
@@ -363,6 +388,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
 
     object.layer = this.layer;
     object.texture = this.texture;
+    object.cubemap = this.cubemap;
     object.geometry = this.geometry;
     object.enable = this.enable;
     object.flags = this.flags;
@@ -376,6 +402,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.clips.hash,
         this.morphGeometry.hash,
         this.texture.hash,
+        this.cubemap.hash,
         this.lights.hash
 
     ]).join(";");
@@ -411,24 +438,20 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 12, "lights", this.lights);
     this._setChunk(object, 13, "material", this.material);
     this._setChunk(object, 14, "texture", this.texture);
-    this._setChunk(object, 15, "framebuf", this.framebuf);
-    this._setChunk(object, 16, "clips", this.clips);
-    this._setChunk(object, 17, "morphGeometry", this.morphGeometry);
-    this._setChunk(object, 18, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 19, "geometry", this.geometry); // Must be last
+    this._setChunk(object, 15, "cubemap", this.cubemap);
+    this._setChunk(object, 16, "framebuf", this.framebuf);
+    this._setChunk(object, 17, "clips", this.clips);
+    this._setChunk(object, 18, "geometry", this.morphGeometry, this.geometry);
+    this._setChunk(object, 19, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 20, "draw", this.geometry); // Must be last
 };
 
-SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, unique) {
+SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, core2) {
 
     var chunkId;
     var chunkClass = this._chunkFactory.chunkTypes[chunkType];
 
-    if (chunkClass.unique) {
-
-        // Suppress run culling for this core type
-        chunkId = core.stateId + 1;
-
-    } else if (core) {
+    if (core) {
 
         // Core supplied
         if (core.empty) { // Only set default cores for state types that have them
@@ -444,16 +467,27 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
             return;
         }
 
-        chunkId = chunkClass.programGlobal
-            ? core.stateId + 1
-            : ((object.program.id + 1) * 50000) + core.stateId + 1;
+        // Note that core.stateId can be either a number or a string, that's why we make
+        // chunkId a string here. String stateId can come from at least nodeEvents.js.
+        // TODO: Would it be better if all were numbers?
+        chunkId = chunkClass.prototype.programGlobal
+            ? '_' + core.stateId
+            : 'p' + object.program.id + '_' + core.stateId;
+
+        if (core2) {
+            chunkId += '__' + core2.stateId;
+        }
 
     } else {
 
         // No core supplied, probably a program.
         // Only one chunk of this type per program.
-        chunkId = ((object.program.id + 1) * 50000);
+        chunkId = 'p' + object.program.id;
     }
+
+    // This is needed so that chunkFactory can distinguish between draw and geometry
+    // chunks with the same core.
+    chunkId = order + '__' + chunkId;
 
     var oldChunk = object.chunks[order];
 
@@ -466,7 +500,7 @@ SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, 
         this._chunkFactory.putChunk(oldChunk); // Release previous chunk to pool
     }
 
-    object.chunks[order] = this._chunkFactory.getChunk(chunkId, chunkType, object.program, core); // Attach new chunk
+    object.chunks[order] = this._chunkFactory.getChunk(chunkId, chunkType, object.program, core, core2); // Attach new chunk
 
     // Ambient light is global across everything in display, and
     // can never be disabled, so grab it now because we want to
@@ -482,7 +516,9 @@ SceneJS_Display.prototype._setAmbient = function (core) {
     for (var i = 0, len = lights.length; i < len; i++) {
         light = lights[i];
         if (light.mode == "ambient") {
-            this._ambientColor = light.color;
+            this._ambientColor[0] = light.color[0];
+            this._ambientColor[1] = light.color[1];
+            this._ambientColor[2] = light.color[2];
         }
     }
 };
@@ -581,10 +617,9 @@ SceneJS_Display.prototype._makeStateSortKeys = function () { // TODO: state sort
     for (var i = 0, len = this._objectListLen; i < len; i++) {
         object = this._objectList[i];
         object.sortKey = object.program
-            ? (((object.layer.priority + 1) * 100000000)
-            + ((object.program.id + 1) * 100000)
-            + (object.texture.stateId * 1000))
-            //    + i // Force stability among same-priority objects across multiple sorts
+            ? (((object.layer.priority + 1) * 1000000)
+            + ((object.program.id + 1) * 1000)
+            + (object.texture.stateId))
             : -1;   // Non-visual object (eg. sound)
     }
 };
@@ -617,7 +652,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 22; i++) {
+    for (var i = 0; i < 21; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
@@ -704,7 +739,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
                 // As we apply the state chunk lists we track the ID of most types of chunk in order
                 // to cull redundant re-applications of runs of the same chunk - except for those chunks with a
-                // 'unique' flag. We don't want to cull runs of geometry chunks because they contain the GL
+                // 'unique' flag. We don't want to cull runs of draw chunks because they contain the GL
                 // drawElements calls which render the objects.
 
                 // Chunk IDs are only considered unique within the same program. Therefore, whenever we do a
@@ -731,7 +766,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
     if (this._xpBufLen > 0) {
 
-        for (var i = 0; i < 22; i++) {  // TODO: magic number!
+        for (var i = 0; i < this._lastStateId.length; i++) {
             this._lastStateId[i] = null;
         }
 
@@ -884,7 +919,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     var gl = this._canvas.gl;
 
-    frameCtx.program = null;
     frameCtx.framebuf = null;
     frameCtx.viewMat = null;
     frameCtx.modelMat = null;
@@ -899,21 +933,30 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     frameCtx.blendEnabled = false;
 
-    frameCtx.vertexBuf = false;
-    frameCtx.normalBuf = false;
-    frameCtx.uvBuf = false;
-    frameCtx.uvBuf2 = false;
-    frameCtx.colorBuf = false;
     frameCtx.backfaces = true;
     frameCtx.frontface = "ccw";
     frameCtx.pick = !!pick;
+    frameCtx.textureUnit = 0;
 
     frameCtx.lineWidth = 1;
 
     frameCtx.transparencyPass = false;
 
+    frameCtx.validateShaders = this.validateShaders;
+
+    // The extension needs to be re-queried in case the context was lost and
+    // has been recreated.
+    var VAO = this.enableVAO && gl.getExtension("OES_vertex_array_object");
+    if (VAO) {
+        frameCtx.VAO = VAO;
+    }
+
     gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
-    gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
+    if (this.transparent) {
+        gl.clearColor(0,0,0,0);
+    } else {
+        gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
+    }
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     gl.frontFace(gl.CCW);
     gl.disable(gl.CULL_FACE);
@@ -959,10 +1002,6 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
 
     gl.flush();                                                         // Flush GL
 
-    if (frameCtx.program) {                                                  // Unbind remaining program
-        //frameCtx.program.unbind();
-    }
-
     if (frameCtx.framebuf) {                                                 // Unbind remaining frame buffer
         gl.finish();
         // frameCtx.framebuf.unbind();
@@ -971,9 +1010,15 @@ SceneJS_Display.prototype._doDrawList = function (pick, rayPick) {
     if (frameCtx.renderer) {                           // Forget last call-time renderer properties
         //     frameCtx.renderer.props.restoreProps(gl);
     }
+
+    if (frameCtx.VAO) {
+        frameCtx.VAO.bindVertexArrayOES(null);
+        for (var i = 0; i < 10; i++) {
+            gl.disableVertexAttribArray(i);
+        }
+    }
 };
 
 SceneJS_Display.prototype.destroy = function () {
     this._programFactory.destroy();
 };
-

@@ -1,0 +1,25 @@
+{
+  "name": "SceneJS",
+  "version": "3.2.0",
+  "description": "WebGL Scene Graph Library for JavaScript",
+  "homepage": "http://scenejs.org/",
+  "author": {
+    "name": "Lindsay Kay",
+    "email": "lindsay.kay@xeolabs.com"
+  },
+  "license": "Dual licensed under the MIT or GPL Version 2 licenses.",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/Stonelinks/scenejs.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-exec": "^0.4.6",
+    "grunt-rsync": "^0.6.2",
+    "load-grunt-tasks": "^0.6.0",
+    "ncp": "^0.6.0",
+    "time-grunt": "^0.4.0"
+  }
+}

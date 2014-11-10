@@ -39,7 +39,8 @@ var SceneJS_Engine = function (json, options) {
      * @type SceneJS_Display
      */
     this.display = new SceneJS_Display({
-        canvas:this.canvas
+        canvas:this.canvas,
+        transparent: json.transparent
     });
 
     /**
@@ -429,7 +430,6 @@ SceneJS_Engine.prototype._tryCompile = function () {
         if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
 
             this._sceneBranchesDirty = false;
-            this.sceneDirty = false;
 
             SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
                 engine:this                                            // Compilation support modules get ready
@@ -441,6 +441,8 @@ SceneJS_Engine.prototype._tryCompile = function () {
             };
 
             this.scene._compileNodes(ctx); // Begin depth-first compilation descent into scene sub-nodes
+
+            this.sceneDirty = false;
         }
 
         this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true

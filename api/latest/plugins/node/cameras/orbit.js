@@ -146,6 +146,8 @@ SceneJS.Types.addType("cameras/orbit", {
             var look = [0, 0, 0];
             var up = [0, 1, 0];
 
+            // TODO: These references are to private SceneJS math methods, which are not part of API
+
             var eyeVec = SceneJS_math_subVec3(eye, look, []);
             var axis = SceneJS_math_cross3Vec3(up, eyeVec, []);
 
@@ -157,6 +159,11 @@ SceneJS.Types.addType("cameras/orbit", {
 
             lookat.setEye({x:eye3[0], y:eye3[1], z:eye3[2] });
         }
+    },
+
+    setLook: function(l) {
+
+
     },
 
     destruct:function () {

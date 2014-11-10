@@ -59,6 +59,12 @@ var SceneJS_Program = function(id, hash, source, gl) {
  * This is also re-called to re-create them after WebGL context loss.
  */
 SceneJS_Program.prototype.build = function(gl) {
+    /**
+     * Current draw uniform state cached as a bitfield to avoid costly extra uniform1i calls
+     * @type Number
+     */
+    this.drawUniformFlags = 0;
+
     this.gl = gl;
     this.draw = new SceneJS_webgl_Program(gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
     this.pick = new SceneJS_webgl_Program(gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);

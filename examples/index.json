@@ -41,7 +41,7 @@
                         "tags":[]
                     },
                     {
-                        "title":"Linking to a canvas",
+                        "title":"Linking to a canvas in the document",
                         "path":"scene/linkToCanvas.html",
                         "tags":["canvas"]
                     },
@@ -49,13 +49,25 @@
                         "title":"Moving nodes - disconnect then add",
                         "path":"scene/movingNodes.html",
                         "tags":["nodes"],
-                        "id":"moveNodes" 
+                        "id":"moveNodes"
                     },
                     {
                         "title":"Multiple scenes on a page",
                         "path":"scene/multipleScenes.html",
                         "tags":["multipleScenes"],
                         "id":"multipleScenes"
+                    },
+                    {
+                        "title":"Transparent canvas",
+                        "path":"scene/transparentAutoCanvas.html",
+                        "tags":["canvas", "transparency"],
+                        "id":"transparentCanvas"
+                    },
+                    {
+                        "title":"Transparent canvas - using external canvas in DOM ",
+                        "path":"scene/transparentCanvas.html",
+                        "tags":["canvas", "transparency"],
+                        "id":"transparentDOMCanvas"
                     }
                 ]
             }
@@ -75,25 +87,36 @@
                         "title":"Toggle backface lighting",
                         "tags":["lighting"],
                         "tip":"Using a flags node to switch lighting of faces on child geometries",
-                        "path":"flags/backfaceLighting.html"
+                        "path":"flags/backfaceLighting.html",
+                        "id":"backfaceLightingFlag"
                     },
                     {
                         "title":"Toggle diffuse lighting",
                         "tags":["diffuseLight"],
                         "tip":"Using a flags node to switch diffuse lighting for child geometries",
-                        "path":"flags/diffuse.html"
+                        "path":"flags/diffuse.html",
+                        "id":"diffuseFlag"
                     },
                     {
                         "title":"Toggle specular lighting",
                         "tags":["specularLight"],
                         "tip":"Using a flags node to switch specular lighting for child geometries",
-                        "path":"flags/specular.html"
+                        "path":"flags/specular.html",
+                        "id":"specularFlag"
                     },
                     {
                         "title":"Toggle ambient lighting",
                         "tags":["ambientLight"],
                         "tip":"Enable ambient lighting for child geometries",
-                        "path":"flags/ambient.html"
+                        "path":"flags/ambient.html",
+                        "id":"ambientFlag"
+                    },
+                    {
+                        "title":"Toggle reflection",
+                        "tags":["reflection"],
+                        "tip":"Enable reflection for child geometries",
+                        "path":"flags/reflection.html",
+                        "id":"reflectionFlag"
                     }
                 ]
             },
@@ -567,6 +590,62 @@
                         "tags":["colorMap", "animation"],
                         "path":"texture/color/colorMapAnimation.html",
                         "id":"colorMapAnimation2"
+                    }
+                ]
+            },
+            {
+                "title":"Reflection mapping",
+                "tip":"",
+                "tags":["cubeMap", "reflection"],
+                "nodes":[
+                    {
+                        "title":"Basic reflection map",
+                        "tip":"A basic reflection map",
+                        "tags":["reflection"],
+                        "path":"texture/reflection/reflection.html",
+                        "id":"cubeMap"
+                    },
+                    {
+                        "title":"Reflection intensity control",
+                        "tip":"Controlling how much reflection map is applied through the 'intensity' property",
+                        "tags":["reflection"],
+                        "path":"texture/reflection/reflectionIntensity.html",
+                        "id":"reflectionIntensity"
+                    },
+                    {
+                        "title":"Controlling surface reflectivity",
+                        "tip":"Demonstrates how to control surface reflectivity",
+                        "tags":["reflection", "specularMap"],
+                        "path":"texture/reflection/reflectionWithVaryingSpecularity.html",
+                        "id":"reflectionWithVaryingSpecularity"
+                    },
+                    {
+                        "title":"Controlling surface reflectivity with a control map",
+                        "tip":"Demonstrates how to control reflectivity across a surface using a specular 'control' map",
+                        "tags":["reflection", "specularMap"],
+                        "path":"texture/reflection/reflectionWithControlMap.html",
+                        "id":"reflectionWithControlMap"
+                    },
+                    {
+                        "title":"Multiple reflections",
+                        "tip":"Applying multiple reflections to a surface",
+                        "tags":["reflection"],
+                        "path":"texture/reflection/reflectionWithLayers.html",
+                        "id":"reflectionWithLayers"
+                    },
+                    {
+                        "title":"Applying reflection to an .OBJ",
+                        "tip":"Applying a reflection map to a mesh imported from .OBJ",
+                        "tags":["reflection", "obj", "importing"],
+                        "path":"texture/reflection/reflectionWithOBJImport.html",
+                        "id":"reflectionWithOBJImport"
+                    },
+                    {
+                        "title":"Reflection with multiple objects",
+                        "tip":"Applying a reflection map to a group of objects",
+                        "tags":["reflection", "obj"],
+                        "path":"texture/reflection/reflectionMultipleObjects.html",
+                        "id":"reflectionMultipleObjects"
                     }
                 ]
             }
@@ -1180,10 +1259,16 @@
                 "tags":["terrain"],
                 "nodes":[
                     {
-                        "title":"Heightmap with custom texture and fog",
+                        "title":"Heightmap with fog",
                         "tags":["heightMap"],
                         "path":"demos/pickFlyOrbitTerrain.html",
                         "id":"customHeightmap"
+                    },
+                    {
+                        "title":"Heightmap with texture",
+                        "tags":["heightMap", "texture", "colorMap"],
+                        "path":"plugins/heightmaps/textured.html",
+                        "id":"texturedHeightmap"
                     }
                 ]
             },
@@ -1242,7 +1327,7 @@
                         "title":"Tron Tank",
                         "path":"demos/tronTank.html",
                         "editor":false,
-                        "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "viewTransform", "animation"],
+                        "tags":["fragmentShader", "vertexShader", "lighting", "modelTransform", "viewTransform", "animation", "reflection"],
                         "id":"tronTank"
                     },
                     {

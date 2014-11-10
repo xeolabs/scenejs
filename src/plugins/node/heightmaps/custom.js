@@ -114,18 +114,21 @@
                 x = px * segWidth;
                 y = py * segHeight;
 
-                imgX = Math.round((x / width) * imageWidth);
-                imgY = Math.round((y / height) * imageHeight);
+                imgX = Math.round((x / width) * (imageWidth - 1));
+                imgY = Math.round((y / height) * (imageHeight - 1));
 
                 z = (imageData[(imageWidth * imgY + imgX) * 4]) / 255 * params.ySize;
 
-                if (z == undefined) {
+                if (z == undefined || isNaN(z)) {
                     z = 0;
                 }
 
                 positions.push(x - halfWidth);
                 positions.push(-y + halfHeight);
                 positions.push(-z);
+
+                uvs.push(py / gridX);
+                uvs.push(1 - px / gridZ);
             }
         }
 
@@ -149,30 +152,6 @@
                 indices.push(c);
                 indices.push(d);
                 indices.push(a);
-
-                // a
-                uvs.push(ix / gridX);
-                uvs.push(1 - iz / gridZ);
-
-                //b
-                uvs.push(ix / gridX);
-                uvs.push(1 - ( iz + 1 ) / gridZ);
-
-                //c
-                uvs.push(( ix + 1 ) / gridX);
-                uvs.push(1 - ( iz + 1 ) / gridZ);
-
-                //c
-                uvs.push(( ix + 1 ) / gridX);
-                uvs.push(1 - ( iz + 1 ) / gridZ);
-
-                //d
-                uvs.push(( ix + 1 ) / gridX, 1 - iz / gridZ);
-                uvs.push(1 - iz / gridZ);
-
-                //a
-                uvs.push(ix / gridX);
-                uvs.push(1 - iz / gridZ);
             }
         }
 

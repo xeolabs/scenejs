@@ -20,29 +20,40 @@ SceneJS_ChunkFactory.createChunkType({
     draw : function() {
 
         var gl = this.program.gl;
+        var materialSettings = this.program.draw.materialSettings;
 
         if (this._uMaterialBaseColor) {
             gl.uniform3fv(this._uMaterialBaseColor, this.core.baseColor);
         }
 
-        if (this._uMaterialSpecularColor) {
+        if (this._uMaterialSpecularColor &&
+            (materialSettings.specularColor[0] != this.core.specularColor[0] ||
+             materialSettings.specularColor[1] != this.core.specularColor[1] ||
+             materialSettings.specularColor[2] != this.core.specularColor[2])) {
             gl.uniform3fv(this._uMaterialSpecularColor, this.core.specularColor);
+            materialSettings.specularColor[0] = this.core.specularColor[0];
+            materialSettings.specularColor[1] = this.core.specularColor[1];
+            materialSettings.specularColor[2] = this.core.specularColor[2];
         }
 
-        if (this._uMaterialSpecular) {
+        if (this._uMaterialSpecular && materialSettings.specular != this.core.specular) {
             gl.uniform1f(this._uMaterialSpecular, this.core.specular);
+            materialSettings.specular = this.core.specular;
         }
 
-        if (this._uMaterialShine) {
+        if (this._uMaterialShine && materialSettings.shine != this.core.shine) {
             gl.uniform1f(this._uMaterialShine, this.core.shine);
+            materialSettings.shine = this.core.shine;
         }
 
-        if (this._uMaterialEmit) {
+        if (this._uMaterialEmit && materialSettings.emit != this.core.emit) {
             gl.uniform1f(this._uMaterialEmit, this.core.emit);
+            materialSettings.emit = this.core.emit;
         }
 
-        if (this._uMaterialAlpha) {
+        if (this._uMaterialAlpha && materialSettings.alpha != this.core.alpha) {
             gl.uniform1f(this._uMaterialAlpha, this.core.alpha);
+            materialSettings.alpha = this.core.alpha;
         }
     }
 });

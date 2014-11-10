@@ -48,7 +48,7 @@ require([
         SceneJS.Types.addType("canvas/capture", {
 
             construct:function (params) {
-                this._format = params.format ? supportedFormat(params.format) : "jpeg";
+                this._format = params.format ? this._supportedFormat(params.format) : "jpeg";
                 this._width = params.width;
                 this._height = params.height;
             },

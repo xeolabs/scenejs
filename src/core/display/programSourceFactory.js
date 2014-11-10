@@ -70,17 +70,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-            src.push("varying   vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
-            src.push("varying   vec3 SCENEJS_vViewNormal;");   // Output world-space vertex normal
+            src.push("varying vec3 SCENEJS_vWorldNormal;");   // Output world-space vertex normal
+            src.push("varying vec3 SCENEJS_vViewNormal;");   // Output world-space vertex normal
         }
 
-        // if (clipping || fragmentHooks.worldPosClip) {
         src.push("varying vec4 SCENEJS_vWorldVertex;");
-        // }
-
-
-        src.push("varying vec4 SCENEJS_vViewVertex;\n");
-        src.push("varying vec4 SCENEJS_vProjVertex;\n");
+        src.push("varying vec4 SCENEJS_vViewVertex;");
+        src.push("varying vec4 SCENEJS_vProjVertex;");
 
         src.push("uniform vec3 SCENEJS_uWorldEye;");                     // World-space eye position
         src.push("varying vec3 SCENEJS_vWorldEyeVec;");
@@ -201,7 +197,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform bool  SCENEJS_uClipping;");
 
         if (normals && (fragmentHooks.worldNormal || fragmentHooks.viewNormal)) {
-
             src.push("varying vec3 SCENEJS_vWorldNormal;");                  // World-space normal
             src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
         }
@@ -286,13 +281,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return src;
     };
 
-
-    /*===================================================================================================================
-     *
-     * Rendering vertex shader
-     *
-     *==================================================================================================================*/
-
     this._isTexturing = function (states) {
         if (states.texture.layers && states.texture.layers.length > 0) {
             if (states.geometry.uvBuf || states.geometry.uvBuf2) {
@@ -303,6 +291,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
         return false;
+    };
+
+    this._isCubeMapping = function (states) {
+        return (states.cubemap.layers && states.cubemap.layers.length > 0 && states.geometry.normalBuf);
     };
 
     this._hasNormals = function (states) {
@@ -544,7 +536,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                         /* World space light - transform position to View space
                          */
-                        src.push("tmpVec3 = ((SCENEJS_uVMatrix * vec4(SCENEJS_uLightPos" + i + ", 1.0)).xyz - worldVertex.xyz);");
+                        src.push("tmpVec3 = ((SCENEJS_uVMatrix * vec4(SCENEJS_uLightPos" + i + ", 1.0)).xyz - viewVertex.xyz);");
                         src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(normalize(tmpVec3), length(tmpVec3));");
 
                     } else {
@@ -599,6 +591,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var fragmentHooks = customFragmentShader.hooks || {};
 
         var texturing = this._isTexturing(states);
+        var cubeMapping = this._isCubeMapping(states);
         var normals = this._hasNormals(states);
         var clipping = states.clips.clips.length > 0;
 
@@ -616,7 +609,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         /*-----------------------------------------------------------------------------------
-         * Variables - Clipping
+         * Variables
          *----------------------------------------------------------------------------------*/
 
         if (clipping) {
@@ -644,6 +637,15 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
+        if (normals && cubeMapping) {
+            var layer;
+            for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
+                layer = states.cubemap.layers[i];
+                src.push("uniform samplerCube SCENEJS_uCubeMapSampler" + i + ";");
+                src.push("uniform float SCENEJS_uCubeMapIntensity" + i + ";");
+            }
+        }
+
         /* True when lighting
          */
         src.push("uniform bool  SCENEJS_uBackfaceTexturing;");
@@ -652,6 +654,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform bool  SCENEJS_uClipping;");
         src.push("uniform bool  SCENEJS_uAmbient;");
         src.push("uniform bool  SCENEJS_uDiffuse;");
+        src.push("uniform bool  SCENEJS_uReflection;");
 
         /* True when rendering transparency
          */
@@ -672,7 +675,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
-        src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of view-space vertex from eye
+        src.push("varying vec3 SCENEJS_vWorldEyeVec;");                          // Direction of world-space vertex from eye
 
         if (normals) {
 
@@ -831,7 +834,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
 
                 /* Alpha from Texture
-                 * */
+                 */
                 if (layer.applyTo == "alpha") {
                     if (layer.blendMode == "multiply") {
                         src.push("alpha = alpha * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
@@ -866,6 +869,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     }
                 }
 
+                if (layer.applyTo == "shine") {
+                    if (layer.blendMode == "multiply") {
+                        src.push("shine  = shine * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                    } else {
+                        src.push("shine = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * shine) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                    }
+                }
+
                 if (layer.applyTo == "normals" && normals) {
                     src.push("vec3 bump = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
                     src.push("viewNormalVec *= -bump;");
@@ -874,6 +885,19 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (normals) {
                 src.push("}");
             }
+        }
+
+        if (normals && cubeMapping) {
+            src.push("if (SCENEJS_uReflection) {"); // Flag which can enable/disable reflection
+            src.push("vec3 envLookup = reflect(normalize(SCENEJS_vWorldEyeVec), normalize(SCENEJS_vWorldNormal));");
+            src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
+            src.push("vec4 envColor;");
+            for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
+                layer = states.cubemap.layers[i];
+                src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
+                src.push("color = mix(color, envColor.rgb, specular * SCENEJS_uCubeMapIntensity" + i + ");");
+            }
+            src.push("}"); // if (SCENEJS_uReflection)
         }
 
         src.push("  vec4    fragColor;");

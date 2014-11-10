@@ -4,8 +4,6 @@
  */
 new (function () {
 
-    var imageBasePath = window.location.hostname + window.location.pathname;
-
     // The default state core singleton for {@link SceneJS.Texture} nodes
     var defaultCore = {
         type:"texture",
@@ -84,7 +82,8 @@ new (function () {
                         layerParams.applyTo != "specular" && // Specular map
                         layerParams.applyTo != "emit" && // Emission map
                         layerParams.applyTo != "alpha" && // Alpha map
-                        layerParams.applyTo != "normals") {
+                        layerParams.applyTo != "normals" && // Normal map
+                        layerParams.applyTo != "shine") { // Shininess map
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + " applyTo value is unsupported - " +
@@ -219,6 +218,7 @@ new (function () {
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self._ensureImageSizePowerOfTwo(image));
                 self._setLayerTexture(gl, layer, texture);
                 SceneJS_sceneStatusModule.taskFinished(taskId);
+                self._engine.display.imageDirty = true;
             };
 
             image.onerror = function () {

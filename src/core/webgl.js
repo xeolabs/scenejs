@@ -2,61 +2,63 @@
  * @private
  */
 var SceneJS_webgl_enumMap = {
-    funcAdd:"FUNC_ADD",
-    funcSubtract:"FUNC_SUBTRACT",
-    funcReverseSubtract:"FUNC_REVERSE_SUBTRACT",
-    zero:"ZERO",
-    one:"ONE",
-    srcColor:"SRC_COLOR",
-    oneMinusSrcColor:"ONE_MINUS_SRC_COLOR",
-    dstColor:"DST_COLOR",
-    oneMinusDstColor:"ONE_MINUS_DST_COLOR",
-    srcAlpha:"SRC_ALPHA",
-    oneMinusSrcAlpha:"ONE_MINUS_SRC_ALPHA",
-    dstAlpha:"DST_ALPHA",
-    oneMinusDstAlpha:"ONE_MINUS_DST_ALPHA",
-    contantColor:"CONSTANT_COLOR",
-    oneMinusConstantColor:"ONE_MINUS_CONSTANT_COLOR",
-    constantAlpha:"CONSTANT_ALPHA",
-    oneMinusConstantAlpha:"ONE_MINUS_CONSTANT_ALPHA",
-    srcAlphaSaturate:"SRC_ALPHA_SATURATE",
-    front:"FRONT",
-    back:"BACK",
-    frontAndBack:"FRONT_AND_BACK",
-    never:"NEVER",
-    less:"LESS",
-    equal:"EQUAL",
-    lequal:"LEQUAL",
-    greater:"GREATER",
-    notequal:"NOTEQUAL",
-    gequal:"GEQUAL",
-    always:"ALWAYS",
-    cw:"CW",
-    ccw:"CCW",
-    linear:"LINEAR",
-    nearest:"NEAREST",
-    linearMipMapNearest:"LINEAR_MIPMAP_NEAREST",
-    nearestMipMapNearest:"NEAREST_MIPMAP_NEAREST",
-    nearestMipMapLinear:"NEAREST_MIPMAP_LINEAR",
-    linearMipMapLinear:"LINEAR_MIPMAP_LINEAR",
-    repeat:"REPEAT",
-    clampToEdge:"CLAMP_TO_EDGE",
-    mirroredRepeat:"MIRRORED_REPEAT",
-    alpha:"ALPHA",
-    rgb:"RGB",
-    rgba:"RGBA",
-    luminance:"LUMINANCE",
-    luminanceAlpha:"LUMINANCE_ALPHA",
-    textureBinding2D:"TEXTURE_BINDING_2D",
-    textureBindingCubeMap:"TEXTURE_BINDING_CUBE_MAP",
-    compareRToTexture:"COMPARE_R_TO_TEXTURE", // Hardware Shadowing Z-depth,
-    unsignedByte:"UNSIGNED_BYTE"
+    funcAdd: "FUNC_ADD",
+    funcSubtract: "FUNC_SUBTRACT",
+    funcReverseSubtract: "FUNC_REVERSE_SUBTRACT",
+    zero: "ZERO",
+    one: "ONE",
+    srcColor: "SRC_COLOR",
+    oneMinusSrcColor: "ONE_MINUS_SRC_COLOR",
+    dstColor: "DST_COLOR",
+    oneMinusDstColor: "ONE_MINUS_DST_COLOR",
+    srcAlpha: "SRC_ALPHA",
+    oneMinusSrcAlpha: "ONE_MINUS_SRC_ALPHA",
+    dstAlpha: "DST_ALPHA",
+    oneMinusDstAlpha: "ONE_MINUS_DST_ALPHA",
+    contantColor: "CONSTANT_COLOR",
+    oneMinusConstantColor: "ONE_MINUS_CONSTANT_COLOR",
+    constantAlpha: "CONSTANT_ALPHA",
+    oneMinusConstantAlpha: "ONE_MINUS_CONSTANT_ALPHA",
+    srcAlphaSaturate: "SRC_ALPHA_SATURATE",
+    front: "FRONT",
+    back: "BACK",
+    frontAndBack: "FRONT_AND_BACK",
+    never: "NEVER",
+    less: "LESS",
+    equal: "EQUAL",
+    lequal: "LEQUAL",
+    greater: "GREATER",
+    notequal: "NOTEQUAL",
+    gequal: "GEQUAL",
+    always: "ALWAYS",
+    cw: "CW",
+    ccw: "CCW",
+    linear: "LINEAR",
+    nearest: "NEAREST",
+    linearMipMapNearest: "LINEAR_MIPMAP_NEAREST",
+    nearestMipMapNearest: "NEAREST_MIPMAP_NEAREST",
+    nearestMipMapLinear: "NEAREST_MIPMAP_LINEAR",
+    linearMipMapLinear: "LINEAR_MIPMAP_LINEAR",
+    repeat: "REPEAT",
+    clampToEdge: "CLAMP_TO_EDGE",
+    mirroredRepeat: "MIRRORED_REPEAT",
+    alpha: "ALPHA",
+    rgb: "RGB",
+    rgba: "RGBA",
+    luminance: "LUMINANCE",
+    luminanceAlpha: "LUMINANCE_ALPHA",
+    textureBinding2D: "TEXTURE_BINDING_2D",
+    textureBindingCubeMap: "TEXTURE_BINDING_CUBE_MAP",
+    compareRToTexture: "COMPARE_R_TO_TEXTURE", // Hardware Shadowing Z-depth,
+    unsignedByte: "UNSIGNED_BYTE"
 };
 
-var SceneJS_webgl_ProgramUniform = function (gl, program, name, type, size, location, logging) {
+var SceneJS_webgl_ProgramUniform = function (gl, program, name, type, size, location, index, logging) {
 
     var func = null;
+    this.numberValue = false;
     if (type == gl.BOOL) {
+        this.numberValue = true;
         func = function (v) {
             gl.uniform1i(location, v);
         };
@@ -73,6 +75,7 @@ var SceneJS_webgl_ProgramUniform = function (gl, program, name, type, size, loca
             gl.uniform4iv(location, v);
         };
     } else if (type == gl.INT) {
+        this.numberValue = true;
         func = function (v) {
             gl.uniform1iv(location, v);
         };
@@ -89,6 +92,7 @@ var SceneJS_webgl_ProgramUniform = function (gl, program, name, type, size, loca
             gl.uniform4iv(location, v);
         };
     } else if (type == gl.FLOAT) {
+        this.numberValue = true;
         func = function (v) {
             gl.uniform1f(location, v);
         };
@@ -130,6 +134,9 @@ var SceneJS_webgl_ProgramUniform = function (gl, program, name, type, size, loca
     this.getLocation = function () {
         return location;
     };
+
+    // This is just an integer key for caching the uniform's value, more efficient than caching by name.
+    this.index = index;
 };
 
 var SceneJS_webgl_ProgramSampler = function (gl, program, name, type, size, location) {
@@ -145,6 +152,10 @@ var SceneJS_webgl_ProgramSampler = function (gl, program, name, type, size, loca
 /** An attribute within a shader
  */
 var SceneJS_webgl_ProgramAttribute = function (gl, program, name, type, size, location) {
+
+    this.gl = gl;
+    this.location = location;
+
     this.bindFloatArrayBuffer = function (buffer) {
         if (buffer) {
             buffer.bind();
@@ -152,8 +163,13 @@ var SceneJS_webgl_ProgramAttribute = function (gl, program, name, type, size, lo
             gl.vertexAttribPointer(location, buffer.itemSize, gl.FLOAT, false, 0, 0);   // Vertices are not homogeneous - no w-element
         }
     };
-
 };
+
+SceneJS_webgl_ProgramAttribute.prototype.bindInterleavedFloatArrayBuffer = function (components, stride, byteOffset) {
+    this.gl.enableVertexAttribArray(this.location);
+    this.gl.vertexAttribPointer(this.location, components, this.gl.FLOAT, false, stride, byteOffset);   // Vertices are not homogeneous - no w-element
+};
+
 
 /**
  * A vertex/fragment shader in a program
@@ -207,6 +223,14 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
     this._samplers = {};
     this._attributes = {};
 
+    this.materialSettings = {
+        specularColor: [0, 0, 0],
+        specular: 0,
+        shine: 0,
+        emit: 0,
+        alpha: 0
+    };
+
     /* Create shaders from sources
      */
     this._shaders = [];
@@ -229,48 +253,13 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
     }
     gl.linkProgram(handle);
 
-    this.valid = (gl.getProgramParameter(handle, gl.LINK_STATUS) != 0);
-
-    var debugCfg = SceneJS_configsModule.getConfigs("shading");
-    if (debugCfg.validate !== false) {
-        gl.validateProgram(handle);
-        this.valid = this.valid && (gl.getProgramParameter(handle, gl.VALIDATE_STATUS) != 0);
-    }
-
-    if (!this.valid) {
-
-        if (!gl.isContextLost()) { // Handled explicitely elsewhere, so wont rehandle here
-
-            SceneJS.log.error("Shader program failed to link: " + gl.getProgramInfoLog(handle));
-
-            SceneJS.log.error("Vertex shader(s):");
-            for (i = 0; i < vertexSources.length; i++) {
-                SceneJS.log.error("Vertex shader #" + i + ":");
-                var lines = vertexSources[i].split('\n');
-                for (var j = 0; j < lines.length; j++) {
-                    SceneJS.log.error(lines[j]);
-
-                }
-            }
-
-            SceneJS.log.error("Fragment shader(s):");
-            for (i = 0; i < fragmentSources.length; i++) {
-                SceneJS.log.error("Fragment shader #" + i + ":");
-                var lines = fragmentSources[i].split('\n');
-                for (var j = 0; j < lines.length; j++) {
-                    SceneJS.log.error(lines[j]);
-                }
-            }
-
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.SHADER_LINK_FAILURE, "Shader program failed to link");
-        }
-    }
-
     /* Discover active uniforms and samplers
      */
 
     var numUniforms = gl.getProgramParameter(handle, gl.ACTIVE_UNIFORMS);
+
+    this.uniformValues = [];
+    var valueIndex = 0;
 
     for (i = 0; i < numUniforms; ++i) {
         u = gl.getActiveUniform(handle, i);
@@ -296,7 +285,10 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
                     u_name,
                     u.type,
                     u.size,
-                    location);
+                    location,
+                    valueIndex);
+                this.uniformValues[valueIndex] = null;
+                ++valueIndex;
             }
         }
     }
@@ -330,6 +322,38 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
         }
     };
 
+    this.validate = function () {
+        if (this.valid) {
+            return true;
+        }
+        gl.validateProgram(handle);
+        this.valid = (gl.getProgramParameter(handle, gl.VALIDATE_STATUS) != 0);
+        if (!this.valid) {
+            if (!gl.isContextLost()) { // Handled explicitly elsewhere, so wont rehandle here
+                SceneJS.log.error("Shader program failed to link: " + gl.getProgramInfoLog(handle));
+                SceneJS.log.error("Vertex shader(s):");
+                for (i = 0; i < vertexSources.length; i++) {
+                    SceneJS.log.error("Vertex shader #" + i + ":");
+                    var lines = vertexSources[i].split('\n');
+                    for (var j = 0; j < lines.length; j++) {
+                        SceneJS.log.error(lines[j]);
+
+                    }
+                }
+                SceneJS.log.error("Fragment shader(s):");
+                for (i = 0; i < fragmentSources.length; i++) {
+                    SceneJS.log.error("Fragment shader #" + i + ":");
+                    var lines = fragmentSources[i].split('\n');
+                    for (var j = 0; j < lines.length; j++) {
+                        SceneJS.log.error(lines[j]);
+                    }
+                }
+                throw SceneJS_error.fatalError(
+                    SceneJS.errors.SHADER_LINK_FAILURE, "Shader program failed to link");
+            }
+        }
+    };
+
     this.getUniformLocation = function (name) {
         var u = this._uniforms[name];
         if (u) {
@@ -343,18 +367,6 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
         var u = this._uniforms[name];
         if (u) {
             return u;
-        } else {
-            //      SceneJS.log.warn("Shader uniform load failed - uniform not found in shader : " + name);
-        }
-    };
-
-    this.setUniform = function (name, value) {
-        var u = this._uniforms[name];
-        if (u) {
-            u.setValue(value);
-            if (this._profile) {
-                this._profile.uniform++;
-            }
         } else {
             //      SceneJS.log.warn("Shader uniform load failed - uniform not found in shader : " + name);
         }
@@ -393,10 +405,6 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
         }
     };
 
-    this.unbind = function () {
-        //     gl.useProgram(0);
-    };
-
     this.destroy = function () {
 
         if (this.valid) {
@@ -414,9 +422,25 @@ var SceneJS_webgl_Program = function (gl, vertexSources, fragmentSources) {
     };
 };
 
+SceneJS_webgl_Program.prototype.setUniform = function (name, value) {
+    var u = this._uniforms[name];
+    if (u) {
+        if (this.uniformValues[u.index] !== value || !u.numberValue) {
+            u.setValue(value);
+            if (this._profile) {
+                this._profile.uniform++;
+            }
+            this.uniformValues[u.index] = value;
+        }
+    } else {
+        //      SceneJS.log.warn("Shader uniform load failed - uniform not found in shader : " + name);
+    }
+};
+
+
 var SceneJS_webgl_Texture2D = function (gl, cfg) {
 
-    this.target = gl.TEXTURE_2D;
+    this.target = cfg.target || gl.TEXTURE_2D;
     this.minFilter = cfg.minFilter;
     this.magFilter = cfg.magFilter;
     this.wrapS = cfg.wrapS;
@@ -433,26 +457,26 @@ var SceneJS_webgl_Texture2D = function (gl, cfg) {
         gl.bindTexture(this.target, this.texture);
 
         if (cfg.minFilter) {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, cfg.minFilter);
+            gl.texParameteri(this.target, gl.TEXTURE_MIN_FILTER, cfg.minFilter);
         }
 
         if (cfg.magFilter) {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, cfg.magFilter);
+            gl.texParameteri(this.target, gl.TEXTURE_MAG_FILTER, cfg.magFilter);
         }
 
         if (cfg.wrapS) {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, cfg.wrapS);
+            gl.texParameteri(this.target, gl.TEXTURE_WRAP_S, cfg.wrapS);
         }
 
         if (cfg.wrapT) {
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, cfg.wrapT);
+            gl.texParameteri(this.target, gl.TEXTURE_WRAP_T, cfg.wrapT);
         }
 
         if (cfg.minFilter == gl.NEAREST_MIPMAP_NEAREST ||
             cfg.minFilter == gl.LINEAR_MIPMAP_NEAREST ||
             cfg.minFilter == gl.NEAREST_MIPMAP_LINEAR ||
             cfg.minFilter == gl.LINEAR_MIPMAP_LINEAR) {
-            gl.generateMipmap(gl.TEXTURE_2D);
+            gl.generateMipmap(this.target);
         }
 
         gl.bindTexture(this.target, null);
@@ -528,7 +552,7 @@ function SceneJS_webgl_nextHighestPowerOfTwo(x) {
 
 var SceneJS_webgl_ArrayBuffer = function (gl, type, values, numItems, itemSize, usage) {
 
-
+    this.gl = gl;
     this.type = type;
     this.itemSize = itemSize;
 
@@ -545,10 +569,6 @@ var SceneJS_webgl_ArrayBuffer = function (gl, type, values, numItems, itemSize, 
     };
 
     this._allocate(values, numItems);
-
-    this.bind = function () {
-        gl.bindBuffer(type, this.handle);
-    };
 
     this.setData = function (data, offset) {
 
@@ -573,6 +593,10 @@ var SceneJS_webgl_ArrayBuffer = function (gl, type, values, numItems, itemSize, 
     this.destroy = function () {
         gl.deleteBuffer(this.handle);
     };
+};
+
+SceneJS_webgl_ArrayBuffer.prototype.bind = function () {
+    this.gl.bindBuffer(this.type, this.handle);
 };
 
 
@@ -609,11 +633,11 @@ var SceneJS_PickBuffer = function (cfg) {
         }
 
         pickBuf = {
-            framebuf:gl.createFramebuffer(),
-            renderbuf:gl.createRenderbuffer(),
-            texture:gl.createTexture(),
-            width:width,
-            height:height
+            framebuf: gl.createFramebuffer(),
+            renderbuf: gl.createRenderbuffer(),
+            texture: gl.createTexture(),
+            width: width,
+            height: height
         };
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
@@ -739,11 +763,11 @@ var SceneJS_PickBufferOLD = function (cfg) {
         }
 
         pickBuf = {
-            framebuf:gl.createFramebuffer(),
-            renderbuf:gl.createRenderbuffer(),
-            texture:gl.createTexture(),
-            width:width,
-            height:height
+            framebuf: gl.createFramebuffer(),
+            renderbuf: gl.createRenderbuffer(),
+            texture: gl.createTexture(),
+            width: width,
+            height: height
         };
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, pickBuf.framebuf);
