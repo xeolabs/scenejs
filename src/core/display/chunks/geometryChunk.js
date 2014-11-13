@@ -128,30 +128,33 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aColorDraw) {
                     this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
                 }
+                if (this._aTangentDraw) {
+
+                    // Lazy-compute tangents as soon as needed.
+                    // Unfortunately we can't include them in interleaving because that happened earlier.
+                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangentBuf());
+                }
             } else {
                 this.VAOHasInterleavedBuf = false;
                 if (this._aVertexDraw) {
                     this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
                 }
-
                 if (this._aNormalDraw) {
                     this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
                 }
-
                 if (this._aUVDraw) {
                     this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
                 }
-
                 if (this._aUV2Draw) {
                     this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
                 }
-
-                if (this._aTangentDraw) {
-                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf);
-                }
-
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
+                }
+                if (this._aTangentDraw) {
+
+                    // Lazy-compute tangents
+                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangentBuf());
                 }
             }
         }

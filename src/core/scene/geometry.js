@@ -45,11 +45,16 @@ new (function () {
      */
     SceneJS.Geometry.prototype._initNodeCore = function (data, options) {
 
+        var self = this;
+
         options = options || {};
 
         var primitive = data.primitive || "triangles";
-        this._core.primitive = this._getPrimitiveType(primitive);
+        var core = this._core;
 
+        core.primitive = this._getPrimitiveType(primitive);
+
+        // Generate normals
         if (data.normals) {
             if (primitive == "triangles") {
                 if (data.normals === "auto" || data.normals === true) {
@@ -57,26 +62,35 @@ new (function () {
                         this._buildNormals(data); // Auto normal generation - build normals array
                     }
                 }
-//                if (data.tangents === "auto" || data.tangents === true) {
-                    if (data.positions && data.indices && data.uv) {
-                        this._buildTangents(data); // Build tangents array
-                    }
-//                }
             }
         }
 
-        this._core.arrays = {
+        // Create typed arrays, apply any baked transforms
+        core.arrays = {
             positions: data.positions
                 ? new Float32Array((options.scale || options.origin)
                 ? this._applyOptions(data.positions, options)
                 : data.positions) : undefined,
             normals: data.normals ? new Float32Array(data.normals) : undefined,
-            tangents: data.tangents ? new Float32Array(data.tangents) : undefined,
             uv: data.uv ? new Float32Array(data.uv) : undefined,
             uv2: data.uv2 ? new Float32Array(data.uv2) : undefined,
             colors: data.colors ? new Float32Array(data.colors) : undefined,
             indices: data.indices ? new Uint16Array(data.indices) : undefined
         };
+
+        // Lazy-build tangents, only when needed as rendering
+        core.getTangentBuf = function () {
+            if (core.tangentBuf) {
+                return core.tangentBuf;
+            }
+            if (data.positions && data.indices && data.uv) {
+                var gl = self._engine.canvas.gl;
+                var tangents = new Float32Array(self._buildTangents(data)); // Build tangents array;
+                core.arrays.tangents = tangents;
+                var usage = gl.STATIC_DRAW;
+                return core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, usage);
+            }
+        }
     };
 
     /**
@@ -257,13 +271,6 @@ new (function () {
                     core.interleavedUV2Offset = prepareInterleaveBuffer(arrays.uv2, 2);
                 }
                 core.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv2, arrays.uv2.length, 2, usage);
-            }
-
-            if (arrays.tangents) {
-                if (canInterleave) {
-                    core.interleavedPositionOffset = prepareInterleaveBuffer(arrays.tangents, 3);
-                }
-                core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.tangents, arrays.tangents.length, 3, usage);
             }
 
             if (arrays.colors) {
@@ -454,6 +461,8 @@ new (function () {
         for (var i = 0; i < tangents.length; i++) {
             data.tangents = data.tangents.concat(tangents[i]);
         }
+
+        return data.tangents;
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
@@ -649,6 +658,7 @@ new (function () {
 
             core.hash = ([                           // Safe to build geometry hash here - geometry is immutable
                 core.normalBuf ? "t" : "f",
+                core.arrays.tangents ? "t" : "f",
                 core.uvBuf ? "t" : "f",
                 core.uvBuf2 ? "t" : "f",
                 core.colorBuf ? "t" : "f",

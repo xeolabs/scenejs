@@ -174,9 +174,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
             for (var i = 0, len = layers.length; i < len; i++) {
                 if (layers[i].applyTo == "normals") {
-                    if (states.geometry.tangentBuf) {
-                        return true;
-                    }
+                    return true;
                 }
             }
         }
