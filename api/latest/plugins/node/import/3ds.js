@@ -10,14 +10,14 @@
  */
 require([
 
-    // This prefix routes to the 3rd-party libs directory containing resources used by plugins
-    "scenejsPluginDeps/k3d"
-],
+        // This prefix routes to the 3rd-party libs directory containing resources used by plugins
+        "scenejsPluginDeps/k3d"
+    ],
     function () {
 
         SceneJS.Types.addType("import/3ds", {
 
-            construct:function (params) {
+            construct: function (params) {
 
                 if (!params.src) {
                     this.log("error", "Attribute expected: src");
@@ -38,17 +38,19 @@ require([
                         var mesh = m.edit.objects[0].mesh;
 
                         // Need to flip the UV coordinates on Y-axis for SceneJS geometry
-                        for (var i = 1, len = mesh.uvt.length; i < len; i += 2) {
-                            mesh.uvt[i] *= -1.0;
+                        if (mesh.uvt) {
+                            for (var i = 1, len = mesh.uvt.length; i < len; i += 2) {
+                                mesh.uvt[i] *= -1.0;
+                            }
                         }
 
                         self.addNode({
-                            type:"geometry",
-                            primitive:"triangles",
-                            positions:mesh.vertices,
-                            uv:mesh.uvt,
-                            //normals:"auto",
-                            indices:mesh.indices
+                            type: "geometry",
+                            primitive: "triangles",
+                            positions: mesh.vertices,
+                            uv: mesh.uvt,
+                            normals: params.normals,
+                            indices: mesh.indices
                         });
 
                         self._taskId = self.taskFinished(self._taskId);
@@ -61,7 +63,7 @@ require([
 
             },
 
-            destruct:function () {
+            destruct: function () {
                 this._taskId = this.taskFinished(this._taskId);
             }
         });
