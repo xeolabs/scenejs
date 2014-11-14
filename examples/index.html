@@ -481,6 +481,7 @@ var files = {
 
     "Importing": [
         "importing_3ds_lexus",
+        "importing_3ds_comet",
         "importing_md2_lion",
         "importing_obj_duck",
         "importing_obj_raptor"
@@ -565,7 +566,7 @@ for (var key in files) {
     var section = files[key];
     var div = document.createElement('div');
     div.className = 'link';
-    indexStr = "" + index++ + ".";
+    indexStr = "" + _index++ + ".";
     for (var i = indexStr.length, len = 5; i < len; i++) {
         indexStr += ".";
     }
@@ -582,12 +583,12 @@ for (var key in files) {
 container.appendChild(document.createElement('hr'));
 container.appendChild(document.createElement('br'));
 
-index = 1;
+_index = 1;
 
 for (var key in files) {
     var section = files[ key ];
     var div = document.createElement('h2');
-    div.textContent = index++ + "." + key;
+    div.textContent = _index++ + "." + key;
     container.appendChild(div);
     catDivs[key] = div;
     for (var i = 0; i < section.length; i++) {
