@@ -503,12 +503,14 @@ SceneJS.Types.addType("postprocess/dof", {
             }
             this._camera = node;
             var self = this;
-            this._cameraSub = (!node) ? null : node.on("matrix", synchWithCamera);
+
             function synchWithCamera() {
                 var optics = self._camera.getOptics();
                 self.setNear(optics.near);
                 self.setFar(optics.far);
             }
+
+            this._cameraSub = (!node) ? null : node.on("matrix", synchWithCamera);
 
             synchWithCamera(); // Immediately synch with camera
         }
@@ -528,12 +530,14 @@ SceneJS.Types.addType("postprocess/dof", {
             this._lookat = node;
             var self = this;
             // Synchronise focus depth with length of eye->look vector
-            this._lookatSub = (!node) ? null : node.on("matrix", synchWithLookat);
+
             function synchWithLookat() {
                 var look = self._lookat.getLook();
                 var eye = self._lookat.getEye();
                 self.setFocusDist(SceneJS_math_lenVec3([ look.x - eye.x, look.y - eye.y, look.z - eye.z ]));
             }
+
+            this._lookatSub = (!node) ? null : node.on("matrix", synchWithLookat);
 
             synchWithLookat(); // Imediately sycnh with lookat
         }
