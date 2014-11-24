@@ -25,7 +25,7 @@ new (function () {
         function () {
             for (var nodeId in nodeCoreMap) {
                 if (nodeCoreMap.hasOwnProperty(nodeId)) {
-                    nodeCoreMap[nodeId]._buildNodeCore();
+                    nodeCoreMap[nodeId]._core.renderBuf.webglRestored();
                 }
             }
         });
