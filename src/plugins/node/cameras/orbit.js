@@ -54,10 +54,21 @@ SceneJS.Types.addType("cameras/orbit", {
 
         var spin = params.spin;
 
-        if (spin) {
+
+        if (params.spin || params.spinYaw || params.spinPitch) {
+            var spinYaw = 0;
+            var spinPitch = 0;
+            if (params.spin) {
+                spinYaw = params.spin;
+            } else {
+                spinYaw = params.spinYaw || 0.0;
+                spinPitch = params.spinPitch || 0.0;
+            }
+
             this._tick = this.getScene().on("tick",
                 function () {
-                    yaw -= spin;
+                    yaw -= spinYaw;
+                    pitch -= spinPitch;
                     update();
                 });
         }
