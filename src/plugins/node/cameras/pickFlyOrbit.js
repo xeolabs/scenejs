@@ -24,7 +24,7 @@
 require([
     SceneJS.getConfigs("pluginPath") + "/lib/gl-matrix-min.js"
 ],
-    function (glmat, jquery) {
+    function (glmat) {
 
         // Create target indicator div
 
@@ -386,9 +386,6 @@ require([
                                 eye: {x: look[0], y: look[1], z: look[2] },
                                 look: {x: look[0] - eye3[0], y: look[1] - eye3[1], z: look[2] - eye3[2] }
                             };
-
-//                            lookat.setLook(lookatArgs.look);
-//                            lookat.setEye(lookatArgs.eye);
 
                             self.publish("updated", lookatArgs);
 

@@ -286,7 +286,7 @@
 
                             if (fileList.length > 0) {
                                 sys.print("Writing core library to: " + distDir + "/scenejs.js\n");
-                                output.push('SceneJS.configure({ pluginPath: "http://xeolabs.github.com/scenejs/' + distDir + '/plugins" });');
+                                output.push('SceneJS.configure({ pluginPath: "http://scenejs.org/' + distDir + '/plugins" });');
                                 output = output.join("");
                                 fs.writeFileSync(distDir + "/scenejs.js", output);
                             }

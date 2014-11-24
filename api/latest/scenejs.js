@@ -5243,10 +5243,8 @@ SceneJS._webgl.RenderBuffer.prototype.bind = function () {
 };
 
 SceneJS._webgl.RenderBuffer.prototype._touch = function () {
-
     var width = this.canvas.canvas.width;
     var height = this.canvas.canvas.height;
-
     if (this.buf) { // Currently have a buffer
         if (this.buf.width == width && this.buf.height == height) { // Canvas size unchanged, buffer still good
             return;
@@ -14988,8 +14986,8 @@ SceneJS_Display.prototype._buildObjectList = function () {
 };
 
 SceneJS_Display.prototype._makeStateSortKeys = function () {
-    //  console.log("--------------------------------------------------------------------------------------------------");
-    // console.log("SceneJS_Display_makeSortKeys");
+  //  console.log("--------------------------------------------------------------------------------------------------");
+   // console.log("SceneJS_Display_makeSortKeys");
     var object;
     for (var i = 0, len = this._objectListLen; i < len; i++) {
         object = this._objectList[i];
@@ -15006,16 +15004,16 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
 
             object.sortKey =
                 ((object.stage.priority + 1) * 1000000000000)
-                + ((object.flags.transparent ? 2 : 1) * 1000000000)
-                + ((object.layer.priority + 1) * 1000000)
-                + ((object.program.id + 1) * 1000)
-                + object.texture.stateId;
+                    + ((object.flags.transparent ? 2 : 1) * 1000000000)
+                    + ((object.layer.priority + 1) * 1000000)
+                    + ((object.program.id + 1) * 1000)
+                    + object.texture.stateId;
 
             //console.log("object.sortKey = " +  object.sortKey);
-            //  console.log("");
+          //  console.log("");
         }
     }
-    //  console.log("--------------------------------------------------------------------------------------------------");
+  //  console.log("--------------------------------------------------------------------------------------------------");
 };
 
 SceneJS_Display.prototype._stateSort = function () {
