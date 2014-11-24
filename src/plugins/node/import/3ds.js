@@ -38,8 +38,10 @@ require([
                         var mesh = m.edit.objects[0].mesh;
 
                         // Need to flip the UV coordinates on Y-axis for SceneJS geometry
-                        for (var i = 1, len = mesh.uvt.length; i < len; i += 2) {
-                            mesh.uvt[i] *= -1.0;
+                        if (mesh.uvt) {
+                            for (var i = 1, len = mesh.uvt.length; i < len; i += 2) {
+                                mesh.uvt[i] *= -1.0;
+                            }
                         }
 
                         self.addNode({
@@ -61,7 +63,7 @@ require([
 
             },
 
-            destruct:function () {
+            destruct: function () {
                 this._taskId = this.taskFinished(this._taskId);
             }
         });

@@ -10,14 +10,14 @@
  */
 require([
 
-        // This prefix routes to the 3rd-party libs directory containing resources used by plugins
-        "scenejsPluginDeps/k3d"
-    ],
+    // This prefix routes to the 3rd-party libs directory containing resources used by plugins
+    "scenejsPluginDeps/k3d"
+],
     function () {
 
         SceneJS.Types.addType("import/3ds", {
 
-            construct: function (params) {
+            construct:function (params) {
 
                 if (!params.src) {
                     this.log("error", "Attribute expected: src");
@@ -45,12 +45,12 @@ require([
                         }
 
                         self.addNode({
-                            type: "geometry",
-                            primitive: "triangles",
-                            positions: mesh.vertices,
-                            uv: mesh.uvt,
-                            normals: params.normals,
-                            indices: mesh.indices
+                            type:"geometry",
+                            primitive:"triangles",
+                            positions:mesh.vertices,
+                            uv:mesh.uvt,
+                            //normals:"auto",
+                            indices:mesh.indices
                         });
 
                         self._taskId = self.taskFinished(self._taskId);
