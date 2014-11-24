@@ -15,8 +15,8 @@ SceneJS_ChunkFactory.createChunkType({
 
     draw : function(frameCtx) {
 
-        if (this.core.dirty) {
-            this.core.rebuild();
+        if (this.core.checkAspect) {
+            this.core.checkAspect(this.core, frameCtx.aspect);
         }
 
         var gl = this.program.gl;
@@ -38,6 +38,10 @@ SceneJS_ChunkFactory.createChunkType({
 
 
     pick : function(frameCtx) {
+
+        if (this.core.checkAspect) {
+            this.core.checkAspect(this.core, frameCtx.aspect);
+        }
 
         var gl = this.program.gl;
 

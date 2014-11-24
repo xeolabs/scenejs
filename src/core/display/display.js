@@ -855,18 +855,22 @@ SceneJS_Display.prototype.pick = function (params) {
     var hit = null;
     var canvasX = params.canvasX;
     var canvasY = params.canvasY;
-    var pickBuf = this.pickBuf;                                                     // Lazy-create pick buffer
+    var pickBuf = this.pickBuf;
 
+    // Lazy-create pick buffer
     if (!pickBuf) {
         pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
-        this.pickBufDirty = true;                                                   // Freshly-created pick buffer is dirty
+        this.pickBufDirty = true;
     }
 
     this.render(); // Do any pending visible render
 
-    pickBuf.bind();                                                                 // Bind pick buffer
+    // Colour-index pick to find the picked object
 
-    if (this.pickBufDirty) {                          // Render pick buffer
+    pickBuf.bind();
+
+    // Re-render the pick buffer if the display has updated
+    if (this.pickBufDirty) {
         pickBuf.clear();
         this._doDrawList({
             pick: true,
@@ -877,11 +881,15 @@ SceneJS_Display.prototype.pick = function (params) {
         this.rayPickBufDirty = true;                                                // Ray pick buffer now dirty
     }
 
+    // Read pixel color in pick buffer at given coordinates,
+    // convert to an index into the pick name list
+
     var pix = pickBuf.read(canvasX, canvasY);                                       // Read pick buffer
     var pickedObjectIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
     var pickIndex = (pickedObjectIndex >= 1) ? pickedObjectIndex - 1 : -1;
     pickBuf.unbind();                                                               // Unbind pick buffer
 
+    // Look up pick name from index
     var pickName = this._frameCtx.pickNames[pickIndex];                                   // Map pixel to name
 
     if (pickName) {
@@ -893,11 +901,18 @@ SceneJS_Display.prototype.pick = function (params) {
             canvasPos: [canvasX, canvasY]
         };
 
-        if (params.rayPick) { // Ray pick to find position
-            var rayPickBuf = this.rayPickBuf; // Lazy-create Z-pick buffer
+        // Now do a ray-pick if requested
+
+        if (params.rayPick) {
+
+            // Lazy-create ray pick depth buffer
+            var rayPickBuf = this.rayPickBuf;
             if (!rayPickBuf) {
                 rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+                this.rayPickBufDirty = true;
             }
+
+            // Render depth values to ray-pick depth buffer
 
             rayPickBuf.bind();
 
@@ -911,12 +926,12 @@ SceneJS_Display.prototype.pick = function (params) {
                 this.rayPickBufDirty = false;
             }
 
+            // Read pixel from depth buffer, convert to normalised device Z coordinate,
+            // which will be in range of [0..1] with z=0 at front
             pix = rayPickBuf.read(canvasX, canvasY);
 
             rayPickBuf.unbind();
 
-            // Read normalised device Z coordinate, which will be
-            // in range of [0..1] with z=0 at front
             var screenZ = this._unpackDepth(pix);
             var w = canvas.width;
             var h = canvas.height;
@@ -935,6 +950,7 @@ SceneJS_Display.prototype.pick = function (params) {
             var dir = SceneJS_math_subVec3(world2, world1, []);
             var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec4Scalar(dir, screenZ, []), []);
 
+            // Got World-space intersect with surface of picked geometry
             hit.worldPos = vWorld;
         }
     }
@@ -989,13 +1005,14 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.lineWidth = 1;
     frameCtx.transparent = false;
     frameCtx.ambientColor = this._ambientColor;
+    frameCtx.aspect = this._canvas.canvas.width / this._canvas.canvas.height;
 
     // The extension needs to be re-queried in case the context was lost and has been recreated.
     var VAO = gl.getExtension("OES_vertex_array_object");
     frameCtx.VAO = (VAO) ? VAO : null;
-    frameCtx.VAO =  null;
+    frameCtx.VAO = null;
 
-    gl.viewport(0, 0, this._canvas.canvas.width, this._canvas.canvas.height);
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     if (this.transparent) {
         gl.clearColor(0, 0, 0, 0);
@@ -1003,7 +1020,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
         gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
     }
 
-   if (params.clear) {
+    if (params.clear) {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     }
 
@@ -1026,7 +1043,6 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     gl.flush();
 
     if (frameCtx.renderBuf) {
-        gl.finish();
         frameCtx.renderBuf.unbind();
     }
 

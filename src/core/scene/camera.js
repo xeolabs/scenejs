@@ -10,16 +10,22 @@
 
     // The default state core singleton for {@link SceneJS.Camera} nodes
     var defaultCore = {
-        type:"camera",
-        stateId:SceneJS._baseStateId++,
-        matrix:defaultMatrix,
-        mat:defaultMat,
-        optics:{
-            type:"perspective",
-            fovy:45.0,
-            aspect:1.0,
-            near:0.1,
-            far:10000.0
+        type: "camera",
+        stateId: SceneJS._baseStateId++,
+        matrix: defaultMatrix,
+        mat: defaultMat,
+        optics: {
+            type: "perspective",
+            fovy: 45.0,
+            aspect: 1.0,
+            near: 0.1,
+            far: 10000.0
+        },
+        checkAspect: function (core, aspect) {
+            if (core.optics.aspect != aspect) {
+                core.optics.aspect = aspect;
+                rebuildCore(this);
+            }
         }
     };
 
@@ -42,16 +48,20 @@
 
     SceneJS.Camera.prototype._init = function (params) {
         if (this._core.useCount == 1) {
+
+            params.optics = params.optics || {};
+            var canvas = this.getScene().getCanvas();
+            params.optics.aspect = canvas.width / canvas.height;
             this.setOptics(params.optics); // Can be undefined
 
-//            // Rebuild on every scene tick
-//            // https://github.com/xeolabs/scenejs/issues/277
-//            var self = this;
-//            this._tick = this.getScene().on("tick", function () {
-//                if (self._core.dirty) {
-//                    self._core.rebuild();
-//                }
-//            });
+            var self = this;
+
+            this._canvasSizeSub = this.getScene().on("canvasSize",
+                function (c) {
+                    self._core.optics.aspect = c.aspect;
+                    rebuildCore(self._core);
+                    self._engine.display.imageDirty = true;
+                });
         }
     };
 
@@ -67,62 +77,63 @@
         var core = this._core;
         if (!optics) {
             core.optics = {
-                type:"perspective",
-                fovy:60.0,
-                aspect:1.0,
-                near:0.1,
-                far:10000.0
+                type: "perspective",
+                fovy: 60.0,
+                aspect: 1.0,
+                near: 0.1,
+                far: 10000.0
             };
         } else {
-            var type = optics.type || core.optics.type;
+            var type = optics.type || core.optics.type || "perspective";
             if (type == "ortho") {
                 core.optics = SceneJS._applyIf(SceneJS_math_ORTHO_OBJ, {
-                    type:type,
-                    left:optics.left,
-                    bottom:optics.bottom,
-                    near:optics.near,
-                    right:optics.right,
-                    top:optics.top,
-                    far:optics.far
+                    type: type,
+                    left: optics.left,
+                    bottom: optics.bottom,
+                    near: optics.near,
+                    right: optics.right,
+                    top: optics.top,
+                    far: optics.far
                 });
             } else if (type == "frustum") {
                 core.optics = {
-                    type:type,
-                    left:optics.left || -1.0,
-                    bottom:optics.bottom || -1.0,
-                    near:optics.near || 0.1,
-                    right:optics.right || 1.00,
-                    top:optics.top || 1.0,
-                    far:optics.far || 10000.0
+                    type: type,
+                    left: optics.left || -1.0,
+                    bottom: optics.bottom || -1.0,
+                    near: optics.near || 0.1,
+                    right: optics.right || 1.00,
+                    top: optics.top || 1.0,
+                    far: optics.far || 10000.0
                 };
             } else if (type == "perspective") {
                 core.optics = {
-                    type:type,
-                    fovy:optics.fovy || 60.0,
-                    aspect:optics.aspect == undefined ? 1.0 : optics.aspect,
-                    near:optics.near || 0.1,
-                    far:optics.far || 10000.0
+                    type: type,
+                    fovy: optics.fovy || 60.0,
+                    aspect: optics.aspect == undefined ? 1.0 : optics.aspect,
+                    near: optics.near || 0.1,
+                    far: optics.far || 10000.0
                 };
             } else if (!optics.type) {
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "SceneJS.Camera configuration invalid: optics type not specified - " +
+                        "SceneJS.Camera configuration invalid: optics type not specified - " +
                         "supported types are 'perspective', 'frustum' and 'ortho'");
             } else {
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "SceneJS.Camera configuration invalid: optics type not supported - " +
+                        "SceneJS.Camera configuration invalid: optics type not supported - " +
                         "supported types are 'perspective', 'frustum' and 'ortho'");
             }
         }
-        this._rebuild();
+        rebuildCore(this._core);
+        this.publish("matrix", this._core.matrix);
         this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Camera.prototype._rebuild = function () {
-        var optics = this._core.optics;
+    function rebuildCore (core) {
+        var optics = core.optics;
         if (optics.type == "ortho") {
-            this._core.matrix = SceneJS_math_orthoMat4c(
+            core.matrix = SceneJS_math_orthoMat4c(
                 optics.left,
                 optics.right,
                 optics.bottom,
@@ -131,7 +142,7 @@
                 optics.far);
 
         } else if (optics.type == "frustum") {
-            this._core.matrix = SceneJS_math_frustumMatrix4(
+            core.matrix = SceneJS_math_frustumMatrix4(
                 optics.left,
                 optics.right,
                 optics.bottom,
@@ -140,19 +151,18 @@
                 optics.far);
 
         } else if (optics.type == "perspective") {
-            this._core.matrix = SceneJS_math_perspectiveMatrix4(
-                optics.fovy * Math.PI / 180.0,
+            core.matrix = SceneJS_math_perspectiveMatrix4(
+                    optics.fovy * Math.PI / 180.0,
                 optics.aspect,
                 optics.near,
                 optics.far);
         }
-        if (!this._core.mat) {
-            this._core.mat = new Float32Array(this._core.matrix);
+        if (!core.mat) {
+            core.mat = new Float32Array(core.matrix);
         } else {
-            this._core.mat.set(this._core.matrix);
+            core.mat.set(core.matrix);
         }
-        this.publish("matrix", this._core.matrix);
-    };
+    }
 
     SceneJS.Camera.prototype.getOptics = function () {
         var optics = {};
@@ -179,7 +189,6 @@
     };
 
     SceneJS.Camera.prototype._destroy = function () {
-        // Stop publishing matrix on each tick
-        this.getScene().off(this._tick);
+        this.getScene().off(this._canvasSizeSub);
     };
 })();

@@ -365,6 +365,11 @@ SceneJS_Engine.prototype.start = function () {
         var startTime = time;
         var scene = this.scene;
         var rendered = false;
+        var canvas = this.canvas.canvas;
+        var width;
+        var height;
+        var lastWidth = null;
+        var lastHeight = null;
 
         // Notify started
         this.events.fireEvent("started", {
@@ -374,6 +379,18 @@ SceneJS_Engine.prototype.start = function () {
 
         // Animation frame callback
         window[fnName] = function () {
+
+            width = canvas.width = canvas.clientWidth;
+            height = canvas.height = canvas.clientHeight;
+
+            if (width != lastWidth || height != lastHeight) {
+                scene.publish("canvasSize", {
+                    width: width,
+                    height: height,
+                    aspect: width / height
+                });
+                self.display.imageDirty = true;
+            }
 
             if (self.running && !self.paused) {
 
