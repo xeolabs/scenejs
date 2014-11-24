@@ -18,7 +18,7 @@ SceneJS._webgl.Shader = function (gl, type, source) {
     this.handle = gl.createShader(type);
 
     if (!this.handle) {
-        return;
+        throw SceneJS_error.fatalError(SceneJS.errors.OUT_OF_VRAM, "Failed to create WebGL shader");
     }
 
     gl.shaderSource(this.handle, source);

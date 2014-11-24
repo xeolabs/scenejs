@@ -2,13 +2,28 @@ SceneJS._webgl.RenderBuffer = function (cfg) {
 
     /**
      * True as soon as this buffer is allocated and ready to go
-     * @type {boolean}
      */
     this.allocated = false;
 
+    /**
+     * The canvas, to synch buffer size with when its dimensions change
+     */
     this.canvas = cfg.canvas;
+
+    /**
+     * WebGL context
+     */
     this.gl = cfg.canvas.gl;
+
+    /**
+     * Buffer resources, set up in #_touch
+     */
     this.buf = null;
+
+    /**
+     * True while this buffer is bound
+     * @type {boolean}
+     */
     this.bound = false;
 };
 
@@ -18,6 +33,8 @@ SceneJS._webgl.RenderBuffer = function (cfg) {
 SceneJS._webgl.RenderBuffer.prototype.webglRestored = function (_gl) {
     this.gl = _gl;
     this.buf = null;
+    this.allocated = false;
+    this.bound = false;
 };
 
 /**
@@ -32,7 +49,6 @@ SceneJS._webgl.RenderBuffer.prototype.bind = function () {
     this.bound = true;
 };
 
-
 SceneJS._webgl.RenderBuffer.prototype._touch = function () {
     var width = this.canvas.canvas.width;
     var height = this.canvas.canvas.height;
@@ -45,6 +61,7 @@ SceneJS._webgl.RenderBuffer.prototype._touch = function () {
             this.gl.deleteRenderbuffer(this.buf.renderbuf);
         }
     }
+
     this.buf = {
         framebuf: this.gl.createFramebuffer(),
         renderbuf: this.gl.createRenderbuffer(),
@@ -52,12 +69,14 @@ SceneJS._webgl.RenderBuffer.prototype._touch = function () {
         width: width,
         height: height
     };
+
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.buf.framebuf);
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.buf.texture);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
     this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+
     try {
         // Do it the way the spec requires
         this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, width, height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
@@ -66,6 +85,7 @@ SceneJS._webgl.RenderBuffer.prototype._touch = function () {
         var textureStorage = new WebGLUnsignedByteArray(width * height * 3);
         this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, width, height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, textureStorage);
     }
+
     this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, this.buf.renderbuf);
     this.gl.renderbufferStorage(this.gl.RENDERBUFFER, this.gl.DEPTH_COMPONENT16, width, height);
     this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0, this.gl.TEXTURE_2D, this.buf.texture, 0);
@@ -73,11 +93,11 @@ SceneJS._webgl.RenderBuffer.prototype._touch = function () {
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     this.gl.bindRenderbuffer(this.gl.RENDERBUFFER, null);
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
     // Verify framebuffer is OK
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.buf.framebuf);
+
     if (!this.gl.isFramebuffer(this.buf.framebuf)) {
-
-
         throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Invalid framebuffer");
     }
 

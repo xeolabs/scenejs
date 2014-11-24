@@ -36,6 +36,9 @@ SceneJS._webgl.ArrayBuffer = function (gl, type, values, numItems, itemSize, usa
 SceneJS._webgl.ArrayBuffer.prototype._allocate = function (values, numItems) {
     this.allocated = false;
     this.handle = this.gl.createBuffer();
+    if (!this.handle) {
+        throw SceneJS_error.fatalError(SceneJS.errors.OUT_OF_VRAM, "Failed to allocate WebGL ArrayBuffer");
+    }
     if (this.handle) {
         this.gl.bindBuffer(this.type, this.handle);
         this.gl.bufferData(this.type, values, this.usage);

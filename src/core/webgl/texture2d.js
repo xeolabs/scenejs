@@ -50,7 +50,7 @@ SceneJS._webgl.Texture2D = function (gl, cfg) {
         this.allocated = true;
 
     } catch (e) {
-        throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Failed to create texture: " + e.message || e);
+        throw SceneJS_error.fatalError(SceneJS.errors.OUT_OF_VRAM, "Failed to create texture: " + e.message || e);
     }
 
     this.bind = function (unit) {
