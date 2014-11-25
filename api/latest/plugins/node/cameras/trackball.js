@@ -74,15 +74,6 @@ SceneJS.Types.addType("cameras/trackball", {
 
             var canvas = this.getScene().getCanvas();
 
-            canvas.addEventListener('mousedown', mouseDown, true);
-            canvas.addEventListener('mousemove', mouseMove, true);
-            canvas.addEventListener('mouseup', mouseUp, true);
-            canvas.addEventListener('touchstart', touchStart, true);
-            canvas.addEventListener('touchmove', touchMove, true);
-            canvas.addEventListener('touchend', touchEnd, true);
-            canvas.addEventListener('mousewheel', mouseWheel, true);
-            canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
-
             function mouseDown(event) {
                 x = event.clientX;
                 y = event.clientY;
@@ -157,6 +148,15 @@ SceneJS.Types.addType("cameras/trackball", {
                 }
                 event.returnValue = false;
             }
+
+            canvas.addEventListener('mousedown', mouseDown, true);
+            canvas.addEventListener('mousemove', mouseMove, true);
+            canvas.addEventListener('mouseup', mouseUp, true);
+            canvas.addEventListener('touchstart', touchStart, true);
+            canvas.addEventListener('touchmove', touchMove, true);
+            canvas.addEventListener('touchend', touchEnd, true);
+            canvas.addEventListener('mousewheel', mouseWheel, true);
+            canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
             this._removeCanvasListeners = function() {
                 canvas.removeEventListener('mousedown', mouseDown, true);

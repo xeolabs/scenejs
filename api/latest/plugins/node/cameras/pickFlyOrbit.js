@@ -178,15 +178,6 @@ require([
 
                 var canvas = this.getScene().getCanvas();
 
-                canvas.addEventListener('mousedown', mouseDown, true);
-                canvas.addEventListener('mouseup', mouseUp, true);
-                canvas.addEventListener('touchstart', touchStart, true);
-                canvas.addEventListener('touchend', touchEnd, true);
-                canvas.addEventListener('mousemove', mouseMove, true);
-                canvas.addEventListener('touchmove', touchMove, true);
-                canvas.addEventListener('mousewheel', mouseWheel, true);
-                canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
-
                 var downX;
                 var downY;
                 var lastX;
@@ -281,6 +272,15 @@ require([
                     event.returnValue = false;
                     orbiting = true;
                 }
+
+                canvas.addEventListener('mousedown', mouseDown, true);
+                canvas.addEventListener('mouseup', mouseUp, true);
+                canvas.addEventListener('touchstart', touchStart, true);
+                canvas.addEventListener('touchend', touchEnd, true);
+                canvas.addEventListener('mousemove', mouseMove, true);
+                canvas.addEventListener('touchmove', touchMove, true);
+                canvas.addEventListener('mousewheel', mouseWheel, true);
+                canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
                 function pick(canvasX, canvasY) {
                     scene.pick(canvasX, canvasY, { rayPick: true });
