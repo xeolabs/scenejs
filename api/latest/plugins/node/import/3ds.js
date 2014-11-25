@@ -49,7 +49,7 @@ require([
                             primitive:"triangles",
                             positions:mesh.vertices,
                             uv:mesh.uvt,
-                            //normals:"auto",
+                            normals:params.normals || "auto",
                             indices:mesh.indices
                         });
 
