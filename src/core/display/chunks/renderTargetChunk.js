@@ -14,7 +14,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         // Flush and unbind any render buffer already bound
         if (frameCtx.renderBuf) {
-            gl.finish();
+            gl.flush();
             frameCtx.renderBuf.unbind();
             frameCtx.renderBuf = null;
         }
