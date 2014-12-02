@@ -98,7 +98,7 @@ SceneJS._webgl.RenderBuffer.prototype._touch = function () {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.buf.framebuf);
 
     if (!this.gl.isFramebuffer(this.buf.framebuf)) {
-        throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Invalid framebuffer");
+        throw SceneJS_error.fatalError(SceneJS.errors.INVALID_FRAMEBUFFER, "Invalid framebuffer");
     }
 
     var status = this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER);

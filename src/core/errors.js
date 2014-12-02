@@ -58,6 +58,7 @@ var SceneJS_error = new (function() {
 
     var n = 0;
     SceneJS.errors.ERROR = n++;
+    SceneJS.errors.INVALID_FRAMEBUFFER = n++;
     SceneJS.errors.WEBGL_NOT_SUPPORTED = n++;
     SceneJS.errors.WEBGL_CONTEXT_LOST = n++;
     SceneJS.errors.NODE_CONFIG_EXPECTED = n++;
