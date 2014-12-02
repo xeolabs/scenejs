@@ -21,10 +21,6 @@ SceneJS_ChunkFactory.createChunkType({
 
                 this._uTexSampler[i] = "SCENEJS_uSampler" + i;
 
-//                this._uTexMatrix[i] = layer.matrixAsArray
-//                        ? draw.getUniform("SCENEJS_uLayer" + i + "Matrix")
-//                        : null;
-
                 this._uTexMatrix[i] = draw.getUniform("SCENEJS_uLayer" + i + "Matrix");
 
                 this._uTexBlendFactor[i] = draw.getUniform("SCENEJS_uLayer" + i + "BlendFactor");
