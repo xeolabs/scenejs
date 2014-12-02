@@ -658,7 +658,7 @@ new (function () {
 
             core.hash = ([                           // Safe to build geometry hash here - geometry is immutable
                 core.normalBuf ? "t" : "f",
-                core.arrays.tangents ? "t" : "f",
+                core.arrays && core.arrays.tangents ? "t" : "f",
                 core.uvBuf ? "t" : "f",
                 core.uvBuf2 ? "t" : "f",
                 core.colorBuf ? "t" : "f",
