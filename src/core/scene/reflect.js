@@ -64,7 +64,7 @@
                         }
                         gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
                         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-                        gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, ensureImageSizePowerOfTwo(image));
+                        gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, SceneJS._webgl.ensureImageSizePowerOfTwo(image));
                         if (++numImagesLoaded == faces.length) {
                             self._core.texture = new SceneJS._webgl.Texture2D(gl, {
                                 texture: texture,
@@ -87,34 +87,6 @@
             }
         }
     };
-
-    function ensureImageSizePowerOfTwo(image) {
-        if (!isPowerOfTwo(image.width) || !isPowerOfTwo(image.height)) {
-            var canvas = document.createElement("canvas");
-            canvas.width = nextHighestPowerOfTwo(image.width);
-            canvas.height = nextHighestPowerOfTwo(image.height);
-            var ctx = canvas.getContext("2d");
-            ctx.drawImage(image,
-                0, 0, image.width, image.height,
-                0, 0, canvas.width, canvas.height);
-
-            image = canvas;
-            image.crossOrigin = "";
-        }
-        return image;
-    }
-
-    function isPowerOfTwo(x) {
-        return (x & (x - 1)) == 0;
-    }
-
-    function nextHighestPowerOfTwo(x) {
-        --x;
-        for (var i = 1; i < 32; i <<= 1) {
-            x = x | x >> i;
-        }
-        return x + 1;
-    }
 
     SceneJS.Reflect.prototype._compile = function (ctx) {
         if (!this.__core) {
