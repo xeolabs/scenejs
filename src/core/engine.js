@@ -315,6 +315,8 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
 
         var time = (new Date()).getTime();
 
+        var force =  params && params.force;
+
         // Render the scene once for each pass
         for (var i = 0; i < this._numPasses; i++) {
 
@@ -329,7 +331,8 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
             // Render display graph
             // Clear buffers only on first frame
             this.display.render({
-                clear: i == 0
+                clear: i == 0,
+                force: force
             });
 
             // Notify that render completed
