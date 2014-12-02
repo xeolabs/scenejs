@@ -2138,7 +2138,8 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
             // Render display graph
             // Clear buffers only on first frame
             this.display.render({
-                clear: i == 0
+                clear: i == 0,
+                force: params.force
             });
 
             // Notify that render completed
@@ -2487,6 +2488,7 @@ var SceneJS_error = new (function() {
 
     var n = 0;
     SceneJS.errors.ERROR = n++;
+    SceneJS.errors.INVALID_FRAMEBUFFER = n++;
     SceneJS.errors.WEBGL_NOT_SUPPORTED = n++;
     SceneJS.errors.WEBGL_CONTEXT_LOST = n++;
     SceneJS.errors.NODE_CONFIG_EXPECTED = n++;
@@ -5291,7 +5293,7 @@ SceneJS._webgl.RenderBuffer.prototype._touch = function () {
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.buf.framebuf);
 
     if (!this.gl.isFramebuffer(this.buf.framebuf)) {
-        throw SceneJS_error.fatalError(SceneJS.errors.ERROR, "Invalid framebuffer");
+        throw SceneJS_error.fatalError(SceneJS.errors.INVALID_FRAMEBUFFER, "Invalid framebuffer");
     }
 
     var status = this.gl.checkFramebufferStatus(this.gl.FRAMEBUFFER);
@@ -13141,7 +13143,7 @@ new (function () {
 
         var texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._ensureImageSizePowerOfTwo(image));
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, SceneJS._webgl.ensureImageSizePowerOfTwo(image));
 
     //    this._core.image = image;
 
@@ -13169,33 +13171,6 @@ new (function () {
         }
 
         this._engine.display.imageDirty = true;
-    };
-
-    SceneJS.TextureMap.prototype._ensureImageSizePowerOfTwo = function (image) {
-        if (!this._isPowerOfTwo(image.width) || !this._isPowerOfTwo(image.height)) {
-            var canvas = document.createElement("canvas");
-            canvas.width = this._nextHighestPowerOfTwo(image.width);
-            canvas.height = this._nextHighestPowerOfTwo(image.height);
-            var ctx = canvas.getContext("2d");
-            ctx.drawImage(image,
-                0, 0, image.width, image.height,
-                0, 0, canvas.width, canvas.height);
-            image = canvas;
-            image.crossOrigin = "";
-        }
-        return image;
-    };
-
-    SceneJS.TextureMap.prototype._isPowerOfTwo = function (x) {
-        return (x & (x - 1)) == 0;
-    };
-
-    SceneJS.TextureMap.prototype._nextHighestPowerOfTwo = function (x) {
-        --x;
-        for (var i = 1; i < 32; i <<= 1) {
-            x = x | x >> i;
-        }
-        return x + 1;
     };
 
     SceneJS.TextureMap.prototype._getGLOption = function (name, defaultVal) {
@@ -13423,7 +13398,7 @@ new (function () {
                         }
                         gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
                         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-                        gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, ensureImageSizePowerOfTwo(image));
+                        gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, SceneJS._webgl.ensureImageSizePowerOfTwo(image));
                         if (++numImagesLoaded == faces.length) {
                             self._core.texture = new SceneJS._webgl.Texture2D(gl, {
                                 texture: texture,
@@ -13446,34 +13421,6 @@ new (function () {
             }
         }
     };
-
-    function ensureImageSizePowerOfTwo(image) {
-        if (!isPowerOfTwo(image.width) || !isPowerOfTwo(image.height)) {
-            var canvas = document.createElement("canvas");
-            canvas.width = nextHighestPowerOfTwo(image.width);
-            canvas.height = nextHighestPowerOfTwo(image.height);
-            var ctx = canvas.getContext("2d");
-            ctx.drawImage(image,
-                0, 0, image.width, image.height,
-                0, 0, canvas.width, canvas.height);
-
-            image = canvas;
-            image.crossOrigin = "";
-        }
-        return image;
-    }
-
-    function isPowerOfTwo(x) {
-        return (x & (x - 1)) == 0;
-    }
-
-    function nextHighestPowerOfTwo(x) {
-        --x;
-        for (var i = 1; i < 32; i <<= 1) {
-            x = x | x >> i;
-        }
-        return x + 1;
-    }
 
     SceneJS.Reflect.prototype._compile = function (ctx) {
         if (!this.__core) {
@@ -14986,8 +14933,8 @@ SceneJS_Display.prototype._buildObjectList = function () {
 };
 
 SceneJS_Display.prototype._makeStateSortKeys = function () {
-  //  console.log("--------------------------------------------------------------------------------------------------");
-   // console.log("SceneJS_Display_makeSortKeys");
+    //  console.log("--------------------------------------------------------------------------------------------------");
+    // console.log("SceneJS_Display_makeSortKeys");
     var object;
     for (var i = 0, len = this._objectListLen; i < len; i++) {
         object = this._objectList[i];
@@ -14995,25 +14942,15 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
             // Non-visual object (eg. sound)
             object.sortKey = -1;
         } else {
-
-//            console.log("object.stage.priority = " + ((object.stage.priority + 1) * 1000000000000));
-//            console.log("object.flags.transparent = " + ((object.flags.transparent ? 2 : 1) * 1000000000));
-//            console.log("object.layer.priority = " +  ((object.layer.priority + 1) * 1000000));
-//            console.log("object.program.id = " +  ((object.program.id + 1) * 1000));
-//            console.log("object.texture.stateId = " +  object.texture.stateId);
-
             object.sortKey =
                 ((object.stage.priority + 1) * 1000000000000)
-                    + ((object.flags.transparent ? 2 : 1) * 1000000000)
-                    + ((object.layer.priority + 1) * 1000000)
-                    + ((object.program.id + 1) * 1000)
-                    + object.texture.stateId;
-
-            //console.log("object.sortKey = " +  object.sortKey);
-          //  console.log("");
+                + ((object.flags.transparent ? 2 : 1) * 1000000000)
+                + ((object.layer.priority + 1) * 1000000)
+                + ((object.program.id + 1) * 1000)
+                + object.texture.stateId;
         }
     }
-  //  console.log("--------------------------------------------------------------------------------------------------");
+    //  console.log("--------------------------------------------------------------------------------------------------");
 };
 
 SceneJS_Display.prototype._stateSort = function () {
@@ -15383,6 +15320,7 @@ SceneJS_Display.prototype._unpackDepth = function (depthZ) {
     return SceneJS_math_dotVector4(vec, bitShift);
 };
 
+
 /** Renders either the draw or pick list.
  *
  * @param {*} params
@@ -15441,17 +15379,13 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     gl.disable(gl.CULL_FACE);
     gl.disable(gl.BLEND);
 
-    if (params.pick) {
-        // Render for pick
-        for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
-            this._pickDrawList[i].pick(frameCtx);
-        }
+    if (params.rayPickObject) {
+        extracted2.call(this, pickObject, frameCtx);
     } else {
-        // Render for draw
-        for (var i = 0, len = this._drawListLen; i < len; i++) {      // Push opaque rendering chunks
-            this._drawList[i].draw(frameCtx);
-        }
+        extracted.call(this, params, frameCtx);
     }
+
+
 
     gl.flush();
 
@@ -15473,6 +15407,35 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 //        gl.bindTexture(gl.TEXTURE_2D, null);
 //    }
 };
+
+function extracted(params, frameCtx) {
+    if (params.pick) {
+        // Render for pick
+        for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
+            this._pickDrawList[i].pick(frameCtx);
+        }
+    } else {
+        // Render for draw
+        for (var i = 0, len = this._drawListLen; i < len; i++) {      // Push opaque rendering chunks
+            this._drawList[i].draw(frameCtx);
+        }
+    }
+}
+
+
+function extracted2(object, frameCtx) {
+    var chunks = object.chunks;
+    var chunk;
+    for (var i = 0, len = chunks.length; i < len; i++) {
+        chunk = chunks[i];
+        if (chunk) {
+            if (chunk.pick) {
+                chunk.pick(frameCtx);
+            }
+        }
+    }
+}
+
 
 SceneJS_Display.prototype.destroy = function () {
     this._programFactory.destroy();
@@ -15522,22 +15485,28 @@ var SceneJS_ProgramSourceFactory = new (function () {
     this._composePickingVertexShader = function (states) {
         var morphing = !!states.morphGeometry.targets;
         var src = [
+
             "precision mediump float;",
+
             "attribute vec3 SCENEJS_aVertex;",
             "uniform mat4 SCENEJS_uMMatrix;",
             "uniform mat4 SCENEJS_uVMatrix;",
             "uniform mat4 SCENEJS_uVNMatrix;",
             "uniform mat4 SCENEJS_uPMatrix;"
         ];
+
         src.push("varying vec4 SCENEJS_vWorldVertex;");
         src.push("varying vec4 SCENEJS_vViewVertex;");
+
         if (morphing) {
             src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
             if (states.morphGeometry.targets[0].vertexBuf) {      // target2 has these arrays also
                 src.push("attribute vec3 SCENEJS_aMorphVertex;");
             }
         }
+
         src.push("void main(void) {");
+
         src.push("   vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
         if (morphing) {
             if (states.morphGeometry.targets[0].vertexBuf) {
@@ -15545,7 +15514,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
         src.push("  SCENEJS_vWorldVertex = SCENEJS_uMMatrix * tmpVertex; ");
+
         src.push("  SCENEJS_vViewVertex = SCENEJS_uVMatrix * SCENEJS_vWorldVertex;");
+
         src.push("  gl_Position =  SCENEJS_uPMatrix * SCENEJS_vViewVertex;");
         src.push("}");
         return src;
@@ -15573,6 +15544,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform bool  SCENEJS_uClipping;");
 
         if (clipping) {
+
             // World-space clipping planes
             for (var i = 0; i < states.clips.clips.length; i++) {
                 src.push("uniform float SCENEJS_uClipMode" + i + ";");
@@ -15592,6 +15564,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("void main(void) {");
 
         if (clipping) {
+
             src.push("if (SCENEJS_uClipping) {");
             src.push("  float   dist;");
             for (var i = 0; i < states.clips.clips.length; i++) {
@@ -15614,6 +15587,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("    } else {");
         src.push("          gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
         src.push("    }");
+
         src.push("}");
 
         return src;
@@ -15688,8 +15662,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
             "precision mediump float;"
         ];
 
+        src.push("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
+        src.push("uniform mat4 SCENEJS_uVMatrix;");             // View matrix
+        src.push("uniform mat4 SCENEJS_uPMatrix;");             // Projection matrix
+
         src.push("attribute vec3 SCENEJS_aVertex;");            // Model coordinates
+
         src.push("uniform vec3 SCENEJS_uWorldEye;");            // World-space eye position
+
         src.push("varying vec3 SCENEJS_vViewEyeVec;");          // View-space vector from origin to eye
 
         if (normals) {
@@ -15697,26 +15677,29 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("attribute vec3 SCENEJS_aNormal;");        // Normal vectors
             src.push("uniform   mat4 SCENEJS_uMNMatrix;");      // Model normal matrix
             src.push("uniform   mat4 SCENEJS_uVNMatrix;");      // View normal matrix
+
             src.push("varying   vec3 SCENEJS_vViewNormal;");    // Output view-space vertex normal
 
             if (tangents) {
-
-                // Input for tangents
-
                 src.push("attribute vec4 SCENEJS_aTangent;");
             }
 
             for (var i = 0; i < states.lights.lights.length; i++) {
+
                 var light = states.lights.lights[i];
+
                 if (light.mode == "ambient") {
                     continue;
                 }
+
                 if (light.mode == "dir") {
                     src.push("uniform vec3 SCENEJS_uLightDir" + i + ";");
                 }
+
                 if (light.mode == "point") {
                     src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
+
                 if (light.mode == "spot") {
                     src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
@@ -15727,26 +15710,22 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (texturing) {
+
             if (states.geometry.uvBuf) {
                 src.push("attribute vec2 SCENEJS_aUVCoord;");      // UV coords
             }
+
             if (states.geometry.uvBuf2) {
                 src.push("attribute vec2 SCENEJS_aUVCoord2;");     // UV2 coords
             }
         }
 
-        /* Vertex color variables
-         */
         if (states.geometry.colorBuf) {
             src.push("attribute vec4 SCENEJS_aVertexColor;");       // UV2 coords
             src.push("varying vec4 SCENEJS_vColor;");               // Varying for fragment texturing
         }
 
-        src.push("uniform mat4 SCENEJS_uMMatrix;");                 // Model matrix
-        src.push("uniform mat4 SCENEJS_uVMatrix;");                 // View matrix
-        src.push("uniform mat4 SCENEJS_uPMatrix;");                 // Projection matrix
-
-        if (clipping || fragmentHooks.worldPos) {
+        if (clipping) {
             src.push("varying vec4 SCENEJS_vWorldVertex;");         // Varying for fragment clip or world pos hook
         }
 
@@ -15783,10 +15762,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         src.push("  vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
 
-        if (vertexHooks.modelPos) {
-            src.push("  tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
-        }
-
         src.push("  vec4 modelVertex = tmpVertex; ");
         if (normals) {
             src.push("  vec4 modelNormal = vec4(SCENEJS_aNormal, 0.0); ");
@@ -15806,11 +15781,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        src.push("  vec4 worldVertex = SCENEJS_uMMatrix * modelVertex; ");
-
-        if (vertexHooks.worldPos) {
-            src.push("worldVertex=" + vertexHooks.worldPos + "(worldVertex);");
-        }
+        src.push("  vec4 worldVertex = SCENEJS_uMMatrix * modelVertex;");
 
         if (vertexHooks.viewMatrix) {
             src.push("vec4 viewVertex = " + vertexHooks.viewMatrix + "(SCENEJS_uVMatrix) * worldVertex;");
@@ -15835,6 +15806,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (vertexHooks.projMatrix) {
             src.push("gl_Position = " + vertexHooks.projMatrix + "(SCENEJS_uPMatrix) * viewVertex;");
+
         } else {
             src.push("  gl_Position = SCENEJS_uPMatrix * viewVertex;");
         }
@@ -15844,9 +15816,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             // Compute tangent-bitangent-normal matrix
 
             src.push("vec3 tangent = normalize((SCENEJS_uVNMatrix * SCENEJS_uMNMatrix * SCENEJS_aTangent).xyz);");
-            src.push("vec3 viewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;"); // TODO: DRY
-            src.push("vec3 bitangent = cross(viewNormal, tangent);");
-            src.push("mat3 TBM = mat3(tangent, bitangent, viewNormal);");
+            src.push("vec3 bitangent = cross(SCENEJS_vViewNormal, tangent);");
+            src.push("mat3 TBM = mat3(tangent, bitangent, SCENEJS_vViewNormal);");
         }
 
         src.push("  vec3 tmpVec3;");
@@ -15903,7 +15874,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                     if (light.space == "world") {
 
-                        // World space 
+                        // World space
 
                         src.push("tmpVec3 = SCENEJS_uLightPos" + i + " - worldVertex.xyz;"); // Vector from World coordinate to light pos
 
@@ -15918,7 +15889,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                     } else {
 
-                        // View space 
+                        // View space
 
                         src.push("tmpVec3 = SCENEJS_uLightPos" + i + ".xyz - viewVertex.xyz;"); // Vector from View coordinate to light pos
 
@@ -15939,11 +15910,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (tangents) {
 
-            // World eye vector to tangent space
             src.push("SCENEJS_vViewEyeVec *= TBM;");
         }
 
-        if (texturing) {                                                        // varyings for fragment texturing
+        if (texturing) {
 
             if (states.geometry.uvBuf) {
                 src.push("SCENEJS_vUVCoord = SCENEJS_aUVCoord;");
@@ -15955,8 +15925,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (states.geometry.colorBuf) {
-            src.push("SCENEJS_vColor = SCENEJS_aVertexColor;");                 // Varyings for fragment interpolated vertex coloring
+            src.push("SCENEJS_vColor = SCENEJS_aVertexColor;");
         }
+
         src.push("}");
 
         return src;
@@ -15993,7 +15964,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("precision mediump float;");
 
 
-        if (clipping || fragmentHooks.worldPos) {
+        if (clipping) {
             src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
         }
 
@@ -16101,11 +16072,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         src.push("void main(void) {");
 
-        src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
-
-        /*-----------------------------------------------------------------------------------
-         * Logic - Clipping
-         *----------------------------------------------------------------------------------*/
+        // World-space arbitrary clipping planes
 
         if (clipping) {
             src.push("if (SCENEJS_uClipping) {");
@@ -16124,12 +16091,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("}");
         }
 
+        src.push("  vec3 ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
+
         if (texturing && states.geometry.uvBuf && fragmentHooks.texturePos) {
             src.push(fragmentHooks.texturePos + "(SCENEJS_vUVCoord);");
-        }
-
-        if (fragmentHooks.worldPos) {
-            src.push(fragmentHooks.worldPos + "(SCENEJS_vWorldVertex);");
         }
 
         if (fragmentHooks.viewPos) {
@@ -16176,7 +16141,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (tangents) {
                 src.push("  vec3    viewNormalVec = vec3(0.0, 1.0, 0.0);");
             } else {
-                src.push("  vec3    viewNormalVec = SCENEJS_vViewNormal;");
+
+                // Normalize the interpolated normals in the per-fragment-fragment-shader,
+                // because if we linear interpolated two nonparallel normalized vectors, the resulting vector won’t be of length 1
+                src.push("  vec3    viewNormalVec = normalize(SCENEJS_vViewNormal);");
             }
         }
 
@@ -16236,10 +16204,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     } else if (layer.blendMode == "add") {
                         src.push("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
                     }
-
-                    //=====================================================================
-                    // TODO: "mix" blendMode
-                    //=====================================================================
                 }
 
                 /* Texture output
@@ -16288,7 +16252,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (normals && cubeMapping) {
             src.push("if (SCENEJS_uReflection) {"); // Flag which can enable/disable reflection
-            src.push("vec3 envLookup = reflect(normalize(SCENEJS_vViewEyeVec), normalize(viewNormalVec));");
+            src.push("vec3 envLookup = reflect(SCENEJS_vViewEyeVec, viewNormalVec);");
             src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
@@ -16347,14 +16311,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
                             " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine) * attenuation;");
                         src.push("}");
                     }
-                    //src.push("}");
                 }
 
                 if (light.mode == "dir") {
 
                     src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
 
-                    //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
                         src.push("if (SCENEJS_uDiffuse) {");
                         src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
@@ -16364,11 +16326,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-//                            " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine);");
                             " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine);");
                         src.push("}");
                     }
-                    // src.push("}");
                 }
             }
 
@@ -17082,6 +17042,7 @@ SceneJS_ChunkFactory.createChunkType({
             if (frameCtx.pick) {
                 mode = vars[i].uClipMode;
                 normalAndDist = vars[i].uClipNormalAndDist;
+
             } else {
                 mode = vars[i].uClipMode;
                 normalAndDist = vars[i].uClipNormalAndDist;
@@ -17101,7 +17062,8 @@ SceneJS_ChunkFactory.createChunkType({
                     gl.uniform1f(mode, 1);
                     gl.uniform4fv(normalAndDist, clip.normalAndDist);
 
-                } else { // disabled
+                } else {
+
                     gl.uniform1f(mode, 0);
                 }
             }
@@ -17188,6 +17150,7 @@ SceneJS_ChunkFactory.createChunkType({
         var transparent = this.core.transparent;
 
         if (frameCtx.transparent != transparent) {
+
             if (transparent) {
 
                 // Entering a transparency bin
@@ -17203,6 +17166,7 @@ SceneJS_ChunkFactory.createChunkType({
                 gl.disable(gl.BLEND);
                 frameCtx.blendEnabled = false;
             }
+
             frameCtx.transparent = transparent;
         }
 
@@ -17246,7 +17210,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         // Flush and unbind any render buffer already bound
         if (frameCtx.renderBuf) {
-            gl.finish();
+            gl.flush();
             frameCtx.renderBuf.unbind();
             frameCtx.renderBuf = null;
         }
@@ -17989,10 +17953,6 @@ SceneJS_ChunkFactory.createChunkType({
                 layer = layers[i];
 
                 this._uTexSampler[i] = "SCENEJS_uSampler" + i;
-
-//                this._uTexMatrix[i] = layer.matrixAsArray
-//                        ? draw.getUniform("SCENEJS_uLayer" + i + "Matrix")
-//                        : null;
 
                 this._uTexMatrix[i] = draw.getUniform("SCENEJS_uLayer" + i + "Matrix");
 
