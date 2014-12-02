@@ -43,22 +43,28 @@ var SceneJS_ProgramSourceFactory = new (function () {
     this._composePickingVertexShader = function (states) {
         var morphing = !!states.morphGeometry.targets;
         var src = [
+
             "precision mediump float;",
+
             "attribute vec3 SCENEJS_aVertex;",
             "uniform mat4 SCENEJS_uMMatrix;",
             "uniform mat4 SCENEJS_uVMatrix;",
             "uniform mat4 SCENEJS_uVNMatrix;",
             "uniform mat4 SCENEJS_uPMatrix;"
         ];
+
         src.push("varying vec4 SCENEJS_vWorldVertex;");
         src.push("varying vec4 SCENEJS_vViewVertex;");
+
         if (morphing) {
             src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
             if (states.morphGeometry.targets[0].vertexBuf) {      // target2 has these arrays also
                 src.push("attribute vec3 SCENEJS_aMorphVertex;");
             }
         }
+
         src.push("void main(void) {");
+
         src.push("   vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
         if (morphing) {
             if (states.morphGeometry.targets[0].vertexBuf) {
@@ -66,7 +72,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
         src.push("  SCENEJS_vWorldVertex = SCENEJS_uMMatrix * tmpVertex; ");
+
         src.push("  SCENEJS_vViewVertex = SCENEJS_uVMatrix * SCENEJS_vWorldVertex;");
+
         src.push("  gl_Position =  SCENEJS_uPMatrix * SCENEJS_vViewVertex;");
         src.push("}");
         return src;
@@ -94,6 +102,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform bool  SCENEJS_uClipping;");
 
         if (clipping) {
+
             // World-space clipping planes
             for (var i = 0; i < states.clips.clips.length; i++) {
                 src.push("uniform float SCENEJS_uClipMode" + i + ";");
@@ -113,6 +122,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("void main(void) {");
 
         if (clipping) {
+
             src.push("if (SCENEJS_uClipping) {");
             src.push("  float   dist;");
             for (var i = 0; i < states.clips.clips.length; i++) {
@@ -135,6 +145,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("    } else {");
         src.push("          gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
         src.push("    }");
+
         src.push("}");
 
         return src;
@@ -209,8 +220,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
             "precision mediump float;"
         ];
 
+        src.push("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
+        src.push("uniform mat4 SCENEJS_uVMatrix;");             // View matrix
+        src.push("uniform mat4 SCENEJS_uPMatrix;");             // Projection matrix
+
         src.push("attribute vec3 SCENEJS_aVertex;");            // Model coordinates
+
         src.push("uniform vec3 SCENEJS_uWorldEye;");            // World-space eye position
+
         src.push("varying vec3 SCENEJS_vViewEyeVec;");          // View-space vector from origin to eye
 
         if (normals) {
@@ -218,26 +235,29 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("attribute vec3 SCENEJS_aNormal;");        // Normal vectors
             src.push("uniform   mat4 SCENEJS_uMNMatrix;");      // Model normal matrix
             src.push("uniform   mat4 SCENEJS_uVNMatrix;");      // View normal matrix
+
             src.push("varying   vec3 SCENEJS_vViewNormal;");    // Output view-space vertex normal
 
             if (tangents) {
-
-                // Input for tangents
-
                 src.push("attribute vec4 SCENEJS_aTangent;");
             }
 
             for (var i = 0; i < states.lights.lights.length; i++) {
+
                 var light = states.lights.lights[i];
+
                 if (light.mode == "ambient") {
                     continue;
                 }
+
                 if (light.mode == "dir") {
                     src.push("uniform vec3 SCENEJS_uLightDir" + i + ";");
                 }
+
                 if (light.mode == "point") {
                     src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
+
                 if (light.mode == "spot") {
                     src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
@@ -248,26 +268,22 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (texturing) {
+
             if (states.geometry.uvBuf) {
                 src.push("attribute vec2 SCENEJS_aUVCoord;");      // UV coords
             }
+
             if (states.geometry.uvBuf2) {
                 src.push("attribute vec2 SCENEJS_aUVCoord2;");     // UV2 coords
             }
         }
 
-        /* Vertex color variables
-         */
         if (states.geometry.colorBuf) {
             src.push("attribute vec4 SCENEJS_aVertexColor;");       // UV2 coords
             src.push("varying vec4 SCENEJS_vColor;");               // Varying for fragment texturing
         }
 
-        src.push("uniform mat4 SCENEJS_uMMatrix;");                 // Model matrix
-        src.push("uniform mat4 SCENEJS_uVMatrix;");                 // View matrix
-        src.push("uniform mat4 SCENEJS_uPMatrix;");                 // Projection matrix
-
-        if (clipping || fragmentHooks.worldPos) {
+        if (clipping) {
             src.push("varying vec4 SCENEJS_vWorldVertex;");         // Varying for fragment clip or world pos hook
         }
 
@@ -304,10 +320,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         src.push("  vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
 
-        if (vertexHooks.modelPos) {
-            src.push("  tmpVertex=" + vertexHooks.modelPos + "(tmpVertex);");
-        }
-
         src.push("  vec4 modelVertex = tmpVertex; ");
         if (normals) {
             src.push("  vec4 modelNormal = vec4(SCENEJS_aNormal, 0.0); ");
@@ -327,11 +339,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        src.push("  vec4 worldVertex = SCENEJS_uMMatrix * modelVertex; ");
-
-        if (vertexHooks.worldPos) {
-            src.push("worldVertex=" + vertexHooks.worldPos + "(worldVertex);");
-        }
+        src.push("  vec4 worldVertex = SCENEJS_uMMatrix * modelVertex;");
 
         if (vertexHooks.viewMatrix) {
             src.push("vec4 viewVertex = " + vertexHooks.viewMatrix + "(SCENEJS_uVMatrix) * worldVertex;");
@@ -365,9 +373,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             // Compute tangent-bitangent-normal matrix
 
             src.push("vec3 tangent = normalize((SCENEJS_uVNMatrix * SCENEJS_uMNMatrix * SCENEJS_aTangent).xyz);");
-            src.push("vec3 viewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;"); // TODO: DRY
-            src.push("vec3 bitangent = cross(viewNormal, tangent);");
-            src.push("mat3 TBM = mat3(tangent, bitangent, viewNormal);");
+            src.push("vec3 bitangent = cross(SCENEJS_vViewNormal, tangent);");
+            src.push("mat3 TBM = mat3(tangent, bitangent, SCENEJS_vViewNormal);");
         }
 
         src.push("  vec3 tmpVec3;");
@@ -424,7 +431,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                     if (light.space == "world") {
 
-                        // World space 
+                        // World space
 
                         src.push("tmpVec3 = SCENEJS_uLightPos" + i + " - worldVertex.xyz;"); // Vector from World coordinate to light pos
 
@@ -439,7 +446,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                     } else {
 
-                        // View space 
+                        // View space
 
                         src.push("tmpVec3 = SCENEJS_uLightPos" + i + ".xyz - viewVertex.xyz;"); // Vector from View coordinate to light pos
 
@@ -460,11 +467,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (tangents) {
 
-            // World eye vector to tangent space
             src.push("SCENEJS_vViewEyeVec *= TBM;");
         }
 
-        if (texturing) {                                                        // varyings for fragment texturing
+        if (texturing) {
 
             if (states.geometry.uvBuf) {
                 src.push("SCENEJS_vUVCoord = SCENEJS_aUVCoord;");
@@ -476,7 +482,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (states.geometry.colorBuf) {
-            src.push("SCENEJS_vColor = SCENEJS_aVertexColor;");                 // Varyings for fragment interpolated vertex coloring
+            src.push("SCENEJS_vColor = SCENEJS_aVertexColor;");
         }
         src.push("}");
 
@@ -514,7 +520,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("precision mediump float;");
 
 
-        if (clipping || fragmentHooks.worldPos) {
+        if (clipping) {
             src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
         }
 
@@ -622,11 +628,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         src.push("void main(void) {");
 
-        src.push("  vec3    ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
-
-        /*-----------------------------------------------------------------------------------
-         * Logic - Clipping
-         *----------------------------------------------------------------------------------*/
+        // World-space arbitrary clipping planes
 
         if (clipping) {
             src.push("if (SCENEJS_uClipping) {");
@@ -645,12 +647,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("}");
         }
 
+        src.push("  vec3 ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
+
         if (texturing && states.geometry.uvBuf && fragmentHooks.texturePos) {
             src.push(fragmentHooks.texturePos + "(SCENEJS_vUVCoord);");
-        }
-
-        if (fragmentHooks.worldPos) {
-            src.push(fragmentHooks.worldPos + "(SCENEJS_vWorldVertex);");
         }
 
         if (fragmentHooks.viewPos) {
@@ -697,7 +697,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (tangents) {
                 src.push("  vec3    viewNormalVec = vec3(0.0, 1.0, 0.0);");
             } else {
-                src.push("  vec3    viewNormalVec = SCENEJS_vViewNormal;");
+
+                // Normalize the interpolated normals in the per-fragment-fragment-shader,
+                // because if we linear interpolated two nonparallel normalized vectors, the resulting vector won’t be of length 1
+                src.push("  vec3    viewNormalVec = normalize(SCENEJS_vViewNormal);");
             }
         }
 
@@ -757,10 +760,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     } else if (layer.blendMode == "add") {
                         src.push("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
                     }
-
-                    //=====================================================================
-                    // TODO: "mix" blendMode
-                    //=====================================================================
                 }
 
                 /* Texture output
@@ -809,7 +808,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (normals && cubeMapping) {
             src.push("if (SCENEJS_uReflection) {"); // Flag which can enable/disable reflection
-            src.push("vec3 envLookup = reflect(normalize(SCENEJS_vViewEyeVec), normalize(viewNormalVec));");
+            src.push("vec3 envLookup = reflect(SCENEJS_vViewEyeVec, viewNormalVec);");
             src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
@@ -868,14 +867,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
                             " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine) * attenuation;");
                         src.push("}");
                     }
-                    //src.push("}");
                 }
 
                 if (light.mode == "dir") {
 
                     src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
 
-                    //src.push("if (dotN > 0.0) {");
                     if (light.diffuse) {
                         src.push("if (SCENEJS_uDiffuse) {");
                         src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
@@ -885,11 +882,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (light.specular) {
                         src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
-//                            " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine);");
                             " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine);");
                         src.push("}");
                     }
-                    // src.push("}");
                 }
             }
 
