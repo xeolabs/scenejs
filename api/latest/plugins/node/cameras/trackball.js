@@ -42,7 +42,6 @@ SceneJS.Types.addType("cameras/trackball", {
 
         this._zoom = params.zoom || 1.0;
         this._zoomRange = params.zoomRange; // Can be undefined, then lazy-calculated in _update
-        this._zoomRange = params.zoomRange; // Can be undefined, then lazy-calculated in _update
 
         this._pan = params.pan || [0, 0, 0];
 
