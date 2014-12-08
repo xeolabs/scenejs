@@ -51,20 +51,22 @@ SceneJS_ChunkFactory.createChunkType({
         var transparent = this.core.transparent;
 
         if (frameCtx.transparent != transparent) {
-            if (transparent) {
+            if (!frameCtx.pick) {
+                if (transparent) {
 
-                // Entering a transparency bin
+                    // Entering a transparency bin
 
-                gl.enable(gl.BLEND);
-                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-                frameCtx.blendEnabled = true;
+                    gl.enable(gl.BLEND);
+                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                    frameCtx.blendEnabled = true;
 
-            } else {
+                } else {
 
-                // Leaving a transparency bin
+                    // Leaving a transparency bin
 
-                gl.disable(gl.BLEND);
-                frameCtx.blendEnabled = false;
+                    gl.disable(gl.BLEND);
+                    frameCtx.blendEnabled = false;
+                }
             }
             frameCtx.transparent = transparent;
         }
