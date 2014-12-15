@@ -78,14 +78,22 @@ new (function () {
             indices: data.indices ? new Uint16Array(data.indices) : undefined
         };
 
+        delete data.positions;
+        delete data.normals;
+        delete data.uv;
+        delete data.uv2;
+        delete data.indices;
+        delete data.colors;
+
         // Lazy-build tangents, only when needed as rendering
         core.getTangentBuf = function () {
             if (core.tangentBuf) {
                 return core.tangentBuf;
             }
-            if (data.positions && data.indices && data.uv) {
+            var arrays =  core.arrays;
+            if (arrays.positions && arrays.indices && arrays.uv) {
                 var gl = self._engine.canvas.gl;
-                var tangents = new Float32Array(self._buildTangents(data)); // Build tangents array;
+                var tangents = new Float32Array(self._buildTangents(arrays)); // Build tangents array;
                 core.arrays.tangents = tangents;
                 var usage = gl.STATIC_DRAW;
                 return core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, usage);
@@ -227,7 +235,7 @@ new (function () {
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
             var arrays = core.arrays;
-            var canInterleave = (SceneJS.getConfigs("enableInterleaving") !== false) && !arrays.tangents;
+            var canInterleave = (SceneJS.getConfigs("enableInterleaving") !== false);
             var dataLength = 0;
             var interleavedValues = 0;
             var interleavedArrays = [];
@@ -395,15 +403,15 @@ new (function () {
      *
      * @private
      **/
-    SceneJS.Geometry.prototype._buildTangents = function (data) {
+    SceneJS.Geometry.prototype._buildTangents = function (arrays) {
 
-        var positions = data.positions;
-        var indices = data.indices;
-        var uv = data.uv;
+        var positions = arrays.positions;
+        var indices = arrays.indices;
+        var uv = arrays.uv;
 
         var tangents = [];
 
-        // The vertex data needs to be calculated
+        // The vertex arrays needs to be calculated
         // before the calculation of the tangents
 
         for (var location = 0; location < indices.length; location += 3) {
@@ -456,13 +464,13 @@ new (function () {
 
         // Deconstruct the vectors back into 1D arrays for WebGL
 
-        data.tangents = [];
+        var tangents2 = [];
 
         for (var i = 0; i < tangents.length; i++) {
-            data.tangents = data.tangents.concat(tangents[i]);
+            tangents2 = tangents2.concat(tangents[i]);
         }
 
-        return data.tangents;
+        return tangents2;
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {

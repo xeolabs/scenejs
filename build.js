@@ -226,11 +226,9 @@
     sys.print("Generating file list\n");
 
     var getFileList = function (list, all) {
-
         if (!list) {
             list = [];
         }
-
         for (var flag in FLAGS) {
             if ((FLAGS[flag] || all) && FILES[flag]) {
                 for (var i = 0; i < FILES[flag].length; i++) {
@@ -240,7 +238,6 @@
                 }
             }
         }
-
         return list;
     };
 
@@ -255,7 +252,8 @@
     var productionBuild = true;
 
     var distDir = "api/" + (productionBuild ? "latest" : "dev");
-  //var distDir = "/media/lindsay/3d58a38b-6943-4956-9cd2-94656da3c188/xeolabs/human-web6/human-web/lib/scenejs";
+  //  var distDir = "../human-web/lib/scenejs/";
+//  var distDir = "/media/lindsay/3d58a38b-6943-4956-9cd2-94656da3c188/xeolabs/human-web6/human-web/lib/scenejs";
     var distPluginDir = distDir + "/plugins";
     var distExtrasDir = distDir + "/extras";
 
