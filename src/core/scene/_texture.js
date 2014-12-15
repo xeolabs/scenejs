@@ -216,6 +216,12 @@ new (function () {
             image.onload = function () {
                 var texture = gl.createTexture();
                 gl.bindTexture(gl.TEXTURE_2D, texture);
+
+                var maxTextureSize = SceneJS_configsModule.configs.maxTextureSize;
+                if (maxTextureSize) {
+                    image = SceneJS._webgl.clampImageSize(image, maxTextureSize);
+                }
+
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self._ensureImageSizePowerOfTwo(image));
                 self._setLayerTexture(gl, layer, texture);
                 SceneJS_sceneStatusModule.taskFinished(taskId);

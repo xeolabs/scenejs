@@ -2124,6 +2124,8 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
 
         var time = (new Date()).getTime();
 
+        var force =  params && params.force;
+
         // Render the scene once for each pass
         for (var i = 0; i < this._numPasses; i++) {
 
@@ -2139,7 +2141,7 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
             // Clear buffers only on first frame
             this.display.render({
                 clear: i == 0,
-                force: params.force
+                force: force
             });
 
             // Notify that render completed
@@ -5720,6 +5722,27 @@ SceneJS._webgl.Texture2D = function (gl, cfg) {
     };
 };
 
+SceneJS._webgl.clampImageSize = function (image, numPixels) {
+    var n = image.width * image.height;
+    if (n > numPixels) {
+        var ratio = numPixels / n;
+
+        var width = image.width * ratio;
+        var height = image.height * ratio;
+
+        var canvas = document.createElement("canvas");
+
+        canvas.width = SceneJS._webgl.nextHighestPowerOfTwo(width);
+        canvas.height = SceneJS._webgl.nextHighestPowerOfTwo(height);
+
+        var ctx = canvas.getContext("2d");
+
+        ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
+
+        image = canvas;
+    }
+    return image;
+};
 
 SceneJS._webgl.ensureImageSizePowerOfTwo = function (image) {
     if (!SceneJS._webgl.isPowerOfTwo(image.width) || !SceneJS._webgl.isPowerOfTwo(image.height)) {
@@ -8580,14 +8603,22 @@ new (function () {
             indices: data.indices ? new Uint16Array(data.indices) : undefined
         };
 
+        delete data.positions;
+        delete data.normals;
+        delete data.uv;
+        delete data.uv2;
+        delete data.indices;
+        delete data.colors;
+
         // Lazy-build tangents, only when needed as rendering
         core.getTangentBuf = function () {
             if (core.tangentBuf) {
                 return core.tangentBuf;
             }
-            if (data.positions && data.indices && data.uv) {
+            var arrays =  core.arrays;
+            if (arrays.positions && arrays.indices && arrays.uv) {
                 var gl = self._engine.canvas.gl;
-                var tangents = new Float32Array(self._buildTangents(data)); // Build tangents array;
+                var tangents = new Float32Array(self._buildTangents(arrays)); // Build tangents array;
                 core.arrays.tangents = tangents;
                 var usage = gl.STATIC_DRAW;
                 return core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, usage);
@@ -8729,7 +8760,7 @@ new (function () {
         try { // TODO: Modify usage flags in accordance with how often geometry is evicted
 
             var arrays = core.arrays;
-            var canInterleave = (SceneJS.getConfigs("enableInterleaving") !== false) && !arrays.tangents;
+            var canInterleave = (SceneJS.getConfigs("enableInterleaving") !== false);
             var dataLength = 0;
             var interleavedValues = 0;
             var interleavedArrays = [];
@@ -8897,15 +8928,15 @@ new (function () {
      *
      * @private
      **/
-    SceneJS.Geometry.prototype._buildTangents = function (data) {
+    SceneJS.Geometry.prototype._buildTangents = function (arrays) {
 
-        var positions = data.positions;
-        var indices = data.indices;
-        var uv = data.uv;
+        var positions = arrays.positions;
+        var indices = arrays.indices;
+        var uv = arrays.uv;
 
         var tangents = [];
 
-        // The vertex data needs to be calculated
+        // The vertex arrays needs to be calculated
         // before the calculation of the tangents
 
         for (var location = 0; location < indices.length; location += 3) {
@@ -8958,13 +8989,13 @@ new (function () {
 
         // Deconstruct the vectors back into 1D arrays for WebGL
 
-        data.tangents = [];
+        var tangents2 = [];
 
         for (var i = 0; i < tangents.length; i++) {
-            data.tangents = data.tangents.concat(tangents[i]);
+            tangents2 = tangents2.concat(tangents[i]);
         }
 
-        return data.tangents;
+        return tangents2;
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
@@ -12695,6 +12726,12 @@ new (function () {
             image.onload = function () {
                 var texture = gl.createTexture();
                 gl.bindTexture(gl.TEXTURE_2D, texture);
+
+                var maxTextureSize = SceneJS_configsModule.configs.maxTextureSize;
+                if (maxTextureSize) {
+                    image = SceneJS._webgl.clampImageSize(image, maxTextureSize);
+                }
+
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self._ensureImageSizePowerOfTwo(image));
                 self._setLayerTexture(gl, layer, texture);
                 SceneJS_sceneStatusModule.taskFinished(taskId);
@@ -13143,9 +13180,15 @@ new (function () {
 
         var texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
+
+        var maxTextureSize = SceneJS_configsModule.configs.maxTextureSize;
+        if (maxTextureSize) {
+            image = SceneJS._webgl.clampImageSize(image, maxTextureSize);
+        }
+
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, SceneJS._webgl.ensureImageSizePowerOfTwo(image));
 
-    //    this._core.image = image;
+        this._core.image = image;
 
         this._core.texture = new SceneJS._webgl.Texture2D(gl, {
             texture: texture, // WebGL texture object
@@ -15320,7 +15363,6 @@ SceneJS_Display.prototype._unpackDepth = function (depthZ) {
     return SceneJS_math_dotVector4(vec, bitShift);
 };
 
-
 /** Renders either the draw or pick list.
  *
  * @param {*} params
@@ -15379,13 +15421,17 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     gl.disable(gl.CULL_FACE);
     gl.disable(gl.BLEND);
 
-    if (params.rayPickObject) {
-        extracted2.call(this, pickObject, frameCtx);
+    if (params.pick) {
+        // Render for pick
+        for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
+            this._pickDrawList[i].pick(frameCtx);
+        }
     } else {
-        extracted.call(this, params, frameCtx);
+        // Render for draw
+        for (var i = 0, len = this._drawListLen; i < len; i++) {      // Push opaque rendering chunks
+            this._drawList[i].draw(frameCtx);
+        }
     }
-
-
 
     gl.flush();
 
@@ -15806,7 +15852,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (vertexHooks.projMatrix) {
             src.push("gl_Position = " + vertexHooks.projMatrix + "(SCENEJS_uPMatrix) * viewVertex;");
-
         } else {
             src.push("  gl_Position = SCENEJS_uPMatrix * viewVertex;");
         }
@@ -15927,7 +15972,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (states.geometry.colorBuf) {
             src.push("SCENEJS_vColor = SCENEJS_aVertexColor;");
         }
-
         src.push("}");
 
         return src;
@@ -17042,7 +17086,6 @@ SceneJS_ChunkFactory.createChunkType({
             if (frameCtx.pick) {
                 mode = vars[i].uClipMode;
                 normalAndDist = vars[i].uClipNormalAndDist;
-
             } else {
                 mode = vars[i].uClipMode;
                 normalAndDist = vars[i].uClipNormalAndDist;
@@ -17062,8 +17105,7 @@ SceneJS_ChunkFactory.createChunkType({
                     gl.uniform1f(mode, 1);
                     gl.uniform4fv(normalAndDist, clip.normalAndDist);
 
-                } else {
-
+                } else { // disabled
                     gl.uniform1f(mode, 0);
                 }
             }
@@ -17150,23 +17192,23 @@ SceneJS_ChunkFactory.createChunkType({
         var transparent = this.core.transparent;
 
         if (frameCtx.transparent != transparent) {
+            if (!frameCtx.pick) {
+                if (transparent) {
 
-            if (transparent) {
+                    // Entering a transparency bin
 
-                // Entering a transparency bin
+                    gl.enable(gl.BLEND);
+                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                    frameCtx.blendEnabled = true;
 
-                gl.enable(gl.BLEND);
-                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-                frameCtx.blendEnabled = true;
+                } else {
 
-            } else {
+                    // Leaving a transparency bin
 
-                // Leaving a transparency bin
-
-                gl.disable(gl.BLEND);
-                frameCtx.blendEnabled = false;
+                    gl.disable(gl.BLEND);
+                    frameCtx.blendEnabled = false;
+                }
             }
-
             frameCtx.transparent = transparent;
         }
 

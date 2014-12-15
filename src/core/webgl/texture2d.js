@@ -89,6 +89,27 @@ SceneJS._webgl.Texture2D = function (gl, cfg) {
     };
 };
 
+SceneJS._webgl.clampImageSize = function (image, numPixels) {
+    var n = image.width * image.height;
+    if (n > numPixels) {
+        var ratio = numPixels / n;
+
+        var width = image.width * ratio;
+        var height = image.height * ratio;
+
+        var canvas = document.createElement("canvas");
+
+        canvas.width = SceneJS._webgl.nextHighestPowerOfTwo(width);
+        canvas.height = SceneJS._webgl.nextHighestPowerOfTwo(height);
+
+        var ctx = canvas.getContext("2d");
+
+        ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
+
+        image = canvas;
+    }
+    return image;
+};
 
 SceneJS._webgl.ensureImageSizePowerOfTwo = function (image) {
     if (!SceneJS._webgl.isPowerOfTwo(image.width) || !SceneJS._webgl.isPowerOfTwo(image.height)) {
