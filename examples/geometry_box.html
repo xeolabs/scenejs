@@ -34,14 +34,11 @@
     SceneJS.createScene({
         nodes:[
 
-            // Asset viewing environment, implemented by plugin at
-            // http://scenejs.org/api/latest/plugins/node/environments/assetViewer.js
+            // Mouse-quaternion-orbited camera using
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/trackball.js
             {
-                type:"environments/modelView",
-                yaw:30,
-                pitch:-30,
-                zoom:5,
-                zoomSensitivity:10.0,
+                type: "cameras/trackball",
+                eye: { x: 4, y: 4, z: -4.0 },
 
                 nodes:[
                     {

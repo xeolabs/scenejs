@@ -20,7 +20,8 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - <a href="../api/latest/plugins/node/geometry/heightmap.js" target="_other">heightmap</a> geometry
+    <a href="http://scenejs.org">SceneJS</a> - <a href="../api/latest/plugins/node/geometry/heightmap.js"
+                                                  target="_other">heightmap</a> geometry
     <br>
     <br>
     click somewhere on the terrain
@@ -44,12 +45,12 @@
                     // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbitPick.js
                     {
                         type: "cameras/pickFlyOrbit",
-                        yaw: -40,
-                        pitch: -20,
+                        yaw: 80,
+                        pitch: -40,
                         maxPitch: -10,
                         minPitch: -80,
-                        zoom: 1000,
-                        eye: { x: 0, y: 150, z: -1000 },
+                        zoom: 1800,
+                        eye: { x: 0, y: 550, z: -1500 },
                         look: { x: 0, y: 150, z: 0 },
                         zoomSensitivity: 20.0,
                         showCursor: true,
@@ -57,33 +58,59 @@
 
                         nodes: [
 
-                            // Blue color
+                            // Override default lights with a single positional light source in World-space.
+                            // Since our light is in World-space, it will move relative to our changing viewpoint, as if it
+                            // were a fixture in the scene.
                             {
-                                type: "material",
-                                color: { r: 0.5, g: 0.5, b: 0.6 },
-                                specular: 0.2,
-
+                                type: "lights",
+                                id: "myLights",
+                                lights: [
+                                    {
+                                        mode: "ambient",
+                                        color: {r: 0.4, g: 0.4, b: 0.6 }
+                                    },
+                                    {
+                                        mode: "dir",
+                                        color: {r: 1.0, g: 1.0, b: 1.0 },
+                                        diffuse: true,
+                                        specular: true,
+                                        dir: {x: 0.7, y: -0.5, z: -0.5 },
+                                        space: "world"
+                                    }
+                                ],
                                 nodes: [
 
-                                    // Heightmap, implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+                                    // Blue color
                                     {
-                                        type: "geometry/heightmap",
+                                        type: "material",
+                                        color: { r: 0.6, g: 0.6, b: 0.7 },
+                                        specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                        specular: 0.7,
+                                        shine: 100,
 
-                                        // Texture image
-                                        src: 'textures/terrainHeightMap.png',
+                                        nodes: [
 
-                                        // Wireframe or solid - default is false
-                                        wire: false,
+                                            // Heightmap, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+                                            {
+                                                type: "geometry/heightmap",
 
-                                        // Dimensions
-                                        xSize: 2000,
-                                        zSize: 2000,
-                                        ySize: 1000,
+                                                // Texture image
+                                                src: 'textures/terrainHeightMap.png',
 
-                                        // Segments on X and Z axis
-                                        xSegments: 200,
-                                        zSegments: 200
+                                                // Wireframe or solid - default is false
+                                                wire: false,
+
+                                                // Dimensions
+                                                xSize: 2000,
+                                                zSize: 2000,
+                                                ySize: 800,
+
+                                                // Segments on X and Z axis
+                                                xSegments: 150,
+                                                zSegments: 150
+                                            }
+                                        ]
                                     }
                                 ]
                             }

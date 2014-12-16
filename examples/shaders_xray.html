@@ -107,38 +107,38 @@
 
                 // DAT GUI menu to play with the xray node's properties
 
-                var Menu = function () {
-
-                    this.enabled = xray.getEnabled();
-                    this.opacity = xray.getOpacity();
-                    this.monochrome = xray.getMonochrome();
-                    this.glassFactor = xray.getGlassFactor();
-
-                    var self = this;
-
-                    var update = function () {
-
-                        xray.setEnabled(self.enabled);
-                        xray.setOpacity(self.opacity);
-                        xray.setMonochrome(self.monochrome);
-                        xray.setGlassFactor(self.glassFactor);
-
-                        requestAnimationFrame(update);
-                    };
-
-                    update();
-                };
-
-                var gui = new dat.GUI();
-                var menu = new Menu();
-                var direction = gui.addFolder("Properties of the 'postprocess/xray' node");
-
-                direction.add(menu, 'enabled');
-                direction.add(menu, 'opacity', 0.0, 1.0);
-                direction.add(menu, 'monochrome');
-                direction.add(menu, 'glassFactor', 0.0, 1.0);
-
-                direction.open();
+//                var Menu = function () {
+//
+//                    this.enabled = xray.getEnabled();
+//                    this.opacity = xray.getOpacity();
+//                    this.monochrome = xray.getMonochrome();
+//                    this.glassFactor = xray.getGlassFactor();
+//
+//                    var self = this;
+//
+//                    var update = function () {
+//
+//                        xray.setEnabled(self.enabled);
+//                        xray.setOpacity(self.opacity);
+//                        xray.setMonochrome(self.monochrome);
+//                        xray.setGlassFactor(self.glassFactor);
+//
+//                        requestAnimationFrame(update);
+//                    };
+//
+//                    update();
+//                };
+//
+//                var gui = new dat.GUI();
+//                var menu = new Menu();
+//                var direction = gui.addFolder("Properties of the 'postprocess/xray' node");
+//
+//                direction.add(menu, 'enabled');
+//                direction.add(menu, 'opacity', 0.0, 1.0);
+//                direction.add(menu, 'monochrome');
+//                direction.add(menu, 'glassFactor', 0.0, 1.0);
+//
+//                direction.open();
             });
 
 </script>

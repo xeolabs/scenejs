@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - <a href="../api/latest/plugins/node/import/obj.js" target="_other">OBJ</a> importer
+    <br>
+    learn more in <a href="http://xeolabs.com/articles/scenejs-obj-md2-3ds/" target="_other">this tutorial</a>
+</div>
+
+<script>
+
+    // Using the "import/obj" node to import a duck mesh from .OBJ format
+    // Internally, the node uses the K3D library for parsing - http://k3d.ivank.net/
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene
+    SceneJS.createScene({
+                nodes: [
+
+                    // Mouse-orbited camera,
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                    {
+                        type: "cameras/orbit",
+                        yaw: -40,
+                        pitch: -20,
+                        zoom: 60,
+                        zoomSensitivity: 10.0,
+
+                        nodes: [
+
+                            // Blue material
+                            {
+                                type: "material",
+                                color: { r: 0.6, g: 0.6, b: 1.0 },
+
+                                nodes: [
+
+                                    // Import the .OBJ mesh
+                                    //
+                                    // This node is implemented by plugin at:
+                                    // http://scenejs.org/api/latest/plugins/node/import/obj.js
+                                    //
+                                    //
+                                    // The OBJ file is loaded from:
+                                    // http://scenejs.org/examples/models/obj/duck.obj
+
+                                    {
+                                        type: "import/obj",
+                                        src: "models/mosh/scans/50002_scan.obj"
+                                    }
+
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    );
+
+</script>
+</body>
+</html>

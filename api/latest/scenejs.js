@@ -13410,16 +13410,20 @@ new (function () {
                 if (params.blendMode != "add" && params.blendMode != "multiply") {
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "reflection blendMode value is unsupported - " +
+                            "reflection blendMode value is unsupported - " +
                             "should be either 'add' or 'multiply'");
                 }
             }
+
             this._core.blendMode = params.blendMode || "multiply";
             this._core.intensity = (params.intensity != undefined && params.intensity != null) ? params.intensity : 1.0;
             this._core.applyTo = "reflect";
+
             var self = this;
+
             var gl = this._engine.canvas.gl;
             var texture = gl.createTexture();
+
             var faces = [
                 gl.TEXTURE_CUBE_MAP_POSITIVE_X,
                 gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
@@ -13428,21 +13432,37 @@ new (function () {
                 gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
                 gl.TEXTURE_CUBE_MAP_NEGATIVE_Z
             ];
+
+            var images = [];
             var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading reflection texture");
-            var numImagesLoaded = 0;
             var loadFailed = false;
+
             for (var i = 0; i < faces.length; i++) {
-                var face = faces[i];
+
                 var image = new Image();
-                image.onload = function (face, image) {
+
+                image.onload = (function() {
+
+                    var _image = image;
+
                     return function () {
+
                         if (loadFailed) {
                             return;
                         }
-                        gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
-                        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
-                        gl.texImage2D(face, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, SceneJS._webgl.ensureImageSizePowerOfTwo(image));
-                        if (++numImagesLoaded == faces.length) {
+
+                        images.push(_image);
+
+                        if (images.length == faces.length) {
+
+                            gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+                            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+
+                            for (var j = 0, lenj = images.length; j < lenj; j++) {
+                                gl.texImage2D(faces[j], 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,
+                                    SceneJS._webgl.ensureImageSizePowerOfTwo(images[j]));
+                            }
+
                             self._core.texture = new SceneJS._webgl.Texture2D(gl, {
                                 texture: texture,
                                 target: gl.TEXTURE_CUBE_MAP,
@@ -13451,15 +13471,19 @@ new (function () {
                                 wrapS: gl.CLAMP_TO_EDGE,
                                 wrapT: gl.CLAMP_TO_EDGE
                             });
+
                             SceneJS_sceneStatusModule.taskFinished(taskId);
+
                             self._engine.display.imageDirty = true;
                         }
-                    }
-                }(face, image);
+                    };
+                })();
+
                 image.onerror = function () {
                     loadFailed = true;
                     SceneJS_sceneStatusModule.taskFailed(taskId);
                 };
+
                 image.src = params.src[i];
             }
         }
@@ -15453,35 +15477,6 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 //        gl.bindTexture(gl.TEXTURE_2D, null);
 //    }
 };
-
-function extracted(params, frameCtx) {
-    if (params.pick) {
-        // Render for pick
-        for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
-            this._pickDrawList[i].pick(frameCtx);
-        }
-    } else {
-        // Render for draw
-        for (var i = 0, len = this._drawListLen; i < len; i++) {      // Push opaque rendering chunks
-            this._drawList[i].draw(frameCtx);
-        }
-    }
-}
-
-
-function extracted2(object, frameCtx) {
-    var chunks = object.chunks;
-    var chunk;
-    for (var i = 0, len = chunks.length; i < len; i++) {
-        chunk = chunks[i];
-        if (chunk) {
-            if (chunk.pick) {
-                chunk.pick(frameCtx);
-            }
-        }
-    }
-}
-
 
 SceneJS_Display.prototype.destroy = function () {
     this._programFactory.destroy();

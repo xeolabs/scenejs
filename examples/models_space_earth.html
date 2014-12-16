@@ -27,7 +27,7 @@
     This Earth is implemented by the <a href="../api/latest/plugins/node/models/space/planets/earth.js" target="_other">models/space/planets/earth</a>
     node,<br>
     which demonstrates multiple textures layered onto the same geometry: a <a href="index.html#texture_color"
-                                                                                  target="_top">color map</a> for land
+                                                                              target="_top">color map</a> for land
     and sea,<br>
     <a href="index.html#texture_specular" target="_top">specular map</a> to create shiny areas, a <a
         href="index.html#texture_emit" target="_top">glow map</a> for lights on the night side, and an <a
@@ -53,11 +53,16 @@
                 type: "lights",
                 lights: [
                     {
+                        mode: "ambient",
+                        color: { r: 0.06, g: 0.06, b: 0.1 }
+                    },
+                    {
                         mode: "dir",
                         color: { r: 1.0, g: 1.0, b: 1.0 },
                         diffuse: true,
                         specular: true,
-                        dir: { x: -0.5, y: -0.5, z: -0.75 }
+                        dir: { x: -0.5, y: -0.5, z: -0.75 },
+                        space: "view"
                     }
                 ],
                 nodes: [
@@ -75,8 +80,6 @@
 
                         nodes: [
 
-                            // Planet Earth,
-                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/models/space/planets/earth.js
                             {
                                 type: "models/space/planets/earth"
                             }

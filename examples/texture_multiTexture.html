@@ -22,11 +22,12 @@
     <a href="http://scenejs.org" target="_other">SceneJS</a> - multitexturing demo
     <br><br>
     This Earth demonstrates multiple textures layered onto the same geometry: a <a href="index.html#texture_color"
-                                                                              target="_top">color map</a> for land
+                                                                                   target="_top">color map</a> for land
     and sea,<br>
+    <a href="index.html#texture_normal" target="_top">normal map</a> to create bumpiness, a
     <a href="index.html#texture_specular" target="_top">specular map</a> to create shiny areas, a <a
-        href="index.html#texture_emit" target="_top">glow map</a> for lights on the night side, and an <a
-        href="index.html#texture_alpha" target="_top">alpha map</a> for the cloud layer,<br>
+        href="index.html#texture_emit" target="_top">glow map</a> for lights on the night side,<br> and an <a
+        href="index.html#texture_alpha" target="_top">alpha map</a> for the cloud layer,
     applied to a white spinning outer <a href="index.html#geometry_sphere" target="_top">sphere</a>.
 </div>
 
@@ -115,28 +116,39 @@ var scene = SceneJS.createScene({
 
                                                                     nodes: [
 
-                                                                        // Specular map for shiny oceans
+                                                                        // Normal map
                                                                         {
                                                                             type: "texture",
-                                                                            src: "textures/earth-specular.png",
-                                                                            applyTo: "specular",
+                                                                            coreId: this.type + ".normal",
+                                                                            src: "textures/bumpearthTexture.jpg",
+                                                                            applyTo: "normals",
 
                                                                             nodes: [
 
-                                                                                // Glow map for lights on night side
+                                                                                // Specular map for shiny oceans
                                                                                 {
                                                                                     type: "texture",
-                                                                                    src: "textures/earth-lights.gif",
-                                                                                    applyTo: "emit",
+                                                                                    src: "textures/earth-specular.png",
+                                                                                    applyTo: "specular",
 
                                                                                     nodes: [
 
-                                                                                        // Sphere geometry node implemented by plugin at
-                                                                                        // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                                                        // Glow map for lights on night side
                                                                                         {
-                                                                                            type: "geometry/sphere",
-                                                                                            latitudeBands: 120,
-                                                                                            longitudeBands: 120
+                                                                                            type: "texture",
+                                                                                            src: "textures/earth-lights.gif",
+                                                                                            applyTo: "emit",
+
+                                                                                            nodes: [
+
+                                                                                                // Sphere geometry node implemented by plugin at
+                                                                                                // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                                                                {
+                                                                                                    type: "geometry/sphere",
+                                                                                                    latitudeBands: 120,
+                                                                                                    longitudeBands: 120
+                                                                                                }
+                                                                                            ]
                                                                                         }
                                                                                     ]
                                                                                 }

@@ -35,13 +35,11 @@
     SceneJS.createScene({
         nodes:[
 
-            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            // Mouse-quaternion-orbited camera using
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/trackball.js
             {
-                type:"cameras/orbit",
-                yaw:30,
-                pitch:-30,
-                zoom:10,
-                zoomSensitivity:1.0,
+                type: "cameras/trackball",
+                eye: { x: 4, y: 4, z: -10.0 },
 
                 nodes:[
                     {
