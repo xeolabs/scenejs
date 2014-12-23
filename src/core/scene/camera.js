@@ -125,12 +125,13 @@
                         "supported types are 'perspective', 'frustum' and 'ortho'");
             }
         }
+        this._core.optics.pan = optics.pan;
         rebuildCore(this._core);
         this.publish("matrix", this._core.matrix);
         this._engine.display.imageDirty = true;
     };
 
-    function rebuildCore (core) {
+    function rebuildCore(core) {
         var optics = core.optics;
         if (optics.type == "ortho") {
             core.matrix = SceneJS_math_orthoMat4c(
@@ -157,6 +158,14 @@
                 optics.near,
                 optics.far);
         }
+
+        if (optics.pan) {
+            // Post-multiply a screen-space pan
+            var pan = optics.pan;
+            var panMatrix = SceneJS_math_translationMat4v([pan.x || 0, pan.y || 0, pan.z || 0]);
+            core.matrix = SceneJS_math_mulMat4(panMatrix, core.matrix, []);
+        }
+
         if (!core.mat) {
             core.mat = new Float32Array(core.matrix);
         } else {
