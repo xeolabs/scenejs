@@ -7857,12 +7857,13 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
                         "supported types are 'perspective', 'frustum' and 'ortho'");
             }
         }
+        this._core.optics.pan = optics.pan;
         rebuildCore(this._core);
         this.publish("matrix", this._core.matrix);
         this._engine.display.imageDirty = true;
     };
 
-    function rebuildCore (core) {
+    function rebuildCore(core) {
         var optics = core.optics;
         if (optics.type == "ortho") {
             core.matrix = SceneJS_math_orthoMat4c(
@@ -7889,6 +7890,14 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
                 optics.near,
                 optics.far);
         }
+
+        if (optics.pan) {
+            // Post-multiply a screen-space pan
+            var pan = optics.pan;
+            var panMatrix = SceneJS_math_translationMat4v([pan.x || 0, pan.y || 0, pan.z || 0]);
+            core.matrix = SceneJS_math_mulMat4(panMatrix, core.matrix, []);
+        }
+
         if (!core.mat) {
             core.mat = new Float32Array(core.matrix);
         } else {
@@ -8964,7 +8973,7 @@ new (function () {
             var deltaUV1 = SceneJS_math_subVec2(uv1, uv0, []);
             var deltaUV2 = SceneJS_math_subVec2(uv2, uv0, []);
 
-            var r = 1 / ((deltaUV1[0] * deltaUV2[1]) - (deltaUV1[1] * deltaUV2[0]));
+            var r = 1.0 / ((deltaUV1[0] * deltaUV2[1]) - (deltaUV1[1] * deltaUV2[0]));
 
             var tangent = SceneJS_math_mulVec3Scalar(
                 SceneJS_math_subVec3(
@@ -9191,7 +9200,7 @@ new (function () {
 
             core.hash = ([                           // Safe to build geometry hash here - geometry is immutable
                 core.normalBuf ? "t" : "f",
-                core.arrays && core.arrays.tangents ? "t" : "f",
+                    core.arrays && core.arrays.tangents ? "t" : "f",
                 core.uvBuf ? "t" : "f",
                 core.uvBuf2 ? "t" : "f",
                 core.colorBuf ? "t" : "f",
@@ -12798,8 +12807,8 @@ new (function () {
             flipY:this._getOption(layer.flipY, true),
             width:this._getOption(layer.width, 1),
             height:this._getOption(layer.height, 1),
-            internalFormat:this._getGLOption("internalFormat", gl, layer, gl.LEQUAL),
-            sourceFormat:this._getGLOption("sourceType", gl, layer, gl.ALPHA),
+            internalFormat:this._getGLOption("internalFormat", gl, layer, gl.ALPHA),
+            sourceFormat:this._getGLOption("sourceFormat", gl, layer, gl.ALPHA),
             sourceType:this._getGLOption("sourceType", gl, layer, gl.UNSIGNED_BYTE),
             update:null
         });
@@ -13203,8 +13212,8 @@ new (function () {
             flipY: this._getOption(this._core.flipY, true),
             width: this._getOption(this._core.width, 1),
             height: this._getOption(this._core.height, 1),
-            internalFormat: this._getGLOption("internalFormat", gl.LEQUAL),
-            sourceFormat: this._getGLOption("sourceType", gl.ALPHA),
+            internalFormat: this._getGLOption("internalFormat", gl.ALPHA),
+            sourceFormat: this._getGLOption("sourceFormat", gl.ALPHA),
             sourceType: this._getGLOption("sourceType", gl.UNSIGNED_BYTE),
             update: null
         });
