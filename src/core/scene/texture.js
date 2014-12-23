@@ -198,8 +198,8 @@ new (function () {
             flipY: this._getOption(this._core.flipY, true),
             width: this._getOption(this._core.width, 1),
             height: this._getOption(this._core.height, 1),
-            internalFormat: this._getGLOption("internalFormat", gl.LEQUAL),
-            sourceFormat: this._getGLOption("sourceType", gl.ALPHA),
+            internalFormat: this._getGLOption("internalFormat", gl.ALPHA),
+            sourceFormat: this._getGLOption("sourceFormat", gl.ALPHA),
             sourceType: this._getGLOption("sourceType", gl.UNSIGNED_BYTE),
             update: null
         });
