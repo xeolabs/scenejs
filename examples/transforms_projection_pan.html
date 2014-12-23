@@ -22,7 +22,8 @@
     <br>
     <br>
     The "camera" node supports an optional "pan" vector to translate the model in Screen-space,<br>
-    after the projection transform is applied. This is useful when we want to offset the model from the point-of-interest.
+    after the projection transform is applied. This is useful when we want to offset the model from the
+    point-of-interest.
     <br>
     <br>
     In this example, we're translating the box by [0.0, 0.0, 0.5], which positions it in the<br>
@@ -65,12 +66,12 @@
                             fovy: 45.0,
                             aspect: 1.0,
                             near: 0.1,
-                            far: 5000.0,
-
-                            // Pan on X-axis in Screen-space, which is a unit cube
-                            // between [-1.0,-1,0, -1.0] and [1.0, 1,0, 1.0]
-                            pan: { x: 0.5 }
+                            far: 5000.0
                         },
+
+                        // Pan on X-axis in Screen-space, which is a unit cube
+                        // between [-1.0,-1,0, -1.0] and [1.0, 1,0, 1.0]
+                        pan: { x: 0.5 },
 
                         nodes: [
 

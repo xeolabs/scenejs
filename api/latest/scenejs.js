@@ -7786,6 +7786,10 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             params.optics.aspect = canvas.width / canvas.height;
             this.setOptics(params.optics); // Can be undefined
 
+            if (params.pan) {
+                this.setPan(params.pan);
+            }
+
             var self = this;
 
             this._canvasSizeSub = this.getScene().on("canvasSize",
@@ -7863,6 +7867,13 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.imageDirty = true;
     };
 
+    SceneJS.Camera.prototype.setPan = function (pan) {
+        this._core.pan = pan;
+        rebuildCore(this._core);
+        this.publish("matrix", this._core.matrix);
+        this._engine.display.imageDirty = true;
+    };
+
     function rebuildCore(core) {
         var optics = core.optics;
         if (optics.type == "ortho") {
@@ -7891,9 +7902,9 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
                 optics.far);
         }
 
-        if (optics.pan) {
+        if (core.pan) {
             // Post-multiply a screen-space pan
-            var pan = optics.pan;
+            var pan = core.pan;
             var panMatrix = SceneJS_math_translationMat4v([pan.x || 0, pan.y || 0, pan.z || 0]);
             core.matrix = SceneJS_math_mulMat4(panMatrix, core.matrix, []);
         }
@@ -8599,6 +8610,30 @@ new (function () {
             }
         }
 
+        var truncateDecimals = function (number, digits) {
+            var multiplier = Math.pow(10, digits),
+                adjustedNum = number * multiplier,
+                truncatedNum = Math[adjustedNum < 0 ? 'ceil' : 'floor'](adjustedNum);
+
+            return truncatedNum / multiplier;
+        };
+
+        if (data.normals) {
+            for (var i = 0, len = data.normals; i < len; i += 3) {
+//                var v = SceneJS_math_normalizeVec3([data.normals[i], data.normals[i + 1], data.normals[i + 2]], []);
+//                data.normals[i] = v[0];
+//                data.normals[i + 1] = v[1];
+//                data.normals[i + 2] = v[2];
+            }
+        }
+
+//        if (data.uv) {
+//            for (var i = 0, len = data.uv.length; i < len; i++) {
+//                data.uv[i] = truncateDecimals(data.uv[i], 3);
+//            }
+//        }
+
+
         // Create typed arrays, apply any baked transforms
         core.arrays = {
             positions: data.positions
@@ -8624,7 +8659,7 @@ new (function () {
             if (core.tangentBuf) {
                 return core.tangentBuf;
             }
-            var arrays =  core.arrays;
+            var arrays = core.arrays;
             if (arrays.positions && arrays.indices && arrays.uv) {
                 var gl = self._engine.canvas.gl;
                 var tangents = new Float32Array(self._buildTangents(arrays)); // Build tangents array;

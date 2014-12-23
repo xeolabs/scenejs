@@ -54,6 +54,10 @@
             params.optics.aspect = canvas.width / canvas.height;
             this.setOptics(params.optics); // Can be undefined
 
+            if (params.pan) {
+                this.setPan(params.pan);
+            }
+
             var self = this;
 
             this._canvasSizeSub = this.getScene().on("canvasSize",
@@ -131,6 +135,13 @@
         this._engine.display.imageDirty = true;
     };
 
+    SceneJS.Camera.prototype.setPan = function (pan) {
+        this._core.pan = pan;
+        rebuildCore(this._core);
+        this.publish("matrix", this._core.matrix);
+        this._engine.display.imageDirty = true;
+    };
+
     function rebuildCore(core) {
         var optics = core.optics;
         if (optics.type == "ortho") {
@@ -159,9 +170,9 @@
                 optics.far);
         }
 
-        if (optics.pan) {
+        if (core.pan) {
             // Post-multiply a screen-space pan
-            var pan = optics.pan;
+            var pan = core.pan;
             var panMatrix = SceneJS_math_translationMat4v([pan.x || 0, pan.y || 0, pan.z || 0]);
             core.matrix = SceneJS_math_mulMat4(panMatrix, core.matrix, []);
         }
