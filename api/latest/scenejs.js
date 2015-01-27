@@ -2309,6 +2309,19 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
 };
 
 /**
+ * Reads colors of pixels from the last rendered frame.
+ */
+SceneJS_Engine.prototype.readPixels = function (entries, size) {
+
+    // Do any pending scene compilations
+    if (this._needCompile()) {
+        this._doCompile();
+    }
+
+    return this.display.readPixels(entries, size);
+};
+
+/**
  * Returns true if view needs refreshing from scene
  * @returns {Boolean}
  * @private
@@ -12029,6 +12042,14 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     }
 };
 
+
+/**
+ * Reads colors of pixels from the last rendered frame.
+ */
+SceneJS.Scene.prototype.readPixels = function (entries, size) {
+    return this._engine.readPixels(entries, size);
+};
+
 /**
  * Scene node's destroy handler, called by {@link SceneJS_node#destroy}
  * @private
@@ -15417,6 +15438,36 @@ SceneJS_Display.prototype.pick = function (params) {
     }
 
     return hit;
+};
+
+SceneJS_Display.prototype.readPixels = function (entries, size) {
+
+    if (!this._readPixelBuf) {
+        this._readPixelBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+    }
+
+    this._readPixelBuf.bind();
+
+    this._readPixelBuf.clear();
+
+    this.render({ force: true });
+
+    var entry;
+    var color;
+
+    for (var i = 0; i < size; i++) {
+
+        entry = entries[i] || (entries[i] = {});
+
+        color = this._readPixelBuf.read(entry.x, entry.y);
+
+        entry.r = color[0];
+        entry.g = color[1];
+        entry.b = color[2];
+        entry.a = color[3];
+    }
+
+    this._readPixelBuf.unbind();
 };
 
 /**

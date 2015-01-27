@@ -573,8 +573,8 @@ SceneJS_Display.prototype._buildObjectList = function () {
 };
 
 SceneJS_Display.prototype._makeStateSortKeys = function () {
-  //  console.log("--------------------------------------------------------------------------------------------------");
-   // console.log("SceneJS_Display_makeSortKeys");
+    //  console.log("--------------------------------------------------------------------------------------------------");
+    // console.log("SceneJS_Display_makeSortKeys");
     var object;
     for (var i = 0, len = this._objectListLen; i < len; i++) {
         object = this._objectList[i];
@@ -582,25 +582,15 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
             // Non-visual object (eg. sound)
             object.sortKey = -1;
         } else {
-
-//            console.log("object.stage.priority = " + ((object.stage.priority + 1) * 1000000000000));
-//            console.log("object.flags.transparent = " + ((object.flags.transparent ? 2 : 1) * 1000000000));
-//            console.log("object.layer.priority = " +  ((object.layer.priority + 1) * 1000000));
-//            console.log("object.program.id = " +  ((object.program.id + 1) * 1000));
-//            console.log("object.texture.stateId = " +  object.texture.stateId);
-
             object.sortKey =
                 ((object.stage.priority + 1) * 1000000000000)
-                    + ((object.flags.transparent ? 2 : 1) * 1000000000)
-                    + ((object.layer.priority + 1) * 1000000)
-                    + ((object.program.id + 1) * 1000)
-                    + object.texture.stateId;
-
-            //console.log("object.sortKey = " +  object.sortKey);
-          //  console.log("");
+                + ((object.flags.transparent ? 2 : 1) * 1000000000)
+                + ((object.layer.priority + 1) * 1000000)
+                + ((object.program.id + 1) * 1000)
+                + object.texture.stateId;
         }
     }
-  //  console.log("--------------------------------------------------------------------------------------------------");
+    //  console.log("--------------------------------------------------------------------------------------------------");
 };
 
 SceneJS_Display.prototype._stateSort = function () {
@@ -956,6 +946,36 @@ SceneJS_Display.prototype.pick = function (params) {
     }
 
     return hit;
+};
+
+SceneJS_Display.prototype.readPixels = function (entries, size) {
+
+    if (!this._readPixelBuf) {
+        this._readPixelBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+    }
+
+    this._readPixelBuf.bind();
+
+    this._readPixelBuf.clear();
+
+    this.render({ force: true });
+
+    var entry;
+    var color;
+
+    for (var i = 0; i < size; i++) {
+
+        entry = entries[i] || (entries[i] = {});
+
+        color = this._readPixelBuf.read(entry.x, entry.y);
+
+        entry.r = color[0];
+        entry.g = color[1];
+        entry.b = color[2];
+        entry.a = color[3];
+    }
+
+    this._readPixelBuf.unbind();
 };
 
 /**

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+            background-image: url(textures/cloudsBackground.jpg);
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        #drawingCanvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100000;
+        }
+
+        #infoText {
+            position: relative;
+            top: 0px;
+            padding: 5px;
+            padding-top: 20px;
+            z-index: 100;
+            font-size: 20px;
+            text-align: center;
+            color: black;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+</head>
+
+<body>
+
+<canvas id="drawingCanvas"></canvas>
+
+<div id="infoLight">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - tracking empty pixels
+    <br>
+    in this demo we have an transparent canvas, and are using the scene's readPixels method
+    <br>
+    on each frame to query pixels on a grid to see if they are occupied by the teapots
+    <br>
+    <br>
+    <div id="infoText">
+    </div>
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Define scene
+    var myScene = SceneJS.createScene({
+
+        // Make canvas transparent
+        transparent: true,
+
+        nodes: [
+            // Mouse-orbited camera,
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 40,
+                pitch: -20,
+                zoom: 10,
+                zoomSensitivity: 1.0,
+                eye: { x: 0, y: 0, z: 10 },
+                look: { x: 0, y: 1, z: 0 },
+                spin: 0.5,
+
+                nodes: [
+
+                    // Pickable red teapot with name "redTeapot"
+                    {
+                        type: "name",
+                        name: "redTeapot",
+                        nodes: [
+                            {
+                                type: "material", color: { r: 1.0, g: 0.3, b: 0.3 },
+                                nodes: [
+                                    {
+                                        type: "translate", z: 2.5,
+                                        nodes: [
+
+                                            // Teapot primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                            {
+                                                type: "geometry/teapot"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    // Pickable blue teapot with name "blueTeapot"
+                    {
+                        type: "name",
+                        name: "blueTeapot",
+                        nodes: [
+                            {
+                                type: "material", color: { r: 0.3, g: 0.3, b: 1.0 },
+                                nodes: [
+                                    {
+                                        type: "translate", z: -2.5,
+                                        nodes: [
+
+                                            // Teapot primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                            {
+                                                type: "geometry/teapot"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    var drawingCanvas = document.getElementById("drawingCanvas");
+    var ctx = drawingCanvas.getContext("2d");
+
+    var canvas = myScene.getCanvas();
+    drawingCanvas.width = canvas.width;
+    drawingCanvas.height = canvas.height;
+
+    var grid = {
+        entries: [],
+        size: 0
+    };
+
+    var lenGrid = 0;
+
+    myScene.on("tick", function () {
+        buildGrid();
+        readGrid();
+        renderGrid();
+    });
+
+    function buildGrid() {
+
+        grid.size = 0;
+
+        var canvasWidth = canvas.width;
+        var canvasHeight = canvas.height;
+        var pixelXSize = 100;
+        var pixelYSize = 100;
+        var entry;
+
+        for (var x = 0; x < canvasWidth; x += pixelXSize) {
+            for (var y = 0; y < canvasHeight; y += pixelYSize) {
+                entry = grid.entries[grid.size] || (grid.entries[grid.size] = { x: 0, y: 0, r: 0, g: 0, b: 0, a: 0 });
+                entry.x = x;
+                entry.y = y;
+                grid.size++;
+            }
+        }
+    }
+
+    function readGrid() {
+        myScene.readPixels(grid.entries, grid.size);
+    }
+
+    function renderGrid() {
+        var size = grid.size;
+        var entries = grid.entries;
+        var entry;
+        for (var i = 0; i < size; i++) {
+            entry = entries[i];
+            drawCircle(entry.x, entry.y, entry.a != 0);
+        }
+    }
+
+    function drawCircle(x, y, empty) {
+        ctx.beginPath();
+        ctx.arc(x, y, 10, 0, 2 * Math.PI, true);
+        ctx.fillStyle = empty ? 'white' : 'red';
+        ctx.fill();
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = 'black';
+        ctx.closePath();
+        ctx.fill();
+    }
+
+</script>
+</body>
+</html>

@@ -500,6 +500,19 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
 };
 
 /**
+ * Reads colors of pixels from the last rendered frame.
+ */
+SceneJS_Engine.prototype.readPixels = function (entries, size) {
+
+    // Do any pending scene compilations
+    if (this._needCompile()) {
+        this._doCompile();
+    }
+
+    return this.display.readPixels(entries, size);
+};
+
+/**
  * Returns true if view needs refreshing from scene
  * @returns {Boolean}
  * @private

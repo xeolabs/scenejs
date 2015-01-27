@@ -143,6 +143,26 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
     }
 };
 
+
+/**
+ * Reads colors of pixels from the last rendered frame.
+ *
+ * <p>Call this method like this:</p>
+ *
+ * <pre>
+ * #readPixels([
+ *      { x: 100, y: 22,  r: 0, g: 0, b: 0 },
+ *      { x: 120, y: 82,  r: 0, g: 0, b: 0 },
+ *      { x: 12,  y: 345, r: 0, g: 0, b: 0 }
+ * ], 3);
+ * </pre>
+ *
+ * Then the r,g,b components of the entries will be set to the colors at those pixels.
+ */
+SceneJS.Scene.prototype.readPixels = function (entries, size) {
+    return this._engine.readPixels(entries, size);
+};
+
 /**
  * Scene node's destroy handler, called by {@link SceneJS_node#destroy}
  * @private
