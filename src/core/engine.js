@@ -393,6 +393,8 @@ SceneJS_Engine.prototype.start = function () {
                     aspect: width / height
                 });
                 self.display.imageDirty = true;
+                lastWidth = width;
+                lastHeight = height;
             }
 
             if (self.running && !self.paused) {
