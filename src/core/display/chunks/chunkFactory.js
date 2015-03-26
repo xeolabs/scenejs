@@ -119,7 +119,7 @@ SceneJS_ChunkFactory.prototype.putChunk = function (chunk) {
             chunk.recycle();
         }
 
-        this._chunks[chunk.id] = null;
+        delete this._chunks[chunk.id];
 
         var freeChunks = SceneJS_ChunkFactory._freeChunks[chunk.type];
 
@@ -140,7 +140,7 @@ SceneJS_ChunkFactory.prototype.webglRestored = function () {
 
             chunk = this._chunks[chunkId]; // Re-cache chunk's shader variable locations
 
-            if (chunk.build) {
+            if (chunk && chunk.build) {
                 chunk.build();
             }
         }

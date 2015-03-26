@@ -44,7 +44,7 @@ SceneJS_ProgramFactory.prototype.putProgram = function(program) {
 
         SceneJS_ProgramSourceFactory.putSource(program.hash);
 
-        this._programs[program.hash] = null;
+       delete this._programs[program.hash];
     }
 };
 
@@ -54,10 +54,14 @@ SceneJS_ProgramFactory.prototype.putProgram = function(program) {
 SceneJS_ProgramFactory.prototype.webglRestored = function() {
 
     var gl = this._canvas.gl;
+    var program;
 
     for (var id in this._programs) {
         if (this._programs.hasOwnProperty(id)) {
-            this._programs[id].build(gl);
+            program = this._programs[id];
+            if (program && program.build) {
+                program.build(gl);
+            }
         }
     }
 };

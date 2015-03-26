@@ -135,7 +135,7 @@ SceneJS_CoreFactory.prototype.putCore = function (core) {
 
         var cores = this._cores[core.type];
 
-        cores[core.coreId] = null;
+        delete cores[core.coreId];
 
         this._stateMap.removeItem(core.stateId);  // Release state ID for reuse
     }
@@ -161,7 +161,7 @@ SceneJS_CoreFactory.prototype.webglRestored = function () {
 
                         core = cores[coreId];
 
-                        if (core.webglRestored) { // Method augmented on core by user
+                        if (core && core.webglRestored) { // Method augmented on core by user
                             core.webglRestored();
                         }
                     }
