@@ -13,13 +13,7 @@
         enabled : true,             // Node not culled from traversal
         transparent: false,         // Node transparent - works in conjunction with matarial alpha properties
         backfaces: true,            // Show backfaces
-        frontface: "ccw",           // Default vertex winding for front face
-        backfaceLighting: true,     // Shading enabled for backfaces
-        backfaceTexturing: true,    // Texturing enabled for backfaces
-        diffuse: true,              // Diffuse lighting enabled
-        specular: true,             // Specular lighting enabled
-        ambient: true,              // Ambient lighting enabled
-        reflection : true           // Reflection enabled by default
+        frontface: "ccw"           // Default vertex winding for front face
     };
 
     var coreStack = [];
@@ -48,13 +42,6 @@
             this._core.transparent = false;      // Node transparent - works in conjunction with matarial alpha properties
             this._core.backfaces = true;         // Show backfaces
             this._core.frontface = "ccw";        // Default vertex winding for front face
-            this._core.backfaceLighting = true;  // Shading enabled for backfaces
-            this._core.backfaceTexturing = true; // Texturing enabled for backfaces
-            this._core.diffuse = true;           // Diffuse lighting enabled by default
-            this._core.specular = true;          // Specular lighting enabled by default
-            this._core.ambient = true;           // Ambient lighting enabled by default
-            this._core.reflection = true;           // Reflection enabled by default
-
             if (params.flags) {                 // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
             }
@@ -94,37 +81,6 @@
             core.frontface = flags.frontface;
             this._engine.display.imageDirty = true;
         }
-
-        if (flags.backfaceLighting != undefined) {
-            core.backfaceLighting = !!flags.backfaceLighting;
-            this._engine.display.imageDirty = true;
-        }
-
-        if (flags.backfaceTexturing != undefined) {
-            core.backfaceTexturing = !!flags.backfaceTexturing;
-            this._engine.display.imageDirty = true;
-        }
-
-        if (flags.diffuse != undefined) {
-            core.diffuse = !!flags.diffuse;
-            this._engine.display.imageDirty = true;
-        }
-
-        if (flags.specular != undefined) {
-            core.specular = !!flags.specular;
-            this._engine.display.imageDirty = true;
-        }
-
-        if (flags.ambient != undefined) {
-            core.ambient = !!flags.ambient;
-            this._engine.display.imageDirty = true;
-        }
-        
-        if (flags.reflection != undefined) {
-            core.reflection = !!flags.reflection;
-            this._engine.display.imageDirty = true;
-        }
-
         return this;
     };
 
@@ -150,13 +106,7 @@
             enabled : core.enabled,
             transparent: core.transparent,
             backfaces: core.backfaces,
-            frontface: core.frontface,
-            diffuse: core.diffuse,
-            specular: core.specular,
-            ambient: core.ambient,
-            backfaceLighting: core.backfaceLighting,
-            backfaceTexturing: core.backfaceTexturing,
-            reflection: core.reflection
+            frontface: core.frontface
         };
     };
 
@@ -235,84 +185,6 @@
 
     SceneJS.Flags.prototype.getFrontface = function() {
         return this._core.frontface;
-    };
-
-    SceneJS.Flags.prototype.setBackfaceLighting = function(backfaceLighting) {
-        backfaceLighting = !!backfaceLighting;
-        if (this._core.backfaceLighting != backfaceLighting) {
-            this._core.backfaceLighting = backfaceLighting;
-            this._engine.display.imageDirty = true;
-        }
-        return this;
-    };
-
-    SceneJS.Flags.prototype.getBackfaceLighting = function() {
-        return this._core.backfaceLighting;
-    };
-
-    SceneJS.Flags.prototype.setBackfaceTexturing = function(backfaceTexturing) {
-        backfaceTexturing = !!backfaceTexturing;
-        if (this._core.backfaceTexturing != backfaceTexturing) {
-            this._core.backfaceTexturing = backfaceTexturing;
-            this._engine.display.imageDirty = true;
-        }
-        return this;
-    };
-
-    SceneJS.Flags.prototype.getBackfaceTexturing = function() {
-        return this._core.backfaceTexturing;
-    };
-
-    SceneJS.Flags.prototype.setDiffuse = function(diffuse) {
-        diffuse = !!diffuse;
-        if (this._core.diffuse != diffuse) {
-            this._core.diffuse = diffuse;
-            this._engine.display.imageDirty = true;
-        }
-        return this;
-    };
-
-    SceneJS.Flags.prototype.getDiffuse = function() {
-        return this._core.diffuse;
-    };
-
-    SceneJS.Flags.prototype.setSpecular = function(specular) {
-        specular = !!specular;
-        if (this._core.specular != specular) {
-            this._core.specular = specular;
-            this._engine.display.imageDirty = true;
-        }
-        return this;
-    };
-
-    SceneJS.Flags.prototype.getSpecular = function() {
-        return this._core.specular;
-    };
-
-    SceneJS.Flags.prototype.setAmbient = function(ambient) {
-        ambient = !!ambient;
-        if (this._core.ambient != ambient) {
-            this._core.ambient = ambient;
-            this._engine.display.imageDirty = true;
-        }
-        return this;
-    };
-
-    SceneJS.Flags.prototype.getAmbient = function() {
-        return this._core.ambient;
-    };
-
-    SceneJS.Flags.prototype.setReflection = function(reflection) {
-        reflection = !!reflection;
-        if (this._core.reflection != reflection) {
-            this._core.reflection = reflection;
-            this._engine.display.imageDirty = true;
-        }
-        return this;
-    };
-
-    SceneJS.Flags.prototype.getReflection = function() {
-        return this._core.reflection;
     };
 
     SceneJS.Flags.prototype._compile = function(ctx) {

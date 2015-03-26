@@ -122,20 +122,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("void main(void) {");
 
         if (clipping) {
-
             src.push("if (SCENEJS_uClipping) {");
-            src.push("  float   dist;");
+            src.push("  float dist = 0.0;");
             for (var i = 0; i < states.clips.clips.length; i++) {
-                src.push("    if (SCENEJS_uClipMode" + i + " != 0.0) {");
-                src.push("        dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w;");
-                src.push("        if (SCENEJS_uClipMode" + i + " == 1.0) {");
-                src.push("            if (dist > 0.0) { discard; }");
-                src.push("        }");
-                src.push("        if (SCENEJS_uClipMode" + i + " == 2.0) {");
-                src.push("            if (dist > 0.0) { discard; }");
-                src.push("        }");
-                src.push("    }");
+                src.push("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
+                src.push("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
+                src.push("  }");
             }
+            src.push("  if (dist > 0.0) { discard; }");
             src.push("}");
         }
 
@@ -572,13 +566,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         /* True when lighting
          */
-        src.push("uniform bool  SCENEJS_uBackfaceTexturing;");
-        src.push("uniform bool  SCENEJS_uBackfaceLighting;");
-        src.push("uniform bool  SCENEJS_uSpecularLighting;");
         src.push("uniform bool  SCENEJS_uClipping;");
-        src.push("uniform bool  SCENEJS_uAmbient;");
-        src.push("uniform bool  SCENEJS_uDiffuse;");
-        src.push("uniform bool  SCENEJS_uReflection;");
 
         // Added in v4.0 to support depth targets
         src.push("uniform bool  SCENEJS_uDepthMode;");
@@ -632,22 +620,17 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (clipping) {
             src.push("if (SCENEJS_uClipping) {");
-            src.push("  float   dist;");
+            src.push("  float dist = 0.0;");
             for (var i = 0; i < states.clips.clips.length; i++) {
-                src.push("    if (SCENEJS_uClipMode" + i + " != 0.0) {");
-                src.push("        dist = dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w;");
-                src.push("        if (SCENEJS_uClipMode" + i + " == 1.0) {");
-                src.push("            if (dist > 0.0) { discard; }");
-                src.push("        }");
-                src.push("        if (SCENEJS_uClipMode" + i + " == 2.0) {");
-                src.push("            if (dist > 0.0) { discard; }");
-                src.push("        }");
-                src.push("    }");
+                src.push("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
+                src.push("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
+                src.push("  }");
             }
+            src.push("  if (dist > 0.0) { discard; }");
             src.push("}");
         }
 
-        src.push("  vec3 ambient= SCENEJS_uAmbient ? SCENEJS_uAmbientColor : vec3(0.0, 0.0, 0.0);");
+        src.push("  vec3 ambient= SCENEJS_uAmbientColor;");
 
         if (texturing && states.geometry.uvBuf && fragmentHooks.texturePos) {
             src.push(fragmentHooks.texturePos + "(SCENEJS_vUVCoord);");
@@ -706,10 +689,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var layer;
         if (texturing) {
-
-            if (normals) {
-                src.push("if (SCENEJS_uBackfaceTexturing || dot(SCENEJS_vViewNormal, SCENEJS_vViewEyeVec) > 0.0) {");
-            }
 
             src.push("  vec4    texturePos;");
             src.push("  vec2    textureCoord=vec2(0.0,0.0);");
@@ -801,13 +780,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
 
             }
-            if (normals) {
-                src.push("}");
-            }
         }
 
         if (normals && cubeMapping) {
-            src.push("if (SCENEJS_uReflection) {"); // Flag which can enable/disable reflection
             src.push("vec3 envLookup = reflect(SCENEJS_vViewEyeVec, viewNormalVec);");
             src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
             src.push("vec4 envColor;");
@@ -816,14 +791,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
                 src.push("color = mix(color, envColor.rgb, specular * SCENEJS_uCubeMapIntensity" + i + ");");
             }
-            src.push("}");
         }
 
         src.push("  vec4    fragColor;");
 
         if (normals) {
-
-            src.push("if (SCENEJS_uBackfaceLighting || dot(viewNormalVec, SCENEJS_vViewEyeVec) > 0.0) {");
 
             src.push("  vec3    lightValue      = vec3(0.0, 0.0, 0.0);");
             src.push("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
@@ -846,7 +818,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                     src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
 
-                    //src.push("if (dotN > 0.0) {");
 
                     src.push("lightDist = SCENEJS_vViewLightVecAndDist" + i + ".w;");
 
@@ -856,16 +827,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
 
                     if (light.diffuse) {
-                        src.push("if (SCENEJS_uDiffuse) {");
                         src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
-                        src.push("}");
                     }
 
                     if (light.specular) {
-                        src.push("if (SCENEJS_uSpecularLighting) {");
                         src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
                             " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine) * attenuation;");
-                        src.push("}");
                     }
                 }
 
@@ -874,24 +841,17 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
 
                     if (light.diffuse) {
-                        src.push("if (SCENEJS_uDiffuse) {");
                         src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
-                        src.push("}");
                     }
 
                     if (light.specular) {
-                        src.push("if (SCENEJS_uSpecularLighting) {");
-                        src.push("    specularValue += specularColor * SCENEJS_uLightColor" + i +
+                        src.push("specularValue += specularColor * SCENEJS_uLightColor" + i +
                             " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine);");
-                        src.push("}");
                     }
                 }
             }
 
             src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * color.rgb), alpha);");
-            src.push("   } else {");
-            src.push("      fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
-            src.push("   }");
 
         } else { // No normals
             src.push("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
@@ -903,25 +863,47 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (false && debugCfg.whitewash === true) {
             src.push("    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
         } else {
-            src.push("    if (SCENEJS_uDepthMode) {");
-            src.push("          float depth = length(SCENEJS_vViewVertex) / (SCENEJS_uZFar - SCENEJS_uZNear);");
-            src.push("          const vec4 bias = vec4(1.0 / 255.0,");
-            src.push("          1.0 / 255.0,");
-            src.push("          1.0 / 255.0,");
-            src.push("          0.0);");
-            src.push("          float r = depth;");
-            src.push("          float g = fract(r * 255.0);");
-            src.push("          float b = fract(g * 255.0);");
-            src.push("          float a = fract(b * 255.0);");
-            src.push("          vec4 colour = vec4(r, g, b, a);");
-            src.push("          gl_FragColor = colour - (colour.yzww * bias);");
-            src.push("    } else {");
-            src.push("          gl_FragColor = fragColor;");
-            src.push("    };");
+
+            if (hasDepthTarget(states)) {
+
+                // Only compile in depth mode support if a depth render target is present
+
+                src.push("    if (SCENEJS_uDepthMode) {");
+                src.push("          float depth = length(SCENEJS_vViewVertex) / (SCENEJS_uZFar - SCENEJS_uZNear);");
+                src.push("          const vec4 bias = vec4(1.0 / 255.0,");
+                src.push("          1.0 / 255.0,");
+                src.push("          1.0 / 255.0,");
+                src.push("          0.0);");
+                src.push("          float r = depth;");
+                src.push("          float g = fract(r * 255.0);");
+                src.push("          float b = fract(g * 255.0);");
+                src.push("          float a = fract(b * 255.0);");
+                src.push("          vec4 colour = vec4(r, g, b, a);");
+                src.push("          gl_FragColor = colour - (colour.yzww * bias);");
+                src.push("    } else {");
+                src.push("          gl_FragColor = fragColor;");
+                src.push("    };");
+
+            } else {
+                src.push("          gl_FragColor = fragColor;");
+            }
         }
         src.push("}");
 
+//        console.log(src.join("\n"));
         return src;
     };
+
+    function hasDepthTarget(states) {
+        if (states.renderTarget && states.renderTarget.targets) {
+            var targets = states.renderTarget.targets;
+            for (var i = 0, len = targets.length; i < len; i++) {
+                if (targets[i].bufType === "depth") {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 })();
