@@ -25,7 +25,7 @@
                      type: "geometry/heightmap",
 
                      // Texture image
-                     src: 'textures/heightmap.jpg',
+                     src: 'textures/heightMap.jpg',
 
                      // Wireframe or solid - default is false
                      wire: false,

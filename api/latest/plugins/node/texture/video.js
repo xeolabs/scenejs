@@ -27,7 +27,7 @@
                  // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
                  {
                      type: "geometry/heightmap",
-                     src: 'textures/heightmap.jpg'
+                     src: 'textures/heightMap.jpg'
                  }
              ]
          }
