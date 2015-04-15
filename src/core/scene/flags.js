@@ -13,7 +13,9 @@
         enabled : true,             // Node not culled from traversal
         transparent: false,         // Node transparent - works in conjunction with matarial alpha properties
         backfaces: true,            // Show backfaces
-        frontface: "ccw"           // Default vertex winding for front face
+        frontface: "ccw",           // Default vertex winding for front face
+        reflective: true,           // Reflects reflection node cubemap, if it exists, by default.
+        hash: "refl"
     };
 
     var coreStack = [];
@@ -42,6 +44,7 @@
             this._core.transparent = false;      // Node transparent - works in conjunction with matarial alpha properties
             this._core.backfaces = true;         // Show backfaces
             this._core.frontface = "ccw";        // Default vertex winding for front face
+            this._core.reflective = true;        // Reflects reflection node cubemap, if it exists, by default.
             if (params.flags) {                 // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
             }
@@ -81,6 +84,12 @@
             core.frontface = flags.frontface;
             this._engine.display.imageDirty = true;
         }
+
+        if (flags.reflective != undefined) {
+            core.reflective = flags.reflective;
+            core.hash = core.reflective ? "refl" : "";
+            this._engine.branchDirty(this);
+        }
         return this;
     };
 
@@ -106,7 +115,8 @@
             enabled : core.enabled,
             transparent: core.transparent,
             backfaces: core.backfaces,
-            frontface: core.frontface
+            frontface: core.frontface,
+            reflective: core.reflective
         };
     };
 
@@ -185,6 +195,20 @@
 
     SceneJS.Flags.prototype.getFrontface = function() {
         return this._core.frontface;
+    };
+
+    SceneJS.Flags.prototype.setReflective = function(reflective) {
+        reflective = !!reflective;
+        if (this._core.reflective != reflective) {
+            this._core.reflective = reflective;
+            this._core.hash = reflective ? "refl" : "";
+            this._engine.branchDirty(this);
+        }
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getReflective = function() {
+        return this._core.reflective;
     };
 
     SceneJS.Flags.prototype._compile = function(ctx) {

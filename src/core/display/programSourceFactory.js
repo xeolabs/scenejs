@@ -158,7 +158,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     };
 
     this._isCubeMapping = function (states) {
-        return (states.cubemap.layers && states.cubemap.layers.length > 0 && states.geometry.normalBuf);
+        return (states.flags.reflective && states.cubemap.layers && states.cubemap.layers.length > 0 && states.geometry.normalBuf);
     };
 
     this._hasNormals = function (states) {
