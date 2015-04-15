@@ -385,7 +385,8 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.morphGeometry.hash,
         this.texture.hash,
         this.cubemap.hash,
-        this.lights.hash
+        this.lights.hash,
+        this.flags.hash
     ]).join(";");
 
     if (!object.program || hash != object.hash) {

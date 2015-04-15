@@ -157,7 +157,7 @@
             }
         }
         if (this._core) {
-            this._coreFactory.putCore(this._core);
+            this._engine._coreFactory.putCore(this._core);
         }
     }
 
