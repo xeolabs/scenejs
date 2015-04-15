@@ -20,25 +20,29 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - reflection map demo
-    <br>
-    learn more in <a href="http://xeolabs.com/articles/scenejs-reflection/" target="_other">this tutorial</a>
+    <a href="http://scenejs.org">SceneJS</a> - enabling and disabling reflectiveness for a subgraph<br><br>
+    The teapot in this example is wrapped in a reflect node.<br>
+    Its also wrapped in a 'flags' node that has a 'reflect' flag, which we're toggling.<br>
+    When the flag is true, the teapot is reflective, with the reflect node's cube map affects the color.
 </div>
 
 <script>
 
-    // Basic demo of the "reflect" node, which defines a cube map which is reflected
-    // on the surfaces of child geometry nodes.
+    // Demonstrates how to make geometries reflective or non-reflective
     //
-    // Surface reflection is the product of three nodes working together:
+    // In the scene below, we make a geometry reflective with 1) a 'reflect'
+    // node with a cube map, and 2) a flags node with a 'reflective' flag,
+    // which allows the cube map to affect the surface's color.
     //
-    //  1. a "reflect" node, which defines a cube map texture to be reflected on child geometries,
-    //  2. a "material" node, which defines the amount of surface reflectivity via its "specular" property, and
-    //  3. one or more geometry nodes (eg. "geometry/teapot"), which define the surface.
+    // When the flag is false, the cube map is ignored and geometry
+    // then appears non-reflective.
     //
-    // The amount of reflectivity of the surface is controlled by the "specular" property
-    // on the material, while the intensity of the cube map texture that is applied is
-    // controlled via the "reflect" node's "intensity" property.
+    // As we periodically toggle the flag, watch the geometry switch between
+    // reflective and non-reflective.
+    //
+    // If there is a reflect node is the sub-graph, the geometry will be 
+    // reflective by default when 1) the flags node is omitted, or 
+    // 2) the 'reflective' flag is not specified and defaults to true
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -60,11 +64,13 @@
 
                 nodes: [
 
+                    // Flags node which enables or disables reflectiveness of our teapot.
+                    // When enabled, the cube map will be reflected off the surface.
                     {
                         type: "flags",
                         id: "myFlags",
                         flags: {
-                            reflective: true
+                            reflective: true // Causes cube map to affect surface color (default is true)
                         },
 
                         nodes: [
