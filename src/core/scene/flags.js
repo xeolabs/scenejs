@@ -89,6 +89,7 @@
             core.reflective = flags.reflective;
             core.hash = core.reflective ? "refl" : "";
             this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
         }
         return this;
     };
@@ -203,6 +204,7 @@
             this._core.reflective = reflective;
             this._core.hash = reflective ? "refl" : "";
             this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
         }
         return this;
     };
