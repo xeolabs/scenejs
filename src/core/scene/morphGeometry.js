@@ -313,11 +313,17 @@ new (function () {
             }
         }
 
+        var frameUpdate = key1 != core.key1;
+
         /* Normalise factor to range [0.0..1.0] for the target frame
          */
         core.factor = (factor - keys[key1]) / (keys[key2] - keys[key1]);
         core.key1 = key1;
         core.key2 = key2;
+
+        if (frameUpdate) {
+            this.publish("frameUpdate", this.getCurrentFrame());
+        }
 
         this._engine.display.imageDirty = true;
     };
@@ -332,6 +338,18 @@ new (function () {
 
     SceneJS.MorphGeometry.prototype.getTargets = function () {
         return this._core.targets;
+    };
+
+    SceneJS.MorphGeometry.prototype.getCurrentFrame = function () {
+        var key1 = this._core.key1;
+        var key2 = this._core.key2;
+        return {
+            key1: key1,
+            key2: key2,
+            factor: this._core.factor,
+            target1: this._core.targets[key1],
+            target2: this._core.targets[key2]
+        }
     };
 
     SceneJS.MorphGeometry.prototype._compile = function (ctx) {
