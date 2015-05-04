@@ -341,14 +341,15 @@ new (function () {
     };
 
     SceneJS.MorphGeometry.prototype.getCurrentFrame = function () {
-        var key1 = this._core.key1;
-        var key2 = this._core.key2;
+        var core = this._core;
+        var key1 = core.key1;
+        var key2 = core.key2;
         return {
             key1: key1,
             key2: key2,
-            factor: this._core.factor,
-            target1: this._core.targets[key1],
-            target2: this._core.targets[key2]
+            factor: core.factor,
+            target1: core.targets[key1],
+            target2: core.targets[key2]
         }
     };
 
