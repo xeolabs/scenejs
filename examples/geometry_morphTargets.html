@@ -12,6 +12,10 @@
             -khtml-user-select: none;
             -webkit-user-select: none;
         }
+
+        #morph-target-pair {
+            font-size: 16px;
+        }
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
@@ -20,7 +24,8 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - geometry morph targets - trivial demo
+    <a href="http://scenejs.org">SceneJS</a> - geometry morph targets - trivial demo<br>
+    Current target pair: <span id="morph-target-pair">0-1</span>
 </div>
 
 <script>
@@ -149,6 +154,11 @@
 
                 var factor = 0;
                 var factorInc = 0.01;
+                var targetPairElement = document.getElementById("morph-target-pair");
+
+                myMorph.on("frameUpdate", function(frame) {
+                    targetPairElement.innerText = frame.key1 + "-" + frame.key2;
+                });
 
                 scene.on("tick",
                         function () {
