@@ -294,6 +294,8 @@ new (function () {
         var key1 = core.key1;
         var key2 = core.key2;
 
+        var oldFactor = core.factor;
+
         if (factor < keys[0]) {
             key1 = 0;
             key2 = 1;
@@ -318,11 +320,18 @@ new (function () {
         /* Normalise factor to range [0.0..1.0] for the target frame
          */
         core.factor = (factor - keys[key1]) / (keys[key2] - keys[key1]);
+
+        var morphUpdate = frameUpdate || oldFactor != core.factor;
+
         core.key1 = key1;
         core.key2 = key2;
 
-        if (frameUpdate) {
-            this.publish("frameUpdate", this.getCurrentFrame());
+        if (morphUpdate) {
+            var currentFrame = this.getCurrentFrame();
+            this.publish("update", currentFrame);
+            if (frameUpdate) {
+                this.publish("frameUpdate", currentFrame);
+            }
         }
 
         this._engine.display.imageDirty = true;
