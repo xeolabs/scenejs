@@ -21,8 +21,9 @@ SceneJS_ChunkFactory.createChunkType({
 
     drawAndPick:function (frameCtx) {
         var gl = this.program.gl;
+        var indexType = this.program.UINT_INDEX_ENABLED ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
         gl.uniform1i(frameCtx.pick ? this._depthModePick : this._depthModeDraw, frameCtx.depthMode);
-        gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, indexType, 0);
         //frameCtx.textureUnit = 0;
     }
 });

@@ -5778,7 +5778,7 @@
             coreId:coreId,
             primitive:params.wire ? "lines" : "triangles",
             positions:new Float32Array(flatten(positions, 3)),
-            indices:new Uint16Array(flatten(reverse(indices))),
+            indices:flatten(reverse(indices)),
             normals:new Float32Array(flatten(calculateNormals(positions, indices), 3))
         };
     }

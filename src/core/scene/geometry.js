@@ -51,6 +51,7 @@ new (function () {
 
         var primitive = data.primitive || "triangles";
         var core = this._core;
+        var IndexArrayType = this._engine.canvas.UINT_INDEX_ENABLED ? Uint32Array : Uint16Array;
 
         core.primitive = this._getPrimitiveType(primitive);
 
@@ -75,7 +76,7 @@ new (function () {
             uv: data.uv ? new Float32Array(data.uv) : undefined,
             uv2: data.uv2 ? new Float32Array(data.uv2) : undefined,
             colors: data.colors ? new Float32Array(data.colors) : undefined,
-            indices: data.indices ? new Uint16Array(data.indices) : undefined
+            indices: data.indices ? new IndexArrayType(data.indices) : undefined
         };
 
         delete data.positions;
