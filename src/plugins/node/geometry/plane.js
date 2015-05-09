@@ -114,7 +114,7 @@
             positions:new Float32Array(positions),
             normals:new Float32Array(normals),
             uv:new Float32Array(uvs),
-            indices:new Uint16Array(indices)
+            indices:indices
         };
     }
 })();

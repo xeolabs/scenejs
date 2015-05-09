@@ -91,6 +91,8 @@ SceneJS_Canvas.prototype.initWebGL = function () {
             SceneJS.errors.WEBGL_NOT_SUPPORTED,
             'Failed to get a WebGL context');
     }
+
+    this.UINT_INDEX_ENABLED = !!this.gl.getExtension("OES_element_index_uint");
 };
 
 

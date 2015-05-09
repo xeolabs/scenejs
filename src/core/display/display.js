@@ -1028,7 +1028,11 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.ambientColor = this._ambientColor;
     frameCtx.aspect = this._canvas.canvas.width / this._canvas.canvas.height;
 
-    // The extension needs to be re-queried in case the context was lost and has been recreated.
+    // The extensions needs to be re-queried in case the context was lost and has been recreated.
+    if (this._canvas.UINT_INDEX_ENABLED) {
+        gl.getExtension("OES_element_index_uint");
+    }
+
     var VAO = gl.getExtension("OES_vertex_array_object");
     frameCtx.VAO = (VAO) ? VAO : null;
     frameCtx.VAO = null;

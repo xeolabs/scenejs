@@ -187,6 +187,14 @@
                         "page": "optimization_textureAtlas"
                     }
                 ]
+            },
+            {
+                "nodes": [
+                    {
+                        "title": "OES_element_index_uint",
+                        "page": "optimization_uintIndex"
+                    }
+                ]
             }
         ]
     },
