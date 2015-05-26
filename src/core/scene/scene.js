@@ -114,7 +114,7 @@ SceneJS.Scene.prototype.start = function (params) {
 };
 
 /**
- * Starts the render loop for this scene
+ * Set refresh rate for the scene
  */
 SceneJS.Scene.prototype.setFPS = function (fps) {
     this._engine.fps = fps;

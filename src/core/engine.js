@@ -469,19 +469,18 @@ SceneJS_Engine.prototype.start = function () {
                 }
 
                 requestAnimationFrame(draw);
+            }
 
-                if (self.running) {
-                    if (self.fps > 0) {
-                        window.setTimeout(window[fnName], 1000 / self.fps);
-                    } else {
-                        requestAnimationFrame(window[fnName]);
-                    }
-                    
-                } 
+            if (self.running) {
+                if (self.fps > 0) {
+                    setTimeout(window[fnName], 1000 / self.fps);
+                } else {
+                    requestAnimationFrame(window[fnName]);
+                }
             }
         };
 
-        window[fnName]();
+        setTimeout(window[fnName], 0);
     }
 };
 
