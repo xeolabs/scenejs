@@ -1889,6 +1889,11 @@ var SceneJS_Engine = function (json, options) {
     this._numNodesToDestroy = 0;
 
     /**
+     * Frame rate. 0 means as fast as the browser will render.
+     */
+    this.fps = json.fps || 0;
+
+    /**
      * Flag which is set while this engine is running - set after call to #start, unset after #stop or #pause
      */
     this.running = false;
@@ -2195,6 +2200,55 @@ SceneJS_Engine.prototype.start = function () {
             startTime: startTime
         });
 
+        function draw() {
+            rendered = false;
+
+            // Render the scene once for each pass
+            for (var i = 0; i < self._numPasses; i++) {
+
+                if (self._needCompile() || rendered) {
+
+                    sleeping = false;
+
+                    // Notify we're about to do a render
+                    scene.publish("rendering", {
+                        pass: i
+                    });
+
+                    // Compile scene graph to display graph, if necessary
+                    self._doCompile();
+
+                    // Render display graph
+                    // Clear buffers only on first frame
+                    self.display.render({
+                        clear: i == 0
+                    });
+
+                    // Notify that we've just done a render
+                    scene.publish("rendered", {
+                        sceneId: self.id,
+                        time: time,
+                        pass: i
+                    });
+
+                    rendered = true;
+                }
+            }
+
+            // If any of the passes did not render anything, then put the render loop to sleep again
+            if (!rendered) {
+                if (!sleeping) {
+                    scene.publish("sleep", {
+                        sceneId: self.id,
+                        startTime: startTime,
+                        prevTime: time,
+                        time: time
+                    });
+                }
+                sleeping = true;
+            }
+        }
+
         // Animation frame callback
         window[fnName] = function () {
 
@@ -2229,60 +2283,20 @@ SceneJS_Engine.prototype.start = function () {
                     return;
                 }
 
-                rendered = false;
+                requestAnimationFrame(draw);
 
-                // Render the scene once for each pass
-                for (var i = 0; i < self._numPasses; i++) {
-
-                    if (self._needCompile() || rendered) {
-
-                        sleeping = false;
-
-                        // Notify we're about to do a render
-                        scene.publish("rendering", {
-                            pass: i
-                        });
-
-                        // Compile scene graph to display graph, if necessary
-                        self._doCompile();
-
-                        // Render display graph
-                        // Clear buffers only on first frame
-                        self.display.render({
-                            clear: i == 0
-                        });
-
-                        // Notify that we've just done a render
-                        scene.publish("rendered", {
-                            sceneId: self.id,
-                            time: time,
-                            pass: i
-                        });
-
-                        rendered = true;
+                if (self.running) {
+                    if (self.fps > 0) {
+                        window.setTimeout(window[fnName], 1000 / self.fps);
+                    } else {
+                        requestAnimationFrame(window[fnName]);
                     }
-                }
-
-                // If any of the passes did not render anything, then put the render loop to sleep again
-                if (!rendered) {
-                    if (!sleeping) {
-                        scene.publish("sleep", {
-                            sceneId: self.id,
-                            startTime: startTime,
-                            prevTime: time,
-                            time: time
-                        });
-                    }
-                    sleeping = true;
-                }
-            }
-
-            if (self.running) {
-                window.requestAnimationFrame(window[fnName]);
+                    
+                } 
             }
         };
 
-        window.requestAnimationFrame(window[fnName]);
+        window[fnName]();
     }
 };
 
@@ -11921,6 +11935,13 @@ SceneJS.Scene.prototype.needFrame = function () {
  */
 SceneJS.Scene.prototype.start = function (params) {
     this._engine.start(params);
+};
+
+/**
+ * Starts the render loop for this scene
+ */
+SceneJS.Scene.prototype.setFPS = function (fps) {
+    this._engine.fps = fps;
 };
 
 /**

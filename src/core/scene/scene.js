@@ -114,6 +114,13 @@ SceneJS.Scene.prototype.start = function (params) {
 };
 
 /**
+ * Starts the render loop for this scene
+ */
+SceneJS.Scene.prototype.setFPS = function (fps) {
+    this._engine.fps = fps;
+};
+
+/**
  * Pauses/unpauses current render loop that was started with {@link #start}. After this, {@link #isRunning} will return false.
  * @param {Boolean} doPause Indicates whether to pause or unpause the render loop
  */
