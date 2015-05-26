@@ -115,7 +115,7 @@
             type:"geometry",
             primitive:"lines",
             positions:new Float32Array(positions),
-            indices:new Uint16Array(indices)
+            indices:indices
         };
     }
 
