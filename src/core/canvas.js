@@ -43,11 +43,13 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
         ? WebGLDebugUtils.makeLostContextSimulatingCanvas(canvas)
         : canvas;
 
+    this.ssaaMultiplier = options.ssaaMultiplier || 1;
+
     // If the canvas uses css styles to specify the sizes make sure the basic
     // width and height attributes match or the WebGL context will use 300 x 150
 
-    this.canvas.width = this.canvas.clientWidth;
-    this.canvas.height = this.canvas.clientHeight;
+    this.canvas.width = this.canvas.clientWidth * this.ssaaMultiplier;
+    this.canvas.height = this.canvas.clientHeight * this.ssaaMultiplier;
 
     /**
      * Attributes given when initialising the WebGL context
