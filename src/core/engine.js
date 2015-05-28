@@ -5,7 +5,6 @@
  * @private
  */
 var SceneJS_Engine = function (json, options) {
-
     json.type = "scene"; // The type property supplied by user on the root JSON node is ignored - would always be 'scene'
 
     /**

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - Super sample anti-aliasing<br>
+    On platforms that don't implement anti-aliasing on the WebGL context, one can use supersampling<br>
+    to anti-alias by rendering to a larger canvas and then scaling the canvas down using CSS.
+    <br>
+    Use the up and down arrow keys to increase or decrease supersampling multiplier for the canvas size.
+    <br>
+    Current multiplier: <span id="ssaa">2</span>
+</div>
+
+<script>
+
+    // Demonstrates how to make geometries reflective or non-reflective
+    //
+    // In the scene below, we make a geometry reflective with 1) a 'reflect'
+    // node with a cube map, and 2) a flags node with a 'reflective' flag,
+    // which allows the cube map to affect the surface's color.
+    //
+    // When the flag is false, the cube map is ignored and geometry
+    // then appears non-reflective.
+    //
+    // As we periodically toggle the flag, watch the geometry switch between
+    // reflective and non-reflective.
+    //
+    // If there is a reflect node is the sub-graph, the geometry will be 
+    // reflective by default when 1) the flags node is omitted, or 
+    // 2) the 'reflective' flag is not specified and defaults to true
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var ssaaMultiplier = 2;
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        contextAttr: {
+            antialias: false
+        },
+        nodes: [
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:8,
+                zoomSensitivity:1.0,
+                nodes: [
+
+                    {
+                        type: "material",
+                        color:{ r:0.3, g:0.3, b:1.0 },
+
+                        // Mirror-like reflection when specular == 1.0, no reflection at all
+                        // when specular == 0.0. We have the value at 0.8 to allow some of the
+                        // yellowness to show through, to simulate a gold-like material.
+                        specular: 0.8,
+
+                        nodes: [
+
+                            // Teapot primitive implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                            {
+                                type: "geometry/teapot"
+                            }
+                       ]
+
+                    }
+                ]
+            }
+        ]
+    }, { ssaaMultiplier: ssaaMultiplier });
+    
+    var ssaaElement = document.getElementById("ssaa");
+
+    window.addEventListener("keydown", function(e) {
+        var keyCode = e.keyCode;
+
+        if (keyCode === 38) {
+            ssaaMultiplier *= 2;
+        }
+
+        if (keyCode === 40) {
+            ssaaMultiplier /= 2;
+        }
+
+        ssaaMultiplier = Math.max(ssaaMultiplier, 1);
+
+        scene.setSSAAMultiplier(ssaaMultiplier);
+
+        if (ssaaMultiplier > 1) {
+            ssaaElement.innerText = ssaaMultiplier;
+        } else {
+            ssaaElement.innerText = "1 (no anti-aliasing)";
+        }
+    });
+</script>
+</body>
+</html>

@@ -1749,11 +1749,13 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
         ? WebGLDebugUtils.makeLostContextSimulatingCanvas(canvas)
         : canvas;
 
+    this.ssaaMultiplier = this.options.ssaaMultiplier || 1;
+
     // If the canvas uses css styles to specify the sizes make sure the basic
     // width and height attributes match or the WebGL context will use 300 x 150
 
-    this.canvas.width = this.canvas.clientWidth;
-    this.canvas.height = this.canvas.clientHeight;
+    this.canvas.width = this.canvas.clientWidth * this.ssaaMultiplier;
+    this.canvas.height = this.canvas.clientHeight * this.ssaaMultiplier;
 
     /**
      * Attributes given when initialising the WebGL context
@@ -1812,6 +1814,15 @@ SceneJS_Canvas.prototype.loseWebGLContext = function () {
     }
 };
 
+/**
+ * Set canvas size multiplier for supersample anti-aliasing
+ */
+SceneJS_Canvas.prototype.setSSAAMultiplier = function (ssaaMultiplier) {
+    this.ssaaMultiplier = ssaaMultiplier;
+    this.canvas.width = this.canvas.clientWidth * ssaaMultiplier;
+    this.canvas.height = this.canvas.clientHeight * ssaaMultiplier;
+};
+
 
 /**
  * @class A container for a scene graph and its display
@@ -1820,7 +1831,6 @@ SceneJS_Canvas.prototype.loseWebGLContext = function () {
  * @private
  */
 var SceneJS_Engine = function (json, options) {
-
     json.type = "scene"; // The type property supplied by user on the root JSON node is ignored - would always be 'scene'
 
     /**
@@ -2252,8 +2262,10 @@ SceneJS_Engine.prototype.start = function () {
         // Animation frame callback
         window[fnName] = function () {
 
-            width = canvas.width = canvas.clientWidth;
-            height = canvas.height = canvas.clientHeight;
+            var ssaaMultiplier = self.canvas.ssaaMultiplier || 1;
+
+            width = canvas.width = canvas.clientWidth * ssaaMultiplier;
+            height = canvas.height = canvas.clientHeight * ssaaMultiplier;
 
             if (width != lastWidth || height != lastHeight) {
                 scene.publish("canvasSize", {
@@ -11877,6 +11889,13 @@ SceneJS.Scene.prototype.getZBufferDepth = function () {
 };
 
 /**
+ * Set canvas size multiplier for supersample anti-aliasing
+ */
+SceneJS.Scene.prototype.setSSAAMultiplier = function (ssaaMultiplier) {
+    return this._engine.canvas.setSSAAMultiplier(ssaaMultiplier);
+};
+
+/**
  * Sets a regular expression to select which of the scene subgraphs that are rooted by {@link SceneJS.Tag} nodes are included in scene renders
  * @param {String} [tagMask] Regular expression string to match on the tag attributes of {@link SceneJS.Tag} nodes. Nothing is selected when this is omitted.
  * @see #getTagMask
@@ -15278,9 +15297,10 @@ SceneJS_Display.prototype._logPickList = function () {
 SceneJS_Display.prototype.pick = function (params) {
 
     var canvas = this._canvas.canvas;
+    var ssaaMultiplier = this._canvas.ssaaMultiplier;
     var hit = null;
-    var canvasX = params.canvasX;
-    var canvasY = params.canvasY;
+    var canvasX = params.canvasX * ssaaMultiplier;
+    var canvasY = params.canvasY * ssaaMultiplier;
     var pickBuf = this.pickBuf;
 
     // Lazy-create pick buffer
@@ -16782,8 +16802,9 @@ SceneJS.RenderContext.prototype.getCanvasPos = function(offset) {
     this.getProjPos(offset);
 
     var canvas = this._frameCtx.canvas.canvas;
-    var canvasWidth = canvas.width;
-    var canvasHeight = canvas.height;
+    var ssaaMultiplier = this._frameCtx.canvas.ssaaMultiplier;
+    var canvasWidth = canvas.width / ssaaMultiplier;
+    var canvasHeight = canvas.height / ssaaMultiplier;
 
     /* Projection division and map to canvas
      */
