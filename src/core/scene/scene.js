@@ -54,6 +54,13 @@ SceneJS.Scene.prototype.getZBufferDepth = function () {
 };
 
 /**
+ * Set canvas size multiplier for supersample anti-aliasing
+ */
+SceneJS.Scene.prototype.setSSAAMultiplier = function (ssaaMultiplier) {
+    return this._engine.canvas.setSSAAMultiplier(ssaaMultiplier);
+};
+
+/**
  * Sets a regular expression to select which of the scene subgraphs that are rooted by {@link SceneJS.Tag} nodes are included in scene renders
  * @param {String} [tagMask] Regular expression string to match on the tag attributes of {@link SceneJS.Tag} nodes. Nothing is selected when this is omitted.
  * @see #getTagMask

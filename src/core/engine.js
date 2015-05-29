@@ -5,7 +5,6 @@
  * @private
  */
 var SceneJS_Engine = function (json, options) {
-
     json.type = "scene"; // The type property supplied by user on the root JSON node is ignored - would always be 'scene'
 
     /**
@@ -437,8 +436,10 @@ SceneJS_Engine.prototype.start = function () {
         // Animation frame callback
         window[fnName] = function () {
 
-            width = canvas.width = canvas.clientWidth;
-            height = canvas.height = canvas.clientHeight;
+            var ssaaMultiplier = self.canvas.ssaaMultiplier || 1;
+
+            width = canvas.width = canvas.clientWidth * ssaaMultiplier;
+            height = canvas.height = canvas.clientHeight * ssaaMultiplier;
 
             if (width != lastWidth || height != lastHeight) {
                 scene.publish("canvasSize", {

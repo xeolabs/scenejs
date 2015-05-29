@@ -843,9 +843,10 @@ SceneJS_Display.prototype._logPickList = function () {
 SceneJS_Display.prototype.pick = function (params) {
 
     var canvas = this._canvas.canvas;
+    var ssaaMultiplier = this._canvas.ssaaMultiplier;
     var hit = null;
-    var canvasX = params.canvasX;
-    var canvasY = params.canvasY;
+    var canvasX = params.canvasX * ssaaMultiplier;
+    var canvasY = params.canvasY * ssaaMultiplier;
     var pickBuf = this.pickBuf;
 
     // Lazy-create pick buffer

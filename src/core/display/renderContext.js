@@ -42,8 +42,9 @@ SceneJS.RenderContext.prototype.getCanvasPos = function(offset) {
     this.getProjPos(offset);
 
     var canvas = this._frameCtx.canvas.canvas;
-    var canvasWidth = canvas.width;
-    var canvasHeight = canvas.height;
+    var ssaaMultiplier = this._frameCtx.canvas.ssaaMultiplier;
+    var canvasWidth = canvas.width / ssaaMultiplier;
+    var canvasHeight = canvas.height / ssaaMultiplier;
 
     /* Projection division and map to canvas
      */
