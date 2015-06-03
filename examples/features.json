@@ -195,6 +195,14 @@
                         "page": "optimization_uintIndex"
                     }
                 ]
+            },
+            {
+                "nodes": [
+                    {
+                        "title": "Super sample anti-aliasing",
+                        "page": "canvas_SSAA"
+                    }
+                ]
             }
         ]
     },
