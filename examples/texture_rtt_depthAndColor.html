@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - render teapot to color and depth textures, apply textures to boxes
+</div>
+
+<script>
+
+
+// Demonstrates how to render a scene to color and depth targets, which are then applied as
+// textures on separate objects.
+//
+// First pass renders our scene (teapot and skybox) to the color and depth targets.
+//
+// Second pass renders two boxes, one textured with the color target, the other textured
+// with the depth target.
+//
+// Note that since the depth target encodes depth values, it doesn't make a particularly nice texture when
+// used for a color map texture as in this example.
+//
+// Note how we're using the "stage" node to ensure that the color and depth targets are rendered before
+// they're used for the textures.
+//
+
+// Point SceneJS to the bundled plugins
+SceneJS.setConfigs({
+    pluginPath: "../api/latest/plugins"
+});
+
+var scene = SceneJS.createScene({
+    nodes: [
+
+        // First pass renders our scene (teapot and skybox) to separate color and depth render targets.
+        {
+            type: "stage",
+            priority: 1,
+
+            nodes: [
+
+                // Rotating teapot
+                {
+                    type: "rotate",
+                    id: "teapot-pitch",
+                    angle: 180.0,
+                    x: 1.0,
+
+                    nodes: [
+                        {
+                            type: "rotate",
+                            id: "teapot-yaw",
+                            angle: 0.0,
+                            y: 1.0,
+
+                            nodes: [
+
+                                // Color target
+                                {
+                                    type: "colorTarget",
+                                    id: "myColorTarget",
+
+                                    nodes: [
+
+                                        // Depth target
+                                        {
+                                            type: "depthTarget",
+                                            id: "myDepthTarget",
+
+                                            nodes: [
+
+                                                // Skybox with custom texture,
+                                                // implemented by plugin at http://scenejs.org/api/latest/plugins/node/skybox/clouds.js
+                                                {
+                                               //     type:"skybox/clouds",
+                                                    size:5000 // Box half-size on each axis - default is 5000
+                                                },
+
+                                                {
+                                                    type: "material",
+                                                    emit: 0,
+                                                    color: { r: 1.0, g: 0.5, b: 0.9 },
+                                                    specularColor: { r: 0.9, g: 0.9, b: 0.9 },
+                                                    specular: 0.9,
+                                                    shine: 100.0,
+
+                                                    nodes: [
+
+                                                        // Node type implemented by plugin at
+                                                        // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                                        {
+                                                            type: "geometry/teapot"
+                                                        }
+                                                    ]
+                                                }
+
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+
+        // Second pass renders two boxes, one textured with the depth target, the other textured
+        // with the color target.
+
+        {
+            type: "stage",
+            priority: 2,
+
+            nodes: [
+
+                // Orbiting camera node, implemented by plugin at
+                // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                {
+                    type: "cameras/orbit",
+                    yaw: 30,
+                    pitch: -30,
+                    zoom: 7,
+                    zoomSensitivity: 1.0,
+
+                    nodes: [
+
+                        // First box, textured with the depth target
+                        {
+                            type: "translate",
+                            x: -1.5,
+
+                            nodes: [
+
+                                // Color map texture, sourcing its image from the colorTarget created earlier
+                                {
+                                    type: "texture",
+                                    target: "myColorTarget",
+
+                                    nodes: [
+                                        {
+                                            type: "material",
+                                            color: { r: 1.0, g: 1.0, b: 1.0 },
+                                            specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                            specular: 0.2,
+                                            shine: 6.0,
+
+                                            nodes: [
+
+                                                // Box primitive implemented by plugin at:
+                                                // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                {
+                                                    type: "geometry/box"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+
+                        // Second box, textured with the color target
+                        {
+                            type: "translate",
+                            x: 1.5,
+
+                            nodes: [
+
+                                // Color map texture, sourcing its image from the depthTarget created earlier
+                                {
+                                    type: "texture",
+                                    target: "myDepthTarget",
+
+                                    nodes: [
+                                        {
+                                            type: "material",
+                                            color: { r: 1.0, g: 1.0, b: 1.0 },
+                                            specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                            specular: 0.2,
+                                            shine: 6.0,
+
+                                            nodes: [
+
+                                                // Box primitive implemented by plugin at:
+                                                // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                {
+                                                    type: "geometry/box"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
+
+// Spin the teapot on each engine tick
+
+scene.getNode("teapot-pitch",
+        function (teapotPitch) {
+
+            scene.getNode("teapot-yaw",
+                    function (teapotYaw) {
+
+                        scene.on("tick",
+                                function () {
+                                    teapotYaw.inc("angle", 1);
+                                    teapotPitch.inc("angle", .3);
+
+                                });
+                    });
+        });
+
+</script>
+</body>
+</html>

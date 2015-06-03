@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - render to single texture applied to multiple objects
+</div>
+
+<script>
+
+// Point SceneJS to the bundled plugins
+SceneJS.setConfigs({
+    pluginPath: "../api/latest/plugins"
+});
+
+var scene = SceneJS.createScene({
+    nodes: [
+
+        //-------------------------------------------------------------------------------------------
+        // First pass renders our rotating teapot, with skybox, to a texture.
+
+        //------------------------------------------------------------------------------------------
+
+        {
+            type: "stage",
+            priority: 1,
+
+            nodes: [
+                {
+                    type: "colorTarget",
+                    id: "myColorTarget",
+
+                    nodes: [
+
+
+                        // Cloudy sea skybox, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                        {
+                            type: "skybox/cloudySea",
+                            size: 5000 // Box half-size on each axis - default is 5000
+                        },
+                        {
+                            type: "rotate",
+                            id: "teapot-pitch",
+                            angle: 180.0,
+                            x: 1.0,
+
+                            nodes: [
+                                {
+                                    type: "rotate",
+                                    id: "teapot-yaw",
+                                    angle: 0.0,
+                                    y: 1.0,
+
+                                    nodes: [
+
+                                        {
+                                            type: "material",
+                                            emit: 0,
+                                            color: { r: 1.0, g: 0.5, b: 0.9 },
+                                            specularColor: { r: 0.9, g: 0.9, b: 0.9 },
+                                            specular: 0.9,
+                                            shine: 100.0,
+
+
+                                            nodes: [
+
+                                                // Node type implemented by plugin at
+                                                // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                                {
+                                                    type: "geometry/teapot"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+
+        //-------------------------------------------------------------------------------------------
+        // The second subgraph renders four geometry primitives, all wrapped with a shared texture
+        // that is dynamically sourced from the colorTarget defined in the subgraph above.
+        //------------------------------------------------------------------------------------------*/
+
+        {
+            type: "stage",
+            priority: 2,
+
+            nodes: [
+
+                // Orbiting camera node, implemented by plugin at
+                // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                {
+                    type: "cameras/orbit",
+                    yaw: 30,
+                    pitch: -30,
+                    zoom: 10,
+                    zoomSensitivity: 1.0,
+
+                    nodes: [
+
+                        // Color map texture, sourcing from the colorTarget created earlier,
+                        // applying to the four geometry primitives in its subgraph
+                        {
+                            type: "texture",
+                            target: "myColorTarget",
+
+                            nodes: [
+
+                                // Yellow box
+
+                                {
+                                    type: "translate",
+                                    x: -1.5,
+                                    z: -1.5,
+
+                                    nodes: [
+                                        {
+                                            type: "material",
+                                            color: { r: 1.0, g: 1.0, b: 0.5 },
+                                            specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                            specular: 0.2,
+                                            shine: 6.0,
+
+                                            nodes: [
+
+                                                // Box primitive implemented by plugin at
+                                                // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                {
+                                                    type: "geometry/box"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                // Red sphere
+
+                                {
+                                    type: "translate",
+                                    x: 1.5,
+                                    z: -1.5,
+
+                                    nodes: [
+                                        {
+                                            type: "material",
+                                            color: { r: 1.0, g: 0.5, b: 0.5 },
+                                            specularColor: { r: 1.0, g: 0.0, b: 1.0 },
+                                            specular: 0.2,
+                                            shine: 6.0,
+
+                                            nodes: [
+
+                                                {
+                                                    type: "rotate",
+                                                    y: 1,
+                                                    angle: 90,
+
+                                                    nodes: [
+
+                                                        // Sphere primitive implemented by plugin at
+                                                        // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                        {
+                                                            type: "geometry/sphere"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                // Green teapot
+
+                                {
+                                    type: "translate",
+                                    x: -1.5,
+                                    z: 1.5,
+
+                                    nodes: [
+                                        {
+                                            type: "material",
+                                            color: { r: 0.5, g: 1.0, b: 0.5 },
+                                            specularColor: { r: 1.0, g: 0.0, b: 1.0 },
+                                            specular: 0.2,
+                                            shine: 6.0,
+
+                                            nodes: [
+                                                {
+                                                    type: "rotate",
+                                                    y: 1,
+                                                    angle: 90,
+
+                                                    nodes: [
+
+                                                        // Torus primitive implemented by plugin at
+                                                        // http://scenejs.org/api/latest/plugins/node/geometry/torus.js
+                                                        {
+                                                            type: "geometry/torus"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                // Blue cylinder
+
+                                {
+                                    type: "translate",
+                                    x: 1.5,
+                                    z: 1.5,
+
+                                    nodes: [
+                                        {
+                                            type: "material",
+                                            color: { r: 0.5, g: 0.5, b: 1.0 },
+                                            specularColor: { r: 1.0, g: 0.0, b: 1.0 },
+                                            specular: 0.2,
+                                            shine: 6.0,
+
+                                            nodes: [
+
+                                                // Cylinder primitive implemented by plugin at
+                                                // http://scenejs.org/api/latest/plugins/node/geometry/cylinder.js
+                                                {
+                                                    type: "geometry/cylinder"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
+
+var teapotPitch = scene.getNode("teapot-pitch");
+var teapotYaw = scene.getNode("teapot-yaw");
+
+scene.on("tick",
+        function () {
+            teapotYaw.inc("angle", 1);
+            teapotPitch.inc("angle", .3);
+
+        });
+
+</script>
+</body>
+</html>

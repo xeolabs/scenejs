@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - depth-of-field effect using a <a href="../api/latest/plugins/node/postprocess/dof.js" target="_other">postprocess/dof</a> node
+    <br>
+    depth-of-field technique based on <a href="http://www.nutty.ca/?page_id=352&link=depth_of_field"  target="_other">this article</a> at Nutty Software
+    <br>
+    click on something to fly to that point
+    <br>
+    drag mouse to orbit it, mouse wheel to zoom in and out
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene
+    SceneJS.createScene({
+
+                nodes: [
+
+                    // Override default lights with custom lights that happen to
+                    // be the same as the default lights
+                    {
+                        type: "lights",
+                        lights: [
+//                            {
+//                                mode: "ambient",
+//                                color: { r: 0.0, g: 0.2, b: 0.4 },
+//                                diffuse: true,
+//                                specular: false
+//                            }
+                            {
+                                mode: "dir",
+                                color: { r: 1.0, g: 1.0, b: 1.0 },
+                                diffuse: true,
+                                specular: true,
+                                dir: { x: -0.5, y: -0.5, z: -1.0 },
+                                space: "world"
+                            },
+                            {
+                                mode: "dir",
+                                color: { r: 1.0, g: 1.0, b: 1.0 },
+                                diffuse: false,
+                                specular: true,
+                                dir: { x: 1.0, y: -0.9, z: -0.7 },
+                                space: "world"
+                            }
+                        ],
+
+                        nodes: [
+
+                            // Mouse-controlled camera that orbits a ray-picked point
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbitPick.js
+                            {
+                                type: "cameras/pickFlyOrbit",
+                                yaw: -40,
+                                pitch: -20,
+                                maxPitch: -10,
+                                minPitch: -80,
+                                zoom: 800,
+                                eye: { x: 0, y: 150, z: -1000 },
+                                look: { x: 0, y: 150, z: 0 },
+                                zoomSensitivity: 20.0,
+                                showCursor: true,
+                                cursorSize: 4.0,
+
+                                nodes: [
+
+                                    // Depth-of-field blur effect, implemented by plugin at:
+                                    // http://scenejs.org/api/latest/plugins/node/postprocess/dof.js
+                                    {
+                                        type: "postprocess/dof",
+                                        texelSize: 0.00022, // Size of one texel (1 / width, 1 / height)
+                                        blurCoeff: 0.0084,	// Calculated from the blur equation, b = ( f * ms / N )
+                                        ppm: 10000,         // Pixels per millimetre
+                                        autofocus: true,    // Automatically synch focusDist to "cameras/pickFlyOrbit"
+
+                                        nodes: [
+
+                                            // Dynamic grid texture, implemented by plugin at:
+                                            // http://scenejs.org/api/latest/plugins/node/texture/grid.js
+                                            {
+                                                type: "texture/procedural/grid",
+
+                                                nodes: [
+                                                    {
+                                                        type: "material",
+                                                        emit: 1.6,
+                                                        nodes: [
+
+                                                            // Heightmap, implemented by plugin at
+                                                            // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+                                                            {
+                                                                type: "geometry/heightmap",
+
+                                                                // Texture image
+                                                                src: 'textures/heightMap.jpg',
+
+                                                                // Wireframe or solid - default is false
+                                                                wire: false,
+
+                                                                // Dimensions
+                                                                xSize: 5000,
+                                                                zSize: 5000,
+                                                                ySize: 400,
+
+                                                                // Segments on X and Z axis
+                                                                xSegments: 200,
+                                                                zSegments: 200
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    );
+
+</script>
+</body>
+</html>

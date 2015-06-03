@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - stages demo <br>
+    'stages' let you to partition your scene objects into render bins that get processed in strict sequence,<br>
+    which is useful for building custom effects pipelines using <a href="/examples/index.html#texture_rtt_color"
+                                                                   target="parent">render-to-texture</a> and <a
+        href="/examples/index.html#shaders_custom_water" target="parent">custom shaders</a>.<br>
+    <a href="/examples/index.html#layers_transparencySort" target="parent">layers</a> may be used if needed to further sub-prioritise the objects with the stages, which is<br>
+    what we're doing here to ensure the transparent boxes are correctly <a href="http://en.wikipedia.org/wiki/Order-independent_transparency"  target="_other">alpha sorted</a>.
+</div>
+
+<script>
+
+
+// A multi-pass scene graph, demonstrating two stages involving transparent objects. The first pass renders
+// the scene, containing transparent objects that are transparency-sorted using layers, to a render target.
+// The second pass uses a custom shader to apply that render target as a texture on a box.
+
+
+// Point SceneJS to the bundled plugins
+SceneJS.setConfigs({
+    pluginPath: "../api/latest/plugins"
+});
+
+var scene = SceneJS.createScene({
+    nodes: [
+
+        // First stage
+        // Renders scene to color target
+        {
+            type: "stage",
+            priority: 1,
+            nodes: [
+
+                // The color target
+                {
+                    type: "colorTarget",
+                    id: "myColorTarget",
+
+                    nodes: [
+
+                        // Cloudy sea skybox, implemented by plugin at
+                        // http://scenejs.org/api/latest/plugins/node/skybox/grimmNight.js
+                        {
+                            type: "skybox/grimmNight",
+                            size: 5000 // Box half-size on each axis - default is 5000
+                        },
+
+                        // Rotating nested transparent boxes
+                        {
+                            type: "scale",
+                            x: 0.3,
+                            y: 0.3,
+                            z: 0.3,
+
+                            nodes: [
+
+                                {
+                                    type: "rotate",
+                                    id: "pitch",
+                                    angle: 180.0,
+                                    x: 1.0,
+
+                                    nodes: [
+                                        {
+                                            type: "rotate",
+                                            id: "yaw",
+                                            angle: 0.0,
+                                            y: 1.0,
+
+                                            nodes: [
+
+                                                // Layer priority -1
+                                                // Inner opaque blue box
+                                                // Rendered first
+                                                {
+                                                    type: "layer",
+                                                    priority: -1,
+                                                    nodes: [
+                                                        {
+                                                            type: "material",
+                                                            color: { r: 0.2, g: 0.2, b: 1.0 },
+                                                            nodes: [
+                                                                {
+                                                                    type: "scale",
+                                                                    x: 3,
+                                                                    y: 3,
+                                                                    z: 3,
+                                                                    nodes: [
+
+                                                                        // Box primitive, implemented by plugin at
+                                                                        // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                                        {
+                                                                            type: "geometry/box"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+
+                                                // Layer priority 0
+                                                // Middle transparent red box
+                                                //  See how we cull backfaces because we can't control the order in which faces
+                                                // render. We don't want front faces rendering before back faces, which would
+                                                // cause the back faces to be rejected by the depth buffer and deny the
+                                                // opportunity to blend the faces - easy fix is just to not render the backfaces.
+                                                {
+                                                    type: "flags",
+                                                    flags: {
+                                                        transparent: true,
+                                                        backfaces: false    // Hide backfaces
+                                                    },
+
+                                                    nodes: [
+                                                        {
+                                                            type: "material",
+                                                            color: { r: 1.0, g: 0.2, b: 0.2 },
+                                                            alpha: 0.2,
+                                                            nodes: [
+                                                                {
+                                                                    type: "scale",
+                                                                    x: 6, y: 6, z: 6,
+                                                                    nodes: [
+
+                                                                        // Box primitive, implemented by plugin at
+                                                                        // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                                        {
+                                                                            type: "geometry/box"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        },
+
+                                                        // Layer priority 1
+                                                        // Outer transparent green cube
+                                                        // Rendered last
+
+                                                        {
+                                                            type: "layer",
+                                                            priority: 1,
+                                                            nodes: [
+                                                                {
+                                                                    type: "material",
+                                                                    color: { r: 0.2, g: 1.0, b: 0.2 },
+                                                                    alpha: 0.2,
+                                                                    nodes: [
+                                                                        {
+                                                                            type: "scale",
+                                                                            x: 9,
+                                                                            y: 9,
+                                                                            z: 9,
+
+                                                                            nodes: [
+
+                                                                                // Box primitive, implemented by plugin at
+                                                                                // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                                                {
+                                                                                    type: "geometry/box"
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+
+        // Second layer
+        // Renders box with color target as texture
+        {
+            type: "stage",
+            priority: 2,
+
+            nodes: [
+
+                // Color map texture, sourcing from the colorTarget created earlier,
+                // applying to the four geometry primitives in its subgraph
+                {
+                    type: "texture",
+                    target: "myColorTarget",
+
+                    nodes: [
+
+                        // Orbiting camera node, implemented by plugin at
+                        // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                        {
+                            type: "cameras/orbit",
+                            yaw: 30,
+                            pitch: -30,
+                            zoom: 5,
+                            zoomSensitivity: 1.0,
+
+                            nodes: [
+                                {
+                                    type: "material",
+                                    color: { r: 1.0, g: 1.0, b: 1.0 },
+                                    specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                    specular: 0.2,
+                                    shine: 6.0,
+
+                                    nodes: [
+
+                                        // Box primitive implemented by plugin at
+                                        // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                        {
+                                            type: "geometry/box"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+});
+
+
+scene.getNode("pitch", function (pitch) {
+    scene.getNode("yaw", function (yaw) {
+        scene.on("tick",
+                function () {
+                    yaw.inc("angle", 1);
+                    pitch.inc("angle", .3);
+                });
+    });
+});
+
+
+</script>
+</body>
+</html>

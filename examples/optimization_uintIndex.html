@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - optimization - OES_element_index_uint<br>
+    This scene uses WebGL extension <a href="https://www.khronos.org/registry/webgl/extensions/OES_element_index_uint/" target="_blank">OES_element_index_uint</a> to render<br> 
+    this torus, which contains <span id="vertex-count"></span> vertices, in a single draw call.
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    var UINT_INDEX_ENABLED = (function() {
+        var canvas = document.createElement("canvas");
+        var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+        return !!(gl && gl.getExtension("OES_element_index_uint"));
+    })();
+
+    if (!UINT_INDEX_ENABLED) {
+        document.getElementById("infoDark").innerText = "Sorry, your browser does not support OES_element_index_uint!"
+    } else {
+        // Create scene
+        var scene = SceneJS.createScene({
+            nodes:[
+
+                // Mouse-orbited camera, implemented by plugin at
+                // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                {
+                    type:"cameras/orbit",
+                    yaw:30,
+                    pitch:-30,
+                    zoom:5,
+                    zoomSensitivity:10.0,
+
+                    nodes:[
+                        {
+                            type:"material",
+                            color:{ r:0.6, g:0.6, b:0.9 },
+                            nodes:[
+
+                                // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/torus.js
+                                {
+                                    id: "torus",
+                                    type: "geometry/torus",
+                                    radius: 3.0,
+                                    tube: 1.5,
+                                    segmentsR: 800,
+                                    segmentsT: 800,
+                                    arc: Math.PI * 2,
+                                    wire: true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        });
+
+        scene.getNode("torus", function(torus) {
+            document.getElementById("vertex-count").innerText = torus.nodes[0]._core.arrays.positions.length / 3;
+        });
+    }
+
+</script>
+</body>
+</html>

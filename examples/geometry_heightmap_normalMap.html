@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoLight">
+    <a href="http://scenejs.org">SceneJS</a> - <a href="../api/latest/plugins/node/geometry/heightmap.js"
+                                                  target="_other">heightmap</a> geometry
+    <br>
+    with a normal map to enhance detail
+    <br>
+    <br>
+
+    click somewhere on the terrain
+</div>
+
+<script>
+
+    // Demo of the "geometry/heightmap" node type in conjunction with a normal map
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene
+    SceneJS.createScene({
+
+                nodes: [
+
+                    // Mouse-controlled camera that orbits a ray-picked point
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbitPick.js
+                    {
+                        type: "cameras/pickFlyOrbit",
+                        yaw: 80,
+                        pitch: -40,
+                        maxPitch: -10,
+                        minPitch: -80,
+                        zoom: 1800,
+                        eye: { x: 0, y: 550, z: -1500 },
+                        look: { x: 0, y: 150, z: 0 },
+                        zoomSensitivity: 20.0,
+                        showCursor: true,
+                        cursorSize: 4.0,
+
+                        nodes: [
+
+                            // Depth-of-field blur effect, implemented by plugin at:
+                            // http://scenejs.org/api/latest/plugins/node/postprocess/dof.js
+                            {
+                                type: "postprocess/dof",
+                                texelSize: 0.00022, // Size of one texel (1 / width, 1 / height)
+                                blurCoeff: 0.0084,	// Calculated from the blur equation, b = ( f * ms / N )
+                                ppm: 10000,         // Pixels per millimetre
+                                autofocus: true,    // Automatically synch focusDist to "cameras/pickFlyOrbit"
+
+                                nodes: [
+
+                                    // Override default lights with a single positional light source in World-space.
+                                    // Since our light is in World-space, it will move relative to our changing viewpoint, as if it
+                                    // were a fixture in the scene.
+                                    {
+                                        type: "lights",
+                                        id: "myLights",
+                                        lights: [
+                                            {
+                                                mode: "ambient",
+                                                color: {r: 0.4, g: 0.4, b: 0.6 }
+                                            },
+                                            {
+                                                mode: "dir",
+                                                color: {r: 1.0, g: 1.0, b: 1.0 },
+                                                diffuse: true,
+                                                specular: true,
+                                                dir: {x: 0.7, y: -0.5, z: -0.5 },
+                                                space: "world"
+                                            }
+                                        ],
+                                        nodes: [
+
+                                            // Blue color
+                                            {
+                                                type: "material",
+                                                color: { r: 0.6, g: 0.6, b: 0.7 },
+                                                specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                                specular: 0.7,
+                                                shine: 100,
+
+                                                nodes: [
+
+                                                    // Normal map
+                                                    {
+                                                        type: "texture",
+                                                        applyTo: "normals",
+                                                        src: 'textures/terrainNormalMap.png',
+//                                                       scale: { x: -1, z: 1 },
+                                                     //  rotate: -270,
+
+                                                        nodes: [
+
+                                                            // Heightmap, implemented by plugin at
+                                                            // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+                                                            {
+                                                                type: "geometry/heightmap",
+
+                                                                // Generate normals all at [0,1,0]
+                                                                // so that the normal map can perturb them
+                                                                emptyNormals: true,
+
+                                                                // Texture image
+                                                                src: 'textures/terrainHeightMap.png',
+
+                                                                // Wireframe or solid - default is false
+                                                                wire: false,
+
+                                                                // Dimensions
+                                                                xSize: 2000,
+                                                                zSize: 2000,
+                                                                ySize: 800,
+
+                                                                // Segments on X and Z axis
+                                                                xSegments: 30,
+                                                                zSegments: 30
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    );
+
+</script>
+</body>
+</html>

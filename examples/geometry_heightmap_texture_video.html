@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - <a href="../api/latest/plugins/node/geometry/heightmap.js" target="_other">heightmap</a> geometry with <a href="../api/latest/plugins/node/texture/video.js" target="_other">video texture</a>
+</div>
+
+<script>
+
+    // Demo of the "geometry/heightmap" custom node type
+
+    // This example is work in progress, not finished yet.
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene
+    SceneJS.createScene({
+                nodes: [
+
+                    // Mouse-orbited camera, implemented by plugin
+                    // at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                    {
+                        type: "cameras/orbit",
+                        yaw:80,
+                        pitch:-90,
+                        zoom:2,
+                        zoomSensitivity:0.5,
+                        spin: 0.1,
+
+                        nodes: [
+
+                            // Video texture node, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/texture/video.js
+                            {
+                                type: "texture/video",
+                                src: "movies/bunny.ogg",
+                                applyTo: "color",
+
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: { r: 0.7, g: 0.7, b: 0.7 },
+                                        specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                        specular: 0.0,
+                                        shine: 50.0,
+                                        nodes: [
+
+                                            // Heightmap node type implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+                                            {
+                                                type: "geometry/heightmap",
+                                                src: 'textures/heightMap.jpg'
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+
+                            // Skybox node, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/skybox/grimmNight.js
+                            {
+                                type: "skybox/clouds"
+                            }
+                        ]
+                    }
+                ]
+            }
+    );
+
+</script>
+</body>
+</html>

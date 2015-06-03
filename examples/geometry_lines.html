@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - line segments geometry
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 30,
+                zoomSensitivity: 1.0,
+
+                nodes: [
+
+                    // Set line width
+                    {
+                        type: "style",
+                        lineWidth: 3, // Default
+
+                        nodes: [
+
+                            // Geometry node which defines our custom object, a simple cube.
+                            {
+                                type: "geometry",
+
+                                // The primitive type - allowed values are
+                                // "points", "lines", "line-loop", "line-strip",
+                                // "triangles", "triangle-strip" and "triangle-fan".
+                                //
+                                // See the OpenGL/WebGL specification docs for
+                                // how the coordinate arrays are supposed to be laid out
+                                // for them.
+                                primitive: "lines",
+
+                                // The vertices - eight for our cube, each
+                                // one spanning three array elements for X,Y and Z
+                                positions: [
+
+                                    // v0-v1-v2-v3 front
+                                    5, 5, 5,
+                                    -5, 5, 5,
+                                    -5, -5, 5,
+                                    5, -5, 5,
+
+                                    // v0-v3-v4-v5 right
+                                    5, 5, 5,
+                                    5, -5, 5,
+                                    5, -5, -5,
+                                    5, 5, -5,
+
+                                    // v0-v5-v6-v1 top
+                                    5, 5, 5,
+                                    5, 5, -5,
+                                    -5, 5, -5,
+                                    -5, 5, 5,
+
+                                    // v1-v6-v7-v2 left
+                                    -5, 5, 5,
+                                    -5, 5, -5,
+                                    -5, -5, -5,
+                                    -5, -5, 5,
+
+                                    // v7-v4-v3-v2 bottom
+                                    -5, -5, -5,
+                                    5, -5, -5,
+                                    5, -5, 5,
+                                    -5, -5, 5,
+
+                                    // v4-v7-v6-v5 back
+                                    5, -5, -5,
+                                    -5, -5, -5,
+                                    -5, 5, -5,
+                                    5, 5, -5
+                                ],
+
+                                // Indices - these organise the
+                                // positions into geometric primitives in accordance
+                                // with the "primitive" parameter,
+                                // in this case a pair of indices for each line segment.
+                                indices: [
+                                    0, 1, 2,
+                                    0, 2, 3,
+                                    // front
+                                    4, 5, 6,
+                                    4, 6, 7,
+                                    // right
+                                    8, 9, 10,
+                                    8, 10, 11,
+                                    // top
+                                    12, 13, 14,
+                                    12, 14, 15,
+                                    // left
+                                    16, 17, 18,
+                                    16, 18, 19,
+                                    // bottom
+                                    20, 21, 22,
+                                    20, 22, 23
+
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

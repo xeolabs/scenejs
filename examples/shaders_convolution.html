@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+</head>
+<body>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Custom shader
+            // Taken from GLSL Sandbox: http://glsl.heroku.com/e#19467.0
+            {
+                type: "shader/convolution",
+                id: "myShader",
+
+                params: {
+                    axis: "x"
+                },
+                nodes: [
+                    {
+                        type: "geometry/quad"
+                    }
+                ]
+            }
+        ]
+    });
+
+    scene.getNode("myShader",
+            function (shader) {
+
+                var time = 0;
+                scene.on("tick",
+                        function (params) {
+
+                            shader.setParams({
+                                time: time += 0.05
+                            });
+                        });
+            })
+    ;
+
+</script>
+</body>
+</html>

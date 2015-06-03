@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - <a href="../api/latest/plugins/node/import/obj.js" target="_other">OBJ</a> importer
+    <br>
+    learn more in <a href="http://xeolabs.com/articles/scenejs-obj-md2-3ds/" target="_other">this tutorial</a>
+</div>
+
+<script>
+
+    // Using the "import/obj" node to import a raptor mesh from .OBJ format
+    // Internally, the node uses the K3D library for parsing - http://k3d.ivank.net/
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene
+    SceneJS.createScene({
+                nodes: [
+
+                    // Mouse-orbited camera,implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                    {
+                        type: "cameras/orbit",
+                        yaw: -40,
+                        pitch: -20,
+                        zoom: 200,
+                        zoomSensitivity: 20.0,
+
+                        nodes: [
+
+                            // Move the raptor a bit to centre it
+                            {
+                                type: "translate", y: -30, z: -20,
+                                nodes: [
+
+                                    // Texture our raptor - the "import.obj" node merely imports meshes, so
+                                    // it's our job to apply any materials and textures. This tends to be OK
+                                    // because for efficiency we would usually have one big baked texture
+                                    // like this one.
+                                    //
+                                    // Texture is loaded from:
+                                    // http://scenejs.org/examples/models/obj/raptor.jpg
+
+                                    {
+                                        type: "texture",
+                                        src: "models/obj/raptor.jpg",
+
+                                        nodes: [
+
+                                            // Import the .OBJ mesh
+                                            //
+                                            // This node is implemented by plugin at:
+                                            // http://scenejs.org/api/latest/plugins/node/import/obj.js
+                                            //
+                                            // The OBJ file is loaded from:
+                                            // http://scenejs.org/examples/models/obj/raptor.obj
+
+                                            {
+                                                type: "import/obj",
+                                                src: "models/obj/raptor.obj"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    );
+
+</script>
+</body>
+</html>

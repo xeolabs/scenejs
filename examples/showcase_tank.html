@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+
+    <script type="application/x-javascript" src="libs/sylvester.js"></script>
+
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - Tank Program from the 1982 Disney motion picture "Tron" <br>
+    <br>
+    tank is implemented by the <a href="../api/latest/plugins/node/models/vehicles/tank.js"  target="_other">models/vehicles/tank</a> node type<br>
+    converted from COLLADA model created by <a href="https://3dwarehouse.sketchup.com/user.html?id=1058361951245355501624136" target="_other">Katase</a><br>
+    <br>
+    mouse wheel to control speed<br>
+    drag to orbit<br>
+</div>
+
+<script>
+
+// Tron Tank Demo
+// Demonstrates lighting, shader customization, view and modelling transforms, texturing,
+// materials and geometry
+
+//Point SceneJS to the bundled plugins
+SceneJS.setConfigs({
+    pluginPath: "../api/latest/plugins"
+});
+
+// Create scene
+var scene = SceneJS.createScene({
+
+    nodes: [
+
+        // View transform - we've given it a globally-unique ID
+        // so we can look it up and update it's properties from
+        // mouse input
+        {
+            type: "lookAt",
+            id: "theLookAt",
+            eye: { x: 0, y: 10, z: -50 },
+
+            nodes: [
+
+                // Depth-of-field blur effect, implemented by plugin at:
+                // http://scenejs.org/api/latest/plugins/node/postprocess/dof.js
+                {
+              //      type: "postprocess/dof",
+                    id: "myDOF",
+                    texelSize: 0.00022,     // Size of one texel (1 / width, 1 / height)
+                    blurCoeff: 0.0084,	    // Calculated from the blur equation, b = ( f * ms / N )
+                    ppm: 5000,              // Pixels per millimetre
+                    autofocus: true,        // Auto synch focus dist with lookat eye->look length
+
+                    nodes: [
+
+                        {
+                            type: "lights",
+                            lights: [
+                                {
+                                    mode: "ambient",
+                                    color: { r: 0.7, g: 0.7, b: 0.9 },
+                                    diffuse: false,
+                                    specular: false
+                                },
+                                {
+                                    mode: "dir",
+                                    color: { r: 1.0, g: 1.0, b: 1.0 },
+                                    diffuse: true,
+                                    specular: false,
+                                    dir: { x: 1.0, y: -0.9, z: -0.7 },
+                                    space: "world"
+                                },
+                                {
+                                    mode: "dir",
+                                    color: { r: 1.0, g: 1.0, b: 1.0 },
+                                    diffuse: true,
+                                    specular: false,
+                                    dir: { x: -1.0, y: -0.9, z: 0.7 },
+                                    space: "world"
+                                }
+                            ],
+
+                            nodes: [
+
+                                // Reflection of cloudy sky
+                                // http://scenejs.org/api/latest/plugins/node/reflect/clouds.js
+                                {
+                                    type: "reflect/clouds",
+                                    intensity: 0.2,
+
+                                    nodes: [
+
+                                        // Tank,implemented by plugin at:
+                                        // http://scenejs.org/api/latest/plugins/node/models/vehicles/tank.js
+                                        {
+                                            type: "models/vehicles/tank",
+                                            id: "myTank"
+                                        }
+                                    ]
+                                },
+
+                                // Tank,implemented by plugin at:
+                                // http://scenejs.org/api/latest/plugins/node/models/ground/grid.js
+                                {
+                                    type: "models/ground/grid"
+                                }
+                            ]
+                        }
+                    ]
+                },
+
+                // Skybox with custom texture, implemented by plugin at
+                // http://scenejs.org/api/latest/plugins/node/skyboxes/clouds.js
+                {
+                    type: "skybox/clouds"
+                }
+            ]
+        }
+    ]
+});
+
+
+function getBlocks() {
+    var nodes = [];
+    var extent = 4000;
+    var inc = extent / 20;
+    for (var x = -extent; x < extent; x += inc) {
+        for (var z = -extent; z < extent; z += inc) {
+            nodes.push({
+                type: "translate",
+                x: x,
+                y: 10,
+                z: z,
+                nodes: [
+                    {
+                        type: "scale", x: 20, y: 20, z: 20,
+                        nodes: [
+                            {
+                                type: "geometry/box"
+                            }
+                        ]
+                    }
+                ]
+            });
+        }
+    }
+
+    return  {
+        // Procedural color texture implemented by plugin at
+        // http://scenejs.org/api/latest/plugins/node/texture/procedural.js
+
+        type: "texture/procedural",
+        code: [
+            // Fragment shader from GLSL sandbox
+            "precision mediump float;",
+            "uniform vec2 resolution;",
+            "float hash(float x){",
+            "    return fract(sin(x) * 43758.23);",
+            "}",
+            "float hash21(vec2 uv) {",
+            "    return fract(sin(uv.x * 15.78 + uv.y * 35.14) * 43758.23);",
+            "}",
+            "mat2 m = mat2(15.78, 35.78, 75.39, 154.27);",
+            "vec2 hash22(vec2 uv){",
+            "    return fract(sin(m * uv) * 43758.23);",
+            "}",
+            "void main( void ) {",
+            "    vec2 uv = gl_FragCoord.xy / resolution  * 20.0; ",
+            "    vec2 g = floor(uv);",
+            "    vec2 f = fract(uv);",
+            "    float res = 1.0;",
+            "    for(int i = -1; i <= 1; i++){",
+            "        for(int j = -1; j <= 1; j++){",
+            "            vec2 b = vec2(i, j);",
+            "            vec2 v = b + hash22(g + b) - f;",
+            "            float d = length(v);",
+            "            res = min(d, res);",
+            "        }",
+            "    }",
+            "    float c = res;",
+            "    gl_FragColor = vec4(c*.4,c,c*.6,1.0);",
+            "}"
+        ],
+        nodes: [
+            { type: "material",
+                color: {r: 0.4, g: 0.4, b: 0.4 }, specular: 0.5, nodes: nodes }
+        ]
+    }
+}
+
+/*----------------------------------------------------------------------
+ * Scene rendering loop and mouse handler stuff follows
+ *---------------------------------------------------------------------*/
+
+var needUpdate = true;
+var speed = 0;
+var tankPos = { x: 0, y: 0, z: -80 };
+var eyeDir = 0;
+var eye = { x: 0, y: 10, z: -10 };
+
+var lastX;
+var lastX2;
+var lastY2;
+var lastY;
+var dragging = false;
+
+var tankYaw = 0;
+var tankYawInc = 0;
+
+var trailYaw = 0;
+var trailYawInc = 0;
+
+var pitch = 25;
+var pitchInc = 0;
+
+var turretRotating = false;
+
+function mouseDown(event) {
+    lastX = event.clientX;
+    lastX2 = lastX;
+    lastY2 = lastY;
+    lastY = event.clientY;
+    dragging = true;
+}
+
+function touchStart(event) {
+    lastX = event.targetTouches[0].clientX;
+    lastX2 = lastX;
+    lastY2 = lastY;
+    lastY = event.targetTouches[0].clientY;
+    dragging = true;
+}
+
+function mouseUp() {
+    dragging = false;
+    tankYawInc = 0;
+    pitchInc = 0;
+}
+
+function touchEnd() {
+    dragging = false;
+    tankYawInc = 0;
+    pitchInc = 0;
+}
+
+function mouseMove(event) {
+    var posX = event.clientX;
+    var posY = event.clientY;
+    actionMove(posX, posY);
+}
+
+function touchMove(event) {
+    var posX = event.targetTouches[0].clientX;
+    var posY = event.targetTouches[0].clientY;
+    actionMove(posX, posY);
+}
+
+/* On a mouse/touch drag, we'll re-render the scene, passing in
+ * incremented angles in each time.
+ */
+function actionMove(posX, posY) {
+    if (dragging) {
+        tankYawInc = (posX - lastX) * -0.01;
+        pitchInc = (lastY - posY) * 0.001;
+        lastX2 = posX;
+        lastY2 = posY;
+    }
+}
+
+function mouseWheel(event) {
+    var delta = 0;
+    if (!event) event = window.event;
+    if (event.wheelDelta) {
+        delta = event.wheelDelta / 120;
+        if (window.opera) delta = -delta;
+    } else if (event.detail) {
+        delta = -event.detail / 3;
+    }
+    if (delta) {
+        if (delta < 0) {
+            speed -= 0.2;
+        } else {
+            speed += 0.2;
+        }
+    }
+    if (event.preventDefault)
+        event.preventDefault();
+    event.returnValue = false;
+}
+
+var canvas = scene.getCanvas();
+
+canvas.addEventListener('mousedown', mouseDown, true);
+canvas.addEventListener('mousemove', mouseMove, true);
+canvas.addEventListener('mouseup', mouseUp, true);
+canvas.addEventListener('touchstart', touchStart, true);
+canvas.addEventListener('touchmove', touchMove, true);
+canvas.addEventListener('touchend', touchEnd, true);
+canvas.addEventListener('mousewheel', mouseWheel, true);
+canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
+
+scene.getNode("theLookAt", function (lookat) {
+
+    scene.getNode("myTank",
+            function (tank) {
+
+                scene.on("tick",
+                        function () {
+
+                            if (!needUpdate && ( pitchInc == 0 && tankYawInc == 0 && speed == 0 && trailYaw == 0)) {
+                                return;
+                            }
+                            needUpdate = false;
+
+                            pitch += pitchInc;
+
+                            if (pitch < 1) {
+                                pitch = 1;
+                            }
+
+                            if (pitch > 80) {
+                                pitch = 80;
+                            }
+
+                            tankYaw += tankYawInc;
+                            var tankYawMat = Matrix.Rotation(tankYaw * 0.0174532925, $V([0, 1, 0]));
+
+                            var moveVec = [0, 0, 1];
+
+                            moveVec = tankYawMat.multiply($V(moveVec)).elements;
+
+                            var trailVec = [0, 0, -1 - (pitch * 0.02)];
+
+                            var trailPitchMat = Matrix.Rotation(pitch * 0.0174532925, $V([1, 0, 0]));
+                            var trailYawMat = Matrix.Rotation(trailYaw * 0.0174532925, $V([0, 1, 0]));
+
+                            trailVec = trailPitchMat.multiply($V(trailVec)).elements;
+                            trailVec = trailYawMat.multiply($V(trailVec)).elements;
+
+                            if (speed) {
+                                tankPos.x += moveVec[0] * speed;
+                                //tankPos.y += moveVec[1] * speed;
+                                tankPos.z += moveVec[2] * speed;
+                            }
+
+                            if (eye.y > 100.0) {
+                                eye.y = 100.0;
+                            }
+
+                            if (eye.y < 20.0) {
+                                eye.y = 20.0;
+                            }
+
+                            eye.x = tankPos.x + (trailVec[0] * 25);
+                            eye.y = tankPos.y + (trailVec[1] * 25);
+                            eye.z = tankPos.z + (trailVec[2] * 25);
+
+                            lookat.setEye(eye);
+                            lookat.setLook(tankPos);
+
+                            tank.setPos(tankPos);
+                            tank.setDir(tankYaw + 180 || 180);
+                            tank.setGunDir(-tankYaw);
+
+                            if (trailYaw > tankYaw) {
+                                trailYaw -= (((trailYaw - tankYaw) * 0.01)) + 0.1;
+
+                            } else if (trailYaw < tankYaw) {
+                                trailYaw += (((tankYaw - trailYaw) * 0.01)) + 0.1;
+                            }
+                        });
+
+            });
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="libs/stats.min.js"></script>
+    <script src="../api/latest/scenejs.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    //-----------------------------------------------------------------------------------------------------------------
+    // Benchmark - 40000 boxes without texture
+    //-----------------------------------------------------------------------------------------------------------------
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:600,
+                zoomSensitivity:10.0,
+                spin: 0.1, // Slowly spin about X axis
+
+                nodes: [
+
+                    // Randomly scattered boxes, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/geometry/randomObjects.js
+                    {
+                        type: "geometry/randomObjects",
+                        numObjects: 400000
+                    }
+                ]
+            }
+        ]
+    });
+
+
+
+</script>
+</body>
+</html>

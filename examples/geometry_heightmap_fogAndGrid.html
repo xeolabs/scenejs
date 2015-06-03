@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoLight">
+    <a href="http://scenejs.org">SceneJS</a> - <a href="../api/latest/plugins/node/geometry/heightmap.js"
+                                                  target="_other">heightmap</a> geometry with <a
+        href="../api/latest/plugins/node/shader/fog.js" target="_other">fog</a>, a <a
+        href="../api/latest/plugins/node/texture/procedural/grid.js" target="_other">grid</a> procedural texture and a
+     <a href="../api/latest/plugins/node/cameras/pickFlyOrbit.js" target="_other">pick-fly-orbit</a> camera
+    <br>
+    click on something to fly to that point
+    <br>
+    drag mouse to orbit it, mouse wheel to zoom in and out
+</div>
+
+<script>
+
+    // Demo of the "geometry/heightmap" custom node type, with an "shader/fog" node thrown in for fun.
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create a scene
+    SceneJS.createScene({
+                nodes: [
+
+                    // Mouse-controlled camera that orbits a ray-picked point
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbitPick.js
+                    {
+                        type: "cameras/pickFlyOrbit",
+                        yaw: -40,
+                        pitch: -20,
+                        maxPitch: -10,
+                        minPitch: -80,
+                        zoom: 800,
+                        eye: { x: 0, y: 150, z: -1000 },
+                        look: { x: 0, y: 150, z: 0 },
+                        zoomSensitivity: 20.0,
+                        showCursor: true,
+                        cursorSize: 10.0,
+
+                        nodes: [
+
+                            // Fog effect, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/shader/fog.js
+                            {
+                                type: "shader/fog",
+                                mode: "exp2", // Quadratic
+                                density: 0.1, // Fog density
+                                start: 100.0, // Near starting point
+                                end: 1500.0, // Far ending point
+                                color: { r: 0.0, g: 0.5, b: 0.0 }, // Fog color
+
+                                nodes: [
+                                    // Override default lights with custom lights that happen to
+                                    // be the same as the default lights
+                                    {
+                                        type: "lights",
+                                        lights: [
+                                            {
+                                                mode: "ambient",
+                                                color: { r: 0.0, g: 0.5, b: 0.0 }
+                                            }
+                                        ],
+
+                                        nodes: [
+                                            {
+                                                type: "material",
+                                                emit: 1,
+                                                nodes: [
+
+                                                    // Procedural grid texture, implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/procedural/grid.js
+                                                    {
+                                                        type: "texture/procedural/grid",
+
+                                                        nodes: [
+
+                                                            // Heightmap, implemented by plugin at
+                                                            // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+                                                            {
+                                                                type: "geometry/heightmap",
+
+                                                                // Texture image
+                                                                src: 'textures/heightMap.jpg',
+
+                                                                // Wireframe or solid - default is false
+                                                                wire: false,
+
+                                                                // Dimensions
+                                                                xSize: 5000,
+                                                                zSize: 5000,
+                                                                ySize: 400,
+
+                                                                // Segments on X and Z axis
+                                                                xSegments: 200,
+                                                                zSegments: 200
+                                                            },
+
+                                                            // Skybox node, implemented by plugin at
+                                                            // http://scenejs.org/api/latest/plugins/node/skybox/grimmNight.js
+                                                            {
+                                                                type: "skybox/clouds"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    );
+
+</script>
+</body>
+</html>

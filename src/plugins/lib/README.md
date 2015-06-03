@@ -1,0 +1,1 @@
+Support libraries for SceneJS node type plugins

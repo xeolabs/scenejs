@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+</head>
+
+<body>
+
+<div id="infoDark"><a href="http://scenejs.org" target="_other">SceneJS</a> - extending - creating a new node type - pubsub
+    <br><br>
+    In this example we create a new scene node type, which consists of a growing teapot<br>
+    that periodically publishes its height as that increases.
+    <br><br>
+    Learn more about creating new node types in <a href="http://xeolabs.com/articles/scenejs-node-types/" target="_other">this tutorial</a>
+    <br><br>
+    Output published by our node:
+    <div id="infoTxt">
+    </div>
+</div>
+
+<script>
+
+    //
+    // This example demonstrates a custom node type that performs
+    // some sort of asynchronous task, then publishes a result to subscribers.
+    //   
+    // The published result is shown in an alert.
+    //
+    // In this example, the task involves simply increasing the height of the teapot, then
+    // firing the publication when the teapot has reached its target height.
+    //
+
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Define a new node type:
+    SceneJS.Types.addType("growingTeapot", {
+
+        // Node constructor.        
+        init:function (params) {
+
+            // Our node will contain a teapot that grows in height on the Y-axis
+            var scale = this.addNode({
+                type:"scale",
+                x:1,
+                y:0,
+                z:1,
+                nodes:[
+
+                    // Green material
+                    {
+                        type:"material",
+                        color:{ r:0.6, g:0.6, b:1.0 },
+                        nodes:[
+
+                            // Teapot primitive,
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                            {
+                                type:"geometry/teapot"
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            // Start growing the teapot within the scene animation loop
+            var ySize = 0;
+            var self = this;
+            this._tick = this.getScene().on("tick",
+                    function () {
+
+                            self.publish("teapotHeight", {
+                                newHeight:ySize
+                            });
+
+                        if (ySize >= 1) {
+
+                            // Unsubscribe from scene render loop
+                            self.getScene().off(self._tick);
+                            return;
+                        }
+
+                        scale.setY(ySize += 0.01);
+                    });
+        },
+
+        /**
+         * Node destructor, unsubscribes from scene tick
+         */
+        destroy:function () {
+            this.getScene().off(this._tick);
+        }
+    });
+
+    // Create a scene that contains an instance of our node type
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:5,
+                nodes:[
+
+                    // An instance of our node type
+                    {
+                        type:"growingTeapot",
+                        id:"myGrowingTeapot"
+                    }
+                ]
+            }
+        ]
+    });
+
+    var info = document.getElementById("infoTxt");
+
+    // Get the custom node
+    scene.getNode("myGrowingTeapot",
+            function (myGrowingTeapot) {
+
+                // Subscribe to its publication topic
+                myGrowingTeapot.on("teapotHeight",
+                        function (data) {
+
+                            // Show the publication in an alert
+                            info.innerHTML = JSON.stringify(data);
+                        });
+            });
+
+</script>
+</body>
+</html>

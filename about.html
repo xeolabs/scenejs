@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>SceneJS V3</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <link href="css/styles.css" rel="stylesheet"/>
+
+    <script src="lib/jquery-1.8.3.min.js"></script>
+
+    <script src="lib/jquery.bxslider.min.js"></script>
+    <link href="css/jquery.bxslider.css" rel="stylesheet"/>
+
+    <link href="css/prettify.css" rel="stylesheet"/>
+    <script src="lib/prettify.js"></script>
+
+
+    <style>
+        p.sectionHeading {
+            font-weight: bold;
+            font-size: 20px;
+            padding-bottom: 0;
+            padding-top: 15px;
+        }
+
+        p.quickStart {
+            font-weight: bold;
+            font-size: 30px;
+            padding-bottom: 0;
+            padding-top: 15px;
+        }
+
+        p.bulletHeading {
+            font-weight: bold;
+            padding-top: 0px;
+            padding-bottom: 5px;
+        }
+
+        p.bullet {
+            padding-top: 0;
+            padding-bottom: 5px;
+            margin-top: 0px;
+            /*line-height: 20px;*/
+            /*color: #2a2a2a;            */
+        }
+
+            /*p {*/
+            /*padding-top: 0;*/
+
+            /*margin-top: 0px;*/
+            /*line-height: 20px;*/
+            /*color: #2a2a2a;*/
+            /*font: 400 14px/1.4 "Open Sans", sans-serif;*/
+            /*}*/
+
+        .col {
+            background-repeat: no-repeat;
+            background-color: white;
+        }
+
+        .left {
+            float: left;
+            width: 45%;
+            padding: 10px;
+            padding-left: 0;
+        }
+
+        .right {
+            float: left;
+            width: 40%;
+            padding-left: 20px;
+            padding-top: 10px;
+            padding-right: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="top">
+    <div class="links"><a href="index.html">Home</a>&nbsp;&nbsp;|&nbsp;&nbsp;<span>About</span>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+            href="examples.html">Examples</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+            href="https://github.com/xeolabs/scenejs#downloads">Downloads</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+            href="https://github.com/xeolabs/scenejs/issues">Issues</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+            href="https://github.com/xeolabs/scenejs/tree/V3.1/licenses">License</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+            href="https://twitter.com/xeolabs">Twitter</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a
+            href="http://www.facebook.com/group.php?gid=350488973712">Facebook</a></div>
+</div>
+
+
+<div id="intro">
+    <!--<p>A JSON-based scene graph engine on WebGL</p>-->
+    <p><span class="strong">SceneJS</span> is an open-source 3D engine for JavaScript that provides a JSON-based scene
+        graph API on WebGL. It was created by <a href="http://about.me/kaylindsay">Lindsay Kay</a> for efficient
+        rendering of large numbers
+        of objects for high-detail visualisation.</p>
+</div>
+
+<div id="container">
+<div style="width:100%;">
+<div class="col left">
+
+    <ul>
+        <li><a href="#scene">Scene Graph</a>
+        <li><a href="#compilation">Optimised Draw List</a></li>
+        <li><a href="#shaderGeneration">Shader Generation</a></li>
+        <li><a href="#lostContext">Lost WebGL Recovery</a>
+        <li><a href="#optimisation">Scene Optimisation</a></li>
+        <li><a href="#extensibility">Custom Scene Node Types</a></li>
+    </ul>
+
+    <a name="scene"></a>
+
+    <h3>1. What's a Scene Graph?</h3>
+
+    <p>A scene graph is a data structure that arranges the logical and spatial
+        representation of a graphical scene as a collection of nodes in a graph, typically
+        a tree. Scene graphs typically provide a convenient
+        abstraction on top of low-level graphics APIs (such as WebGL) that encapsulates optimisations
+        and API best practices, leaving the developer free to concentrate on
+        scene content.</p>
+
+    <p>A key feature of most scene graphs is state inheritance in which
+        child nodes inherit the states set up by parents (e.g. coordinate spaces,
+        appearance attributes etc).</p>
+
+    <p>For SceneJS, a benefit of this kind structure
+        is modularity, where JSON subtrees can be complete reusable components.</p>
+
+    <a name="compilation"></a>
+
+    <h3>2. Optimised Draw List</h3>
+
+    <p>When aiming at high performance 3D graphics in the browser, the greatest performance bottleneck
+        is JavaScript execution overhead.</p>
+
+    <p>SceneJS efficiently bridges the gap between its user-friendly scene graph representation and
+        WebGL usage through a three step pipeline:</p>
+    <ol>
+        <li><strong>Scene definition</strong> - a JSON definition like that of Listing 1 is parsed
+            to create a scene graph like Figure 2, with resources such as vertex
+            buffer objects (VBOs) and textures stored for its nodes on the GPU.
+            Note the geometry nodes at the leaves.
+        </li>
+
+        <li><strong>Draw list compilation</strong> - the scene graph is then compiled into an
+            optimised sequence of WebGL calls, in which the calls are sorted so that the state changes
+            they make on WebGL will be closer to the most efficient sequence for rendering the frame.
+        </li>
+
+        <li>The draw list is executed to render the frame.</li>
+    </ol>
+
+    <p>SceneJS retains the draw list for fast redraw. Then whenever an update is made to the scene graph,
+        SceneJS will recompile only the affected portion of the draw list from the modified
+        nodes or branches. In many cases (such as changing a color or a rotation angle) this is trivial
+        and instantaneous, where the display nodes and scene nodes share values by reference. In the worst case,
+        such as for a scene restructuring, SceneJS must re-traverse the scene graph to regenerate nodes in
+        the draw list, however in most cases this is just a limited branch re-traversal to regenerate a
+        limited portion of the draw list.</p>
+
+    <a name="shaderGeneration"></a>
+
+    <h3>3. Shader Generation</h3>
+
+    <ul>
+        <li><a href="" target="_other">Demo</a></li>
+    </ul>
+
+    <a name="lostContext"></a>
+
+    <h3>4. Lost WebGL Context Recovery</h3>
+
+    <p>The GPU is a shared resource, and there are times when it might be taken away from our WebGL
+        applications,
+        such as when there are too many applications holding them, or when another application does something
+        that
+        ties up the GPU too long (perhaps even a DOS attack via shader, perish the thought). In such cases the
+        operating system or browser may decide to reset the GPU to regain control.</p>
+
+    <p>When this happens, our WebGL apps will need to reallocate their textures, VBOs, shaders etc. on a new
+        context afterwards.</p>
+
+    <p>SceneJS takes care of that recovery transparently, without disruption to code at higher layers.
+        When WebGL restores the context again, SceneJS automatically reallocates the shaders and buffers
+        from data it retains in its scene graph, without needing to reload anything off
+        the server, and without loss of any scene state.</p>
+
+    <p>It's surprising how quick that recovery is - SceneJS was benchmarked at around 5-7 seconds
+        to recover a scene containing approximately 2000 meshes and 100 textures.</p>
+
+    <p>[&nbsp;<a href="http://scenejs.org/examples.html?page=webglContextLost" target="_other">Demo</a>&nbsp;]</p>
+    <a name="optimisation"></a>
+
+    <h3>5. Scene Optimisation</h3>
+
+    <p>The SceneJS API supports several scene definition techniques that improve scene
+        performance by exploiting the draw list state sorting order described above.
+
+    <h4>5.1. Texture Atlases</h4>
+
+    <p>A texture atlas is a large image that contains many sub-images, each of
+        which is used as a texture for a different geometry, or different parts of
+        the same geometry. The sub-textures are applied by mapping the geometries’
+        texture coordinates to different regions of the atlas. SceneJS sorts
+        its draw list by shader, then by texture. So long as
+        each of the geometry nodes inherit the same configuration of parent node
+        states, and can therefore share the same shader, the draw list will bind
+        the texture once for all the geometries. Another important benefit of texture
+        atlases is that they reduce the number of HTTP requests for texture
+        images.</p>
+
+    <p>[&nbsp;<a href="http://scenejs.org/examples.html?page=textureAtlas" target="_other">Demo</a>&nbsp;]</p>
+
+
+    <h4>5.2. VBO Sharing</h4>
+
+    <p>VBO sharing is a technique in which a parent geometry node defines vertices
+        (consisting of position, normal and UV arrays) that are inherited by
+        child geometry nodes, which supply their own index arrays pointing into
+        different portions of the vertices. The parent VBOs are then bound once
+        across the draw calls for all the children. Each child is a separate object,
+        which as shown in Figure SceneJS:vboSharingListing, each child geometry
+        can be wrapped by different texture or materials etc.</p>
+
+    <p>[&nbsp;<a href="http://scenejs.org/examples.html?page=vertexSharing" target="_other">Demo</a>&nbsp;]</p>
+
+    <h4>5.3. Shareable Node Cores</h4>
+    Traditionally, re-use within a scene graph is done by attaching nodes to
+    multiple parents. For dynamically updated scenes this can have a performance
+    impact when the engine must traverse multiple parent paths in the
+    scene graph, so SceneJS takes an alternative approach with ”node cores”,
+    a concept borrowed from OpenSG.
+    A node core is the node’s state. Having multiple nodes share a core
+    means that they share the same state. This can have two performance
+    benefits:
+    <ol>
+        <li>An update to shared node can write through to multiple draw and
+            call list nodes simultaneously.
+        </li>
+        <li>There is increased chance of identical repeated states having matching
+            IDs when executing the call list, which as described in Section 0.2.2,
+            tracks the state IDs to avoid redundantly reapplying them.
+            Listing 5 shows an example of node core sharing through the scene
+            definition API.
+        </li>
+    </ol>
+
+    <p>[&nbsp;<a href="http://scenejs.org/examples.html?page=sharedNodeCores" target="_other">Demo</a>&nbsp;]</p>
+
+    <a name="extensibility"></a>
+
+    <h3>6. Custom Scene Node Types</h3>
+
+    <p>New node types can be provided as plugins. This allows us to define our
+        own high-level (perhaps even domain-specific) scene components that just slot
+        straight into the scene graph as nodes which you create and update
+        as usual via the JSON API.</p>
+
+    <p>Custom nodes are effectively <i>actors</i>, which may create and manage subtrees
+        of child nodes beneath themselves, including other custom node types.</p>
+
+    <p>SceneJS comes with a growing library of various custom node types, such as
+        cameras, geometric primitives, special effects, buildings, vehicles, and
+        so on.</p>
+
+    <p>
+    <ul>
+        <li><a href="http://scenejs.org/examples.html?page=customNodesSkyGridAndTeapot" target="_other">Demo</a></li>
+        <li><a href="https://github.com/xeolabs/scenejs#custom-node-types" target="_other">More info</a></li>
+    </ul>
+    </p>
+</div>
+<div class="col right">
+    <a name="sceneDef"></a>
+        <pre class="prettyprint lang-javascript" style="margin-bottom:20px;">
+var scene = SceneJS.createScene({
+    nodes: [{
+        type: "material",
+        color: {
+            r: 0.5,
+            g: 0.5,
+            b: 1.0
+        },
+
+        nodes: [{
+            type: "texture",
+            layers: [{
+                src: "../../textures/superman.jpg"
+            }],
+
+            nodes: [{
+                type: "translate",
+                id: "firstBoxPos,
+                x: -3.0,
+                y: 1.0,
+                z: 5.0,
+
+                nodes: [{
+                    type: "geometry/box"
+                }]
+            }, {
+                type: "translate",
+                y: 1.0,
+                z: 5.0,
+
+                nodes: [{
+                    type: "geometry/box"
+                }]
+            }]
+        }, {
+            type: "geometry/teapot"
+        }]
+    }]
+});</pre>
+    <p><strong>Listing 1.</strong> Scene graph definition. The scene graph is a directed acyclic
+        graph expressed in JSON, in this case defining a scene containing a blue
+        teapot and two boxes sharing the same textured appearance. Geometry nodes are normally
+        at the leaves, where they inherit the state defined by higher nodes, in this case the
+        material and rotation transform.
+    </p>
+
+
+    <img src="images/sceneGraphObjects.png">
+
+    <p><strong>Figure 1.</strong> Scene graph data structure compiled from the scene definition
+        of Listing 1. Note that geometries at the leaves inherit state from parent nodes, and that
+        various nodes hold resources allocated for them on the GPU.
+    </p>
+
+    <br/><br/>
+    <img src="images/drawListObjects.png">
+
+    <p><strong>Figure 2.</strong> State-sorted draw list compiled from the scene graph data structure
+        of Figure 1. Draw list nodes N1, N2 and N3 reference scene node states to activate on WebGL to
+        draw the teapot and cubes. N2 and N3 reference a similar state configuration and therefore
+        reference the same shader. The draw list nodes are ordered to minimise re-activation of
+        texture, geometry and shaders when rendering the frame. Note how the same box geometry
+        is shared by N1 and N2.
+    </p>
+
+    <br/><br/><br/><br/>
+    <a href="examples.html?page=secondExample" target="_other"><img src="images/secondExample.jpg"></a>
+
+    <p><strong>Figure 3.</strong> Screenshot of the 3D scene rendered from the draw list of Figure 2.
+        Run it <a href="examples.html?page=secondExample" target="_other">here</a>.
+    </p>
+
+
+    <br/><br/><br/><br/>
+    <a name="animation"></a>
+            <pre class="prettyprint lang-javascript" style="margin-bottom:20px;">
+scene.getNode("firstBoxPos", function (firstBoxPos) {
+
+    var y = 1.0;
+    var inc = 0.02;
+
+    scene.on("tick", function () {
+        firstBoxPos.setY(y);
+        y += inc;
+
+        if (y > 5 || y < 1.0) {
+            inc *= -1.0;
+        }
+    });
+});
+</pre>
+    <p><strong>Listing 2.</strong> Animating the Y-axis position of the first box.
+        The translation node above the box is located by ID, then its Y-axis
+        translation offset is updated on each tick of the scene render loop.
+    </p>
+
+
+    <br/><br/><br/><br/>
+    <a name="nodeCores"></a>
+            <pre class="prettyprint lang-javascript">
+var scene = SceneJS.createScene({
+    nodes:[
+        // Define a couple of nodes , in a library
+        // to prevent them rendering by themselves :
+        {
+            type: "library",
+            nodes: [
+                {
+                    type: "geometry",
+                    coreId: " myGeometryCore",
+                    positions: [..],
+                    indices: [..],
+                    primitive:"triangles"
+                },
+                {
+                    type: "material",
+                    coreId: "myMaterialCore",
+                    color: { r: 1.0 }
+                }
+            ]
+        },
+        // Share their cores:
+        {
+            type: "material",
+            id: "myMaterial",
+            coreId: "myMaterialCore",
+            nodes: [
+                {
+                    type: "geometry",
+                    coreId: "myGeometryCore"
+                }
+            ]
+        }
+    ]
+});
+</pre>
+    <p><strong>Listing 2.</strong> State reuse through shared node cores.
+        We define geometry and material nodes within a library node, which prevents
+        them from being rendered. The geometry and material each have a coreId
+        which allows their state (VBOs, colour etc.) to be shared by other nodes of the
+        same type later in the scene.
+    </p>
+
+</div>
+</div>
+</div>
+
+<a href="https://github.com/xeolabs/scenejs" target="_blank"><img
+        style="position: absolute; top: 0; left: 0; border: 0;"
+        src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
+
+<script>
+
+    jQuery(document).ready(
+            function ($) {
+                addFeatures();
+                addPrettify();
+                addSlider();
+            });
+
+    function addFeatures() {
+        $.ajax({
+            type:'GET',
+            url:'examples/features.json',
+            dataType:'json',
+            success:function (features) {
+
+                var featureList = $('#featureList');
+
+                var category;
+                var categoryElem;
+                var subCategoryElem;
+                var featureElem;
+                var subSection;
+                var subCategory;
+                var feature;
+
+                var li;
+
+                for (var categoryName in features) {
+                    if (features.hasOwnProperty(categoryName)) {
+
+                        category = features[categoryName];
+
+                        categoryElem = $('<h3/>')
+                                .addClass('feature-category')
+                                .text(category.title)
+                                .appendTo(featureList);
+
+                        for (var i = 0, len = category.nodes.length; i < len; i++) {
+                            subCategory = category.nodes[i];
+                            subCategoryElem = $('<div/>')
+                                    .addClass('feature-subcategory')
+                                    .appendTo(featureList);
+
+                            var nodes = subCategory.nodes;
+                            if (nodes) {
+                                for (var j = 0, lenj = subCategory.nodes.length; j < lenj; j++) {
+                                    feature = subCategory.nodes[j];
+                                    featureElem = $('<a/>')
+                                            .addClass('feature-feature')
+                                            .attr('href', 'examples.html?page=' + feature.page)
+                                            .text(feature.title)
+                                            .appendTo(subCategoryElem);
+                                    if (j < lenj - 2) {
+                                        $('<span/>')
+                                                .text(", ")
+                                                .appendTo(featureElem);
+                                    } else if (j < lenj - 1) {
+                                        $('<span/>')
+                                                .text(" and ")
+                                                .appendTo(featureElem);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function addPrettify() {
+        var els = document.querySelectorAll('pre');
+        for (var i = 0, el; el = els[i]; i++) {
+            if (!el.classList.contains('noprettyprint')) {
+                el.classList.add('prettyprint');
+            }
+        }
+        var el = document.createElement('script');
+        el.type = 'text/javascript';
+        el.src = 'lib/prettify.js';
+        el.onload = function () {
+            prettyPrint();
+        };
+        document.body.appendChild(el);
+    }
+
+    function addSlider() {
+        $('.bxslider').bxSlider({
+            mode:'fade',
+            pause:6000,
+            useCSS:false,
+            infiniteLoop:true,
+            hideControlOnEnd:true,
+            speed:1000,
+            captions:true,
+            auto:true,
+            pager:false
+        });
+    }
+
+</script>
+</body>
+</html>

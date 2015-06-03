@@ -1,0 +1,1 @@
+SceneJS._webgl = {};

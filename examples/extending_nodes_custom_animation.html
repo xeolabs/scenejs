@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+</head>
+
+<body>
+
+<div id="infoDark"><a href="http://scenejs.org" target="_other">SceneJS</a> - extending - creating a new node type
+    <br><br>
+    In this example we create a new scene node type, which consists of a rotating teapot.
+    <br><br>
+    Learn more about creating new node types in <a href="http://xeolabs.com/articles/scenejs-node-types/" target="_other">this tutorial</a>
+</div>
+
+<script>
+
+    // Non-core SceneJS node types are provided as plugins. This is a powerful extension mechanism that allows you to
+    // create your own high-level scene components that just slot straight into the graph as nodes which you can access
+    // as usual via the JSON API.
+    //
+    // More info here: https://github.com/xeolabs/scenejs#custom-node-types
+    //
+    // This example demonstrates the definition and instantiation of a custom node type. In this example, our custom
+    // node contains an animation that autonomously updates itself within the scene render loop.
+    //
+    // Custom node types are normally defined via scripts in the plugins directory, so that when we create a node of
+    // some non-core type (core types are 'rotate', 'scale', 'material' etc.), SceneJS will resolve the node type
+    // to a script, which it then dynamically loads. When loaded, the script will register the node type, then SceneJS
+    // will instantiate the type to create the node.
+    //
+    // Custom node types offer major extensibility. Typically, they create and manage a subgraph of nodes beneath
+    // themselves, which can include further instances of custom node types. Custom node types can have  accessor
+    // methods, which, just like those on the core node types (eg. setAngle, setColor etc.), are accessible through
+    // SceneJS' JSON API.
+    //
+    // Custom node types can implement controller hierarchies within your scene graphs, creating, updating and
+    // destroying their subnodes through an abstract domain-specific facade provided by their methods.
+    //
+    // We can create extensive libraries of them, then as we cherry-pick them for our applications, SceneJS
+    // will load them on-demand.
+    //
+    // In the example below, we'll define a custom node type inline within this page, instead of in a
+    // plugin script, so that we can show the node type API.
+
+
+    // Point SceneJS to the bundled plugins
+
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Define a new node type:
+
+    SceneJS.Types.addType("spinningTeapot", {
+
+        // Node constructor.
+        // The params will contain the attributes we provide within node instance in our scene definition below.
+        init:function (params) {
+
+            // Our node will create a subgraph of child nodes containing a spinnable teapot
+            var rotate = this.addNode({
+                type:"rotate",
+                y:1,
+                angle:0,
+                nodes:[
+
+                    // Green material
+                    {
+                        type:"material",
+                        color:{ r:0.6, g:1.0, b:0.6 },
+                        nodes:[
+
+                            // Teapot primitive,
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                            {
+                                type:"geometry/teapot"
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            // Process node attributes
+            this._spinRate = (undefined != params.spinRate) ? params.spinRate : 0.5;
+
+            // Spin the teapot within the scene animation loop
+            var angle = 0;
+            var self = this;
+            this._tick = this.getScene().on("tick",
+                    function () {
+                        rotate.setAngle(angle += self._spinRate);
+                    });
+        },
+
+        /**
+         * Node setter, sets the spin rate
+         */
+        setSpinRate:function (spinRate) {
+            this._spinRate = spinRate;
+        },
+
+        /**
+         * Node destructor, unsubscribes from scene tick
+         */
+        destroy:function () {
+            this.getScene().off(this._tick);
+        }
+    });
+
+    // Now we'll create a scene graph that contains an instance of our node type.
+    // The attributes for the node are optional here - we can get the node
+    // and also just set them via the node's setters.
+
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:-100,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:10.0,
+
+                nodes:[
+
+                    // Instantiate the node type we defined above
+                    {
+                        type:"spinningTeapot",
+                        spinRate:1.0
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

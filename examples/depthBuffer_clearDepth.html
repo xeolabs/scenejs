@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - clearing the depth buffer
+</div>
+
+<script src="../api/latest/scenejs.js"></script>
+
+<script>
+
+    //
+    // Demonstrates the clearDepth property of the depthBuffer node, which configures
+    // the depth buffer for the nodes in its subgraph
+    //
+    // What is the depth buffer?
+    // --------------------------
+    // When an object is rendered, the Z-depth of each pixel is stored in a depth buffer,
+    // which is a two-dimensional array (x-y) with one element for each pixel.
+    // If another object is to be rendered at the same pixel, the buffer compares the two
+    // depths and overrides the current pixel if the new object is closer to the viewpoint.
+    // The chosen depth is then saved to the buffer, replacing the old one.    /
+    // In short, the buffer ensures corrrect depth perception, where a close object hides a farther one.
+    //
+    // http://en.wikipedia.org/wiki/Z-buffering
+    //
+    // The clearDepth property
+    // -----------------------
+    // The clearDepth value specifies the value that the pixels within the depth buffer are set to
+    // when the buffer is cleared. The value is always clamped to within [0..1].
+    //
+    // In this example we're setting the clearDepth value to a point that lies approximately at the centre
+    // of a teapot. The result is that, with the depth comparison function being "less" by default,
+    // the  pixels that would fall behind that depth are not plotted in the color buffer. The result
+    // is as if there was a clipping plane in the X-Y axis, about half way through the teapot,
+    // clipping everything that falls behind it.
+    //
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:0.1,
+
+                nodes:[
+                    {
+                        type:"material",
+                        color:{ r:0.6, g:0.6, b:0.9 },
+                        nodes:[
+
+                            // Our depthBuffer node, with a clearDepth at approximately
+                            // half way through the teapot
+                            {
+                                type:"depthBuffer",
+
+                                enabled: true, // Default
+                                clearDepth:.989, // Default is 1.0 - clamped to [0..1]
+                                depthFunc: "less", // Default - also "equal","lequal","greater","notequal" and "gequal"
+
+                                nodes:[
+
+                                    // Teapot primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                    {
+                                        type:"geometry/teapot"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

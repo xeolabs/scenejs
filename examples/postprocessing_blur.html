@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoLight">
+    <a href="http://scenejs.org">SceneJS</a> - post-processing -  blur
+    <br>post-processing effect using the <a href="../api/latest/plugins/node/postprocess/blur.js" target="_other">blur</a> node
+    in combo with a <a href="../api/latest/plugins/node/cameras/orbit.js" target="_other">orbiting camera</a>, <a href="../api/latest/plugins/node/skybox/cloudySea.js" target="_other">skybox</a>, <a href="../api/latest/plugins/node/reflect/london.js" target="_other">reflection map</a>
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+
+        nodes: [
+
+            // Mouse-orbit for camera,
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: -40,
+                pitch: -20,
+                zoom: 500,
+                eye: { x: 0, y: 150, z: -1000 },
+                look: { x: 0, y: 0, z: 0 },
+                zoomSensitivity: 10.0,
+                spin: 0.1, // Slowly spin about X axis
+
+                nodes: [
+
+                    // Blur effect, implemented by plugin at:
+                    // http://scenejs.org/api/latest/plugins/node/postprocess/blur.js
+                    {
+                        type: "postprocess/blur",
+                        id: "myBlur",
+                        texelSize: 0.00099, // Size of one texel (1 / width, 1 / height)
+                        factor: 0.5,	    // Amount of blur, in range [0..1]
+
+                        nodes: [
+
+                            // Cloudy sea skybox, implemented by plugin at:
+                            // http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            {
+                                type: "skybox/cloudySea",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+
+                            // The reflection cube map
+                            // Images taken from: http://hristo.oskov.com/projects/cs418/mp3/
+                            {
+                                type: "reflect/london",
+                                intensity: 0.7,
+
+                                nodes: [
+
+                                    // Randomly scattered boxes, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/randomObjects.js
+                                    {
+                                        type: "geometry/randomObjects",
+                                        numObjects: 1000
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    //  Get DOF node and bind a GUI to it to play with it
+    scene.getNode("myBlur",
+            function (blur) {
+
+                var Menu = function () {
+
+                    var texelSize = blur.getTexelSize();
+                    var factor = blur.getFactor();
+
+                    this["texelSize"] = texelSize;
+                    this["factor"] = factor;
+
+                    var self = this;
+
+                    // This is actually quite inefficient because it continually updates
+                    // the scene graph, forcing frames to continually re-render.
+                    // Your GPU's not going to like it, but it's just for a quick and dirty demo.
+
+                    var update = function () {
+
+                        blur.setTexelSize(self["texelSize"]);
+                        blur.setFactor(self["factor"]);
+
+                        requestAnimationFrame(update);
+                    };
+                    update();
+                };
+
+                var gui = new dat.GUI();
+                var folder = gui.addFolder("Blur");
+                var menu = new Menu();
+                folder.add(menu, 'texelSize', 0.0, 0.01);
+                folder.add(menu, 'factor', 0.0, 1.0);
+                folder.open();
+            });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>SceneJS Examples</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <script src="lib/jquery-1.8.3.min.js"></script>
+
+</head>
+<body>
+
+<style>
+    html, body {
+        height: 100%;
+    }
+
+    body {
+        margin: 0px;
+        overflow: hidden;
+    }
+</style>
+
+<script>
+
+    var legacyIDs = {
+        "configuration_pluginPath": "configs_pluginPath",
+        "configuration_disableStatusPopups": "configs_disableStatusPopups",
+        "firstExample": "scenegraph_firstExample",
+        "scenegraph_nodes_moving": "scenegraph_nodes_moving",
+        "canvas_transparent": "canvas_transparent",
+        "canvas_external_transparent": "canvas_external_transparent",
+        "backfaceLightingFlag": "scenegraph_flags_backfaceLighting",
+        "diffuseFlag": "scenegraph_flags_diffuse",
+        "specularFlag": "scenegraph_flags_specular",
+        "ambientFlag": "scenegraph_flags_ambient",
+        "reflectionFlag": "scenegraph_flags_reflection",
+        "flagsToggleBackfaces": "scenegraph_flags_backfaces",
+        "basicTransparency": "scenegraph_flags_transparent",
+        "transparencySorting": "layers_transparencySort",
+        "enableDisableLayers": "layers_enableDisable",
+        "styleLineWidth": "styles_lineWidth",
+        "depthbufEnableDisable": "depthBuf_enableDisable",
+        "depthbufClearDepth": "depthBuf_clearDepth",
+        "depthbufDepthFunc": "depthBuf_depthFunc",
+        "customTriangles": "geometry_triangles",
+        "customLines": "geometry_lines",
+        "customVertexColors": "geometry_vertexColors",
+        "customTrianglesTypedArrays": "geometry_typedArrays",
+        "autoNormals": "geometry_autoNormals",
+        "geometryMorphing": "geometry_morphTargets",
+        "geometryMorphingTypedArrays": "geometry_morphTargets_typedArrays",
+        "planePrim": "geometry_plane",
+        "boxPrim": "geometry_box",
+        "spherePrim": "geometry_sphere",
+        "torusPrim": "geometry_torus",
+        "teapotPrim": "geometry_teapot",
+        "vectorText": "geometry_vectorText",
+        "colorMap": "texture_color",
+        "videoColorMap": "texture_video_color",
+        "bumpMap": "texture_bump",
+        "videoBumpMap": "texture_video_bump",
+        "alphaMap": "texture_alpha",
+        "videoAlphaMap": "texture_video_alpha",
+        "specularMap": "texture_specular",
+        "videoSpecularMap": "texture_video_specular",
+        "glowMap": "texture_emit",
+        "videoGlowMap": "texture_video_emit",
+        "colorMapAnimation": "texture_color_animated",
+        "multitexturing": "texture_multiTexture",
+        "uvLayers": "texture_uvLayers",
+        "colorMapAnimation2": "texture_animation",
+        "cubeMap": "reflections_custom",
+        "reflectionIntensity": "reflections_intensity",
+        "reflectionWithVaryingSpecularity": "reflections_withSpecularMaterial",
+        "reflectionWithControlMap": "reflections_withSpecularMap",
+        "reflectionWithLayers": "reflections_multipleCombined",
+        "reflectionWithOBJImport": "reflections_shinyRaptor",
+        "reflectionMultipleObjects": "reflections_manyObjects",
+        "defaultLightAndMaterial": "lighting_defaults",
+        "ambientLight": "lighting_ambient",
+        "directionalWorldLight": "lighting_directional_world",
+        "pointWorldLight": "lighting_point_world",
+        "perspectiveProjection": "transforms_projection_perspective",
+        "orthoProjection": "transforms_projection_ortho",
+        "frustumProjection": "transforms_projection_frustum",
+        "viewTransform": "transforms_viewing",
+        "rotateTransform": "transforms_modelling_rotate",
+        "translateTransform": "transforms_modelling_translate",
+        "scaleTransform": "transforms_modelling_scale",
+        "matrixTransform": "transforms_modelling_matrix",
+        "transformHierarchy": "transforms_modelling_hierarchy",
+        "vertexDisplaceShader": "shaders_vertexDisplacement",
+        "xrayShader": "shaders_xray",
+        "crtShader": "shaders_scanline",
+        "customNodesWobble": "shaders_vertexDisplacement",
+        "pluginsXRay": "shaders_xray",
+        "customNodesCRT": "postprocessing_scanlines",
+        "customNodesFog": "shaders_fog",
+        "customNodesCameraOrbit": "cameras_orbit",
+        "cameraPickFlyOrbit": "cameras_pickFlyOrbit_city",
+        "cameraPickFlyOrbitTerrain": "cameras_pickFlyOrbit_terrain",
+        "picking": "picking_basic",
+        "disablePicking": "picking_disabling",
+        "pickThroughTransparentObject": "picking_throughTransparency",
+        "namePaths": "picking_names",
+        "rayPicking": "picking_rayPicking",
+        "canvasCapture": "canvas_capture",
+        "importObj": "importing_obj_raptor",
+        "importDuckObj": "importing_obj_duck",
+        "import3ds": "importing_3ds_lexus",
+        "importMd2": "importing_md2_lion",
+        "physicsBouncingSpheres": "physics_balls",
+        "physicsBouncingSpheresMultiSystems": "physics_multithreaded",
+        "physicsBouncingBoxes": "physics_boxes",
+        "vertexSharing": "optimization_vertexSharing",
+        "textureAtlas": "optimization_textureAtlas",
+        "sharedNodeCores": "optimization_instancing",
+        "frustumVisibilityCulling": "optimization_frustumClipping",
+        "frustumDetailCulling": "optimization_discreteLOD",
+        "basicCustomNodeDef": "extending_nodes_custom",
+        "anotherCustomNodeDef": "extending_nodes_custom",
+        "animatedCustomNodeDef": "extending_nodes_custom_animation",
+        "customNodeDefWithTasks": "extending_nodes_custom_tasks",
+        "customNodeDefWithPublications": "extending_nodes_custom_pubSub",
+        "gradientBackground": "models_backgrounds_gradient",
+        "customSkybox": "skyboxes_custom",
+        "cloudsSkybox": "skyboxes_clouds",
+        "cloudySeaSkybox": "skyboxes_cloudySea",
+        "grimmNightSkyBox": "skyboxes_grimmNight",
+        "interstellarCloudsSkyBox": "skyboxes_interstellarClouds",
+        "miramarCloudsSkyBox": "skyboxes_miramarClouds",
+        "stormyDaysCloudsSkyBox": "skyboxes_stormyDays",
+        "violentDaysCloudsSkyBox": "skyboxes_violentDays",
+        "customHeightmap": "geometry_heightmap",
+        "texturedHeightmap": "geometry_heightmap_texture",
+        "customNodesEarth": "models_space_earth",
+        "customNodesTank": "models_vehicles_tank",
+        "webglContextLost": "scenegraph_webglContextRecovery",
+        "secondExample": "scenegraph_secondExample",
+        "tronTank": "showcase_tank",
+        "city": "models_buildings_city",
+        "funTerrain": "geometry_heightmap",
+        "earth": "models_space_earth",
+        "ghostTrees": "models_plants_ghostTree",
+        "bubbles": "scenegraph_webglContextRecovery"
+    };
+
+    var testLinks = false;
+    if (testLinks) {
+        for (var key in legacyIDs) {
+            if (legacyIDs.hasOwnProperty(key)) {
+                var button = document.createElement('div');
+                button.id = 'button';
+                button.textContent = legacyIDs[key];
+                button.addEventListener('click', (function () {
+                    var id = legacyIDs[key];
+                    return function (event) {
+                        window.location = "examples/index.html#" + id;
+                    };
+                })(), false);
+                document.body.appendChild(button);
+            }
+        }
+    } else {
+
+        var examplesPage = "examples/index.html";
+
+        var page = gup("page");
+
+        if (page) {
+            var path = legacyIDs[page];
+            if (path) {
+                examplesPage += "#" + path
+            }
+        }
+
+        window.location = examplesPage;
+
+        function gup(name) {
+            name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+            var regexS = "[\\?&]" + name + "=([^&#]*)";
+            var regex = new RegExp(regexS);
+            var results = regex.exec(window.location.href);
+            if (results == null)
+                return null;
+            else
+                return results[1];
+        }
+    }
+
+</script>
+</body>
+</html>

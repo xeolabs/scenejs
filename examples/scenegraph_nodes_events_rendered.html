@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="libs/jquery-1.8.3.min.js"></script>
+
+    <script src="../api/latest/scenejs.js"></script>
+
+    <style type="text/css">
+
+        .transparent-ui {
+            opacity: .75;
+        }
+
+        #teapot1 {
+            position: absolute;
+            width: 180px;
+            height: 120px;
+            clear: both;
+            padding: 8px;
+            overflow: hidden;
+            background: red;
+            color: white;
+            margin: 0 auto;
+            border: 1px solid;
+            text-align: left;
+            -webkit-box-shadow: #444 5px 5px 2px;
+            border-bottom-left-radius: 5px 5px;
+            border-bottom-right-radius: 5px 5px;
+            border-top-left-radius: 5px 5px;
+            border-top-right-radius: 5px 5px;
+            z-index: 100000;
+        }
+
+        #teapot2 {
+            position: absolute;
+            width: 180px;
+            height: 120px;
+            clear: both;
+            padding: 8px;
+            overflow: hidden;
+            background: green;
+            color: white;
+            margin: 0 auto;
+            border: 1px solid;
+            text-align: left;
+            -webkit-box-shadow: #444 5px 5px 2px;
+            border-bottom-left-radius: 5px 5px;
+            border-bottom-right-radius: 5px 5px;
+            border-top-left-radius: 5px 5px;
+            border-top-right-radius: 5px 5px;
+            z-index: 100000;
+        }
+
+        #teapot3 {
+            position: absolute;
+            width: 180px;
+            height: 120px;
+            clear: both;
+            padding: 8px;
+            overflow: hidden;
+            background: blue;
+            color: white;
+            margin: 0 auto;
+            border: 1px solid;
+            text-align: left;
+            -webkit-box-shadow: #444 5px 5px 2px;
+            border-bottom-left-radius: 5px 5px;
+            border-bottom-right-radius: 5px 5px;
+            border-top-left-radius: 5px 5px;
+            border-top-right-radius: 5px 5px;
+            z-index: 100000;
+        }
+    </style>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - handling 'rendered' events on scene nodes
+    <br>
+    useful for tracking the positions of scene objects
+
+</div>
+
+<div id="teapot1" class="transparent-ui">
+    Teapot 1
+</div>
+
+<div id="teapot2" class="transparent-ui">
+    Teapot 2
+</div>
+
+<div id="teapot3" class="transparent-ui">
+    Teapot 3
+</div>
+
+<script>
+
+    jQuery(document).ready(
+            function ($) {
+
+                // Point SceneJS to the bundled plugins
+                SceneJS.setConfigs({
+                    pluginPath:"../api/latest/plugins"
+                });
+
+                var scene = SceneJS.createScene({
+                    nodes:[
+
+                        // Mouse-orbited camera, implemented by plugin at
+                        // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                        {
+                            type:"cameras/orbit",
+                            yaw:30,
+                            pitch:-30,
+                            zoom:35,
+                            zoomSensitivity:15,
+                            nodes:[
+                                {
+                                    type:"translate",
+                                    x:-10.0,
+                                    id:"teapot1",
+                                    nodes:[
+                                        {
+                                            type:"material",
+                                            color:{ r:1.0, g:0.4, b:0.4 },
+                                            nodes:[
+
+                                                // Teapot primitive, implemented by plugin at
+                                                // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                                {
+                                                    type:"geometry/teapot"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    type:"translate",
+                                    z:-10.0,
+                                    id:"teapot2",
+                                    nodes:[
+                                        {
+                                            type:"material",
+                                            color:{ r:0.4, g:1.0, b:0.4 },
+                                            nodes:[
+
+                                                // Teapot primitive, implemented by plugin at
+                                                // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                                {
+                                                    type:"geometry/teapot"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    type:"translate",
+                                    z:10.0,
+                                    id:"teapot3",
+                                    nodes:[
+                                        {
+                                            type:"material",
+                                            color:{ r:0.4, g:0.4, b:1.0 },
+                                            nodes:[
+
+                                                // Teapot primitive, implemented by plugin at
+                                                // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                                {
+                                                    type:"geometry/teapot"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                });
+
+                scene.getNode("teapot1",
+                        function (teapot1) {
+                            teapot1.on("rendered",
+                                    function (event) {
+                                        updateLabelPos(
+                                                "teapot1",
+                                                event.getCanvasPos(),
+                                                event.getProjPos(),
+                                                event.getCameraPos(),
+                                                event.getViewPos(),
+                                                event.getWorldPos());
+                                    });
+                        });
+
+                scene.getNode("teapot2",
+                        function (teapot2) {
+                            teapot2.on("rendered",
+                                    function (event) {
+                                        updateLabelPos(
+                                                "teapot2",
+                                                event.getCanvasPos(),
+                                                event.getProjPos(),
+                                                event.getCameraPos(),
+                                                event.getViewPos(),
+                                                event.getWorldPos());
+                                    });
+                        });
+
+                scene.getNode("teapot3",
+                        function (teapot3) {
+                            teapot3.on("rendered",
+                                    function (event) {
+                                        updateLabelPos(
+                                                "teapot3",
+                                                event.getCanvasPos(),
+                                                event.getProjPos(),
+                                                event.getCameraPos(),
+                                                event.getViewPos(),
+                                                event.getWorldPos());
+                                    });
+                        });
+
+                function updateLabelPos(elementId, canvasPos, projPos, cameraPos, viewPos, worldPos) {
+
+                    var element = $("#" + elementId);
+
+                    element.html(elementId
+                            + "<br/>"
+                            + "<br/>Canvas: " + Math.round(canvasPos.x) + ", " + Math.round(canvasPos.y)
+                            + "<br/>Proj  : " + Math.round(projPos.x) + ", " + Math.round(projPos.y)
+                            + "<br/>Camera  : " + roundFloat(cameraPos.x) + ", " + roundFloat(cameraPos.y) + ", " + roundFloat(cameraPos.z)
+                            + "<br/>View  : " + roundFloat(viewPos.x) + ", " + roundFloat(viewPos.y) + ", " + roundFloat(viewPos.z)
+                            + "<br/>World : " + roundFloat(worldPos.x) + ", " + roundFloat(worldPos.y) + ", " + roundFloat(worldPos.z)
+                    );
+
+                    var canvas = scene.getCanvas();
+
+                    var zIndex = 100000 + roundFloat(viewPos.z);
+
+                    element.css("left", canvas.offsetLeft + canvasPos.x);
+                    element.css("top", canvas.offsetTop + canvasPos.y);
+                    element.css("z-index", zIndex);
+                }
+
+                function roundFloat(v) {
+                    return Math.round(v * 10) / 10;
+                }
+            });
+
+</script>
+</body>
+</html>

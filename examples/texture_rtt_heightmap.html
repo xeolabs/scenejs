@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - render teapot to texture, apply texture to height map
+</div>
+
+<script>
+
+    // Demonstrates how to render a scene to a color target, then apply that as a color map texture on a heightmap.
+    //
+    // First pass renders our scene (teapot and skybox) to a color target.
+    //
+    // Second pass renders a heightmap that's textured with the color target.
+    //
+    // Note that since the depth target encodes depth values, it doesn't make a particularly nice texture when
+    // used for a color map texture as in this example.
+    //
+    // Note how we're using the "stage" node to ensure that the color target is rendered before
+    // it's used for the texture.
+    //
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // First pass renders our rotating teapot, with skybox, to a color target
+
+            {
+                type: "stage",
+                priority: 1,
+
+                nodes: [
+
+                    // The color target
+                    {
+                        type: "colorTarget",
+                        id: "myColorTarget",
+
+                        nodes: [
+
+                            // Cloudy sea skybox, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            // Skybox, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            {
+                                type: "skybox/cloudySea",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+
+                            // Rotating teapot
+                            {
+                                type: "rotate",
+                                id: "teapot-pitch",
+                                angle: 180.0,
+                                x: 1.0,
+
+                                nodes: [
+                                    {
+                                        type: "rotate",
+                                        id: "teapot-yaw",
+                                        angle: 0.0,
+                                        y: 1.0,
+
+                                        nodes: [
+                                            {
+                                                type: "material",
+                                                emit: 0,
+                                                color: { r: 1.0, g: 0.5, b: 0.9 },
+                                                specularColor: { r: 0.9, g: 0.9, b: 0.9 },
+                                                specular: 0.9,
+                                                shine: 100.0,
+
+                                                nodes: [
+
+                                                    // Teapot implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                                    {
+                                                        type: "geometry/teapot"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            // The second pass renders a heightmap with a texture that is dynamically sourced from
+            // the colorTarget defined in the previous pass.
+
+            {
+                type: "stage",
+                priority: 2,
+
+                nodes: [
+
+                    // Orbiting camera node, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                    {
+                        type: "cameras/orbit",
+                        yaw: 30,
+                        pitch: -30,
+                        zoom: 5,
+                        zoomSensitivity: 1.0,
+
+                        nodes: [
+
+                            // Color map texture, sourcing from the colorTarget within the previous pass
+                            {
+                                type: "texture",
+                                target: "myColorTarget",
+
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: { r: 1.0, g: 1.0, b: 1.0 },
+                                        specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                        specular: 0.2,
+                                        shine: 6.0,
+
+                                        nodes: [
+
+                                            // Heightmap, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+                                            {
+                                                type: "geometry/heightmap",
+
+                                                // Texture image
+                                                src: 'textures/heightMap.jpg',
+
+                                                // Wireframe or solid - default is false
+                                                wire: false,
+
+                                                // Dimensions
+                                                xSize: 3,
+                                                zSize: 3,
+                                                ySize: 0.2,
+
+                                                // Segments on X and Z axis
+                                                xSegments: 100,
+                                                zSegments: 100
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+
+    var teapotPitch = scene.getNode("teapot-pitch");
+    var teapotYaw = scene.getNode("teapot-yaw");
+
+    scene.on("tick",
+            function () {
+                teapotYaw.inc("angle", 1);
+                teapotPitch.inc("angle", .3);
+
+            });
+
+
+</script>
+</body>
+</html>

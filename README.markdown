@@ -1,74 +1,49 @@
-# SceneJS
+## SceneJS
 
-SceneJS is a concise, fast and flexible scene graph framework for WebGL, targeted to be a browser interface
-for model and data visualisation systems.
+An extensible WebGL-based engine for high-detail 3D visualisation.
 
-Some key features:
-
- * flexible JSON API for scene graph create/update/query
- * messaging system for peer-to-peer commands to the JSON API
- * automatic GLSL generation - fully encapsulated
- * IoC container
- * GL state sorting
- * bounding boxes
- * LOD
- * flexible data flows
- * interpolated animation
- * branching
- * instancing
- * animated textures
- * multimaterials
- * debugging modes
- * and more..
+ * [SceneJS.org](http://scenejs.org)
+ * [Tutorials](http://xeolabs.com/articles/)
+ * [Facebook group](http://www.facebook.com/group.php?gid=350488973712)
+ * [Issues](https://github.com/xeolabs/scenejs/issues)
 
 
-# Building
+## Downloads
 
-To build SceneJS, you'll need Java and ANT. Then at the same level as build.xml, type:
+ * [http://scenejs.org/api/latest/scenejs.js](http://scenejs.org/api/latest/scenejs.js)
+ * [ZIP archive of plugins](http://scenejs.org/api/latest/plugins.zip)
 
-ant all
+### Using the Plugins
 
-Create the "dist" directory, which will contain all the SceneJS libraries, JSDocs and examples.
+To keep the core library small, SceneJS dynamically loads it’s non-core functionality from a directory of plugins,
+ which it loads on-demand from the plugins directory within this GitHub repository.
 
-If you are modifying the source code and testing it with a new example or your own project the following 
-ant tasks which complete in just a couple of seconds may be helpful. These tasks do not clean the dist 
-directory so previously-generated JSDocs will still available
+You can hotlink to this library if you're OK with using the plugins from this repo and don't need any plugins that
+provide textures, (because those textures won't load cross-domain).
 
-ant package-lib
+If not, then just do this:
 
-Create the "dist" directory and populate the lib directory with scenejs.js, scenejs.min.js, and the plugins and utils directories.
+1. get a copy of the library
+2. get the [ZIP archive of plugins](http://scenejs.org/api/latest/plugins.zip)
+3. unzip that archive, say to directory ```myDir```
+4. configure SceneJS to load the plugins from there, like this:
 
-ant packge-examples
+``` javascript
+SceneJS.setConfigs({
+    pluginPath: "./myDir/plugins"
+});
+```
 
-Create the "dist" directory and populate the lib directory and the examples directory.
+Then off you go, start building a scene:
+
+```javascript
+var myScene = SceneJS.createScene({
+    // ...
+});
+```
+
+Read more in the [Quick Start tutorial](http://xeolabs.com/articles/scenejs-quick-start).
 
 
-# Resources
 
-Website:
-http://scenejs.org
-
-Contributors:
-http://scenejs.wikispaces.com/Contributors
-
-Live examples:
-http://scenejs.org/dist/curr/extr/examples/index.html
-
-Wiki:
-http://scenejs.wikispaces.com/
-
-Facebook Group:
-http://www.facebook.com/group.php?gid=350488973712
-
-YouTube channel:
-http://www.youtube.com/user/xeolabs
-
-Twitter:
-http://twitter.com/xeolabs
-
-Google group:
-http://groups.google.co.nz/group/scenejs?lnk=gcimh
-
-Issue tracker:
-http://bit.ly/9Cpzi0
 

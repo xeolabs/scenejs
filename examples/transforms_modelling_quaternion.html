@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - modelling transforms - <a
+        href="../api/latest/plugins/node/xform/quaternion.js" target="_other">quaternion</a>
+    <br><br>
+    click and drag to rotate the teapot
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Override default material to make teapot blue
+            {
+                type: "material",
+                color: { r: 0.5, g: 0.5, b: 0.6 },
+                nodes: [
+
+                    // Quaternion modelling transform, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/xform/quaternion.js
+                    {
+                        type: "xform/quaternion",
+                        id: "myQuaternion",
+
+                        // Base rotation
+                        x: 0.0, y: 0.0, z: 0.0, angle: 0.0,  // No rotation
+
+                        // Sequence of rotations to apply on top of the base rotation
+                        rotations: [
+                            { x: 0, y: 0, z: 1, angle: 45 }, // Rotate 45 degrees about Z the axis
+                            { x: 1, y: 0, z: 0, angle: 20 }, // Rotate 20 degrees about X the axis
+                            { x: 0, y: 1, z: 0, angle: 90 }, // Rotate 90 degrees about Y the axis
+                        ],
+
+                        nodes: [
+
+                            // Teapot primitive, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                            {
+                                type: "geometry/teapot"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Get the quaternion and hook it up to mouse rotation
+    scene.getNode("myQuaternion",
+            function (myQuaternion) {
+
+                var x;
+                var y;
+
+                var lastX;
+                var lastY;
+                var dragging;
+
+                var canvas = scene.getCanvas();
+                canvas.addEventListener('mousedown', mouseDown, true);
+                canvas.addEventListener('mousemove', mouseMove, true);
+                canvas.addEventListener('mouseup', mouseUp, true);
+                canvas.addEventListener('touchstart', touchStart, true);
+                canvas.addEventListener('touchmove', touchMove, true);
+                canvas.addEventListener('touchend', touchEnd, true);
+
+                function mouseDown(event) {
+                    x = event.clientX;
+                    y = event.clientY;
+                    lastX = x;
+                    lastY = y;
+                    dragging = true;
+                }
+
+                function touchStart(event) {
+                    x = event.targetTouches[0].clientX;
+                    y = event.targetTouches[0].clientY;
+                    lastX = x;
+                    lastY = y;
+                    dragging = true;
+                }
+
+                function mouseUp() {
+                    dragging = false;
+                }
+
+                function touchEnd() {
+                    dragging = false;
+                }
+
+                function mouseMove(event) {
+                    x = event.clientX;
+                    y = event.clientY;
+                    actionMove(x - lastX, y - lastY);
+                    lastX = x;
+                    lastY = y;
+                }
+
+                function touchMove(event) {
+                    x = event.targetTouches[0].clientX;
+                    y = event.targetTouches[0].clientY;
+                    actionMove(x - lastX, y - lastY);
+                    lastX = x;
+                    lastY = y;
+                }
+
+                function actionMove(deltaX, deltaY) {
+                    if (dragging) {
+
+                        deltaX *= 0.1;
+                        deltaY *= 0.1;
+
+                        myQuaternion.addRotation({
+                            x: 0,
+                            y: 1,
+                            z: 0,
+                            angle: deltaX
+                        });
+
+                        myQuaternion.addRotation({
+                            x: 1,
+                            y: 0,
+                            z: 0,
+                            angle: deltaY
+                        });
+
+                        myQuaternion.normalize();
+                    }
+                }
+            });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - enabling and disabling transparency for a subgraph<br><br>
+    The teapot in this example is wrapped in a material with an 'alpha' value of 0.4.<br>
+    Its also wrapped in a 'flags' node that has a 'transparent' flag, which we're toggling.<br>
+    When the flag is true, the teapot is transparent, with the alpha value specifying its opacity.
+</div>
+
+<script>
+
+    // Demonstrates how to make geometries transparent or opaque
+    //
+    // In the scene below, we make a geometry transparent with 1) a material
+    // with an alpha value, and 2) a flags node with a 'transparent' flag,
+    // which enables the alpha value to define the degree of opacity of
+    // the geometry.
+    //
+    // When the flag is false, the alpha value is ignored and geometry
+    // then appears opaque.
+    //
+    // As we periodically toggle the flag, watch the geometry switch between
+    // transparent and opaque.
+    //
+    // The geometry will be opaque by default when 1) the flags node
+    // is omitted, or 2) the 'transparent' flag is not specified and
+    // defaults to false, or 3) the material is omitted, or 4) the material
+    // alpha is not specified and thus defaults to 1.0
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:10,
+                zoomSensitivity:1,
+
+                nodes:[
+
+                    // Flags node which enables or disables transparency of our teapot.
+                    // When enabled, the material alpha value will specify the degree of opacity.
+                    {
+                        type:"flags",
+                        id:"myFlags",
+                        flags:{
+                            transparent:true // Causes material alpha to govern geometry's opacity (default is false)
+                        },
+
+                        nodes:[
+                            {
+                                type:"material",
+                                color:{ r:0.3, g:0.3, b:0.9 },
+                                alpha:0.4, // 60% opacity while transparent flag is true (default is 1.0)
+
+                                nodes:[
+
+                                    // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                    {
+                                        type:"geometry/teapot"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    // Opaque sphere
+                    {
+                        type:"material",
+                        color:{ r:0.8, g:0.5, b:0.5 },
+                        nodes:[
+                            {
+                                type:"translate",
+                                y:1,
+                                nodes:[
+                                    {
+                                        type:"scale",
+                                        x:0.4,
+                                        y:0.4,
+                                        z:0.4,
+                                        nodes:[
+                                            // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                            {
+                                                type:"geometry/sphere"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Flags node is within a custom node type, so will not exist until the plugin for that custom node has been loaded
+    // Therefore, we get the flags node asynchronously
+
+    scene.getNode("myFlags", function (myFlags) {
+        setInterval(
+                function () {
+                    myFlags.setTransparent(!myFlags.getTransparent());
+                },
+                1000);
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>SceneJS v4.2.0 - Examples</title>
+
+    <!--Examples viewer adapted from the one over at THREE.js -->
+    <!-- threejs.com -->
+
+    <style>
+
+        @font-face {
+            font-family: Arial, helvetica, freesans, sans-serif monospace;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            background-color: #e8e8e8;
+            margin: 0px;
+            font-size: 14px;
+            font-family: Arial, helvetica, freesans, sans-serif monospace;
+            overflow: hidden;
+        }
+
+        a {
+            /*color: #2194CE;*/
+            color: #3a7445;
+            text-decoration: none;
+        }
+
+        h1 {
+            margin-top: 30px;
+            margin-bottom: 40px;
+            font-size: 25px;
+            font-weight: normal;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: normal;
+            padding-top: 10px;
+        }
+
+        #panel {
+            position: absolute;
+            width: 310px;
+            height: 100%;
+            overflow: scroll;
+            background: #fafafa;
+        }
+
+        #panel #list {
+            padding: 0px 20px;
+            line-height: 18px;
+        }
+
+        #panel #list .link {
+            /*color: #2194CE;*/
+            color: #3d7749;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #panel #list .selected {
+            color: #ff0000;
+        }
+
+        #panel #list .link:hover {
+            text-decoration: underline;
+        }
+
+        #panel #list .info {
+            color: #71705a;
+            text-decoration: none;
+            font-style: italic;
+            font-size: 14px;
+            background-color: aliceblue;
+            padding-top: 4px;
+            padding-bottom: 4px;
+            margin-top: 15px;
+            margin-bottom: 4px;
+        }
+
+        #panel #list .infoFirst {
+            color: #71705a;
+            text-decoration: none;
+            font-style: italic;
+            font-size: 14px;
+            background-color: aliceblue;
+            padding-top: 4px;
+            padding-bottom: 4px;
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+
+        #viewer {
+            position: absolute;
+            left: 310px;
+            width: -webkit-calc(100% - 310px); /* Safari */
+            width: calc(100% - 310px);
+            height: 100%;
+            border: 0px;
+        }
+
+        #sourceButton {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px;
+            color: #fff;
+            background-color: #02550b;
+            opacity: 0.7;
+        }
+
+        #sourceButton:hover {
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        .contents {
+            padding-top: 0px;
+            padding-bottom: 0px;
+        }
+
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+
+    //    var _gaq = _gaq || [];
+    //    _gaq.push(['_setAccount', 'UA-86951-15']);
+    //    _gaq.push(['_trackPageview']);
+    //
+    //    (function () {
+    //        var ga = document.createElement('script');
+    //        ga.type = 'text/javascript';
+    //        ga.async = true;
+    //        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    //        var s = document.getElementsByTagName('script')[0];
+    //        s.parentNode.insertBefore(ga, s);
+    //    })();
+
+</script>
+
+<div id="panel">
+    <div id="list">
+        <h1><a href="../index.html">SceneJS</a> / Examples</h1>
+
+        <p>v4.0</p>
+    </div>
+</div>
+<iframe id="viewer"></iframe>
+
+<script>
+
+var files = {
+
+    "Showcase": [
+        "#stuff made with SceneJS",
+        "scenegraph_firstExample",
+        "scenegraph_secondExample",
+        "showcase_BioDigitalHuman",
+        //"showcase_BioDigitalHuman_eye",
+        "models_space_earth",
+        "showcase_tank",
+        "cameras_pickFlyOrbit_city",
+        "environments_lawn_teapots"
+    ],
+
+    "Configs": [
+        "#SceneJS framework configs",
+        "configs_pluginPath",
+        "configs_disableStatusPopups",
+        "configs_maxTextureSize",
+    ],
+
+    "Scenegraph": [
+        "#basic scene graph functionality",
+        "scenegraph_firstExample",
+        "scenegraph_secondExample",
+        "scenegraph_fpsControl",
+        "scenegraph_events_misc",
+        "scenegraph_status",
+        "scenegraph_nodes_adding",
+        "scenegraph_nodes_events_rendered",
+        "scenegraph_nodes_instancing",
+        "scenegraph_nodes_moving",
+        "scenegraph_multipleScenes",
+        "scenegraph_webglContextRecovery",
+        "#selectively enabling rendering modes for subgraphs",
+        "scenegraph_enable",
+        "scenegraph_tags",
+        "scenegraph_flags",
+        "scenegraph_flags_backfaces",
+        "scenegraph_flags_enabled",
+        "scenegraph_flags_frontface",
+        "scenegraph_flags_picking",
+        "scenegraph_flags_transparent",
+        "scenegraph_flags_reflective",
+    ],
+
+    "Canvas": [
+        "canvas_capture",
+        "canvas_capture_customSize",
+        "canvas_capture_transparent",
+        "canvas_external",
+        "canvas_external_transparent",
+        "canvas_transparent",
+        "canvas_SSAA"
+    ],
+
+    "Cameras": [
+
+        "#controlling the viewpoint",
+        "cameras_orbit",
+        "cameras_orbit_spin",
+        "cameras_trackball_orbit",
+        "cameras_pickFlyOrbit_city",
+        "cameras_pickFlyOrbit_terrain"
+    ],
+
+    "Effects": [
+
+        "#stereoscopic rendering",
+        "effects_anaglyph",
+   //     "effects_anaglyph_pickFlyOrbit",
+        "effects_stereo",
+        "effects_stereo_pickFlyOrbit"
+//        ,
+//        "effects_oculusRift",
+//        "effects_oculusRift_pickFlyOrbit",
+//        "effects_oculusRift_externalCanvas"
+    ],
+
+    "Geometry": [
+
+        "#defining",
+        "geometry_points",
+        "geometry_lines",
+        "geometry_triangles",
+        "geometry_typedArrays",
+        "geometry_vertexColors",
+
+        "#primitives",
+        "geometry_box",
+        "geometry_cylinder",
+        "geometry_plane",
+        "geometry_quad",
+        "geometry_sphere",
+        "geometry_teapot",
+        "geometry_torus",
+        "geometry_torus_wireframe",
+        "geometry_heightmap",
+     //   "geometry_heightmap_normalMap",
+        "geometry_heightmap_texture",
+        "geometry_heightmap_fogAndGrid",
+        "geometry_heightmap_texture_video",
+        "geometry_heightmap_transparent",
+        "geometry_vectorText",
+
+        "#morphing",
+        "geometry_morphTargets",
+        "geometry_morphTargets_typedArrays",
+
+        "#automatic goodness",
+        "geometry_autoNormals",
+
+        "#optimization",
+        "optimization_vertexSharing",
+        "optimization_uintIndex"
+    ],
+
+
+    "Styles": [
+        "#general styles",
+        "styles_lineWidth"
+    ],
+
+
+    "Transforms": [
+        "#model",
+        "transforms_modelling_hierarchy",
+        "transforms_modelling_matrix",
+        "transforms_modelling_rotate",
+        "transforms_modelling_scale",
+        "transforms_modelling_translate",
+        "transforms_modelling_quaternion",
+
+        "#projection",
+        "transforms_projection_default",
+        "transforms_projection_frustum",
+        "transforms_projection_ortho",
+        "transforms_projection_perspective",
+        "transforms_projection_pan",
+
+        "#viewing",
+        "transforms_viewing"
+    ],
+
+    "Lighting": [
+
+        "#surface material",
+        "lighting_material_defaults",
+        "lighting_material_custom",
+
+        "#light sources",
+        "lighting_ambient",
+        "lighting_defaults",
+        "lighting_directional_view",
+        "lighting_directional_world",
+        "lighting_directional_world_texture",
+        "lighting_point_view",
+        "lighting_point_world"
+    ],
+
+    "Textures": [
+
+        "#color mapping",
+        "texture_color",
+        "texture_color_add",
+        "texture_color_multiply",
+
+        "#specular mapping",
+        "texture_specular",
+        "texture_specular_add",
+        "texture_specular_multiply",
+
+        "#alpha mapping",
+        "texture_alpha",
+        "texture_alpha_add",
+        "texture_alpha_multiply",
+
+        "#glow mapping",
+        "texture_emit",
+        "texture_emit_add",
+        "texture_emit_multiply",
+
+        "#normal mapping",
+        "texture_normal",
+        "texture_normal_reflect",
+        "texture_normal_pointLights",
+        "texture_normal_pointLights2",
+
+        "#animated blending and transformation",
+        "texture_animation",
+
+        "#video textures",
+        "texture_video_alpha",
+        "texture_video_color",
+        "texture_video_emit",
+      //  "texture_video_bump",
+        "texture_video_specular",
+
+        "#shader-generated textures",
+        "texture_procedural_color",
+        "texture_procedural_color_mold",
+        "texture_procedural_color_water",
+        "texture_procedural_color_grid",
+        "texture_procedural_specular",
+        "texture_procedural_alpha",
+        "texture_procedural_emit",
+
+        "#render-to-texture",
+        "texture_rtt_color",
+        "texture_rtt_depth",
+        "texture_rtt_depthAndColor",
+        "texture_rtt_heightmap",
+        "texture_rtt_sharedTexture",
+        "texture_rtt_manyTextures",
+        "texture_rtt_shader",
+        "texture_rtt_withVideo",
+
+        "#layering textures",
+        "texture_multiTexture",
+        "texture_uvLayers",
+
+        "#optimization",
+        "optimization_textureAtlas",
+
+        "#configs",
+        "configs_maxTextureSize"
+    ],
+
+    "Reflections": [
+        "#reflection using cubemaps",
+        "reflections_custom",
+        "reflections_intensity",
+        "reflections_multipleSeparate",
+        "reflections_multipleCombined",
+        "reflections_shinyRaptor",
+        "reflections_manyObjects",
+        "reflections_heightmap",
+        //"reflections_withNormalMap",
+        "reflections_withTransparency",
+        "reflections_withSpecularMaterial",
+        "reflections_withSpecularMap"
+    ],
+
+    "Skyboxes": [
+        "skyboxes_custom",
+        "skyboxes_clouds",
+        "skyboxes_cloudySea",
+        "skyboxes_grimmNight",
+        "skyboxes_interstellarClouds",
+        "skyboxes_miramarClouds",
+        "skyboxes_stormyDays",
+        "skyboxes_violentDays"
+    ],
+
+    "Multipass": [
+        "#multi-pass rendering",
+        "multipass_twoPasses",
+        "multipass_threePasses"
+    ],
+
+    "Stages": [
+        "#custom effect pipelines",
+        "stages_twoStages",
+        "stages_threeStages",
+        "stages_withPicking",
+        "stages_withReflection",
+        "stages_withSharedShader",
+        "stages_withTransparencySort"
+    ],
+
+    "Layers": [
+        "#prioritised render bins",
+        "layers_enableDisable",
+        "layers_transparencySort"
+    ],
+
+    "Color Buffer": [
+        "#controlling the color buffer",
+        "colorBuffer_colorMask",
+        "colorBuffer_blendEnabled"
+    ],
+
+    "Depth Buffer": [
+        "#controlling the depth buffer",
+        "depthBuffer_clearDepth",
+        "depthBuffer_depthFunc",
+        "depthBuffer_enableDisable"
+    ],
+
+    "Shaders": [
+        "shaders_fog",
+        "shaders_xray",
+        "shaders_scanline",
+        "shaders_vertexDisplacement",
+        "shaders_custom_material_color",
+        "shaders_custom_water",
+        "shaders_custom_withTexture",
+        "shaders_custom_withTwoTextures",
+        "shaders_custom_withThreeTextures"
+    ],
+
+    "Postprocessing": [
+        "postprocessing_blur",
+        "postprocessing_depthOfField",
+        "postprocessing_depthOfField_autofocus",
+        "postprocessing_depthOfField_autofocus_grid",
+        "postprocessing_scanlines",
+        "postprocessing_sepia",
+        "postprocessing_scanlinesAndSepia",
+        "postprocessing_technicolor"
+    ],
+
+    "Physics": [
+        "physics_balls",
+        "physics_boxes",
+        "#multiple physics systems in worker threads",
+        "physics_multithreaded",
+        "#physical material attributes",
+        "physics_materials"
+    ],
+
+    "Picking": [
+        "picking_basic",
+        "picking_disabling",
+        "picking_names",
+        "picking_spheres",
+        "picking_throughTransparency",
+        "picking_rayPicking",
+        "picking_rayPicking_onTransparentObject",
+        "picking_rayPicking_performance",
+        "picking_emptyPixels"
+    ],
+
+    "Importing": [
+        "importing_3ds_lexus",
+        "importing_3ds_comet",
+        "importing_md2_lion",
+        "importing_obj_duck",
+        "importing_obj_raptor"
+    ],
+
+    "Optimization": [
+        "#optimizing your scene graphs",
+        "optimization_discreteLOD",
+        "optimization_frustumClipping",
+        "optimization_instancing",
+        "optimization_textureAtlas",
+        "optimization_vertexSharing",
+        "optimization_uintIndex"
+    ],
+
+    "Benchmarks": [
+        "#performance tests",
+        "benchmarks_5000boxes",
+        "benchmarks_10000boxes",
+        "benchmarks_40000boxes"
+    ],
+
+    "Extending": [
+        "#adding new node types to SceneJS",
+        "extending_nodes_custom",
+        "extending_nodes_custom_animation",
+        "extending_nodes_custom_pubSub",
+        "extending_nodes_custom_tasks"
+    ],
+
+    "Environments": [
+        "#prebuilt scene setups with camera, lights, effects etc.",
+        "environments_lawn_teapots",
+        "environments_lawn_city",
+        "environments_gridRoom_teapot",
+        "environments_modelView_teapot"
+//        ,
+//        "environments_holoDeck"
+    ],
+
+    "Models": [
+        "#models from the examples library",
+        "models_vehicles_tank",
+        "models_buildings_city",
+        "models_space_earth",
+        "models_backgrounds_gradient",
+        "models_backgrounds_water",
+        "models_plants_ghostTree"
+    ]
+};
+
+//
+
+var list = document.getElementById('list');
+var viewer = document.getElementById('viewer');
+
+var container = document.createElement('div');
+list.appendChild(container);
+
+var sourceButton = document.createElement('div');
+sourceButton.id = 'sourceButton';
+sourceButton.textContent = 'Source code';
+sourceButton.addEventListener('click', function (event) {
+    var array = location.href.split('/');
+    array.pop();
+    window.open('view-source:' + array.join('/') + '/' + selected + '.html');
+}, false);
+sourceButton.style.display = 'none';
+document.body.appendChild(sourceButton);
+
+var catDivs = {};
+var divs = {};
+var selected = null;
+var index = 1;
+var indexStr;
+
+// Table of contents
+var div = document.createElement('h2');
+div.textContent = "Contents";
+container.appendChild(div);
+container.appendChild(document.createElement('hr'));
+for (var key in files) {
+    var section = files[key];
+    var div = document.createElement('div');
+    div.className = 'link';
+    indexStr = "" + index++ + ".";
+    for (var i = indexStr.length, len = 5; i < len; i++) {
+        indexStr += ".";
+    }
+    div.textContent = indexStr + key;
+    div.addEventListener('click', (function () {
+        var k = key;
+        return function () {
+            catDivs[k].scrollIntoView();
+        }
+    })());
+    container.appendChild(div);
+}
+
+container.appendChild(document.createElement('hr'));
+container.appendChild(document.createElement('br'));
+
+_index = 1;
+
+for (var key in files) {
+    var section = files[ key ];
+    var div = document.createElement('h2');
+    div.textContent = _index++ + "." + key;
+    container.appendChild(div);
+    catDivs[key] = div;
+    for (var i = 0; i < section.length; i++) {
+        var file = section[ i ];
+        if (file.charAt(0) == "#") {
+            var div = document.createElement('div');
+            div.textContent = "// " + file.substring(1);
+            div.className = (i == 0 ? 'infoFirst' : 'info');
+            container.appendChild(div);
+            continue;
+        }
+        (function (file) {
+            var name = file.split('_');
+            name.shift();
+            name = name.join(' / ');
+            var div = document.createElement('div');
+            div.className = 'link';
+            div.textContent = name; // expandCamel(name);
+            div.addEventListener('click', function () {
+                load(file);
+            });
+            container.appendChild(div);
+            divs[ file ] = div;
+        })(file);
+    }
+}
+
+function expandCamel(str) {
+    return str.replace(/([A-Z])/g, function ($1) {
+        return " " + $1.toLowerCase();
+    });
+}
+
+var load = function (file) {
+    if (selected !== null) divs[ selected ].className = 'link';
+    divs[ file ].className = 'link selected';
+    window.location.hash = file;
+    viewer.src = file + '.html';
+    viewer.focus();
+    sourceButton.style.display = '';
+    selected = file;
+};
+
+if (window.location.hash !== '') {
+    load(window.location.hash.substring(1));
+}
+
+
+</script>
+
+</body>
+</html>

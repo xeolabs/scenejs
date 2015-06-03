@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+
+        a {
+            color: #ffffff;
+            padding-top: 20px;
+            font-family: Helvetica;
+            font-size: 16px;
+        }
+
+        #info {
+            position: absolute;
+            top: 50px;
+            left: 100px;
+            width: auto;
+            color: #ffffff;
+            padding: 10px;
+            padding-top: 20px;
+            font-family: Helvetica;
+            font-size: 16px;
+            text-align: left;
+            background: black;
+            opacity: 0.6;
+            z-index: 100000;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - pick-fly-orbit camera using a <a href="../api/latest/plugins/node/cameras/pickFlyOrbit.js" target="_other">cameras/pickFlyOrbit</a> node
+    <br>
+    click on something to fly to that point
+    <br>
+    drag mouse to orbit it, mouse wheel to zoom in and out
+</div>
+
+<script>
+
+    //-----------------------------------------------------------------------------------------------------------------
+    // Demonstrates how to use the "cameras/pickFlyOrbit" node, which provides a camera which will fly to orbit a
+    // 3D point-of-interest that you select by ray-picking with the mouse.
+    //-----------------------------------------------------------------------------------------------------------------
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/pickFlyOrbit.js
+            {
+                type: "cameras/pickFlyOrbit",
+                yaw: -30,
+                pitch: -20,
+                zoom: 300,
+                zoomSensitivity: 25.0,
+                showCursor: true,
+                cursorSize: 2.0,
+
+                nodes: [
+
+                    // City demo scene
+                    // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
+                    {
+                        type: "models/buildings/city"
+                    },
+
+                    // Ground
+                    // http://scenejs.org/api/latest/plugins/node/ground/grid.js
+                    {
+                        type: "models/ground/grid"
+                    },
+
+                    // Skybox node, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/skybox/grimmNight.js
+                    {
+                        type: "skybox/clouds"
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

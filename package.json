@@ -1,0 +1,34 @@
+{
+  "name": "scenejs",
+  "title": "SceneJS",
+  "version": "4.2.0",
+  "description": "A WebGL-based 3D scene graph from xeoLabs",
+  "homepage": "http://scenejs.org/",
+  "author": {
+    "name": "Lindsay Kay",
+    "email": "lindsay.kay@xeolabs.com"
+  },
+  "license": "MIT License",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/xeolabs/scenejs.git"
+  },
+  "dependencies": {
+    "grunt-contrib-yuidoc": "~0.7.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-copy": "^0.8.0",
+    "grunt-contrib-jasmine": "~0.8.2",
+    "grunt-contrib-jshint": "~0.11.1",
+    "grunt-contrib-qunit": "~0.5.2",
+    "grunt-contrib-uglify": "^0.9.1",
+    "grunt-contrib-yuidoc": "~0.7.0"
+  },
+  "engines": {
+    "node": ">=0.10.17",
+    "npm": "1.3.8"
+  }
+}

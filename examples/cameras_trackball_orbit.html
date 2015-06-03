@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - orbiting camera using a <a
+        href="../api/latest/plugins/node/cameras/trackball.js" target="_other">cameras/trackball</a> node<br>
+    drag mouse to orbit
+    <br>
+    mouse wheel to zoom in and out
+</div>
+
+<script>
+
+    //-----------------------------------------------------------------------------------------------------------------
+    // Demo of the "cameras/trackball" node type, which uses quaternions to orbit the eye about a point of interest
+    //-----------------------------------------------------------------------------------------------------------------
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-quaternion-orbited camera using
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/trackball.js
+            {
+                type: "cameras/trackball",
+
+                // Unique ID so we can access this node (see below)
+                id: "myCamera",
+
+                // Initial position
+                eye: { x: 1000.0, y: 0.0, z: -1000.0 },
+                look: { x: 0.0, y: 0.0, z: 0.0 },
+                up: { y: 1.0 },
+
+                // Initial zoom (default == 1.0)
+                zoom: 0.7,
+
+                // Sensitivity of mouse wheel zoom control
+                zoomSensitivity: 0.01,
+
+                // Orbiting the 'look' position (default)
+                // otherwise we are orbiting the 'look' point.
+                orbit: true,
+
+                nodes: [
+
+                    // Blue material
+                    {
+                        type: "material",
+                        color: { r: 0.3, g: 0.3, b: 1.0 },
+
+                        nodes: [
+
+                            // City,implemented by plugin at:
+                            // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
+                            {
+                                type: "models/buildings/city"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    scene.getNode("myCamera",
+            function (trackball) {
+
+//                    trackball.setZoom(0.5);
+//                    trackball.addPan([0.0, 0.0, 1.0]);
+//                    trackball.addRotate([0.0, 1.0, 0.0, 0.5]);
+
+            });
+
+</script>
+</body>
+</html>

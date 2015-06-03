@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoLight">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - The Earth<br>
+    <br>
+    This Earth is implemented by the <a href="../api/latest/plugins/node/models/space/planets/earth.js" target="_other">models/space/planets/earth</a>
+    node,<br>
+    which demonstrates multiple textures layered onto the same geometry: a <a href="index.html#texture_color"
+                                                                              target="_top">color map</a> for land
+    and sea,<br>
+    <a href="index.html#texture_specular" target="_top">specular map</a> to create shiny areas, a <a
+        href="index.html#texture_emit" target="_top">glow map</a> for lights on the night side, and an <a
+        href="index.html#texture_alpha" target="_top">alpha map</a> for the cloud layer,<br>
+    applied to a white spinning outer <a href="index.html#geometry_sphere" target="_top">sphere</a>.
+</div>
+
+<script>
+
+    // Demo of the "cameras/orbit" and "models/space/planets/earth" custom node types
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    SceneJS.createScene({
+        nodes: [
+
+            // Custom lighting to simulate the Sun
+            {
+                type: "lights",
+                lights: [
+                    {
+                        mode: "ambient",
+                        color: { r: 0.06, g: 0.06, b: 0.1 }
+                    },
+                    {
+                        mode: "dir",
+                        color: { r: 1.0, g: 1.0, b: 1.0 },
+                        diffuse: true,
+                        specular: true,
+                        dir: { x: -0.5, y: -0.5, z: -0.75 },
+                        space: "view"
+                    }
+                ],
+                nodes: [
+
+                    // Mouse-orbited camera,
+                    // implemented by plugin at ../../../../api/latest/plugins/node/cameras/orbit.js
+                    {
+                        type: "cameras/orbit",
+                        yaw: 340,
+                        pitch: -20,
+                        zoom: 7,
+                        zoomSensitivity: 1.0,
+                        eye: { y: 0 },
+                        look: { y: 0 },
+
+                        nodes: [
+
+                            {
+                                type: "models/space/planets/earth"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

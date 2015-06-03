@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - depth-of-field effect using a <a href="../api/latest/plugins/node/postprocess/dof.js" target="_other">postprocess/dof</a> node
+    <br>
+    depth-of-field technique based on <a href="http://www.nutty.ca/?page_id=352&link=depth_of_field"  target="_other">this article</a> at Nutty Software
+    <br>
+    tweak the DOF params in the GUI
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+
+        nodes: [
+
+            // Mouse-orbit for camera,
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: -40,
+                pitch: -20,
+                zoom: 500,
+                eye: { x: 0, y: 150, z: -1000 },
+                look: { x: 0, y: 0, z: 0 },
+                zoomSensitivity: 10.0,
+
+                nodes: [
+
+                    // Depth-of-field blur effect, implemented by plugin at:
+                    // http://scenejs.org/api/latest/plugins/node/postprocess/dof.js
+                    {
+                        type: "postprocess/dof",
+                        id: "myDOF",
+                        texelSize: 0.00022, // Size of one texel (1 / width, 1 / height)
+                        blurCoeff: 0.0084,	// Calculated from the blur equation, b = ( f * ms / N )
+                        focusDist: 500.0,	// The distance to the subject in perfect focus (= Ds)
+                        ppm: 10000,         // Pixels per millimetre
+                        near: 0.1,
+                        far: 10000.0,
+                        autofocus: false, // Set true (default) to automatically manage focusDist
+
+                        nodes: [
+
+                            // Cloudy sea skybox, implemented by plugin at:
+                            // http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                            {
+                                type: "skybox/cloudySea",
+                                size: 5000 // Box half-size on each axis - default is 5000
+                            },
+
+                            // City, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/models/buildings/city.js
+                            {
+                                type: "models/buildings/city",
+                                width: 600
+                            },
+
+                            {
+                                type: "material",
+                                color: { r: 0.5, g: 1.0, b: 0.5 },
+                                emit: 0.1,
+                                nodes: [
+
+                                    // Grid ground, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/models/ground/grid.js
+                                    {
+                                        type: "geometry/grid",
+                                        size: { x: 10000, z: 10000 },
+                                        width: 10000,
+                                        height: 10000,
+                                        widthSegments: 100,
+                                        heightSegments: 100
+                                    }
+                                ]
+                            },
+
+                            {
+                                type: "translate",
+                                y: -3,
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: { r: 0.5, g: 1.0, b: 0.5 },
+                                        emit: 0.01,
+                                        nodes: [
+
+                                            // Solid green surface under the grid, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/models/ground/grid.js
+                                            {
+                                                type: "geometry/grid",
+                                                size: { x: 10000, z: 10000 },
+                                                width: 10000,
+                                                height: 10000,
+                                                widthSegments: 10,
+                                                heightSegments: 10,
+                                                wire: false
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    //  Get DOF node and bind a GUI to it to play with it
+    scene.getNode("myDOF",
+            function (dof) {
+
+                var Menu = function () {
+
+                    var texelSize = dof.getTexelSize();
+                    var blurCoeff = dof.getBlurCoeff();
+                    var focusDist = dof.getFocusDist();
+                    var ppm = dof.getPPM();
+
+                    this["texelSize"] = texelSize;
+                    this["blurCoeff"] = blurCoeff;
+                    this["focusDist"] = focusDist;
+                    this["ppm"] = ppm;
+
+                    var self = this;
+
+                    // This is actually quite inefficient because it continually updates
+                    // the scene graph, forcing frames to continually re-render.
+                    // Your GPU's not going to like it, but it's just for a quick and dirty demo.
+                    var update = function () {
+
+                        dof.setTexelSize(self["texelSize"]);
+                        dof.setBlurCoeff(self["blurCoeff"]);
+                        dof.setFocusDist(self["focusDist"]);
+                        dof.setPPM(self["ppm"]);
+
+                        requestAnimationFrame(update);
+                    };
+                    update();
+                };
+
+                var gui = new dat.GUI();
+                var folder = gui.addFolder("Depth of Field Blur");
+                var menu = new Menu();
+                folder.add(menu, 'texelSize', 0.0, 0.01);
+                folder.add(menu, 'blurCoeff', 0.0, 0.01);
+                folder.add(menu, 'focusDist', 0.0, 1500.0);
+                folder.add(menu, 'ppm', 10.0, 10000.0);
+                folder.open();
+            });
+
+</script>
+</body>
+</html>

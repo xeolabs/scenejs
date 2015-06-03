@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - environment demo
+    <br>
+    pre-made rendering environment <a href="../api/latest/plugins/node/environments/lawn.js" target="_other">lawn</a> with
+    <a href="../api/latest/plugins/node/geometry/teapot.js" target="_other">teapot</a> model
+    <br>
+    click on something to fly to that point
+    <br>
+    drag mouse to orbit it, mouse wheel to zoom in and out
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+            {
+                type: "environments/lawn",
+
+                nodes: [
+                    {
+                        type: "scale",
+                        x: 70,
+                        y: 70,
+                        z: 70,
+
+                        nodes: [
+                            {
+                                type: "material",
+                                color: { r: 0.5, g: 0.5, b: 0.3 },
+                                specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                specular: 0.6,
+
+                                nodes: getTeapots()
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    function getTeapots() {
+        var nodes = [];
+        var extent = 50;
+        var inc = extent / 5;
+        for (var x = -extent; x < extent; x += inc) {
+            for (var z = -extent; z < extent; z += inc) {
+                nodes.push({
+                    type: "translate",
+                    x: x,
+                    y: 0,
+                    z: z,
+                    nodes: [
+                        {
+                            type: "geometry/teapot"
+                        }
+                    ]
+                });
+            }
+        }
+        return nodes;
+    }
+
+</script>
+</body>
+</html>

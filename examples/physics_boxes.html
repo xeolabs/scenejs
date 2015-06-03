@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <script src="libs/stats.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - physics
+    <br>
+    physics system runs in a web worker
+    <br>
+    learn more in <a href="http://xeolabs.com/articles/scenejs-physics/"  target="_other">this tutorial</a>
+</div>
+
+<script>
+
+
+    // Basic demonstration of the "physics/body" and "physics/system" nodes
+    // within the SceneJS rigid-body physics system.
+    //
+    // In this demo, we're using the scene's default physics system to simulate
+    // a bunch of spheres falling and bouncing on a ground plane.
+    //
+    // Documentation on the physics system here: https://github.com/xeolabs/scenejs/wiki/Physics
+    //
+
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:30,
+                pitch:-30,
+                zoom:100,
+                zoomSensitivity:10.0,
+
+                nodes:[
+
+                    // Optional physics system configs, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/physics/system.js
+                    {
+                        type:"physics/system",
+                        gravity:[0, -9, 0, 0],
+                        solver:"ACCUMULATED" // Options are "ACCUMULATED" (default) or "FAST", "NORMAL"
+                    },
+
+                    // Ground plane
+
+                    // Physics body, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/physics/body.js
+                    {
+                        type:"physics/body",
+                        shape:"plane",
+
+                        // Points upwards
+                        dir:[0, 1, 0],
+                        width:100,
+                        depth:100,
+                        height:0,
+
+                        // Fixed at origin
+                        pos:[0, 0, 0],
+
+                        // Ground does not move
+                        velocity:[0, 0, 0],
+
+                        // Mass not relevant for unmoving object?
+                        mass:0.0,
+
+                        // The coefficient of restitution (COR) of two colliding objects is a
+                        // fractional value representing the ratio of speeds after and before
+                        // an impact, taken along the line of the impact.
+                        restitution:0.9,
+
+                        friction:0.3,
+
+                        // Specify that this body is not able to move
+                        movable:false,
+
+                        // Child nodes will be translated and rotated according to
+                        // the body's behaviour within the physics system
+
+                        nodes:[
+
+                            // Blue color for ground plane
+                            {
+                                type:"material",
+                                color:{ r:0.8, g:0.8, b:1.0 },
+                                nodes:[
+
+                                    // Grid ground plane geometry, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/grid.js
+                                    {
+                                        type:"geometry/grid",
+                                        size:{ x:1000, z:1000 },
+                                        xSegments:200,
+                                        zSegments:200
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    // Falling balls
+
+                    // A bunch of physics bodies wrapping colored spheres
+                    {
+                        type:"node",
+                        nodes:makeBodies(30)
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Returns a bunch of "geometry/sphere" nodes, each wrapped by a spherical "physics/body" node
+    function makeBodies(numBodies) {
+
+        var nodes = [];
+
+        var xSize;
+        var ySize;
+        var zSize;
+
+        var yPos = 50;
+
+        for (var i = 0; i < numBodies; i++) {
+
+            xSize = Math.random() * 5 + 1;
+            ySize = Math.random() * 5 + 1;
+            zSize = Math.random() * 5 + 1;
+
+            nodes.push(
+
+                    // Physics body primitive, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/physics/body.js
+                    {
+                        type:"physics/body",
+                        shape:"box",
+
+                        // Default box dimensions
+                        width:xSize,
+                        depth:zSize,
+                        height:ySize,
+
+                        pos:[
+                            Math.random() * 5 - 2.5,
+                            yPos,
+                            Math.random() * 5 - 2.5
+                        ],
+
+                        // Body is just passively falling from a height
+                        velocity:[0, 0, 0],
+
+                        //
+                        mass:2.0,
+
+                        // Specify that this body is able to move
+                        movable:true,
+
+                        // The coefficient of restitution (COR) of two colliding objects is a
+                        // fractional value representing the ratio of speeds after and before
+                        // an impact, taken along the line of the impact.
+                        //
+                        // This body will not be so bouncy.
+                        restitution:0.05,
+
+
+                        friction:10.0,
+
+                        // Child node will be translated and rotated according to
+                        // the body's behaviour within the physics system
+                        nodes:[
+                            {
+                                type:"material",
+                                color:{ r:Math.random(), g:Math.random(), b:Math.random() },
+
+                                nodes:[
+
+                                    // Sphere primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                    {
+                                        type:"geometry/box",
+                                        xSize:xSize / 2,
+                                        ySize:ySize / 2,
+                                        zSize:zSize / 2
+                                    }
+                                ]
+                            }
+                        ]
+                    });
+
+            yPos += 10;
+        }
+        return nodes;
+    }
+
+    // Stats
+
+    var stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+    stats.domElement.style.right = '0px';
+    stats.domElement.style.zIndex = 100;
+    document.body.appendChild( stats.domElement );
+    scene.on("tick", function() {
+        stats.end();
+        stats.begin();
+    });
+
+</script>
+</body>
+</html>

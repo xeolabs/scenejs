@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+
+</head>
+<body>
+
+<script>
+
+    // Draws the scene three times on each render, each time drawing to a different viewport, in a different color.
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+
+        // Each render will produce three passes
+        numPasses: 3,
+
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at:
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 10,
+                zoomSensitivity: 1.0,
+
+                nodes: [
+
+                    // Renderer node, through which we'll control the viewport for each pass
+                    {
+                        type: "renderer",
+                        id: "myRenderer",
+
+                        nodes: [
+
+                            // Teapot color
+                            {
+                                type: "material",
+                                id: "myMaterial",
+
+                                nodes: [
+
+                                    // Teapot primitive, implemented by plugin at:
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                    {
+                                        type: "geometry/teapot"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Get the "renderer" node, through which we'll control the viewport size
+    scene.getNode("myRenderer",
+            function (renderer) {
+
+                scene.getNode("myMaterial",
+                        function (material) {
+                          
+                            scene.on("rendering",
+                                    function (params) {
+
+                                        // Index of pass we're rendering
+                                        var pass = params.pass;
+
+                                        // Get canvas dimensions
+                                        var canvas = scene.getCanvas();
+                                        var thirdWidth = canvas.width / 3.0;
+                                        var height = canvas.height;
+                                        
+                                        switch (pass) {
+                                            case 0:
+                                                renderer.setViewport({ x: 0, y: 0, width: thirdWidth, height: height });
+                                                material.setColor({ r: 1.0, g: 0.3, b: 0.3 });
+                                                //lookat.setEye
+                                                //lookat.setLook
+                                                break;
+
+                                            case 1:
+                                                renderer.setViewport({ x: thirdWidth, y: 0, width: thirdWidth, height: height });
+                                                material.setColor({ r: 0.3, g: 1.0, b: 0.3 });
+                                                break;
+
+                                            case 2:
+                                                renderer.setViewport({ x: thirdWidth * 2, y: 0, width: thirdWidth, height: height });
+                                                material.setColor({ r: 0.3, g: 0.3, b: 1.0 });
+                                                break;
+                                        }
+                                    });
+                        });
+            });
+
+</script>
+</body>
+</html>
