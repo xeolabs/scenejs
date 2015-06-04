@@ -15589,9 +15589,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
     this._composePickingVertexShader = function (states) {
         var morphing = !!states.morphGeometry.targets;
         var src = [
-
-            "precision mediump float;",
-
             "attribute vec3 SCENEJS_aVertex;",
             "uniform mat4 SCENEJS_uMMatrix;",
             "uniform mat4 SCENEJS_uVMatrix;",
@@ -15756,9 +15753,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
 
-        var src = [
-            "precision mediump float;"
-        ];
+        var src = [];
 
         src.push("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
         src.push("uniform mat4 SCENEJS_uVMatrix;");             // View matrix
