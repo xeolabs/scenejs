@@ -506,6 +506,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var texturing = this._isTexturing(states);
         var cubeMapping = this._isCubeMapping(states);
         var normals = this._hasNormals(states);
+        var solid = states.flags.solid;
         var tangents = this._hasTangents(states);
         var clipping = states.clips.clips.length > 0;
 
@@ -564,9 +565,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        /* True when lighting
-         */
+        // True when lighting
         src.push("uniform bool  SCENEJS_uClipping;");
+
+        // True when interior surfaces of solid cross-sections
+        // are to be rendered without texture and shading
+        src.push("uniform bool  SCENEJS_uSolid;");
 
         // Added in v4.0 to support depth targets
         src.push("uniform bool  SCENEJS_uDepthMode;");
@@ -628,6 +632,18 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
             src.push("  if (dist > 0.0) { discard; }");
             src.push("}");
+        }
+
+        if (normals) {
+
+            if (solid) {
+
+                src.push("  float a = dot(normalize(SCENEJS_vViewNormal), normalize(SCENEJS_vViewEyeVec));");
+                src.push("  if (a < 0.0) {");
+                src.push("     gl_FragColor = vec4(0.4, 0.4, 1.0, 1.0);");
+                src.push("     return;");
+                src.push("  }");
+            }
         }
 
         src.push("  vec3 ambient= SCENEJS_uAmbientColor;");

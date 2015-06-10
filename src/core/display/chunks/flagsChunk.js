@@ -10,6 +10,7 @@ SceneJS_ChunkFactory.createChunkType({
         var draw = this.program.draw;
 
         this._uClippingDraw = draw.getUniform("SCENEJS_uClipping");
+        this._uSolidDraw = draw.getUniform("SCENEJS_uSolid");
 
         var pick = this.program.pick;
 
@@ -66,13 +67,19 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (frameCtx.pick) {
+
             if (this._uClippingPick) {
                 this._uClippingPick.setValue(this.core.clipping);
             }
 
         } else {
+
             if (this._uClippingDraw) {
                 this._uClippingDraw.setValue(this.core.clipping);
+            }
+
+            if (this._uSolidDraw) {
+                this._uSolidDraw.setValue(this.core.solid);
             }
         }
     }

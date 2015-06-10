@@ -15,7 +15,8 @@
         backfaces: true,            // Show backfaces
         frontface: "ccw",           // Default vertex winding for front face
         reflective: true,           // Reflects reflection node cubemap, if it exists, by default.
-        hash: "refl"
+        solid: true,               // When true, renders backfaces without texture or shading, for a cheap solid cross-section effect
+        hash: "refl;s;"
     };
 
     var coreStack = [];
@@ -45,7 +46,8 @@
             this._core.backfaces = true;         // Show backfaces
             this._core.frontface = "ccw";        // Default vertex winding for front face
             this._core.reflective = true;        // Reflects reflection node cubemap, if it exists, by default.
-            if (params.flags) {                 // 'flags' property is actually optional in the node definition
+            this._core.solid = true;            // Renders backfaces without texture or shading, for a cheap solid cross-section effect
+            if (params.flags) {                  // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
             }
         }
@@ -89,8 +91,14 @@
             core.reflective = flags.reflective;
             core.hash = core.reflective ? "refl" : "";
             this._engine.branchDirty(this);
-            this._engine.display.imageDirty = true;
         }
+
+        if (flags.solid != undefined) {
+            core.solid = flags.solid;
+            core.hash = core.reflective ? "refl" : "";
+            this._engine.branchDirty(this);
+        }
+        
         return this;
     };
 
@@ -117,7 +125,8 @@
             transparent: core.transparent,
             backfaces: core.backfaces,
             frontface: core.frontface,
-            reflective: core.reflective
+            reflective: core.reflective,
+            solid: core.solid
         };
     };
 
@@ -202,9 +211,8 @@
         reflective = !!reflective;
         if (this._core.reflective != reflective) {
             this._core.reflective = reflective;
-            this._core.hash = reflective ? "refl" : "";
+            this._core.hash = (reflective ? "refl" : "") + this._core.solid ? ";s" : ";";
             this._engine.branchDirty(this);
-            this._engine.display.imageDirty = true;
         }
         return this;
     };
@@ -213,6 +221,21 @@
         return this._core.reflective;
     };
 
+    SceneJS.Flags.prototype.setSolid = function(solid) {
+        solid = !!solid;
+        if (this._core.solid != solid) {
+            this._core.solid = solid;
+            this._core.hash = (this._core.reflective ? "refl" : "") + solid ? ";s" : ";";
+            this._engine.branchDirty(this);
+        }
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getSolid = function() {
+        return this._core.solid;
+    };
+
+    
     SceneJS.Flags.prototype._compile = function(ctx) {
         this._engine.display.flags = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
