@@ -6,7 +6,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
     this._sourceCache = {}; // Source codes are shared across all scenes
 
-
     /**
      * Get sourcecode for a program to render the given states
      */
@@ -43,9 +42,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
     this._composePickingVertexShader = function (states) {
         var morphing = !!states.morphGeometry.targets;
         var src = [
-
-            "precision mediump float;",
-
             "attribute vec3 SCENEJS_aVertex;",
             "uniform mat4 SCENEJS_uMMatrix;",
             "uniform mat4 SCENEJS_uVMatrix;",
@@ -88,8 +84,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var clipping = states.clips.clips.length > 0;
 
+        var floatPrecision = getFSFloatPrecision(states._canvas.gl);
+
         var src = [
-            "precision mediump float;"
+            "precision " + floatPrecision + " float;"
         ];
 
         src.push("varying vec4 SCENEJS_vWorldVertex;");
@@ -210,9 +208,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
 
-        var src = [
-            "precision mediump float;"
-        ];
+        var src = [];
 
         src.push("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
         src.push("uniform mat4 SCENEJS_uVMatrix;");             // View matrix
@@ -510,9 +506,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var tangents = this._hasTangents(states);
         var clipping = states.clips.clips.length > 0;
 
+        var floatPrecision = getFSFloatPrecision(states._canvas.gl);
+
         var src = ["\n"];
 
-        src.push("precision mediump float;");
+        src.push("precision " + floatPrecision + " float;");
 
 
         if (clipping) {
@@ -920,6 +918,22 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
         return false;
+    }
+
+    function getFSFloatPrecision(gl) {
+        if (!gl.getShaderPrecisionFormat) {
+            return "mediump";
+        }
+
+        if (gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT).precision > 0) {
+            return "highp";
+        }
+
+        if (gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT).precision > 0) {
+            return "mediump";
+        }
+
+        return "lowp";
     }
 
 })();
