@@ -1036,7 +1036,6 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     var VAO = gl.getExtension("OES_vertex_array_object");
     frameCtx.VAO = (VAO) ? VAO : null;
-    frameCtx.VAO = null;
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 

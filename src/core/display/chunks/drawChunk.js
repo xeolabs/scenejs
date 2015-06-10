@@ -15,15 +15,20 @@ SceneJS_ChunkFactory.createChunkType({
     unique:true,
 
     build:function () {
-        this._depthModeDraw = this.program.draw.getUniformLocation("SCENEJS_uDepthMode");
-        this._depthModePick = this.program.pick.getUniformLocation("SCENEJS_uDepthMode");
+        this._depthModeDraw = this.program.draw.getUniform("SCENEJS_uDepthMode");
+        this._depthModePick = this.program.pick.getUniform("SCENEJS_uDepthMode");
     },
 
     drawAndPick:function (frameCtx) {
+
         var gl = this.program.gl;
+
         var indexType = this.program.UINT_INDEX_ENABLED ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
-        gl.uniform1i(frameCtx.pick ? this._depthModePick : this._depthModeDraw, frameCtx.depthMode);
+
+        (frameCtx.pick ? this._depthModePick : this._depthModeDraw).setValue(frameCtx.depthMode);
+
         gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, indexType, 0);
+
         //frameCtx.textureUnit = 0;
     }
 });

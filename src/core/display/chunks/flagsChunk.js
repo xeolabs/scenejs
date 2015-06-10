@@ -9,11 +9,11 @@ SceneJS_ChunkFactory.createChunkType({
 
         var draw = this.program.draw;
 
-        this._uClippingDraw = draw.getUniformLocation("SCENEJS_uClipping");
+        this._uClippingDraw = draw.getUniform("SCENEJS_uClipping");
 
         var pick = this.program.pick;
 
-        this._uClippingPick = pick.getUniformLocation("SCENEJS_uClipping");
+        this._uClippingPick = pick.getUniform("SCENEJS_uClipping");
     },
 
     drawAndPick: function (frameCtx) {
@@ -66,13 +66,13 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (frameCtx.pick) {
-            gl.uniform1i(this._uClippingPick, this.core.clipping);
+            if (this._uClippingPick) {
+                this._uClippingPick.setValue(this.core.clipping);
+            }
 
         } else {
-            var drawUniforms = (this.core.clipping ? 1 : 0);
-            if (this.program.drawUniformFlags != drawUniforms) {
-                gl.uniform1i(this._uClippingDraw, this.core.clipping);
-                this.program.drawUniformFlags = drawUniforms;
+            if (this._uClippingDraw) {
+                this._uClippingDraw.setValue(this.core.clipping);
             }
         }
     }

@@ -2,19 +2,19 @@ SceneJS_ChunkFactory.createChunkType({
 
     type: "xform",
 
-    build : function() {
+    build: function () {
 
         var draw = this.program.draw;
 
-        this._uMatLocationDraw = draw.getUniformLocation("SCENEJS_uMMatrix");
-        this._uNormalMatLocationDraw = draw.getUniformLocation("SCENEJS_uMNMatrix");
+        this._uMatLocationDraw = draw.getUniform("SCENEJS_uMMatrix");
+        this._uNormalMatLocationDraw = draw.getUniform("SCENEJS_uMNMatrix");
 
         var pick = this.program.pick;
 
-        this._uMatLocationPick = pick.getUniformLocation("SCENEJS_uMMatrix");
+        this._uMatLocationPick = pick.getUniform("SCENEJS_uMMatrix");
     },
 
-    draw : function(frameCtx) {
+    draw: function (frameCtx) {
 
         /* Rebuild core's matrix from matrices at cores on path up to root
          */
@@ -25,17 +25,17 @@ SceneJS_ChunkFactory.createChunkType({
         var gl = this.program.gl;
 
         if (this._uMatLocationDraw) {
-            gl.uniformMatrix4fv(this._uMatLocationDraw, gl.FALSE, this.core.mat);
+            this._uMatLocationDraw.setValue(this.core.mat);
         }
 
         if (this._uNormalMatLocationDraw) {
-            gl.uniformMatrix4fv(this._uNormalMatLocationDraw, gl.FALSE, this.core.normalMat);
+            this._uNormalMatLocationDraw.setValue(this.core.normalMat);
         }
 
         frameCtx.modelMat = this.core.mat;
     },
 
-    pick : function(frameCtx) {
+    pick: function (frameCtx) {
 
         /* Rebuild core's matrix from matrices at cores on path up to root
          */
@@ -46,7 +46,7 @@ SceneJS_ChunkFactory.createChunkType({
         var gl = this.program.gl;
 
         if (this._uMatLocationPick) {
-            gl.uniformMatrix4fv(this._uMatLocationPick, gl.FALSE, this.core.mat);
+            this._uMatLocationPick.setValue(this.core.mat);
         }
 
         frameCtx.modelMat = this.core.mat;

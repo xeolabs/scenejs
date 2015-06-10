@@ -7,11 +7,11 @@ SceneJS_ChunkFactory.createChunkType({
 
     build : function() {
 
-        this._uvMatrixDraw = this.program.draw.getUniformLocation("SCENEJS_uVMatrix");
-        this._uVNMatrixDraw = this.program.draw.getUniformLocation("SCENEJS_uVNMatrix");
-        this._uWorldEyeDraw = this.program.draw.getUniformLocation("SCENEJS_uWorldEye");
+        this._uvMatrixDraw = this.program.draw.getUniform("SCENEJS_uVMatrix");
+        this._uVNMatrixDraw = this.program.draw.getUniform("SCENEJS_uVNMatrix");
+        this._uWorldEyeDraw = this.program.draw.getUniform("SCENEJS_uWorldEye");
 
-        this._uvMatrixPick = this.program.pick.getUniformLocation("SCENEJS_uVMatrix");
+        this._uvMatrixPick = this.program.pick.getUniform("SCENEJS_uVMatrix");
     },
 
     draw : function(frameCtx) {
@@ -23,15 +23,15 @@ SceneJS_ChunkFactory.createChunkType({
         var gl = this.program.gl;
 
         if (this._uvMatrixDraw) {
-            gl.uniformMatrix4fv(this._uvMatrixDraw, gl.FALSE, this.core.mat);
+            this._uvMatrixDraw.setValue(this.core.mat);
         }
 
         if (this._uVNMatrixDraw) {
-            gl.uniformMatrix4fv(this._uVNMatrixDraw, gl.FALSE, this.core.normalMat);
+            this._uVNMatrixDraw.setValue(this.core.normalMat);
         }
 
         if (this._uWorldEyeDraw) {
-            gl.uniform3fv(this._uWorldEyeDraw, this.core.lookAt.eye);
+            this._uWorldEyeDraw.setValue(this.core.lookAt.eye);
         }
 
         frameCtx.viewMat = this.core.mat;
@@ -42,7 +42,7 @@ SceneJS_ChunkFactory.createChunkType({
         var gl = this.program.gl;
 
         if (this._uvMatrixPick) {
-            gl.uniformMatrix4fv(this._uvMatrixPick, gl.FALSE, this.core.mat);
+            this._uvMatrixPick.setValue(this.core.mat);
         }
 
         frameCtx.viewMat = this.core.mat;
