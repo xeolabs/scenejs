@@ -449,7 +449,7 @@
             {
                 "nodes": [
                     {
-                        "title": "Low-resolution preload",
+                        "title": "Low-res preload",
                         "page": "texture_preload"
                     }
                 ]
