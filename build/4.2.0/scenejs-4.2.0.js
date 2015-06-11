@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-06-10
+ * Built on 2015-06-11
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -5971,6 +5971,9 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
     } else if (type === gl.FLOAT_MAT4) {
 
         func = function (v) {
+
+            // Caching this matrix is actually slower than not caching
+
             gl.uniformMatrix4fv(location, gl.FALSE, v);
         };
 
@@ -8241,8 +8244,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         backfaces: true,            // Show backfaces
         frontface: "ccw",           // Default vertex winding for front face
         reflective: true,           // Reflects reflection node cubemap, if it exists, by default.
-        solid: true,               // When true, renders backfaces without texture or shading, for a cheap solid cross-section effect
-        hash: "refl;s;"
+        solid: false,               // When true, renders backfaces without texture or shading, for a cheap solid cross-section effect
+        hash: "refl;;"
     };
 
     var coreStack = [];
@@ -8272,7 +8275,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             this._core.backfaces = true;         // Show backfaces
             this._core.frontface = "ccw";        // Default vertex winding for front face
             this._core.reflective = true;        // Reflects reflection node cubemap, if it exists, by default.
-            this._core.solid = true;            // Renders backfaces without texture or shading, for a cheap solid cross-section effect
+            this._core.solid = false;            // Renders backfaces without texture or shading, for a cheap solid cross-section effect
             if (params.flags) {                  // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
             }
@@ -8317,12 +8320,14 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             core.reflective = flags.reflective;
             core.hash = core.reflective ? "refl" : "";
             this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
         }
 
         if (flags.solid != undefined) {
             core.solid = flags.solid;
             core.hash = core.reflective ? "refl" : "";
             this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
         }
         
         return this;
@@ -8437,8 +8442,9 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         reflective = !!reflective;
         if (this._core.reflective != reflective) {
             this._core.reflective = reflective;
-            this._core.hash = (reflective ? "refl" : "") + this._core.solid ? ";s" : ";";
+            this._core.hash = (reflective ? "refl" : "") + this._core.solid ? ";s" : ";;";
             this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
         }
         return this;
     };
@@ -8451,8 +8457,9 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         solid = !!solid;
         if (this._core.solid != solid) {
             this._core.solid = solid;
-            this._core.hash = (this._core.reflective ? "refl" : "") + solid ? ";s" : ";";
+            this._core.hash = (this._core.reflective ? "refl" : "") + solid ? ";s;" : ";;";
             this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
         }
         return this;
     };
@@ -15661,7 +15668,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
     this._sourceCache = {}; // Source codes are shared across all scenes
 
-
     /**
      * Get sourcecode for a program to render the given states
      */
@@ -15698,9 +15704,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
     this._composePickingVertexShader = function (states) {
         var morphing = !!states.morphGeometry.targets;
         var src = [
-
-            "precision mediump float;",
-
             "attribute vec3 SCENEJS_aVertex;",
             "uniform mat4 SCENEJS_uMMatrix;",
             "uniform mat4 SCENEJS_uVMatrix;",
@@ -15743,8 +15746,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var clipping = states.clips.clips.length > 0;
 
+        var floatPrecision = getFSFloatPrecision(states._canvas.gl);
+
         var src = [
-            "precision mediump float;"
+            "precision " + floatPrecision + " float;"
         ];
 
         src.push("varying vec4 SCENEJS_vWorldVertex;");
@@ -15865,9 +15870,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
 
-        var src = [
-            "precision mediump float;"
-        ];
+        var src = [];
 
         src.push("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
         src.push("uniform mat4 SCENEJS_uVMatrix;");             // View matrix
@@ -16165,9 +16168,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var tangents = this._hasTangents(states);
         var clipping = states.clips.clips.length > 0;
 
+        var floatPrecision = getFSFloatPrecision(states._canvas.gl);
+
         var src = ["\n"];
 
-        src.push("precision mediump float;");
+        src.push("precision " + floatPrecision + " float;");
 
 
         if (clipping) {
@@ -16575,6 +16580,22 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
         return false;
+    }
+
+    function getFSFloatPrecision(gl) {
+        if (!gl.getShaderPrecisionFormat) {
+            return "mediump";
+        }
+
+        if (gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT).precision > 0) {
+            return "highp";
+        }
+
+        if (gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT).precision > 0) {
+            return "mediump";
+        }
+
+        return "lowp";
     }
 
 })();;/**
