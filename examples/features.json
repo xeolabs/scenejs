@@ -188,14 +188,7 @@
                     }
                 ]
             },
-            {
-                "nodes": [
-                    {
-                        "title": "OES_element_index_uint",
-                        "page": "optimization_uintIndex"
-                    }
-                ]
-            },
+
             {
                 "nodes": [
                     {
@@ -359,6 +352,14 @@
                         "page": "geometry_autoNormals"
                     }
                 ]
+            },
+            {
+                "nodes": [
+                    {
+                        "title": "OES_element_index_uint",
+                        "page": "optimization_uintIndex"
+                    }
+                ]
             }
         ]
     },
@@ -442,6 +443,14 @@
                     {
                         "title": "UV layers",
                         "page": "texture_uvLayers"
+                    }
+                ]
+            },
+            {
+                "nodes": [
+                    {
+                        "title": "Low-resolution preload",
+                        "page": "texture_preload"
                     }
                 ]
             }
