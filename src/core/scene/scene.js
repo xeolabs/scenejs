@@ -56,8 +56,8 @@ SceneJS.Scene.prototype.getZBufferDepth = function () {
 /**
  * Set canvas size multiplier for supersample anti-aliasing
  */
-SceneJS.Scene.prototype.setSSAAMultiplier = function (ssaaMultiplier) {
-    return this._engine.canvas.setSSAAMultiplier(ssaaMultiplier);
+SceneJS.Scene.prototype.setResolutionScaling = function (resolutionScaling) {
+    return this._engine.canvas.setResolutionScaling(resolutionScaling);
 };
 
 /**

@@ -20,39 +20,21 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org" target="_other">SceneJS</a> - Super sample anti-aliasing<br>
-    On platforms that don't implement anti-aliasing on the WebGL context, one can use supersampling<br>
-    to anti-alias by rendering to a larger canvas and then scaling the canvas down using CSS.
-    <br>
-    Use the up and down arrow keys to increase or decrease supersampling multiplier for the canvas size.
-    <br>
-    Current multiplier: <span id="ssaa">2</span>
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - Resolution Scaling<br>
+    Scale the resolution to draw at higher or lower resolutions than that of the canvas.<br>
+    On platforms that don't support anti-aliasing, scaling > 1 can be used to implement <a target="_blank" href="http://en.wikipedia.org/wiki/Supersampling">SSAA</a>.<br>
+    (Anti-aliasing has been disabled in this scene as a demonstration).<br>
+    Current scaling factor: <span id="scaling">1</span>
 </div>
 
 <script>
-
-    // Demonstrates how to make geometries reflective or non-reflective
-    //
-    // In the scene below, we make a geometry reflective with 1) a 'reflect'
-    // node with a cube map, and 2) a flags node with a 'reflective' flag,
-    // which allows the cube map to affect the surface's color.
-    //
-    // When the flag is false, the cube map is ignored and geometry
-    // then appears non-reflective.
-    //
-    // As we periodically toggle the flag, watch the geometry switch between
-    // reflective and non-reflective.
-    //
-    // If there is a reflect node is the sub-graph, the geometry will be 
-    // reflective by default when 1) the flags node is omitted, or 
-    // 2) the 'reflective' flag is not specified and defaults to true
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
         pluginPath: "../api/latest/plugins"
     });
 
-    var ssaaMultiplier = 2;
+    var resolutionScaling = 1;
 
     // Create scene
     var scene = SceneJS.createScene({
@@ -93,30 +75,26 @@
                 ]
             }
         ]
-    }, { ssaaMultiplier: ssaaMultiplier });
+    }, { resolutionScaling: resolutionScaling });
     
-    var ssaaElement = document.getElementById("ssaa");
+    var scalingElement = document.getElementById("scaling");
 
     window.addEventListener("keydown", function(e) {
         var keyCode = e.keyCode;
 
         if (keyCode === 38) {
-            ssaaMultiplier *= 2;
+            resolutionScaling *= 2;
         }
 
         if (keyCode === 40) {
-            ssaaMultiplier /= 2;
+            resolutionScaling /= 2;
         }
 
-        ssaaMultiplier = Math.max(ssaaMultiplier, 1);
+        resolutionScaling = Math.min(Math.max(resolutionScaling, 0.03125), 64);
 
-        scene.setSSAAMultiplier(ssaaMultiplier);
+        scene.setResolutionScaling(resolutionScaling);
 
-        if (ssaaMultiplier > 1) {
-            ssaaElement.innerText = ssaaMultiplier;
-        } else {
-            ssaaElement.innerText = "1 (no anti-aliasing)";
-        }
+        scalingElement.innerText = resolutionScaling;
     });
 </script>
 </body>

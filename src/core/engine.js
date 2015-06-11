@@ -436,10 +436,10 @@ SceneJS_Engine.prototype.start = function () {
         // Animation frame callback
         window[fnName] = function () {
 
-            var ssaaMultiplier = self.canvas.ssaaMultiplier || 1;
+            var resolutionScaling = self.canvas.resolutionScaling || 1;
 
-            width = canvas.width = canvas.clientWidth * ssaaMultiplier;
-            height = canvas.height = canvas.clientHeight * ssaaMultiplier;
+            width = canvas.width = canvas.clientWidth * resolutionScaling;
+            height = canvas.height = canvas.clientHeight * resolutionScaling;
 
             if (width != lastWidth || height != lastHeight) {
                 scene.publish("canvasSize", {
