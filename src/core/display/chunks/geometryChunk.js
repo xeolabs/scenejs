@@ -18,13 +18,13 @@ SceneJS_ChunkFactory.createChunkType({
 
         this._aMorphVertexDraw = draw.getAttribute("SCENEJS_aMorphVertex");
         this._aMorphNormalDraw = draw.getAttribute("SCENEJS_aMorphNormal");
-        this._uMorphFactorDraw = draw.getUniformLocation("SCENEJS_uMorphFactor");
+        this._uMorphFactorDraw = draw.getUniform("SCENEJS_uMorphFactor");
 
         var pick = this.program.pick;
 
         this._aVertexPick = pick.getAttribute("SCENEJS_aVertex");
         this._aMorphVertexPick = pick.getAttribute("SCENEJS_aMorphVertex");
-        this._uMorphFactorPick = pick.getUniformLocation("SCENEJS_uMorphFactor");
+        this._uMorphFactorPick = pick.getUniform("SCENEJS_uMorphFactor");
 
         this.VAO = null;
         this.VAOMorphKey1 = 0;
@@ -80,7 +80,7 @@ SceneJS_ChunkFactory.createChunkType({
     setDrawMorphFactor:function () {
 
         if (this._uMorphFactorDraw) {
-            this.program.gl.uniform1f(this._uMorphFactorDraw, this.core.factor); // Bind LERP factor
+            this._uMorphFactorDraw.setValue*(this.core.factor); // Bind LERP factor
         }
 
     },
@@ -176,7 +176,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (this._uMorphFactorPick) {
-            this.program.gl.uniform1f(this._uMorphFactorPick, this.core.factor); // Bind LERP factor
+            this._uMorphFactorPick.setValue(this.core.factor); // Bind LERP factor
         }
 
     },

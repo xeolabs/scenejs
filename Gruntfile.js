@@ -44,11 +44,11 @@ module.exports = function (grunt) {
         copy: {
             minified: {
                 src: '<%= build_dir %>/<%= PROJECT_NAME %>-<%= ENGINE_VERSION %>.min.js',
-                dest: 'build/<%= PROJECT_NAME %>.min.js'
+                dest: 'api/latest/<%= PROJECT_NAME %>.min.js'
             },
             unminified: {
                 src: '<%= build_dir %>/<%= PROJECT_NAME %>-<%= ENGINE_VERSION %>.js',
-                dest: 'build/<%= PROJECT_NAME %>.js'
+                dest: 'api/latest/<%= PROJECT_NAME %>.js'
             }
         }
     });

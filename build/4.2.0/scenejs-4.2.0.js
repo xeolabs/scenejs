@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-06-03
+ * Built on 2015-06-11
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -5830,84 +5830,158 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
     return x + 1;
 };
 
-;
-SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, index, logging) {
+;SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, index, logging) {
 
     var func = null;
-    this.numberValue = false;
-    if (type == gl.BOOL) {
-        this.numberValue = true;
+
+    var value = null;
+
+    if (type === gl.BOOL) {
+
         func = function (v) {
+            if (value === v) {
+                return;
+            }
+            value = v;
             gl.uniform1i(location, v);
         };
-    } else if (type == gl.BOOL_VEC2) {
+
+    } else if (type === gl.BOOL_VEC2) {
+
         func = function (v) {
+            if (value !== null && value[0] === v[0] && value[1] === v[1]) {
+                return;
+            }
+            value = v;
             gl.uniform2iv(location, v);
         };
-    } else if (type == gl.BOOL_VEC3) {
+
+    } else if (type === gl.BOOL_VEC3) {
+
         func = function (v) {
+            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+                return;
+            }
+            value = v;
             gl.uniform3iv(location, v);
         };
-    } else if (type == gl.BOOL_VEC4) {
+
+    } else if (type === gl.BOOL_VEC4) {
+
         func = function (v) {
+            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+                return;
+            }
+            value = v;
             gl.uniform4iv(location, v);
         };
-    } else if (type == gl.INT) {
-        this.numberValue = true;
+
+    } else if (type === gl.INT) {
+
         func = function (v) {
+            if (value === v) {
+                return;
+            }
+            value = v;
             gl.uniform1iv(location, v);
         };
-    } else if (type == gl.INT_VEC2) {
+
+    } else if (type === gl.INT_VEC2) {
+
         func = function (v) {
+            if (value !== null && value[0] === v[0] && value[1] === v[1]) {
+                return;
+            }
+            value = v;
             gl.uniform2iv(location, v);
         };
-    } else if (type == gl.INT_VEC3) {
+
+    } else if (type === gl.INT_VEC3) {
+
         func = function (v) {
+            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+                return;
+            }
+            value = v;
             gl.uniform3iv(location, v);
         };
-    } else if (type == gl.INT_VEC4) {
+
+    } else if (type === gl.INT_VEC4) {
+
         func = function (v) {
+            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+                return;
+            }
+            value = v;
             gl.uniform4iv(location, v);
         };
-    } else if (type == gl.FLOAT) {
-        this.numberValue = true;
+
+    } else if (type === gl.FLOAT) {
+
         func = function (v) {
+            if (value === v) {
+                return;
+            }
+            value = v;
             gl.uniform1f(location, v);
         };
-    } else if (type == gl.FLOAT_VEC2) {
+
+    } else if (type === gl.FLOAT_VEC2) {
+
         func = function (v) {
+            if (value !== null && value[0] === v[0] && value[1] === v[1]) {
+                return;
+            }
+            value = v;
             gl.uniform2fv(location, v);
         };
-    } else if (type == gl.FLOAT_VEC3) {
+
+    } else if (type === gl.FLOAT_VEC3) {
+
         func = function (v) {
+            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+                return;
+            }
+            value = v;
             gl.uniform3fv(location, v);
         };
-    } else if (type == gl.FLOAT_VEC4) {
+
+    } else if (type === gl.FLOAT_VEC4) {
+
         func = function (v) {
+            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+                return;
+            }
+            value = v;
             gl.uniform4fv(location, v);
         };
-    } else if (type == gl.FLOAT_MAT2) {
+
+    } else if (type === gl.FLOAT_MAT2) {
+
         func = function (v) {
             gl.uniformMatrix2fv(location, gl.FALSE, v);
         };
-    } else if (type == gl.FLOAT_MAT3) {
+
+    } else if (type === gl.FLOAT_MAT3) {
+
         func = function (v) {
             gl.uniformMatrix3fv(location, gl.FALSE, v);
         };
-    } else if (type == gl.FLOAT_MAT4) {
+
+    } else if (type === gl.FLOAT_MAT4) {
+
         func = function (v) {
+
+            // Caching this matrix is actually slower than not caching
+
             gl.uniformMatrix4fv(location, gl.FALSE, v);
         };
+
     } else {
         throw "Unsupported shader uniform type: " + type;
     }
 
     this.setValue = func;
-
-
-    this.getValue = function () {
-        return gl.getUniform(program, location);
-    };
 
     this.getLocation = function () {
         return location;
@@ -8170,7 +8244,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         backfaces: true,            // Show backfaces
         frontface: "ccw",           // Default vertex winding for front face
         reflective: true,           // Reflects reflection node cubemap, if it exists, by default.
-        hash: "refl"
+        solid: false,               // When true, renders backfaces without texture or shading, for a cheap solid cross-section effect
+        hash: "refl;;"
     };
 
     var coreStack = [];
@@ -8200,7 +8275,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             this._core.backfaces = true;         // Show backfaces
             this._core.frontface = "ccw";        // Default vertex winding for front face
             this._core.reflective = true;        // Reflects reflection node cubemap, if it exists, by default.
-            if (params.flags) {                 // 'flags' property is actually optional in the node definition
+            this._core.solid = false;            // Renders backfaces without texture or shading, for a cheap solid cross-section effect
+            if (params.flags) {                  // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
             }
         }
@@ -8246,6 +8322,14 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
+
+        if (flags.solid != undefined) {
+            core.solid = flags.solid;
+            core.hash = core.reflective ? "refl" : "";
+            this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
+        }
+        
         return this;
     };
 
@@ -8272,7 +8356,8 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             transparent: core.transparent,
             backfaces: core.backfaces,
             frontface: core.frontface,
-            reflective: core.reflective
+            reflective: core.reflective,
+            solid: core.solid
         };
     };
 
@@ -8357,7 +8442,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         reflective = !!reflective;
         if (this._core.reflective != reflective) {
             this._core.reflective = reflective;
-            this._core.hash = reflective ? "refl" : "";
+            this._core.hash = (reflective ? "refl" : "") + this._core.solid ? ";s" : ";;";
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
@@ -8368,6 +8453,22 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         return this._core.reflective;
     };
 
+    SceneJS.Flags.prototype.setSolid = function(solid) {
+        solid = !!solid;
+        if (this._core.solid != solid) {
+            this._core.solid = solid;
+            this._core.hash = (this._core.reflective ? "refl" : "") + solid ? ";s;" : ";;";
+            this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getSolid = function() {
+        return this._core.solid;
+    };
+
+    
     SceneJS.Flags.prototype._compile = function(ctx) {
         this._engine.display.flags = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
@@ -10575,6 +10676,8 @@ new (function () {
          */
         core.factor = (factor - keys[key1]) / (keys[key2] - keys[key1]);
 
+        this._factor = factor;
+
         var morphUpdate = frameUpdate || oldFactor != core.factor;
 
         core.key1 = key1;
@@ -10592,7 +10695,7 @@ new (function () {
     };
 
     SceneJS.MorphGeometry.prototype.getFactor = function () {
-        return this._core.factor;
+        return this._factor;
     };
 
     SceneJS.MorphGeometry.prototype.getKeys = function () {
@@ -15504,7 +15607,6 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     var VAO = gl.getExtension("OES_vertex_array_object");
     frameCtx.VAO = (VAO) ? VAO : null;
-    frameCtx.VAO = null;
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -15566,7 +15668,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
     this._sourceCache = {}; // Source codes are shared across all scenes
 
-
     /**
      * Get sourcecode for a program to render the given states
      */
@@ -15603,9 +15704,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
     this._composePickingVertexShader = function (states) {
         var morphing = !!states.morphGeometry.targets;
         var src = [
-
-            "precision mediump float;",
-
             "attribute vec3 SCENEJS_aVertex;",
             "uniform mat4 SCENEJS_uMMatrix;",
             "uniform mat4 SCENEJS_uVMatrix;",
@@ -15648,8 +15746,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var clipping = states.clips.clips.length > 0;
 
+        var floatPrecision = getFSFloatPrecision(states._canvas.gl);
+
         var src = [
-            "precision mediump float;"
+            "precision " + floatPrecision + " float;"
         ];
 
         src.push("varying vec4 SCENEJS_vWorldVertex;");
@@ -15770,9 +15870,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
 
-        var src = [
-            "precision mediump float;"
-        ];
+        var src = [];
 
         src.push("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
         src.push("uniform mat4 SCENEJS_uVMatrix;");             // View matrix
@@ -16066,12 +16164,15 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var texturing = this._isTexturing(states);
         var cubeMapping = this._isCubeMapping(states);
         var normals = this._hasNormals(states);
+        var solid = states.flags.solid;
         var tangents = this._hasTangents(states);
         var clipping = states.clips.clips.length > 0;
 
+        var floatPrecision = getFSFloatPrecision(states._canvas.gl);
+
         var src = ["\n"];
 
-        src.push("precision mediump float;");
+        src.push("precision " + floatPrecision + " float;");
 
 
         if (clipping) {
@@ -16124,9 +16225,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        /* True when lighting
-         */
+        // True when lighting
         src.push("uniform bool  SCENEJS_uClipping;");
+
+        // True when interior surfaces of solid cross-sections
+        // are to be rendered without texture and shading
+        src.push("uniform bool  SCENEJS_uSolid;");
 
         // Added in v4.0 to support depth targets
         src.push("uniform bool  SCENEJS_uDepthMode;");
@@ -16188,6 +16292,18 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
             src.push("  if (dist > 0.0) { discard; }");
             src.push("}");
+        }
+
+        if (normals) {
+
+            if (solid) {
+
+                src.push("  float a = dot(normalize(SCENEJS_vViewNormal), normalize(SCENEJS_vViewEyeVec));");
+                src.push("  if (a < 0.0) {");
+                src.push("     gl_FragColor = vec4(0.4, 0.4, 1.0, 1.0);");
+                src.push("     return;");
+                src.push("  }");
+            }
         }
 
         src.push("  vec3 ambient= SCENEJS_uAmbientColor;");
@@ -16466,6 +16582,22 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return false;
     }
 
+    function getFSFloatPrecision(gl) {
+        if (!gl.getShaderPrecisionFormat) {
+            return "mediump";
+        }
+
+        if (gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT).precision > 0) {
+            return "highp";
+        }
+
+        if (gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT).precision > 0) {
+            return "mediump";
+        }
+
+        return "lowp";
+    }
+
 })();;/**
  * @class Source code for pick and draw shader programs, to be compiled into one or more {@link SceneJS_Program}s
  * @private
@@ -16655,11 +16787,6 @@ var SceneJS_Program = function(id, hash, source, gl) {
  * This is also re-called to re-create them after WebGL context loss.
  */
 SceneJS_Program.prototype.build = function(gl) {
-    /**
-     * Current draw uniform state cached as a bitfield to avoid costly extra uniform1i calls
-     * @type Number
-     */
-    this.drawUniformFlags = 0;
 
     this.gl = gl;
     this.draw = new SceneJS._webgl.Program(gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
@@ -17046,13 +17173,13 @@ SceneJS_ChunkFactory.prototype.webglRestored = function () {
 
     build : function() {
 
-        this._uPMatrixDraw = this.program.draw.getUniformLocation("SCENEJS_uPMatrix");
-        this._uZNearDraw = this.program.draw.getUniformLocation("SCENEJS_uZNear");
-        this._uZFarDraw = this.program.draw.getUniformLocation("SCENEJS_uZFar");
+        this._uPMatrixDraw = this.program.draw.getUniform("SCENEJS_uPMatrix");
+        this._uZNearDraw = this.program.draw.getUniform("SCENEJS_uZNear");
+        this._uZFarDraw = this.program.draw.getUniform("SCENEJS_uZFar");
 
-        this._uPMatrixPick = this.program.pick.getUniformLocation("SCENEJS_uPMatrix");
-        this._uZNearPick = this.program.pick.getUniformLocation("SCENEJS_uZNear");
-        this._uZFarPick = this.program.pick.getUniformLocation("SCENEJS_uZFar");
+        this._uPMatrixPick = this.program.pick.getUniform("SCENEJS_uPMatrix");
+        this._uZNearPick = this.program.pick.getUniform("SCENEJS_uZNear");
+        this._uZFarPick = this.program.pick.getUniform("SCENEJS_uZFar");
     },
 
     draw : function(frameCtx) {
@@ -17064,15 +17191,15 @@ SceneJS_ChunkFactory.prototype.webglRestored = function () {
         var gl = this.program.gl;
 
         if (this._uPMatrixDraw) {
-            gl.uniformMatrix4fv(this._uPMatrixDraw, gl.FALSE, this.core.mat);
+            this._uPMatrixDraw.setValue(this.core.mat);
         }
 
         if (this._uZNearDraw) {
-            gl.uniform1f(this._uZNearDraw, this.core.optics.near);
+            this._uZNearDraw.setValue(this.core.optics.near);
         }
 
         if (this._uZFarDraw) {
-            gl.uniform1f(this._uZFarDraw, this.core.optics.far);
+            this._uZFarDraw.setValue(this.core.optics.far);
         }
 
         frameCtx.cameraMat = this.core.mat; // Query only in draw pass
@@ -17088,17 +17215,17 @@ SceneJS_ChunkFactory.prototype.webglRestored = function () {
         var gl = this.program.gl;
 
         if (this._uPMatrixPick) {
-            gl.uniformMatrix4fv(this._uPMatrixPick, gl.FALSE, this.core.mat);
+            this._uPMatrixPick.setValue(this.core.mat);
         }
 
         if (frameCtx.rayPick) { // Z-pick pass: feed near and far clip planes into shader
 
             if (this._uZNearPick) {
-                gl.uniform1f(this._uZNearPick, this.core.optics.near);
+                this._uZNearPick.setValue(this.core.optics.near);
             }
 
             if (this._uZFarPick) {
-                gl.uniform1f(this._uZFarPick, this.core.optics.far);
+                this._uZFarPick.setValue(this.core.optics.far);
             }
         }
 
@@ -17119,8 +17246,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         for (var i = 0, len = this.core.clips.length; i < len; i++) {
             this._draw[i] = {
-                uClipMode :draw.getUniformLocation("SCENEJS_uClipMode" + i),
-                uClipNormalAndDist: draw.getUniformLocation("SCENEJS_uClipNormalAndDist" + i)
+                uClipMode :draw.getUniform("SCENEJS_uClipMode" + i),
+                uClipNormalAndDist: draw.getUniform("SCENEJS_uClipNormalAndDist" + i)
             };
         }
 
@@ -17130,8 +17257,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         for (var i = 0, len = this.core.clips.length; i < len; i++) {
             this._pick[i] = {
-                uClipMode :pick.getUniformLocation("SCENEJS_uClipMode" + i),
-                uClipNormalAndDist: pick.getUniformLocation("SCENEJS_uClipNormalAndDist" + i)
+                uClipMode :pick.getUniform("SCENEJS_uClipMode" + i),
+                uClipNormalAndDist: pick.getUniform("SCENEJS_uClipNormalAndDist" + i)
             };
         }
     },
@@ -17162,16 +17289,16 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (clip.mode == "inside") {
 
-                    gl.uniform1f(mode, 2);
-                    gl.uniform4fv(normalAndDist, clip.normalAndDist);
+                    mode.setValue(2);
+                    normalAndDist.setValue(clip.normalAndDist);
 
                 } else if (clip.mode == "outside") {
 
-                    gl.uniform1f(mode, 1);
-                    gl.uniform4fv(normalAndDist, clip.normalAndDist);
+                    mode.setValue(1);
+                    normalAndDist.setValue(clip.normalAndDist);
 
                 } else { // disabled
-                    gl.uniform1f(mode, 0);
+                    mode.setValue(0);
                 }
             }
         }
@@ -17181,7 +17308,7 @@ SceneJS_ChunkFactory.createChunkType({
  */
 SceneJS_ChunkFactory.createChunkType({
 
-    type:"draw",
+    type: "draw",
 
     /**
      * As we apply a list of state chunks in a {@link SceneJS_Display}, we track the ID of each chunk
@@ -17190,18 +17317,31 @@ SceneJS_ChunkFactory.createChunkType({
      * We don't want that for draw chunks however, because they contain GL drawElements calls,
      * which we need to do for each object.
      */
-    unique:true,
+    unique: true,
 
-    build:function () {
-        this._depthModeDraw = this.program.draw.getUniformLocation("SCENEJS_uDepthMode");
-        this._depthModePick = this.program.pick.getUniformLocation("SCENEJS_uDepthMode");
+    build: function () {
+        this._depthModeDraw = this.program.draw.getUniform("SCENEJS_uDepthMode");
+        this._depthModePick = this.program.pick.getUniform("SCENEJS_uDepthMode");
     },
 
-    drawAndPick:function (frameCtx) {
+    drawAndPick: function (frameCtx) {
+
         var gl = this.program.gl;
+
         var indexType = this.program.UINT_INDEX_ENABLED ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
-        gl.uniform1i(frameCtx.pick ? this._depthModePick : this._depthModeDraw, frameCtx.depthMode);
+
+        if (frameCtx.pick) {
+            if (this._depthModePick) {
+                this._depthModePick.setValue(frameCtx.depthMode);
+            }
+        } else {
+            if (this._depthModeDraw) {
+                this._depthModeDraw.setValue(frameCtx.depthMode);
+            }
+        }
+
         gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, indexType, 0);
+
         //frameCtx.textureUnit = 0;
     }
 });
@@ -17216,11 +17356,12 @@ SceneJS_ChunkFactory.createChunkType({
 
         var draw = this.program.draw;
 
-        this._uClippingDraw = draw.getUniformLocation("SCENEJS_uClipping");
+        this._uClippingDraw = draw.getUniform("SCENEJS_uClipping");
+        this._uSolidDraw = draw.getUniform("SCENEJS_uSolid");
 
         var pick = this.program.pick;
 
-        this._uClippingPick = pick.getUniformLocation("SCENEJS_uClipping");
+        this._uClippingPick = pick.getUniform("SCENEJS_uClipping");
     },
 
     drawAndPick: function (frameCtx) {
@@ -17273,13 +17414,19 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (frameCtx.pick) {
-            gl.uniform1i(this._uClippingPick, this.core.clipping);
+
+            if (this._uClippingPick) {
+                this._uClippingPick.setValue(this.core.clipping);
+            }
 
         } else {
-            var drawUniforms = (this.core.clipping ? 1 : 0);
-            if (this.program.drawUniformFlags != drawUniforms) {
-                gl.uniform1i(this._uClippingDraw, this.core.clipping);
-                this.program.drawUniformFlags = drawUniforms;
+
+            if (this._uClippingDraw) {
+                this._uClippingDraw.setValue(this.core.clipping);
+            }
+
+            if (this._uSolidDraw) {
+                this._uSolidDraw.setValue(this.core.solid);
             }
         }
     }
@@ -17353,13 +17500,13 @@ SceneJS_ChunkFactory.createChunkType({
 
         this._aMorphVertexDraw = draw.getAttribute("SCENEJS_aMorphVertex");
         this._aMorphNormalDraw = draw.getAttribute("SCENEJS_aMorphNormal");
-        this._uMorphFactorDraw = draw.getUniformLocation("SCENEJS_uMorphFactor");
+        this._uMorphFactorDraw = draw.getUniform("SCENEJS_uMorphFactor");
 
         var pick = this.program.pick;
 
         this._aVertexPick = pick.getAttribute("SCENEJS_aVertex");
         this._aMorphVertexPick = pick.getAttribute("SCENEJS_aMorphVertex");
-        this._uMorphFactorPick = pick.getUniformLocation("SCENEJS_uMorphFactor");
+        this._uMorphFactorPick = pick.getUniform("SCENEJS_uMorphFactor");
 
         this.VAO = null;
         this.VAOMorphKey1 = 0;
@@ -17415,7 +17562,7 @@ SceneJS_ChunkFactory.createChunkType({
     setDrawMorphFactor:function () {
 
         if (this._uMorphFactorDraw) {
-            this.program.gl.uniform1f(this._uMorphFactorDraw, this.core.factor); // Bind LERP factor
+            this._uMorphFactorDraw.setValue*(this.core.factor); // Bind LERP factor
         }
 
     },
@@ -17511,7 +17658,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (this._uMorphFactorPick) {
-            this.program.gl.uniform1f(this._uMorphFactorPick, this.core.factor); // Bind LERP factor
+            this._uMorphFactorPick.setValue(this.core.factor); // Bind LERP factor
         }
 
     },
@@ -17556,20 +17703,20 @@ SceneJS_ChunkFactory.createChunkType({
             switch (lights[i].mode) {
 
                 case "ambient":
-                    this._uAmbientColor[i] = (program.draw.getUniformLocation("SCENEJS_uAmbientColor"));
+                    this._uAmbientColor[i] = (program.draw.getUniform("SCENEJS_uAmbientColor"));
                     break;
 
                 case "dir":
-                    this._uLightColor[i] = program.draw.getUniformLocation("SCENEJS_uLightColor" + i);
+                    this._uLightColor[i] = program.draw.getUniform("SCENEJS_uLightColor" + i);
                     this._uLightPos[i] = null;
-                    this._uLightDir[i] = program.draw.getUniformLocation("SCENEJS_uLightDir" + i);
+                    this._uLightDir[i] = program.draw.getUniform("SCENEJS_uLightDir" + i);
                     break;
 
                 case "point":
-                    this._uLightColor[i] = program.draw.getUniformLocation("SCENEJS_uLightColor" + i);
-                    this._uLightPos[i] = program.draw.getUniformLocation("SCENEJS_uLightPos" + i);
+                    this._uLightColor[i] = program.draw.getUniform("SCENEJS_uLightColor" + i);
+                    this._uLightPos[i] = program.draw.getUniform("SCENEJS_uLightPos" + i);
                     this._uLightDir[i] = null;
-                    this._uLightAttenuation[i] = program.draw.getUniformLocation("SCENEJS_uLightAttenuation" + i);
+                    this._uLightAttenuation[i] = program.draw.getUniform("SCENEJS_uLightAttenuation" + i);
                     break;
             }
         }
@@ -17591,24 +17738,24 @@ SceneJS_ChunkFactory.createChunkType({
             light = lights[i];
 
             if (this._uAmbientColor[i]) {
-                gl.uniform3fv(this._uAmbientColor[i], light.color);
+                this._uAmbientColor[i].setValue(light.color);
 
             } else {
 
                 if (this._uLightColor[i]) {
-                    gl.uniform3fv(this._uLightColor[i], light.color);
+                    this._uLightColor[i].setValue(light.color);
                 }
 
                 if (this._uLightPos[i]) {
-                    gl.uniform3fv(this._uLightPos[i], light.pos);
+                    this._uLightPos[i].setValue(light.pos);
 
                     if (this._uLightAttenuation[i]) {
-                        gl.uniform3fv(this._uLightAttenuation[i], light.attenuation);
+                        this._uLightAttenuation[i].setValue(light.attenuation);
                     }
                 }
 
                 if (this._uLightDir[i]) {
-                    gl.uniform3fv(this._uLightDir[i], light.dir);
+                    this._uLightDir[i].setValue(light.dir);
                 }
             }
         }
@@ -17646,11 +17793,11 @@ SceneJS_ChunkFactory.createChunkType({
 
     build : function() {
 
-        this._uvMatrixDraw = this.program.draw.getUniformLocation("SCENEJS_uVMatrix");
-        this._uVNMatrixDraw = this.program.draw.getUniformLocation("SCENEJS_uVNMatrix");
-        this._uWorldEyeDraw = this.program.draw.getUniformLocation("SCENEJS_uWorldEye");
+        this._uvMatrixDraw = this.program.draw.getUniform("SCENEJS_uVMatrix");
+        this._uVNMatrixDraw = this.program.draw.getUniform("SCENEJS_uVNMatrix");
+        this._uWorldEyeDraw = this.program.draw.getUniform("SCENEJS_uWorldEye");
 
-        this._uvMatrixPick = this.program.pick.getUniformLocation("SCENEJS_uVMatrix");
+        this._uvMatrixPick = this.program.pick.getUniform("SCENEJS_uVMatrix");
     },
 
     draw : function(frameCtx) {
@@ -17662,15 +17809,15 @@ SceneJS_ChunkFactory.createChunkType({
         var gl = this.program.gl;
 
         if (this._uvMatrixDraw) {
-            gl.uniformMatrix4fv(this._uvMatrixDraw, gl.FALSE, this.core.mat);
+            this._uvMatrixDraw.setValue(this.core.mat);
         }
 
         if (this._uVNMatrixDraw) {
-            gl.uniformMatrix4fv(this._uVNMatrixDraw, gl.FALSE, this.core.normalMat);
+            this._uVNMatrixDraw.setValue(this.core.normalMat);
         }
 
         if (this._uWorldEyeDraw) {
-            gl.uniform3fv(this._uWorldEyeDraw, this.core.lookAt.eye);
+            this._uWorldEyeDraw.setValue(this.core.lookAt.eye);
         }
 
         frameCtx.viewMat = this.core.mat;
@@ -17681,7 +17828,7 @@ SceneJS_ChunkFactory.createChunkType({
         var gl = this.program.gl;
 
         if (this._uvMatrixPick) {
-            gl.uniformMatrix4fv(this._uvMatrixPick, gl.FALSE, this.core.mat);
+            this._uvMatrixPick.setValue(this.core.mat);
         }
 
         frameCtx.viewMat = this.core.mat;
@@ -17693,55 +17840,44 @@ SceneJS_ChunkFactory.createChunkType({
 
     type: "material",
 
-    build : function() {
+    build: function () {
 
         var draw = this.program.draw;
 
-        this._uMaterialBaseColor = draw.getUniformLocation("SCENEJS_uMaterialColor");
-        this._uMaterialSpecularColor = draw.getUniformLocation("SCENEJS_uMaterialSpecularColor");
-        this._uMaterialSpecular = draw.getUniformLocation("SCENEJS_uMaterialSpecular");
-        this._uMaterialShine = draw.getUniformLocation("SCENEJS_uMaterialShine");
-        this._uMaterialEmit = draw.getUniformLocation("SCENEJS_uMaterialEmit");
-        this._uMaterialAlpha = draw.getUniformLocation("SCENEJS_uMaterialAlpha");
+        this._uMaterialBaseColor = draw.getUniform("SCENEJS_uMaterialColor");
+        this._uMaterialSpecularColor = draw.getUniform("SCENEJS_uMaterialSpecularColor");
+        this._uMaterialSpecular = draw.getUniform("SCENEJS_uMaterialSpecular");
+        this._uMaterialShine = draw.getUniform("SCENEJS_uMaterialShine");
+        this._uMaterialEmit = draw.getUniform("SCENEJS_uMaterialEmit");
+        this._uMaterialAlpha = draw.getUniform("SCENEJS_uMaterialAlpha");
     },
 
-    draw : function() {
+    draw: function () {
 
         var gl = this.program.gl;
-        var materialSettings = this.program.draw.materialSettings;
 
         if (this._uMaterialBaseColor) {
-            gl.uniform3fv(this._uMaterialBaseColor, this.core.baseColor);
+            this._uMaterialBaseColor.setValue(this.core.baseColor);
         }
 
-        if (this._uMaterialSpecularColor &&
-            (materialSettings.specularColor[0] != this.core.specularColor[0] ||
-             materialSettings.specularColor[1] != this.core.specularColor[1] ||
-             materialSettings.specularColor[2] != this.core.specularColor[2])) {
-            gl.uniform3fv(this._uMaterialSpecularColor, this.core.specularColor);
-            materialSettings.specularColor[0] = this.core.specularColor[0];
-            materialSettings.specularColor[1] = this.core.specularColor[1];
-            materialSettings.specularColor[2] = this.core.specularColor[2];
+        if (this._uMaterialSpecularColor) {
+            this._uMaterialSpecularColor.setValue(this.core.specularColor);
         }
 
-        if (this._uMaterialSpecular && materialSettings.specular != this.core.specular) {
-            gl.uniform1f(this._uMaterialSpecular, this.core.specular);
-            materialSettings.specular = this.core.specular;
+        if (this._uMaterialSpecular) {
+            this._uMaterialSpecular.setValue(this.core.specular);
         }
 
-        if (this._uMaterialShine && materialSettings.shine != this.core.shine) {
-            gl.uniform1f(this._uMaterialShine, this.core.shine);
-            materialSettings.shine = this.core.shine;
+        if (this._uMaterialShine) {
+            this._uMaterialShine.setValue(this.core.shine);
         }
 
-        if (this._uMaterialEmit && materialSettings.emit != this.core.emit) {
-            gl.uniform1f(this._uMaterialEmit, this.core.emit);
-            materialSettings.emit = this.core.emit;
+        if (this._uMaterialEmit) {
+            this._uMaterialEmit.setValue(this.core.emit);
         }
 
-        if (this._uMaterialAlpha && materialSettings.alpha != this.core.alpha) {
-            gl.uniform1f(this._uMaterialAlpha, this.core.alpha);
-            materialSettings.alpha = this.core.alpha;
+        if (this._uMaterialAlpha) {
+            this._uMaterialAlpha.setValue(this.core.alpha);
         }
     }
 });
@@ -17752,11 +17888,11 @@ SceneJS_ChunkFactory.createChunkType({
 
     type: "name",
 
-    build : function() {
-        this._uPickColor = this.program.pick.getUniformLocation("SCENEJS_uPickColor");
+    build: function () {
+        this._uPickColor = this.program.pick.getUniform("SCENEJS_uPickColor");
     },
 
-    pick : function(frameCtx) {
+    pick: function (frameCtx) {
 
         if (this._uPickColor && this.core.name) {
 
@@ -17766,7 +17902,7 @@ SceneJS_ChunkFactory.createChunkType({
             var g = frameCtx.pickIndex >> 8 & 0xFF;
             var r = frameCtx.pickIndex & 0xFF;
 
-            this.program.gl.uniform3fv(this._uPickColor, [r / 255, g / 255, b / 255]);
+            this._uPickColor.setValue([r / 255, g / 255, b / 255]);
         }
     }
 });;SceneJS_ChunkFactory.createChunkType({
@@ -17776,9 +17912,9 @@ SceneJS_ChunkFactory.createChunkType({
     build : function() {
 
         // Note that "program" chunks are always after "renderTarget" chunks
-        this._depthModeDraw = this.program.draw.getUniformLocation("SCENEJS_uDepthMode");
-        this._depthModePick = this.program.pick.getUniformLocation("SCENEJS_uDepthMode");
-        this._rayPickMode = this.program.pick.getUniformLocation("SCENEJS_uRayPickMode");
+        this._depthModeDraw = this.program.draw.getUniform("SCENEJS_uDepthMode");
+        this._depthModePick = this.program.pick.getUniform("SCENEJS_uDepthMode");
+        this._rayPickMode = this.program.pick.getUniform("SCENEJS_uRayPickMode");
     },
 
     draw : function(frameCtx) {
@@ -17786,7 +17922,9 @@ SceneJS_ChunkFactory.createChunkType({
         drawProgram.bind();
         frameCtx.textureUnit = 0;
         var gl = this.program.gl;
-        gl.uniform1i(this._depthModeDraw, frameCtx.depthMode);
+        if (this._depthModeDraw) {
+            this._depthModeDraw.setValue(frameCtx.depthMode);
+        }
         if (!frameCtx.VAO) {
             for (var i = 0; i < 10; i++) {
                 gl.disableVertexAttribArray(i);
@@ -17800,8 +17938,12 @@ SceneJS_ChunkFactory.createChunkType({
         var pickProgram = this.program.pick;
         pickProgram.bind();
         var gl = this.program.gl;
-        gl.uniform1i(this._rayPickMode, frameCtx.rayPick);
-        gl.uniform1i(this._depthModePick, frameCtx.depthMode);
+        if (this._rayPickMode) {
+            this._rayPickMode.setValue(frameCtx.rayPick);
+        }
+        if (this._depthModePick) {
+            this._depthModePick.setValue(frameCtx.depthMode);
+        }
         frameCtx.textureUnit = 0;
         for (var i = 0; i < 10; i++) {
             gl.disableVertexAttribArray(i);
@@ -18135,19 +18277,19 @@ SceneJS_ChunkFactory.createChunkType({
 
     type: "xform",
 
-    build : function() {
+    build: function () {
 
         var draw = this.program.draw;
 
-        this._uMatLocationDraw = draw.getUniformLocation("SCENEJS_uMMatrix");
-        this._uNormalMatLocationDraw = draw.getUniformLocation("SCENEJS_uMNMatrix");
+        this._uMatLocationDraw = draw.getUniform("SCENEJS_uMMatrix");
+        this._uNormalMatLocationDraw = draw.getUniform("SCENEJS_uMNMatrix");
 
         var pick = this.program.pick;
 
-        this._uMatLocationPick = pick.getUniformLocation("SCENEJS_uMMatrix");
+        this._uMatLocationPick = pick.getUniform("SCENEJS_uMMatrix");
     },
 
-    draw : function(frameCtx) {
+    draw: function (frameCtx) {
 
         /* Rebuild core's matrix from matrices at cores on path up to root
          */
@@ -18158,17 +18300,17 @@ SceneJS_ChunkFactory.createChunkType({
         var gl = this.program.gl;
 
         if (this._uMatLocationDraw) {
-            gl.uniformMatrix4fv(this._uMatLocationDraw, gl.FALSE, this.core.mat);
+            this._uMatLocationDraw.setValue(this.core.mat);
         }
 
         if (this._uNormalMatLocationDraw) {
-            gl.uniformMatrix4fv(this._uNormalMatLocationDraw, gl.FALSE, this.core.normalMat);
+            this._uNormalMatLocationDraw.setValue(this.core.normalMat);
         }
 
         frameCtx.modelMat = this.core.mat;
     },
 
-    pick : function(frameCtx) {
+    pick: function (frameCtx) {
 
         /* Rebuild core's matrix from matrices at cores on path up to root
          */
@@ -18179,7 +18321,7 @@ SceneJS_ChunkFactory.createChunkType({
         var gl = this.program.gl;
 
         if (this._uMatLocationPick) {
-            gl.uniformMatrix4fv(this._uMatLocationPick, gl.FALSE, this.core.mat);
+            this._uMatLocationPick.setValue(this.core.mat);
         }
 
         frameCtx.modelMat = this.core.mat;

@@ -6,7 +6,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
     this._sourceCache = {}; // Source codes are shared across all scenes
 
-
     /**
      * Get sourcecode for a program to render the given states
      */
@@ -43,9 +42,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
     this._composePickingVertexShader = function (states) {
         var morphing = !!states.morphGeometry.targets;
         var src = [
-
-            "precision mediump float;",
-
             "attribute vec3 SCENEJS_aVertex;",
             "uniform mat4 SCENEJS_uMMatrix;",
             "uniform mat4 SCENEJS_uVMatrix;",
@@ -88,8 +84,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var clipping = states.clips.clips.length > 0;
 
+        var floatPrecision = getFSFloatPrecision(states._canvas.gl);
+
         var src = [
-            "precision mediump float;"
+            "precision " + floatPrecision + " float;"
         ];
 
         src.push("varying vec4 SCENEJS_vWorldVertex;");
@@ -210,9 +208,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
 
-        var src = [
-            "precision mediump float;"
-        ];
+        var src = [];
 
         src.push("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
         src.push("uniform mat4 SCENEJS_uVMatrix;");             // View matrix
@@ -506,12 +502,15 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var texturing = this._isTexturing(states);
         var cubeMapping = this._isCubeMapping(states);
         var normals = this._hasNormals(states);
+        var solid = states.flags.solid;
         var tangents = this._hasTangents(states);
         var clipping = states.clips.clips.length > 0;
 
+        var floatPrecision = getFSFloatPrecision(states._canvas.gl);
+
         var src = ["\n"];
 
-        src.push("precision mediump float;");
+        src.push("precision " + floatPrecision + " float;");
 
 
         if (clipping) {
@@ -564,9 +563,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        /* True when lighting
-         */
+        // True when lighting
         src.push("uniform bool  SCENEJS_uClipping;");
+
+        // True when interior surfaces of solid cross-sections
+        // are to be rendered without texture and shading
+        src.push("uniform bool  SCENEJS_uSolid;");
 
         // Added in v4.0 to support depth targets
         src.push("uniform bool  SCENEJS_uDepthMode;");
@@ -628,6 +630,18 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
             src.push("  if (dist > 0.0) { discard; }");
             src.push("}");
+        }
+
+        if (normals) {
+
+            if (solid) {
+
+                src.push("  float a = dot(normalize(SCENEJS_vViewNormal), normalize(SCENEJS_vViewEyeVec));");
+                src.push("  if (a < 0.0) {");
+                src.push("     gl_FragColor = vec4(0.4, 0.4, 1.0, 1.0);");
+                src.push("     return;");
+                src.push("  }");
+            }
         }
 
         src.push("  vec3 ambient= SCENEJS_uAmbientColor;");
@@ -904,6 +918,22 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
         return false;
+    }
+
+    function getFSFloatPrecision(gl) {
+        if (!gl.getShaderPrecisionFormat) {
+            return "mediump";
+        }
+
+        if (gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT).precision > 0) {
+            return "highp";
+        }
+
+        if (gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT).precision > 0) {
+            return "mediump";
+        }
+
+        return "lowp";
     }
 
 })();

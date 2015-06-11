@@ -321,6 +321,8 @@ new (function () {
          */
         core.factor = (factor - keys[key1]) / (keys[key2] - keys[key1]);
 
+        this._factor = factor;
+
         var morphUpdate = frameUpdate || oldFactor != core.factor;
 
         core.key1 = key1;
@@ -338,7 +340,7 @@ new (function () {
     };
 
     SceneJS.MorphGeometry.prototype.getFactor = function () {
-        return this._core.factor;
+        return this._factor;
     };
 
     SceneJS.MorphGeometry.prototype.getKeys = function () {

@@ -13,8 +13,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         for (var i = 0, len = this.core.clips.length; i < len; i++) {
             this._draw[i] = {
-                uClipMode :draw.getUniformLocation("SCENEJS_uClipMode" + i),
-                uClipNormalAndDist: draw.getUniformLocation("SCENEJS_uClipNormalAndDist" + i)
+                uClipMode :draw.getUniform("SCENEJS_uClipMode" + i),
+                uClipNormalAndDist: draw.getUniform("SCENEJS_uClipNormalAndDist" + i)
             };
         }
 
@@ -24,8 +24,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         for (var i = 0, len = this.core.clips.length; i < len; i++) {
             this._pick[i] = {
-                uClipMode :pick.getUniformLocation("SCENEJS_uClipMode" + i),
-                uClipNormalAndDist: pick.getUniformLocation("SCENEJS_uClipNormalAndDist" + i)
+                uClipMode :pick.getUniform("SCENEJS_uClipMode" + i),
+                uClipNormalAndDist: pick.getUniform("SCENEJS_uClipNormalAndDist" + i)
             };
         }
     },
@@ -56,16 +56,16 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (clip.mode == "inside") {
 
-                    gl.uniform1f(mode, 2);
-                    gl.uniform4fv(normalAndDist, clip.normalAndDist);
+                    mode.setValue(2);
+                    normalAndDist.setValue(clip.normalAndDist);
 
                 } else if (clip.mode == "outside") {
 
-                    gl.uniform1f(mode, 1);
-                    gl.uniform4fv(normalAndDist, clip.normalAndDist);
+                    mode.setValue(1);
+                    normalAndDist.setValue(clip.normalAndDist);
 
                 } else { // disabled
-                    gl.uniform1f(mode, 0);
+                    mode.setValue(0);
                 }
             }
         }

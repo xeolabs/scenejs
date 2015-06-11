@@ -23,20 +23,20 @@ SceneJS_ChunkFactory.createChunkType({
             switch (lights[i].mode) {
 
                 case "ambient":
-                    this._uAmbientColor[i] = (program.draw.getUniformLocation("SCENEJS_uAmbientColor"));
+                    this._uAmbientColor[i] = (program.draw.getUniform("SCENEJS_uAmbientColor"));
                     break;
 
                 case "dir":
-                    this._uLightColor[i] = program.draw.getUniformLocation("SCENEJS_uLightColor" + i);
+                    this._uLightColor[i] = program.draw.getUniform("SCENEJS_uLightColor" + i);
                     this._uLightPos[i] = null;
-                    this._uLightDir[i] = program.draw.getUniformLocation("SCENEJS_uLightDir" + i);
+                    this._uLightDir[i] = program.draw.getUniform("SCENEJS_uLightDir" + i);
                     break;
 
                 case "point":
-                    this._uLightColor[i] = program.draw.getUniformLocation("SCENEJS_uLightColor" + i);
-                    this._uLightPos[i] = program.draw.getUniformLocation("SCENEJS_uLightPos" + i);
+                    this._uLightColor[i] = program.draw.getUniform("SCENEJS_uLightColor" + i);
+                    this._uLightPos[i] = program.draw.getUniform("SCENEJS_uLightPos" + i);
                     this._uLightDir[i] = null;
-                    this._uLightAttenuation[i] = program.draw.getUniformLocation("SCENEJS_uLightAttenuation" + i);
+                    this._uLightAttenuation[i] = program.draw.getUniform("SCENEJS_uLightAttenuation" + i);
                     break;
             }
         }
@@ -58,24 +58,24 @@ SceneJS_ChunkFactory.createChunkType({
             light = lights[i];
 
             if (this._uAmbientColor[i]) {
-                gl.uniform3fv(this._uAmbientColor[i], light.color);
+                this._uAmbientColor[i].setValue(light.color);
 
             } else {
 
                 if (this._uLightColor[i]) {
-                    gl.uniform3fv(this._uLightColor[i], light.color);
+                    this._uLightColor[i].setValue(light.color);
                 }
 
                 if (this._uLightPos[i]) {
-                    gl.uniform3fv(this._uLightPos[i], light.pos);
+                    this._uLightPos[i].setValue(light.pos);
 
                     if (this._uLightAttenuation[i]) {
-                        gl.uniform3fv(this._uLightAttenuation[i], light.attenuation);
+                        this._uLightAttenuation[i].setValue(light.attenuation);
                     }
                 }
 
                 if (this._uLightDir[i]) {
-                    gl.uniform3fv(this._uLightDir[i], light.dir);
+                    this._uLightDir[i].setValue(light.dir);
                 }
             }
         }
