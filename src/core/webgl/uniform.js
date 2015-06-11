@@ -139,6 +139,9 @@ SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, inde
     } else if (type === gl.FLOAT_MAT4) {
 
         func = function (v) {
+
+            // Caching this matrix is actually slower than not caching
+
             gl.uniformMatrix4fv(location, gl.FALSE, v);
         };
 
