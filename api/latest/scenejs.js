@@ -1,18 +1,4 @@
 /*
- * SceneJS V4.2.0
- *
- * A WebGL-based 3D scene graph from xeoLabs
- * http://scenejs.org/
- *
- * Built on 2015-06-11
- *
- * MIT License
- * Copyright 2015, Lindsay Kay
- * http://xeolabs.com/
- *
- */
-
-/*
  * SceneJS Latest
  *
  * A WebGL-based 3D scene graph from xeoLabs
@@ -24,8 +10,8 @@
  *
  */
 
-;// Only define RequireJS if not already present
-if (undefined === require) {;/*
+// Only define RequireJS if not already present
+if (undefined === require) {/*
  RequireJS 2.1.6 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
  Available via the MIT or new BSD license.
  see: http://github.com/jrburke/requirejs for details
@@ -60,7 +46,7 @@ var requirejs,require,define;
     "html:script"):document.createElement("script"),g.type=h.scriptType||"text/javascript",g.charset="utf-8",g.async=!0,g.setAttribute("data-requirecontext",b.contextName),g.setAttribute("data-requiremodule",c),g.attachEvent&&!(g.attachEvent.toString&&0>g.attachEvent.toString().indexOf("[native code"))&&!Z?(Q=!0,g.attachEvent("onreadystatechange",b.onScriptLoad)):(g.addEventListener("load",b.onScriptLoad,!1),g.addEventListener("error",b.onScriptError,!1)),g.src=d,M=g,E?y.insertBefore(g,E):y.appendChild(g),
     M=null,g;if(ea)try{importScripts(d),b.completeLoad(c)}catch(l){b.onError(B("importscripts","importScripts failed for "+c+" at "+d,l,[c]))}};A&&O(document.getElementsByTagName("script"),function(b){y||(y=b.parentNode);if(L=b.getAttribute("data-main"))return s=L,u.baseUrl||(F=s.split("/"),s=F.pop(),ga=F.length?F.join("/")+"/":"./",u.baseUrl=ga),s=s.replace(fa,""),h.jsExtRegExp.test(s)&&(s=L),u.deps=u.deps?u.deps.concat(s):[s],!0});define=function(b,c,d){var h,g;"string"!==typeof b&&(d=c,c=b,b=null);
     K(c)||(d=c,c=null);!c&&J(d)&&(c=[],d.length&&(d.toString().replace(ma,"").replace(na,function(b,d){c.push(d)}),c=(1===d.length?["require"]:["require","exports","module"]).concat(c)));if(Q){if(!(h=M))R&&"interactive"===R.readyState||O(document.getElementsByTagName("script"),function(b){if("interactive"===b.readyState)return R=b}),h=R;h&&(b||(b=h.getAttribute("data-requiremodule")),g=G[h.getAttribute("data-requirecontext")])}(g?g.defQueue:U).push([b,c,d])};define.amd={jQuery:!0};h.exec=function(b){return eval(b)};
-    h(u)}})(this);;};
+    h(u)}})(this);}
 WebGLDebugUtils = function() {
 
 /**
@@ -899,7 +885,7 @@ return {
 };
 
 }();
-;/**
+/**
  * @class Generic map of IDs to items - can generate own IDs or accept given IDs. IDs should be strings in order to not
  * clash with internally generated IDs, which are numbers.
  * @private
@@ -963,7 +949,7 @@ var SceneJS_Map = function(items, _baseId) {
     this.removeItem = function(id) {
         delete this.items[id];
     };
-};;/**
+};/**
  * The SceneJS object.
  */
 var SceneJS = new (function () {
@@ -1299,7 +1285,7 @@ var SceneJS = new (function () {
     };
 
 })();
-;// Configure RequireJS to find plugins relative to plugins location
+// Configure RequireJS to find plugins relative to plugins location
 (function () {
 
     var pluginPath;
@@ -1316,7 +1302,7 @@ var SceneJS = new (function () {
                 });
             }
         });
-})();;/**
+})();/**
  *  @private
  */
 var SceneJS_eventManager = function () {
@@ -1409,7 +1395,7 @@ SceneJS_eventManager.prototype.unEvent = function (handlerId) {
     delete handlers[handlerId];
     this.typeHandlers[type].numSubs--;
 };
-;/**
+/**
  * SceneJS plugin registry
  */
 SceneJS.Plugins = new (function () {
@@ -1535,7 +1521,7 @@ SceneJS.Plugins = new (function () {
         document.getElementsByTagName("head")[0].appendChild(script);
     }
 
-})();;/**
+})();/**
  *  @private
  */
 var SceneJS_events = new (function () {
@@ -1718,7 +1704,7 @@ SceneJS.off = SceneJS.unEvent;
 
 
 
-;/**
+/**
  *
  */
 var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
@@ -1838,7 +1824,7 @@ SceneJS_Canvas.prototype.setSSAAMultiplier = function (ssaaMultiplier) {
 };
 
 
-;/**
+/**
  * @class A container for a scene graph and its display
  *
  *
@@ -2490,7 +2476,7 @@ if (!self.Int32Array) {
             clearTimeout(id);
         };
 }());
-;/**
+/**
  * Backend module that provides single point through which exceptions may be raised
  *
  * @class SceneJS_error
@@ -2575,7 +2561,7 @@ SceneJS.errors._getErrorName = function(code) {
     return null;
 };
 
-;/**
+/**
  * Backend that manages configurations.
  *
  * @class SceneJS_configsModule
@@ -2670,7 +2656,7 @@ SceneJS.getConfigs = SceneJS.getDebugConfigs = function (path) {
     return SceneJS_configsModule.getConfigs(path);
 };
 
-;/**
+/**
  * @class Manages logging
  *  @private
  */
@@ -2769,7 +2755,7 @@ SceneJS.log = new (function() {
         return funcs;
     };
 
-})();;/* 
+})();/* 
  * Optimizations made based on glMatrix by Brandon Jones
  */
 
@@ -4878,7 +4864,7 @@ var SceneJS_math_angleAxisFromQuaternion = function(q) {
         };
     }
 };
-;/**
+/**
  * Backend that tracks statistics on loading states of nodes during scene traversal.
  *
  * This supports the "loading-status" events that we can listen for on scene nodes.
@@ -5071,8 +5057,8 @@ var SceneJS_sceneStatusModule = new (function () {
     function failPopup(element) {
         element.style.background = "#FFAAAA";
     }
-})();;SceneJS._webgl = {};
-;/** Buffer for vertices and indices
+})();SceneJS._webgl = {};
+/** Buffer for vertices and indices
  *
  * @private
  * @param gl  WebGL gl
@@ -5178,7 +5164,7 @@ SceneJS._webgl.ArrayBuffer.prototype.bind = function () {
 };
 
 
-;
+
 /** An attribute within a shader
  */
 SceneJS._webgl.Attribute = function (gl, program, name, type, size, location) {
@@ -5199,7 +5185,7 @@ SceneJS._webgl.Attribute.prototype.bindInterleavedFloatArrayBuffer = function (c
     this.gl.enableVertexAttribArray(this.location);
     this.gl.vertexAttribPointer(this.location, components, this.gl.FLOAT, false, stride, byteOffset);   // Vertices are not homogeneous - no w-element
 };
-;
+
 /** Maps SceneJS node parameter names to WebGL enum names
  * @private
  */
@@ -5255,7 +5241,7 @@ SceneJS._webgl.enumMap = {
     unsignedByte: "UNSIGNED_BYTE"
 };
 
-;SceneJS._webgl.RenderBuffer = function (cfg) {
+SceneJS._webgl.RenderBuffer = function (cfg) {
 
     /**
      * True as soon as this buffer is allocated and ready to go
@@ -5446,7 +5432,7 @@ SceneJS._webgl.RenderBuffer.prototype.destroy = function () {
         this.buf = null;
         this.bound = false;
     }
-};;/**
+};/**
  * @class Wrapper for a WebGL program
  *
  * @param hash SceneJS-managed ID for program
@@ -5635,7 +5621,7 @@ SceneJS._webgl.Program.prototype.setUniform = function (name, value) {
         }
     }
 };
-;SceneJS._webgl.Sampler = function (gl, program, name, type, size, location) {
+SceneJS._webgl.Sampler = function (gl, program, name, type, size, location) {
 
     this.bindTexture = function (texture, unit) {
         if (texture.bind(unit)) {
@@ -5645,7 +5631,7 @@ SceneJS._webgl.Program.prototype.setUniform = function (name, value) {
         return false;
     };
 };
-;/**
+/**
  * A vertex/fragment shader in a program
  *
  * @private
@@ -5691,7 +5677,7 @@ SceneJS._webgl.Shader = function (gl, type, source) {
 
     this.allocated = true;
 };
-;
+
 SceneJS._webgl.Texture2D = function (gl, cfg) {
     /**
      * True as soon as this texture is allocated and ready to go
@@ -5830,7 +5816,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
     return x + 1;
 };
 
-;SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, index, logging) {
+SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, index, logging) {
 
     var func = null;
 
@@ -6000,7 +5986,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
 
 
-;/**
+/**
  * Manages scene node event listeners
  * @private
  */
@@ -6097,7 +6083,7 @@ var SceneJS_nodeEventsModule = new (function () {
 
 })();
 
-;/**
+/**
  * @class Holds state for one or more {@link SceneJS.Node}s.
  *
  * <p>Each {@link SceneJS.Node} has a state core to hold its state, and the core may be shared by other
@@ -6139,7 +6125,7 @@ var SceneJS_Core = function(type) {
      * Count of {@link SceneJS.Node} instances this core holds state for
      */
     this.useCount = 0;
-};;/**
+};/**
  * @class Manages creation, recycle and destruction of {@link SceneJS_Core} instances
  * @private
  */
@@ -6311,7 +6297,7 @@ SceneJS_CoreFactory.prototype.webglRestored = function () {
         }
     }
 };
-;/**
+/**
  * @class The basic scene graph node type
  */
 SceneJS.Node = function () {
@@ -7709,7 +7695,7 @@ SceneJS.Node.prototype._doDestroy = function () {
     }
 
     return this;
-};;SceneJS_PubSubProxy = function (scene, proxy) {
+};SceneJS_PubSubProxy = function (scene, proxy) {
     this.scene = scene;
     this.proxy = proxy;
 
@@ -7717,7 +7703,7 @@ SceneJS.Node.prototype._doDestroy = function () {
 
 
 
-;/**
+/**
  * @class Manages creation, recycle and destruction of {@link SceneJS.Node} instances
  * @private
  */
@@ -7864,7 +7850,7 @@ SceneJS_NodeFactory.prototype._loadScript = function (url, error) {
 SceneJS_NodeFactory.prototype.putNode = function (node) {
     this.nodes.removeItem(node.id);
 };
-;(function () {
+(function () {
 
     var defaultMatrix = SceneJS_math_perspectiveMatrix4(
         45, // fovy
@@ -8077,7 +8063,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     SceneJS.Camera.prototype._destroy = function () {
         this.getScene().off(this._canvasSizeSub);
     };
-})();;(function() {
+})();(function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Clips} nodes
@@ -8174,7 +8160,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     };
 
 
-})();;(function () {
+})();(function () {
 
     // The default state core singleton for {@link SceneJS.Enable} nodes
     var defaultCore = {
@@ -8227,7 +8213,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.enable = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();;(function() {
+})();(function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Flags} nodes
@@ -8476,7 +8462,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     };
 
 })();
-;new (function () {
+new (function () {
 
     var defaultCore = {
         type: "renderTarget",
@@ -8539,7 +8525,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             delete nodeCoreMap[this._core.coreId];
         }
     };
-})();;new (function () {
+})();new (function () {
 
     var defaultCore = {
         type: "renderTarget",
@@ -8602,7 +8588,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             delete nodeCoreMap[this._core.coreId];
         }
     };
-})();;new (function () {
+})();new (function () {
 
     var coreStack = [];
     var stackLen = 0;
@@ -9363,7 +9349,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
     };
 
 })();
-;(function() {
+(function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Stage} nodes
@@ -9436,7 +9422,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
 
 })();
 
-;(function () {
+(function () {
 
     /**
      * The default state core singleton for {@link SceneJS.Layer} nodes
@@ -9519,7 +9505,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
 
 })();
 
-;/**
+/**
  * @class Scene graph node which assigns nodes in its subgraph to a library
  * @extends SceneJS.Node
  */
@@ -9527,7 +9513,7 @@ SceneJS.Library = SceneJS_NodeFactory.createNodeType("library");
 SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
 };
 
-;(function () {
+(function () {
 
     /**
      * The default state core singleton for {@link SceneJS.Lights} nodes
@@ -9792,7 +9778,7 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
         this._engine.display.lights = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();;(function () {
+})();(function () {
 
     var defaultMatrix = SceneJS_math_lookAtMat4c(0, 0, 10, 0, 0, 0, 0, 1, 0);
     var defaultMat = new Float32Array(defaultMatrix);
@@ -10199,7 +10185,7 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
         this.getScene().off(this._tick);
     };
 
-})();;/*
+})();/*
 
  TODO: material system from virtualworldframework:
 
@@ -10353,7 +10339,7 @@ new (function () {
         this._engine.display.material = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();;new (function () {
+})();new (function () {
 
     /**
      * The default state core singleton for {@link SceneJS.MorphGeometry} nodes
@@ -10774,7 +10760,7 @@ new (function () {
         }
     };
 
-})();;(function () {
+})();(function () {
 
     /**
      * The default state core singleton for {@link SceneJS.Name} nodes
@@ -10833,7 +10819,7 @@ new (function () {
         this._compileNodes(ctx);
         this._engine.display.name = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
-})();;new (function () {
+})();new (function () {
 
     /**
      * The default state core singleton for {@link SceneJS.Renderer} nodes
@@ -11621,7 +11607,7 @@ new (function () {
         this._compileNodes(ctx);
         this._engine.display.renderer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
-})();;(function () {
+})();(function () {
 
     var lookup = {
         less:"LESS",
@@ -11791,7 +11777,7 @@ new (function () {
         this._engine.display.depthBuffer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();;(function () {
+})();(function () {
 
     // The default state core singleton for {@link SceneJS.ColorBuffer} nodes
     var defaultCore = {
@@ -11877,7 +11863,7 @@ new (function () {
         this._engine.display.imageDirty = true;
     };
 
-})();;(function () {
+})();(function () {
 
     // The default state core singleton for {@link SceneJS.View} nodes
     var defaultCore = {
@@ -11950,7 +11936,7 @@ new (function () {
         this._engine.display.view = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();;/**
+})();/**
  * @class The root node of a scenegraph
  * @extends SceneJS.Node
  *
@@ -12241,7 +12227,7 @@ SceneJS.Scene.prototype.getStatus = function () {
     }
     return SceneJS._shallowClone(sceneStatus);
 };
-;new (function() {
+new (function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Shader} nodes
@@ -12434,7 +12420,7 @@ SceneJS.Scene.prototype.getStatus = function () {
         dirty = true;
     };
 
-})();;new (function() {
+})();new (function() {
 
     /**
      * The default state core singleton for {@link SceneJS.ShaderParams} nodes
@@ -12530,7 +12516,7 @@ SceneJS.Scene.prototype.getStatus = function () {
         dirty = true;
     };
 
-})();;(function () {
+})();(function () {
 
     // The default state core singleton for {@link SceneJS.Line} nodes
     var defaultCore = {
@@ -12593,7 +12579,7 @@ SceneJS.Scene.prototype.getStatus = function () {
         this._engine.display.style = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
 
-})();;(function() {
+})();(function() {
 
     /**
      * The default state core singleton for {@link SceneJS.Tag} nodes
@@ -12652,7 +12638,7 @@ SceneJS.Scene.prototype.getStatus = function () {
         this._compileNodes(ctx);
         this._engine.display.tag = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
     };
-})();;/**
+})();/**
  * @class Scene graph node which defines textures to apply to the objects in its subgraph
  * <p>This is the deprecated node type from SceneJS v3.2, which has been replaced by the "texture" node in ./texture.js</p>
  * @extends SceneJS.Node
@@ -12862,37 +12848,81 @@ new (function () {
              */
 
             var src = layer.uri || layer.src;
+            var preloadSrc = layer.preloadURI || layer.preloadSrc;
+            var preloadColor = layer.preloadColor || { r: 0.57735, g: 0.57735, b: 0.57735 };
+            preloadColor.a = preloadColor.a === undefined ? 1 : preloadColor.a;
+
+            preloadColor = new Uint8Array([
+                Math.floor(preloadColor.r * 255),
+                Math.floor(preloadColor.g * 255),
+                Math.floor(preloadColor.b * 255),
+                Math.floor(preloadColor.a * 255)
+            ]);
 
             var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading texture");
 
             var image = new Image();
 
+            var texture = gl.createTexture();
+
+            var loaded = false;
+            var taskFinished = false;
+
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, preloadColor);
+            self._setLayerTexture(gl, layer, texture);
+
+            if (preloadSrc) {
+                var preloadImage = new Image();
+
+                preloadImage.onload = function () {
+                    if (!loaded) {
+                        self._setTextureImage(gl, texture, preloadImage);
+                        self._setLayerTexture(gl, layer, texture);
+                        SceneJS_sceneStatusModule.taskFinished(taskId);
+                        taskFinished = true;
+                    }
+                };
+
+                self._fetchImage(preloadImage, preloadSrc);
+            }
+
             image.onload = function () {
-                var texture = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, texture);
-
-                var maxTextureSize = SceneJS_configsModule.configs.maxTextureSize;
-                if (maxTextureSize) {
-                    image = SceneJS._webgl.clampImageSize(image, maxTextureSize);
-                }
-
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self._ensureImageSizePowerOfTwo(image));
+                self._setTextureImage(gl, texture, image);
                 self._setLayerTexture(gl, layer, texture);
-                SceneJS_sceneStatusModule.taskFinished(taskId);
-                self._engine.display.imageDirty = true;
+                if (!taskFinished) {
+                    SceneJS_sceneStatusModule.taskFinished(taskId);
+                }
+                loaded = true;
             };
 
             image.onerror = function () {
                 SceneJS_sceneStatusModule.taskFailed(taskId);
             };
 
-            if (src.indexOf("data") == 0) {  // Image data
-                image.src = src;
-            } else { // Image file
-                image.crossOrigin = "Anonymous";
-                image.src = src;
-            }
+            self._fetchImage(image, src);
         }
+    };
+
+    SceneJS.Texture.prototype._fetchImage = function (image, src) {
+        if (src.indexOf("data") == 0) {  // Image data
+            image.src = src;
+        } else { // Image file
+            image.crossOrigin = "Anonymous";
+            image.src = src;
+        }
+    };
+
+    SceneJS.Texture.prototype._setTextureImage = function (gl, texture, image) {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+
+        var maxTextureSize = SceneJS_configsModule.configs.maxTextureSize;
+        if (maxTextureSize) {
+            image = SceneJS._webgl.clampImageSize(image, maxTextureSize);
+        }
+
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._ensureImageSizePowerOfTwo(image));
+        this._engine.display.imageDirty = true;
     };
 
     SceneJS.Texture.prototype._ensureImageSizePowerOfTwo = function (image) {
@@ -13147,7 +13177,7 @@ new (function () {
         }
     };
 
-})();;/**
+})();/**
  * @class Scene graph node which defines textures to apply to the objects in its subgraph
  * @extends SceneJS.Node
  */
@@ -13241,13 +13271,16 @@ new (function () {
 
             buildMatrix.call(this._core);
 
+
             if (params.src) { // Load from URL
+                var texture = this._initTexture(params.preloadColor);
                 this._core.src = params.src;
-                this._loadTexture(params.src);
+                this._loadTexture(texture, params.src, params.preloadSrc);
 
             } else if (params.image) { // Create from image
+                var texture = this._initTexture(params.preloadColor);
                 this._core.image = params.image;
-                this._initTexture(params.image);
+                this._setTextureImage(texture, params.image);
 
             } else if (params.target) { // Render to this texture
                 this.getScene().getNode(params.target,
@@ -13257,11 +13290,14 @@ new (function () {
             }
 
             this._core.webglRestored = function () {
+                
                 if (self._core.image) {
-                    self._initTexture(self._core.image);
+                    var texture = this._initTexture(params.preloadColor);
+                    self._setTextureImage(texture, self._core.image);
 
                 } else if (self._core.src) {
-                    self._loadTexture(self._core.src);
+                    var texture = this._initTexture(params.preloadColor);
+                    self._loadTexture(texture, self._core.src);
 
                 } else if (self._core.target) {
 //                    self.getScene().getNode(params.target,
@@ -13298,18 +13334,64 @@ new (function () {
         this._matrixDirty = false;
     }
 
-    SceneJS.TextureMap.prototype._loadTexture = function (src) {
+    SceneJS.TextureMap.prototype._initTexture = function (preloadColor) {
+        var gl = this._engine.canvas.gl;
+
+        preloadColor = preloadColor || { r: 0.57735, g: 0.57735, b: 0.57735 };
+        preloadColor.a = preloadColor.a === undefined ? 1 : preloadColor.a;
+
+        preloadColor = new Uint8Array([
+            Math.floor(preloadColor.r * 255),
+            Math.floor(preloadColor.g * 255),
+            Math.floor(preloadColor.b * 255),
+            Math.floor(preloadColor.a * 255)
+        ]);
+
+        var texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, preloadColor);
+        this._setCoreTexture(texture);
+
+        return texture;
+    };
+
+    SceneJS.TextureMap.prototype._loadTexture = function (texture, src, preloadSrc) {
         var self = this;
         var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading texture");
         var image = new Image();
+        var loaded = false;
+        var taskFinished = false;
+
+        if (preloadSrc) {
+            var preloadImage = new Image();
+
+            preloadImage.onload = function () {
+                if (!loaded) {
+                    self._setTextureImage(texture, preloadImage);
+                    SceneJS_sceneStatusModule.taskFinished(taskId);
+                    taskFinished = true;
+                    self._engine.display.imageDirty = true; 
+                }   
+            };
+
+            this._fetchImage(preloadImage, preloadSrc);
+        }
+
         image.onload = function () {
-            self._initTexture(image);
-            SceneJS_sceneStatusModule.taskFinished(taskId);
+            self._setTextureImage(texture, image);
+            if (!taskFinished) {
+                SceneJS_sceneStatusModule.taskFinished(taskId);
+            }
+            loaded = true;
             self._engine.display.imageDirty = true;
         };
         image.onerror = function () {
             SceneJS_sceneStatusModule.taskFailed(taskId);
         };
+        this._fetchImage(image, src);
+    };
+
+    SceneJS.TextureMap.prototype._fetchImage = function (image, src) {
         if (src.indexOf("data") == 0) {  // Image data
             image.src = src;
         } else { // Image file
@@ -13318,7 +13400,7 @@ new (function () {
         }
     };
 
-    SceneJS.TextureMap.prototype._initTexture = function (image) {
+    SceneJS.TextureMap.prototype._setTextureImage = function (texture, image) {
 
         var gl = this._engine.canvas.gl;
 
@@ -13333,6 +13415,12 @@ new (function () {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, SceneJS._webgl.ensureImageSizePowerOfTwo(image));
 
         this._core.image = image;
+
+        this._setCoreTexture(texture);
+    };
+
+    SceneJS.TextureMap.prototype._setCoreTexture = function (texture) {
+        var gl = this._engine.canvas.gl;
 
         this._core.texture = new SceneJS._webgl.Texture2D(gl, {
             texture: texture, // WebGL texture object
@@ -13519,7 +13607,7 @@ new (function () {
         }
     };
 
-})();;(function () {
+})();(function () {
 
     // The default state core singleton for {@link SceneJS.ColorBuf} nodes
     var defaultCore = {
@@ -13682,7 +13770,7 @@ new (function () {
         }
     }
 
-})();;/**
+})();/**
  * @class Scene graph node which defines the modelling transform to apply to the objects in its subgraph
  * @extends SceneJS.Node
  */
@@ -13762,7 +13850,7 @@ SceneJS.XForm.prototype._compile = function (ctx) {
     this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };
-;
+
 /**
  * @class Scene graph node which defines a modelling transform matrix to apply to the objects in its subgraph
  * @extends SceneJS.Node
@@ -13847,7 +13935,7 @@ SceneJS.Matrix.prototype._compile = function(ctx) {
     this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };
-;/**
+/**
  * @class Scene graph node which defines a rotation modelling transform to apply to the objects in its subgraph
  * @extends SceneJS.Node
  */
@@ -13995,7 +14083,7 @@ SceneJS.Rotate.prototype._compile = function(ctx) {
     this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };
-;/**
+/**
  * @class Scene graph node which defines a translation modelling transform to apply to the objects in its subgraph
  * @extends SceneJS.Node
  */
@@ -14153,7 +14241,7 @@ SceneJS.Translate.prototype._compile = function(ctx) {
     this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };
-;/**
+/**
  * @class Scene graph node which defines a rotation modelling transform to apply to the objects in its subgraph
  * @extends SceneJS.Node
  */
@@ -14300,7 +14388,7 @@ SceneJS.Scale.prototype._compile = function (ctx) {
     this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
 };
-;/**
+/**
  * Provides a model transform stack in front of the renderer.
  * Nodes peek push and pop to the stack, while the renderer peeks at
  * the transform on the top of the stack whenever it builds a renderer node.
@@ -14516,7 +14604,7 @@ var SceneJS_modelXFormStack = new (function () {
     };
 
 })();
-;/**
+/**
  * Container for custom node types
  */
 SceneJS.Types = new (function () {
@@ -14569,7 +14657,7 @@ SceneJS.Types = new (function () {
     };
 })();
 
-;/**
+/**
  * @class Display compiled from a {@link SceneJS.Scene}, providing methods to render and pick.
  * @private
  *
@@ -15660,7 +15748,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 SceneJS_Display.prototype.destroy = function () {
     this._programFactory.destroy();
 };
-;/**
+/**
  * @class Manages creation, sharing and recycle of {@link SceneJS_ProgramSource} instances
  * @private
  */
@@ -16598,7 +16686,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return "lowp";
     }
 
-})();;/**
+})();/**
  * @class Source code for pick and draw shader programs, to be compiled into one or more {@link SceneJS_Program}s
  * @private
  * 
@@ -16647,7 +16735,7 @@ var SceneJS_ProgramSource = function(hash, pickVertexSrc, pickFragmentSrc, drawV
     this.useCount = 0;
 };
 
-;/**  
+/**  
  * @class Manages creation, sharing and recycle of {@link SceneJS_Program} instances
  * @private
  */
@@ -16720,7 +16808,7 @@ SceneJS_ProgramFactory.prototype.webglRestored = function() {
  */
 SceneJS_ProgramFactory.prototype.destroy = function() {
 };
-;/**
+/**
  * @class Vertex and fragment shaders for pick and draw
  * @private
  *
@@ -16792,7 +16880,7 @@ SceneJS_Program.prototype.build = function(gl) {
     this.draw = new SceneJS._webgl.Program(gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
     this.pick = new SceneJS._webgl.Program(gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
 };
-;/**
+/**
  * @class Manages creation and recycle of {@link SceneJS_Object} instances
  * @private
  */
@@ -16838,7 +16926,7 @@ SceneJS_ObjectFactory.prototype.getObject = function(id) {
 SceneJS_ObjectFactory.prototype.putObject = function (object) {
 
     this._freeObjects[this._numFreeObjects++] = object;
-};;/**
+};/**
  * @class An object within a {@link SceneJS_Display}
  * @private
  */
@@ -16899,7 +16987,7 @@ var SceneJS_Object = function(id) {
      * State core for the {@link SceneJS.Tag} that this object was compiled from, used for visibility cull
      */
     this.tag = null;
-};;/**
+};/**
  * @class A facade which exposes internal scene rendering state to "rendered" event listeners bound to scene graph nodes with {@link SceneJS.Node#bind}.
  *
  * <p>The listener is fired for each {@link SceneJS.Geometry} that is rendered within the subgraph of the bound node.
@@ -16987,7 +17075,7 @@ SceneJS.RenderContext.prototype.getWorldPos = function(offset) {
     this._wc = SceneJS_math_transformPoint3(this._frameCtx.modelMat, offset || [0,0,0]);
     return { x: this._wc[0], y: this._wc[1], z: this._wc[2],  w: this._wc[3] };
 };
-;/**
+/**
  * @class A chunk of WebGL state changes to render a {@link SceneJS_Core} for drawing and picking (if applicable to the core type).
  *
  * <p>Instances of this class are created and recycled by a {@link SceneJS_ChunkFactory}.</p>
@@ -17019,7 +17107,7 @@ SceneJS_Chunk.prototype.init = function(id, program, core, core2) {
         this.build();
     }
 };
-;/**
+/**
  * @class Manages creation, reuse and destruction of {@link SceneJS_Chunk}s for the nodes within a single {@link SceneJS_Display}.
  * @private
  */
@@ -17167,7 +17255,7 @@ SceneJS_ChunkFactory.prototype.webglRestored = function () {
         }
     }
 };
-;SceneJS_ChunkFactory.createChunkType({
+SceneJS_ChunkFactory.createChunkType({
 
     type: "camera",
 
@@ -17231,7 +17319,7 @@ SceneJS_ChunkFactory.prototype.webglRestored = function () {
 
         frameCtx.cameraMat = this.core.mat; // Query only in draw pass
     }
-});;/**
+});/**
  * Create display state chunk type for draw and pick render of user clipping planes
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -17303,7 +17391,7 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
     }
-});;/**
+});/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -17345,7 +17433,7 @@ SceneJS_ChunkFactory.createChunkType({
         //frameCtx.textureUnit = 0;
     }
 });
-;/**
+/**
  *  Create display state chunk type for draw and pick render of flags
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -17431,7 +17519,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });
-;/**
+/**
  *   Create display state chunk type for draw and pick render of renderTarget
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -17480,7 +17568,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         frameCtx.renderBuf = renderBuf;
     }
-});;/**
+});/**
  *  Create display state chunk type for draw and pick render of geometry
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -17678,7 +17766,7 @@ SceneJS_ChunkFactory.createChunkType({
         this.core2.indexBuf.bind();
     }
 });
-;/**
+/**
  *  Create display state chunk type for draw render of lights projection
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -17760,7 +17848,7 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
     }
-});;/**
+});/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -17784,7 +17872,7 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
     }
-});;/**
+});/**
  * Create display state chunk type for draw and pick render of lookAt transform
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -17833,7 +17921,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         frameCtx.viewMat = this.core.mat;
     }
-});;/**
+});/**
  * Create display state chunk type for draw render of material transform
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -17881,7 +17969,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });
-;/**
+/**
  * Create display state chunk type for draw render of material transform
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -17905,7 +17993,7 @@ SceneJS_ChunkFactory.createChunkType({
             this._uPickColor.setValue([r / 255, g / 255, b / 255]);
         }
     }
-});;SceneJS_ChunkFactory.createChunkType({
+});SceneJS_ChunkFactory.createChunkType({
 
     type: "program",
 
@@ -17953,7 +18041,7 @@ SceneJS_ChunkFactory.createChunkType({
 
 
 
-;/**
+/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -17975,7 +18063,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });
-;/**
+/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -18019,7 +18107,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });
-;/**
+/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -18054,7 +18142,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });
-;/**
+/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -18082,7 +18170,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });
-;/**
+/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -18112,7 +18200,7 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
     }
-});;/**
+});/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -18142,7 +18230,7 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
     }
-});;/**
+});/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
@@ -18163,7 +18251,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });
-;SceneJS_ChunkFactory.createChunkType({
+SceneJS_ChunkFactory.createChunkType({
 
     type: "texture",
 
@@ -18234,7 +18322,7 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.textureUnit = 0;
         }
     }
-});;SceneJS_ChunkFactory.createChunkType({
+});SceneJS_ChunkFactory.createChunkType({
 
     type: "cubemap",
 
@@ -18273,7 +18361,7 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.textureUnit = 0;
         }
     }
-});;SceneJS_ChunkFactory.createChunkType({
+});SceneJS_ChunkFactory.createChunkType({
 
     type: "xform",
 
@@ -18327,3 +18415,4 @@ SceneJS_ChunkFactory.createChunkType({
         frameCtx.modelMat = this.core.mat;
     }
 });
+SceneJS.configure({ pluginPath: "http://scenejs.org/api/latest/plugins" });
