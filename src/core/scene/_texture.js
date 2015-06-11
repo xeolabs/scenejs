@@ -208,37 +208,81 @@ new (function () {
              */
 
             var src = layer.uri || layer.src;
+            var preloadSrc = layer.preloadURI || layer.preloadSrc;
+            var preloadColor = layer.preloadColor || { r: 0.57735, g: 0.57735, b: 0.57735 };
+            preloadColor.a = preloadColor.a === undefined ? 1 : preloadColor.a;
+
+            preloadColor = new Uint8Array([
+                Math.floor(preloadColor.r * 255),
+                Math.floor(preloadColor.g * 255),
+                Math.floor(preloadColor.b * 255),
+                Math.floor(preloadColor.a * 255)
+            ]);
 
             var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading texture");
 
             var image = new Image();
 
+            var texture = gl.createTexture();
+
+            var loaded = false;
+            var taskFinished = false;
+
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, preloadColor);
+            self._setLayerTexture(gl, layer, texture);
+
+            if (preloadSrc) {
+                var preloadImage = new Image();
+
+                preloadImage.onload = function () {
+                    if (!loaded) {
+                        self._setTextureImage(gl, texture, preloadImage);
+                        self._setLayerTexture(gl, layer, texture);
+                        SceneJS_sceneStatusModule.taskFinished(taskId);
+                        taskFinished = true;
+                    }
+                };
+
+                self._fetchImage(preloadImage, preloadSrc);
+            }
+
             image.onload = function () {
-                var texture = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, texture);
-
-                var maxTextureSize = SceneJS_configsModule.configs.maxTextureSize;
-                if (maxTextureSize) {
-                    image = SceneJS._webgl.clampImageSize(image, maxTextureSize);
-                }
-
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, self._ensureImageSizePowerOfTwo(image));
+                self._setTextureImage(gl, texture, image);
                 self._setLayerTexture(gl, layer, texture);
-                SceneJS_sceneStatusModule.taskFinished(taskId);
-                self._engine.display.imageDirty = true;
+                if (!taskFinished) {
+                    SceneJS_sceneStatusModule.taskFinished(taskId);
+                }
+                loaded = true;
             };
 
             image.onerror = function () {
                 SceneJS_sceneStatusModule.taskFailed(taskId);
             };
 
-            if (src.indexOf("data") == 0) {  // Image data
-                image.src = src;
-            } else { // Image file
-                image.crossOrigin = "Anonymous";
-                image.src = src;
-            }
+            self._fetchImage(image, src);
         }
+    };
+
+    SceneJS.Texture.prototype._fetchImage = function (image, src) {
+        if (src.indexOf("data") == 0) {  // Image data
+            image.src = src;
+        } else { // Image file
+            image.crossOrigin = "Anonymous";
+            image.src = src;
+        }
+    };
+
+    SceneJS.Texture.prototype._setTextureImage = function (gl, texture, image) {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+
+        var maxTextureSize = SceneJS_configsModule.configs.maxTextureSize;
+        if (maxTextureSize) {
+            image = SceneJS._webgl.clampImageSize(image, maxTextureSize);
+        }
+
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._ensureImageSizePowerOfTwo(image));
+        this._engine.display.imageDirty = true;
     };
 
     SceneJS.Texture.prototype._ensureImageSizePowerOfTwo = function (image) {
