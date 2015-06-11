@@ -26,219 +26,206 @@
     <br>
     physics system in its own web worker
     <br>
-    learn more in <a href="http://xeolabs.com/articles/scenejs-physics/"  target="_other">this tutorial</a>
+    learn more in <a href="http://xeolabs.com/articles/scenejs-physics/" target="_other">this tutorial</a>
 </div>
 
 <script>
 
 
-// Basic demonstration of the "physics/body" and "physics/system" nodes
-// within the SceneJS rigid-body physics system.
-//
-// In this demo, we're using the scene's default physics system to simulate
-// a bunch of spheres falling and bouncing on a ground plane.
-//
-// Documentation on the physics system here: https://github.com/xeolabs/scenejs/wiki/Physics
-//
+    // Basic demonstration of the "physics/body" and "physics/system" nodes
+    // within the SceneJS rigid-body physics system.
+    //
+    // In this demo, we're using the scene's default physics system to simulate
+    // a bunch of spheres falling and bouncing on a ground plane.
+    //
+    // Documentation on the physics system here: https://github.com/xeolabs/scenejs/wiki/Physics
+    //
 
 
-// Point SceneJS to the bundled plugins
-SceneJS.setConfigs({
-    pluginPath: "../api/latest/plugins"
-});
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
 
-// Create scene
-var scene = SceneJS.createScene({
-    nodes: [
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
 
-        // Depth-of-field blur effect, implemented by plugin at:
-        // http://scenejs.org/api/latest/plugins/node/postprocess/dof.js
-        {
-           // type: "postprocess/dof",
-            texelSize: 0.00008,    // Size of one texel (1 / width, 1 / height)
-            blurCoeff: 0.005,	   // Calculated from the blur equation, b = ( f * ms / N )
-            focusDist: 100.0,	   // The distance to the subject in perfect focus (= Ds)
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 100,
+                zoomSensitivity: 10.0,
+                spin: 0.1, // Slowly spin about X axis
 
-            nodes: [
+                nodes: [
 
-                // Mouse-orbited camera, implemented by plugin at
-                // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
-                {
-                    type: "cameras/orbit",
-                    yaw: 30,
-                    pitch: -30,
-                    zoom: 100,
-                    zoomSensitivity: 10.0,
-                    spin: 0.1, // Slowly spin about X axis
+                    // Don't need backfaces for this demo
+                    {
+                        type: "flags",
+                        backfaces: false,
+                        nodes: [
 
-                    nodes: [
+                            // Optional physics system configs, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/physics/system.js
+                            {
+                                type: "physics/system",
+                                gravity: [0, -9, 0, 0],
+                                solver: "ACCUMULATED" // Options are "ACCUMULATED" (default) or "FAST", "NORMAL"
+                            },
 
-                        // Don't need backfaces for this demo
-                        {
-                            type: "flags",
-                            backfaces: false,
-                            nodes: [
+                            // Ground plane
 
-                                // Optional physics system configs, implemented by plugin at
-                                // http://scenejs.org/api/latest/plugins/node/physics/system.js
-                                {
-                                    type: "physics/system",
-                                    gravity: [0, -9, 0, 0],
-                                    solver: "ACCUMULATED" // Options are "ACCUMULATED" (default) or "FAST", "NORMAL"
-                                },
+                            // Physics body, implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/physics/body.js
+                            {
+                                type: "physics/body",
+                                shape: "plane",
 
-                                // Ground plane
+                                // Points upwards
+                                dir: [0, 1, 0],
+                                width: 100,
+                                depth: 100,
+                                height: 0,
 
-                                // Physics body, implemented by plugin at
-                                // http://scenejs.org/api/latest/plugins/node/physics/body.js
-                                {
-                                    type: "physics/body",
-                                    shape: "plane",
+                                // Fixed at origin
+                                pos: [0, 0, 0],
 
-                                    // Points upwards
-                                    dir: [0, 1, 0],
-                                    width: 100,
-                                    depth: 100,
-                                    height: 0,
+                                // Ground does not move
+                                velocity: [0, 0, 0],
 
-                                    // Fixed at origin
-                                    pos: [0, 0, 0],
+                                // Mass not relevant for unmoving object?
+                                mass: 0.0,
 
-                                    // Ground does not move
-                                    velocity: [0, 0, 0],
+                                // The coefficient of restitution (COR) of two colliding objects is a
+                                // fractional value representing the ratio of speeds after and before
+                                // an impact, taken along the line of the impact.
+                                restitution: 0.9,
 
-                                    // Mass not relevant for unmoving object?
-                                    mass: 0.0,
+                                friction: 0.3,
 
-                                    // The coefficient of restitution (COR) of two colliding objects is a
-                                    // fractional value representing the ratio of speeds after and before
-                                    // an impact, taken along the line of the impact.
-                                    restitution: 0.9,
+                                // Specify that this body is not able to move
+                                movable: false,
 
-                                    friction: 0.3,
+                                // Child nodes will be translated and rotated according to
+                                // the body's behaviour within the physics system
 
-                                    // Specify that this body is not able to move
-                                    movable: false,
+                                nodes: [
 
-                                    // Child nodes will be translated and rotated according to
-                                    // the body's behaviour within the physics system
+                                    // Blue color for ground plane
+                                    {
+                                        type: "material",
+                                        color: { r: 0.8, g: 0.8, b: 1.0 },
+                                        nodes: [
 
-                                    nodes: [
+                                            // Grid ground plane geometry, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/grid.js
+                                            {
+                                                type: "geometry/grid",
+                                                size: { x: 1000, z: 1000 },
+                                                xSegments: 100,
+                                                zSegments: 100
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
 
-                                        // Blue color for ground plane
-                                        {
-                                            type: "material",
-                                            color: { r: 0.8, g: 0.8, b: 1.0 },
-                                            nodes: [
+                            // Falling balls
 
-                                                // Grid ground plane geometry, implemented by plugin at
-                                                // http://scenejs.org/api/latest/plugins/node/geometry/grid.js
-                                                {
-                                                    type: "geometry/grid",
-                                                    size: { x: 1000, z: 1000 },
-                                                    xSegments: 100,
-                                                    zSegments: 100
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                },
+                            // A bunch of physics bodies wrapping colored spheres
+                            {
+                                type: "node",
+                                nodes: makeBodies(100)
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
 
-                                // Falling balls
+    // Returns a bunch of "geometry/sphere" nodes, each wrapped by a spherical "physics/body" node
+    function makeBodies(numBodies) {
+        var nodes = [];
 
-                                // A bunch of physics bodies wrapping colored spheres
-                                {
-                                    type: "node",
-                                    nodes: makeBodies(100)
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
+        for (var i = 0; i < numBodies; i++) {
+            nodes.push(
+                    // Physics body primitive, implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/physics/body.js
+                    {
+                        type: "physics/body",
+                        shape: "sphere",
+
+                        // Sphere radius
+                        radius: 1.0,
+
+                        pos: [
+                                    Math.random() * 5 - 2.5,
+                                    Math.random() * 200 + 50,
+                                    Math.random() * 5 - 2.5
+                        ],
+
+                        // Body is just passively falling from a height
+                        velocity: [0, 0, 0],
+
+                        //
+                        mass: 1.0,
+
+                        // Specify that this body is able to move
+                        movable: true,
+
+                        // The coefficient of restitution (COR) of two colliding objects is a
+                        // fractional value representing the ratio of speeds after and before
+                        // an impact, taken along the line of the impact.
+                        //
+                        // This body will be bouncy.
+                        restitution: 1.0,
+
+                        // Low friction
+                        friction: 0.1,
+
+                        // Child node will be translated and rotated according to
+                        // the body's behaviour within the physics system
+                        nodes: [
+                            {
+                                type: "material",
+                                color: { r: Math.random(), g: Math.random(), b: Math.random() },
+
+                                nodes: [
+
+                                    // Sphere primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                    {
+                                        type: "geometry/sphere",
+                                        radius: 1,
+
+                                        latitudeBands: 16, // A fairly low-rez sphere
+                                        longitudeBands: 16
+                                    }
+                                ]
+                            }
+                        ]
+                    });
         }
-    ]
-});
-
-// Returns a bunch of "geometry/sphere" nodes, each wrapped by a spherical "physics/body" node
-function makeBodies(numBodies) {
-    var nodes = [];
-
-    for (var i = 0; i < numBodies; i++) {
-        nodes.push(
-
-                // Physics body primitive, implemented by plugin at
-                // http://scenejs.org/api/latest/plugins/node/physics/body.js
-                {
-                    type: "physics/body",
-                    shape: "sphere",
-
-                    // Sphere radius
-                    radius: 1.0,
-
-                    pos: [
-                        Math.random() * 5 - 2.5,
-                        Math.random() * 200 + 50,
-                        Math.random() * 5 - 2.5
-                    ],
-
-                    // Body is just passively falling from a height
-                    velocity: [0, 0, 0],
-
-                    //
-                    mass: 1.0,
-
-                    // Specify that this body is able to move
-                    movable: true,
-
-                    // The coefficient of restitution (COR) of two colliding objects is a
-                    // fractional value representing the ratio of speeds after and before
-                    // an impact, taken along the line of the impact.
-                    //
-                    // This body will be bouncy.
-                    restitution: 1.0,
-
-                    // Low friction
-                    friction: 0.1,
-
-                    // Child node will be translated and rotated according to
-                    // the body's behaviour within the physics system
-                    nodes: [
-                        {
-                            type: "material",
-                            color: { r: Math.random(), g: Math.random(), b: Math.random() },
-
-                            nodes: [
-
-                                // Sphere primitive, implemented by plugin at
-                                // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
-                                {
-                                    type: "geometry/sphere",
-                                    radius: 1,
-
-                                    latitudeBands: 16, // A fairly low-rez sphere
-                                    longitudeBands: 16
-                                }
-                            ]
-                        }
-                    ]
-                });
+        return nodes;
     }
-    return nodes;
-}
 
-// Stats
+    // Stats
 
-var stats = new Stats();
-stats.domElement.style.position = 'absolute';
-stats.domElement.style.top = '0px';
-stats.domElement.style.right = '0px';
-stats.domElement.style.zIndex = 100;
-document.body.appendChild(stats.domElement);
-scene.on("tick", function () {
-    stats.end();
-    stats.begin();
-});
+    var stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+    stats.domElement.style.right = '0px';
+    stats.domElement.style.zIndex = 100;
+    document.body.appendChild(stats.domElement);
+    scene.on("tick", function () {
+        stats.end();
+        stats.begin();
+    });
 
 
 </script>
