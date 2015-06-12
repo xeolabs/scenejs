@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-06-11
+ * Built on 2015-06-12
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -1763,13 +1763,13 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
         ? WebGLDebugUtils.makeLostContextSimulatingCanvas(canvas)
         : canvas;
 
-    this.ssaaMultiplier = this.options.ssaaMultiplier || 1;
+    this.resolutionScaling = this.options.resolutionScaling || 1;
 
     // If the canvas uses css styles to specify the sizes make sure the basic
     // width and height attributes match or the WebGL context will use 300 x 150
 
-    this.canvas.width = this.canvas.clientWidth * this.ssaaMultiplier;
-    this.canvas.height = this.canvas.clientHeight * this.ssaaMultiplier;
+    this.canvas.width = this.canvas.clientWidth * this.resolutionScaling;
+    this.canvas.height = this.canvas.clientHeight * this.resolutionScaling;
 
     /**
      * Attributes given when initialising the WebGL context
@@ -1831,10 +1831,10 @@ SceneJS_Canvas.prototype.loseWebGLContext = function () {
 /**
  * Set canvas size multiplier for supersample anti-aliasing
  */
-SceneJS_Canvas.prototype.setSSAAMultiplier = function (ssaaMultiplier) {
-    this.ssaaMultiplier = ssaaMultiplier;
-    this.canvas.width = this.canvas.clientWidth * ssaaMultiplier;
-    this.canvas.height = this.canvas.clientHeight * ssaaMultiplier;
+SceneJS_Canvas.prototype.setResolutionScaling = function (resolutionScaling) {
+    this.resolutionScaling = resolutionScaling;
+    this.canvas.width = this.canvas.clientWidth * resolutionScaling;
+    this.canvas.height = this.canvas.clientHeight * resolutionScaling;
 };
 
 
@@ -2276,10 +2276,10 @@ SceneJS_Engine.prototype.start = function () {
         // Animation frame callback
         window[fnName] = function () {
 
-            var ssaaMultiplier = self.canvas.ssaaMultiplier || 1;
+            var resolutionScaling = self.canvas.resolutionScaling || 1;
 
-            width = canvas.width = canvas.clientWidth * ssaaMultiplier;
-            height = canvas.height = canvas.clientHeight * ssaaMultiplier;
+            width = canvas.width = canvas.clientWidth * resolutionScaling;
+            height = canvas.height = canvas.clientHeight * resolutionScaling;
 
             if (width != lastWidth || height != lastHeight) {
                 scene.publish("canvasSize", {
@@ -2309,7 +2309,11 @@ SceneJS_Engine.prototype.start = function () {
                     return;
                 }
 
-                requestAnimationFrame(draw);
+                if (self.fps > 0) {
+                    requestAnimationFrame(draw);
+                } else {
+                    draw();  // Already at an animation frame.
+                }
             }
 
             if (self.running) {
@@ -12008,8 +12012,8 @@ SceneJS.Scene.prototype.getZBufferDepth = function () {
 /**
  * Set canvas size multiplier for supersample anti-aliasing
  */
-SceneJS.Scene.prototype.setSSAAMultiplier = function (ssaaMultiplier) {
-    return this._engine.canvas.setSSAAMultiplier(ssaaMultiplier);
+SceneJS.Scene.prototype.setResolutionScaling = function (resolutionScaling) {
+    return this._engine.canvas.setResolutionScaling(resolutionScaling);
 };
 
 /**
@@ -15516,10 +15520,10 @@ SceneJS_Display.prototype._logPickList = function () {
 SceneJS_Display.prototype.pick = function (params) {
 
     var canvas = this._canvas.canvas;
-    var ssaaMultiplier = this._canvas.ssaaMultiplier;
+    var resolutionScaling = this._canvas.resolutionScaling;
     var hit = null;
-    var canvasX = params.canvasX * ssaaMultiplier;
-    var canvasY = params.canvasY * ssaaMultiplier;
+    var canvasX = params.canvasX * resolutionScaling;
+    var canvasY = params.canvasY * resolutionScaling;
     var pickBuf = this.pickBuf;
 
     // Lazy-create pick buffer
@@ -17044,9 +17048,9 @@ SceneJS.RenderContext.prototype.getCanvasPos = function(offset) {
     this.getProjPos(offset);
 
     var canvas = this._frameCtx.canvas.canvas;
-    var ssaaMultiplier = this._frameCtx.canvas.ssaaMultiplier;
-    var canvasWidth = canvas.width / ssaaMultiplier;
-    var canvasHeight = canvas.height / ssaaMultiplier;
+    var resolutionScaling = this._frameCtx.canvas.resolutionScaling;
+    var canvasWidth = canvas.width / resolutionScaling;
+    var canvasHeight = canvas.height / resolutionScaling;
 
     /* Projection division and map to canvas
      */
