@@ -469,7 +469,11 @@ SceneJS_Engine.prototype.start = function () {
                     return;
                 }
 
-                requestAnimationFrame(draw);
+                if (self.fps > 0) {
+                    requestAnimationFrame(draw);
+                } else {
+                    draw();  // Already at an animation frame.
+                }
             }
 
             if (self.running) {
