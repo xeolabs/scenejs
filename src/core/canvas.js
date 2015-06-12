@@ -43,13 +43,13 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
         ? WebGLDebugUtils.makeLostContextSimulatingCanvas(canvas)
         : canvas;
 
-    this.ssaaMultiplier = this.options.ssaaMultiplier || 1;
+    this.resolutionScaling = this.options.resolutionScaling || 1;
 
     // If the canvas uses css styles to specify the sizes make sure the basic
     // width and height attributes match or the WebGL context will use 300 x 150
 
-    this.canvas.width = this.canvas.clientWidth * this.ssaaMultiplier;
-    this.canvas.height = this.canvas.clientHeight * this.ssaaMultiplier;
+    this.canvas.width = this.canvas.clientWidth * this.resolutionScaling;
+    this.canvas.height = this.canvas.clientHeight * this.resolutionScaling;
 
     /**
      * Attributes given when initialising the WebGL context
@@ -111,10 +111,10 @@ SceneJS_Canvas.prototype.loseWebGLContext = function () {
 /**
  * Set canvas size multiplier for supersample anti-aliasing
  */
-SceneJS_Canvas.prototype.setSSAAMultiplier = function (ssaaMultiplier) {
-    this.ssaaMultiplier = ssaaMultiplier;
-    this.canvas.width = this.canvas.clientWidth * ssaaMultiplier;
-    this.canvas.height = this.canvas.clientHeight * ssaaMultiplier;
+SceneJS_Canvas.prototype.setResolutionScaling = function (resolutionScaling) {
+    this.resolutionScaling = resolutionScaling;
+    this.canvas.width = this.canvas.clientWidth * resolutionScaling;
+    this.canvas.height = this.canvas.clientHeight * resolutionScaling;
 };
 
 
