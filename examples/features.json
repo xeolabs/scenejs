@@ -192,8 +192,8 @@
             {
                 "nodes": [
                     {
-                        "title": "Super sample anti-aliasing",
-                        "page": "canvas_SSAA"
+                        "title": "Resolution scaling",
+                        "page": "canvas_resolutionScaling"
                     }
                 ]
             }
