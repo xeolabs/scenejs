@@ -115,7 +115,7 @@ var scene = SceneJS.createScene({
                                                                 // Color map
                                                                 {
                                                                     type: "texture",
-                                                                    src: "textures/earth.jpg",
+                                                                    src: "textures/earthDiffuse.jpg",
                                                                     applyTo: "color",
 
                                                                     nodes: [
@@ -124,7 +124,7 @@ var scene = SceneJS.createScene({
                                                                         {
                                                                             type: "texture",
                                                                             coreId: this.type + ".normal",
-                                                                            src: "textures/bumpearthTexture.jpg",
+                                                                            src: "textures/earthNormal.jpg",
                                                                             applyTo: "normals",
 
                                                                             nodes: [
@@ -132,7 +132,7 @@ var scene = SceneJS.createScene({
                                                                                 // Specular map for shiny oceans
                                                                                 {
                                                                                     type: "texture",
-                                                                                    src: "textures/earth-specular.png",
+                                                                                    src: "textures/earthSpecular.png",
                                                                                     applyTo: "specular",
 
                                                                                     nodes: [
@@ -140,7 +140,7 @@ var scene = SceneJS.createScene({
                                                                                         // Glow map for lights on night side
                                                                                         {
                                                                                             type: "texture",
-                                                                                            src: "textures/earth-lights.gif",
+                                                                                            src: "textures/earthEmit.gif",
                                                                                             applyTo: "emit",
 
                                                                                             nodes: [
@@ -207,7 +207,7 @@ var scene = SceneJS.createScene({
                                                                         // Alpha map for clouds
                                                                         {
                                                                             type: "texture",
-                                                                            src: "textures/earthclouds.jpg",
+                                                                            src: "textures/earthAlpha.jpg",
                                                                             applyTo: "alpha", // Apply to material "alpha" property
                                                                             flipY: false,
 

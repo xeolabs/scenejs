@@ -46,8 +46,8 @@ SceneJS.Types.addType("models/space/planets/earth", {
                         {
                             type: "material",
                             emit: 1,
-                            color: { r: 1.0, g: 1.0, b: 1.0 },
-                            specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                            color: {r: 1.0, g: 1.0, b: 1.0},
+                            specularColor: {r: 1.0, g: 1.0, b: 1.0},
                             specular: 5.0,
                             shine: 70.0,
 
@@ -57,34 +57,48 @@ SceneJS.Types.addType("models/space/planets/earth", {
                                 {
                                     type: "texture",
                                     coreId: this.type + ".color",
-                                    src: texturePath + "earth.jpg",
+                                    src: texturePath + "earthDiffuse.jpg",
+                                    preloadSrc: texturePath + "earthDiffusePreload.jpg",
                                     applyTo: "color",
 
                                     nodes: [
 
-                                        // Specular map for shiny oceans
+                                        // Normal map
                                         {
                                             type: "texture",
-                                            coreId: this.type + ".specular",
-                                            src: texturePath + "earth-specular.png",
-                                            applyTo: "specular",
+                                            src: "textures/earthNormal.jpg",
+                                            preloadSrc: "textures/earthNormalPreload.jpg",
+                                            applyTo: "normals",
 
                                             nodes: [
 
-                                                // Glow map for lights on night side
+                                                // Specular map for shiny oceans
                                                 {
                                                     type: "texture",
-                                                    coreId: this.type + ".emit",
-                                                    src: texturePath + "earth-lights.gif",
-                                                    applyTo: "emit",
+                                                    coreId: this.type + ".specular",
+                                                    src: texturePath + "earthSpecular.png",
+                                                    preloadSrc: texturePath + "earthSpecularPreload.jpg",
+                                                    applyTo: "specular",
 
                                                     nodes: [
 
-                                                        // Sphere geometry
+                                                        // Glow map for lights on night side
                                                         {
-                                                            type: "geometry/sphere",
-                                                            latitudeBands: 120,
-                                                            longitudeBands: 120
+                                                            type: "texture",
+                                                            coreId: this.type + ".emit",
+                                                            src: texturePath + "earthEmit.gif",
+                                                            preloadSrc: texturePath + "earthEmitPreload.jpg",
+                                                            applyTo: "emit",
+
+                                                            nodes: [
+
+                                                                // Sphere geometry
+                                                                {
+                                                                    type: "geometry/sphere",
+                                                                    latitudeBands: 120,
+                                                                    longitudeBands: 120
+                                                                }
+                                                            ]
                                                         }
                                                     ]
                                                 }
@@ -99,7 +113,7 @@ SceneJS.Types.addType("models/space/planets/earth", {
             ]
         });
 
-        // Layer 1: Cloud layer with alpha map
+// Layer 1: Cloud layer with alpha map
         var cloudsRotate = node = node.addNode({
             type: "rotate",
             y: 1,
@@ -119,8 +133,8 @@ SceneJS.Types.addType("models/space/planets/earth", {
                                     type: "material",
                                     emit: 0.1,
                                     alpha: 0.7,
-                                    color: { r: 1, g: 1, b: 1 },
-                                    specularColor: { r: 1.0, g: 1.0, b: 1.0 },
+                                    color: {r: 1, g: 1, b: 1},
+                                    specularColor: {r: 1.0, g: 1.0, b: 1.0},
                                     specular: 0.5,
                                     shine: 1.0,
                                     nodes: [
@@ -134,7 +148,8 @@ SceneJS.Types.addType("models/space/planets/earth", {
                                                 {
                                                     type: "texture",
                                                     coreId: this.type + ".alpha",
-                                                    src: texturePath + "earthclouds.jpg",
+                                                    src: texturePath + "earthAlpha.jpg",
+                                                    preloadSrc: texturePath + "earthAlphaPreload.jpg",
                                                     applyTo: "alpha",
                                                     flipY: false,
 
@@ -179,8 +194,9 @@ SceneJS.Types.addType("models/space/planets/earth", {
             });
     },
 
-    // Node destructor, unsubscribes from scene tick
+// Node destructor, unsubscribes from scene tick
     destruct: function () {
         this.getScene().off(this._tick);
     }
-});
+})
+;
