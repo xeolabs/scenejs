@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-06-12
+ * Built on 2015-06-17
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -16410,7 +16410,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             if (solid) {
 
-                src.push("  if (!gl_FrontFacing) {");
+                src.push("  if (gl_FrontFacing == false) {");
                 src.push("     gl_FragColor = vec4(0.4, 0.4, 1.0, 1.0);");
                 src.push("     return;");
                 src.push("  }");
@@ -17511,6 +17511,7 @@ SceneJS_ChunkFactory.createChunkType({
 
                     gl.enable(gl.BLEND);
                     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                    //gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
                     frameCtx.blendEnabled = true;
 
                 } else {
@@ -17673,7 +17674,7 @@ SceneJS_ChunkFactory.createChunkType({
     setDrawMorphFactor:function () {
 
         if (this._uMorphFactorDraw) {
-            this._uMorphFactorDraw.setValue*(this.core.factor); // Bind LERP factor
+            this._uMorphFactorDraw.setValue(this.core.factor); // Bind LERP factor
         }
 
     },
