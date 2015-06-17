@@ -88,7 +88,13 @@
                 far: 10000.0
             };
         } else {
-            var type = optics.type || core.optics.type || "perspective";
+            var type = optics.type;
+            if (!type) {
+                if (core.optics) {
+                    type = core.optics.type;
+                }
+            }
+            type = type || "perspective";
             if (type == "ortho") {
                 core.optics = SceneJS._applyIf(SceneJS_math_ORTHO_OBJ, {
                     type: type,
@@ -120,13 +126,13 @@
             } else if (!optics.type) {
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "SceneJS.Camera configuration invalid: optics type not specified - " +
-                        "supported types are 'perspective', 'frustum' and 'ortho'");
+                    "SceneJS.Camera configuration invalid: optics type not specified - " +
+                    "supported types are 'perspective', 'frustum' and 'ortho'");
             } else {
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "SceneJS.Camera configuration invalid: optics type not supported - " +
-                        "supported types are 'perspective', 'frustum' and 'ortho'");
+                    "SceneJS.Camera configuration invalid: optics type not supported - " +
+                    "supported types are 'perspective', 'frustum' and 'ortho'");
             }
         }
         this._core.optics.pan = optics.pan;
@@ -164,7 +170,7 @@
 
         } else if (optics.type == "perspective") {
             core.matrix = SceneJS_math_perspectiveMatrix4(
-                    optics.fovy * Math.PI / 180.0,
+                optics.fovy * Math.PI / 180.0,
                 optics.aspect,
                 optics.near,
                 optics.far);
