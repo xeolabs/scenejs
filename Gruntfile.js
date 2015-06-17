@@ -20,7 +20,7 @@ module.exports = function (grunt) {
             },
             engine: {
                 src: devScripts.engine,
-                dest: "<%= build_dir %>/<%= PROJECT_NAME %>-<%= ENGINE_VERSION %>.js"
+                dest: 'api/latest/<%= PROJECT_NAME %>.js'
             }
         },
 
@@ -31,7 +31,7 @@ module.exports = function (grunt) {
             },
             engine: {
                 files: {
-                    "<%= build_dir %>/<%= PROJECT_NAME %>-<%= ENGINE_VERSION %>.min.js": "<%= concat.engine.dest %>"
+                    "api/latest/<%= PROJECT_NAME %>.min.js": "<%= concat.engine.dest %>"
                 }
             }
         },
@@ -43,12 +43,12 @@ module.exports = function (grunt) {
 
         copy: {
             minified: {
-                src: '<%= build_dir %>/<%= PROJECT_NAME %>-<%= ENGINE_VERSION %>.min.js',
-                dest: 'api/latest/<%= PROJECT_NAME %>.min.js'
+                src: 'api/latest/<%= PROJECT_NAME %>.min.js',
+                dest: '<%= build_dir %>/<%= PROJECT_NAME %>-<%= ENGINE_VERSION %>.min.js'
             },
             unminified: {
-                src: '<%= build_dir %>/<%= PROJECT_NAME %>-<%= ENGINE_VERSION %>.js',
-                dest: 'api/latest/<%= PROJECT_NAME %>.js'
+                src: 'api/latest/<%= PROJECT_NAME %>.js',
+                dest: '<%= build_dir %>/<%= PROJECT_NAME %>-<%= ENGINE_VERSION %>.js'
             }
         }
     });
@@ -58,11 +58,13 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks('grunt-contrib-copy');
 
+    // Builds snapshot libs within api/latest
+    // Run this when testing examples locally against your changes before committing them
+    grunt.registerTask("snapshot", ["concat", "uglify"]);
 
-    grunt.registerTask("compile", ["clean", "concat", "uglify"]);
-    grunt.registerTask("build", ["compile"]);
-    grunt.registerTask("default", "compile");
-    grunt.registerTask("all", ["build"]);
+    // Build a package within ./build
+    // Assigns the package the current version number that's defined in package.json
+    grunt.registerTask("build", ["snapshot", "copy"]);
 
-    grunt.registerTask("snapshot", ["concat", "uglify", "copy"]);
+    grunt.registerTask("default", "snapshot");
 };
