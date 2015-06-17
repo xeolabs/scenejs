@@ -59,7 +59,7 @@
                 var x = cosPhi * sinTheta;
                 var y = cosTheta;
                 var z = sinPhi * sinTheta;
-                var u = 1- (longNumber / longitudeBands);
+                var u = longNumber / longitudeBands;
                 var v = latNumber / latitudeBands;
 
                 normals.push(x);
