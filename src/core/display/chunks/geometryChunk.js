@@ -80,7 +80,7 @@ SceneJS_ChunkFactory.createChunkType({
     setDrawMorphFactor:function () {
 
         if (this._uMorphFactorDraw) {
-            this._uMorphFactorDraw.setValue*(this.core.factor); // Bind LERP factor
+            this._uMorphFactorDraw.setValue(this.core.factor); // Bind LERP factor
         }
 
     },
