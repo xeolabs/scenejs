@@ -52,7 +52,7 @@ SceneJS_ChunkFactory.createChunkType({
                     // Entering a transparency bin
 
                     gl.enable(gl.BLEND);
-                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
                     frameCtx.blendEnabled = true;
 
                 } else {
