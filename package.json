@@ -1,7 +1,7 @@
 {
   "name": "scenejs",
   "title": "SceneJS",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "A WebGL-based 3D scene graph from xeoLabs",
   "homepage": "http://scenejs.org/",
   "author": {
