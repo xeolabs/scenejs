@@ -54,7 +54,8 @@
 
                 nodes: [
 
-                    // Custom lighting to simulate the Sun
+                    // Depth-of-field blur effect, implemented by plugin at:
+                    // http://scenejs.org/api/latest/plugins/node/postprocess/dof.js
                     {
                         type: "lights",
                         lights: [
@@ -68,90 +69,118 @@
                         ],
 
                         nodes: [
+
+
+                            // Custom lighting to simulate the Sun
                             {
-                                type: "rotate",
-                                z: 1,
-                                angle: 195,
+                                type: "lights",
+                                lights: [
+                                    {
+                                        mode: "dir",
+                                        color: {r: 1.0, g: 1.0, b: 1.0},
+                                        diffuse: true,
+                                        specular: true,
+                                        dir: {x: -0.5, y: -0.5, z: -0.75}
+                                    }
+                                ],
 
                                 nodes: [
                                     {
                                         type: "rotate",
-                                        y: 1,
-                                        id: "earth-rotate",
+                                        z: 1,
+                                        angle: 195,
 
                                         nodes: [
-
-                                            // Layer 0: Earth's surface with color, specular
-                                            // and emissive maps
-                                            //
-                                            // The priority on this layer ensure that it's rendered before the
-                                            // clouds in the second layer
                                             {
-                                                type: "layer",
-                                                priority: 0,
-                                                enabled: true,
+                                                type: "rotate",
+                                                y: 1,
+                                                id: "earth-rotate",
 
                                                 nodes: [
+
+                                                    // Layer 0: Earth's surface with color, specular
+                                                    // and emissive maps
+                                                    //
+                                                    // The priority on this layer ensure that it's rendered before the
+                                                    // clouds in the second layer
                                                     {
-                                                        type: "scale",
-                                                        x: 2,
-                                                        y: 2,
-                                                        z: 2,
+                                                        type: "layer",
+                                                        priority: 0,
+                                                        enabled: true,
 
                                                         nodes: [
                                                             {
-                                                                type: "material",
-                                                                emit: 0,
-                                                                color: {r: 1.0, g: 1.0, b: 1.0},
-                                                                specularColor: {r: 0.5, g: 0.5, b: 0.5},
-                                                                specular: 5.0,
-                                                                shine: 70.0,
+                                                                type: "flags",
+                                                                flags: {
+                                                                    backfaces: false
+                                                                },
 
                                                                 nodes: [
 
-                                                                    // Color map
                                                                     {
-                                                                        type: "texture",
-                                                                        src: "textures/earthDiffuse.jpg",
-                                                                        preloadSrc: "textures/earthDiffusePreload.jpg",
-                                                                        applyTo: "color",
+                                                                        type: "scale",
+                                                                        x: 2,
+                                                                        y: 2,
+                                                                        z: 2,
 
                                                                         nodes: [
-
-                                                                            // Normal map
                                                                             {
-                                                                                type: "texture",
-                                                                                src: "textures/earthNormal.jpg",
-                                                                                preloadSrc: "textures/earthNormalPreload.jpg",
-                                                                                applyTo: "normals",
+                                                                                type: "material",
+                                                                                emit: 0,
+                                                                                color: {r: 1.0, g: 1.0, b: 1.0},
+                                                                                specularColor: {r: 0.5, g: 0.5, b: 0.5},
+                                                                                specular: 5.0,
+                                                                                shine: 70.0,
 
                                                                                 nodes: [
 
-                                                                                    // Specular map for shiny oceans
+                                                                                    // Color map
                                                                                     {
                                                                                         type: "texture",
-                                                                                        src: "textures/earthSpecular.png",
-                                                                                        preloadSrc: "textures/earthSpecularPreload.png",
-                                                                                        applyTo: "specular",
+                                                                                        src: "textures/earthDiffuse.jpg",
+                                                                                        preloadSrc: "textures/earthDiffusePreload.jpg",
+                                                                                        applyTo: "color",
 
                                                                                         nodes: [
 
-                                                                                            // Glow map for lights on night side
+                                                                                            // Normal map
                                                                                             {
                                                                                                 type: "texture",
-                                                                                                src: "textures/earthEmit.gif",
-                                                                                                preloadSrc: "textures/earthEmitPreload.png",
-                                                                                                applyTo: "emit",
-                                                                                                blendMode: "add",
+                                                                                                src: "textures/earthNormal.jpg",
+                                                                                                preloadSrc: "textures/earthNormalPreload.jpg",
+                                                                                                applyTo: "normals",
 
                                                                                                 nodes: [
 
-                                                                                                    // Sphere geometry node implemented by plugin at
-                                                                                                    // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                                                                    // Specular map for shiny oceans
                                                                                                     {
-                                                                                                        type: "geometry/sphere",
-                                                                                                        latitudeBands: 120,
-                                                                                                        longitudeBands: 120
+                                                                                                        type: "texture",
+                                                                                                        src: "textures/earthSpecular.png",
+                                                                                                        preloadSrc: "textures/earthSpecularPreload.png",
+                                                                                                        applyTo: "specular",
+
+                                                                                                        nodes: [
+
+                                                                                                            // Glow map for lights on night side
+                                                                                                            {
+                                                                                                                type: "texture",
+                                                                                                                src: "textures/earthEmit.gif",
+                                                                                                                preloadSrc: "textures/earthEmitPreload.png",
+                                                                                                                applyTo: "emit",
+                                                                                                                blendMode: "add",
+
+                                                                                                                nodes: [
+
+                                                                                                                    // Sphere geometry node implemented by plugin at
+                                                                                                                    // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                                                                                    {
+                                                                                                                        type: "geometry/sphere",
+                                                                                                                        latitudeBands: 120,
+                                                                                                                        longitudeBands: 120
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            }
+                                                                                                        ]
                                                                                                     }
                                                                                                 ]
                                                                                             }
@@ -164,74 +193,74 @@
                                                                 ]
                                                             }
                                                         ]
-                                                    }
-                                                ]
-                                            },
+                                                    },
 
-                                            // Layer 1: Clouds with alpha map
-                                            // The priority on this this layer ensures that it's rendered after the
-                                            // Earth surface in the previously-defined layer
-                                            {
-                                                type: "layer",
-                                                priority: 1,
-
-                                                nodes: [
-
-                                                    // Flags to enable cloud transparency
+                                                    // Layer 1: Clouds with alpha map
+                                                    // The priority on this this layer ensures that it's rendered after the
+                                                    // Earth surface in the previously-defined layer
                                                     {
-                                                        type: "flags",
-                                                        flags: {
-                                                            transparent: true,
-                                                            specular: true,
-                                                            backfaces: false
-                                                        },
+                                                        type: "layer",
+                                                        priority: 1,
 
                                                         nodes: [
 
-                                                            // Material with alpha channel
+                                                            // Flags to enable cloud transparency
                                                             {
-                                                                type: "material",
-                                                                emit: 0.0,
-                                                                alpha: 0.0,
-                                                                color: {r: 1, g: 1, b: 1},
-                                                                specularColor: {r: 1.0, g: 1.0, b: 1.0},
-                                                                specular: 0.5,
-                                                                shine: 1.0,
+                                                                type: "flags",
+                                                                flags: {
+                                                                    transparent: true,
+                                                                    specular: true,
+                                                                    backfaces: false
+                                                                },
 
                                                                 nodes: [
+
+                                                                    // Material with alpha channel
                                                                     {
-                                                                        type: "scale",
-                                                                        x: 2.02,
-                                                                        y: 2.02,
-                                                                        z: 2.02,
+                                                                        type: "material",
+                                                                        emit: 0.0,
+                                                                        alpha: 0.0,
+                                                                        color: {r: 1, g: 1, b: 1},
+                                                                        specularColor: {r: 1.0, g: 1.0, b: 1.0},
+                                                                        specular: 0.5,
+                                                                        shine: 1.0,
 
                                                                         nodes: [
-
-                                                                            // Alpha map for clouds
                                                                             {
-                                                                                type: "texture",
-                                                                                src: "textures/earthAlpha.jpg",
-                                                                                preloadSrc: "textures/earthAlphaPreload.jpg",
-                                                                                applyTo: "alpha", // Apply to material "alpha" property
-                                                                                flipY: false,
-                                                                                blendMode: "add",
+                                                                                type: "scale",
+                                                                                x: 2.02,
+                                                                                y: 2.02,
+                                                                                z: 2.02,
 
                                                                                 nodes: [
-                                                                                    {
-                                                                                        type: "rotate",
-                                                                                        y: 1,
-                                                                                        id: "clouds-rotate",
-                                                                                        nodes: [
 
-                                                                                            // Sphere geometry node implemented by plugin at
-                                                                                            // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                                                    // Alpha map for clouds
+                                                                                    {
+                                                                                        type: "texture",
+                                                                                        src: "textures/earthAlpha.jpg",
+                                                                                        preloadSrc: "textures/earthAlphaPreload.jpg",
+                                                                                        applyTo: "alpha", // Apply to material "alpha" property
+                                                                                        flipY: false,
+                                                                                        blendMode: "add",
+
+                                                                                        nodes: [
                                                                                             {
-                                                                                                type: "geometry/sphere",
-                                                                                                latitudeBands: 120,
-                                                                                                longitudeBands: 120
+                                                                                                type: "rotate",
+                                                                                                y: 1,
+                                                                                                id: "clouds-rotate",
+                                                                                                nodes: [
+
+                                                                                                    // Sphere geometry node implemented by plugin at
+                                                                                                    // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                                                                    {
+                                                                                                        type: "geometry/sphere",
+                                                                                                        latitudeBands: 120,
+                                                                                                        longitudeBands: 120
+                                                                                                    }
+                                                                                                ]
+
                                                                                             }
                                                                                         ]
-
                                                                                     }
                                                                                 ]
                                                                             }
