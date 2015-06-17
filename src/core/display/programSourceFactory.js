@@ -636,7 +636,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             if (solid) {
 
-                src.push("  if (!gl_FrontFacing) {");
+                src.push("  if (gl_FrontFacing == false) {");
                 src.push("     gl_FragColor = vec4(0.4, 0.4, 1.0, 1.0);");
                 src.push("     return;");
                 src.push("  }");
