@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - Arbitrarily-aligned clipping planes
+    <br><br>In this demo we're creating a fake cap on the cross-section<br>by using a 'solid' flag, which disables
+    shading and texturing<br>on the object's interior surfaces.
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: -30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 10.0,
+                spin: 0.1, // Slowly spin about X axis
+
+                nodes: [
+
+                    // Four arbitrarily-aligned clip planes
+                    {
+                        type: "clips",
+                        clips: [
+
+                            // Left
+                            {
+
+                                // Vector from origin to clipping plane
+                                x: -1.0,
+                                y: 0.2,
+                                z: 0.0,
+
+                                // Distance to plane along the vector
+                                dist: 1.0,
+                                mode: "inside"
+                            }
+                        ],
+
+                        nodes: [
+
+                            // You can approximate solid cross-sections by setting
+                            // a "solid" flag. This simply renders interior faces
+                            // without texture or shading, which works pretty well
+                            // when there is only one clip plane in effect.
+                            //
+                            // When there multiple clip planes, then you'll still
+                            // be able to see through the holes created by the planes,
+                            // which kind of defeats the purpose of this flag.
+                            //
+                            {
+                                type: "flags",
+                                flags: {
+                                    solid: true
+                                },
+
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: {r: 0.6, g: 0.6, b: 0.9},
+
+                                        nodes: [
+
+                                            // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/torus.js
+                                            {
+                                                type: "geometry/torus",
+                                                radius: 1.0,
+                                                tube: 0.30,
+                                                segmentsR: 60,
+                                                segmentsT: 40,
+                                                arc: Math.PI * 2
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>
