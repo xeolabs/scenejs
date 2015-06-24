@@ -1,6 +1,3 @@
-/**
- * Create display state chunk type for draw render of material transform
- */
 SceneJS_ChunkFactory.createChunkType({
 
     type: "material",
