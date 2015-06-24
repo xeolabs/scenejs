@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-06-17
+ * Built on 2015-06-25
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -13631,6 +13631,175 @@ new (function () {
         }
     };
 
+})();;/**
+ * @class Scene graph node which defines fresnels to apply to the objects in its subgraph
+ * @extends SceneJS.Node
+ */
+new (function () {
+
+    // The default state core singleton for {@link SceneJS.Fresnel} nodes
+    var defaultCore = {
+        type: "fresnel",
+        stateId: SceneJS._baseStateId++,
+        bias:0.0,
+        power: 1.0,
+        topColor:[ 1.0, 1.0, 1.0 ],
+        bottomColor:[ 0.0, 0.0, 0.0 ],
+        empty: true,
+        hash: ""
+    };
+
+    SceneJS_events.addListener(
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.fresnel = defaultCore;
+            stackLen = 0;
+        });
+
+    var coreStack = [];
+    var stackLen = 0;
+
+    /**
+     * @class Scene graph node which defines a fresnel to apply to the {@link SceneJS.Geometry} nodes in its subgraph
+     * @extends SceneJS.Node
+     */
+    SceneJS.Fresnel = SceneJS_NodeFactory.createNodeType("fresnel");
+
+    SceneJS.Fresnel.prototype._init = function (params) {
+
+        if (this._core.useCount == 1) { // This node is the resource definer
+
+            if (params.applyTo) {
+                if (params.applyTo != "color" &&
+                    params.applyTo != "specular" &&
+                    params.applyTo != "alpha" &&
+                    params.applyTo != "reflect") {
+
+                    throw SceneJS_error.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "fresnel applyTo value is unsupported - should be either 'color', 'specular', 'alpha' or 'reflect'");
+                }
+            }
+
+            this._core.applyTo = params.applyTo;
+        }
+
+        this.setBias(params.bias);
+        this.setPower(params.power);
+        this.setTopColor(params.topColor);
+        this.setBottomColor(params.bottomColor);
+    };
+
+    SceneJS.Fresnel.prototype.getApplyTo = function () {
+        return this._core.applyTo;
+    };
+
+    SceneJS.Fresnel.prototype.setBias = function (bias) {
+        this._core.bias = (bias !== undefined && bias !== null) ? bias : defaultCore.bias;
+        this._engine.display.imageDirty = true;
+    };
+
+    SceneJS.Fresnel.prototype.getBias = function () {
+        return this._core.bias;
+    };
+
+    SceneJS.Fresnel.prototype.setPower = function (power) {
+        this._core.power = (power !== undefined && power !== null) ? power : defaultCore.power;
+        this._engine.display.imageDirty = true;
+    };
+
+    SceneJS.Fresnel.prototype.getPower = function () {
+        return this._core.power;
+    };
+
+    SceneJS.Fresnel.prototype.setTopColor = function (color) {
+        var defaultTopColor = defaultCore.topColor;
+        this._core.topColor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultTopColor[0],
+            color.g != undefined && color.g != null ? color.g : defaultTopColor[1],
+            color.b != undefined && color.b != null ? color.b : defaultTopColor[2]
+        ] : defaultCore.topColor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.Fresnel.prototype.getTopColor = function () {
+        return {
+            r:this._core.topColor[0],
+            g:this._core.topColor[1],
+            b:this._core.topColor[2]
+        };
+    };
+
+    SceneJS.Fresnel.prototype.setBottomColor = function (color) {
+        var defaultBottomColor = defaultCore.bottomColor;
+        this._core.bottomColor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultBottomColor[0],
+            color.g != undefined && color.g != null ? color.g : defaultBottomColor[1],
+            color.b != undefined && color.b != null ? color.b : defaultBottomColor[2]
+        ] : defaultCore.bottomColor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.Fresnel.prototype.getBottomColor = function () {
+        return {
+            r:this._core.bottomColor[0],
+            g:this._core.bottomColor[1],
+            b:this._core.bottomColor[2]
+        };
+    };
+    
+    SceneJS.Fresnel.prototype._compile = function (ctx) {
+
+        if (!this.__core) {
+            this.__core = this._engine._coreFactory.getCore("fresnel");
+        }
+
+        var parentCore = this._engine.display.fresnel;
+
+        if (!this._core.empty) {
+            this.__core.diffuse = this._core.applyTo == "color" ? this._core : parentCore.diffuse;
+            this.__core.specular = this._core.applyTo == "specular" ? this._core : parentCore.specular;
+            this.__core.alpha = this._core.applyTo == "alpha" ? this._core : parentCore.alpha;
+            this.__core.reflect = this._core.applyTo == "reflect" ? this._core : parentCore.reflect;
+        }
+
+        this._makeHash(this.__core);
+
+        coreStack[stackLen++] = this.__core;
+
+        this._engine.display.fresnel = this.__core;
+        this._compileNodes(ctx);
+        this._engine.display.fresnel = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+    };
+
+    SceneJS.Fresnel.prototype._makeHash = function (core) {
+        var hash = [];
+        if (core.diffuse) {
+            hash.push("d;")
+        }
+        if (core.specular) {
+            hash.push("s;")
+        }
+        if (core.alpha) {
+            hash.push("a;")
+        }
+        if (core.reflect) {
+            hash.push("r;")
+        }
+        hash = hash.join("");
+        if (core.hash != hash) {
+            core.hash = hash;
+        }
+    };
+
+    SceneJS.Fresnel.prototype._destroy = function () {
+        if (this._core) {
+            this._engine._coreFactory.putCore(this._core);
+        }
+    };
+
 })();;(function () {
 
     // The default state core singleton for {@link SceneJS.ColorBuf} nodes
@@ -14834,6 +15003,12 @@ var SceneJS_Display = function (cfg) {
     this.texture = null;
 
     /**
+     * Node state core for the last {@link SceneJS.Fresnel} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.fresnel = null;
+
+    /**
      * Node state core for the last {@link SceneJS.Reflect} visited during scene graph compilation traversal
      * @type Object
      */
@@ -15067,6 +15242,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.clips.hash,
         this.morphGeometry.hash,
         this.texture.hash,
+        this.fresnel.hash,
         this.cubemap.hash,
         this.lights.hash,
         this.flags.hash
@@ -15099,12 +15275,13 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 12, "lights", this.lights);
     this._setChunk(object, 13, "material", this.material);
     this._setChunk(object, 14, "texture", this.texture);
-    this._setChunk(object, 15, "cubemap", this.cubemap);
-    this._setChunk(object, 16, "clips", this.clips);
-    this._setChunk(object, 17, "renderer", this.renderer);
-    this._setChunk(object, 18, "geometry", this.morphGeometry, this.geometry);
-    this._setChunk(object, 19, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 20, "draw", this.geometry); // Must be last
+    this._setChunk(object, 15, "fresnel", this.fresnel);
+    this._setChunk(object, 16, "cubemap", this.cubemap);
+    this._setChunk(object, 17, "clips", this.clips);
+    this._setChunk(object, 18, "renderer", this.renderer);
+    this._setChunk(object, 19, "geometry", this.morphGeometry, this.geometry);
+    this._setChunk(object, 20, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 21, "draw", this.geometry); // Must be last
 };
 
 SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, core2) {
@@ -15301,7 +15478,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 23; i++) {
+    for (var i = 0; i < 24; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
@@ -16280,6 +16457,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var tangents = this._hasTangents(states);
         var clipping = states.clips.clips.length > 0;
 
+        var diffuseFresnel = states.fresnel.diffuse;
+        var specularFresnel = states.fresnel.specular;
+        var alphaFresnel = states.fresnel.alpha;
+        var reflectFresnel = states.fresnel.reflect;
+
         var floatPrecision = getFSFloatPrecision(states._canvas.gl);
 
         var src = ["\n"];
@@ -16366,6 +16548,34 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
+        if (diffuseFresnel) {
+            src.push("uniform float SCENEJS_uDiffuseFresnelBias;");
+            src.push("uniform float SCENEJS_uDiffuseFresnelPower;");
+            src.push("uniform vec3 SCENEJS_uDiffuseFresnelTopColor;");
+            src.push("uniform vec3 SCENEJS_uDiffuseFresnelBottomColor;");
+        }
+
+        if (specularFresnel) {
+            src.push("uniform float SCENEJS_uSpecularFresnelBias;");
+            src.push("uniform float SCENEJS_uSpecularFresnelPower;");
+            src.push("uniform vec3 SCENEJS_uSpecularFresnelTopColor;");
+            src.push("uniform vec3 SCENEJS_uSpecularFresnelBottomColor;");
+        }
+
+        if (alphaFresnel) {
+            src.push("uniform float SCENEJS_uAlphaFresnelBias;");
+            src.push("uniform float SCENEJS_uAlphaFresnelPower;");
+            src.push("uniform vec3 SCENEJS_uAlphaFresnelTopColor;");
+            src.push("uniform vec3 SCENEJS_uAlphaFresnelBottomColor;");
+        }
+
+        if (reflectFresnel) {
+            src.push("uniform float SCENEJS_uReflectFresnelBias;");
+            src.push("uniform float SCENEJS_uReflectFresnelPower;");
+            src.push("uniform vec3 SCENEJS_uReflectFresnelTopColor;");
+            src.push("uniform vec3 SCENEJS_uReflectFresnelBottomColor;");
+        }
+
         src.push("varying vec3 SCENEJS_vViewEyeVec;");                          // Direction of world-space vertex from eye
 
         if (normals) {
@@ -16388,6 +16598,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (customFragmentShader.code) {
             src.push("\n" + customFragmentShader.code + "\n");
+        }
+
+        if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel) {
+            src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float bias, float power) {");
+            src.push("  float fresnelTerm = pow(bias + abs(dot(viewDirection, worldNormal)), power);");
+            src.push("  return clamp(fresnelTerm, 0., 1.);");
+            src.push("}");
         }
 
         src.push("void main(void) {");
@@ -16472,6 +16689,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 // because if we linear interpolated two nonparallel normalized vectors, the resulting vector won’t be of length 1
                 src.push("  vec3    viewNormalVec = normalize(SCENEJS_vViewNormal);");
             }
+            src.push("vec3 viewEyeVec = normalize(SCENEJS_vViewEyeVec);");
         }
 
         var layer;
@@ -16570,13 +16788,20 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals && cubeMapping) {
+            src.push("float reflectFactor = 1.0;");
+
+            if (reflectFresnel) {
+                src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelBias, SCENEJS_uReflectFresnelPower);");
+                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelTopColor.b, SCENEJS_uReflectFresnelBottomColor.b, reflectFresnel);");
+            }
+            
             src.push("vec3 envLookup = reflect(SCENEJS_vViewEyeVec, viewNormalVec);");
             src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
                 layer = states.cubemap.layers[i];
                 src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
-                src.push("color = mix(color, envColor.rgb, specular * SCENEJS_uCubeMapIntensity" + i + ");");
+                src.push("color = mix(color, envColor.rgb, reflectFactor * specular * SCENEJS_uCubeMapIntensity" + i + ");");
             }
         }
 
@@ -16603,7 +16828,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "point") {
 
-                    src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
+                    src.push("dotN = max(dot(viewNormalVec, normalize(viewLightVec)), 0.0);");
 
 
                     src.push("lightDist = SCENEJS_vViewLightVecAndDist" + i + ".w;");
@@ -16625,7 +16850,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "dir") {
 
-                    src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
+                    src.push("dotN = max(dot(viewNormalVec, normalize(viewLightVec)), 0.0);");
 
                     if (light.diffuse) {
                         src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
@@ -16635,6 +16860,24 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         src.push("specularValue += specularColor * SCENEJS_uLightColor" + i +
                             " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine);");
                     }
+                }
+            }
+
+            if (diffuseFresnel || specularFresnel || alphaFresnel) {
+
+                if (diffuseFresnel) {
+                    src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelBias, SCENEJS_uDiffuseFresnelPower);");
+                    src.push("lightValue *= mix(SCENEJS_uDiffuseFresnelTopColor.rgb, SCENEJS_uDiffuseFresnelBottomColor.rgb, diffuseFresnel);");
+                }
+
+                if (specularFresnel) {
+                    src.push("float specFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uSpecularFresnelBias, SCENEJS_uSpecularFresnelPower);");
+                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelTopColor.rgb, SCENEJS_uSpecularFresnelBottomColor.rgb, specFresnel);");
+                }
+
+                if (alphaFresnel) {
+                    src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelBias, SCENEJS_uAlphaFresnelPower);");
+                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelTopColor.r, SCENEJS_uAlphaFresnelBottomColor.r, alphaFresnel);");
                 }
             }
 
@@ -16709,7 +16952,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return "lowp";
     }
 
-})();;/**
+})
+();;/**
  * @class Source code for pick and draw shader programs, to be compiled into one or more {@link SceneJS_Program}s
  * @private
  * 
@@ -17510,6 +17754,7 @@ SceneJS_ChunkFactory.createChunkType({
                     // Entering a transparency bin
 
                     gl.enable(gl.BLEND);
+             //       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
                     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
                     frameCtx.blendEnabled = true;
 
@@ -17944,10 +18189,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         frameCtx.viewMat = this.core.mat;
     }
-});;/**
- * Create display state chunk type for draw render of material transform
- */
-SceneJS_ChunkFactory.createChunkType({
+});;SceneJS_ChunkFactory.createChunkType({
 
     type: "material",
 
@@ -18346,6 +18588,128 @@ SceneJS_ChunkFactory.createChunkType({
         }
     }
 });;SceneJS_ChunkFactory.createChunkType({
+
+    type: "fresnel",
+
+    build: function () {
+
+        var draw = this.program.draw;
+
+        var core = this.core;
+
+        if (core.diffuse) {
+            this._uDiffuseFresnelBias = draw.getUniform("SCENEJS_uDiffuseFresnelBias");
+            this._uDiffuseFresnelPower = draw.getUniform("SCENEJS_uDiffuseFresnelPower");
+            this._uDiffuseFresnelTopColor = draw.getUniform("SCENEJS_uDiffuseFresnelTopColor");
+            this._uDiffuseFresnelBottomColor = draw.getUniform("SCENEJS_uDiffuseFresnelBottomColor");
+        }
+
+        if (core.specular) {
+            this._uSpecularFresnelBias = draw.getUniform("SCENEJS_uSpecularFresnelBias");
+            this._uSpecularFresnelPower = draw.getUniform("SCENEJS_uSpecularFresnelPower");
+            this._uSpecularFresnelTopColor = draw.getUniform("SCENEJS_uSpecularFresnelTopColor");
+            this._uSpecularFresnelBottomColor = draw.getUniform("SCENEJS_uSpecularFresnelBottomColor");
+        }
+
+        if (core.alpha) {
+            this._uAlphaFresnelBias = draw.getUniform("SCENEJS_uAlphaFresnelBias");
+            this._uAlphaFresnelPower = draw.getUniform("SCENEJS_uAlphaFresnelPower");
+            this._uAlphaFresnelTopColor = draw.getUniform("SCENEJS_uAlphaFresnelTopColor");
+            this._uAlphaFresnelBottomColor = draw.getUniform("SCENEJS_uAlphaFresnelBottomColor");
+        }
+
+        if (core.reflect) {
+            this._uReflectFresnelBias = draw.getUniform("SCENEJS_uReflectFresnelBias");
+            this._uReflectFresnelPower = draw.getUniform("SCENEJS_uReflectFresnelPower");
+            this._uReflectFresnelTopColor = draw.getUniform("SCENEJS_uReflectFresnelTopColor");
+            this._uReflectFresnelBottomColor = draw.getUniform("SCENEJS_uReflectFresnelBottomColor");
+        }
+    },
+
+    draw: function () {
+
+        var gl = this.program.gl;
+
+        var core = this.core;
+
+        if (core.diffuse) {
+            
+            if (this._uDiffuseFresnelBias) {
+                this._uDiffuseFresnelBias.setValue(core.diffuse.bias);
+            }
+
+            if (this._uDiffuseFresnelPower) {
+                this._uDiffuseFresnelPower.setValue(core.diffuse.power);
+            }
+
+            if (this._uDiffuseFresnelTopColor) {
+                this._uDiffuseFresnelTopColor.setValue(core.diffuse.topColor);
+            }
+
+            if (this._uDiffuseFresnelBottomColor) {
+                this._uDiffuseFresnelBottomColor.setValue(core.diffuse.bottomColor);
+            }
+        }
+
+        if (core.specular) {
+
+            if (this._uSpecularFresnelBias) {
+                this._uSpecularFresnelBias.setValue(core.specular.bias);
+            }
+
+            if (this._uSpecularFresnelPower) {
+                this._uSpecularFresnelPower.setValue(core.specular.power);
+            }
+
+            if (this._uSpecularFresnelTopColor) {
+                this._uSpecularFresnelTopColor.setValue(core.specular.topColor);
+            }
+
+            if (this._uSpecularFresnelBottomColor) {
+                this._uSpecularFresnelBottomColor.setValue(core.specular.bottomColor);
+            }
+        }
+
+        if (core.alpha) {
+
+            if (this._uAlphaFresnelBias) {
+                this._uAlphaFresnelBias.setValue(core.alpha.bias);
+            }
+
+            if (this._uAlphaFresnelPower) {
+                this._uAlphaFresnelPower.setValue(core.alpha.power);
+            }
+
+            if (this._uAlphaFresnelTopColor) {
+                this._uAlphaFresnelTopColor.setValue(core.alpha.topColor);
+            }
+
+            if (this._uAlphaFresnelBottomColor) {
+                this._uAlphaFresnelBottomColor.setValue(core.alpha.bottomColor);
+            }
+        }
+
+        if (core.reflect) {
+
+            if (this._uReflectFresnelBias) {
+                this._uReflectFresnelBias.setValue(core.reflect.bias);
+            }
+
+            if (this._uReflectFresnelPower) {
+                this._uReflectFresnelPower.setValue(core.reflect.power);
+            }
+
+            if (this._uReflectFresnelTopColor) {
+                this._uReflectFresnelTopColor.setValue(core.reflect.topColor);
+            }
+
+            if (this._uReflectFresnelBottomColor) {
+                this._uReflectFresnelBottomColor.setValue(core.reflect.bottomColor);
+            }
+        }
+    }
+});
+;SceneJS_ChunkFactory.createChunkType({
 
     type: "cubemap",
 
