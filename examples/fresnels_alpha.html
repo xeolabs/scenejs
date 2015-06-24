@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - Alpha Fresnel
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 10,
+                zoomSensitivity: 1.0,
+                spin: 0.2,
+
+                nodes: [
+
+                    // Cloudy sea skybox, implemented by plugin at http://scenejs.org/api/latest/plugins/node/skybox/cloudySea.js
+                    {
+                        type: "skybox/cloudySea",
+                        size: 5000 // Box half-size on each axis - default is 5000
+                    },
+
+                    {
+                        type: "flags",
+                        flags: {
+                            transparent: true,
+                            backfaces: false
+                        },
+
+                        nodes: [
+                            {
+                                type: "material",
+                                color: {r: 0.4, g: 0.4, b: 0.9},
+                                specularColor: {r: 0, g: 0, b: 0},
+                                alpha: 0.9,
+
+                                nodes: [
+
+                                    // Alpha fresnel
+                                    {
+                                        type: "fresnel",
+                                        applyTo: "alpha",
+                                        bias: 0.0,
+                                        power: 1.0,
+                                        topColor: {r: 1.0, g: 1.0, b: 1.0},
+                                        bottomColor: {r: 0.0, g: 0.0, b: 0.0},
+
+                                        nodes: [
+
+                                            // Teapot primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                            {
+                                                type: "geometry/teapot"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>

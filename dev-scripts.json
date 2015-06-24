@@ -60,6 +60,7 @@
         "src/core/scene/tag.js",
         "src/core/scene/_texture.js",
         "src/core/scene/texture.js",
+        "src/core/scene/fresnel.js",
         "src/core/scene/reflect.js",
         "src/core/scene/xform.js",
         "src/core/scene/matrix.js",
@@ -98,6 +99,7 @@
         "src/core/display/chunks/shaderParamsChunk.js",
         "src/core/display/chunks/styleChunk.js",
         "src/core/display/chunks/textureChunk.js",
+        "src/core/display/chunks/fresnelChunk.js",
         "src/core/display/chunks/cubemapChunk.js",
         "src/core/display/chunks/xformChunk.js"
     ],

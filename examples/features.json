@@ -68,6 +68,14 @@
             {
                 "nodes": [
                     {
+                        "title": "Fresnel",
+                        "page": "fresnel_alpha_reflect"
+                    }
+                ]
+            },
+            {
+                "nodes": [
+                    {
                         "title": "Custom fragment shaders",
                         "page": "shaders_custom_water"
                     }
@@ -98,6 +106,14 @@
                     {
                         "title": "Stereo",
                         "page": "effects_stereo_pickFlyOrbit"
+                    }
+                ]
+            },
+            {
+                "nodes": [
+                    {
+                        "title": "Cross-sections",
+                        "page": "effects_clipping"
                     }
                 ]
             }

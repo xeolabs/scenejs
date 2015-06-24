@@ -151,6 +151,12 @@ var SceneJS_Display = function (cfg) {
     this.texture = null;
 
     /**
+     * Node state core for the last {@link SceneJS.Fresnel} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.fresnel = null;
+
+    /**
      * Node state core for the last {@link SceneJS.Reflect} visited during scene graph compilation traversal
      * @type Object
      */
@@ -384,6 +390,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.clips.hash,
         this.morphGeometry.hash,
         this.texture.hash,
+        this.fresnel.hash,
         this.cubemap.hash,
         this.lights.hash,
         this.flags.hash
@@ -416,12 +423,13 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 12, "lights", this.lights);
     this._setChunk(object, 13, "material", this.material);
     this._setChunk(object, 14, "texture", this.texture);
-    this._setChunk(object, 15, "cubemap", this.cubemap);
-    this._setChunk(object, 16, "clips", this.clips);
-    this._setChunk(object, 17, "renderer", this.renderer);
-    this._setChunk(object, 18, "geometry", this.morphGeometry, this.geometry);
-    this._setChunk(object, 19, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 20, "draw", this.geometry); // Must be last
+    this._setChunk(object, 15, "fresnel", this.fresnel);
+    this._setChunk(object, 16, "cubemap", this.cubemap);
+    this._setChunk(object, 17, "clips", this.clips);
+    this._setChunk(object, 18, "renderer", this.renderer);
+    this._setChunk(object, 19, "geometry", this.morphGeometry, this.geometry);
+    this._setChunk(object, 20, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 21, "draw", this.geometry); // Must be last
 };
 
 SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, core2) {
@@ -618,7 +626,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 23; i++) {
+    for (var i = 0; i < 24; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }

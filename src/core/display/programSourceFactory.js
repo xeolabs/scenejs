@@ -506,6 +506,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var tangents = this._hasTangents(states);
         var clipping = states.clips.clips.length > 0;
 
+        var diffuseFresnel = states.fresnel.diffuse;
+        var specularFresnel = states.fresnel.specular;
+        var alphaFresnel = states.fresnel.alpha;
+        var reflectFresnel = states.fresnel.reflect;
+
         var floatPrecision = getFSFloatPrecision(states._canvas.gl);
 
         var src = ["\n"];
@@ -592,6 +597,34 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
 
+        if (diffuseFresnel) {
+            src.push("uniform float SCENEJS_uDiffuseFresnelBias;");
+            src.push("uniform float SCENEJS_uDiffuseFresnelPower;");
+            src.push("uniform vec3 SCENEJS_uDiffuseFresnelTopColor;");
+            src.push("uniform vec3 SCENEJS_uDiffuseFresnelBottomColor;");
+        }
+
+        if (specularFresnel) {
+            src.push("uniform float SCENEJS_uSpecularFresnelBias;");
+            src.push("uniform float SCENEJS_uSpecularFresnelPower;");
+            src.push("uniform vec3 SCENEJS_uSpecularFresnelTopColor;");
+            src.push("uniform vec3 SCENEJS_uSpecularFresnelBottomColor;");
+        }
+
+        if (alphaFresnel) {
+            src.push("uniform float SCENEJS_uAlphaFresnelBias;");
+            src.push("uniform float SCENEJS_uAlphaFresnelPower;");
+            src.push("uniform vec3 SCENEJS_uAlphaFresnelTopColor;");
+            src.push("uniform vec3 SCENEJS_uAlphaFresnelBottomColor;");
+        }
+
+        if (reflectFresnel) {
+            src.push("uniform float SCENEJS_uReflectFresnelBias;");
+            src.push("uniform float SCENEJS_uReflectFresnelPower;");
+            src.push("uniform vec3 SCENEJS_uReflectFresnelTopColor;");
+            src.push("uniform vec3 SCENEJS_uReflectFresnelBottomColor;");
+        }
+
         src.push("varying vec3 SCENEJS_vViewEyeVec;");                          // Direction of world-space vertex from eye
 
         if (normals) {
@@ -614,6 +647,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (customFragmentShader.code) {
             src.push("\n" + customFragmentShader.code + "\n");
+        }
+
+        if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel) {
+            src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float bias, float power) {");
+            src.push("  float fresnelTerm = pow(bias + abs(dot(viewDirection, worldNormal)), power);");
+            src.push("  return clamp(fresnelTerm, 0., 1.);");
+            src.push("}");
         }
 
         src.push("void main(void) {");
@@ -698,6 +738,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 // because if we linear interpolated two nonparallel normalized vectors, the resulting vector won’t be of length 1
                 src.push("  vec3    viewNormalVec = normalize(SCENEJS_vViewNormal);");
             }
+            src.push("vec3 viewEyeVec = normalize(SCENEJS_vViewEyeVec);");
         }
 
         var layer;
@@ -796,13 +837,20 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals && cubeMapping) {
+            src.push("float reflectFactor = 1.0;");
+
+            if (reflectFresnel) {
+                src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelBias, SCENEJS_uReflectFresnelPower);");
+                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelTopColor.b, SCENEJS_uReflectFresnelBottomColor.b, reflectFresnel);");
+            }
+            
             src.push("vec3 envLookup = reflect(SCENEJS_vViewEyeVec, viewNormalVec);");
             src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
                 layer = states.cubemap.layers[i];
                 src.push("envColor = textureCube(SCENEJS_uCubeMapSampler" + i + ", envLookup);");
-                src.push("color = mix(color, envColor.rgb, specular * SCENEJS_uCubeMapIntensity" + i + ");");
+                src.push("color = mix(color, envColor.rgb, reflectFactor * specular * SCENEJS_uCubeMapIntensity" + i + ");");
             }
         }
 
@@ -829,7 +877,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "point") {
 
-                    src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
+                    src.push("dotN = max(dot(viewNormalVec, normalize(viewLightVec)), 0.0);");
 
 
                     src.push("lightDist = SCENEJS_vViewLightVecAndDist" + i + ".w;");
@@ -851,7 +899,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (light.mode == "dir") {
 
-                    src.push("dotN = max(dot(normalize(viewNormalVec), normalize(viewLightVec)), 0.0);");
+                    src.push("dotN = max(dot(viewNormalVec, normalize(viewLightVec)), 0.0);");
 
                     if (light.diffuse) {
                         src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
@@ -861,6 +909,24 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         src.push("specularValue += specularColor * SCENEJS_uLightColor" + i +
                             " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine);");
                     }
+                }
+            }
+
+            if (diffuseFresnel || specularFresnel || alphaFresnel) {
+
+                if (diffuseFresnel) {
+                    src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelBias, SCENEJS_uDiffuseFresnelPower);");
+                    src.push("lightValue *= mix(SCENEJS_uDiffuseFresnelTopColor.rgb, SCENEJS_uDiffuseFresnelBottomColor.rgb, diffuseFresnel);");
+                }
+
+                if (specularFresnel) {
+                    src.push("float specFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uSpecularFresnelBias, SCENEJS_uSpecularFresnelPower);");
+                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelTopColor.rgb, SCENEJS_uSpecularFresnelBottomColor.rgb, specFresnel);");
+                }
+
+                if (alphaFresnel) {
+                    src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelBias, SCENEJS_uAlphaFresnelPower);");
+                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelTopColor.r, SCENEJS_uAlphaFresnelBottomColor.r, alphaFresnel);");
                 }
             }
 
@@ -935,4 +1001,5 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return "lowp";
     }
 
-})();
+})
+();
