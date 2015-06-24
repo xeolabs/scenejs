@@ -35,6 +35,13 @@ SceneJS_ChunkFactory.createChunkType({
             this._uReflectFresnelTopColor = draw.getUniform("SCENEJS_uReflectFresnelTopColor");
             this._uReflectFresnelBottomColor = draw.getUniform("SCENEJS_uReflectFresnelBottomColor");
         }
+
+        if (core.emit) {
+            this._uEmitFresnelBias = draw.getUniform("SCENEJS_uEmitFresnelBias");
+            this._uEmitFresnelPower = draw.getUniform("SCENEJS_uEmitFresnelPower");
+            this._uEmitFresnelTopColor = draw.getUniform("SCENEJS_uEmitFresnelTopColor");
+            this._uEmitFresnelBottomColor = draw.getUniform("SCENEJS_uEmitFresnelBottomColor");
+        }
     },
 
     draw: function () {
@@ -116,6 +123,25 @@ SceneJS_ChunkFactory.createChunkType({
 
             if (this._uReflectFresnelBottomColor) {
                 this._uReflectFresnelBottomColor.setValue(core.reflect.bottomColor);
+            }
+        }
+
+        if (core.emit) {
+
+            if (this._uEmitFresnelBias) {
+                this._uEmitFresnelBias.setValue(core.emit.bias);
+            }
+
+            if (this._uEmitFresnelPower) {
+                this._uEmitFresnelPower.setValue(core.emit.power);
+            }
+
+            if (this._uEmitFresnelTopColor) {
+                this._uEmitFresnelTopColor.setValue(core.emit.topColor);
+            }
+
+            if (this._uEmitFresnelBottomColor) {
+                this._uEmitFresnelBottomColor.setValue(core.emit.bottomColor);
             }
         }
     }

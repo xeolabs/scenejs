@@ -510,6 +510,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var specularFresnel = states.fresnel.specular;
         var alphaFresnel = states.fresnel.alpha;
         var reflectFresnel = states.fresnel.reflect;
+        var emitFresnel = states.fresnel.emit;
 
         var floatPrecision = getFSFloatPrecision(states._canvas.gl);
 
@@ -625,6 +626,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("uniform vec3 SCENEJS_uReflectFresnelBottomColor;");
         }
 
+        if (emitFresnel) {
+            src.push("uniform float SCENEJS_uEmitFresnelBias;");
+            src.push("uniform float SCENEJS_uEmitFresnelPower;");
+            src.push("uniform vec3 SCENEJS_uEmitFresnelTopColor;");
+            src.push("uniform vec3 SCENEJS_uEmitFresnelBottomColor;");
+        }
+
         src.push("varying vec3 SCENEJS_vViewEyeVec;");                          // Direction of world-space vertex from eye
 
         if (normals) {
@@ -649,7 +657,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("\n" + customFragmentShader.code + "\n");
         }
 
-        if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel) {
+        if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel) {
             src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float bias, float power) {");
             src.push("  float fresnelTerm = pow(bias + abs(dot(viewDirection, worldNormal)), power);");
             src.push("  return clamp(fresnelTerm, 0., 1.);");
@@ -912,7 +920,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
             }
 
-            if (diffuseFresnel || specularFresnel || alphaFresnel) {
+            if (diffuseFresnel || specularFresnel || alphaFresnel || emitFresnel) {
 
                 if (diffuseFresnel) {
                     src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelBias, SCENEJS_uDiffuseFresnelPower);");
@@ -927,6 +935,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 if (alphaFresnel) {
                     src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelBias, SCENEJS_uAlphaFresnelPower);");
                     src.push("alpha *= mix(SCENEJS_uAlphaFresnelTopColor.r, SCENEJS_uAlphaFresnelBottomColor.r, alphaFresnel);");
+                }
+
+                if (emitFresnel) {
+                    src.push("float emitFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uEmitFresnelBias, SCENEJS_uEmitFresnelPower);");
+                    src.push("emit *= mix(SCENEJS_uEmitFresnelTopColor.r, SCENEJS_uEmitFresnelBottomColor.r, emitFresnel);");
                 }
             }
 

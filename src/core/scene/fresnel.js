@@ -40,11 +40,12 @@ new (function () {
                 if (params.applyTo != "color" &&
                     params.applyTo != "specular" &&
                     params.applyTo != "alpha" &&
-                    params.applyTo != "reflect") {
+                    params.applyTo != "reflect" &&
+                    params.applyTo != "emit") {
 
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "fresnel applyTo value is unsupported - should be either 'color', 'specular', 'alpha' or 'reflect'");
+                        "fresnel applyTo value is unsupported - should be either 'color', 'specular', 'alpha', 'reflect' or 'emit'");
                 }
             }
 
@@ -130,6 +131,7 @@ new (function () {
             this.__core.specular = this._core.applyTo == "specular" ? this._core : parentCore.specular;
             this.__core.alpha = this._core.applyTo == "alpha" ? this._core : parentCore.alpha;
             this.__core.reflect = this._core.applyTo == "reflect" ? this._core : parentCore.reflect;
+            this.__core.emit = this._core.applyTo == "emit" ? this._core : parentCore.emit;
         }
 
         this._makeHash(this.__core);
@@ -154,6 +156,9 @@ new (function () {
         }
         if (core.reflect) {
             hash.push("r;")
+        }
+        if (core.emit) {
+            hash.push("e;")
         }
         hash = hash.join("");
         if (core.hash != hash) {
