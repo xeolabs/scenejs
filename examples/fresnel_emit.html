@@ -47,10 +47,7 @@
 
                 nodes: [
 
-                    // Override default lights with a single positional light source in View-space.
-                    // Since our light is in View-space, it will remain locked in alignment with
-                    // the view frustum and will therefore not change position relative to our
-                    // changing viewpoint. It will behave as if it were head-mounted.
+                    // Remove the default lights
 
                     {
                         type: "lights",
@@ -68,7 +65,7 @@
 
                                 nodes: [
 
-                                    // Specular fresnel
+                                    // Emissive fresnel
                                     {
                                         type: "fresnel",
                                         applyTo: "emit",
