@@ -39,7 +39,7 @@
                 yaw: 30,
                 pitch: -30,
                 zoom: 5,
-                zoomSensitivity: 1.0,
+                zoomSensitivity: 0.5,
 
                 nodes: [
 
@@ -74,7 +74,9 @@
                                             {
                                                 type: "material",
                                                 color: { r: 1.0, g: 0.3, b: 0.3 },
+                                                emitColor: { r: 1, g: 0, b: 1 }, // Default is white
                                                 emit: 1.0,
+
                                                 nodes: [
                                                     {
                                                         type: "texture",

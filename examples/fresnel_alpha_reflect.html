@@ -20,12 +20,27 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - Alpha and Reflection Fresnels
+    <a href="http://scenejs.org">SceneJS</a> - Alpha Fresnel
 </div>
 
 <script>
 
-    // Demonstrates how to use Fresnel nodes
+    // Demonstrates how to use layer nodes to control the order in which geometry is rendered
+    //
+    // Layer nodes effectively put their sub-geometries into a proritized render bin, ordered
+    // with respect to other layers. The layer with the lowest priority value is rendered first.
+    // Geometry not defined within a layer is binned within an implicit layer of priority 0.
+    //
+    // Layer nodes are normally used to control the rendering order of transparent geometries,
+    // rendering them back-to-front to ensure that each object's pixels are not rejected by
+    // previous pixels in the Z-buffer and thus blend with the pixels of all other transparent
+    // objects.
+    //
+    // More info on transparency sorting here: http://www.opengl.org/wiki/Transparency_Sorting
+    //
+    // In the example below, we render three nested spherees, the innermost of which is opaque,
+    // with the outer two spherees transparent. We render the inner sphere first, then with
+    // transparency enabled, render the next two spherees, rendering the outermost sphere last.
     //
 
     // Point SceneJS to the bundled plugins
