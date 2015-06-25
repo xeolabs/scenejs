@@ -10233,6 +10233,7 @@ new (function () {
         stateId:SceneJS._baseStateId++,
         baseColor:[ 1.0, 1.0, 1.0 ],
         specularColor:[ 1.0, 1.0, 1.0 ],
+        emitColor:[ 1.0, 1.0, 1.0 ],
         specular:1.0,
         shine:70.0,
         alpha:1.0,
@@ -10259,6 +10260,7 @@ new (function () {
         if (this._core.useCount == 1) {
             this.setBaseColor(params.color || params.baseColor);
             this.setSpecularColor(params.specularColor);
+            this.setEmitColor(params.emitColor);
             this.setSpecular(params.specular);
             this.setShine(params.shine);
             this.setEmit(params.emit);
@@ -10314,6 +10316,25 @@ new (function () {
             r:this._core.specularColor[0],
             g:this._core.specularColor[1],
             b:this._core.specularColor[2]
+        };
+    };
+
+    SceneJS.Material.prototype.setEmitColor = function (color) {
+        var defaultEmitColor = defaultCore.emitColor;
+        this._core.emitColor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultEmitColor[0],
+            color.g != undefined && color.g != null ? color.g : defaultEmitColor[1],
+            color.b != undefined && color.b != null ? color.b : defaultEmitColor[2]
+        ] : defaultCore.emitColor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.Material.prototype.getEmitColor = function () {
+        return {
+            r:this._core.emitColor[0],
+            g:this._core.emitColor[1],
+            b:this._core.emitColor[2]
         };
     };
 
@@ -16548,11 +16569,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform vec3  SCENEJS_uAmbientColor;");                         // Scene ambient colour - taken from clear colour
 
         src.push("uniform vec3  SCENEJS_uMaterialColor;");
-        src.push("uniform float SCENEJS_uMaterialAlpha;");
-        src.push("uniform float SCENEJS_uMaterialEmit;");
         src.push("uniform vec3  SCENEJS_uMaterialSpecularColor;");
+        src.push("uniform vec3  SCENEJS_uMaterialEmitColor;");
+
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
+        src.push("uniform float SCENEJS_uMaterialAlpha;");
+        src.push("uniform float SCENEJS_uMaterialEmit;");
 
         if (diffuseFresnel) {
             src.push("uniform float SCENEJS_uDiffuseFresnelBias;");
@@ -16671,6 +16694,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("  float emit          = SCENEJS_uMaterialEmit;");
         src.push("  float specular      = SCENEJS_uMaterialSpecular;");
         src.push("  vec3  specularColor = SCENEJS_uMaterialSpecularColor;");
+        src.push("  vec3  emitColor     = SCENEJS_uMaterialEmitColor;");
         src.push("  float shine         = SCENEJS_uMaterialShine;");
 
         if (fragmentHooks.materialBaseColor) {
@@ -16899,7 +16923,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
             }
 
-            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * color.rgb), alpha);");
+            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * emitColor.rgb), alpha);");
 
         } else { // No normals
             src.push("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
@@ -18217,9 +18241,12 @@ SceneJS_ChunkFactory.createChunkType({
 
         this._uMaterialBaseColor = draw.getUniform("SCENEJS_uMaterialColor");
         this._uMaterialSpecularColor = draw.getUniform("SCENEJS_uMaterialSpecularColor");
+        this._uMaterialEmitColor = draw.getUniform("SCENEJS_uMaterialEmitColor");
+
         this._uMaterialSpecular = draw.getUniform("SCENEJS_uMaterialSpecular");
         this._uMaterialShine = draw.getUniform("SCENEJS_uMaterialShine");
         this._uMaterialEmit = draw.getUniform("SCENEJS_uMaterialEmit");
+
         this._uMaterialAlpha = draw.getUniform("SCENEJS_uMaterialAlpha");
     },
 
@@ -18233,6 +18260,10 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this._uMaterialSpecularColor) {
             this._uMaterialSpecularColor.setValue(this.core.specularColor);
+        }
+
+        if (this._uMaterialEmitColor) {
+            this._uMaterialEmitColor.setValue(this.core.emitColor);
         }
 
         if (this._uMaterialSpecular) {
