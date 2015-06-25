@@ -22,6 +22,7 @@ new (function () {
         stateId:SceneJS._baseStateId++,
         baseColor:[ 1.0, 1.0, 1.0 ],
         specularColor:[ 1.0, 1.0, 1.0 ],
+        emitColor:[ 1.0, 1.0, 1.0 ],
         specular:1.0,
         shine:70.0,
         alpha:1.0,
@@ -48,6 +49,7 @@ new (function () {
         if (this._core.useCount == 1) {
             this.setBaseColor(params.color || params.baseColor);
             this.setSpecularColor(params.specularColor);
+            this.setEmitColor(params.emitColor);
             this.setSpecular(params.specular);
             this.setShine(params.shine);
             this.setEmit(params.emit);
@@ -103,6 +105,25 @@ new (function () {
             r:this._core.specularColor[0],
             g:this._core.specularColor[1],
             b:this._core.specularColor[2]
+        };
+    };
+
+    SceneJS.Material.prototype.setEmitColor = function (color) {
+        var defaultEmitColor = defaultCore.emitColor;
+        this._core.emitColor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultEmitColor[0],
+            color.g != undefined && color.g != null ? color.g : defaultEmitColor[1],
+            color.b != undefined && color.b != null ? color.b : defaultEmitColor[2]
+        ] : defaultCore.emitColor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.Material.prototype.getEmitColor = function () {
+        return {
+            r:this._core.emitColor[0],
+            g:this._core.emitColor[1],
+            b:this._core.emitColor[2]
         };
     };
 

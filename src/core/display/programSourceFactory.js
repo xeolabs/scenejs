@@ -592,11 +592,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform vec3  SCENEJS_uAmbientColor;");                         // Scene ambient colour - taken from clear colour
 
         src.push("uniform vec3  SCENEJS_uMaterialColor;");
-        src.push("uniform float SCENEJS_uMaterialAlpha;");
-        src.push("uniform float SCENEJS_uMaterialEmit;");
         src.push("uniform vec3  SCENEJS_uMaterialSpecularColor;");
+        src.push("uniform vec3  SCENEJS_uMaterialEmitColor;");
+
         src.push("uniform float SCENEJS_uMaterialSpecular;");
         src.push("uniform float SCENEJS_uMaterialShine;");
+        src.push("uniform float SCENEJS_uMaterialAlpha;");
+        src.push("uniform float SCENEJS_uMaterialEmit;");
 
         if (diffuseFresnel) {
             src.push("uniform float SCENEJS_uDiffuseFresnelBias;");
@@ -715,6 +717,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("  float emit          = SCENEJS_uMaterialEmit;");
         src.push("  float specular      = SCENEJS_uMaterialSpecular;");
         src.push("  vec3  specularColor = SCENEJS_uMaterialSpecularColor;");
+        src.push("  vec3  emitColor     = SCENEJS_uMaterialEmitColor;");
         src.push("  float shine         = SCENEJS_uMaterialShine;");
 
         if (fragmentHooks.materialBaseColor) {
@@ -943,7 +946,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
             }
 
-            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * color.rgb), alpha);");
+            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * emitColor.rgb), alpha);");
 
         } else { // No normals
             src.push("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");

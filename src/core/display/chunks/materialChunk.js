@@ -8,9 +8,12 @@ SceneJS_ChunkFactory.createChunkType({
 
         this._uMaterialBaseColor = draw.getUniform("SCENEJS_uMaterialColor");
         this._uMaterialSpecularColor = draw.getUniform("SCENEJS_uMaterialSpecularColor");
+        this._uMaterialEmitColor = draw.getUniform("SCENEJS_uMaterialEmitColor");
+
         this._uMaterialSpecular = draw.getUniform("SCENEJS_uMaterialSpecular");
         this._uMaterialShine = draw.getUniform("SCENEJS_uMaterialShine");
         this._uMaterialEmit = draw.getUniform("SCENEJS_uMaterialEmit");
+
         this._uMaterialAlpha = draw.getUniform("SCENEJS_uMaterialAlpha");
     },
 
@@ -24,6 +27,10 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this._uMaterialSpecularColor) {
             this._uMaterialSpecularColor.setValue(this.core.specularColor);
+        }
+
+        if (this._uMaterialEmitColor) {
+            this._uMaterialEmitColor.setValue(this.core.emitColor);
         }
 
         if (this._uMaterialSpecular) {
