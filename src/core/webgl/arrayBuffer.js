@@ -17,12 +17,17 @@ SceneJS._webgl.ArrayBuffer = function (gl, type, values, numItems, itemSize, usa
      */
     this.allocated = false;
 
+    var itemType = values.constructor == Uint8Array   ? gl.UNSIGNED_BYTE :
+                   values.constructor == Uint16Array  ? gl.UNSIGNED_SHORT :
+                   values.constructor == Uint32Array  ? gl.UNSIGNED_INT :
+                                                        gl.FLOAT;
+
     this.gl = gl;
     this.type = type;
+    this.itemType = itemType;
     this.numItems = numItems;
     this.itemSize = itemSize;
     this.usage = usage;
-
     this._allocate(values, numItems);
 };
 

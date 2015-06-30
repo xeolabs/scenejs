@@ -34,12 +34,6 @@ var SceneJS_Program = function(id, hash, source, gl) {
     this.gl = gl;
 
     /**
-     * Whether or not we can use UINT indices
-     * @type boolean
-     */
-    this.UINT_INDEX_ENABLED = !!gl.getExtension("OES_element_index_uint");
-
-    /**
      * The drawing program
      * @type SceneJS._webgl.Program
      */
