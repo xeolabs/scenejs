@@ -67,24 +67,59 @@ new (function () {
         }
 
         // Create typed arrays, apply any baked transforms
-        core.arrays = {
-            positions: data.positions
-                ? new Float32Array((options.scale || options.origin)
-                ? this._applyOptions(data.positions, options)
-                : data.positions) : undefined,
-            normals: data.normals ? new Float32Array(data.normals) : undefined,
-            uv: data.uv ? new Float32Array(data.uv) : undefined,
-            uv2: data.uv2 ? new Float32Array(data.uv2) : undefined,
-            colors: data.colors ? new Float32Array(data.colors) : undefined,
-            indices: data.indices ? new IndexArrayType(data.indices) : undefined
-        };
+        core.arrays = {};
 
-        delete data.positions;
-        delete data.normals;
-        delete data.uv;
-        delete data.uv2;
-        delete data.indices;
-        delete data.colors;
+        if (data.positions) {
+          if (data.positions.constructor != Float32Array) {
+            data.positions = new Float32Array(data.positions);
+          }
+
+          if (options.scale || options.origin) {
+            this._applyOptions(data.positions, options)
+          }
+
+          core.arrays.positions = data.positions;
+        }
+
+        if (data.normals) {
+          if (data.normals.constructor != Float32Array) {
+            data.normals = new Float32Array(data.normals);
+          }
+
+          core.arrays.normals = data.normals;
+        }
+
+        if (data.uv) {
+          if (data.uv.constructor != Float32Array) {
+            data.uv = new Float32Array(data.uv);
+          }
+
+          core.arrays.uv = data.uv;
+        }
+
+        if (data.uv2) {
+          if (data.uv2.constructor != Float32Array) {
+            data.uv2 = new Float32Array(data.uv2);
+          }
+
+          core.arrays.uv2 = data.uv2;
+        }
+
+        if (data.colors) {
+          if (data.colors.constructor != Float32Array) {
+            data.colors = new Float32Array(data.colors);
+          }
+
+          core.arrays.colors = data.colors;
+        }
+
+        if (data.indices) {
+          if (data.indices.constructor != Uint16Array && data.indices.constructor != Uint32Array) {
+            data.indices = new IndexArrayType(data.indices);
+          }
+
+          core.arrays.indices = data.indices;
+        }
 
         // Lazy-build tangents, only when needed as rendering
         core.getTangentBuf = function () {
@@ -147,35 +182,33 @@ new (function () {
      */
     SceneJS.Geometry.prototype._applyOptions = function (positions, options) {
 
-        var positions2 = positions.slice ? positions.slice(0) : new Float32Array(positions);  // HACK
+      if (options.scale) {
 
-        if (options.scale) {
+        var scaleX = options.scale.x != undefined ? options.scale.x : 1.0;
+        var scaleY = options.scale.y != undefined ? options.scale.y : 1.0;
+        var scaleZ = options.scale.z != undefined ? options.scale.z : 1.0;
 
-            var scaleX = options.scale.x != undefined ? options.scale.x : 1.0;
-            var scaleY = options.scale.y != undefined ? options.scale.y : 1.0;
-            var scaleZ = options.scale.z != undefined ? options.scale.z : 1.0;
-
-            for (var i = 0, len = positions2.length; i < len; i += 3) {
-                positions2[i    ] *= scaleX;
-                positions2[i + 1] *= scaleY;
-                positions2[i + 2] *= scaleZ;
-            }
+        for (var i = 0, len = positions.length; i < len; i += 3) {
+          positions[i    ] *= scaleX;
+          positions[i + 1] *= scaleY;
+          positions[i + 2] *= scaleZ;
         }
+      }
 
-        if (options.origin) {
+      if (options.origin) {
 
-            var originX = options.origin.x != undefined ? options.origin.x : 0.0;
-            var originY = options.origin.y != undefined ? options.origin.y : 0.0;
-            var originZ = options.origin.z != undefined ? options.origin.z : 0.0;
+        var originX = options.origin.x != undefined ? options.origin.x : 0.0;
+        var originY = options.origin.y != undefined ? options.origin.y : 0.0;
+        var originZ = options.origin.z != undefined ? options.origin.z : 0.0;
 
-            for (var i = 0, len = positions2.length; i < len; i += 3) {
-                positions2[i    ] -= originX;
-                positions2[i + 1] -= originY;
-                positions2[i + 2] -= originZ;
-            }
+        for (var i = 0, len = positions.length; i < len; i += 3) {
+          positions[i    ] -= originX;
+          positions[i + 1] -= originY;
+          positions[i + 2] -= originZ;
         }
+      }
 
-        return positions2;
+      return positions;
     };
 
     /**
@@ -374,7 +407,7 @@ new (function () {
             nvecs[j2].push(n);
         }
 
-        var normals = new Array(positions.length);
+        var normals = new Float32Array(positions.length);
 
         // now go through and average out everything
         for (var i = 0, len = nvecs.length; i < len; i++) {

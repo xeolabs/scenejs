@@ -216,30 +216,30 @@ new (function () {
 
                 arry = targetData.positions || positions;
                 if (arry) {
-                    target.positions = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
-                    target.vertexBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.positions, arry.length, 3, usage);
-                    positions = arry;
+                  target.positions = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                  target.vertexBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.positions, arry.length, 3, usage);
+                  positions = arry;
                 }
 
                 arry = targetData.normals || normals;
                 if (arry) {
-                    target.normals = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
-                    target.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.normals, arry.length, 3, usage);
-                    normals = arry;
+                  target.normals = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                  target.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.normals, arry.length, 3, usage);
+                  normals = arry;
                 }
 
                 arry = targetData.uv || uv;
                 if (arry) {
-                    target.uv = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
-                    target.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv, arry.length, 2, usage);
-                    uv = arry;
+                  target.uv = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                  target.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv, arry.length, 2, usage);
+                  uv = arry;
                 }
 
                 arry = targetData.uv2 || uv2;
                 if (arry) {
-                    target.uv2 = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
-                    target.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv2, arry.length, 2, usage);
-                    uv2 = arry;
+                  target.uv2 = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                  target.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv2, arry.length, 2, usage);
+                  uv2 = arry;
                 }
 
                 core.targets.push(target);  // We'll iterate this to destroy targets when we recover from error

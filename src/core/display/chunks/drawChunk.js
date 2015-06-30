@@ -23,8 +23,6 @@ SceneJS_ChunkFactory.createChunkType({
 
         var gl = this.program.gl;
 
-        var indexType = this.program.UINT_INDEX_ENABLED ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
-
         if (frameCtx.pick) {
             if (this._depthModePick) {
                 this._depthModePick.setValue(frameCtx.depthMode);
@@ -35,7 +33,7 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
 
-        gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, indexType, 0);
+        gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, this.core.indexBuf.itemType, 0);
 
         //frameCtx.textureUnit = 0;
     }
