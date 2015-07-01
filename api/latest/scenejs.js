@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-06-25
+ * Built on 2015-07-01
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -2176,7 +2176,8 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
             // Clear buffers only on first frame
             this.display.render({
                 clear: i == 0,
-                force: force
+                force: force,
+                opaqueOnly: params && params.opaqueOnly
             });
 
             // Notify that render completed
@@ -2362,14 +2363,14 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
 /**
  * Reads colors of pixels from the last rendered frame.
  */
-SceneJS_Engine.prototype.readPixels = function (entries, size) {
+SceneJS_Engine.prototype.readPixels = function (entries, size, opaqueOnly) {
 
     // Do any pending scene compilations
     if (this._needCompile()) {
         this._doCompile();
     }
 
-    return this.display.readPixels(entries, size);
+    return this.display.readPixels(entries, size, opaqueOnly);
 };
 
 /**
@@ -5095,12 +5096,17 @@ SceneJS._webgl.ArrayBuffer = function (gl, type, values, numItems, itemSize, usa
      */
     this.allocated = false;
 
+    var itemType = values.constructor == Uint8Array   ? gl.UNSIGNED_BYTE :
+                   values.constructor == Uint16Array  ? gl.UNSIGNED_SHORT :
+                   values.constructor == Uint32Array  ? gl.UNSIGNED_INT :
+                                                        gl.FLOAT;
+
     this.gl = gl;
     this.type = type;
+    this.itemType = itemType;
     this.numItems = numItems;
     this.itemSize = itemSize;
     this.usage = usage;
-
     this._allocate(values, numItems);
 };
 
@@ -8681,24 +8687,59 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         }
 
         // Create typed arrays, apply any baked transforms
-        core.arrays = {
-            positions: data.positions
-                ? new Float32Array((options.scale || options.origin)
-                ? this._applyOptions(data.positions, options)
-                : data.positions) : undefined,
-            normals: data.normals ? new Float32Array(data.normals) : undefined,
-            uv: data.uv ? new Float32Array(data.uv) : undefined,
-            uv2: data.uv2 ? new Float32Array(data.uv2) : undefined,
-            colors: data.colors ? new Float32Array(data.colors) : undefined,
-            indices: data.indices ? new IndexArrayType(data.indices) : undefined
-        };
+        core.arrays = {};
 
-        delete data.positions;
-        delete data.normals;
-        delete data.uv;
-        delete data.uv2;
-        delete data.indices;
-        delete data.colors;
+        if (data.positions) {
+          if (data.positions.constructor != Float32Array) {
+            data.positions = new Float32Array(data.positions);
+          }
+
+          if (options.scale || options.origin) {
+            this._applyOptions(data.positions, options)
+          }
+
+          core.arrays.positions = data.positions;
+        }
+
+        if (data.normals) {
+          if (data.normals.constructor != Float32Array) {
+            data.normals = new Float32Array(data.normals);
+          }
+
+          core.arrays.normals = data.normals;
+        }
+
+        if (data.uv) {
+          if (data.uv.constructor != Float32Array) {
+            data.uv = new Float32Array(data.uv);
+          }
+
+          core.arrays.uv = data.uv;
+        }
+
+        if (data.uv2) {
+          if (data.uv2.constructor != Float32Array) {
+            data.uv2 = new Float32Array(data.uv2);
+          }
+
+          core.arrays.uv2 = data.uv2;
+        }
+
+        if (data.colors) {
+          if (data.colors.constructor != Float32Array) {
+            data.colors = new Float32Array(data.colors);
+          }
+
+          core.arrays.colors = data.colors;
+        }
+
+        if (data.indices) {
+          if (data.indices.constructor != Uint16Array && data.indices.constructor != Uint32Array) {
+            data.indices = new IndexArrayType(data.indices);
+          }
+
+          core.arrays.indices = data.indices;
+        }
 
         // Lazy-build tangents, only when needed as rendering
         core.getTangentBuf = function () {
@@ -8761,35 +8802,33 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
      */
     SceneJS.Geometry.prototype._applyOptions = function (positions, options) {
 
-        var positions2 = positions.slice ? positions.slice(0) : new Float32Array(positions);  // HACK
+      if (options.scale) {
 
-        if (options.scale) {
+        var scaleX = options.scale.x != undefined ? options.scale.x : 1.0;
+        var scaleY = options.scale.y != undefined ? options.scale.y : 1.0;
+        var scaleZ = options.scale.z != undefined ? options.scale.z : 1.0;
 
-            var scaleX = options.scale.x != undefined ? options.scale.x : 1.0;
-            var scaleY = options.scale.y != undefined ? options.scale.y : 1.0;
-            var scaleZ = options.scale.z != undefined ? options.scale.z : 1.0;
-
-            for (var i = 0, len = positions2.length; i < len; i += 3) {
-                positions2[i    ] *= scaleX;
-                positions2[i + 1] *= scaleY;
-                positions2[i + 2] *= scaleZ;
-            }
+        for (var i = 0, len = positions.length; i < len; i += 3) {
+          positions[i    ] *= scaleX;
+          positions[i + 1] *= scaleY;
+          positions[i + 2] *= scaleZ;
         }
+      }
 
-        if (options.origin) {
+      if (options.origin) {
 
-            var originX = options.origin.x != undefined ? options.origin.x : 0.0;
-            var originY = options.origin.y != undefined ? options.origin.y : 0.0;
-            var originZ = options.origin.z != undefined ? options.origin.z : 0.0;
+        var originX = options.origin.x != undefined ? options.origin.x : 0.0;
+        var originY = options.origin.y != undefined ? options.origin.y : 0.0;
+        var originZ = options.origin.z != undefined ? options.origin.z : 0.0;
 
-            for (var i = 0, len = positions2.length; i < len; i += 3) {
-                positions2[i    ] -= originX;
-                positions2[i + 1] -= originY;
-                positions2[i + 2] -= originZ;
-            }
+        for (var i = 0, len = positions.length; i < len; i += 3) {
+          positions[i    ] -= originX;
+          positions[i + 1] -= originY;
+          positions[i + 2] -= originZ;
         }
+      }
 
-        return positions2;
+      return positions;
     };
 
     /**
@@ -8988,7 +9027,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             nvecs[j2].push(n);
         }
 
-        var normals = new Array(positions.length);
+        var normals = new Float32Array(positions.length);
 
         // now go through and average out everything
         for (var i = 0, len = nvecs.length; i < len; i++) {
@@ -10602,30 +10641,30 @@ new (function () {
 
                 arry = targetData.positions || positions;
                 if (arry) {
-                    target.positions = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
-                    target.vertexBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.positions, arry.length, 3, usage);
-                    positions = arry;
+                  target.positions = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                  target.vertexBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.positions, arry.length, 3, usage);
+                  positions = arry;
                 }
 
                 arry = targetData.normals || normals;
                 if (arry) {
-                    target.normals = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
-                    target.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.normals, arry.length, 3, usage);
-                    normals = arry;
+                  target.normals = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                  target.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.normals, arry.length, 3, usage);
+                  normals = arry;
                 }
 
                 arry = targetData.uv || uv;
                 if (arry) {
-                    target.uv = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
-                    target.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv, arry.length, 2, usage);
-                    uv = arry;
+                  target.uv = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                  target.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv, arry.length, 2, usage);
+                  uv = arry;
                 }
 
                 arry = targetData.uv2 || uv2;
                 if (arry) {
-                    target.uv2 = (typeof arry == "Float32Array") ? arry : new Float32Array(arry);
-                    target.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv2, arry.length, 2, usage);
-                    uv2 = arry;
+                  target.uv2 = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                  target.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv2, arry.length, 2, usage);
+                  uv2 = arry;
                 }
 
                 core.targets.push(target);  // We'll iterate this to destroy targets when we recover from error
@@ -12147,17 +12186,21 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
  * <p>Call this method like this:</p>
  *
  * <pre>
+ *
+ * // Ignore transparent pixels (default is false)
+ * var opaqueOnly = true;
+ *
  * #readPixels([
  *      { x: 100, y: 22,  r: 0, g: 0, b: 0 },
  *      { x: 120, y: 82,  r: 0, g: 0, b: 0 },
  *      { x: 12,  y: 345, r: 0, g: 0, b: 0 }
- * ], 3);
+ * ], 3, opaqueonly);
  * </pre>
  *
  * Then the r,g,b components of the entries will be set to the colors at those pixels.
  */
-SceneJS.Scene.prototype.readPixels = function (entries, size) {
-    return this._engine.readPixels(entries, size);
+SceneJS.Scene.prototype.readPixels = function (entries, size, opaqueOnly) {
+    return this._engine.readPixels(entries, size, opaqueOnly);
 };
 
 /**
@@ -13337,11 +13380,11 @@ new (function () {
             this._core.webglRestored = function () {
                 
                 if (self._core.image) {
-                    var texture = this._initTexture(params.preloadColor);
+                    var texture = self._initTexture(params.preloadColor);
                     self._setTextureImage(texture, self._core.image);
 
                 } else if (self._core.src) {
-                    var texture = this._initTexture(params.preloadColor);
+                    var texture = self._initTexture(params.preloadColor);
                     self._loadTexture(texture, self._core.src);
 
                 } else if (self._core.target) {
@@ -13695,11 +13738,12 @@ new (function () {
                     params.applyTo != "specular" &&
                     params.applyTo != "alpha" &&
                     params.applyTo != "reflect" &&
-                    params.applyTo != "emit") {
+                    params.applyTo != "emit" &&
+                    params.applyTo != "fragment") {
 
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "fresnel applyTo value is unsupported - should be either 'color', 'specular', 'alpha', 'reflect' or 'emit'");
+                        "fresnel applyTo value is unsupported - should be either 'color', 'specular', 'alpha', 'reflect', 'emit' or 'fragment'");
                 }
             }
 
@@ -13786,6 +13830,7 @@ new (function () {
             this.__core.alpha = this._core.applyTo == "alpha" ? this._core : parentCore.alpha;
             this.__core.reflect = this._core.applyTo == "reflect" ? this._core : parentCore.reflect;
             this.__core.emit = this._core.applyTo == "emit" ? this._core : parentCore.emit;
+            this.__core.fragment = this._core.applyTo == "fragment" ? this._core : parentCore.fragment;
         }
 
         this._makeHash(this.__core);
@@ -13813,6 +13858,9 @@ new (function () {
         }
         if (core.emit) {
             hash.push("e;")
+        }
+        if (core.fragment) {
+            hash.push("f;")
         }
         hash = hash.join("");
         if (core.hash != hash) {
@@ -15152,6 +15200,11 @@ var SceneJS_Display = function (cfg) {
     this._targetList = [];
     this._targetListLen = 0;
 
+    // Tracks the index of the first chunk in the transparency pass. The first run of chunks
+    // in the list are for opaque objects, while the remainder are for transparent objects.
+    // This supports a mode in which we only render the opaque chunks.
+    this._drawListTransparentIndex = -1;
+
     /* The frame context holds state shared across a single render of the draw list, along with any results of
      * the render, such as pick hits
      */
@@ -15443,7 +15496,8 @@ SceneJS_Display.prototype.render = function (params) {
 
     if (this.imageDirty || params.force) {
         this._doDrawList({ // Render, no pick
-            clear: (params.clear !== false) // Clear buffers by default
+            clear: (params.clear !== false), // Clear buffers by default
+            opaqueOnly: params.opaqueOnly
         });
         this.imageDirty = false;
         this.pickBufDirty = true;       // Pick buff will now need rendering on next pick
@@ -15511,6 +15565,8 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
     this._drawListLen = 0;
     this._pickDrawListLen = 0;
+
+    this._drawListTransparentIndex = -1;
 
     // For each render target, a list of objects to render to that target
     var targetObjectLists = {};
@@ -15658,8 +15714,17 @@ SceneJS_Display.prototype._appendObjectToDrawLists = function (object, pickable)
 
             if (chunk.draw) {
                 if (chunk.unique || this._lastStateId[i] != chunk.id) { // Don't reapply repeated states
-                    this._drawList[this._drawListLen++] = chunk;
+                    this._drawList[this._drawListLen] = chunk;
                     this._lastStateId[i] = chunk.id;
+
+                    // Get index of first chunk in transparency pass
+
+                    if (chunk.core && chunk.core && chunk.core.transparent) {
+                        if (this._drawListTransparentIndex < 0) {
+                            this._drawListTransparentIndex = this._drawListLen;
+                        }
+                    }
+                    this._drawListLen++;
                 }
             }
 
@@ -15884,6 +15949,7 @@ SceneJS_Display.prototype._unpackDepth = function (depthZ) {
  * @param {Boolean} params.clear Set true to clear the color, depth and stencil buffers first
  * @param {Boolean} params.pick Set true to render for picking
  * @param {Boolean} params.rayPick Set true to render for ray-picking
+ * @param {Boolean} params.transparent Set false to only render opaque objects
  * @private
  */
 SceneJS_Display.prototype._doDrawList = function (params) {
@@ -15945,8 +16011,12 @@ SceneJS_Display.prototype._doDrawList = function (params) {
             this._pickDrawList[i].pick(frameCtx);
         }
     } else {
+
+        // Option to only render opaque objects
+        var len =  (params.opaqueOnly ? this._drawListTransparentIndex: this._drawListLen);
+
         // Render for draw
-        for (var i = 0, len = this._drawListLen; i < len; i++) {      // Push opaque rendering chunks
+        for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
             this._drawList[i].draw(frameCtx);
         }
     }
@@ -16488,6 +16558,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var alphaFresnel = states.fresnel.alpha;
         var reflectFresnel = states.fresnel.reflect;
         var emitFresnel = states.fresnel.emit;
+        var fragmentFresnel = states.fresnel.fragment;
 
         var floatPrecision = getFSFloatPrecision(states._canvas.gl);
 
@@ -16612,6 +16683,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("uniform vec3 SCENEJS_uEmitFresnelBottomColor;");
         }
 
+        if (fragmentFresnel) {
+            src.push("uniform float SCENEJS_uFragmentFresnelBias;");
+            src.push("uniform float SCENEJS_uFragmentFresnelPower;");
+            src.push("uniform vec3 SCENEJS_uFragmentFresnelTopColor;");
+            src.push("uniform vec3 SCENEJS_uFragmentFresnelBottomColor;");
+        }
+
         src.push("varying vec3 SCENEJS_vViewEyeVec;");                          // Direction of world-space vertex from eye
 
         if (normals) {
@@ -16636,7 +16714,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("\n" + customFragmentShader.code + "\n");
         }
 
-        if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel) {
+        if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel) {
             src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float bias, float power) {");
             src.push("  float fresnelTerm = pow(bias + abs(dot(viewDirection, worldNormal)), power);");
             src.push("  return clamp(fresnelTerm, 0., 1.);");
@@ -16933,7 +17011,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("fragColor=" + fragmentHooks.pixelColor + "(fragColor);");
         }
         if (false && debugCfg.whitewash === true) {
-            src.push("    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+
+            src.push("    fragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+
         } else {
 
             if (hasDepthTarget(states)) {
@@ -16951,15 +17031,18 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 src.push("          float b = fract(g * 255.0);");
                 src.push("          float a = fract(b * 255.0);");
                 src.push("          vec4 colour = vec4(r, g, b, a);");
-                src.push("          gl_FragColor = colour - (colour.yzww * bias);");
-                src.push("    } else {");
-                src.push("          gl_FragColor = fragColor;");
-                src.push("    };");
-
-            } else {
-                src.push("          gl_FragColor = fragColor;");
+                src.push("          fragColor = colour - (colour.yzww * bias);");
+                src.push("    }");
             }
         }
+
+        if (fragmentFresnel) {
+            src.push("float fragmentFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uFragmentFresnelBias, SCENEJS_uFragmentFresnelPower);");
+            src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelTopColor.rgb, SCENEJS_uFragmentFresnelBottomColor.rgb, fragmentFresnel);");
+        }
+
+        src.push("gl_FragColor = fragColor;");
+
         src.push("}");
 
 //        console.log(src.join("\n"));
@@ -17151,12 +17234,6 @@ var SceneJS_Program = function(id, hash, source, gl) {
      * @type WebGLRenderingContext
      */
     this.gl = gl;
-
-    /**
-     * Whether or not we can use UINT indices
-     * @type boolean
-     */
-    this.UINT_INDEX_ENABLED = !!gl.getExtension("OES_element_index_uint");
 
     /**
      * The drawing program
@@ -17725,8 +17802,6 @@ SceneJS_ChunkFactory.createChunkType({
 
         var gl = this.program.gl;
 
-        var indexType = this.program.UINT_INDEX_ENABLED ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT;
-
         if (frameCtx.pick) {
             if (this._depthModePick) {
                 this._depthModePick.setValue(frameCtx.depthMode);
@@ -17737,7 +17812,7 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
 
-        gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, indexType, 0);
+        gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, this.core.indexBuf.itemType, 0);
 
         //frameCtx.textureUnit = 0;
     }
@@ -18680,6 +18755,13 @@ SceneJS_ChunkFactory.createChunkType({
             this._uEmitFresnelTopColor = draw.getUniform("SCENEJS_uEmitFresnelTopColor");
             this._uEmitFresnelBottomColor = draw.getUniform("SCENEJS_uEmitFresnelBottomColor");
         }
+
+        if (core.fragment) {
+            this._uFragmentFresnelBias = draw.getUniform("SCENEJS_uFragmentFresnelBias");
+            this._uFragmentFresnelPower = draw.getUniform("SCENEJS_uFragmentFresnelPower");
+            this._uFragmentFresnelTopColor = draw.getUniform("SCENEJS_uFragmentFresnelTopColor");
+            this._uFragmentFresnelBottomColor = draw.getUniform("SCENEJS_uFragmentFresnelBottomColor");
+        }
     },
 
     draw: function () {
@@ -18780,6 +18862,25 @@ SceneJS_ChunkFactory.createChunkType({
 
             if (this._uEmitFresnelBottomColor) {
                 this._uEmitFresnelBottomColor.setValue(core.emit.bottomColor);
+            }
+        }
+
+        if (core.fragment) {
+
+            if (this._uFragmentFresnelBias) {
+                this._uFragmentFresnelBias.setValue(core.fragment.bias);
+            }
+
+            if (this._uFragmentFresnelPower) {
+                this._uFragmentFresnelPower.setValue(core.fragment.power);
+            }
+
+            if (this._uFragmentFresnelTopColor) {
+                this._uFragmentFresnelTopColor.setValue(core.fragment.topColor);
+            }
+
+            if (this._uFragmentFresnelBottomColor) {
+                this._uFragmentFresnelBottomColor.setValue(core.fragment.bottomColor);
             }
         }
     }
