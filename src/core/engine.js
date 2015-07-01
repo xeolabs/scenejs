@@ -336,7 +336,8 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
             // Clear buffers only on first frame
             this.display.render({
                 clear: i == 0,
-                force: force
+                force: force,
+                opaqueOnly: params && params.opaqueOnly
             });
 
             // Notify that render completed
@@ -522,14 +523,14 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
 /**
  * Reads colors of pixels from the last rendered frame.
  */
-SceneJS_Engine.prototype.readPixels = function (entries, size) {
+SceneJS_Engine.prototype.readPixels = function (entries, size, opaqueOnly) {
 
     // Do any pending scene compilations
     if (this._needCompile()) {
         this._doCompile();
     }
 
-    return this.display.readPixels(entries, size);
+    return this.display.readPixels(entries, size, opaqueOnly);
 };
 
 /**

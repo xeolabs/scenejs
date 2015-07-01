@@ -274,6 +274,11 @@ var SceneJS_Display = function (cfg) {
     this._targetList = [];
     this._targetListLen = 0;
 
+    // Tracks the index of the first chunk in the transparency pass. The first run of chunks
+    // in the list are for opaque objects, while the remainder are for transparent objects.
+    // This supports a mode in which we only render the opaque chunks.
+    this._drawListTransparentIndex = -1;
+
     /* The frame context holds state shared across a single render of the draw list, along with any results of
      * the render, such as pick hits
      */
@@ -565,7 +570,8 @@ SceneJS_Display.prototype.render = function (params) {
 
     if (this.imageDirty || params.force) {
         this._doDrawList({ // Render, no pick
-            clear: (params.clear !== false) // Clear buffers by default
+            clear: (params.clear !== false), // Clear buffers by default
+            opaqueOnly: params.opaqueOnly
         });
         this.imageDirty = false;
         this.pickBufDirty = true;       // Pick buff will now need rendering on next pick
@@ -633,6 +639,8 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
     this._drawListLen = 0;
     this._pickDrawListLen = 0;
+
+    this._drawListTransparentIndex = -1;
 
     // For each render target, a list of objects to render to that target
     var targetObjectLists = {};
@@ -780,8 +788,17 @@ SceneJS_Display.prototype._appendObjectToDrawLists = function (object, pickable)
 
             if (chunk.draw) {
                 if (chunk.unique || this._lastStateId[i] != chunk.id) { // Don't reapply repeated states
-                    this._drawList[this._drawListLen++] = chunk;
+                    this._drawList[this._drawListLen] = chunk;
                     this._lastStateId[i] = chunk.id;
+
+                    // Get index of first chunk in transparency pass
+
+                    if (chunk.core && chunk.core && chunk.core.transparent) {
+                        if (this._drawListTransparentIndex < 0) {
+                            this._drawListTransparentIndex = this._drawListLen;
+                        }
+                    }
+                    this._drawListLen++;
                 }
             }
 
@@ -1006,6 +1023,7 @@ SceneJS_Display.prototype._unpackDepth = function (depthZ) {
  * @param {Boolean} params.clear Set true to clear the color, depth and stencil buffers first
  * @param {Boolean} params.pick Set true to render for picking
  * @param {Boolean} params.rayPick Set true to render for ray-picking
+ * @param {Boolean} params.transparent Set false to only render opaque objects
  * @private
  */
 SceneJS_Display.prototype._doDrawList = function (params) {
@@ -1067,8 +1085,12 @@ SceneJS_Display.prototype._doDrawList = function (params) {
             this._pickDrawList[i].pick(frameCtx);
         }
     } else {
+
+        // Option to only render opaque objects
+        var len =  (params.opaqueOnly ? this._drawListTransparentIndex: this._drawListLen);
+
         // Render for draw
-        for (var i = 0, len = this._drawListLen; i < len; i++) {      // Push opaque rendering chunks
+        for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
             this._drawList[i].draw(frameCtx);
         }
     }
