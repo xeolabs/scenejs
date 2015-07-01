@@ -113,11 +113,11 @@ new (function () {
             this._core.webglRestored = function () {
                 
                 if (self._core.image) {
-                    var texture = this._initTexture(params.preloadColor);
+                    var texture = self._initTexture(params.preloadColor);
                     self._setTextureImage(texture, self._core.image);
 
                 } else if (self._core.src) {
-                    var texture = this._initTexture(params.preloadColor);
+                    var texture = self._initTexture(params.preloadColor);
                     self._loadTexture(texture, self._core.src);
 
                 } else if (self._core.target) {
