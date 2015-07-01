@@ -317,7 +317,7 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
 //        // Render display graph
 //        this.display.render(params);
 
-        var time = (new Date()).getTime();
+        var time = Date.now();
 
         var force =  params && params.force;
 
@@ -368,7 +368,7 @@ SceneJS_Engine.prototype.start = function () {
         var self = this;
         var fnName = "__scenejs_sceneLoop" + this.id;
         var sleeping = false;
-        var time = (new Date()).getTime();
+        var time = Date.now();
         var prevTime = time;
         var startTime = time;
         var scene = this.scene;
@@ -385,6 +385,35 @@ SceneJS_Engine.prototype.start = function () {
             startTime: startTime
         });
 
+        var renderingEvent = {
+            pass: 0
+        };
+        var renderOptions = {
+            clear: true
+        };
+        var renderedEvent = {
+            sceneId: self.id,
+            time: time,
+            pass: 0
+        };
+        var sleepEvent = {
+            sceneId: self.id,
+            startTime: time,
+            prevTime: time,
+            time: time
+        };
+        var canvasSizeEvent = {
+            width: 0,
+            height: 0,
+            aspect: 1
+        };
+        var tickEvent = {
+            sceneId: self.id,
+            startTime: time,
+            prevTime: time,
+            time: time
+        };
+
         function draw() {
             rendered = false;
 
@@ -396,25 +425,22 @@ SceneJS_Engine.prototype.start = function () {
                     sleeping = false;
 
                     // Notify we're about to do a render
-                    scene.publish("rendering", {
-                        pass: i
-                    });
+                    renderingEvent.pass = i;
+                    scene.publish("rendering", renderingEvent);
 
                     // Compile scene graph to display graph, if necessary
                     self._doCompile();
 
                     // Render display graph
                     // Clear buffers only on first frame
-                    self.display.render({
-                        clear: i == 0
-                    });
+                    renderOptions.clear = i == 0;
+                    self.display.render(renderOptions);
 
                     // Notify that we've just done a render
-                    scene.publish("rendered", {
-                        sceneId: self.id,
-                        time: time,
-                        pass: i
-                    });
+                    renderedEvent.sceneId = self.id;
+                    renderedEvent.time = time;
+                    renderedEvent.pass = i;
+                    scene.publish("rendered", renderedEvent);
 
                     rendered = true;
                 }
@@ -423,12 +449,11 @@ SceneJS_Engine.prototype.start = function () {
             // If any of the passes did not render anything, then put the render loop to sleep again
             if (!rendered) {
                 if (!sleeping) {
-                    scene.publish("sleep", {
-                        sceneId: self.id,
-                        startTime: startTime,
-                        prevTime: time,
-                        time: time
-                    });
+                    sleepEvent.sceneId = self.id;
+                    sleepEvent.startTime = startTime;
+                    sleepEvent.prevTime = time;
+                    sleepEvent.time = time;
+                    scene.publish("sleep", sleepEvent);
                 }
                 sleeping = true;
             }
@@ -443,11 +468,10 @@ SceneJS_Engine.prototype.start = function () {
             height = canvas.height = canvas.clientHeight * resolutionScaling;
 
             if (width != lastWidth || height != lastHeight) {
-                scene.publish("canvasSize", {
-                    width: width,
-                    height: height,
-                    aspect: width / height
-                });
+                canvasSizeEvent.width = width;
+                canvasSizeEvent.height = height;
+                canvasSizeEvent.aspect = width / height;
+                scene.publish("canvasSize", canvasSizeEvent);
                 self.display.imageDirty = true;
                 lastWidth = width;
                 lastHeight = height;
@@ -455,14 +479,13 @@ SceneJS_Engine.prototype.start = function () {
 
             if (self.running && !self.paused) {
 
-                time = (new Date()).getTime();
+                time = Date.now();
 
-                scene.publish("tick", {
-                    sceneId: self.id,
-                    startTime: startTime,
-                    prevTime: prevTime,
-                    time: time
-                });
+                tickEvent.sceneId = self.id;
+                tickEvent.startTime = startTime;
+                tickEvent.prevTime = time;
+                tickEvent.time = time;
+                scene.publish("tick", tickEvent);
 
                 prevTime = time;
 
