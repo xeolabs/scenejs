@@ -41,11 +41,12 @@ new (function () {
                     params.applyTo != "specular" &&
                     params.applyTo != "alpha" &&
                     params.applyTo != "reflect" &&
-                    params.applyTo != "emit") {
+                    params.applyTo != "emit" &&
+                    params.applyTo != "fragment") {
 
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "fresnel applyTo value is unsupported - should be either 'color', 'specular', 'alpha', 'reflect' or 'emit'");
+                        "fresnel applyTo value is unsupported - should be either 'color', 'specular', 'alpha', 'reflect', 'emit' or 'fragment'");
                 }
             }
 
@@ -132,6 +133,7 @@ new (function () {
             this.__core.alpha = this._core.applyTo == "alpha" ? this._core : parentCore.alpha;
             this.__core.reflect = this._core.applyTo == "reflect" ? this._core : parentCore.reflect;
             this.__core.emit = this._core.applyTo == "emit" ? this._core : parentCore.emit;
+            this.__core.fragment = this._core.applyTo == "fragment" ? this._core : parentCore.fragment;
         }
 
         this._makeHash(this.__core);
@@ -159,6 +161,9 @@ new (function () {
         }
         if (core.emit) {
             hash.push("e;")
+        }
+        if (core.fragment) {
+            hash.push("f;")
         }
         hash = hash.join("");
         if (core.hash != hash) {
