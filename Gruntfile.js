@@ -10,6 +10,7 @@ module.exports = function (grunt) {
         PROJECT_NAME: "<%= pkg.name %>",
         ENGINE_VERSION: "<%= pkg.version %>",
         build_dir: "build/<%= ENGINE_VERSION %>",
+        plugin_dir: "src/plugins/",
         license: grunt.file.read("LICENSE.txt"),
 
         concat: {
@@ -49,11 +50,17 @@ module.exports = function (grunt) {
             unminified: {
                 src: 'api/latest/<%= PROJECT_NAME %>.js',
                 dest: '<%= build_dir %>/<%= PROJECT_NAME %>-<%= ENGINE_VERSION %>.js'
+            },
+            plugins: {
+                expand: true,
+                cwd: '<%= plugin_dir %>',
+                src: '**',
+                dest: 'api/latest/plugins/' 
             }
         },
         watch: {
             scripts: {
-                files: ["<%= concat.engine.src %>", "Gruntfile.js"],
+                files: ["<%= concat.engine.src %>", "<%= plugin_dir %>/**", "Gruntfile.js"],
                 tasks: ["snapshot"],
                 options: {
                   spawn: false,
@@ -70,11 +77,13 @@ module.exports = function (grunt) {
 
     // Builds snapshot libs within api/latest
     // Run this when testing examples locally against your changes before committing them
-    grunt.registerTask("snapshot", ["concat", "uglify"]);
+    grunt.registerTask("snapshot", ["concat", "uglify", "copy:plugins"]);
 
     // Build a package within ./build
     // Assigns the package the current version number that's defined in package.json
-    grunt.registerTask("build", ["snapshot", "copy"]);
+    grunt.registerTask("build", ["snapshot", "copy-build"]);
+
+    grunt.registerTask("copy-build", ["copy:minified", "copy:unminified"])
 
     grunt.registerTask("default", "snapshot");
 };
