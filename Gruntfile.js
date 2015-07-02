@@ -50,6 +50,15 @@ module.exports = function (grunt) {
                 src: 'api/latest/<%= PROJECT_NAME %>.js',
                 dest: '<%= build_dir %>/<%= PROJECT_NAME %>-<%= ENGINE_VERSION %>.js'
             }
+        },
+        watch: {
+            scripts: {
+                files: ["<%= concat.engine.src %>", "Gruntfile.js"],
+                tasks: ["snapshot"],
+                options: {
+                  spawn: false,
+                },
+            },
         }
     });
 
@@ -57,6 +66,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-contrib-concat");
     grunt.loadNpmTasks("grunt-contrib-clean");
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Builds snapshot libs within api/latest
     // Run this when testing examples locally against your changes before committing them
