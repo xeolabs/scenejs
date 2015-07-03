@@ -77,7 +77,7 @@ SceneJS.Types.addType("models/space/planets/earth", {
                                                     type: "texture",
                                                     coreId: this.type + ".specular",
                                                     src: texturePath + "earthSpecular.png",
-                                                    preloadSrc: texturePath + "earthSpecularPreload.jpg",
+                                                    preloadSrc: texturePath + "earthSpecularPreload.png",
                                                     applyTo: "specular",
 
                                                     nodes: [
@@ -87,7 +87,7 @@ SceneJS.Types.addType("models/space/planets/earth", {
                                                             type: "texture",
                                                             coreId: this.type + ".emit",
                                                             src: texturePath + "earthEmit.gif",
-                                                            preloadSrc: texturePath + "earthEmitPreload.jpg",
+                                                            preloadSrc: texturePath + "earthEmitPreload.png",
                                                             applyTo: "emit",
 
                                                             nodes: [
