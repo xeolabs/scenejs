@@ -13388,14 +13388,14 @@ new (function () {
 
 
             if (params.src) { // Load from URL
-                var texture = this._initTexture(params.preloadColor);
+                this._initTexture(params.preloadColor);
                 this._core.src = params.src;
-                this._loadTexture(texture, params.src, params.preloadSrc);
+                this._loadTexture(params.src, params.preloadSrc);
 
             } else if (params.image) { // Create from image
-                var texture = this._initTexture(params.preloadColor);
+                this._initTexture(params.preloadColor);
                 this._core.image = params.image;
-                this._setTextureImage(texture, params.image);
+                this._setTextureImage(params.image);
 
             } else if (params.target) { // Render to this texture
                 this.getScene().getNode(params.target,
@@ -13407,12 +13407,12 @@ new (function () {
             this._core.webglRestored = function () {
                 
                 if (self._core.image) {
-                    var texture = self._initTexture(params.preloadColor);
-                    self._setTextureImage(texture, self._core.image);
+                    self._initTexture(params.preloadColor);
+                    self._setTextureImage(self._core.image);
 
                 } else if (self._core.src) {
-                    var texture = self._initTexture(params.preloadColor);
-                    self._loadTexture(texture, self._core.src);
+                    self._initTexture(params.preloadColor);
+                    self._loadTexture(self._core.src);
 
                 } else if (self._core.target) {
 //                    self.getScene().getNode(params.target,
@@ -13466,11 +13466,9 @@ new (function () {
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, preloadColor);
         this._setCoreTexture(texture);
-
-        return texture;
     };
 
-    SceneJS.TextureMap.prototype._loadTexture = function (texture, src, preloadSrc) {
+    SceneJS.TextureMap.prototype._loadTexture = function (src, preloadSrc) {
         var self = this;
         var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading texture");
         var image = new Image();
@@ -13482,7 +13480,7 @@ new (function () {
 
             preloadImage.onload = function () {
                 if (!loaded) {
-                    self._setTextureImage(texture, preloadImage);
+                    self._setTextureImage(preloadImage);
                     SceneJS_sceneStatusModule.taskFinished(taskId);
                     taskFinished = true;
                     self._engine.display.imageDirty = true; 
@@ -13493,7 +13491,7 @@ new (function () {
         }
 
         image.onload = function () {
-            self._setTextureImage(texture, image);
+            self._setTextureImage(image);
             if (!taskFinished) {
                 SceneJS_sceneStatusModule.taskFinished(taskId);
             }
@@ -13515,11 +13513,10 @@ new (function () {
         }
     };
 
-    SceneJS.TextureMap.prototype._setTextureImage = function (texture, image) {
-
+    SceneJS.TextureMap.prototype._setTextureImage = function (image) {
         var gl = this._engine.canvas.gl;
-
-        var texture = gl.createTexture();
+        var texture = this._core.texture ? this._core.texture.texture : gl.createTexture(); 
+       
         gl.bindTexture(gl.TEXTURE_2D, texture);
 
         var maxTextureSize = SceneJS_configsModule.configs.maxTextureSize;
@@ -13593,7 +13590,7 @@ new (function () {
         this._core.image = image;
         this._core.src = null;
         this._core.target = null;
-        this._initTexture(image);
+        this._setTextureImage(image);
     };
 
     SceneJS.TextureMap.prototype.setTarget = function (target) {
