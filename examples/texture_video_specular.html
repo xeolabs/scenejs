@@ -64,36 +64,27 @@
                                 space: "view"
                             }
                         ],
-
                         nodes: [
                             {
-                                type: "flags",
-                                flags: {
-                                    transparent: true
-                                },
+                                type: "material",
+                                color: { r: 0.5, g: 0.5, b: 0.6 },
+                                specularColor: { r: 0.7, g: 0.7, b: 0.8 },
+                                specular: 10.0,
+                                shine: 5.0,
                                 nodes: [
+
+                                    // Video texture, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/texture/video.js
                                     {
-                                        type: "material",
-                                        color: { r: 0.5, g: 0.5, b: 0.6 },
-                                        specularColor: { r: 0.7, g: 0.7, b: 0.8 },
-                                        specular: 10.0,
-                                        shine: 5.0,
+                                        type: "texture/video",
+                                        src: "movies/testVideo.ogv",
+                                        applyTo: "specular",
+
                                         nodes: [
 
-                                            // Video texture, implemented by plugin at
-                                            // http://scenejs.org/api/latest/plugins/node/texture/video.js
+                                            // Box primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/box.js
                                             {
-                                                type: "texture/video",
-                                                src: "movies/testVideo.ogv",
-                                                applyTo: "specular",
-
-                                                nodes: [
-
-                                                    // Box primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/box.js
-                                                    {
-                                                        type: "geometry/box"
-                                                    }
-                                                ]
+                                                type: "geometry/box"
                                             }
                                         ]
                                     }
