@@ -344,11 +344,8 @@ SceneJS.GUI = function (scene, nodeIds) {
             this.transparent = attr.transparent;
             this.backfaces = attr.backfaces;
             this.frontface = attr.frontface;
-            this.backfaceLighting = attr.backfaceLighting;
-            this.backfaceTexturing = attr.backfaceTexturing;
-            this.specular = attr.specular;
-            this.ambient = attr.ambient;
-            this.reflection = attr.reflection;
+            this.reflective = attr.reflective;
+            this.solid = attr.solid;
 
             var self = this;
             var update = function () {
@@ -358,11 +355,8 @@ SceneJS.GUI = function (scene, nodeIds) {
                     transparent:self.transparent,
                     backfaces:self.backfaces,
                     frontface:self.frontface,
-                    backfaceLighting:self.backfaceLighting,
-                    backfaceTexturing:self.backfaceTexturing,
-                    specular:self.specular,
-                    ambient:self.ambient,
-                    reflection: self.reflection
+                    reflective: self.reflective,
+                    solid: self.solid
                 });
                 requestAnimationFrame(update);
             };
@@ -375,11 +369,8 @@ SceneJS.GUI = function (scene, nodeIds) {
         folder.add(menu, 'transparent');
         folder.add(menu, 'backfaces');
         folder.add(menu, 'frontface', [ 'ccw', 'cw' ]);
-        folder.add(menu, 'backfaceLighting');
-        folder.add(menu, 'backfaceTexturing');
-        folder.add(menu, 'specular');
-        folder.add(menu, 'ambient');
-        folder.add(menu, 'reflection');
+        folder.add(menu, 'reflective');
+        folder.add(menu, 'solid');
         folder.open();
     }
 };

@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-07-01
+ * Built on 2015-07-04
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -2157,7 +2157,7 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
 //        // Render display graph
 //        this.display.render(params);
 
-        var time = (new Date()).getTime();
+        var time = Date.now();
 
         var force =  params && params.force;
 
@@ -2208,7 +2208,7 @@ SceneJS_Engine.prototype.start = function () {
         var self = this;
         var fnName = "__scenejs_sceneLoop" + this.id;
         var sleeping = false;
-        var time = (new Date()).getTime();
+        var time = Date.now();
         var prevTime = time;
         var startTime = time;
         var scene = this.scene;
@@ -2225,6 +2225,35 @@ SceneJS_Engine.prototype.start = function () {
             startTime: startTime
         });
 
+        var renderingEvent = {
+            pass: 0
+        };
+        var renderOptions = {
+            clear: true
+        };
+        var renderedEvent = {
+            sceneId: self.id,
+            time: time,
+            pass: 0
+        };
+        var sleepEvent = {
+            sceneId: self.id,
+            startTime: time,
+            prevTime: time,
+            time: time
+        };
+        var canvasSizeEvent = {
+            width: 0,
+            height: 0,
+            aspect: 1
+        };
+        var tickEvent = {
+            sceneId: self.id,
+            startTime: time,
+            prevTime: time,
+            time: time
+        };
+
         function draw() {
             rendered = false;
 
@@ -2236,25 +2265,22 @@ SceneJS_Engine.prototype.start = function () {
                     sleeping = false;
 
                     // Notify we're about to do a render
-                    scene.publish("rendering", {
-                        pass: i
-                    });
+                    renderingEvent.pass = i;
+                    scene.publish("rendering", renderingEvent);
 
                     // Compile scene graph to display graph, if necessary
                     self._doCompile();
 
                     // Render display graph
                     // Clear buffers only on first frame
-                    self.display.render({
-                        clear: i == 0
-                    });
+                    renderOptions.clear = i == 0;
+                    self.display.render(renderOptions);
 
                     // Notify that we've just done a render
-                    scene.publish("rendered", {
-                        sceneId: self.id,
-                        time: time,
-                        pass: i
-                    });
+                    renderedEvent.sceneId = self.id;
+                    renderedEvent.time = time;
+                    renderedEvent.pass = i;
+                    scene.publish("rendered", renderedEvent);
 
                     rendered = true;
                 }
@@ -2263,12 +2289,11 @@ SceneJS_Engine.prototype.start = function () {
             // If any of the passes did not render anything, then put the render loop to sleep again
             if (!rendered) {
                 if (!sleeping) {
-                    scene.publish("sleep", {
-                        sceneId: self.id,
-                        startTime: startTime,
-                        prevTime: time,
-                        time: time
-                    });
+                    sleepEvent.sceneId = self.id;
+                    sleepEvent.startTime = startTime;
+                    sleepEvent.prevTime = time;
+                    sleepEvent.time = time;
+                    scene.publish("sleep", sleepEvent);
                 }
                 sleeping = true;
             }
@@ -2283,11 +2308,10 @@ SceneJS_Engine.prototype.start = function () {
             height = canvas.height = canvas.clientHeight * resolutionScaling;
 
             if (width != lastWidth || height != lastHeight) {
-                scene.publish("canvasSize", {
-                    width: width,
-                    height: height,
-                    aspect: width / height
-                });
+                canvasSizeEvent.width = width;
+                canvasSizeEvent.height = height;
+                canvasSizeEvent.aspect = width / height;
+                scene.publish("canvasSize", canvasSizeEvent);
                 self.display.imageDirty = true;
                 lastWidth = width;
                 lastHeight = height;
@@ -2295,14 +2319,13 @@ SceneJS_Engine.prototype.start = function () {
 
             if (self.running && !self.paused) {
 
-                time = (new Date()).getTime();
+                time = Date.now();
 
-                scene.publish("tick", {
-                    sceneId: self.id,
-                    startTime: startTime,
-                    prevTime: prevTime,
-                    time: time
-                });
+                tickEvent.sceneId = self.id;
+                tickEvent.startTime = startTime;
+                tickEvent.prevTime = time;
+                tickEvent.time = time;
+                scene.publish("tick", tickEvent);
 
                 prevTime = time;
 
@@ -8458,7 +8481,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         reflective = !!reflective;
         if (this._core.reflective != reflective) {
             this._core.reflective = reflective;
-            this._core.hash = (reflective ? "refl" : "") + this._core.solid ? ";s" : ";;";
+            this._core.hash = (reflective ? "refl" : "") + (this._core.solid ? ";s" : ";;");
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
@@ -8473,7 +8496,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         solid = !!solid;
         if (this._core.solid != solid) {
             this._core.solid = solid;
-            this._core.hash = (this._core.reflective ? "refl" : "") + solid ? ";s;" : ";;";
+            this._core.hash = (this._core.reflective ? "refl" : "") + (solid ? ";s;" : ";;");
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
@@ -9031,14 +9054,18 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
 
         // now go through and average out everything
         for (var i = 0, len = nvecs.length; i < len; i++) {
-            var count = nvecs[i].length;
+            var nvec = nvecs[i];
+            if (!nvec) {
+                continue;
+            }
+            var count = nvec.length;
             var x = 0;
             var y = 0;
             var z = 0;
             for (var j = 0; j < count; j++) {
-                x += nvecs[i][j][0];
-                y += nvecs[i][j][1];
-                z += nvecs[i][j][2];
+                x += nvec[j][0];
+                y += nvec[j][1];
+                z += nvec[j][2];
             }
             normals[i * 3 + 0] = (x / count);
             normals[i * 3 + 1] = (y / count);

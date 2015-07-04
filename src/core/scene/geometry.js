@@ -411,14 +411,18 @@ new (function () {
 
         // now go through and average out everything
         for (var i = 0, len = nvecs.length; i < len; i++) {
-            var count = nvecs[i].length;
+            var nvec = nvecs[i];
+            if (!nvec) {
+                continue;
+            }
+            var count = nvec.length;
             var x = 0;
             var y = 0;
             var z = 0;
             for (var j = 0; j < count; j++) {
-                x += nvecs[i][j][0];
-                y += nvecs[i][j][1];
-                z += nvecs[i][j][2];
+                x += nvec[j][0];
+                y += nvec[j][1];
+                z += nvec[j][2];
             }
             normals[i * 3 + 0] = (x / count);
             normals[i * 3 + 1] = (y / count);
