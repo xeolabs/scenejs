@@ -213,7 +213,7 @@
         reflective = !!reflective;
         if (this._core.reflective != reflective) {
             this._core.reflective = reflective;
-            this._core.hash = (reflective ? "refl" : "") + this._core.solid ? ";s" : ";;";
+            this._core.hash = (reflective ? "refl" : "") + (this._core.solid ? ";s" : ";;");
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
@@ -228,7 +228,7 @@
         solid = !!solid;
         if (this._core.solid != solid) {
             this._core.solid = solid;
-            this._core.hash = (this._core.reflective ? "refl" : "") + solid ? ";s;" : ";;";
+            this._core.hash = (this._core.reflective ? "refl" : "") + (solid ? ";s;" : ";;");
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }

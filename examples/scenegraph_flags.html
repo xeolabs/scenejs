@@ -15,6 +15,7 @@
     </style>
 
     <script src="../api/latest/scenejs.min.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
     <script src="libs/gui/gui.js"></script>
     <link href="css/styles.css" rel="stylesheet"/>
 
@@ -58,10 +59,8 @@
                             transparent:false, // Transparency - works in conjunction with material alpha
                             backfaces:true, // Show backfaces
                             frontface:"ccw", // Default vertex winding for front faces
-                            backfaceLighting:true, // Shading enabled for backfaces
-                            backfaceTexturing:true, // Texturing enabled for backfaces
-                            specular:true, // Specular lighting enabled
-                            ambient:true               // Ambient lighting enabled
+                            reflective: true, // Reflect any active environment maps
+                            solid: false  // Appear solid when clipped
                         },
 
                         nodes:[
