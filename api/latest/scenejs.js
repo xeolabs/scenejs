@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-07-04
+ * Built on 2015-07-06
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -16766,7 +16766,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (solid) {
 
                 src.push("  if (gl_FrontFacing == false) {");
-                src.push("     gl_FragColor = vec4(0.4, 0.4, 1.0, 1.0);");
+                src.push("     gl_FragColor = vec4(0.5, 0.5, 0.5, 1.0);");
                 src.push("     return;");
                 src.push("  }");
             }
@@ -16992,7 +16992,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     src.push("dotN = max(dot(viewNormalVec, normalize(viewLightVec)), 0.0);");
 
                     if (light.diffuse) {
-                        src.push("      lightValue += dotN * SCENEJS_uLightColor" + i + ";");
+                        src.push("lightValue += dotN * SCENEJS_uLightColor" + i + ";");
                     }
 
                     if (light.specular) {
