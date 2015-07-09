@@ -229,6 +229,14 @@ new (function () {
             var taskFinished = false;
 
             gl.bindTexture(gl.TEXTURE_2D, texture);
+
+            if (layer.image) {
+                self._setTextureImage(gl, texture, layer.image);
+                self._setLayerTexture(gl, layer, texture);
+                SceneJS_sceneStatusModule.taskFinished(taskId);
+                return;
+            }
+
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, preloadColor);
             self._setLayerTexture(gl, layer, texture);
 
