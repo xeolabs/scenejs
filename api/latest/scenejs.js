@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-07-06
+ * Built on 2015-07-09
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -9218,6 +9218,18 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         return this._core.arrays ? this._core.arrays.colors : null;
     };
 
+    SceneJS.Geometry.prototype.setIndices = function (data) {
+        if (data.indices && this._core.indexBuf) {
+            this._boundary = null;
+            var core = this._core;
+            core.indexBuf.bind();
+            var IndexArrayType = this._engine.canvas.UINT_INDEX_ENABLED ? Uint32Array : Uint16Array;
+            core.indexBuf.setData(new IndexArrayType(data.indices), data.indicesOffset || 0);
+            core.arrays.indices.set(data.indices, data.indicesOffset || 0);
+            this._engine.display.imageDirty = true;
+        }
+    };
+
     SceneJS.Geometry.prototype.getIndices = function () {
         return this._core.arrays ? this._core.arrays.indices : null;
     };
@@ -12976,14 +12988,20 @@ new (function () {
 
             var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading texture");
 
-            var image = new Image();
-
             var texture = gl.createTexture();
 
             var loaded = false;
             var taskFinished = false;
 
             gl.bindTexture(gl.TEXTURE_2D, texture);
+
+            if (layer.image) {
+                self._setTextureImage(gl, texture, layer.image);
+                self._setLayerTexture(gl, layer, texture);
+                SceneJS_sceneStatusModule.taskFinished(taskId);
+                return;
+            }
+
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, preloadColor);
             self._setLayerTexture(gl, layer, texture);
 
@@ -13001,6 +13019,8 @@ new (function () {
 
                 self._fetchImage(preloadImage, preloadSrc);
             }
+
+            var image = new Image();
 
             image.onload = function () {
                 self._setTextureImage(gl, texture, image);
