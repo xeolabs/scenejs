@@ -575,6 +575,18 @@ new (function () {
         return this._core.arrays ? this._core.arrays.colors : null;
     };
 
+    SceneJS.Geometry.prototype.setIndices = function (data) {
+        if (data.indices && this._core.indexBuf) {
+            this._boundary = null;
+            var core = this._core;
+            core.indexBuf.bind();
+            var IndexArrayType = this._engine.canvas.UINT_INDEX_ENABLED ? Uint32Array : Uint16Array;
+            core.indexBuf.setData(new IndexArrayType(data.indices), data.indicesOffset || 0);
+            core.arrays.indices.set(data.indices, data.indicesOffset || 0);
+            this._engine.display.imageDirty = true;
+        }
+    };
+
     SceneJS.Geometry.prototype.getIndices = function () {
         return this._core.arrays ? this._core.arrays.indices : null;
     };

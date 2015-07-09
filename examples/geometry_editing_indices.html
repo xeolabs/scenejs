@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - triangle mesh geometry
+</div>
+
+<script>
+
+
+    //--------------------------------------------------------------------------------------------------------
+    // Demo in which we periodically edit the geometry's indices array.
+    //
+    // Starting with a box geometry, at each one-second interval,
+    // we'll rebuild its indices array to include only the triangles
+    // that we randomly select from its original indices array.
+    //
+    // The effect will be a spinning yellow box, in which triangles
+    // will randomly wink in and out of existence. Note that backfaces
+    // are set visible.
+    //--------------------------------------------------------------------------------------------------------
+
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 30,
+                zoomSensitivity: 1.0,
+                spin: 0.2,
+
+                nodes: [
+                    {
+                        //   type: "texture",
+                        src: "textures/BrickWall.jpg",
+
+                        // Texture scale factors
+                        scale: {
+                            x: .1,
+                            y: .05
+                        },
+
+                        nodes: [
+                            {
+                                type: "material",
+                                color: {r: 1, g: 1, b: 0},
+
+                                nodes: [
+                                    // Geometry node which defines our custom object, a simple cube.
+                                    {
+                                        type: "geometry",
+
+                                        id: "myGeometry",
+
+                                        primitive: "triangles",
+
+                                        positions: [
+
+                                            // v0-v1-v2-v3 front
+                                            5, 5, 5,
+                                            -5, 5, 5,
+                                            -5, -5, 5,
+                                            5, -5, 5,
+
+                                            // v0-v3-v4-v5 right
+                                            5, 5, 5,
+                                            5, -5, 5,
+                                            5, -5, -5,
+                                            5, 5, -5,
+
+                                            // v0-v5-v6-v1 top
+                                            5, 5, 5,
+                                            5, 5, -5,
+                                            -5, 5, -5,
+                                            -5, 5, 5,
+
+                                            // v1-v6-v7-v2 left
+                                            -5, 5, 5,
+                                            -5, 5, -5,
+                                            -5, -5, -5,
+                                            -5, -5, 5,
+
+                                            // v7-v4-v3-v2 bottom
+                                            -5, -5, -5,
+                                            5, -5, -5,
+                                            5, -5, 5,
+                                            -5, -5, 5,
+
+                                            // v4-v7-v6-v5 back
+                                            5, -5, -5,
+                                            -5, -5, -5,
+                                            -5, 5, -5,
+                                            5, 5, -5
+                                        ],
+
+                                        normals: [
+
+                                            // v0-v1-v2-v3 front
+                                            0, 0, 1,
+                                            0, 0, 1,
+                                            0, 0, 1,
+                                            0, 0, 1,
+
+                                            // v0-v3-v4-v5 right
+                                            1, 0, 0,
+                                            1, 0, 0,
+                                            1, 0, 0,
+                                            1, 0, 0,
+
+                                            // v0-v5-v6-v1 top
+                                            0, 1, 0,
+                                            0, 1, 0,
+                                            0, 1, 0,
+                                            0, 1, 0,
+
+                                            // v1-v6-v7-v2 left
+                                            -1, 0, 0,
+                                            -1, 0, 0,
+                                            -1, 0, 0,
+                                            -1, 0, 0,
+
+                                            // v7-v4-v3-v2 bottom
+                                            0, -1, 0,
+                                            0, -1, 0,
+                                            0, -1, 0,
+                                            0, -1, 0,
+
+                                            // v4-v7-v6-v5 back
+                                            0, 0, -1,
+                                            0, 0, -1,
+                                            0, 0, -1,
+                                            0, 0, -1
+                                        ],
+
+                                        uv: [
+
+                                            // v0-v1-v2-v3 front
+                                            5, 5,
+                                            0, 5,
+                                            0, 0,
+                                            5, 0,
+
+                                            // v0-v3-v4-v5 right
+                                            0, 5,
+                                            0, 0,
+                                            5, 0,
+                                            5, 5,
+
+                                            // v0-v5-v6-v1 top
+                                            5, 0,
+                                            5, 5,
+                                            0, 5,
+                                            0, 0,
+
+                                            // v1-v6-v7-v2 left
+                                            5, 5,
+                                            0, 5,
+                                            0, 0,
+                                            5, 0,
+
+                                            // v7-v4-v3-v2 bottom
+                                            0, 0,
+                                            5, 0,
+                                            5, 5,
+                                            0, 5,
+
+                                            // v4-v7-v6-v5 back
+                                            0, 0,
+                                            5, 0,
+                                            5, 5,
+                                            0, 5
+                                        ],
+
+                                        // Initial indices
+                                        indices: [
+                                            0, 1, 2,
+                                            0, 2, 3,
+                                            // front
+                                            4, 5, 6,
+                                            4, 6, 7,
+                                            // right
+                                            8, 9, 10,
+                                            8, 10, 11,
+                                            // top
+                                            12, 13, 14,
+                                            12, 14, 15,
+                                            // left
+                                            16, 17, 18,
+                                            16, 18, 19,
+                                            // bottom
+                                            20, 21, 22,
+                                            20, 22, 23
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+
+
+    var indices2 = [];
+
+    scene.getNode("myGeometry",
+            function (geometry) {
+
+                var indices = Array.prototype.slice.call(geometry.getIndices());
+
+                setInterval(function () {
+
+                    var lenIndices2 = 0;
+
+                    for (var i = 0, len = indices.length - 3; i < len; i += 3) {
+
+                        if (Math.random() < 0.5) {
+
+                            // Triangle selected
+
+                            indices2[lenIndices2++] = indices[i];
+                            indices2[lenIndices2++] = indices[i + 1];
+                            indices2[lenIndices2++] = indices[i + 2];
+                        }
+                    }
+
+                    geometry.setIndices({
+                        indices: indices2
+                    });
+
+                }, 1000)
+            });
+
+</script>
+</body>
+</html>
