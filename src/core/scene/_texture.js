@@ -221,14 +221,20 @@ new (function () {
 
             var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading texture");
 
-            var image = new Image();
-
             var texture = gl.createTexture();
 
             var loaded = false;
             var taskFinished = false;
 
             gl.bindTexture(gl.TEXTURE_2D, texture);
+
+            if (layer.image) {
+                self._setTextureImage(gl, texture, layer.image);
+                self._setLayerTexture(gl, layer, texture);
+                SceneJS_sceneStatusModule.taskFinished(taskId);
+                return;
+            }
+
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, preloadColor);
             self._setLayerTexture(gl, layer, texture);
 
@@ -246,6 +252,8 @@ new (function () {
 
                 self._fetchImage(preloadImage, preloadSrc);
             }
+
+            var image = new Image();
 
             image.onload = function () {
                 self._setTextureImage(gl, texture, image);
