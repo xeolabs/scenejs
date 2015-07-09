@@ -221,8 +221,6 @@ new (function () {
 
             var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading texture");
 
-            var image = new Image();
-
             var texture = gl.createTexture();
 
             var loaded = false;
@@ -254,6 +252,8 @@ new (function () {
 
                 self._fetchImage(preloadImage, preloadSrc);
             }
+
+            var image = new Image();
 
             image.onload = function () {
                 self._setTextureImage(gl, texture, image);
