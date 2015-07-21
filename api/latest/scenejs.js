@@ -1,10 +1,10 @@
 /*
- * SceneJS V4.2.1
+ * SceneJS V4.2.2
  *
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-07-09
+ * Built on 2015-07-21
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -5586,6 +5586,11 @@ SceneJS._webgl.Program.prototype.bind = function () {
         return;
     }
     this.gl.useProgram(this.handle);
+    for (var name in this._uniforms) {
+        if (this._uniforms.hasOwnProperty(name)) {
+            this._uniforms[name] = null;
+        }
+    }
 };
 
 SceneJS._webgl.Program.prototype.getUniformLocation = function (name) {
@@ -17915,8 +17920,7 @@ SceneJS_ChunkFactory.createChunkType({
                     // Entering a transparency bin
 
                     gl.enable(gl.BLEND);
-             //       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
                     frameCtx.blendEnabled = true;
 
                 } else {
