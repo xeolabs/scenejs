@@ -105,6 +105,11 @@ SceneJS._webgl.Program.prototype.bind = function () {
         return;
     }
     this.gl.useProgram(this.handle);
+    for (var name in this._uniforms) {
+        if (this._uniforms.hasOwnProperty(name)) {
+            this._uniforms[name] = null;
+        }
+    }
 };
 
 SceneJS._webgl.Program.prototype.getUniformLocation = function (name) {
