@@ -474,6 +474,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (states.geometry.colorBuf) {
             src.push("SCENEJS_vColor = SCENEJS_aVertexColor;");
         }
+
+        src.push("gl_PointSize = 3.0;");
+
         src.push("}");
 
         return src;
