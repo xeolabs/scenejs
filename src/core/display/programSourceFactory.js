@@ -573,9 +573,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         // True when lighting
         src.push("uniform bool  SCENEJS_uClipping;");
 
-        // True when interior surfaces of solid cross-sections
-        // are to be rendered without texture and shading
-        src.push("uniform bool  SCENEJS_uSolid;");
+        if (solid) {
+            src.push("uniform vec3  SCENEJS_uSolidColor;");
+        }
 
         // Added in v4.0 to support depth targets
         src.push("uniform bool  SCENEJS_uDepthMode;");
@@ -695,7 +695,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (solid) {
 
                 src.push("  if (gl_FrontFacing == false) {");
-                src.push("     gl_FragColor = vec4(0.5, 0.5, 0.5, 1.0);");
+                src.push("     gl_FragColor = vec4(SCENEJS_uSolidColor.xyz, 1.0);");
                 src.push("     return;");
                 src.push("  }");
             }

@@ -11,6 +11,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         this._uClippingDraw = draw.getUniform("SCENEJS_uClipping");
         this._uSolidDraw = draw.getUniform("SCENEJS_uSolid");
+        this._uSolidColorDraw = draw.getUniform("SCENEJS_uSolidColor");
 
         var pick = this.program.pick;
 
@@ -80,6 +81,10 @@ SceneJS_ChunkFactory.createChunkType({
 
             if (this._uSolidDraw) {
                 this._uSolidDraw.setValue(this.core.solid);
+            }
+
+            if (this._uSolidColorDraw) {
+                this._uSolidColorDraw.setValue(this.core.solidColor);
             }
         }
     }

@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
     /**
      * The default state core singleton for {@link SceneJS.Flags} nodes
@@ -8,14 +8,15 @@
         stateId: SceneJS._baseStateId++,
         type: "flags",
 
-        picking : true,             // Picking enabled
-        clipping : true,            // User-defined clipping enabled
-        enabled : true,             // Node not culled from traversal
+        picking: true,             // Picking enabled
+        clipping: true,            // User-defined clipping enabled
+        enabled: true,             // Node not culled from traversal
         transparent: false,         // Node transparent - works in conjunction with matarial alpha properties
         backfaces: true,            // Show backfaces
         frontface: "ccw",           // Default vertex winding for front face
         reflective: true,           // Reflects reflection node cubemap, if it exists, by default.
         solid: false,               // When true, renders backfaces without texture or shading, for a cheap solid cross-section effect
+        solidColor: [1.0, 1.0, 1.0], // Solid cap color
         hash: "refl;;"
     };
 
@@ -23,11 +24,11 @@
     var stackLen = 0;
 
     SceneJS_events.addListener(
-            SceneJS_events.SCENE_COMPILING,
-            function(params) {
-                params.engine.display.flags = defaultCore;
-                stackLen = 0;
-            });
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.flags = defaultCore;
+            stackLen = 0;
+        });
 
     /**
      * @class Scene graph node which sets rendering mode flags for its subgraph
@@ -35,7 +36,7 @@
      */
     SceneJS.Flags = SceneJS_NodeFactory.createNodeType("flags");
 
-    SceneJS.Flags.prototype._init = function(params) {
+    SceneJS.Flags.prototype._init = function (params) {
 
         if (this._core.useCount == 1) {         // This node is first to reference the state core, so sets it up
 
@@ -47,13 +48,14 @@
             this._core.frontface = "ccw";        // Default vertex winding for front face
             this._core.reflective = true;        // Reflects reflection node cubemap, if it exists, by default.
             this._core.solid = false;            // Renders backfaces without texture or shading, for a cheap solid cross-section effect
+            this._core.solidColor = [1.0, 1.0, 1.0 ]; // Solid cap color
             if (params.flags) {                  // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
             }
         }
     };
 
-    SceneJS.Flags.prototype.setFlags = function(flags) {
+    SceneJS.Flags.prototype.setFlags = function (flags) {
 
         var core = this._core;
 
@@ -89,50 +91,48 @@
 
         if (flags.reflective != undefined) {
             core.reflective = flags.reflective;
-            core.hash = core.reflective ? "refl" : "";
+            core.hash = (core.reflective ? "refl" : "") + (core.solid ? ";s" : ";;");
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
 
         if (flags.solid != undefined) {
             core.solid = flags.solid;
-            core.hash = core.reflective ? "refl" : "";
+            core.hash = (core.reflective ? "refl" : "") + (core.solid ? ";s" : ";;");
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
-        
+
+        if (flags.solidColor != undefined) {
+            var defaultSolidColor = defaultCore.solidColor;
+            var color = flags.solidColor;
+            core.solidColor = color ? [
+                color.r != undefined && color.r != null ? color.r : defaultSolidColor[0],
+                color.g != undefined && color.g != null ? color.g : defaultSolidColor[1],
+                color.b != undefined && color.b != null ? color.b : defaultSolidColor[2]
+            ] : defaultCore.solidColor;
+            this._engine.display.imageDirty = true;
+        }
+
         return this;
     };
 
-    SceneJS.Flags.prototype.addFlags = function(flags) {
-        return this.setFlags(flags);
-        //        var core = this._core;
-        //        if (flags.picking != undefined) core.picking = flags.picking;
-        //        if (flags.clipping != undefined) core.clipping = flags.clipping;
-        //        if (flags.enabled != undefined) core.enabled = flags.enabled;
-        //        if (flags.transparent != undefined) core.transparent = flags.transparent;
-        //        if (flags.backfaces != undefined) core.backfaces = flags.backfaces;
-        //        if (flags.frontface != undefined) core.frontface = flags.frontface;
-        //        if (flags.backfaceLighting != undefined) core.backfaceLighting = flags.backfaceLighting;
-        //        if (flags.backfaceTexturing != undefined) core.backfaceTexturing = flags.backfaceTexturing;
-        //        return this;
-    };
-
-    SceneJS.Flags.prototype.getFlags = function() {
+    SceneJS.Flags.prototype.getFlags = function () {
         var core = this._core;
         return {
-            picking : core.picking,
-            clipping : core.clipping,
-            enabled : core.enabled,
+            picking: core.picking,
+            clipping: core.clipping,
+            enabled: core.enabled,
             transparent: core.transparent,
             backfaces: core.backfaces,
             frontface: core.frontface,
             reflective: core.reflective,
-            solid: core.solid
+            solid: core.solid,
+            solidColor: core.solidColor
         };
     };
 
-    SceneJS.Flags.prototype.setPicking = function(picking) {
+    SceneJS.Flags.prototype.setPicking = function (picking) {
         picking = !!picking;
         if (this._core.picking != picking) {
             this._core.picking = picking;
@@ -141,11 +141,11 @@
         return this;
     };
 
-    SceneJS.Flags.prototype.getPicking = function() {
+    SceneJS.Flags.prototype.getPicking = function () {
         return this._core.picking;
     };
 
-    SceneJS.Flags.prototype.setClipping = function(clipping) {
+    SceneJS.Flags.prototype.setClipping = function (clipping) {
         clipping = !!clipping;
         if (this._core.clipping != clipping) {
             this._core.clipping = clipping;
@@ -154,11 +154,11 @@
         return this;
     };
 
-    SceneJS.Flags.prototype.getClipping = function() {
+    SceneJS.Flags.prototype.getClipping = function () {
         return this._core.clipping;
     };
 
-    SceneJS.Flags.prototype.setEnabled = function(enabled) {
+    SceneJS.Flags.prototype.setEnabled = function (enabled) {
         enabled = !!enabled;
         if (this._core.enabled != enabled) {
             this._core.enabled = enabled;
@@ -167,11 +167,11 @@
         return this;
     };
 
-    SceneJS.Flags.prototype.getEnabled = function() {
+    SceneJS.Flags.prototype.getEnabled = function () {
         return this._core.enabled;
     };
 
-    SceneJS.Flags.prototype.setTransparent = function(transparent) {
+    SceneJS.Flags.prototype.setTransparent = function (transparent) {
         transparent = !!transparent;
         if (this._core.transparent != transparent) {
             this._core.transparent = transparent;
@@ -180,11 +180,11 @@
         return this;
     };
 
-    SceneJS.Flags.prototype.getTransparent = function() {
+    SceneJS.Flags.prototype.getTransparent = function () {
         return this._core.transparent;
     };
 
-    SceneJS.Flags.prototype.setBackfaces = function(backfaces) {
+    SceneJS.Flags.prototype.setBackfaces = function (backfaces) {
         backfaces = !!backfaces;
         if (this._core.backfaces != backfaces) {
             this._core.backfaces = backfaces;
@@ -193,11 +193,11 @@
         return this;
     };
 
-    SceneJS.Flags.prototype.getBackfaces = function() {
+    SceneJS.Flags.prototype.getBackfaces = function () {
         return this._core.backfaces;
     };
 
-    SceneJS.Flags.prototype.setFrontface = function(frontface) {
+    SceneJS.Flags.prototype.setFrontface = function (frontface) {
         if (this._core.frontface != frontface) {
             this._core.frontface = frontface;
             this._engine.display.imageDirty = true;
@@ -205,11 +205,11 @@
         return this;
     };
 
-    SceneJS.Flags.prototype.getFrontface = function() {
+    SceneJS.Flags.prototype.getFrontface = function () {
         return this._core.frontface;
     };
 
-    SceneJS.Flags.prototype.setReflective = function(reflective) {
+    SceneJS.Flags.prototype.setReflective = function (reflective) {
         reflective = !!reflective;
         if (this._core.reflective != reflective) {
             this._core.reflective = reflective;
@@ -220,11 +220,11 @@
         return this;
     };
 
-    SceneJS.Flags.prototype.getReflective = function() {
+    SceneJS.Flags.prototype.getReflective = function () {
         return this._core.reflective;
     };
 
-    SceneJS.Flags.prototype.setSolid = function(solid) {
+    SceneJS.Flags.prototype.setSolid = function (solid) {
         solid = !!solid;
         if (this._core.solid != solid) {
             this._core.solid = solid;
@@ -235,12 +235,30 @@
         return this;
     };
 
-    SceneJS.Flags.prototype.getSolid = function() {
+    SceneJS.Flags.prototype.getSolid = function () {
         return this._core.solid;
     };
 
-    
-    SceneJS.Flags.prototype._compile = function(ctx) {
+    SceneJS.Flags.prototype.setSolidColor = function (color) {
+        var defaultSolidColor = defaultCore.solidColor;
+        this._core.solidColor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultSolidColor[0],
+            color.g != undefined && color.g != null ? color.g : defaultSolidColor[1],
+            color.b != undefined && color.b != null ? color.b : defaultSolidColor[2]
+        ] : defaultCore.solidColor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getSolidColor = function () {
+        return {
+            r: this._core.solidColor[0],
+            g: this._core.solidColor[1],
+            b: this._core.solidColor[2]
+        };
+    };
+
+    SceneJS.Flags.prototype._compile = function (ctx) {
         this._engine.display.flags = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.flags = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
