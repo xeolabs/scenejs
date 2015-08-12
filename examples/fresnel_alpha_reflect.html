@@ -103,7 +103,8 @@
                                             {
                                                 type: "fresnel",
                                                 applyTo: "reflect",
-                                                bias: 0.3,
+                                                topBias: 0.0,
+                                                bottomBias: 0.6,
                                                 power: 5.0,
                                                 topColor: {r: 1.0, g: 1.0, b: 1.0},
                                                 bottomColor: {r: 0.0, g: 0.0, b: 0.0},
@@ -114,8 +115,9 @@
                                                     {
                                                         type: "fresnel",
                                                         applyTo: "alpha",
-                                                        bias: 0.2,
-                                                        power: 3.0,
+                                                        topBias: 0.2,
+                                                        bottomBias: 0.7,
+                                                        power: 1.0,
                                                         topColor: {r: 1.0, g: 1.0, b: 1.0},
                                                         bottomColor: {r: 0.0, g: 0.0, b: 0.0},
 

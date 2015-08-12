@@ -8,7 +8,8 @@ new (function () {
     var defaultCore = {
         type: "fresnel",
         stateId: SceneJS._baseStateId++,
-        bias:0.0,
+        topBias:0.0,
+        bottomBias: 1.0,
         power: 1.0,
         topColor:[ 1.0, 1.0, 1.0 ],
         bottomColor:[ 0.0, 0.0, 0.0 ],
@@ -53,7 +54,8 @@ new (function () {
             this._core.applyTo = params.applyTo;
         }
 
-        this.setBias(params.bias);
+        this.setTopBias(params.topBias);
+        this.setBottomBias(params.bottomBias);
         this.setPower(params.power);
         this.setTopColor(params.topColor);
         this.setBottomColor(params.bottomColor);
@@ -63,13 +65,22 @@ new (function () {
         return this._core.applyTo;
     };
 
-    SceneJS.Fresnel.prototype.setBias = function (bias) {
-        this._core.bias = (bias !== undefined && bias !== null) ? bias : defaultCore.bias;
+    SceneJS.Fresnel.prototype.setTopBias = function (topBias) {
+        this._core.topBias = (topBias !== undefined && topBias !== null) ? topBias : defaultCore.topBias;
         this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Fresnel.prototype.getBias = function () {
-        return this._core.bias;
+    SceneJS.Fresnel.prototype.getTopBias = function () {
+        return this._core.topBias;
+    };
+
+    SceneJS.Fresnel.prototype.setBottomBias = function (bottomBias) {
+        this._core.bottomBias = (bottomBias !== undefined && bottomBias !== null) ? bottomBias : defaultCore.bottomBias;
+        this._engine.display.imageDirty = true;
+    };
+
+    SceneJS.Fresnel.prototype.getBottomBias = function () {
+        return this._core.bottomBias;
     };
 
     SceneJS.Fresnel.prototype.setPower = function (power) {

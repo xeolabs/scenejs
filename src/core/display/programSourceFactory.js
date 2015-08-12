@@ -608,42 +608,48 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialEmit;");
 
         if (diffuseFresnel) {
-            src.push("uniform float SCENEJS_uDiffuseFresnelBias;");
+            src.push("uniform float SCENEJS_uDiffuseFresnelTopBias;");
+            src.push("uniform float SCENEJS_uDiffuseFresnelBottomBias;");
             src.push("uniform float SCENEJS_uDiffuseFresnelPower;");
             src.push("uniform vec3 SCENEJS_uDiffuseFresnelTopColor;");
             src.push("uniform vec3 SCENEJS_uDiffuseFresnelBottomColor;");
         }
 
         if (specularFresnel) {
-            src.push("uniform float SCENEJS_uSpecularFresnelBias;");
+            src.push("uniform float SCENEJS_uSpecularFresnelTopBias;");
+            src.push("uniform float SCENEJS_uSpecularFresnelBottomBias;");
             src.push("uniform float SCENEJS_uSpecularFresnelPower;");
             src.push("uniform vec3 SCENEJS_uSpecularFresnelTopColor;");
             src.push("uniform vec3 SCENEJS_uSpecularFresnelBottomColor;");
         }
 
         if (alphaFresnel) {
-            src.push("uniform float SCENEJS_uAlphaFresnelBias;");
+            src.push("uniform float SCENEJS_uAlphaFresnelTopBias;");
+            src.push("uniform float SCENEJS_uAlphaFresnelBottomBias;");
             src.push("uniform float SCENEJS_uAlphaFresnelPower;");
             src.push("uniform vec3 SCENEJS_uAlphaFresnelTopColor;");
             src.push("uniform vec3 SCENEJS_uAlphaFresnelBottomColor;");
         }
 
         if (reflectFresnel) {
-            src.push("uniform float SCENEJS_uReflectFresnelBias;");
+            src.push("uniform float SCENEJS_uReflectFresnelTopBias;");
+            src.push("uniform float SCENEJS_uReflectFresnelBottomBias;");
             src.push("uniform float SCENEJS_uReflectFresnelPower;");
             src.push("uniform vec3 SCENEJS_uReflectFresnelTopColor;");
             src.push("uniform vec3 SCENEJS_uReflectFresnelBottomColor;");
         }
 
         if (emitFresnel) {
-            src.push("uniform float SCENEJS_uEmitFresnelBias;");
+            src.push("uniform float SCENEJS_uEmitFresnelTopBias;");
+            src.push("uniform float SCENEJS_uEmitFresnelBottomBias;");
             src.push("uniform float SCENEJS_uEmitFresnelPower;");
             src.push("uniform vec3 SCENEJS_uEmitFresnelTopColor;");
             src.push("uniform vec3 SCENEJS_uEmitFresnelBottomColor;");
         }
 
         if (fragmentFresnel) {
-            src.push("uniform float SCENEJS_uFragmentFresnelBias;");
+            src.push("uniform float SCENEJS_uFragmentFresnelTopBias;");
+            src.push("uniform float SCENEJS_uFragmentFresnelBottomBias;");
             src.push("uniform float SCENEJS_uFragmentFresnelPower;");
             src.push("uniform vec3 SCENEJS_uFragmentFresnelTopColor;");
             src.push("uniform vec3 SCENEJS_uFragmentFresnelBottomColor;");
@@ -674,9 +680,17 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel) {
-            src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float bias, float power) {");
-            src.push("  float fresnelTerm = pow(bias + abs(dot(viewDirection, worldNormal)), power);");
-            src.push("  return clamp(fresnelTerm, 0., 1.);");
+            src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float topBias, float bottomBias, float power) {");
+            src.push("    float fr = abs(dot(viewDirection, worldNormal));");
+            src.push("    float finalFr = (1.0 + (fr - bottomBias) / (bottomBias - topBias));");
+            src.push("    float fresnelTerm = pow(finalFr, power);");
+            src.push("    return clamp(fresnelTerm, 0.0, 1.0);");
+
+            //
+            //
+            //src.push("  float fresnelTerm = pow(bias + abs(dot(viewDirection, worldNormal)), power);");
+            //src.push("  return clamp(fresnelTerm, 0., 1.);");
+
             src.push("}");
         }
 
@@ -865,7 +879,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("float reflectFactor = 1.0;");
 
             if (reflectFresnel) {
-                src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelBias, SCENEJS_uReflectFresnelPower);");
+                src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelTopBias,  SCENEJS_uReflectFresnelBottomBias, SCENEJS_uReflectFresnelPower);");
                 src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelTopColor.b, SCENEJS_uReflectFresnelBottomColor.b, reflectFresnel);");
             }
 
@@ -947,27 +961,27 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (diffuseFresnel || specularFresnel || alphaFresnel || emitFresnel) {
 
                 if (diffuseFresnel) {
-                    src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelBias, SCENEJS_uDiffuseFresnelPower);");
+                    src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelTopBias, SCENEJS_uDiffuseFresnelBottomBias, SCENEJS_uDiffuseFresnelPower);");
                     src.push("lightValue *= mix(SCENEJS_uDiffuseFresnelTopColor.rgb, SCENEJS_uDiffuseFresnelBottomColor.rgb, diffuseFresnel);");
                 }
 
                 if (specularFresnel) {
-                    src.push("float specFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uSpecularFresnelBias, SCENEJS_uSpecularFresnelPower);");
+                    src.push("float specFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uSpecularFresnelTopBias, SCENEJS_uSpecularFresnelBottomBias, SCENEJS_uSpecularFresnelPower);");
                     src.push("specularValue *= mix(SCENEJS_uSpecularFresnelTopColor.rgb, SCENEJS_uSpecularFresnelBottomColor.rgb, specFresnel);");
                 }
 
                 if (alphaFresnel) {
-                    src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelBias, SCENEJS_uAlphaFresnelPower);");
+                    src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelTopBias, SCENEJS_uAlphaFresnelBottomBias, SCENEJS_uAlphaFresnelPower);");
                     src.push("alpha *= mix(SCENEJS_uAlphaFresnelTopColor.r, SCENEJS_uAlphaFresnelBottomColor.r, alphaFresnel);");
                 }
 
                 if (emitFresnel) {
-                    src.push("float emitFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uEmitFresnelBias, SCENEJS_uEmitFresnelPower);");
+                    src.push("float emitFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uEmitFresnelTopBias, SCENEJS_uEmitFresnelBottomBias, SCENEJS_uEmitFresnelPower);");
                     src.push("emit *= mix(SCENEJS_uEmitFresnelTopColor.r, SCENEJS_uEmitFresnelBottomColor.r, emitFresnel);");
                 }
             }
 
-            src.push("      fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * emitColor.rgb), alpha);");
+            src.push("fragColor = vec4((specularValue.rgb + color.rgb * (lightValue.rgb + ambient.rgb)) + (emit * emitColor.rgb), alpha);");
 
         } else { // No normals
             src.push("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
@@ -1003,7 +1017,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (fragmentFresnel) {
-            src.push("float fragmentFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uFragmentFresnelBias, SCENEJS_uFragmentFresnelPower);");
+            src.push("float fragmentFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uFragmentFresnelTopBias, SCENEJS_uFragmentFresnelPower);");
             src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelTopColor.rgb, SCENEJS_uFragmentFresnelBottomColor.rgb, fragmentFresnel);");
         }
 
