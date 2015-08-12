@@ -7,10 +7,10 @@ new (function () {
 
     // The default state core singleton for {@link SceneJS.Texture} nodes
     var defaultCore = {
-        type:"texture",
-        stateId:SceneJS._baseStateId++,
-        empty:true,
-        hash:""
+        type: "texture",
+        stateId: SceneJS._baseStateId++,
+        empty: true,
+        hash: ""
     };
 
     var coreStack = [];
@@ -73,7 +73,7 @@ new (function () {
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + "  applyFrom value is unsupported - " +
-                                "should be either 'uv', 'uv2', 'normal' or 'geometry'");
+                            "should be either 'uv', 'uv2', 'normal' or 'geometry'");
                     }
                 }
 
@@ -88,7 +88,7 @@ new (function () {
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + " applyTo value is unsupported - " +
-                                "should be either 'color', 'baseColor', 'specular' or 'normals'");
+                            "should be either 'color', 'baseColor', 'specular' or 'normals'");
                     }
                 }
 
@@ -97,7 +97,7 @@ new (function () {
                         throw SceneJS_error.fatalError(
                             SceneJS.errors.NODE_CONFIG_EXPECTED,
                             "texture layer " + i + " blendMode value is unsupported - " +
-                                "should be either 'add', 'multiply' or 'mix'");
+                            "should be either 'add', 'multiply' or 'mix'");
                     }
                 }
 
@@ -106,15 +106,15 @@ new (function () {
                 }
 
                 var layer = SceneJS._apply(layerParams, {
-                    waitForLoad:waitForLoad,
-                    texture:null,
-                    applyFrom:layerParams.applyFrom || "uv",
-                    applyTo:layerParams.applyTo || "baseColor",
-                    blendMode:layerParams.blendMode || "multiply",
-                    blendFactor:(layerParams.blendFactor != undefined && layerParams.blendFactor != null) ? layerParams.blendFactor : 1.0,
-                    translate:{ x:0, y:0},
-                    scale:{ x:1, y:1 },
-                    rotate:{ z:0.0 }
+                    waitForLoad: waitForLoad,
+                    texture: null,
+                    applyFrom: layerParams.applyFrom || "uv",
+                    applyTo: layerParams.applyTo || "baseColor",
+                    blendMode: layerParams.blendMode || "multiply",
+                    blendFactor: (layerParams.blendFactor != undefined && layerParams.blendFactor != null) ? layerParams.blendFactor : 1.0,
+                    translate: {x: 0, y: 0},
+                    scale: {x: 1, y: 1},
+                    rotate: {z: 0.0}
                 });
 
                 this._core.layers.push(layer);
@@ -128,6 +128,11 @@ new (function () {
                     }
                 } else { // Create from texture node's layer configs
                     this._loadLayerTexture(gl, layer);
+                }
+
+                if (layer.image && layer.applyTo == "baseColor" && !this._imagePublished) {
+                    this.publish("image", layer.image);
+                    this._imagePublished = true;
                 }
             }
 
@@ -171,7 +176,7 @@ new (function () {
                             "texture: 'getSource' method missing on plugin for texture source type '" + sourceConfigs.type + "'.");
                     }
 
-                    var source = plugin.getSource({ gl:gl });
+                    var source = plugin.getSource({gl: gl});
 
                     if (!source.subscribe) {
                         throw SceneJS_error.fatalError(
@@ -209,7 +214,7 @@ new (function () {
 
             var src = layer.uri || layer.src;
             var preloadSrc = layer.preloadURI || layer.preloadSrc;
-            var preloadColor = layer.preloadColor || { r: 0.57735, g: 0.57735, b: 0.57735 };
+            var preloadColor = layer.preloadColor || {r: 0.57735, g: 0.57735, b: 0.57735};
             preloadColor.a = preloadColor.a === undefined ? 1 : preloadColor.a;
 
             preloadColor = new Uint8Array([
@@ -261,7 +266,10 @@ new (function () {
                 if (!taskFinished) {
                     SceneJS_sceneStatusModule.taskFinished(taskId);
                 }
+                layer.image = image;
                 loaded = true;
+
+                self.publish("image", image);
             };
 
             image.onerror = function () {
@@ -291,6 +299,7 @@ new (function () {
 
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._ensureImageSizePowerOfTwo(image));
         this._engine.display.imageDirty = true;
+        return image;
     };
 
     SceneJS.Texture.prototype._ensureImageSizePowerOfTwo = function (image) {
@@ -328,22 +337,22 @@ new (function () {
     SceneJS.Texture.prototype._setLayerTexture = function (gl, layer, texture) {
 
         layer.texture = new SceneJS._webgl.Texture2D(gl, {
-            texture:texture, // WebGL texture object
-            minFilter:this._getGLOption("minFilter", gl, layer, gl.LINEAR_MIPMAP_NEAREST),
-            magFilter:this._getGLOption("magFilter", gl, layer, gl.LINEAR),
-            wrapS:this._getGLOption("wrapS", gl, layer, gl.REPEAT),
-            wrapT:this._getGLOption("wrapT", gl, layer, gl.REPEAT),
-            isDepth:this._getOption(layer.isDepth, false),
-            depthMode:this._getGLOption("depthMode", gl, layer, gl.LUMINANCE),
-            depthCompareMode:this._getGLOption("depthCompareMode", gl, layer, gl.COMPARE_R_TO_TEXTURE),
-            depthCompareFunc:this._getGLOption("depthCompareFunc", gl, layer, gl.LEQUAL),
-            flipY:this._getOption(layer.flipY, true),
-            width:this._getOption(layer.width, 1),
-            height:this._getOption(layer.height, 1),
-            internalFormat:this._getGLOption("internalFormat", gl, layer, gl.LEQUAL),
-            sourceFormat:this._getGLOption("sourceType", gl, layer, gl.ALPHA),
-            sourceType:this._getGLOption("sourceType", gl, layer, gl.UNSIGNED_BYTE),
-            update:null
+            texture: texture, // WebGL texture object
+            minFilter: this._getGLOption("minFilter", gl, layer, gl.LINEAR_MIPMAP_NEAREST),
+            magFilter: this._getGLOption("magFilter", gl, layer, gl.LINEAR),
+            wrapS: this._getGLOption("wrapS", gl, layer, gl.REPEAT),
+            wrapT: this._getGLOption("wrapT", gl, layer, gl.REPEAT),
+            isDepth: this._getOption(layer.isDepth, false),
+            depthMode: this._getGLOption("depthMode", gl, layer, gl.LUMINANCE),
+            depthCompareMode: this._getGLOption("depthCompareMode", gl, layer, gl.COMPARE_R_TO_TEXTURE),
+            depthCompareFunc: this._getGLOption("depthCompareFunc", gl, layer, gl.LEQUAL),
+            flipY: this._getOption(layer.flipY, true),
+            width: this._getOption(layer.width, 1),
+            height: this._getOption(layer.height, 1),
+            internalFormat: this._getGLOption("internalFormat", gl, layer, gl.LEQUAL),
+            sourceFormat: this._getGLOption("sourceType", gl, layer, gl.ALPHA),
+            sourceType: this._getGLOption("sourceType", gl, layer, gl.UNSIGNED_BYTE),
+            update: null
         });
 
         if (this.destroyed) { // Node was destroyed while loading
@@ -454,7 +463,7 @@ new (function () {
             if (translate.y != undefined) {
                 layer.translate.y = translate.y;
             }
-            matrix = SceneJS_math_translationMat4v([ translate.x || 0, translate.y || 0, 0]);
+            matrix = SceneJS_math_translationMat4v([translate.x || 0, translate.y || 0, 0]);
         }
 
         if (cfg.scale) {
@@ -465,7 +474,7 @@ new (function () {
             if (scale.y != undefined) {
                 layer.scale.y = scale.y;
             }
-            t = SceneJS_math_scalingMat4v([ scale.x || 1, scale.y || 1, 1]);
+            t = SceneJS_math_scalingMat4v([scale.x || 1, scale.y || 1, 1]);
             matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
         }
 
