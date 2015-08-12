@@ -435,6 +435,11 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 19, "geometry", this.morphGeometry, this.geometry);
     this._setChunk(object, 20, "listeners", this.renderListeners);      // Must be after the above chunks
     this._setChunk(object, 21, "draw", this.geometry); // Must be last
+
+    // At the very least, the object sort order
+    // will need be recomputed
+
+    this.stateOrderDirty = true;
 };
 
 SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, core2) {

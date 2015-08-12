@@ -565,6 +565,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals && cubeMapping) {
+
+            src.push("uniform mat4 SCENEJS_uVNMatrix;");
+
             var layer;
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
                 layer = states.cubemap.layers[i];
@@ -865,8 +868,15 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelBias, SCENEJS_uReflectFresnelPower);");
                 src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelTopColor.b, SCENEJS_uReflectFresnelBottomColor.b, reflectFresnel);");
             }
-            
-            src.push("vec3 envLookup = reflect(SCENEJS_vViewEyeVec, viewNormalVec);");
+
+            src.push("vec4 v = SCENEJS_uVNMatrix * vec4(SCENEJS_vViewEyeVec, 1.0);");
+            src.push("vec3 v1 = v.xyz;");
+
+            src.push("v = SCENEJS_uVNMatrix * vec4(viewNormalVec, 1.0);");
+            src.push("vec3 v2 = v.xyz;");
+
+            src.push("vec3 envLookup = reflect(v1, v2);");
+
             src.push("envLookup.y = envLookup.y * -1.0;"); // Need to flip textures on Y-axis for some reason
             src.push("vec4 envColor;");
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
