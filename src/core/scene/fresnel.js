@@ -8,11 +8,11 @@ new (function () {
     var defaultCore = {
         type: "fresnel",
         stateId: SceneJS._baseStateId++,
-        topBias:0.0,
-        bottomBias: 1.0,
+        centerBias:0.0,
+        edgeBias: 1.0,
         power: 1.0,
-        topColor:[ 1.0, 1.0, 1.0 ],
-        bottomColor:[ 0.0, 0.0, 0.0 ],
+        centerColor:[ 1.0, 1.0, 1.0 ],
+        edgeColor:[ 0.0, 0.0, 0.0 ],
         empty: true,
         hash: ""
     };
@@ -54,33 +54,33 @@ new (function () {
             this._core.applyTo = params.applyTo;
         }
 
-        this.setTopBias(params.topBias);
-        this.setBottomBias(params.bottomBias);
+        this.setCenterBias(params.centerBias);
+        this.setEdgeBias(params.edgeBias);
         this.setPower(params.power);
-        this.setTopColor(params.topColor);
-        this.setBottomColor(params.bottomColor);
+        this.setCenterColor(params.centerColor);
+        this.setEdgeColor(params.edgeColor);
     };
 
     SceneJS.Fresnel.prototype.getApplyTo = function () {
         return this._core.applyTo;
     };
 
-    SceneJS.Fresnel.prototype.setTopBias = function (topBias) {
-        this._core.topBias = (topBias !== undefined && topBias !== null) ? topBias : defaultCore.topBias;
+    SceneJS.Fresnel.prototype.setCenterBias = function (centerBias) {
+        this._core.centerBias = (centerBias !== undefined && centerBias !== null) ? centerBias : defaultCore.centerBias;
         this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Fresnel.prototype.getTopBias = function () {
-        return this._core.topBias;
+    SceneJS.Fresnel.prototype.getCenterBias = function () {
+        return this._core.centerBias;
     };
 
-    SceneJS.Fresnel.prototype.setBottomBias = function (bottomBias) {
-        this._core.bottomBias = (bottomBias !== undefined && bottomBias !== null) ? bottomBias : defaultCore.bottomBias;
+    SceneJS.Fresnel.prototype.setEdgeBias = function (edgeBias) {
+        this._core.edgeBias = (edgeBias !== undefined && edgeBias !== null) ? edgeBias : defaultCore.edgeBias;
         this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Fresnel.prototype.getBottomBias = function () {
-        return this._core.bottomBias;
+    SceneJS.Fresnel.prototype.getEdgeBias = function () {
+        return this._core.edgeBias;
     };
 
     SceneJS.Fresnel.prototype.setPower = function (power) {
@@ -92,41 +92,41 @@ new (function () {
         return this._core.power;
     };
 
-    SceneJS.Fresnel.prototype.setTopColor = function (color) {
-        var defaultTopColor = defaultCore.topColor;
-        this._core.topColor = color ? [
-            color.r != undefined && color.r != null ? color.r : defaultTopColor[0],
-            color.g != undefined && color.g != null ? color.g : defaultTopColor[1],
-            color.b != undefined && color.b != null ? color.b : defaultTopColor[2]
-        ] : defaultCore.topColor;
+    SceneJS.Fresnel.prototype.setCenterColor = function (color) {
+        var defaultCenterColor = defaultCore.centerColor;
+        this._core.centerColor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultCenterColor[0],
+            color.g != undefined && color.g != null ? color.g : defaultCenterColor[1],
+            color.b != undefined && color.b != null ? color.b : defaultCenterColor[2]
+        ] : defaultCore.centerColor;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Fresnel.prototype.getTopColor = function () {
+    SceneJS.Fresnel.prototype.getCenterColor = function () {
         return {
-            r:this._core.topColor[0],
-            g:this._core.topColor[1],
-            b:this._core.topColor[2]
+            r:this._core.centerColor[0],
+            g:this._core.centerColor[1],
+            b:this._core.centerColor[2]
         };
     };
 
-    SceneJS.Fresnel.prototype.setBottomColor = function (color) {
-        var defaultBottomColor = defaultCore.bottomColor;
-        this._core.bottomColor = color ? [
-            color.r != undefined && color.r != null ? color.r : defaultBottomColor[0],
-            color.g != undefined && color.g != null ? color.g : defaultBottomColor[1],
-            color.b != undefined && color.b != null ? color.b : defaultBottomColor[2]
-        ] : defaultCore.bottomColor;
+    SceneJS.Fresnel.prototype.setEdgeColor = function (color) {
+        var defaultEdgeColor = defaultCore.edgeColor;
+        this._core.edgeColor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultEdgeColor[0],
+            color.g != undefined && color.g != null ? color.g : defaultEdgeColor[1],
+            color.b != undefined && color.b != null ? color.b : defaultEdgeColor[2]
+        ] : defaultCore.edgeColor;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Fresnel.prototype.getBottomColor = function () {
+    SceneJS.Fresnel.prototype.getEdgeColor = function () {
         return {
-            r:this._core.bottomColor[0],
-            g:this._core.bottomColor[1],
-            b:this._core.bottomColor[2]
+            r:this._core.edgeColor[0],
+            g:this._core.edgeColor[1],
+            b:this._core.edgeColor[2]
         };
     };
     

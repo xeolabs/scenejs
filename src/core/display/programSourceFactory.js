@@ -608,51 +608,51 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialEmit;");
 
         if (diffuseFresnel) {
-            src.push("uniform float SCENEJS_uDiffuseFresnelTopBias;");
-            src.push("uniform float SCENEJS_uDiffuseFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uDiffuseFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uDiffuseFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uDiffuseFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uDiffuseFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uDiffuseFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uDiffuseFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uDiffuseFresnelEdgeColor;");
         }
 
         if (specularFresnel) {
-            src.push("uniform float SCENEJS_uSpecularFresnelTopBias;");
-            src.push("uniform float SCENEJS_uSpecularFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uSpecularFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uSpecularFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uSpecularFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uSpecularFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uSpecularFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uSpecularFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uSpecularFresnelEdgeColor;");
         }
 
         if (alphaFresnel) {
-            src.push("uniform float SCENEJS_uAlphaFresnelTopBias;");
-            src.push("uniform float SCENEJS_uAlphaFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uAlphaFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uAlphaFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uAlphaFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uAlphaFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uAlphaFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uAlphaFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uAlphaFresnelEdgeColor;");
         }
 
         if (reflectFresnel) {
-            src.push("uniform float SCENEJS_uReflectFresnelTopBias;");
-            src.push("uniform float SCENEJS_uReflectFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uReflectFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uReflectFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uReflectFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uReflectFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uReflectFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uReflectFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uReflectFresnelEdgeColor;");
         }
 
         if (emitFresnel) {
-            src.push("uniform float SCENEJS_uEmitFresnelTopBias;");
-            src.push("uniform float SCENEJS_uEmitFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uEmitFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uEmitFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uEmitFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uEmitFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uEmitFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uEmitFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uEmitFresnelEdgeColor;");
         }
 
         if (fragmentFresnel) {
-            src.push("uniform float SCENEJS_uFragmentFresnelTopBias;");
-            src.push("uniform float SCENEJS_uFragmentFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uFragmentFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uFragmentFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uFragmentFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uFragmentFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uFragmentFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uFragmentFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uFragmentFresnelEdgeColor;");
         }
 
         src.push("varying vec3 SCENEJS_vViewEyeVec;");                          // Direction of world-space vertex from eye
@@ -680,9 +680,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel) {
-            src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float topBias, float bottomBias, float power) {");
+            src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float centerBias, float edgeBias, float power) {");
             src.push("    float fr = abs(dot(viewDirection, worldNormal));");
-            src.push("    float finalFr = (1.0 + (fr - bottomBias) / (bottomBias - topBias));");
+            src.push("    float finalFr = (1.0 + (fr - edgeBias) / (edgeBias - centerBias));");
             src.push("    float fresnelTerm = pow(finalFr, power);");
             src.push("    return clamp(fresnelTerm, 0.0, 1.0);");
 
@@ -879,8 +879,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("float reflectFactor = 1.0;");
 
             if (reflectFresnel) {
-                src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelTopBias,  SCENEJS_uReflectFresnelBottomBias, SCENEJS_uReflectFresnelPower);");
-                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelTopColor.b, SCENEJS_uReflectFresnelBottomColor.b, reflectFresnel);");
+                src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelCenterBias,  SCENEJS_uReflectFresnelEdgeBias, SCENEJS_uReflectFresnelPower);");
+                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelCenterColor.b, SCENEJS_uReflectFresnelEdgeColor.b, reflectFresnel);");
             }
 
             src.push("vec4 v = SCENEJS_uVNMatrix * vec4(SCENEJS_vViewEyeVec, 1.0);");
@@ -961,23 +961,23 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (diffuseFresnel || specularFresnel || alphaFresnel || emitFresnel) {
 
                 if (diffuseFresnel) {
-                    src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelTopBias, SCENEJS_uDiffuseFresnelBottomBias, SCENEJS_uDiffuseFresnelPower);");
-                    src.push("lightValue *= mix(SCENEJS_uDiffuseFresnelTopColor.rgb, SCENEJS_uDiffuseFresnelBottomColor.rgb, diffuseFresnel);");
+                    src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelCenterBias, SCENEJS_uDiffuseFresnelEdgeBias, SCENEJS_uDiffuseFresnelPower);");
+                    src.push("lightValue *= mix(SCENEJS_uDiffuseFresnelCenterColor.rgb, SCENEJS_uDiffuseFresnelEdgeColor.rgb, diffuseFresnel);");
                 }
 
                 if (specularFresnel) {
-                    src.push("float specFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uSpecularFresnelTopBias, SCENEJS_uSpecularFresnelBottomBias, SCENEJS_uSpecularFresnelPower);");
-                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelTopColor.rgb, SCENEJS_uSpecularFresnelBottomColor.rgb, specFresnel);");
+                    src.push("float specFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uSpecularFresnelCenterBias, SCENEJS_uSpecularFresnelEdgeBias, SCENEJS_uSpecularFresnelPower);");
+                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelCenterColor.rgb, SCENEJS_uSpecularFresnelEdgeColor.rgb, specFresnel);");
                 }
 
                 if (alphaFresnel) {
-                    src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelTopBias, SCENEJS_uAlphaFresnelBottomBias, SCENEJS_uAlphaFresnelPower);");
-                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelTopColor.r, SCENEJS_uAlphaFresnelBottomColor.r, alphaFresnel);");
+                    src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelCenterBias, SCENEJS_uAlphaFresnelEdgeBias, SCENEJS_uAlphaFresnelPower);");
+                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelCenterColor.r, SCENEJS_uAlphaFresnelEdgeColor.r, alphaFresnel);");
                 }
 
                 if (emitFresnel) {
-                    src.push("float emitFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uEmitFresnelTopBias, SCENEJS_uEmitFresnelBottomBias, SCENEJS_uEmitFresnelPower);");
-                    src.push("emit *= mix(SCENEJS_uEmitFresnelTopColor.r, SCENEJS_uEmitFresnelBottomColor.r, emitFresnel);");
+                    src.push("float emitFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uEmitFresnelCenterBias, SCENEJS_uEmitFresnelEdgeBias, SCENEJS_uEmitFresnelPower);");
+                    src.push("emit *= mix(SCENEJS_uEmitFresnelCenterColor.r, SCENEJS_uEmitFresnelEdgeColor.r, emitFresnel);");
                 }
             }
 
@@ -1017,8 +1017,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (fragmentFresnel) {
-            src.push("float fragmentFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uFragmentFresnelTopBias, SCENEJS_uFragmentFresnelPower);");
-            src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelTopColor.rgb, SCENEJS_uFragmentFresnelBottomColor.rgb, fragmentFresnel);");
+            src.push("float fragmentFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uFragmentFresnelCenterBias, SCENEJS_uFragmentFresnelPower);");
+            src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelCenterColor.rgb, SCENEJS_uFragmentFresnelEdgeColor.rgb, fragmentFresnel);");
         }
 
         src.push("gl_FragColor = fragColor;");
