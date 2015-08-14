@@ -879,8 +879,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("float reflectFactor = 1.0;");
 
             if (reflectFresnel) {
-                src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelCenterBias,  SCENEJS_uReflectFresnelEdgeBias, SCENEJS_uReflectFresnelPower);");
-                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelCenterColor.b, SCENEJS_uReflectFresnelEdgeColor.b, reflectFresnel);");
+                src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelEdgeBias,  SCENEJS_uReflectFresnelCenterBias, SCENEJS_uReflectFresnelPower);");
+                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelEdgeColor.b, SCENEJS_uReflectFresnelCenterColor.b, reflectFresnel);");
             }
 
             src.push("vec4 v = SCENEJS_uVNMatrix * vec4(SCENEJS_vViewEyeVec, 1.0);");
@@ -961,23 +961,23 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (diffuseFresnel || specularFresnel || alphaFresnel || emitFresnel) {
 
                 if (diffuseFresnel) {
-                    src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelCenterBias, SCENEJS_uDiffuseFresnelEdgeBias, SCENEJS_uDiffuseFresnelPower);");
-                    src.push("lightValue *= mix(SCENEJS_uDiffuseFresnelCenterColor.rgb, SCENEJS_uDiffuseFresnelEdgeColor.rgb, diffuseFresnel);");
+                    src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelEdgeBias, SCENEJS_uDiffuseFresnelCenterBias, SCENEJS_uDiffuseFresnelPower);");
+                    src.push("lightValue *= mix(SCENEJS_uDiffuseFresnelEdgeColor.rgb, SCENEJS_uDiffuseFresnelCenterColor.rgb, diffuseFresnel);");
                 }
 
                 if (specularFresnel) {
-                    src.push("float specFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uSpecularFresnelCenterBias, SCENEJS_uSpecularFresnelEdgeBias, SCENEJS_uSpecularFresnelPower);");
-                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelCenterColor.rgb, SCENEJS_uSpecularFresnelEdgeColor.rgb, specFresnel);");
+                    src.push("float specFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uSpecularFresnelEdgeBias, SCENEJS_uSpecularFresnelCenterBias, SCENEJS_uSpecularFresnelPower);");
+                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelEdgeColor.rgb, SCENEJS_uSpecularFresnelCenterColor.rgb, specFresnel);");
                 }
 
                 if (alphaFresnel) {
-                    src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelCenterBias, SCENEJS_uAlphaFresnelEdgeBias, SCENEJS_uAlphaFresnelPower);");
-                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelCenterColor.r, SCENEJS_uAlphaFresnelEdgeColor.r, alphaFresnel);");
+                    src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelEdgeBias, SCENEJS_uAlphaFresnelCenterBias, SCENEJS_uAlphaFresnelPower);");
+                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelEdgeColor.r, SCENEJS_uAlphaFresnelCenterColor.r, alphaFresnel);");
                 }
 
                 if (emitFresnel) {
-                    src.push("float emitFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uEmitFresnelCenterBias, SCENEJS_uEmitFresnelEdgeBias, SCENEJS_uEmitFresnelPower);");
-                    src.push("emit *= mix(SCENEJS_uEmitFresnelCenterColor.r, SCENEJS_uEmitFresnelEdgeColor.r, emitFresnel);");
+                    src.push("float emitFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uEmitFresnelEdgeBias, SCENEJS_uEmitFresnelCenterBias, SCENEJS_uEmitFresnelPower);");
+                    src.push("emit *= mix(SCENEJS_uEmitFresnelEdgeColor.r, SCENEJS_uEmitFresnelCenterColor.r, emitFresnel);");
                 }
             }
 
@@ -1017,8 +1017,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (fragmentFresnel) {
-            src.push("float fragmentFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uFragmentFresnelCenterBias, SCENEJS_uFragmentFresnelPower);");
-            src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelCenterColor.rgb, SCENEJS_uFragmentFresnelEdgeColor.rgb, fragmentFresnel);");
+            src.push("float fragmentFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uFragmentFresnelEdgeBias, SCENEJS_uFragmentFresnelCenterBias, SCENEJS_uFragmentFresnelPower);");
+            src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelEdgeColor.rgb, SCENEJS_uFragmentFresnelCenterColor.rgb, fragmentFresnel);");
         }
 
         src.push("gl_FragColor = fragColor;");
