@@ -49,7 +49,7 @@
                 nodes: [
                     {
                         type: "material",
-                        color: {r: 0.4, g: 0.4, b: 1.0},
+                        color: {r: 0.5, g: 0.5, b: 0.5},
                         specularColor: {r: 1.0, g: 1.0, b: 1.0},
                         specular: 1.0,
 
@@ -59,11 +59,11 @@
                             {
                                 type: "fresnel",
                                 applyTo: "fragment",
-                                centerBias: 0.2,
-                                edgeBias : 1.0,
-                                power: 2.0,
-                                centerColor: {r: 4.0, g: 2.0, b: 0.0},
-                                edgeColor: {r: 1.0, g: 1.0, b: 1.0},
+                                edgeBias : 0.2,
+                                centerBias: 0.8,
+                                power: 3.0,
+                                edgeColor: {r: 2.0, g: 2.0, b: 0.5},
+                                centerColor: {r: 1.0, g: 1.0, b: 1.0},
 
                                 nodes: [
 
