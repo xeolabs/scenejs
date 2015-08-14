@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-08-12
+ * Built on 2015-08-14
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -13285,8 +13285,6 @@ new (function () {
         }
     };
 
-
-
     SceneJS.Texture.prototype._compile = function (ctx) {
         if (!this._core.hash) {
             this._makeHash();
@@ -13779,11 +13777,11 @@ new (function () {
     var defaultCore = {
         type: "fresnel",
         stateId: SceneJS._baseStateId++,
-        topBias:0.0,
-        bottomBias: 1.0,
+        centerBias:0.0,
+        edgeBias: 1.0,
         power: 1.0,
-        topColor:[ 1.0, 1.0, 1.0 ],
-        bottomColor:[ 0.0, 0.0, 0.0 ],
+        centerColor:[ 1.0, 1.0, 1.0 ],
+        edgeColor:[ 0.0, 0.0, 0.0 ],
         empty: true,
         hash: ""
     };
@@ -13825,33 +13823,33 @@ new (function () {
             this._core.applyTo = params.applyTo;
         }
 
-        this.setTopBias(params.topBias);
-        this.setBottomBias(params.bottomBias);
+        this.setCenterBias(params.centerBias);
+        this.setEdgeBias(params.edgeBias);
         this.setPower(params.power);
-        this.setTopColor(params.topColor);
-        this.setBottomColor(params.bottomColor);
+        this.setCenterColor(params.centerColor);
+        this.setEdgeColor(params.edgeColor);
     };
 
     SceneJS.Fresnel.prototype.getApplyTo = function () {
         return this._core.applyTo;
     };
 
-    SceneJS.Fresnel.prototype.setTopBias = function (topBias) {
-        this._core.topBias = (topBias !== undefined && topBias !== null) ? topBias : defaultCore.topBias;
+    SceneJS.Fresnel.prototype.setCenterBias = function (centerBias) {
+        this._core.centerBias = (centerBias !== undefined && centerBias !== null) ? centerBias : defaultCore.centerBias;
         this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Fresnel.prototype.getTopBias = function () {
-        return this._core.topBias;
+    SceneJS.Fresnel.prototype.getCenterBias = function () {
+        return this._core.centerBias;
     };
 
-    SceneJS.Fresnel.prototype.setBottomBias = function (bottomBias) {
-        this._core.bottomBias = (bottomBias !== undefined && bottomBias !== null) ? bottomBias : defaultCore.bottomBias;
+    SceneJS.Fresnel.prototype.setEdgeBias = function (edgeBias) {
+        this._core.edgeBias = (edgeBias !== undefined && edgeBias !== null) ? edgeBias : defaultCore.edgeBias;
         this._engine.display.imageDirty = true;
     };
 
-    SceneJS.Fresnel.prototype.getBottomBias = function () {
-        return this._core.bottomBias;
+    SceneJS.Fresnel.prototype.getEdgeBias = function () {
+        return this._core.edgeBias;
     };
 
     SceneJS.Fresnel.prototype.setPower = function (power) {
@@ -13863,41 +13861,41 @@ new (function () {
         return this._core.power;
     };
 
-    SceneJS.Fresnel.prototype.setTopColor = function (color) {
-        var defaultTopColor = defaultCore.topColor;
-        this._core.topColor = color ? [
-            color.r != undefined && color.r != null ? color.r : defaultTopColor[0],
-            color.g != undefined && color.g != null ? color.g : defaultTopColor[1],
-            color.b != undefined && color.b != null ? color.b : defaultTopColor[2]
-        ] : defaultCore.topColor;
+    SceneJS.Fresnel.prototype.setCenterColor = function (color) {
+        var defaultCenterColor = defaultCore.centerColor;
+        this._core.centerColor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultCenterColor[0],
+            color.g != undefined && color.g != null ? color.g : defaultCenterColor[1],
+            color.b != undefined && color.b != null ? color.b : defaultCenterColor[2]
+        ] : defaultCore.centerColor;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Fresnel.prototype.getTopColor = function () {
+    SceneJS.Fresnel.prototype.getCenterColor = function () {
         return {
-            r:this._core.topColor[0],
-            g:this._core.topColor[1],
-            b:this._core.topColor[2]
+            r:this._core.centerColor[0],
+            g:this._core.centerColor[1],
+            b:this._core.centerColor[2]
         };
     };
 
-    SceneJS.Fresnel.prototype.setBottomColor = function (color) {
-        var defaultBottomColor = defaultCore.bottomColor;
-        this._core.bottomColor = color ? [
-            color.r != undefined && color.r != null ? color.r : defaultBottomColor[0],
-            color.g != undefined && color.g != null ? color.g : defaultBottomColor[1],
-            color.b != undefined && color.b != null ? color.b : defaultBottomColor[2]
-        ] : defaultCore.bottomColor;
+    SceneJS.Fresnel.prototype.setEdgeColor = function (color) {
+        var defaultEdgeColor = defaultCore.edgeColor;
+        this._core.edgeColor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultEdgeColor[0],
+            color.g != undefined && color.g != null ? color.g : defaultEdgeColor[1],
+            color.b != undefined && color.b != null ? color.b : defaultEdgeColor[2]
+        ] : defaultCore.edgeColor;
         this._engine.display.imageDirty = true;
         return this;
     };
 
-    SceneJS.Fresnel.prototype.getBottomColor = function () {
+    SceneJS.Fresnel.prototype.getEdgeColor = function () {
         return {
-            r:this._core.bottomColor[0],
-            g:this._core.bottomColor[1],
-            b:this._core.bottomColor[2]
+            r:this._core.edgeColor[0],
+            g:this._core.edgeColor[1],
+            b:this._core.edgeColor[2]
         };
     };
     
@@ -16745,51 +16743,51 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("uniform float SCENEJS_uMaterialEmit;");
 
         if (diffuseFresnel) {
-            src.push("uniform float SCENEJS_uDiffuseFresnelTopBias;");
-            src.push("uniform float SCENEJS_uDiffuseFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uDiffuseFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uDiffuseFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uDiffuseFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uDiffuseFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uDiffuseFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uDiffuseFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uDiffuseFresnelEdgeColor;");
         }
 
         if (specularFresnel) {
-            src.push("uniform float SCENEJS_uSpecularFresnelTopBias;");
-            src.push("uniform float SCENEJS_uSpecularFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uSpecularFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uSpecularFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uSpecularFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uSpecularFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uSpecularFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uSpecularFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uSpecularFresnelEdgeColor;");
         }
 
         if (alphaFresnel) {
-            src.push("uniform float SCENEJS_uAlphaFresnelTopBias;");
-            src.push("uniform float SCENEJS_uAlphaFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uAlphaFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uAlphaFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uAlphaFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uAlphaFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uAlphaFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uAlphaFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uAlphaFresnelEdgeColor;");
         }
 
         if (reflectFresnel) {
-            src.push("uniform float SCENEJS_uReflectFresnelTopBias;");
-            src.push("uniform float SCENEJS_uReflectFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uReflectFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uReflectFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uReflectFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uReflectFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uReflectFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uReflectFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uReflectFresnelEdgeColor;");
         }
 
         if (emitFresnel) {
-            src.push("uniform float SCENEJS_uEmitFresnelTopBias;");
-            src.push("uniform float SCENEJS_uEmitFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uEmitFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uEmitFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uEmitFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uEmitFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uEmitFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uEmitFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uEmitFresnelEdgeColor;");
         }
 
         if (fragmentFresnel) {
-            src.push("uniform float SCENEJS_uFragmentFresnelTopBias;");
-            src.push("uniform float SCENEJS_uFragmentFresnelBottomBias;");
+            src.push("uniform float SCENEJS_uFragmentFresnelCenterBias;");
+            src.push("uniform float SCENEJS_uFragmentFresnelEdgeBias;");
             src.push("uniform float SCENEJS_uFragmentFresnelPower;");
-            src.push("uniform vec3 SCENEJS_uFragmentFresnelTopColor;");
-            src.push("uniform vec3 SCENEJS_uFragmentFresnelBottomColor;");
+            src.push("uniform vec3 SCENEJS_uFragmentFresnelCenterColor;");
+            src.push("uniform vec3 SCENEJS_uFragmentFresnelEdgeColor;");
         }
 
         src.push("varying vec3 SCENEJS_vViewEyeVec;");                          // Direction of world-space vertex from eye
@@ -16817,9 +16815,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel) {
-            src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float topBias, float bottomBias, float power) {");
+            src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float centerBias, float edgeBias, float power) {");
             src.push("    float fr = abs(dot(viewDirection, worldNormal));");
-            src.push("    float finalFr = (1.0 + (fr - bottomBias) / (bottomBias - topBias));");
+            src.push("    float finalFr = (1.0 + (fr - edgeBias) / (edgeBias - centerBias));");
             src.push("    float fresnelTerm = pow(finalFr, power);");
             src.push("    return clamp(fresnelTerm, 0.0, 1.0);");
 
@@ -17016,8 +17014,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("float reflectFactor = 1.0;");
 
             if (reflectFresnel) {
-                src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelTopBias,  SCENEJS_uReflectFresnelBottomBias, SCENEJS_uReflectFresnelPower);");
-                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelTopColor.b, SCENEJS_uReflectFresnelBottomColor.b, reflectFresnel);");
+                src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelCenterBias,  SCENEJS_uReflectFresnelEdgeBias, SCENEJS_uReflectFresnelPower);");
+                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelCenterColor.b, SCENEJS_uReflectFresnelEdgeColor.b, reflectFresnel);");
             }
 
             src.push("vec4 v = SCENEJS_uVNMatrix * vec4(SCENEJS_vViewEyeVec, 1.0);");
@@ -17098,23 +17096,23 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (diffuseFresnel || specularFresnel || alphaFresnel || emitFresnel) {
 
                 if (diffuseFresnel) {
-                    src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelTopBias, SCENEJS_uDiffuseFresnelBottomBias, SCENEJS_uDiffuseFresnelPower);");
-                    src.push("lightValue *= mix(SCENEJS_uDiffuseFresnelTopColor.rgb, SCENEJS_uDiffuseFresnelBottomColor.rgb, diffuseFresnel);");
+                    src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelCenterBias, SCENEJS_uDiffuseFresnelEdgeBias, SCENEJS_uDiffuseFresnelPower);");
+                    src.push("lightValue *= mix(SCENEJS_uDiffuseFresnelCenterColor.rgb, SCENEJS_uDiffuseFresnelEdgeColor.rgb, diffuseFresnel);");
                 }
 
                 if (specularFresnel) {
-                    src.push("float specFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uSpecularFresnelTopBias, SCENEJS_uSpecularFresnelBottomBias, SCENEJS_uSpecularFresnelPower);");
-                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelTopColor.rgb, SCENEJS_uSpecularFresnelBottomColor.rgb, specFresnel);");
+                    src.push("float specFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uSpecularFresnelCenterBias, SCENEJS_uSpecularFresnelEdgeBias, SCENEJS_uSpecularFresnelPower);");
+                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelCenterColor.rgb, SCENEJS_uSpecularFresnelEdgeColor.rgb, specFresnel);");
                 }
 
                 if (alphaFresnel) {
-                    src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelTopBias, SCENEJS_uAlphaFresnelBottomBias, SCENEJS_uAlphaFresnelPower);");
-                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelTopColor.r, SCENEJS_uAlphaFresnelBottomColor.r, alphaFresnel);");
+                    src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelCenterBias, SCENEJS_uAlphaFresnelEdgeBias, SCENEJS_uAlphaFresnelPower);");
+                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelCenterColor.r, SCENEJS_uAlphaFresnelEdgeColor.r, alphaFresnel);");
                 }
 
                 if (emitFresnel) {
-                    src.push("float emitFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uEmitFresnelTopBias, SCENEJS_uEmitFresnelBottomBias, SCENEJS_uEmitFresnelPower);");
-                    src.push("emit *= mix(SCENEJS_uEmitFresnelTopColor.r, SCENEJS_uEmitFresnelBottomColor.r, emitFresnel);");
+                    src.push("float emitFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uEmitFresnelCenterBias, SCENEJS_uEmitFresnelEdgeBias, SCENEJS_uEmitFresnelPower);");
+                    src.push("emit *= mix(SCENEJS_uEmitFresnelCenterColor.r, SCENEJS_uEmitFresnelEdgeColor.r, emitFresnel);");
                 }
             }
 
@@ -17154,8 +17152,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (fragmentFresnel) {
-            src.push("float fragmentFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uFragmentFresnelTopBias, SCENEJS_uFragmentFresnelPower);");
-            src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelTopColor.rgb, SCENEJS_uFragmentFresnelBottomColor.rgb, fragmentFresnel);");
+            src.push("float fragmentFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uFragmentFresnelCenterBias, SCENEJS_uFragmentFresnelPower);");
+            src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelCenterColor.rgb, SCENEJS_uFragmentFresnelEdgeColor.rgb, fragmentFresnel);");
         }
 
         src.push("gl_FragColor = fragColor;");
@@ -18843,51 +18841,51 @@ SceneJS_ChunkFactory.createChunkType({
         var core = this.core;
 
         if (core.diffuse) {
-            this._uDiffuseFresnelTopBias = draw.getUniform("SCENEJS_uDiffuseFresnelTopBias");
-            this._uDiffuseFresnelBottomBias = draw.getUniform("SCENEJS_uDiffuseFresnelBottomBias");
+            this._uDiffuseFresnelCenterBias = draw.getUniform("SCENEJS_uDiffuseFresnelCenterBias");
+            this._uDiffuseFresnelEdgeBias = draw.getUniform("SCENEJS_uDiffuseFresnelEdgeBias");
             this._uDiffuseFresnelPower = draw.getUniform("SCENEJS_uDiffuseFresnelPower");
-            this._uDiffuseFresnelTopColor = draw.getUniform("SCENEJS_uDiffuseFresnelTopColor");
-            this._uDiffuseFresnelBottomColor = draw.getUniform("SCENEJS_uDiffuseFresnelBottomColor");
+            this._uDiffuseFresnelCenterColor = draw.getUniform("SCENEJS_uDiffuseFresnelCenterColor");
+            this._uDiffuseFresnelEdgeColor = draw.getUniform("SCENEJS_uDiffuseFresnelEdgeColor");
         }
 
         if (core.specular) {
-            this._uSpecularFresnelTopBias = draw.getUniform("SCENEJS_uSpecularFresnelTopBias");
-            this._uSpecularFresnelBottomBias = draw.getUniform("SCENEJS_uSpecularFresnelBottomBias");
+            this._uSpecularFresnelCenterBias = draw.getUniform("SCENEJS_uSpecularFresnelCenterBias");
+            this._uSpecularFresnelEdgeBias = draw.getUniform("SCENEJS_uSpecularFresnelEdgeBias");
             this._uSpecularFresnelPower = draw.getUniform("SCENEJS_uSpecularFresnelPower");
-            this._uSpecularFresnelTopColor = draw.getUniform("SCENEJS_uSpecularFresnelTopColor");
-            this._uSpecularFresnelBottomColor = draw.getUniform("SCENEJS_uSpecularFresnelBottomColor");
+            this._uSpecularFresnelCenterColor = draw.getUniform("SCENEJS_uSpecularFresnelCenterColor");
+            this._uSpecularFresnelEdgeColor = draw.getUniform("SCENEJS_uSpecularFresnelEdgeColor");
         }
 
         if (core.alpha) {
-            this._uAlphaFresnelTopBias = draw.getUniform("SCENEJS_uAlphaFresnelTopBias");
-            this._uAlphaFresnelBottomBias = draw.getUniform("SCENEJS_uAlphaFresnelBottomBias");
+            this._uAlphaFresnelCenterBias = draw.getUniform("SCENEJS_uAlphaFresnelCenterBias");
+            this._uAlphaFresnelEdgeBias = draw.getUniform("SCENEJS_uAlphaFresnelEdgeBias");
             this._uAlphaFresnelPower = draw.getUniform("SCENEJS_uAlphaFresnelPower");
-            this._uAlphaFresnelTopColor = draw.getUniform("SCENEJS_uAlphaFresnelTopColor");
-            this._uAlphaFresnelBottomColor = draw.getUniform("SCENEJS_uAlphaFresnelBottomColor");
+            this._uAlphaFresnelCenterColor = draw.getUniform("SCENEJS_uAlphaFresnelCenterColor");
+            this._uAlphaFresnelEdgeColor = draw.getUniform("SCENEJS_uAlphaFresnelEdgeColor");
         }
 
         if (core.reflect) {
-            this._uReflectFresnelTopBias = draw.getUniform("SCENEJS_uReflectFresnelTopBias");
-            this._uReflectFresnelBottomBias = draw.getUniform("SCENEJS_uReflectFresnelBottomBias");
+            this._uReflectFresnelCenterBias = draw.getUniform("SCENEJS_uReflectFresnelCenterBias");
+            this._uReflectFresnelEdgeBias = draw.getUniform("SCENEJS_uReflectFresnelEdgeBias");
             this._uReflectFresnelPower = draw.getUniform("SCENEJS_uReflectFresnelPower");
-            this._uReflectFresnelTopColor = draw.getUniform("SCENEJS_uReflectFresnelTopColor");
-            this._uReflectFresnelBottomColor = draw.getUniform("SCENEJS_uReflectFresnelBottomColor");
+            this._uReflectFresnelCenterColor = draw.getUniform("SCENEJS_uReflectFresnelCenterColor");
+            this._uReflectFresnelEdgeColor = draw.getUniform("SCENEJS_uReflectFresnelEdgeColor");
         }
 
         if (core.emit) {
-            this._uEmitFresnelTopBias = draw.getUniform("SCENEJS_uEmitFresnelTopBias");
-            this._uEmitFresnelBottomBias = draw.getUniform("SCENEJS_uEmitFresnelBottomBias");
+            this._uEmitFresnelCenterBias = draw.getUniform("SCENEJS_uEmitFresnelCenterBias");
+            this._uEmitFresnelEdgeBias = draw.getUniform("SCENEJS_uEmitFresnelEdgeBias");
             this._uEmitFresnelPower = draw.getUniform("SCENEJS_uEmitFresnelPower");
-            this._uEmitFresnelTopColor = draw.getUniform("SCENEJS_uEmitFresnelTopColor");
-            this._uEmitFresnelBottomColor = draw.getUniform("SCENEJS_uEmitFresnelBottomColor");
+            this._uEmitFresnelCenterColor = draw.getUniform("SCENEJS_uEmitFresnelCenterColor");
+            this._uEmitFresnelEdgeColor = draw.getUniform("SCENEJS_uEmitFresnelEdgeColor");
         }
 
         if (core.fragment) {
-            this._uFragmentFresnelTopBias = draw.getUniform("SCENEJS_uFragmentFresnelTopBias");
-            this._uFragmentFresnelBottomBias = draw.getUniform("SCENEJS_uFragmentFresnelBottomBias");
+            this._uFragmentFresnelCenterBias = draw.getUniform("SCENEJS_uFragmentFresnelCenterBias");
+            this._uFragmentFresnelEdgeBias = draw.getUniform("SCENEJS_uFragmentFresnelEdgeBias");
             this._uFragmentFresnelPower = draw.getUniform("SCENEJS_uFragmentFresnelPower");
-            this._uFragmentFresnelTopColor = draw.getUniform("SCENEJS_uFragmentFresnelTopColor");
-            this._uFragmentFresnelBottomColor = draw.getUniform("SCENEJS_uFragmentFresnelBottomColor");
+            this._uFragmentFresnelCenterColor = draw.getUniform("SCENEJS_uFragmentFresnelCenterColor");
+            this._uFragmentFresnelEdgeColor = draw.getUniform("SCENEJS_uFragmentFresnelEdgeColor");
         }
     },
 
@@ -18899,139 +18897,139 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (core.diffuse) {
             
-            if (this._uDiffuseFresnelTopBias) {
-                this._uDiffuseFresnelTopBias.setValue(core.diffuse.topBias);
+            if (this._uDiffuseFresnelCenterBias) {
+                this._uDiffuseFresnelCenterBias.setValue(core.diffuse.centerBias);
             }
 
-            if (this._uDiffuseFresnelBottomBias) {
-                this._uDiffuseFresnelBottomBias.setValue(core.diffuse.bottomBias);
+            if (this._uDiffuseFresnelEdgeBias) {
+                this._uDiffuseFresnelEdgeBias.setValue(core.diffuse.edgeBias);
             }
 
             if (this._uDiffuseFresnelPower) {
                 this._uDiffuseFresnelPower.setValue(core.diffuse.power);
             }
 
-            if (this._uDiffuseFresnelTopColor) {
-                this._uDiffuseFresnelTopColor.setValue(core.diffuse.topColor);
+            if (this._uDiffuseFresnelCenterColor) {
+                this._uDiffuseFresnelCenterColor.setValue(core.diffuse.centerColor);
             }
 
-            if (this._uDiffuseFresnelBottomColor) {
-                this._uDiffuseFresnelBottomColor.setValue(core.diffuse.bottomColor);
+            if (this._uDiffuseFresnelEdgeColor) {
+                this._uDiffuseFresnelEdgeColor.setValue(core.diffuse.edgeColor);
             }
         }
 
         if (core.specular) {
 
-            if (this._uSpecularFresnelTopBias) {
-                this._uSpecularFresnelTopBias.setValue(core.specular.topBias);
+            if (this._uSpecularFresnelCenterBias) {
+                this._uSpecularFresnelCenterBias.setValue(core.specular.centerBias);
             }
 
-            if (this._uSpecularFresnelBottomBias) {
-                this._uSpecularFresnelBottomBias.setValue(core.specular.bottomBias);
+            if (this._uSpecularFresnelEdgeBias) {
+                this._uSpecularFresnelEdgeBias.setValue(core.specular.edgeBias);
             }
 
             if (this._uSpecularFresnelPower) {
                 this._uSpecularFresnelPower.setValue(core.specular.power);
             }
 
-            if (this._uSpecularFresnelTopColor) {
-                this._uSpecularFresnelTopColor.setValue(core.specular.topColor);
+            if (this._uSpecularFresnelCenterColor) {
+                this._uSpecularFresnelCenterColor.setValue(core.specular.centerColor);
             }
 
-            if (this._uSpecularFresnelBottomColor) {
-                this._uSpecularFresnelBottomColor.setValue(core.specular.bottomColor);
+            if (this._uSpecularFresnelEdgeColor) {
+                this._uSpecularFresnelEdgeColor.setValue(core.specular.edgeColor);
             }
         }
 
         if (core.alpha) {
 
-            if (this._uAlphaFresnelTopBias) {
-                this._uAlphaFresnelTopBias.setValue(core.alpha.topBias);
+            if (this._uAlphaFresnelCenterBias) {
+                this._uAlphaFresnelCenterBias.setValue(core.alpha.centerBias);
             }
 
-            if (this._uAlphaFresnelBottomBias) {
-                this._uAlphaFresnelBottomBias.setValue(core.alpha.bottomBias);
+            if (this._uAlphaFresnelEdgeBias) {
+                this._uAlphaFresnelEdgeBias.setValue(core.alpha.edgeBias);
             }
 
             if (this._uAlphaFresnelPower) {
                 this._uAlphaFresnelPower.setValue(core.alpha.power);
             }
 
-            if (this._uAlphaFresnelTopColor) {
-                this._uAlphaFresnelTopColor.setValue(core.alpha.topColor);
+            if (this._uAlphaFresnelCenterColor) {
+                this._uAlphaFresnelCenterColor.setValue(core.alpha.centerColor);
             }
 
-            if (this._uAlphaFresnelBottomColor) {
-                this._uAlphaFresnelBottomColor.setValue(core.alpha.bottomColor);
+            if (this._uAlphaFresnelEdgeColor) {
+                this._uAlphaFresnelEdgeColor.setValue(core.alpha.edgeColor);
             }
         }
 
         if (core.reflect) {
 
-            if (this._uReflectFresnelTopBias) {
-                this._uReflectFresnelTopBias.setValue(core.reflect.topBias);
+            if (this._uReflectFresnelCenterBias) {
+                this._uReflectFresnelCenterBias.setValue(core.reflect.centerBias);
             }
 
-            if (this._uReflectFresnelBottomBias) {
-                this._uReflectFresnelBottomBias.setValue(core.reflect.bottomBias);
+            if (this._uReflectFresnelEdgeBias) {
+                this._uReflectFresnelEdgeBias.setValue(core.reflect.edgeBias);
             }
 
             if (this._uReflectFresnelPower) {
                 this._uReflectFresnelPower.setValue(core.reflect.power);
             }
 
-            if (this._uReflectFresnelTopColor) {
-                this._uReflectFresnelTopColor.setValue(core.reflect.topColor);
+            if (this._uReflectFresnelCenterColor) {
+                this._uReflectFresnelCenterColor.setValue(core.reflect.centerColor);
             }
 
-            if (this._uReflectFresnelBottomColor) {
-                this._uReflectFresnelBottomColor.setValue(core.reflect.bottomColor);
+            if (this._uReflectFresnelEdgeColor) {
+                this._uReflectFresnelEdgeColor.setValue(core.reflect.edgeColor);
             }
         }
 
         if (core.emit) {
 
-            if (this._uEmitFresnelTopBias) {
-                this._uEmitFresnelTopBias.setValue(core.emit.topBias);
+            if (this._uEmitFresnelCenterBias) {
+                this._uEmitFresnelCenterBias.setValue(core.emit.centerBias);
             }
 
-            if (this._uEmitFresnelBottomBias) {
-                this._uEmitFresnelBottomBias.setValue(core.emit.bottomBias);
+            if (this._uEmitFresnelEdgeBias) {
+                this._uEmitFresnelEdgeBias.setValue(core.emit.edgeBias);
             }
 
             if (this._uEmitFresnelPower) {
                 this._uEmitFresnelPower.setValue(core.emit.power);
             }
 
-            if (this._uEmitFresnelTopColor) {
-                this._uEmitFresnelTopColor.setValue(core.emit.topColor);
+            if (this._uEmitFresnelCenterColor) {
+                this._uEmitFresnelCenterColor.setValue(core.emit.centerColor);
             }
 
-            if (this._uEmitFresnelBottomColor) {
-                this._uEmitFresnelBottomColor.setValue(core.emit.bottomColor);
+            if (this._uEmitFresnelEdgeColor) {
+                this._uEmitFresnelEdgeColor.setValue(core.emit.edgeColor);
             }
         }
 
         if (core.fragment) {
 
-            if (this._uFragmentFresnelTopBias) {
-                this._uFragmentFresnelTopBias.setValue(core.fragment.topBias);
+            if (this._uFragmentFresnelCenterBias) {
+                this._uFragmentFresnelCenterBias.setValue(core.fragment.centerBias);
             }
 
-            if (this._uFragmentFresnelBottomBias) {
-                this._uFragmentFresnelBottomBias.setValue(core.fragment.bottomBias);
+            if (this._uFragmentFresnelEdgeBias) {
+                this._uFragmentFresnelEdgeBias.setValue(core.fragment.edgeBias);
             }
 
             if (this._uFragmentFresnelPower) {
                 this._uFragmentFresnelPower.setValue(core.fragment.power);
             }
 
-            if (this._uFragmentFresnelTopColor) {
-                this._uFragmentFresnelTopColor.setValue(core.fragment.topColor);
+            if (this._uFragmentFresnelCenterColor) {
+                this._uFragmentFresnelCenterColor.setValue(core.fragment.centerColor);
             }
 
-            if (this._uFragmentFresnelBottomColor) {
-                this._uFragmentFresnelBottomColor.setValue(core.fragment.bottomColor);
+            if (this._uFragmentFresnelEdgeColor) {
+                this._uFragmentFresnelEdgeColor.setValue(core.fragment.edgeColor);
             }
         }
     }
