@@ -20,7 +20,7 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - Alpha Fresnel
+    <a href="http://scenejs.org">SceneJS</a> - Alpha and reflection Fresnels
 </div>
 
 <script>
@@ -103,11 +103,11 @@
                                             {
                                                 type: "fresnel",
                                                 applyTo: "reflect",
-                                                topBias: 0.0,
-                                                bottomBias: 0.6,
+                                                centerBias: 0.0,
+                                                edgeBias: 0.6,
                                                 power: 5.0,
-                                                topColor: {r: 1.0, g: 1.0, b: 1.0},
-                                                bottomColor: {r: 0.0, g: 0.0, b: 0.0},
+                                                centerColor: {r: 1.0, g: 1.0, b: 1.0},
+                                                edgeColor: {r: 0.0, g: 0.0, b: 0.0},
 
                                                 nodes: [
 
@@ -115,11 +115,11 @@
                                                     {
                                                         type: "fresnel",
                                                         applyTo: "alpha",
-                                                        topBias: 0.2,
-                                                        bottomBias: 0.7,
+                                                        centerBias: 0.7,
+                                                        edgeBias: 0.2,
                                                         power: 1.0,
-                                                        topColor: {r: 1.0, g: 1.0, b: 1.0},
-                                                        bottomColor: {r: 0.0, g: 0.0, b: 0.0},
+                                                        centerColor: {r: 1.0, g: 1.0, b: 1.0},
+                                                        edgeColor: {r: 0.0, g: 0.0, b: 0.0},
 
                                                         nodes: [
 
