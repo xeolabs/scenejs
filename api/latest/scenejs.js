@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-08-14
+ * Built on 2015-08-20
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -6757,7 +6757,7 @@ SceneJS.Node.prototype.disconnectNodeAt = function (index) {
     var r = this.nodes.splice(index, 1);
     if (r.length > 0) {
         r[0].parent = null;
-        this._engine.display.objectListDirty = true;
+        this._engine.branchDirty(this);
         return r[0];
     } else {
         return null;
@@ -6789,7 +6789,6 @@ SceneJS.Node.prototype.removeNodeAt = function (index) {
     var child = this.disconnectNodeAt(index);
     if (child) {
         child.destroy();
-        this._engine.display.objectListDirty = true;
     }
 };
 
@@ -6821,7 +6820,6 @@ SceneJS.Node.prototype.removeNode = function (node) {
         for (var i = 0; i < this.nodes.length; i++) {
             if (this.nodes[i] === node) {
                 var removedNode = this.removeNodeAt(i);
-                this._engine.display.objectListDirty = true;
                 return removedNode;
             }
         }
@@ -6841,7 +6839,7 @@ SceneJS.Node.prototype.disconnectNodes = function () {
     }
     var nodes = this.nodes;
     this.nodes = [];
-    this._engine.display.objectListDirty = true;
+    this._engine.branchDirty(this);
     return nodes;
 };
 
@@ -6851,7 +6849,6 @@ SceneJS.Node.prototype.removeNodes = function () {
     var nodes = this.disconnectNodes();
     for (var i = 0; i < nodes.length; i++) {
         nodes[i].destroy();
-        this._engine.display.objectListDirty = true;
     }
 };
 
