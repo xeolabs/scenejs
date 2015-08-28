@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-08-20
+ * Built on 2015-08-28
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -13818,13 +13818,13 @@ new (function () {
             }
 
             this._core.applyTo = params.applyTo;
-        }
 
-        this.setCenterBias(params.centerBias);
-        this.setEdgeBias(params.edgeBias);
-        this.setPower(params.power);
-        this.setCenterColor(params.centerColor);
-        this.setEdgeColor(params.edgeColor);
+            this.setCenterBias(params.centerBias);
+            this.setEdgeBias(params.edgeBias);
+            this.setPower(params.power);
+            this.setCenterColor(params.centerColor);
+            this.setEdgeColor(params.edgeColor);
+        }
     };
 
     SceneJS.Fresnel.prototype.getApplyTo = function () {
@@ -17094,7 +17094,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (diffuseFresnel) {
                     src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelEdgeBias, SCENEJS_uDiffuseFresnelCenterBias, SCENEJS_uDiffuseFresnelPower);");
-                    src.push("lightValue *= mix(SCENEJS_uDiffuseFresnelEdgeColor.rgb, SCENEJS_uDiffuseFresnelCenterColor.rgb, diffuseFresnel);");
+                    src.push("color.rgb *= mix(SCENEJS_uDiffuseFresnelEdgeColor.rgb, SCENEJS_uDiffuseFresnelCenterColor.rgb, diffuseFresnel);");
                 }
 
                 if (specularFresnel) {
