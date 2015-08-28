@@ -52,13 +52,13 @@ new (function () {
             }
 
             this._core.applyTo = params.applyTo;
-        }
 
-        this.setCenterBias(params.centerBias);
-        this.setEdgeBias(params.edgeBias);
-        this.setPower(params.power);
-        this.setCenterColor(params.centerColor);
-        this.setEdgeColor(params.edgeColor);
+            this.setCenterBias(params.centerBias);
+            this.setEdgeBias(params.edgeBias);
+            this.setPower(params.power);
+            this.setCenterColor(params.centerColor);
+            this.setEdgeColor(params.edgeColor);
+        }
     };
 
     SceneJS.Fresnel.prototype.getApplyTo = function () {
