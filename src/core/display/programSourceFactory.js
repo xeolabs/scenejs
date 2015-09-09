@@ -687,15 +687,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel) {
             src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float centerBias, float edgeBias, float power) {");
             src.push("    float fr = abs(dot(viewDirection, worldNormal));");
-            src.push("    float finalFr = (fr - edgeBias) / (centerBias - edgeBias);");
-            src.push("    float fresnelTerm = pow(finalFr, power);");
-            src.push("    return clamp(fresnelTerm, 0.0, 1.0);");
-
-            //
-            //
-            //src.push("  float fresnelTerm = pow(bias + abs(dot(viewDirection, worldNormal)), power);");
-            //src.push("  return clamp(fresnelTerm, 0., 1.);");
-
+            src.push("    float finalFr = clamp((fr - edgeBias) / (centerBias - edgeBias), 0.0, 1.0);");
+            src.push("    return pow(finalFr, power);");
             src.push("}");
         }
 
