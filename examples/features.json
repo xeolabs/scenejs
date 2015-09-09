@@ -69,7 +69,7 @@
                 "nodes": [
                     {
                         "title": "Fresnel",
-                        "page": "fresnel_alpha_reflect"
+                        "page": "fresnel_reflect"
                     }
                 ]
             },
