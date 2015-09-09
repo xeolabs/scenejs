@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoLight">
+    <a href="http://scenejs.org">SceneJS</a> - Fresnel Glow
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 10,
+                zoomSensitivity: 1.0,
+
+
+                nodes: [
+
+                    // Override default lights, defining a single directional light in World-space
+                    // that has both diffuse and specular components. Since the light is in World-space,
+                    // it will move relative to our changing viewpoint, as if it
+                    // were a fixture in the scene.
+                    {
+                        type: "lights",
+                        id: "myLights", // So we can reference this lights node
+                        lights: [
+                            {
+                                mode: "dir",
+                                color: {r: 1.0, g: 1.0, b: 1.0},
+                                diffuse: true,
+                                specular: true,
+                                dir: {x: 1.0, y: -0.5, z: -1.0},
+                                space: "view"
+                            }
+                        ],
+                        nodes: [
+                            {
+                                type: "material",
+                                color: {r: 0.6, g: 0.5, b: 0.5},
+                                specularColor: {r: 1.0, g: 1.0, b: 1.0},
+                                emitColor: {r: 1.0, g: 0.5, b: 0.0},
+                                specular: 1.0,
+                                shine: 70.0,
+                                emit: 1.0,
+
+                                nodes: [
+
+                                    // Translate the fresnel back and forth
+                                    {
+                                        type: "translate",
+                                        id: "myTranslate",
+                                        x: 0,
+
+                                        nodes: [
+
+                                            // Emissive fresnel
+                                            {
+                                                type: "fresnel",
+                                                applyTo: "emit",
+                                                edgeBias: 0.2,
+                                                centerBias: 0.7,
+                                                power: 1.0,
+                                                edgeColor: {r: 1.0, g: 1.0, b: 1.0},
+                                                centerColor: {r: 0.0, g: 0.0, b: 0.0},
+
+                                                nodes: [
+
+                                                    // Color map
+                                                    {
+                                                        type: "texture",
+                                                        src: "textures/crossGridColorMap.jpg",
+
+                                                        nodes: [
+
+                                                            // Torus primitive, implemented by plugin at
+                                                            // http://scenejs.org/api/latest/plugins/node/geometry/torus.js
+                                                            {
+                                                                type: "geometry/sphere",
+                                                                segmentsR: 60,
+                                                                segmentsT: 40
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    scene.getNode("myTranslate",
+            function (translate) {
+
+                var x = -6;
+                var i = 0.1;
+
+                scene.on("tick", function () {
+
+                    if (x < -6 || x > 6) {
+                        i *= -1;
+                    }
+
+                    translate.setX(x);
+
+                    x += i;
+                });
+
+            });
+
+</script>
+</body>
+</html>
