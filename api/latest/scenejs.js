@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-08-28
+ * Built on 2015-09-09
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -15534,6 +15534,7 @@ SceneJS_Display.prototype.removeObject = function (objectId) {
     object.hash = null;
     this._objectFactory.putObject(object);
     delete this._objects[objectId];
+
     this.objectListDirty = true;
 };
 
@@ -16359,6 +16360,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("uniform   mat4 SCENEJS_uVNMatrix;");      // View normal matrix
 
             src.push("varying   vec3 SCENEJS_vViewNormal;");    // Output view-space vertex normal
+            src.push("varying   vec3 SCENEJS_vWorldNormal;");    // Output view-space vertex normal
 
             if (tangents) {
                 src.push("attribute vec4 SCENEJS_aTangent;");
@@ -16405,7 +16407,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("varying vec4 SCENEJS_vColor;");               // Varying for fragment texturing
         }
 
-        if (clipping) {
+        if (clipping || normals) {
             src.push("varying vec4 SCENEJS_vWorldVertex;");         // Varying for fragment clip or world pos hook
         }
 
@@ -16476,9 +16478,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (normals) {
             src.push("  vec3 worldNormal = (SCENEJS_uMNMatrix * modelNormal).xyz; ");
             src.push("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
+            src.push("  SCENEJS_vWorldNormal = worldNormal;");
         }
 
-        if (clipping || fragmentHooks.worldPos) {
+        if (clipping || normals || fragmentHooks.worldPos) {
             src.push("  SCENEJS_vWorldVertex = worldVertex;");                  // Varying for fragment world clip or hooks
         }
 
@@ -16655,7 +16658,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("precision " + floatPrecision + " float;");
 
 
-        if (clipping) {
+        if (clipping || normals) {
             src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
         }
 
@@ -16665,6 +16668,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         src.push("uniform float SCENEJS_uZNear;");                      // Used in Z-pick mode
         src.push("uniform float SCENEJS_uZFar;");                       // Used in Z-pick mode
+
+        src.push("uniform vec3 SCENEJS_uWorldEye;");
 
 
         /*-----------------------------------------------------------------------------------
@@ -16791,7 +16796,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (normals) {
 
-            src.push("varying vec3 SCENEJS_vViewNormal;");                   // View-space normal
+            src.push("varying vec3 SCENEJS_vWorldNormal;");
+            src.push("varying vec3 SCENEJS_vViewNormal;");
 
             var light;
             for (var i = 0; i < states.lights.lights.length; i++) {
@@ -16814,7 +16820,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel) {
             src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float centerBias, float edgeBias, float power) {");
             src.push("    float fr = abs(dot(viewDirection, worldNormal));");
-            src.push("    float finalFr = (1.0 + (fr - edgeBias) / (edgeBias - centerBias));");
+            src.push("    float finalFr = (fr - edgeBias) / (centerBias - edgeBias);");
             src.push("    float fresnelTerm = pow(finalFr, power);");
             src.push("    return clamp(fresnelTerm, 0.0, 1.0);");
 
@@ -16843,6 +16849,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals) {
+
+            src.push("vec3 worldEyeVec = normalize(SCENEJS_uWorldEye - SCENEJS_vWorldVertex.xyz);");            // World-space eye position
 
             if (solid) {
 
@@ -17011,8 +17019,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("float reflectFactor = 1.0;");
 
             if (reflectFresnel) {
-                src.push("float reflectFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uReflectFresnelEdgeBias,  SCENEJS_uReflectFresnelCenterBias, SCENEJS_uReflectFresnelPower);");
-                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelEdgeColor.b, SCENEJS_uReflectFresnelCenterColor.b, reflectFresnel);");
+                src.push("float reflectFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uReflectFresnelEdgeBias,  SCENEJS_uReflectFresnelCenterBias, SCENEJS_uReflectFresnelPower);");
+                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelEdgeColor.b, SCENEJS_uReflectFresnelCenterColor.b, 1.0-reflectFresnel);");
             }
 
             src.push("vec4 v = SCENEJS_uVNMatrix * vec4(SCENEJS_vViewEyeVec, 1.0);");
@@ -17093,23 +17101,23 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (diffuseFresnel || specularFresnel || alphaFresnel || emitFresnel) {
 
                 if (diffuseFresnel) {
-                    src.push("float diffuseFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uDiffuseFresnelEdgeBias, SCENEJS_uDiffuseFresnelCenterBias, SCENEJS_uDiffuseFresnelPower);");
-                    src.push("color.rgb *= mix(SCENEJS_uDiffuseFresnelEdgeColor.rgb, SCENEJS_uDiffuseFresnelCenterColor.rgb, diffuseFresnel);");
+                    src.push("float diffuseFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uDiffuseFresnelEdgeBias, SCENEJS_uDiffuseFresnelCenterBias, SCENEJS_uDiffuseFresnelPower);");
+                    src.push("color.rgb *= mix(SCENEJS_uDiffuseFresnelEdgeColor.rgb, SCENEJS_uDiffuseFresnelCenterColor.rgb, 1.0-diffuseFresnel);");
                 }
 
                 if (specularFresnel) {
-                    src.push("float specFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uSpecularFresnelEdgeBias, SCENEJS_uSpecularFresnelCenterBias, SCENEJS_uSpecularFresnelPower);");
-                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelEdgeColor.rgb, SCENEJS_uSpecularFresnelCenterColor.rgb, specFresnel);");
+                    src.push("float specFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uSpecularFresnelEdgeBias, SCENEJS_uSpecularFresnelCenterBias, SCENEJS_uSpecularFresnelPower);");
+                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelEdgeColor.rgb, SCENEJS_uSpecularFresnelCenterColor.rgb, 1.0-specFresnel);");
                 }
 
                 if (alphaFresnel) {
-                    src.push("float alphaFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uAlphaFresnelEdgeBias, SCENEJS_uAlphaFresnelCenterBias, SCENEJS_uAlphaFresnelPower);");
-                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelEdgeColor.r, SCENEJS_uAlphaFresnelCenterColor.r, alphaFresnel);");
+                    src.push("float alphaFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uAlphaFresnelEdgeBias, SCENEJS_uAlphaFresnelCenterBias, SCENEJS_uAlphaFresnelPower);");
+                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelEdgeColor.r, SCENEJS_uAlphaFresnelCenterColor.r, 1.0-alphaFresnel);");
                 }
 
                 if (emitFresnel) {
-                    src.push("float emitFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uEmitFresnelEdgeBias, SCENEJS_uEmitFresnelCenterBias, SCENEJS_uEmitFresnelPower);");
-                    src.push("emit *= mix(SCENEJS_uEmitFresnelEdgeColor.r, SCENEJS_uEmitFresnelCenterColor.r, emitFresnel);");
+                    src.push("float emitFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uEmitFresnelEdgeBias, SCENEJS_uEmitFresnelCenterBias, SCENEJS_uEmitFresnelPower);");
+                    src.push("emit *= mix(SCENEJS_uEmitFresnelEdgeColor.r, SCENEJS_uEmitFresnelCenterColor.r, 1.0-emitFresnel);");
                 }
             }
 
@@ -17149,8 +17157,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (fragmentFresnel) {
-            src.push("float fragmentFresnel = fresnel(viewEyeVec, viewNormalVec, SCENEJS_uFragmentFresnelEdgeBias, SCENEJS_uFragmentFresnelCenterBias, SCENEJS_uFragmentFresnelPower);");
-            src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelEdgeColor.rgb, SCENEJS_uFragmentFresnelCenterColor.rgb, fragmentFresnel);");
+            src.push("float fragmentFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uFragmentFresnelEdgeBias, SCENEJS_uFragmentFresnelCenterBias, SCENEJS_uFragmentFresnelPower);");
+            src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelEdgeColor.rgb, SCENEJS_uFragmentFresnelCenterColor.rgb, 1.0-fragmentFresnel);");
         }
 
         src.push("gl_FragColor = fragColor;");
