@@ -977,7 +977,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (emitFresnel) {
                     src.push("float emitFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uEmitFresnelEdgeBias, SCENEJS_uEmitFresnelCenterBias, SCENEJS_uEmitFresnelPower);");
-                    src.push("emit *= mix(SCENEJS_uEmitFresnelEdgeColor.r, SCENEJS_uEmitFresnelCenterColor.r, emitFresnel);");
+                    src.push("emitColor.rgb *= mix(SCENEJS_uEmitFresnelEdgeColor.rgb, SCENEJS_uEmitFresnelCenterColor.rgb, emitFresnel);");
                 }
             }
 
