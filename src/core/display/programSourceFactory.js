@@ -685,7 +685,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel) {
-            src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float centerBias, float edgeBias, float power) {");
+            src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float edgeBias, float centerBias, float power) {");
             src.push("    float fr = abs(dot(viewDirection, worldNormal));");
             src.push("    float finalFr = clamp((fr - edgeBias) / (centerBias - edgeBias), 0.0, 1.0);");
             src.push("    return pow(finalFr, power);");
@@ -880,7 +880,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             if (reflectFresnel) {
                 src.push("float reflectFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uReflectFresnelEdgeBias,  SCENEJS_uReflectFresnelCenterBias, SCENEJS_uReflectFresnelPower);");
-                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelEdgeColor.b, SCENEJS_uReflectFresnelCenterColor.b, 1.0-reflectFresnel);");
+                src.push("reflectFactor *= mix(SCENEJS_uReflectFresnelEdgeColor.b, SCENEJS_uReflectFresnelCenterColor.b, reflectFresnel);");
             }
 
             src.push("vec4 v = SCENEJS_uVNMatrix * vec4(SCENEJS_vViewEyeVec, 1.0);");
@@ -962,22 +962,22 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 if (diffuseFresnel) {
                     src.push("float diffuseFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uDiffuseFresnelEdgeBias, SCENEJS_uDiffuseFresnelCenterBias, SCENEJS_uDiffuseFresnelPower);");
-                    src.push("color.rgb *= mix(SCENEJS_uDiffuseFresnelEdgeColor.rgb, SCENEJS_uDiffuseFresnelCenterColor.rgb, 1.0-diffuseFresnel);");
+                    src.push("color.rgb *= mix(SCENEJS_uDiffuseFresnelEdgeColor.rgb, SCENEJS_uDiffuseFresnelCenterColor.rgb, diffuseFresnel);");
                 }
 
                 if (specularFresnel) {
                     src.push("float specFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uSpecularFresnelEdgeBias, SCENEJS_uSpecularFresnelCenterBias, SCENEJS_uSpecularFresnelPower);");
-                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelEdgeColor.rgb, SCENEJS_uSpecularFresnelCenterColor.rgb, 1.0-specFresnel);");
+                    src.push("specularValue *= mix(SCENEJS_uSpecularFresnelEdgeColor.rgb, SCENEJS_uSpecularFresnelCenterColor.rgb, specFresnel);");
                 }
 
                 if (alphaFresnel) {
                     src.push("float alphaFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uAlphaFresnelEdgeBias, SCENEJS_uAlphaFresnelCenterBias, SCENEJS_uAlphaFresnelPower);");
-                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelEdgeColor.r, SCENEJS_uAlphaFresnelCenterColor.r, 1.0-alphaFresnel);");
+                    src.push("alpha *= mix(SCENEJS_uAlphaFresnelEdgeColor.r, SCENEJS_uAlphaFresnelCenterColor.r, alphaFresnel);");
                 }
 
                 if (emitFresnel) {
                     src.push("float emitFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uEmitFresnelEdgeBias, SCENEJS_uEmitFresnelCenterBias, SCENEJS_uEmitFresnelPower);");
-                    src.push("emit *= mix(SCENEJS_uEmitFresnelEdgeColor.r, SCENEJS_uEmitFresnelCenterColor.r, 1.0-emitFresnel);");
+                    src.push("emit *= mix(SCENEJS_uEmitFresnelEdgeColor.r, SCENEJS_uEmitFresnelCenterColor.r, emitFresnel);");
                 }
             }
 
@@ -1018,7 +1018,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (fragmentFresnel) {
             src.push("float fragmentFresnel = fresnel(worldEyeVec, SCENEJS_vWorldNormal, SCENEJS_uFragmentFresnelEdgeBias, SCENEJS_uFragmentFresnelCenterBias, SCENEJS_uFragmentFresnelPower);");
-            src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelEdgeColor.rgb, SCENEJS_uFragmentFresnelCenterColor.rgb, 1.0-fragmentFresnel);");
+            src.push("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelEdgeColor.rgb, SCENEJS_uFragmentFresnelCenterColor.rgb, fragmentFresnel);");
         }
 
         src.push("gl_FragColor = fragColor;");
