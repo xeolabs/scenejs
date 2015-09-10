@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-09-09
+ * Built on 2015-09-10
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -13774,8 +13774,8 @@ new (function () {
     var defaultCore = {
         type: "fresnel",
         stateId: SceneJS._baseStateId++,
-        centerBias:0.0,
-        edgeBias: 1.0,
+        centerBias: 1.0,
+        edgeBias: 0.0,
         power: 1.0,
         centerColor:[ 1.0, 1.0, 1.0 ],
         edgeColor:[ 0.0, 0.0, 0.0 ],
@@ -15534,7 +15534,6 @@ SceneJS_Display.prototype.removeObject = function (objectId) {
     object.hash = null;
     this._objectFactory.putObject(object);
     delete this._objects[objectId];
-
     this.objectListDirty = true;
 };
 
@@ -16820,15 +16819,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel) {
             src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float centerBias, float edgeBias, float power) {");
             src.push("    float fr = abs(dot(viewDirection, worldNormal));");
-            src.push("    float finalFr = (fr - edgeBias) / (centerBias - edgeBias);");
-            src.push("    float fresnelTerm = pow(finalFr, power);");
-            src.push("    return clamp(fresnelTerm, 0.0, 1.0);");
-
-            //
-            //
-            //src.push("  float fresnelTerm = pow(bias + abs(dot(viewDirection, worldNormal)), power);");
-            //src.push("  return clamp(fresnelTerm, 0., 1.);");
-
+            src.push("    float finalFr = clamp((fr - edgeBias) / (centerBias - edgeBias), 0.0, 1.0);");
+            src.push("    return pow(finalFr, power);");
             src.push("}");
         }
 
