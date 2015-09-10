@@ -8,8 +8,8 @@ new (function () {
     var defaultCore = {
         type: "fresnel",
         stateId: SceneJS._baseStateId++,
-        centerBias:0.0,
-        edgeBias: 1.0,
+        centerBias: 1.0,
+        edgeBias: 0.0,
         power: 1.0,
         centerColor:[ 1.0, 1.0, 1.0 ],
         edgeColor:[ 0.0, 0.0, 0.0 ],
