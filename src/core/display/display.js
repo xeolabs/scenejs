@@ -1095,7 +1095,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     } else {
 
         // Option to only render opaque objects
-        var len =  (params.opaqueOnly ? this._drawListTransparentIndex: this._drawListLen);
+        var len =  (params.opaqueOnly && this._drawListTransparentIndex >= 0 ? this._drawListTransparentIndex : this._drawListLen);
 
         // Render for draw
         for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
