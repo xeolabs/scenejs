@@ -22,6 +22,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         var pick = this.program.pick;
 
+        this._aRegionMapUVPick = pick.getAttribute("SCENEJS_aRegionMapUV");
         this._aVertexPick = pick.getAttribute("SCENEJS_aVertex");
         this._aMorphVertexPick = pick.getAttribute("SCENEJS_aMorphVertex");
         this._uMorphFactorPick = pick.getUniform("SCENEJS_uMorphFactor");
@@ -190,6 +191,10 @@ SceneJS_ChunkFactory.createChunkType({
 
             if (this._aVertexPick) {
                 this._aVertexPick.bindFloatArrayBuffer(this.core2.vertexBuf);
+            }
+
+            if (this._aRegionMapUVPick) {
+                this._aRegionMapUVPick.bindFloatArrayBuffer(this.core2.uvBuf);
             }
         }
 

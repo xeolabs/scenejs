@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #info {
+            position: absolute;
+            top: 200px;
+            width: 100%;
+            color: #ffffff;
+            padding: 5px;
+            font-family: Monospace;
+            font-size: 18px;
+            text-align: center;
+            background: black;
+            opacity: 0.6;
+            z-index: 100000;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+</head>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - picking - region mapping
+    <br>
+    <br>
+
+    <div id="infoTxt">Click somewhere!
+    </div>
+</div>
+
+<script>
+
+    //
+    // Demonstrates how to define pickable regions
+    //
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 10,
+                zoomSensitivity: 1.0,
+
+                nodes: [
+
+                    // The region map
+                    {
+                        type: "regionMap",
+                        src: "textures/regionMap.jpg",
+                        nodes: [
+
+                            // Color map, applying the region map
+                            // to base color so that we can visualise it
+                            {
+                                type: "texture",
+                                src: "textures/regionMap.jpg",
+                                applyTo: "color",
+                                blendMode: "add",
+
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        "baseColor": {
+                                            "b": 0.0,
+                                            "g": 0.0,
+                                            "r": 0.0
+                                        },
+                                        "shine": 20.0,
+                                        "specularColor": {
+                                            "b": 0.5,
+                                            "g": 0.5,
+                                            "r": 0.5
+                                        },
+                                        "nodes": [
+
+                                            // Box primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            {
+                                                type: "geometry/box"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Pick hit handler
+    // Shows pick info in an HTML element
+
+    var info = document.getElementById("infoTxt");
+
+    scene.on("pick",
+            function (hit) {
+
+                info.innerHTML = "Pick hit: " + JSON.stringify(hit);
+
+                // How to get color of picked pixel:
+                var r = hit.r;
+                var g = hit.g;
+                var b = hit.b;
+            });
+
+    // Called when nothing picked
+    scene.on("nopick",
+            function () {
+                info.innerHTML = "Nothing picked.";
+            });
+
+    // Mouse event handling to do a pick on each mouse click
+
+    var canvas = scene.getCanvas();
+
+    var lastX;
+    var lastY;
+    var dragging;
+
+    canvas.addEventListener('mousedown',
+            function (event) {
+                lastX = event.clientX;
+                lastY = event.clientY;
+                dragging = true;
+            }, true);
+
+    canvas.addEventListener('mouseup',
+            function (event) {
+                if (dragging && Math.abs(event.clientX - lastX) < 3 && Math.abs(event.clientY - lastY) < 3) {
+
+                    // Do a region pick
+
+                    pick(event.clientX, event.clientY);
+                }
+                dragging = false;
+            }, true);
+
+    canvas.addEventListener('touchstart',
+            function touchStart(event) {
+                lastX = event.targetTouches[0].clientX;
+                lastY = event.targetTouches[0].clientY;
+                dragging = true;
+            }, true);
+
+    canvas.addEventListener('touchend',
+            function touchEnd(event) {
+                if (dragging && event.targetTouches[0].clientX == lastX && event.targetTouches[0].clientY == lastY) {
+
+                    // Do a region pick
+
+                    pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
+                }
+                dragging = false;
+            }, true);
+
+
+    function pick(x, y) {
+        scene.pick(x, y, { regionPick: true });
+    }
+
+</script>
+</body>
+</html>
