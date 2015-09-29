@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-09-21
+ * Built on 2015-09-29
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -2365,6 +2365,7 @@ SceneJS_Engine.prototype.start = function () {
  * @param {Number} canvasY Y-axis canvas pick coordinate
  * @param options Pick options
  * @param options.rayPick Performs additional ray-intersect pick when true
+ * @param options.regionPick Performs additional region-intersect pick when true
  * @returns The pick record
  */
 SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
@@ -2404,12 +2405,12 @@ SceneJS_Engine.prototype.readPixels = function (entries, size, opaqueOnly) {
  */
 SceneJS_Engine.prototype._needCompile = function () {
     return (this.display.imageDirty // Frame buffer needs redraw
-        || this.display.drawListDirty // Draw list needs rebuild
-        || this.display.stateSortDirty // Draw list needs to redetermine state order
-        || this.display.stateOrderDirty // Draw list needs state sort
-        || this.display.objectListDirty // Draw list needs to be rebuilt
-        || this._sceneBranchesDirty // One or more branches in scene graph need (re)compilation
-        || this.sceneDirty); // Whole scene needs recompilation
+    || this.display.drawListDirty // Draw list needs rebuild
+    || this.display.stateSortDirty // Draw list needs to redetermine state order
+    || this.display.stateOrderDirty // Draw list needs state sort
+    || this.display.objectListDirty // Draw list needs to be rebuilt
+    || this._sceneBranchesDirty // One or more branches in scene graph need (re)compilation
+    || this.sceneDirty); // Whole scene needs recompilation
 };
 
 /**
@@ -14129,6 +14130,9 @@ new (function () {
         type: "regionMap",
         stateId: SceneJS._baseStateId++,
         empty: true,
+        texture: null,
+        highlightColor:[ 1.0, 1.0, 1.0 ],
+        highlightFactor:[ 1.5, 1.5, 0.0 ],
         hash: ""
     };
 
@@ -14200,6 +14204,9 @@ new (function () {
                     // Don't need to rebind anything for targets
                 }
             };
+
+            this.setHighlightColor(params.highlightColor);
+            this.setHighlightFactor(params.highlightFactor);
         }
     };
 
@@ -14338,19 +14345,34 @@ new (function () {
         this._engine.display.imageDirty = true;
     };
 
+    SceneJS.RegionMap.prototype.setHighlightColor = function (color) {
+        var defaultHighlightColor = defaultCore.highlightColor;
+        this._core.highlightColor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultHighlightColor[0],
+            color.g != undefined && color.g != null ? color.g : defaultHighlightColor[1],
+            color.b != undefined && color.b != null ? color.b : defaultHighlightColor[2]
+        ] : defaultCore.highlightColor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.RegionMap.prototype.setHighlightFactor = function (color) {
+        var defaultHighlightFactor = defaultCore.highlightFactor;
+        this._core.highlightFactor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultHighlightFactor[0],
+            color.g != undefined && color.g != null ? color.g : defaultHighlightFactor[1],
+            color.b != undefined && color.b != null ? color.b : defaultHighlightFactor[2]
+        ] : defaultCore.highlightFactor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+
     SceneJS.RegionMap.prototype._compile = function (ctx) {
-        if (!this.__core) {
-            this.__core = this._engine._coreFactory.getCore("regionMap");
-        }
         var parentCore = this._engine.display.regionMap;
-        if (!this._core.empty) {
-            this.__core.layers = (parentCore && parentCore.layers) ? parentCore.layers.concat([this._core]) : [this._core];
-        }
-        //this._makeHash(this.__core);
-        coreStack[stackLen++] = this.__core;
-        this._engine.display.regionMap = this.__core;
+        this._engine.display.regionMap = this._core;
         this._compileNodes(ctx);
-        this._engine.display.regionMap = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        this._engine.display.regionMap = parentCore;
     };
 
     SceneJS.RegionMap.prototype._destroy = function () {
@@ -14359,9 +14381,6 @@ new (function () {
                 this._core.texture.destroy();
                 this._core.texture = null;
             }
-        }
-        if (this._core) {
-            this._engine._coreFactory.putCore(this._core);
         }
     };
 
@@ -15898,7 +15917,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 24; i++) {
+    for (var i = 0; i < 25; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
@@ -16142,7 +16161,7 @@ SceneJS_Display.prototype.pick = function (params) {
 
     // Lazy-create pick buffer
     if (!pickBuf) {
-        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
         this.pickBufDirty = true;
     }
 
@@ -16174,9 +16193,12 @@ SceneJS_Display.prototype.pick = function (params) {
 
     if (params.regionPick) {
 
-        // Region-picking just needs the pixel color
+        // Region picking
 
-       // return pix;
+        return {
+            color: {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255},
+            canvasPos: [canvasX, canvasY]
+        };
     }
 
     // Ray-picking
@@ -16203,7 +16225,7 @@ SceneJS_Display.prototype.pick = function (params) {
             // Lazy-create ray pick depth buffer
             var rayPickBuf = this.rayPickBuf;
             if (!rayPickBuf) {
-                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
                 this.rayPickBufDirty = true;
             }
 
@@ -16256,14 +16278,14 @@ SceneJS_Display.prototype.pick = function (params) {
 SceneJS_Display.prototype.readPixels = function (entries, size) {
 
     if (!this._readPixelBuf) {
-        this._readPixelBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+        this._readPixelBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
     }
 
     this._readPixelBuf.bind();
 
     this._readPixelBuf.clear();
 
-    this.render({ force: true });
+    this.render({force: true});
 
     var entry;
     var color;
@@ -16301,6 +16323,7 @@ SceneJS_Display.prototype._unpackDepth = function (depthZ) {
  * @param {Boolean} params.clear Set true to clear the color, depth and stencil buffers first
  * @param {Boolean} params.pick Set true to render for picking
  * @param {Boolean} params.rayPick Set true to render for ray-picking
+ * @param {Boolean} params.regionPick Set true to render for region-picking
  * @param {Boolean} params.transparent Set false to only render opaque objects
  * @private
  */
@@ -16366,7 +16389,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     } else {
 
         // Option to only render opaque objects
-        var len =  (params.opaqueOnly ? this._drawListTransparentIndex: this._drawListLen);
+        var len = (params.opaqueOnly ? this._drawListTransparentIndex : this._drawListLen);
 
         // Render for draw
         for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
@@ -16452,7 +16475,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("varying vec4 SCENEJS_vWorldVertex;");
         src.push("varying vec4 SCENEJS_vViewVertex;");
 
-        if (states.geometry.uvBuf) {
+        if (!states.regionMap.empty) {
             src.push("attribute vec2 SCENEJS_aRegionMapUV;");
             src.push("varying vec2 SCENEJS_vRegionMapUV;");
         }
@@ -16478,7 +16501,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         src.push("  gl_Position =  SCENEJS_uPMatrix * SCENEJS_vViewVertex;");
 
-        if (states.geometry.uvBuf) {
+        if (!states.regionMap.empty) {
             src.push("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
         }
 
@@ -16519,7 +16542,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (states.geometry.uvBuf) {
+        if (!states.regionMap.empty) {
             src.push("varying vec2 SCENEJS_vRegionMapUV;");
             src.push("uniform sampler2D SCENEJS_uRegionMapSampler;");
         }
@@ -16550,21 +16573,28 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("    if (SCENEJS_uPickMode == 1.0) {");
 
         // Ray-pick
+
         src.push("          float zNormalizedDepth = abs((SCENEJS_uZNear + SCENEJS_vViewVertex.z) / (SCENEJS_uZFar - SCENEJS_uZNear));");
         src.push("          gl_FragColor = packDepth(zNormalizedDepth); ");
 
         src.push("    } else if (SCENEJS_uPickMode == 2.0) {");
 
         // Region-pick
+        if (!states.regionMap.empty) {
 
-        src.push("          gl_FragColor = texture2D(SCENEJS_uRegionMapSampler, SCENEJS_vRegionMapUV);");
+            src.push("          gl_FragColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t));");
+        } else {
+            src.push("          gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+        }
 
         src.push("    } else {");
 
-        // Object-pick
+        // Object-color-index-pick
+
         src.push("          gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
 
         src.push("}");
+
         src.push("}");
 
         return src;
@@ -16716,6 +16746,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (states.geometry.uvBuf2) {
                 src.push("varying vec2 SCENEJS_vUVCoord2;");
             }
+        }
+
+        if (!states.regionMap.empty) {
+            src.push("attribute vec2 SCENEJS_aRegionMapUV;");
+            src.push("varying vec2 SCENEJS_vRegionMapUV;");
         }
 
         if (morphing) {
@@ -16904,6 +16939,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("SCENEJS_vColor = SCENEJS_aVertexColor;");
         }
 
+        if (!states.regionMap.empty) {
+            src.push("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
+        }
+
         src.push("gl_PointSize = 3.0;");
 
         src.push("}");
@@ -17005,6 +17044,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 src.push("uniform samplerCube SCENEJS_uCubeMapSampler" + i + ";");
                 src.push("uniform float SCENEJS_uCubeMapIntensity" + i + ";");
             }
+        }
+
+        if (!states.regionMap.empty) {
+            src.push("varying vec2 SCENEJS_vRegionMapUV;");
+            src.push("uniform sampler2D SCENEJS_uRegionMapSampler;");
+            src.push("uniform vec3 SCENEJS_uRegionMapHighlightColor;");
+            src.push("uniform vec3 SCENEJS_uRegionMapHighlightFactor;");
         }
 
         // True when lighting
@@ -17412,6 +17458,21 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         } else { // No normals
             src.push("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
+        }
+
+        if (!states.regionMap.empty) {
+
+            // Region map highlighting
+
+            src.push("vec3 regionColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t)).rgb;");
+            src.push("float tolerance = 0.01;");
+            src.push("if (" +
+                "(SCENEJS_uRegionMapHighlightColor.r - tolerance) < regionColor.r && regionColor.r < (SCENEJS_uRegionMapHighlightColor.r + tolerance) && " +
+                "(SCENEJS_uRegionMapHighlightColor.g - tolerance) < regionColor.g && regionColor.g < (SCENEJS_uRegionMapHighlightColor.g + tolerance) && " +
+                "(SCENEJS_uRegionMapHighlightColor.b - tolerance) < regionColor.b && regionColor.b < (SCENEJS_uRegionMapHighlightColor.b + tolerance)) {");
+
+            src.push("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
+            src.push("}");
         }
 
         if (fragmentHooks.pixelColor) {
@@ -18375,6 +18436,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         var draw = this.program.draw;
 
+        this._aRegionMapUVDraw = draw.getAttribute("SCENEJS_aRegionMapUV");
         this._aVertexDraw = draw.getAttribute("SCENEJS_aVertex");
         this._aNormalDraw = draw.getAttribute("SCENEJS_aNormal");
         this._aUVDraw = draw.getAttribute("SCENEJS_aUVCoord");
@@ -18524,6 +18586,10 @@ SceneJS_ChunkFactory.createChunkType({
                     this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangentBuf());
                 }
             }
+        }
+
+        if (this._aRegionMapUVDraw) {
+            this._aRegionMapUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
         }
 
         this.core2.indexBuf.bind();
@@ -18828,27 +18894,27 @@ SceneJS_ChunkFactory.createChunkType({
     },
 
     pick : function(frameCtx) {
-        
+
         var pickProgram = this.program.pick;
         pickProgram.bind();
-        
+
         var gl = this.program.gl;
 
         // Set the picking mode
 
         if (frameCtx.rayPick) {
-            this._pickMode.setValue(1);
-            
+            this._pickMode.setValue(1.0);
+
         } else if (frameCtx.regionPick) {
-            this._pickMode.setValue(2);
+            this._pickMode.setValue(2.0);
         }
-        
+
         if (this._depthModePick) {
             this._depthModePick.setValue(frameCtx.depthMode);
         }
-        
+
         frameCtx.textureUnit = 0;
-        
+
         for (var i = 0; i < 10; i++) {
             gl.disableVertexAttribArray(i);
         }
@@ -18884,22 +18950,45 @@ SceneJS_ChunkFactory.createChunkType({
     type: "regionMap",
 
     build: function () {
+        this._uRegionMapHighlightColor = this.program.draw.getUniform("SCENEJS_uRegionMapHighlightColor");
+        this._uRegionMapHighlightFactor = this.program.draw.getUniform("SCENEJS_uRegionMapHighlightFactor");
         this._uRegionMapSampler = "SCENEJS_uRegionMapSampler";
+    },
+
+    draw: function (frameCtx) {
+
+        var texture = this.core.texture;
+
+        if (texture) {
+
+            this.program.draw.bindTexture(this._uRegionMapSampler, texture, frameCtx.textureUnit++);
+
+            if (frameCtx.textureUnit > 10) { // TODO: Find how many textures allowed
+                frameCtx.textureUnit = 0;
+            }
+        }
+
+        if (this._uRegionMapHighlightColor) {
+            this._uRegionMapHighlightColor.setValue(this.core.highlightColor);
+        }
+
+        if (this._uRegionMapHighlightFactor) {
+            this._uRegionMapHighlightFactor.setValue(this.core.highlightFactor);
+        }
     },
 
     pick: function (frameCtx) {
 
-        var regionMap = this.core.regionMap;
+        var texture = this.core.texture;
 
-        if (regionMap && regionMap.texture) {
+        if (texture) {
 
-            if (this._uRegionMapSampler) {
+            frameCtx.textureUnit = 0;
 
-                this.program.pick.bindTexture(this._uRegionMapSampler, regionMap.texture, frameCtx.textureUnit++);
+            this.program.pick.bindTexture(this._uRegionMapSampler, texture, frameCtx.textureUnit++);
 
-                if (frameCtx.textureUnit > 10) { // TODO: Find how many textures allowed
-                    frameCtx.textureUnit = 0;
-                }
+            if (frameCtx.textureUnit > 10) { // TODO: Find how many textures allowed
+                frameCtx.textureUnit = 0;
             }
         }
     }
