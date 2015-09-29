@@ -174,9 +174,9 @@
                 positions.push(-y + halfHeight);
                 positions.push(-z);
 
-                uvs.push( px / gridZ);
-                uvs.push(1-py / gridX);
 
+                uvs.push(px / gridZ);
+                uvs.push(1-py / gridX);
             }
         }
 

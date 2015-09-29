@@ -57,11 +57,11 @@
     var scene = SceneJS.createScene({
         nodes: [
 
-            // Orbiting camera node, implemented by plugin at
-            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            // Mouse-orbit for camera,
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
                 type: "cameras/orbit",
-                yaw: 220,
+                yaw: 270,
                 pitch: -40,
                 maxPitch: -10,
                 minPitch: -80,
@@ -79,7 +79,9 @@
                         type: "regionMap",
                         id: "myRegionMap",
                         src: 'textures/terrainHeightMap.png',
-                        highlightFactor: [1.4, 1.4, 0.0],
+                        highlightFactor: {
+                            r: 1.5, g: 1.5, b: 0.0
+                        },
 
                         nodes: [
 
@@ -100,6 +102,7 @@
                                             "r": 0.0
                                         },
                                         "shine": 20.0,
+                                        "specular": 0.5,
                                         "specularColor": {
                                             "b": 0.5,
                                             "g": 0.5,
@@ -148,33 +151,30 @@
 
                 info.innerHTML = "Pick hit: " + JSON.stringify(hit);
 
+                var color = hit.color; // Eg. { r: 0.3, g: 0.5, b: 1.0 }
                 var canvasPos = hit.canvasPos;
-                var color = hit.color;
 
                 scene.getNode("myRegionMap",
                         function (regionMap) {
-                            regionMap.setHighlightColor(hit.color);
-                        })
+                            regionMap.setHighlightColor(color);
+                        });
             });
 
     // Called when nothing picked
+
     scene.on("nopick",
             function () {
                 info.innerHTML = "Nothing picked.";
             });
 
-    // Mouse event handling to do a pick on each mouse click
+    // Mouse event handling
 
     var canvas = scene.getCanvas();
 
-    canvas.addEventListener('mousemove', function (event) {
-        pick(event.clientX, event.clientY);
-    });
-
-
-    function pick(x, y) {
-        scene.pick(x, y, {regionPick: true});
-    }
+    canvas.addEventListener('mousemove',
+            function (event) {
+                scene.pick(event.clientX, event.clientY, { regionPick: true });
+            }, true);
 
 </script>
 </body>
