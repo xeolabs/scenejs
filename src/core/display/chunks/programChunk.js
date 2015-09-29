@@ -7,7 +7,7 @@ SceneJS_ChunkFactory.createChunkType({
         // Note that "program" chunks are always after "renderTarget" chunks
         this._depthModeDraw = this.program.draw.getUniform("SCENEJS_uDepthMode");
         this._depthModePick = this.program.pick.getUniform("SCENEJS_uDepthMode");
-        this._rayPickMode = this.program.pick.getUniform("SCENEJS_uRayPickMode");
+        this._pickMode = this.program.pick.getUniform("SCENEJS_uPickMode");
     },
 
     draw : function(frameCtx) {
@@ -28,16 +28,27 @@ SceneJS_ChunkFactory.createChunkType({
     },
 
     pick : function(frameCtx) {
+
         var pickProgram = this.program.pick;
         pickProgram.bind();
+
         var gl = this.program.gl;
-        if (this._rayPickMode) {
-            this._rayPickMode.setValue(frameCtx.rayPick);
+
+        // Set the picking mode
+
+        if (frameCtx.rayPick) {
+            this._pickMode.setValue(1.0);
+
+        } else if (frameCtx.regionPick) {
+            this._pickMode.setValue(2.0);
         }
+
         if (this._depthModePick) {
             this._depthModePick.setValue(frameCtx.depthMode);
         }
+
         frameCtx.textureUnit = 0;
+
         for (var i = 0; i < 10; i++) {
             gl.disableVertexAttribArray(i);
         }

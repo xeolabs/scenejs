@@ -181,6 +181,12 @@ var SceneJS_Display = function (cfg) {
     this.projTransform = null;
 
     /**
+     * Node state core for the last {@link SceneJS.RegionMap} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.regionMap = null;
+
+    /**
      * Node state core for the last {@link SceneJS.ColorTarget} visited during scene graph compilation traversal
      * @type Object
      */
@@ -428,13 +434,14 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 12, "lights", this.lights);
     this._setChunk(object, 13, "material", this.material);
     this._setChunk(object, 14, "texture", this.texture);
-    this._setChunk(object, 15, "fresnel", this.fresnel);
-    this._setChunk(object, 16, "cubemap", this.cubemap);
-    this._setChunk(object, 17, "clips", this.clips);
-    this._setChunk(object, 18, "renderer", this.renderer);
-    this._setChunk(object, 19, "geometry", this.morphGeometry, this.geometry);
-    this._setChunk(object, 20, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 21, "draw", this.geometry); // Must be last
+    this._setChunk(object, 15, "regionMap", this.regionMap);
+    this._setChunk(object, 16, "fresnel", this.fresnel);
+    this._setChunk(object, 17, "cubemap", this.cubemap);
+    this._setChunk(object, 18, "clips", this.clips);
+    this._setChunk(object, 19, "renderer", this.renderer);
+    this._setChunk(object, 20, "geometry", this.morphGeometry, this.geometry);
+    this._setChunk(object, 21, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 22, "draw", this.geometry); // Must be last
 
     // At the very least, the object sort order
     // will need be recomputed
@@ -637,7 +644,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 24; i++) {
+    for (var i = 0; i < 25; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
@@ -881,7 +888,7 @@ SceneJS_Display.prototype.pick = function (params) {
 
     // Lazy-create pick buffer
     if (!pickBuf) {
-        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
         this.pickBufDirty = true;
     }
 
@@ -896,6 +903,7 @@ SceneJS_Display.prototype.pick = function (params) {
         pickBuf.clear();
         this._doDrawList({
             pick: true,
+            regionPick: params.regionPick,
             clear: true
         });
         this._canvas.gl.finish();
@@ -907,9 +915,23 @@ SceneJS_Display.prototype.pick = function (params) {
     // convert to an index into the pick name list
 
     var pix = pickBuf.read(canvasX, canvasY);                                       // Read pick buffer
+
+    pickBuf.unbind();                                                               // Unbind pick buffer
+
+    if (params.regionPick) {
+
+        // Region picking
+
+        return {
+            color: {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255},
+            canvasPos: [canvasX, canvasY]
+        };
+    }
+
+    // Ray-picking
+
     var pickedObjectIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
     var pickIndex = (pickedObjectIndex >= 1) ? pickedObjectIndex - 1 : -1;
-    pickBuf.unbind();                                                               // Unbind pick buffer
 
     // Look up pick name from index
     var pickName = this._frameCtx.pickNames[pickIndex];                                   // Map pixel to name
@@ -930,7 +952,7 @@ SceneJS_Display.prototype.pick = function (params) {
             // Lazy-create ray pick depth buffer
             var rayPickBuf = this.rayPickBuf;
             if (!rayPickBuf) {
-                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
                 this.rayPickBufDirty = true;
             }
 
@@ -980,20 +1002,17 @@ SceneJS_Display.prototype.pick = function (params) {
     return hit;
 };
 
-SceneJS_Display.prototype.readPixels = function (entries, size, opaqueOnly) {
+SceneJS_Display.prototype.readPixels = function (entries, size) {
 
     if (!this._readPixelBuf) {
-        this._readPixelBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+        this._readPixelBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
     }
 
     this._readPixelBuf.bind();
 
     this._readPixelBuf.clear();
 
-    this.render({
-        force: true,
-        opaqueOnly: opaqueOnly
-    });
+    this.render({force: true});
 
     var entry;
     var color;
@@ -1031,6 +1050,7 @@ SceneJS_Display.prototype._unpackDepth = function (depthZ) {
  * @param {Boolean} params.clear Set true to clear the color, depth and stencil buffers first
  * @param {Boolean} params.pick Set true to render for picking
  * @param {Boolean} params.rayPick Set true to render for ray-picking
+ * @param {Boolean} params.regionPick Set true to render for region-picking
  * @param {Boolean} params.transparent Set false to only render opaque objects
  * @private
  */
@@ -1056,6 +1076,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.frontface = "ccw";
     frameCtx.pick = !!params.pick;
     frameCtx.rayPick = !!params.rayPick;
+    frameCtx.regionPick = !!params.regionPick;
     frameCtx.pickIndex = 0;
     frameCtx.textureUnit = 0;
     frameCtx.lineWidth = 1;
@@ -1095,7 +1116,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     } else {
 
         // Option to only render opaque objects
-        var len =  (params.opaqueOnly && this._drawListTransparentIndex >= 0 ? this._drawListTransparentIndex : this._drawListLen);
+        var len = (params.opaqueOnly ? this._drawListTransparentIndex : this._drawListLen);
 
         // Render for draw
         for (var i = 0; i < len; i++) {      // Push opaque rendering chunks

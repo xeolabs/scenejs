@@ -9,6 +9,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         var draw = this.program.draw;
 
+        this._aRegionMapUVDraw = draw.getAttribute("SCENEJS_aRegionMapUV");
         this._aVertexDraw = draw.getAttribute("SCENEJS_aVertex");
         this._aNormalDraw = draw.getAttribute("SCENEJS_aNormal");
         this._aUVDraw = draw.getAttribute("SCENEJS_aUVCoord");
@@ -22,6 +23,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         var pick = this.program.pick;
 
+        this._aRegionMapUVPick = pick.getAttribute("SCENEJS_aRegionMapUV");
         this._aVertexPick = pick.getAttribute("SCENEJS_aVertex");
         this._aMorphVertexPick = pick.getAttribute("SCENEJS_aMorphVertex");
         this._uMorphFactorPick = pick.getUniform("SCENEJS_uMorphFactor");
@@ -159,6 +161,10 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
 
+        if (this._aRegionMapUVDraw) {
+            this._aRegionMapUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
+        }
+
         this.core2.indexBuf.bind();
 
     },
@@ -190,6 +196,10 @@ SceneJS_ChunkFactory.createChunkType({
 
             if (this._aVertexPick) {
                 this._aVertexPick.bindFloatArrayBuffer(this.core2.vertexBuf);
+            }
+
+            if (this._aRegionMapUVPick) {
+                this._aRegionMapUVPick.bindFloatArrayBuffer(this.core2.uvBuf);
             }
         }
 
