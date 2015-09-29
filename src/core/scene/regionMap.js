@@ -11,6 +11,7 @@ new (function () {
         empty: true,
         texture: null,
         highlightColor:[ 1.0, 1.0, 1.0 ],
+        highlightFactor:[ 1.5, 1.5, 0.0 ],
         hash: ""
     };
 
