@@ -38,9 +38,10 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (frameCtx.rayPick) {
             this._pickMode.setValue(1.0);
-
         } else if (frameCtx.regionPick) {
             this._pickMode.setValue(2.0);
+        } else {
+            this._pickMode.setValue(0.0);
         }
 
         if (this._depthModePick) {
