@@ -61,24 +61,33 @@
             // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
                 type: "cameras/orbit",
-                yaw: 30,
-                pitch: -30,
-                zoom: 10,
-                zoomSensitivity: 1.0,
+                yaw: 220,
+                pitch: -40,
+                maxPitch: -10,
+                minPitch: -80,
+                zoom: 2500,
+                eye: {x: 0, y: 550, z: -1500},
+                look: {x: 0, y: 150, z: 0},
+                zoomSensitivity: 20.0,
+                showCursor: true,
+                cursorSize: 4.0,
 
                 nodes: [
 
                     // The region map
                     {
                         type: "regionMap",
-                        src: "textures/regionMap.jpg",
+                        id: "myRegionMap",
+                        src: 'textures/terrainHeightMap.png',
+                        highlightFactor: [1.4, 1.4, 0.0],
+
                         nodes: [
 
                             // Color map, applying the region map
                             // to base color so that we can visualise it
                             {
                                 type: "texture",
-                                src: "textures/regionMap.jpg",
+                                src: 'textures/terrainHeightMap.png',
                                 applyTo: "color",
                                 blendMode: "add",
 
@@ -98,10 +107,25 @@
                                         },
                                         "nodes": [
 
-                                            // Box primitive, implemented by plugin at
-                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            // Heightmap, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
                                             {
-                                                type: "geometry/box"
+                                                type: "geometry/heightmap",
+
+                                                // Texture image
+                                                src: 'textures/terrainHeightMap.png',
+
+                                                // Wireframe or solid - default is false
+                                                wire: false,
+
+                                                // Dimensions
+                                                xSize: 2000,
+                                                zSize: 2000,
+                                                ySize: 800,
+
+                                                // Segments on X and Z axis
+                                                xSegments: 150,
+                                                zSegments: 150
                                             }
                                         ]
                                     }
@@ -124,10 +148,13 @@
 
                 info.innerHTML = "Pick hit: " + JSON.stringify(hit);
 
-                // How to get color of picked pixel:
-                var r = hit.r;
-                var g = hit.g;
-                var b = hit.b;
+                var canvasPos = hit.canvasPos;
+                var color = hit.color;
+
+                scene.getNode("myRegionMap",
+                        function (regionMap) {
+                            regionMap.setHighlightColor(hit.color);
+                        })
             });
 
     // Called when nothing picked
@@ -140,49 +167,13 @@
 
     var canvas = scene.getCanvas();
 
-    var lastX;
-    var lastY;
-    var dragging;
-
-    canvas.addEventListener('mousedown',
-            function (event) {
-                lastX = event.clientX;
-                lastY = event.clientY;
-                dragging = true;
-            }, true);
-
-    canvas.addEventListener('mouseup',
-            function (event) {
-                if (dragging && Math.abs(event.clientX - lastX) < 3 && Math.abs(event.clientY - lastY) < 3) {
-
-                    // Do a region pick
-
-                    pick(event.clientX, event.clientY);
-                }
-                dragging = false;
-            }, true);
-
-    canvas.addEventListener('touchstart',
-            function touchStart(event) {
-                lastX = event.targetTouches[0].clientX;
-                lastY = event.targetTouches[0].clientY;
-                dragging = true;
-            }, true);
-
-    canvas.addEventListener('touchend',
-            function touchEnd(event) {
-                if (dragging && event.targetTouches[0].clientX == lastX && event.targetTouches[0].clientY == lastY) {
-
-                    // Do a region pick
-
-                    pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
-                }
-                dragging = false;
-            }, true);
+    canvas.addEventListener('mousemove', function (event) {
+        pick(event.clientX, event.clientY);
+    });
 
 
     function pick(x, y) {
-        scene.pick(x, y, { regionPick: true });
+        scene.pick(x, y, {regionPick: true});
     }
 
 </script>
