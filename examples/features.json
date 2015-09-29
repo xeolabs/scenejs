@@ -233,6 +233,14 @@
                         "page": "picking_rayPicking_performance"
                     }
                 ]
+            },
+            {
+                "nodes": [
+                    {
+                        "title": "Region picking",
+                        "page": "picking_regions"
+                    }
+                ]
             }
         ]
     },
