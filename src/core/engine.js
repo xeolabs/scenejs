@@ -525,6 +525,7 @@ SceneJS_Engine.prototype.start = function () {
  * @param {Number} canvasY Y-axis canvas pick coordinate
  * @param options Pick options
  * @param options.rayPick Performs additional ray-intersect pick when true
+ * @param options.regionPick Performs additional region-intersect pick when true
  * @returns The pick record
  */
 SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
@@ -537,7 +538,8 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
     var hit = this.display.pick({
         canvasX: canvasX,
         canvasY: canvasY,
-        rayPick: options ? options.rayPick : false
+        rayPick: options ? options.rayPick : false,
+        regionPick: options ? options.regionPick : false
     });
 
     return hit;
@@ -563,12 +565,12 @@ SceneJS_Engine.prototype.readPixels = function (entries, size, opaqueOnly) {
  */
 SceneJS_Engine.prototype._needCompile = function () {
     return (this.display.imageDirty // Frame buffer needs redraw
-        || this.display.drawListDirty // Draw list needs rebuild
-        || this.display.stateSortDirty // Draw list needs to redetermine state order
-        || this.display.stateOrderDirty // Draw list needs state sort
-        || this.display.objectListDirty // Draw list needs to be rebuilt
-        || this._sceneBranchesDirty // One or more branches in scene graph need (re)compilation
-        || this.sceneDirty); // Whole scene needs recompilation
+    || this.display.drawListDirty // Draw list needs rebuild
+    || this.display.stateSortDirty // Draw list needs to redetermine state order
+    || this.display.stateOrderDirty // Draw list needs state sort
+    || this.display.objectListDirty // Draw list needs to be rebuilt
+    || this._sceneBranchesDirty // One or more branches in scene graph need (re)compilation
+    || this.sceneDirty); // Whole scene needs recompilation
 };
 
 /**

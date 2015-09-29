@@ -52,6 +52,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("varying vec4 SCENEJS_vWorldVertex;");
         src.push("varying vec4 SCENEJS_vViewVertex;");
 
+        if (!states.regionMap.empty) {
+            src.push("attribute vec2 SCENEJS_aRegionMapUV;");
+            src.push("varying vec2 SCENEJS_vRegionMapUV;");
+        }
+
         if (morphing) {
             src.push("uniform float SCENEJS_uMorphFactor;");       // LERP factor for morph
             if (states.morphGeometry.targets[0].vertexBuf) {      // target2 has these arrays also
@@ -72,7 +77,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("  SCENEJS_vViewVertex = SCENEJS_uVMatrix * SCENEJS_vWorldVertex;");
 
         src.push("  gl_Position =  SCENEJS_uPMatrix * SCENEJS_vViewVertex;");
+
+        if (!states.regionMap.empty) {
+            src.push("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
+        }
+
         src.push("}");
+
         return src;
     };
 
@@ -93,7 +104,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("varying vec4 SCENEJS_vWorldVertex;");
         src.push("varying vec4  SCENEJS_vViewVertex;");                  // View-space vertex
 
-        src.push("uniform bool  SCENEJS_uRayPickMode;");                   // Z-pick mode when true else colour-pick
+        src.push("uniform float  SCENEJS_uPickMode;");                   // Z-pick mode when true else colour-pick
         src.push("uniform vec3  SCENEJS_uPickColor;");                   // Used in colour-pick mode
         src.push("uniform float SCENEJS_uZNear;");                      // Used in Z-pick mode
         src.push("uniform float SCENEJS_uZFar;");                       // Used in Z-pick mode
@@ -106,6 +117,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 src.push("uniform float SCENEJS_uClipMode" + i + ";");
                 src.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
             }
+        }
+
+        if (!states.regionMap.empty) {
+            src.push("varying vec2 SCENEJS_vRegionMapUV;");
+            src.push("uniform sampler2D SCENEJS_uRegionMapSampler;");
         }
 
         // Pack depth function for ray-pick
@@ -131,12 +147,30 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("}");
         }
 
-        src.push("    if (SCENEJS_uRayPickMode) {");
+        src.push("    if (SCENEJS_uPickMode == 1.0) {");
+
+        // Ray-pick
+
         src.push("          float zNormalizedDepth = abs((SCENEJS_uZNear + SCENEJS_vViewVertex.z) / (SCENEJS_uZFar - SCENEJS_uZNear));");
         src.push("          gl_FragColor = packDepth(zNormalizedDepth); ");
+
+        src.push("    } else if (SCENEJS_uPickMode == 2.0) {");
+
+        // Region-pick
+        if (!states.regionMap.empty) {
+
+            src.push("          gl_FragColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t));");
+        } else {
+            src.push("          gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+        }
+
         src.push("    } else {");
+
+        // Object-color-index-pick
+
         src.push("          gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
-        src.push("    }");
+
+        src.push("}");
 
         src.push("}");
 
@@ -289,6 +323,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (states.geometry.uvBuf2) {
                 src.push("varying vec2 SCENEJS_vUVCoord2;");
             }
+        }
+
+        if (!states.regionMap.empty) {
+            src.push("attribute vec2 SCENEJS_aRegionMapUV;");
+            src.push("varying vec2 SCENEJS_vRegionMapUV;");
         }
 
         if (morphing) {
@@ -477,6 +516,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("SCENEJS_vColor = SCENEJS_aVertexColor;");
         }
 
+        if (!states.regionMap.empty) {
+            src.push("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
+        }
+
         src.push("gl_PointSize = 3.0;");
 
         src.push("}");
@@ -578,6 +621,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 src.push("uniform samplerCube SCENEJS_uCubeMapSampler" + i + ";");
                 src.push("uniform float SCENEJS_uCubeMapIntensity" + i + ";");
             }
+        }
+
+        if (!states.regionMap.empty) {
+            src.push("varying vec2 SCENEJS_vRegionMapUV;");
+            src.push("uniform sampler2D SCENEJS_uRegionMapSampler;");
+            src.push("uniform vec3 SCENEJS_uRegionMapHighlightColor;");
+            src.push("uniform vec3 SCENEJS_uRegionMapHighlightFactor;");
         }
 
         // True when lighting
@@ -985,6 +1035,21 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         } else { // No normals
             src.push("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
+        }
+
+        if (!states.regionMap.empty) {
+
+            // Region map highlighting
+
+            src.push("vec3 regionColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t)).rgb;");
+            src.push("float tolerance = 0.01;");
+            src.push("if (" +
+                "(SCENEJS_uRegionMapHighlightColor.r - tolerance) < regionColor.r && regionColor.r < (SCENEJS_uRegionMapHighlightColor.r + tolerance) && " +
+                "(SCENEJS_uRegionMapHighlightColor.g - tolerance) < regionColor.g && regionColor.g < (SCENEJS_uRegionMapHighlightColor.g + tolerance) && " +
+                "(SCENEJS_uRegionMapHighlightColor.b - tolerance) < regionColor.b && regionColor.b < (SCENEJS_uRegionMapHighlightColor.b + tolerance)) {");
+
+            src.push("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
+            src.push("}");
         }
 
         if (fragmentHooks.pixelColor) {
