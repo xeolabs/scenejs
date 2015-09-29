@@ -9,6 +9,8 @@ new (function () {
         type: "regionMap",
         stateId: SceneJS._baseStateId++,
         empty: true,
+        texture: null,
+        highlightColor:[ 1.0, 1.0, 1.0 ],
         hash: ""
     };
 
@@ -80,6 +82,9 @@ new (function () {
                     // Don't need to rebind anything for targets
                 }
             };
+
+            this.setHighlightColor(params.highlightColor);
+            this.setHighlightFactor(params.highlightFactor);
         }
     };
 
@@ -218,19 +223,34 @@ new (function () {
         this._engine.display.imageDirty = true;
     };
 
+    SceneJS.RegionMap.prototype.setHighlightColor = function (color) {
+        var defaultHighlightColor = defaultCore.highlightColor;
+        this._core.highlightColor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultHighlightColor[0],
+            color.g != undefined && color.g != null ? color.g : defaultHighlightColor[1],
+            color.b != undefined && color.b != null ? color.b : defaultHighlightColor[2]
+        ] : defaultCore.highlightColor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.RegionMap.prototype.setHighlightFactor = function (color) {
+        var defaultHighlightFactor = defaultCore.highlightFactor;
+        this._core.highlightFactor = color ? [
+            color.r != undefined && color.r != null ? color.r : defaultHighlightFactor[0],
+            color.g != undefined && color.g != null ? color.g : defaultHighlightFactor[1],
+            color.b != undefined && color.b != null ? color.b : defaultHighlightFactor[2]
+        ] : defaultCore.highlightFactor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+
     SceneJS.RegionMap.prototype._compile = function (ctx) {
-        if (!this.__core) {
-            this.__core = this._engine._coreFactory.getCore("regionMap");
-        }
         var parentCore = this._engine.display.regionMap;
-        if (!this._core.empty) {
-            this.__core.layers = (parentCore && parentCore.layers) ? parentCore.layers.concat([this._core]) : [this._core];
-        }
-        //this._makeHash(this.__core);
-        coreStack[stackLen++] = this.__core;
-        this._engine.display.regionMap = this.__core;
+        this._engine.display.regionMap = this._core;
         this._compileNodes(ctx);
-        this._engine.display.regionMap = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        this._engine.display.regionMap = parentCore;
     };
 
     SceneJS.RegionMap.prototype._destroy = function () {
@@ -239,9 +259,6 @@ new (function () {
                 this._core.texture.destroy();
                 this._core.texture = null;
             }
-        }
-        if (this._core) {
-            this._engine._coreFactory.putCore(this._core);
         }
     };
 

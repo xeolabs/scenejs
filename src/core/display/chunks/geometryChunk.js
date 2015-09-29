@@ -9,6 +9,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         var draw = this.program.draw;
 
+        this._aRegionMapUVDraw = draw.getAttribute("SCENEJS_aRegionMapUV");
         this._aVertexDraw = draw.getAttribute("SCENEJS_aVertex");
         this._aNormalDraw = draw.getAttribute("SCENEJS_aNormal");
         this._aUVDraw = draw.getAttribute("SCENEJS_aUVCoord");
@@ -158,6 +159,10 @@ SceneJS_ChunkFactory.createChunkType({
                     this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangentBuf());
                 }
             }
+        }
+
+        if (this._aRegionMapUVDraw) {
+            this._aRegionMapUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
         }
 
         this.core2.indexBuf.bind();

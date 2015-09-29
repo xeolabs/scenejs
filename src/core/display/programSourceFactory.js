@@ -52,7 +52,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("varying vec4 SCENEJS_vWorldVertex;");
         src.push("varying vec4 SCENEJS_vViewVertex;");
 
-        if (states.geometry.uvBuf) {
+        if (!states.regionMap.empty) {
             src.push("attribute vec2 SCENEJS_aRegionMapUV;");
             src.push("varying vec2 SCENEJS_vRegionMapUV;");
         }
@@ -78,7 +78,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         src.push("  gl_Position =  SCENEJS_uPMatrix * SCENEJS_vViewVertex;");
 
-        if (states.geometry.uvBuf) {
+        if (!states.regionMap.empty) {
             src.push("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
         }
 
@@ -119,7 +119,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (states.geometry.uvBuf) {
+        if (!states.regionMap.empty) {
             src.push("varying vec2 SCENEJS_vRegionMapUV;");
             src.push("uniform sampler2D SCENEJS_uRegionMapSampler;");
         }
@@ -157,8 +157,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("    } else if (SCENEJS_uPickMode == 2.0) {");
 
         // Region-pick
+        if (!states.regionMap.empty) {
 
-        src.push("          gl_FragColor = texture2D(SCENEJS_uRegionMapSampler, SCENEJS_vRegionMapUV);");
+            src.push("          gl_FragColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t));");
+        } else {
+            src.push("          gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);");
+        }
 
         src.push("    } else {");
 
@@ -167,6 +171,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         src.push("          gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
 
         src.push("}");
+
         src.push("}");
 
         return src;
@@ -318,6 +323,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (states.geometry.uvBuf2) {
                 src.push("varying vec2 SCENEJS_vUVCoord2;");
             }
+        }
+
+        if (!states.regionMap.empty) {
+            src.push("attribute vec2 SCENEJS_aRegionMapUV;");
+            src.push("varying vec2 SCENEJS_vRegionMapUV;");
         }
 
         if (morphing) {
@@ -506,6 +516,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("SCENEJS_vColor = SCENEJS_aVertexColor;");
         }
 
+        if (!states.regionMap.empty) {
+            src.push("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
+        }
+
         src.push("gl_PointSize = 3.0;");
 
         src.push("}");
@@ -607,6 +621,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 src.push("uniform samplerCube SCENEJS_uCubeMapSampler" + i + ";");
                 src.push("uniform float SCENEJS_uCubeMapIntensity" + i + ";");
             }
+        }
+
+        if (!states.regionMap.empty) {
+            src.push("varying vec2 SCENEJS_vRegionMapUV;");
+            src.push("uniform sampler2D SCENEJS_uRegionMapSampler;");
+            src.push("uniform vec3 SCENEJS_uRegionMapHighlightColor;");
+            src.push("uniform vec3 SCENEJS_uRegionMapHighlightFactor;");
         }
 
         // True when lighting
@@ -1014,6 +1035,21 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         } else { // No normals
             src.push("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
+        }
+
+        if (!states.regionMap.empty) {
+
+            // Region map highlighting
+
+            src.push("vec3 regionColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t)).rgb;");
+            src.push("float tolerance = 0.01;");
+            src.push("if (" +
+                "(SCENEJS_uRegionMapHighlightColor.r - tolerance) < regionColor.r && regionColor.r < (SCENEJS_uRegionMapHighlightColor.r + tolerance) && " +
+                "(SCENEJS_uRegionMapHighlightColor.g - tolerance) < regionColor.g && regionColor.g < (SCENEJS_uRegionMapHighlightColor.g + tolerance) && " +
+                "(SCENEJS_uRegionMapHighlightColor.b - tolerance) < regionColor.b && regionColor.b < (SCENEJS_uRegionMapHighlightColor.b + tolerance)) {");
+
+            src.push("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
+            src.push("}");
         }
 
         if (fragmentHooks.pixelColor) {

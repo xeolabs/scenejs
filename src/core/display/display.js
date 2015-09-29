@@ -644,7 +644,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 24; i++) {
+    for (var i = 0; i < 25; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
@@ -888,7 +888,7 @@ SceneJS_Display.prototype.pick = function (params) {
 
     // Lazy-create pick buffer
     if (!pickBuf) {
-        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
         this.pickBufDirty = true;
     }
 
@@ -920,9 +920,12 @@ SceneJS_Display.prototype.pick = function (params) {
 
     if (params.regionPick) {
 
-        // Region-picking just needs the pixel color
+        // Region picking
 
-        return { r: pix[0], g: pix[1], b: pix[2], a: pix[3] };
+        return {
+            color: {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255},
+            canvasPos: [canvasX, canvasY]
+        };
     }
 
     // Ray-picking
@@ -949,7 +952,7 @@ SceneJS_Display.prototype.pick = function (params) {
             // Lazy-create ray pick depth buffer
             var rayPickBuf = this.rayPickBuf;
             if (!rayPickBuf) {
-                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
                 this.rayPickBufDirty = true;
             }
 
@@ -1002,14 +1005,14 @@ SceneJS_Display.prototype.pick = function (params) {
 SceneJS_Display.prototype.readPixels = function (entries, size) {
 
     if (!this._readPixelBuf) {
-        this._readPixelBuf = new SceneJS._webgl.RenderBuffer({ canvas: this._canvas });
+        this._readPixelBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
     }
 
     this._readPixelBuf.bind();
 
     this._readPixelBuf.clear();
 
-    this.render({ force: true });
+    this.render({force: true});
 
     var entry;
     var color;
@@ -1113,7 +1116,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     } else {
 
         // Option to only render opaque objects
-        var len =  (params.opaqueOnly ? this._drawListTransparentIndex: this._drawListLen);
+        var len = (params.opaqueOnly ? this._drawListTransparentIndex : this._drawListLen);
 
         // Render for draw
         for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
