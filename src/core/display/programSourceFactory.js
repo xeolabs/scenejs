@@ -1042,12 +1042,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
             // Region map highlighting
 
             src.push("vec3 regionColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t)).rgb;");
-            src.push("float tolerance = 0.01;");
-            src.push("if (" +
-                "(SCENEJS_uRegionMapHighlightColor.r - tolerance) < regionColor.r && regionColor.r < (SCENEJS_uRegionMapHighlightColor.r + tolerance) && " +
-                "(SCENEJS_uRegionMapHighlightColor.g - tolerance) < regionColor.g && regionColor.g < (SCENEJS_uRegionMapHighlightColor.g + tolerance) && " +
-                "(SCENEJS_uRegionMapHighlightColor.b - tolerance) < regionColor.b && regionColor.b < (SCENEJS_uRegionMapHighlightColor.b + tolerance)) {");
-
+            src.push("float tolerance = 0.03;");
+            src.push("float colorDelta = dot(abs(SCENEJS_uRegionMapHighlightColor - regionColor), vec3(1.0));");
+            src.push("if (colorDelta < tolerance) {");
             src.push("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
             src.push("}");
         }
