@@ -10,7 +10,7 @@ new (function () {
         stateId: SceneJS._baseStateId++,
         empty: true,
         texture: null,
-        highlightColor:[ 1.0, 1.0, 1.0 ],
+        highlightColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
         highlightFactor:[ 1.5, 1.5, 0.0 ],
         hash: ""
     };
@@ -86,6 +86,8 @@ new (function () {
 
             this.setHighlightColor(params.highlightColor);
             this.setHighlightFactor(params.highlightFactor);
+
+            this._core.hash = "reg";
         }
     };
 

@@ -404,7 +404,8 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.fresnel.hash,
         this.cubemap.hash,
         this.lights.hash,
-        this.flags.hash
+        this.flags.hash,
+        this.regionMap.hash
     ]).join(";");
 
     if (!object.program || hash != object.hash) {
