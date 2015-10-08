@@ -1043,8 +1043,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             src.push("vec3 regionColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t)).rgb;");
             src.push("float tolerance = 0.01;");
-            src.push("float colorDelta = dot(abs(SCENEJS_uRegionMapHighlightColor - regionColor), vec3(1.0));");
-            src.push("if (colorDelta < tolerance) {");
+            src.push("vec3 colorDelta = abs(SCENEJS_uRegionMapHighlightColor - regionColor);");
+            src.push("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) < tolerance) {");
             src.push("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
             src.push("}");
         }

@@ -155,8 +155,8 @@ new (function () {
 
         this._core.texture = new SceneJS._webgl.Texture2D(gl, {
             texture: texture, // WebGL texture object
-            minFilter: this._getGLOption("minFilter", gl.LINEAR_MIPMAP_NEAREST),
-            magFilter: this._getGLOption("magFilter", gl.LINEAR),
+            minFilter: this._getGLOption("minFilter", gl.NEAREST_MIPMAP_NEAREST),  // Don't want any interpolation
+            magFilter: this._getGLOption("magFilter", gl.NEAREST),
             wrapS: this._getGLOption("wrapS", gl.REPEAT),
             wrapT: this._getGLOption("wrapT", gl.REPEAT),
             isDepth: this._getOption(this._core.isDepth, false),
