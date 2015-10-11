@@ -36,6 +36,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (texture) {
 
+            frameCtx.regionData = this.core.regionData;
+
             frameCtx.textureUnit = 0;
 
             this.program.pick.bindTexture(this._uRegionMapSampler, texture, frameCtx.textureUnit++);

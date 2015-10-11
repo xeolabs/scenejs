@@ -289,7 +289,8 @@ var SceneJS_Display = function (cfg) {
      * the render, such as pick hits
      */
     this._frameCtx = {
-        pickNames: [], // Pick names of objects hit during pick render
+        pickNames: [], // Pick names of objects hit during pick render,
+        regionData: {},
         canvas: this._canvas,           // The canvas
         VAO: null                       // Vertex array object extension
     };
@@ -923,8 +924,27 @@ SceneJS_Display.prototype.pick = function (params) {
 
         // Region picking
 
+        var regionColor = {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255};
+        var regionData = this._frameCtx.regionData;
+        var data = {};
+        var tolerance = 0.01;
+
+        for (var color in regionData) {
+            var delta = color.split(",");
+            delta[0] = Math.abs(regionColor.r - parseFloat(delta[0]));
+            delta[1] = Math.abs(regionColor.g - parseFloat(delta[1]));
+            delta[2] = Math.abs(regionColor.b - parseFloat(delta[2]));
+            delta[3] = Math.abs(regionColor.a - parseFloat(delta[3] || 1));
+
+            if (Math.max(delta[0], delta[1], delta[2], delta[3]) < tolerance) {
+                data = regionData[color];
+            }
+
+        }
+
         return {
-            color: {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255},
+            color: regionColor,
+            regionData: data,
             canvasPos: [canvasX, canvasY]
         };
     }
