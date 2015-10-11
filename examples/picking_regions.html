@@ -78,7 +78,25 @@
                     {
                         type: "regionMap",
                         id: "myRegionMap",
+
+                        // Colors of the texture define regions of the surface
                         src: 'textures/terrainHeightMap.png',
+
+                        // Arbitrary data can be associated with a particular region
+                        regionData: {
+                            "0.1,0.1,0.1": {
+                                message: "Getting started!"
+                            },
+                            "0.33333,0.33333,0.33333": {
+                                message: "Halfway there!"
+                            },
+                            "0.5,0.5,0.5": {
+                                message: "Almost!"
+                            },
+                            "0.66666,0.66666,0.66666": {
+                                message: "Made it!"
+                            },
+                        },
                         highlightFactor: {
                             r: 1.5, g: 1.5, b: 0.0
                         },
@@ -149,7 +167,7 @@
     scene.on("pick",
             function (hit) {
 
-                info.innerHTML = "Pick hit: " + JSON.stringify(hit);
+                info.innerHTML = "Message: " + (hit.regionData.message || "(None)");
 
                 var color = hit.color; // Eg. { r: 0.3, g: 0.5, b: 1.0 }
                 var canvasPos = hit.canvasPos;
