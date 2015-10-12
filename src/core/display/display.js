@@ -290,7 +290,7 @@ var SceneJS_Display = function (cfg) {
      */
     this._frameCtx = {
         pickNames: [], // Pick names of objects hit during pick render,
-        regionData: {},
+        regionData: [],
         canvas: this._canvas,           // The canvas
         VAO: null                       // Vertex array object extension
     };
@@ -924,22 +924,31 @@ SceneJS_Display.prototype.pick = function (params) {
 
         // Region picking
 
+        if (pix[0] === 0 && pix[1] === 0 && pix[2] === 0 && pix[3] === 0) {
+            return null;
+        }
+
         var regionColor = {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255};
         var regionData = this._frameCtx.regionData;
-        var data = {};
         var tolerance = 0.01;
+        var data = {};
+        var color, delta;
 
-        for (var color in regionData) {
-            var delta = color.split(",");
-            delta[0] = Math.abs(regionColor.r - parseFloat(delta[0]));
-            delta[1] = Math.abs(regionColor.g - parseFloat(delta[1]));
-            delta[2] = Math.abs(regionColor.b - parseFloat(delta[2]));
-            delta[3] = Math.abs(regionColor.a - parseFloat(delta[3] || 1));
+        for (var i = 0, len = regionData.length; i < len; i++) {
+            color = regionData[i].color;
+            if (regionColor && regionData[i].data) {
+                delta = Math.max(
+                    Math.abs(regionColor.r - color.r),
+                    Math.abs(regionColor.g - color.g),
+                    Math.abs(regionColor.b - color.b),
+                    Math.abs(regionColor.a - (color.a === undefined ? regionColor.a : color.a))
+                );
 
-            if (Math.max(delta[0], delta[1], delta[2], delta[3]) < tolerance) {
-                data = regionData[color];
+                if (delta < tolerance) {
+                    data = regionData[i].data;
+                    break;
+                }
             }
-
         }
 
         return {
@@ -1115,7 +1124,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    if (this.transparent) {
+    if (this.transparent || params.pick) {
         gl.clearColor(0, 0, 0, 0);
     } else {
         gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
