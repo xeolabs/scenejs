@@ -12,7 +12,7 @@ new (function () {
         texture: null,
         highlightColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
         highlightFactor:[ 1.5, 1.5, 0.0 ],
-        regionData: {},
+        regionData: [],
         hash: ""
     };
 

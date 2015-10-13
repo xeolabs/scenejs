@@ -83,20 +83,48 @@
                         src: 'textures/terrainHeightMap.png',
 
                         // Arbitrary data can be associated with a particular region
-                        regionData: {
-                            "0.1,0.1,0.1": {
-                                message: "Getting started!"
+                        regionData: [
+                            {
+                                color: {
+                                    r: 0.1,
+                                    g: 0.1,
+                                    b: 0.1
+                                },
+                                data: {
+                                    message: "Getting started!"
+                                }
                             },
-                            "0.33333,0.33333,0.33333": {
-                                message: "Halfway there!"
+                            {
+                                color: {
+                                    r: 0.33333,
+                                    g: 0.33333,
+                                    b: 0.33333
+                                },
+                                data: {
+                                    message: "Halfway there!"
+                                }
                             },
-                            "0.5,0.5,0.5": {
-                                message: "Almost!"
+                            {
+                                color: {
+                                    r: 0.5,
+                                    g: 0.5,
+                                    b: 0.5
+                                },
+                                data: {
+                                    message: "Almost!"
+                                }
                             },
-                            "0.66666,0.66666,0.66666": {
-                                message: "Made it!"
+                            {
+                                color: {
+                                    r: 0.6666,
+                                    g: 0.6666,
+                                    b: 0.6666
+                                },
+                                data: {
+                                    message: "Made it!"
+                                }
                             },
-                        },
+                        ],
                         highlightFactor: {
                             r: 1.5, g: 1.5, b: 0.0
                         },
