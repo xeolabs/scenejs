@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-10-01
+ * Built on 2015-10-13
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -14131,8 +14131,9 @@ new (function () {
         stateId: SceneJS._baseStateId++,
         empty: true,
         texture: null,
-        highlightColor:[ 1.0, 1.0, 1.0 ],
+        highlightColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
         highlightFactor:[ 1.5, 1.5, 0.0 ],
+        regionData: [],
         hash: ""
     };
 
@@ -14207,6 +14208,9 @@ new (function () {
 
             this.setHighlightColor(params.highlightColor);
             this.setHighlightFactor(params.highlightFactor);
+            this.setRegionData(params.regionData);
+
+            this._core.hash = "reg";
         }
     };
 
@@ -14274,8 +14278,8 @@ new (function () {
 
         this._core.texture = new SceneJS._webgl.Texture2D(gl, {
             texture: texture, // WebGL texture object
-            minFilter: this._getGLOption("minFilter", gl.LINEAR_MIPMAP_NEAREST),
-            magFilter: this._getGLOption("magFilter", gl.LINEAR),
+            minFilter: this._getGLOption("minFilter", gl.NEAREST_MIPMAP_NEAREST),  // Don't want any interpolation
+            magFilter: this._getGLOption("magFilter", gl.NEAREST),
             wrapS: this._getGLOption("wrapS", gl.REPEAT),
             wrapT: this._getGLOption("wrapT", gl.REPEAT),
             isDepth: this._getOption(this._core.isDepth, false),
@@ -14364,6 +14368,11 @@ new (function () {
             color.b != undefined && color.b != null ? color.b : defaultHighlightFactor[2]
         ] : defaultCore.highlightFactor;
         this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.RegionMap.prototype.setRegionData = function (data) {
+        this._core.regionData = data ? data : defaultCore.regionData;
         return this;
     };
 
@@ -15562,7 +15571,8 @@ var SceneJS_Display = function (cfg) {
      * the render, such as pick hits
      */
     this._frameCtx = {
-        pickNames: [], // Pick names of objects hit during pick render
+        pickNames: [], // Pick names of objects hit during pick render,
+        regionData: [],
         canvas: this._canvas,           // The canvas
         VAO: null                       // Vertex array object extension
     };
@@ -15677,7 +15687,8 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.fresnel.hash,
         this.cubemap.hash,
         this.lights.hash,
-        this.flags.hash
+        this.flags.hash,
+        this.regionMap.hash
     ]).join(";");
 
     if (!object.program || hash != object.hash) {
@@ -16195,8 +16206,36 @@ SceneJS_Display.prototype.pick = function (params) {
 
         // Region picking
 
+        if (pix[0] === 0 && pix[1] === 0 && pix[2] === 0 && pix[3] === 0) {
+            return null;
+        }
+
+        var regionColor = {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255};
+        var regionData = this._frameCtx.regionData;
+        var tolerance = 0.01;
+        var data = {};
+        var color, delta;
+
+        for (var i = 0, len = regionData.length; i < len; i++) {
+            color = regionData[i].color;
+            if (regionColor && regionData[i].data) {
+                delta = Math.max(
+                    Math.abs(regionColor.r - color.r),
+                    Math.abs(regionColor.g - color.g),
+                    Math.abs(regionColor.b - color.b),
+                    Math.abs(regionColor.a - (color.a === undefined ? regionColor.a : color.a))
+                );
+
+                if (delta < tolerance) {
+                    data = regionData[i].data;
+                    break;
+                }
+            }
+        }
+
         return {
-            color: {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255},
+            color: regionColor,
+            regionData: data,
             canvasPos: [canvasX, canvasY]
         };
     }
@@ -16367,7 +16406,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    if (this.transparent) {
+    if (this.transparent || params.pick) {
         gl.clearColor(0, 0, 0, 0);
     } else {
         gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
@@ -17466,11 +17505,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             src.push("vec3 regionColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t)).rgb;");
             src.push("float tolerance = 0.01;");
-            src.push("if (" +
-                "(SCENEJS_uRegionMapHighlightColor.r - tolerance) < regionColor.r && regionColor.r < (SCENEJS_uRegionMapHighlightColor.r + tolerance) && " +
-                "(SCENEJS_uRegionMapHighlightColor.g - tolerance) < regionColor.g && regionColor.g < (SCENEJS_uRegionMapHighlightColor.g + tolerance) && " +
-                "(SCENEJS_uRegionMapHighlightColor.b - tolerance) < regionColor.b && regionColor.b < (SCENEJS_uRegionMapHighlightColor.b + tolerance)) {");
-
+            src.push("vec3 colorDelta = abs(SCENEJS_uRegionMapHighlightColor - regionColor);");
+            src.push("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) < tolerance) {");
             src.push("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
             src.push("}");
         }
@@ -18983,6 +19019,8 @@ SceneJS_ChunkFactory.createChunkType({
         var texture = this.core.texture;
 
         if (texture) {
+
+            frameCtx.regionData = this.core.regionData;
 
             frameCtx.textureUnit = 0;
 
