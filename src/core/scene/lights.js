@@ -97,7 +97,7 @@
 
     SceneJS.Lights.prototype._initLight = function (index, cfg) {
 
-        var light = [];
+        var light = {};
         this._core.lights[index] = light;
 
         var mode = cfg.mode || "dir";
