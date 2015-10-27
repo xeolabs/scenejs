@@ -242,6 +242,15 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
 
+        var diffuseFresnel = states.fresnel.diffuse;
+        var specularFresnel = states.fresnel.specular;
+        var alphaFresnel = states.fresnel.alpha;
+        var reflectFresnel = states.fresnel.reflect;
+        var emitFresnel = states.fresnel.emit;
+        var fragmentFresnel = states.fresnel.fragment;
+
+        var fresnel = diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel;
+
         var src = [];
 
         src.push("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
@@ -261,7 +270,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("uniform   mat4 SCENEJS_uVNMatrix;");      // View normal matrix
 
             src.push("varying   vec3 SCENEJS_vViewNormal;");    // Output view-space vertex normal
-            src.push("varying   vec3 SCENEJS_vWorldNormal;");    // Output view-space vertex normal
+
+            if (fresnel) {
+                src.push("varying   vec3 SCENEJS_vWorldNormal;");    // Output view-space vertex normal
+            }
 
             if (tangents) {
                 src.push("attribute vec4 SCENEJS_aTangent;");
@@ -361,7 +373,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (normals) {
             src.push("  vec3 worldNormal = (SCENEJS_uMNMatrix * modelNormal).xyz; ");
             src.push("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
-            src.push("  SCENEJS_vWorldNormal = worldNormal;");
+
+            if (fresnel) {
+                src.push("  SCENEJS_vWorldNormal = worldNormal;");
+            }
         }
 
         if (clipping || normals || fragmentHooks.worldPos) {
@@ -453,6 +468,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var reflectFresnel = states.fresnel.reflect;
         var emitFresnel = states.fresnel.emit;
         var fragmentFresnel = states.fresnel.fragment;
+
+        var fresnel = diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel;
 
         var floatPrecision = getFSFloatPrecision(states._canvas.gl);
 
@@ -607,8 +624,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             src.push("uniform mat4 SCENEJS_uMNMatrix;");      // Model normal matrix
             src.push("uniform mat4 SCENEJS_uVNMatrix;"); 
-            src.push("varying vec3 SCENEJS_vWorldNormal;");
             src.push("varying vec3 SCENEJS_vViewNormal;");
+
+            if (fresnel) {
+                src.push("varying vec3 SCENEJS_vWorldNormal;");
+            }
 
             if (tangents) {
                 src.push("varying vec3 SCENEJS_vTangent;");
@@ -641,7 +661,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("\n" + customFragmentShader.code + "\n");
         }
 
-        if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel) {
+        if (fresnel) {
             src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float edgeBias, float centerBias, float power) {");
             src.push("    float fr = abs(dot(viewDirection, worldNormal));");
             src.push("    float finalFr = clamp((fr - edgeBias) / (centerBias - edgeBias), 0.0, 1.0);");
@@ -666,8 +686,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals) {
-            src.push("vec3 worldNormal = normalize(SCENEJS_vWorldNormal); ")
             src.push("vec3 worldEyeVec = normalize(SCENEJS_uWorldEye - SCENEJS_vWorldVertex.xyz);");            // World-space eye position
+
+            if (fresnel) {
+                src.push("vec3 worldNormal = normalize(SCENEJS_vWorldNormal); ")
+            }
 
             if (solid) {
 
