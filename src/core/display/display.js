@@ -1032,7 +1032,7 @@ SceneJS_Display.prototype.pick = function (params) {
     return hit;
 };
 
-SceneJS_Display.prototype.readPixels = function (entries, size) {
+SceneJS_Display.prototype.readPixels = function (entries, size, opaqueOnly) {
 
     if (!this._readPixelBuf) {
         this._readPixelBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
@@ -1042,7 +1042,10 @@ SceneJS_Display.prototype.readPixels = function (entries, size) {
 
     this._readPixelBuf.clear();
 
-    this.render({force: true});
+    this.render({
+        force: true,
+        opaqueOnly: opaqueOnly
+    });
 
     var entry;
     var color;
@@ -1146,7 +1149,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     } else {
 
         // Option to only render opaque objects
-        var len = (params.opaqueOnly ? this._drawListTransparentIndex : this._drawListLen);
+        var len = (params.opaqueOnly && this._drawListTransparentIndex >= 0 ? this._drawListTransparentIndex : this._drawListLen);
 
         // Render for draw
         for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
