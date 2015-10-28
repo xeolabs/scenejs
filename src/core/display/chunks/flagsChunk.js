@@ -67,7 +67,7 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.transparent = transparent;
         }
 
-        if (frameCtx.pick) {
+        if (frameCtx.pickObject || frameCtx.pickTriangle || frameCtx.pickRegion) {
 
             if (this._uClippingPick) {
                 this._uClippingPick.setValue(this.core.clipping);

@@ -343,13 +343,6 @@ var SceneJS_Display = function (cfg) {
      * @type Boolean
      */
     this.imageDirty = true;
-
-    /**
-     * Flags the neccessity for the image buffer to be re-rendered from the draw list.
-     * @type Boolean
-     */
-    this.pickBufDirty = true;           // Redraw pick buffer
-    this.rayPickBufDirty = true;        // Redraw raypick buffer
 };
 
 /**
@@ -361,9 +354,6 @@ SceneJS_Display.prototype.webglRestored = function () {
     var gl = this._canvas.gl;
     if (this.pickBuf) {
         this.pickBuf.webglRestored(gl);          // Rebuild pick buffers
-    }
-    if (this.rayPickBuf) {
-        this.rayPickBuf.webglRestored(gl);
     }
     this.imageDirty = true;             // Need redraw
 };
@@ -384,6 +374,9 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.objectListDirty = true;
     }
 
+    object.modelTransform = this.modelTransform;
+    object.viewTransform = this.viewTransform;
+    object.projTransform = this.projTransform;
     object.stage = this.stage;
     object.layer = this.layer;
     object.renderTarget = this.renderTarget;
@@ -393,6 +386,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     object.enable = this.enable;
     object.flags = this.flags;
     object.tag = this.tag;
+    object.name = this.name;
 
     //if (!object.hash) {
 
@@ -874,162 +868,499 @@ SceneJS_Display.prototype._logPickList = function () {
     console.log("--------------------------------------------------------------------------------------------------");
 };
 
-/**
- * Performs a pick on the display graph and returns info on the result.
- * @param {*} params
- * @returns {*}
- */
-SceneJS_Display.prototype.pick = function (params) {
+(function () {
 
-    var canvas = this._canvas.canvas;
-    var resolutionScaling = this._canvas.resolutionScaling;
-    var hit = null;
-    var canvasX = params.canvasX * resolutionScaling;
-    var canvasY = params.canvasY * resolutionScaling;
-    var pickBuf = this.pickBuf;
+// Cached vectors to avoid garbage collection
 
-    // Lazy-create pick buffer
-    if (!pickBuf) {
-        pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
-        this.pickBufDirty = true;
+    var origin = SceneJS_math_vec3();
+    var dir = SceneJS_math_vec3();
+
+    var a = SceneJS_math_vec3();
+    var b = SceneJS_math_vec3();
+    var c = SceneJS_math_vec3();
+
+    var triangleVertices = SceneJS_math_vec3();
+    var position = SceneJS_math_vec4();
+    var worldPos = SceneJS_math_vec4();
+    var barycentric = SceneJS_math_vec3();
+
+    var na = SceneJS_math_vec3();
+    var nb = SceneJS_math_vec3();
+    var nc = SceneJS_math_vec3();
+
+    var uva = SceneJS_math_vec3();
+    var uvb = SceneJS_math_vec3();
+    var uvc = SceneJS_math_vec3();
+
+    var tempMat4 = SceneJS_math_mat4();
+    var tempMat4b = SceneJS_math_mat4();
+
+    var tempVec4 = SceneJS_math_vec4();
+    var tempVec4b = SceneJS_math_vec4();
+    var tempVec4c = SceneJS_math_vec4();
+
+    var tempVec3 = SceneJS_math_vec3();
+    var tempVec3b = SceneJS_math_vec3();
+    var tempVec3c = SceneJS_math_vec3();
+    var tempVec3d = SceneJS_math_vec3();
+    var tempVec3e = SceneJS_math_vec3();
+    var tempVec3f = SceneJS_math_vec3();
+    var tempVec3g = SceneJS_math_vec3();
+    var tempVec3h = SceneJS_math_vec3();
+    var tempVec3i = SceneJS_math_vec3();
+    var tempVec3j = SceneJS_math_vec3();
+
+
+    // Given a GameObject and camvas coordinates, gets a ray
+    // originating at the World-space eye position that passes
+    // through the perspective projection plane. The ray is
+    // returned via the origin and dir arguments.
+
+    function getLocalRay(canvas, object, canvasCoords, origin, dir) {
+
+        var modelMat = object.modelTransform.matrix;
+        var viewMat = object.viewTransform.matrix;
+        var projMat = object.projTransform.matrix;
+
+        var vmMat = SceneJS_math_mulMat4(viewMat, modelMat, tempMat4);
+        var pvMat = SceneJS_math_mulMat4(projMat, vmMat, tempMat4b);
+        var pvMatInverse = SceneJS_math_inverseMat4(pvMat, tempMat4b);
+
+        //var modelMatInverse = math.inverseMat4(modelMat, tempMat4c);
+
+        // Calculate clip space coordinates, which will be in range
+        // of x=[-1..1] and y=[-1..1], with y=(+1) at top
+
+        var canvasWidth = canvas.width;
+        var canvasHeight = canvas.height;
+
+        var clipX = (canvasCoords[0] - canvasWidth / 2) / (canvasWidth / 2);  // Calculate clip space coordinates
+        var clipY = -(canvasCoords[1] - canvasHeight / 2) / (canvasHeight / 2);
+
+        var local1 = SceneJS_math_transformVector4(pvMatInverse, [clipX, clipY, -1, 1], tempVec4);
+        local1 = SceneJS_math_mulVec4Scalar(local1, 1 / local1[3]);
+
+        var local2 = SceneJS_math_transformVector4(pvMatInverse, [clipX, clipY, 1, 1], tempVec4b);
+        local2 = SceneJS_math_mulVec4Scalar(local2, 1 / local2[3]);
+
+        origin[0] = local1[0];
+        origin[1] = local1[1];
+        origin[2] = local1[2];
+
+        SceneJS_math_subVec3(local2, local1, dir);
     }
 
-    this.render(); // Do any pending visible render
+    /**
+     * Performs a pick on the display graph and returns info on the result.
+     * @param {*} params
+     * @returns {*}
+     */
+    SceneJS_Display.prototype.pick = function (params) {
 
-    // Colour-index pick to find the picked object
+        var canvas = this._canvas.canvas;
+        var resolutionScaling = this._canvas.resolutionScaling;
+        var canvasX = params.canvasX * resolutionScaling;
+        var canvasY = params.canvasY * resolutionScaling;
+        var canvasPos= [canvasX, canvasY];
+        var pickBuf = this.pickBuf;
+        var hit = null;
+        var object;
 
-    pickBuf.bind();
+        // Lazy-create pick buffer
 
-    // Re-render the pick buffer if the display has updated
-    if (this.pickBufDirty) {
-        pickBuf.clear();
-        this._doDrawList({
-            pick: true,
-            regionPick: params.regionPick,
-            clear: true
-        });
-        this._canvas.gl.finish();
-        this.pickBufDirty = false;                                                  // Pick buffer up to date
-        this.rayPickBufDirty = true;                                                // Ray pick buffer now dirty
-    }
-
-    // Read pixel color in pick buffer at given coordinates,
-    // convert to an index into the pick name list
-
-    var pix = pickBuf.read(canvasX, canvasY);                                       // Read pick buffer
-
-    pickBuf.unbind();                                                               // Unbind pick buffer
-
-    if (params.regionPick) {
-
-        // Region picking
-
-        if (pix[0] === 0 && pix[1] === 0 && pix[2] === 0 && pix[3] === 0) {
-            return null;
+        if (!pickBuf) {
+            pickBuf = this.pickBuf = new SceneJS._webgl.RenderBuffer({
+                canvas: this._canvas
+            });
         }
 
-        var regionColor = {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255};
-        var regionData = this._frameCtx.regionData;
-        var tolerance = 0.01;
-        var data = {};
-        var color, delta;
+        this.render(); // Do any pending visible render
 
-        for (var i = 0, len = regionData.length; i < len; i++) {
-            color = regionData[i].color;
-            if (regionColor && regionData[i].data) {
-                delta = Math.max(
-                    Math.abs(regionColor.r - color.r),
-                    Math.abs(regionColor.g - color.g),
-                    Math.abs(regionColor.b - color.b),
-                    Math.abs(regionColor.a - (color.a === undefined ? regionColor.a : color.a))
-                );
+        //------------------------------------------------------------------
+        // Pick an object using color-indexed render
+        //------------------------------------------------------------------
 
-                if (delta < tolerance) {
-                    data = regionData[i].data;
-                    break;
+        pickBuf.bind();
+
+        pickBuf.clear();
+
+        this._doDrawList({
+            pickObject: true,
+            clear: true
+        });
+
+        this._canvas.gl.finish();
+
+        // Read pixel color in pick buffer at given coordinates,
+        // convert to an index into the pick name list
+
+        var pix = pickBuf.read(canvasX, canvasY);
+
+        var pickedColorIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
+        var pickIndex = (pickedColorIndex >= 1) ? pickedColorIndex - 1 : -1;
+
+        object = this._objectDrawList[pickIndex];
+
+        //var pickName = this._frameCtx.pickNames[pickIndex];
+
+        if (object) {
+
+            hit = {
+                canvasPos: canvasPos
+            };
+
+            var name = object.name;
+
+            if (name) {
+                hit.name = name.name;
+                hit.path = name.path;
+                hit.nodeId = name.nodeId;
+            }
+        }
+
+        if (params.pickRegion) {
+
+            //------------------------------------------------------------------
+            // Pick a region
+            // Region picking is independent of having picked an object
+            //------------------------------------------------------------------
+
+            hit = hit || {
+                    canvasPos: canvasPos
+                };
+
+            pickBuf.clear();
+
+            this._doDrawList({
+                pickRegion: true,
+                object: object,
+                clear: true
+            });
+
+            pix = pickBuf.read(canvasX, canvasY);
+
+            if (pix[0] !== 0 || pix[1] !== 0 || pix[2] === 0 || pix[3] === 0) {
+
+                var regionColor = {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255};
+                var regionData = this._frameCtx.regionData;
+                var tolerance = 0.01;
+                var data = {};
+                var color, delta;
+
+                for (var i = 0, len = regionData.length; i < len; i++) {
+                    color = regionData[i].color;
+                    if (regionColor && regionData[i].data) {
+                        delta = Math.max(
+                            Math.abs(regionColor.r - color.r),
+                            Math.abs(regionColor.g - color.g),
+                            Math.abs(regionColor.b - color.b),
+                            Math.abs(regionColor.a - (color.a === undefined ? regionColor.a : color.a))
+                        );
+
+                        if (delta < tolerance) {
+                            data = regionData[i].data;
+                            break;
+                        }
+                    }
+                }
+
+                hit.color = regionColor;
+                hit.regionData = data;
+            }
+        }
+
+        if (params.pickTriangle && object) {
+
+            //------------------------------------------------------------------
+            // Pick a triangle on the picked object
+            //------------------------------------------------------------------
+
+            pickBuf.clear();
+
+            this._doDrawList({
+                pickTriangle: true,
+                object: object,
+                clear: true
+            });
+
+            pix = pickBuf.read(canvasX, canvasY);
+            var primitiveIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
+            primitiveIndex = (primitiveIndex >= 1) ? primitiveIndex - 1 : -1;
+
+            hit.primitiveIndex = primitiveIndex;
+
+            var geometry = object.geometry;
+
+            if (geometry.primitiveName === "triangles") {
+
+                // Triangle picked; this only happens when the
+                // GameObject has a Geometry that has primitives of type "triangle"
+
+                hit.primitive = "triangle";
+
+                // Get the World-space positions of the triangle's vertices
+
+                var i = hit.primitiveIndex; // Indicates the first triangle index in the indices array
+
+                var indices = geometry.arrays.indices;
+                var positions = geometry.arrays.positions;
+
+                var ia = indices[i];
+                var ib = indices[i + 1];
+                var ic = indices[i + 2];
+
+                triangleVertices[0] = ia;
+                triangleVertices[1] = ib;
+                triangleVertices[2] = ic;
+
+                hit.indices = triangleVertices;
+
+                a[0] = positions[(ia * 3)];
+                a[1] = positions[(ia * 3) + 1];
+                a[2] = positions[(ia * 3) + 2];
+
+                b[0] = positions[(ib * 3)];
+                b[1] = positions[(ib * 3) + 1];
+                b[2] = positions[(ib * 3) + 2];
+
+                c[0] = positions[(ic * 3)];
+                c[1] = positions[(ic * 3) + 1];
+                c[2] = positions[(ic * 3) + 2];
+
+                // Attempt to ray-pick the triangle; in World-space, fire a ray
+                // from the eye position through the mouse position
+                // on the perspective projection plane
+
+                getLocalRay(canvas, object, canvasPos, origin, dir);
+
+                if (SceneJS_math_rayTriangleIntersect(origin, dir, a, b, c, position)
+                    || SceneJS_math_rayTriangleIntersect(origin, dir, c, b, a, position)) {
+
+                    // Ray intersects the triangle
+
+                    // Get Local-space cartesian coordinates of the ray-triangle intersection
+
+                    hit.position = position;
+
+                    // Get interpolated World-space coordinates
+
+                    // Need to transform homogeneous coords
+
+                    tempVec4[0] = position[0];
+                    tempVec4[1] = position[1];
+                    tempVec4[2] = position[2];
+                    tempVec4[3] = 1;
+
+                    // Get World-space cartesian coordinates of the ray-triangle intersection
+
+                    SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
+
+                    worldPos[0] = tempVec4b[0];
+                    worldPos[1] = tempVec4b[1];
+                    worldPos[2] = tempVec4b[2];
+
+                    hit.worldPos = worldPos;
+
+                    // Get barycentric coordinates of the ray-triangle intersection
+
+                    SceneJS_math_cartesianToBarycentric(position, a, b, c, barycentric);
+
+                    hit.barycentric = barycentric;
+
+                    // Get interpolated normal vector
+
+                    var normals = geometry.arrays.normals;
+
+                    if (normals) {
+
+                        na[0] = normals[(ia * 3)];
+                        na[1] = normals[(ia * 3) + 1];
+                        na[2] = normals[(ia * 3) + 2];
+
+                        nb[0] = normals[(ib * 3)];
+                        nb[1] = normals[(ib * 3) + 1];
+                        nb[2] = normals[(ib * 3) + 2];
+
+                        nc[0] = normals[(ic * 3)];
+                        nc[1] = normals[(ic * 3) + 1];
+                        nc[2] = normals[(ic * 3) + 2];
+
+                        hit.normal = SceneJS_math_addVec3(SceneJS_math_addVec3(
+                                SceneJS_math_mulVec3Scalar(na, barycentric[0], tempVec3),
+                                SceneJS_math_mulVec3Scalar(nb, barycentric[1], tempVec3b), tempVec3c),
+                            SceneJS_math_mulVec3Scalar(nc, barycentric[2], tempVec3d), tempVec3e);
+                    }
+
+                    // Get interpolated UV coordinates
+
+                    var uvs = geometry.arrays.uv;
+
+                    if (uvs) {
+
+                        uva[0] = uvs[(ia * 2)];
+                        uva[1] = uvs[(ia * 2) + 1];
+
+                        uvb[0] = uvs[(ib * 2)];
+                        uvb[1] = uvs[(ib * 2) + 1];
+
+                        uvc[0] = uvs[(ic * 2)];
+                        uvc[1] = uvs[(ic * 2) + 1];
+
+                        hit.uv = SceneJS_math_addVec3(
+                            SceneJS_math_addVec3(
+                                SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
+                                SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
+                            SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), tempVec3j);
+                    }
                 }
             }
         }
 
-        return {
-            color: regionColor,
-            regionData: data,
-            canvasPos: [canvasX, canvasY]
-        };
+        pickBuf.unbind();
+
+        return hit;
+    };
+})();
+
+/** Renders either the draw or pick list.
+ *
+ * @param {*} params
+ * @param {Boolean} params.clear Set true to clear the color, depth and stencil buffers first
+ * @param {*} params.object Object to render chunks of, for pickTriangle or pickRegion modes
+ * @param {Boolean} params.pickObject Set true to render for object-picking, using per-object indexed color
+ * @param {Boolean} params.pickTriangle Set true to render for triangle-picking, using per-triangle indexed color
+ * @param {Boolean} params.pickRegion Set true to render for region-picking
+ * @param {Boolean} params.transparent Set false to only render opaque objects
+ * @private
+ */
+SceneJS_Display.prototype._doDrawList = function (params) {
+
+    var gl = this._canvas.gl;
+
+    // Reset frame context
+    var frameCtx = this._frameCtx;
+    frameCtx.renderTarget = null;
+    frameCtx.targetIndex = 0;
+    frameCtx.renderBuf = null;
+    frameCtx.viewMat = null;
+    frameCtx.modelMat = null;
+    frameCtx.cameraMat = null;
+    frameCtx.renderer = null;
+    frameCtx.depthbufEnabled = null;
+    frameCtx.clearDepth = null;
+    frameCtx.depthFunc = gl.LESS;
+    frameCtx.scissorTestEnabled = false;
+    frameCtx.blendEnabled = false;
+    frameCtx.backfaces = true;
+    frameCtx.frontface = "ccw";
+    frameCtx.pickObject = !!params.pickObject;
+    frameCtx.pickTriangle = !!params.pickTriangle;
+    frameCtx.pickRegion = !!params.pickRegion;
+    frameCtx.pickIndex = 0;
+    frameCtx.textureUnit = 0;
+    frameCtx.lineWidth = 1;
+    frameCtx.transparent = false;
+    frameCtx.ambientColor = this._ambientColor;
+    frameCtx.aspect = this._canvas.canvas.width / this._canvas.canvas.height;
+
+    // The extensions needs to be re-queried in case the context was lost and has been recreated.
+    if (this._canvas.UINT_INDEX_ENABLED) {
+        gl.getExtension("OES_element_index_uint");
     }
 
-    // Ray-picking
+    var VAO = gl.getExtension("OES_vertex_array_object");
+    frameCtx.VAO = (VAO) ? VAO : null;
 
-    var pickedObjectIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
-    var pickIndex = (pickedObjectIndex >= 1) ? pickedObjectIndex - 1 : -1;
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    // Look up pick name from index
-    var pickName = this._frameCtx.pickNames[pickIndex];                                   // Map pixel to name
+    if (this.transparent || params.pick) {
+        gl.clearColor(0, 0, 0, 0);
+    } else {
+        gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
+    }
 
-    if (pickName) {
+    if (params.clear) {
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+    }
 
-        hit = {
-            name: pickName.name,
-            path: pickName.path,
-            nodeId: pickName.nodeId,
-            canvasPos: [canvasX, canvasY]
-        };
+    gl.frontFace(gl.CCW);
+    gl.disable(gl.CULL_FACE);
+    gl.disable(gl.BLEND);
 
-        // Now do a ray-pick if requested
+    if (params.pickObject) {
 
-        if (params.rayPick) {
+        // Pick object
+        // Render whole draw list
 
-            // Lazy-create ray pick depth buffer
-            var rayPickBuf = this.rayPickBuf;
-            if (!rayPickBuf) {
-                rayPickBuf = this.rayPickBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
-                this.rayPickBufDirty = true;
+        for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
+            this._pickDrawList[i].pick(frameCtx);
+        }
+
+    } else if (params.pickRegion || params.pickTriangle) {
+
+        // Pick region or triangle
+
+        if (params.object) {
+
+            // Object was picked
+            // Render just the chunks of the target object
+
+            var chunks = params.object.chunks;
+            var chunk;
+
+            for (var i = 0, len = chunks.length; i < len; i++) {
+                chunk = chunks[i];
+                if (chunk && chunk.pick) {
+                    chunk.pick(frameCtx);
+                }
             }
 
-            // Render depth values to ray-pick depth buffer
+        } else {
 
-            rayPickBuf.bind();
+            // No object was picked
+            // Render whole draw list
 
-            if (this.rayPickBufDirty) {
-                rayPickBuf.clear();
-                this._doDrawList({
-                    pick: true,
-                    rayPick: true,
-                    clear: true
-                });
-                this.rayPickBufDirty = false;
+            if (params.pickRegion) {
+
+                for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
+                    this._pickDrawList[i].pick(frameCtx);
+                }
             }
+        }
 
-            // Read pixel from depth buffer, convert to normalised device Z coordinate,
-            // which will be in range of [0..1] with z=0 at front
-            pix = rayPickBuf.read(canvasX, canvasY);
+    } else {
 
-            rayPickBuf.unbind();
+        // Render scene
+        // Render whole draw list
 
-            var screenZ = this._unpackDepth(pix);
-            var w = canvas.width;
-            var h = canvas.height;
-            // Calculate clip space coordinates, which will be in range
-            // of x=[-1..1] and y=[-1..1], with y=(+1) at top
-            var x = (canvasX - w / 2) / (w / 2);           // Calculate clip space coordinates
-            var y = -(canvasY - h / 2) / (h / 2);
-            var projMat = this._frameCtx.cameraMat;
-            var viewMat = this._frameCtx.viewMat;
-            var pvMat = SceneJS_math_mulMat4(projMat, viewMat, []);
-            var pvMatInverse = SceneJS_math_inverseMat4(pvMat, []);
-            var world1 = SceneJS_math_transformVector4(pvMatInverse, [x, y, -1, 1]);
-            world1 = SceneJS_math_mulVec4Scalar(world1, 1 / world1[3]);
-            var world2 = SceneJS_math_transformVector4(pvMatInverse, [x, y, 1, 1]);
-            world2 = SceneJS_math_mulVec4Scalar(world2, 1 / world2[3]);
-            var dir = SceneJS_math_subVec3(world2, world1, []);
-            var vWorld = SceneJS_math_addVec3(world1, SceneJS_math_mulVec4Scalar(dir, screenZ, []), []);
+        // Option to only render opaque objects
+        var len = (params.opaqueOnly ? this._drawListTransparentIndex : this._drawListLen);
 
-            // Got World-space intersect with surface of picked geometry
-            hit.worldPos = vWorld;
+        // Render for draw
+        for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
+            this._drawList[i].draw(frameCtx);
         }
     }
 
-    return hit;
+    gl.flush();
+
+    if (frameCtx.renderBuf) {
+        frameCtx.renderBuf.unbind();
+    }
+
+    if (frameCtx.VAO) {
+        frameCtx.VAO.bindVertexArrayOES(null);
+        for (var i = 0; i < 10; i++) {
+            gl.disableVertexAttribArray(i);
+        }
+    }
+//
+//    var numTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+//    for (var ii = 0; ii < numTextureUnits; ++ii) {
+//        gl.activeTexture(gl.TEXTURE0 + ii);
+//        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+//        gl.bindTexture(gl.TEXTURE_2D, null);
+//    }
 };
 
 SceneJS_Display.prototype.readPixels = function (entries, size) {
@@ -1074,106 +1405,6 @@ SceneJS_Display.prototype._unpackDepth = function (depthZ) {
     return SceneJS_math_dotVector4(vec, bitShift);
 };
 
-/** Renders either the draw or pick list.
- *
- * @param {*} params
- * @param {Boolean} params.clear Set true to clear the color, depth and stencil buffers first
- * @param {Boolean} params.pick Set true to render for picking
- * @param {Boolean} params.rayPick Set true to render for ray-picking
- * @param {Boolean} params.regionPick Set true to render for region-picking
- * @param {Boolean} params.transparent Set false to only render opaque objects
- * @private
- */
-SceneJS_Display.prototype._doDrawList = function (params) {
-
-    var gl = this._canvas.gl;
-
-    // Reset frame context
-    var frameCtx = this._frameCtx;
-    frameCtx.renderTarget = null;
-    frameCtx.targetIndex = 0;
-    frameCtx.renderBuf = null;
-    frameCtx.viewMat = null;
-    frameCtx.modelMat = null;
-    frameCtx.cameraMat = null;
-    frameCtx.renderer = null;
-    frameCtx.depthbufEnabled = null;
-    frameCtx.clearDepth = null;
-    frameCtx.depthFunc = gl.LESS;
-    frameCtx.scissorTestEnabled = false;
-    frameCtx.blendEnabled = false;
-    frameCtx.backfaces = true;
-    frameCtx.frontface = "ccw";
-    frameCtx.pick = !!params.pick;
-    frameCtx.rayPick = !!params.rayPick;
-    frameCtx.regionPick = !!params.regionPick;
-    frameCtx.pickIndex = 0;
-    frameCtx.textureUnit = 0;
-    frameCtx.lineWidth = 1;
-    frameCtx.transparent = false;
-    frameCtx.ambientColor = this._ambientColor;
-    frameCtx.aspect = this._canvas.canvas.width / this._canvas.canvas.height;
-
-    // The extensions needs to be re-queried in case the context was lost and has been recreated.
-    if (this._canvas.UINT_INDEX_ENABLED) {
-        gl.getExtension("OES_element_index_uint");
-    }
-
-    var VAO = gl.getExtension("OES_vertex_array_object");
-    frameCtx.VAO = (VAO) ? VAO : null;
-
-    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-    if (this.transparent || params.pick) {
-        gl.clearColor(0, 0, 0, 0);
-    } else {
-        gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
-    }
-
-    if (params.clear) {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
-    }
-
-    gl.frontFace(gl.CCW);
-    gl.disable(gl.CULL_FACE);
-    gl.disable(gl.BLEND);
-
-    if (params.pick) {
-        // Render for pick
-        for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
-            this._pickDrawList[i].pick(frameCtx);
-        }
-    } else {
-
-        // Option to only render opaque objects
-        var len = (params.opaqueOnly ? this._drawListTransparentIndex : this._drawListLen);
-
-        // Render for draw
-        for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
-            this._drawList[i].draw(frameCtx);
-        }
-    }
-
-    gl.flush();
-
-    if (frameCtx.renderBuf) {
-        frameCtx.renderBuf.unbind();
-    }
-
-    if (frameCtx.VAO) {
-        frameCtx.VAO.bindVertexArrayOES(null);
-        for (var i = 0; i < 10; i++) {
-            gl.disableVertexAttribArray(i);
-        }
-    }
-//
-//    var numTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
-//    for (var ii = 0; ii < numTextureUnits; ++ii) {
-//        gl.activeTexture(gl.TEXTURE0 + ii);
-//        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
-//        gl.bindTexture(gl.TEXTURE_2D, null);
-//    }
-};
 
 SceneJS_Display.prototype.destroy = function () {
     this._programFactory.destroy();

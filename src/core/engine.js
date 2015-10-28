@@ -538,8 +538,8 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
     var hit = this.display.pick({
         canvasX: canvasX,
         canvasY: canvasY,
-        rayPick: options ? options.rayPick : false,
-        regionPick: options ? options.regionPick : false
+        pickTriangle: options ? options.rayPick : false,
+        pickRegion: options ? options.regionPick : false
     });
 
     return hit;

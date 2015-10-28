@@ -28,7 +28,7 @@
         }
     </style>
 
-    <script src="../api/latest/scenejs.min.js"></script>
+    <script src="../api/latest/scenejs.js"></script>
     <link href="css/styles.css" rel="stylesheet"/>
 </head>
 
@@ -146,7 +146,7 @@
     scene.on("pick",
             function (hit) {
 
-                info.innerHTML = "Pick hit: " + JSON.stringify(hit);
+                info.innerHTML = "Pick hit: " + JSON.stringify(hit, '\n', 4);
                 showHit(hit);
 
                 // To illustrate, these are the params to expect on the pick hit:

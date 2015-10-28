@@ -54,6 +54,7 @@ new (function () {
         var IndexArrayType = this._engine.canvas.UINT_INDEX_ENABLED ? Uint32Array : Uint16Array;
 
         core.primitive = this._getPrimitiveType(primitive);
+        core.primitiveName = primitive;
 
         // Generate normals
         if (data.normals) {
@@ -122,7 +123,7 @@ new (function () {
         }
 
         // Lazy-build tangents, only when needed as rendering
-        core.getTangentBuf = function () {
+        core.getTangents = function () {
             if (core.tangentBuf) {
                 return core.tangentBuf;
             }
@@ -134,8 +135,57 @@ new (function () {
                 var usage = gl.STATIC_DRAW;
                 return core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, usage);
             }
+        };
+
+        // Buffers for primitive-pick rendering
+
+        core.getPickPositions = function () {
+            if (core.pickPositionsBuf) {
+                return core.pickPositionsBuf;
+            }
+            self._buildPickVBOs();
+            return core.pickPositionsBuf;
+        };
+
+        core.getPickColors = function () {
+            if (core.pickColorsBuf) {
+                return core.pickColorsBuf;
+            }
+            self._buildPickVBOs();
+            return core.pickColorsBuf;
+        };
+
+        core.getPickIndices = function () {
+            if (core.pickIndicesBuf) {
+                return core.pickIndicesBuf;
+            }
+            self._buildPickVBOs();
+            return core.pickIndicesBuf;
+        };
+    };
+
+    SceneJS.Geometry.prototype._buildPickVBOs = function () {
+
+        var core = this._core;
+
+        if (core.arrays.positions && core.arrays.indices) {
+
+            var gl = this._engine.canvas.gl;
+
+            var usage = gl.STATIC_DRAW;
+
+            var arrays = SceneJS_math_getPickPrimitives(core.arrays.positions, core.arrays.indices);
+
+            var pickPositions = arrays.pickPositions;
+            var pickColors = arrays.pickColors;
+            var pickIndices = arrays.pickIndices;
+
+            core.pickPositionsBuf = new  SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickPositions), pickPositions.length, 3, usage);
+            core.pickColorsBuf = new  SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickColors), pickColors.length, 4, usage);
+            core.pickIndicesBuf = new  SceneJS._webgl.ArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(pickIndices), pickIndices.length, 1, usage);
         }
     };
+
 
     /**
      * Returns WebGL constant for primitive name

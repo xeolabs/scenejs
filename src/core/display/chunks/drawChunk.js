@@ -15,26 +15,57 @@ SceneJS_ChunkFactory.createChunkType({
     unique: true,
 
     build: function () {
+
         this._depthModeDraw = this.program.draw.getUniform("SCENEJS_uDepthMode");
-        this._depthModePick = this.program.pick.getUniform("SCENEJS_uDepthMode");
+
+        this._uPickColor = this.program.pick.getUniform("xeo_uPickColor");
     },
 
-    drawAndPick: function (frameCtx) {
 
+    draw: function (frameCtx) {
+
+        var core = this.core;
         var gl = this.program.gl;
 
-        if (frameCtx.pick) {
-            if (this._depthModePick) {
-                this._depthModePick.setValue(frameCtx.depthMode);
-            }
-        } else {
-            if (this._depthModeDraw) {
-                this._depthModeDraw.setValue(frameCtx.depthMode);
-            }
+        if (this._depthModeDraw) {
+            this._depthModeDraw.setValue(frameCtx.depthMode);
         }
 
-        gl.drawElements(this.core.primitive, this.core.indexBuf.numItems, this.core.indexBuf.itemType, 0);
+        gl.drawElements(core.primitive, core.indexBuf.numItems, core.indexBuf.itemType, 0);
 
         //frameCtx.textureUnit = 0;
+    },
+
+    pick: function (frameCtx) {
+
+        var core = this.core;
+        var gl = this.program.gl;
+
+        if (frameCtx.pickObject || frameCtx.pickRegion) {
+
+            if (frameCtx.pickObject) {
+
+                if (this._uPickColor) {
+
+                    frameCtx.pickIndex++;
+
+                    var b = frameCtx.pickIndex >> 16 & 0xFF;
+                    var g = frameCtx.pickIndex >> 8 & 0xFF;
+                    var r = frameCtx.pickIndex & 0xFF;
+
+                    this._uPickColor.setValue([r / 255, g / 255, b / 255, 0]);
+                }
+            }
+
+            gl.drawElements(core.primitive, core.indexBuf.numItems, core.indexBuf.itemType, 0);
+
+        } else if (frameCtx.pickTriangle) {
+
+            var pickIndices = core.getPickIndices();
+
+            if (pickIndices) {
+                gl.drawElements(core.primitive, pickIndices.numItems, pickIndices.itemType, 0);
+            }
+        }
     }
 });
