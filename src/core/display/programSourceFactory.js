@@ -242,6 +242,15 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var clipping = states.clips.clips.length > 0;
         var morphing = !!states.morphGeometry.targets;
 
+        var diffuseFresnel = states.fresnel.diffuse;
+        var specularFresnel = states.fresnel.specular;
+        var alphaFresnel = states.fresnel.alpha;
+        var reflectFresnel = states.fresnel.reflect;
+        var emitFresnel = states.fresnel.emit;
+        var fragmentFresnel = states.fresnel.fragment;
+
+        var fresnel = diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel;
+
         var src = [];
 
         src.push("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
@@ -261,34 +270,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("uniform   mat4 SCENEJS_uVNMatrix;");      // View normal matrix
 
             src.push("varying   vec3 SCENEJS_vViewNormal;");    // Output view-space vertex normal
-            src.push("varying   vec3 SCENEJS_vWorldNormal;");    // Output view-space vertex normal
+
+            if (fresnel) {
+                src.push("varying   vec3 SCENEJS_vWorldNormal;");    // Output view-space vertex normal
+            }
 
             if (tangents) {
                 src.push("attribute vec4 SCENEJS_aTangent;");
-            }
-
-            for (var i = 0; i < states.lights.lights.length; i++) {
-
-                var light = states.lights.lights[i];
-
-                if (light.mode == "ambient") {
-                    continue;
-                }
-
-                if (light.mode == "dir") {
-                    src.push("uniform vec3 SCENEJS_uLightDir" + i + ";");
-                }
-
-                if (light.mode == "point") {
-                    src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
-                }
-
-                if (light.mode == "spot") {
-                    src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
-                }
-
-                // Vector from vertex to light, packaged with the pre-computed length of that vector
-                src.push("varying vec4 SCENEJS_vViewLightVecAndDist" + i + ";");
+                src.push("varying   vec3 SCENEJS_vTangent;");
             }
         }
 
@@ -384,7 +373,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (normals) {
             src.push("  vec3 worldNormal = (SCENEJS_uMNMatrix * modelNormal).xyz; ");
             src.push("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
-            src.push("  SCENEJS_vWorldNormal = worldNormal;");
+
+            if (fresnel) {
+                src.push("  SCENEJS_vWorldNormal = worldNormal;");
+            }
         }
 
         if (clipping || normals || fragmentHooks.worldPos) {
@@ -406,92 +398,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("vec3 tangent = normalize((SCENEJS_uVNMatrix * SCENEJS_uMNMatrix * SCENEJS_aTangent).xyz);");
             src.push("vec3 bitangent = cross(SCENEJS_vViewNormal, tangent);");
             src.push("mat3 TBM = mat3(tangent, bitangent, SCENEJS_vViewNormal);");
-        }
 
-        src.push("  vec3 tmpVec3;");
-
-        if (normals) {
-
-            for (var i = 0; i < states.lights.lights.length; i++) {
-
-                light = states.lights.lights[i];
-
-                if (light.mode == "ambient") {
-                    continue;
-                }
-
-                if (light.mode == "dir") {
-
-                    // Directional light
-
-                    if (light.space == "world") {
-
-                        // World space light
-
-                        src.push("tmpVec3 = normalize(SCENEJS_uLightDir" + i + ");");
-
-                        // Transform to View space
-                        src.push("tmpVec3 = vec3(SCENEJS_uVMatrix * vec4(tmpVec3, 0.0)).xyz;");
-
-                        if (tangents) {
-
-                            // Transform to Tangent space
-                            src.push("tmpVec3 *= TBM;");
-                        }
-
-                    } else {
-
-                        // View space light
-
-                        src.push("tmpVec3 = normalize(SCENEJS_uLightDir" + i + ");");
-
-                        if (tangents) {
-
-                            // Transform to Tangent space
-                            src.push("tmpVec3 *= TBM;");
-                        }
-                    }
-
-                    // Output
-                    src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(-tmpVec3, 0.0);");
-                }
-
-                if (light.mode == "point") {
-
-                    // Positional light
-
-                    if (light.space == "world") {
-
-                        // World space
-
-                        src.push("tmpVec3 = SCENEJS_uLightPos" + i + " - worldVertex.xyz;"); // Vector from World coordinate to light pos
-
-                        // Transform to View space
-                        src.push("tmpVec3 = vec3(SCENEJS_uVMatrix * vec4(tmpVec3, 0.0)).xyz;");
-
-                        if (tangents) {
-
-                            // Transform to Tangent space
-                            src.push("tmpVec3 *= TBM;");
-                        }
-
-                    } else {
-
-                        // View space
-
-                        src.push("tmpVec3 = SCENEJS_uLightPos" + i + ".xyz - viewVertex.xyz;"); // Vector from View coordinate to light pos
-
-                        if (tangents) {
-
-                            // Transform to tangent space
-                            src.push("tmpVec3 *= TBM;");
-                        }
-                    }
-
-                    // Output
-                    src.push("SCENEJS_vViewLightVecAndDist" + i + " = vec4(tmpVec3, length( SCENEJS_uLightPos" + i + " - worldVertex.xyz));");
-                }
-            }
+            src.push("SCENEJS_vTangent = tangent;");
         }
 
         src.push("SCENEJS_vViewEyeVec = ((SCENEJS_uVMatrix * vec4(SCENEJS_uWorldEye, 0.0)).xyz  - viewVertex.xyz);");
@@ -561,12 +469,15 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var emitFresnel = states.fresnel.emit;
         var fragmentFresnel = states.fresnel.fragment;
 
+        var fresnel = diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel;
+
         var floatPrecision = getFSFloatPrecision(states._canvas.gl);
 
         var src = ["\n"];
 
         src.push("precision " + floatPrecision + " float;");
 
+        src.push("uniform mat4 SCENEJS_uVMatrix;");
 
         if (clipping || normals) {
             src.push("varying vec4 SCENEJS_vWorldVertex;");             // World-space vertex
@@ -612,8 +523,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals && cubeMapping) {
-
-            src.push("uniform mat4 SCENEJS_uVNMatrix;");
 
             var layer;
             for (var i = 0, len = states.cubemap.layers.length; i < len; i++) {
@@ -713,8 +622,16 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (normals) {
 
-            src.push("varying vec3 SCENEJS_vWorldNormal;");
+            src.push("uniform mat4 SCENEJS_uVNMatrix;"); 
             src.push("varying vec3 SCENEJS_vViewNormal;");
+
+            if (fresnel) {
+                src.push("varying vec3 SCENEJS_vWorldNormal;");
+            }
+
+            if (tangents) {
+                src.push("varying vec3 SCENEJS_vTangent;");
+            }
 
             var light;
             for (var i = 0; i < states.lights.lights.length; i++) {
@@ -723,10 +640,19 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     continue;
                 }
                 src.push("uniform vec3  SCENEJS_uLightColor" + i + ";");
+                
+                if (light.mode == "dir") {
+                    src.push("uniform vec3 SCENEJS_uLightDir" + i + ";");
+                }
+
                 if (light.mode == "point") {
                     src.push("uniform vec3  SCENEJS_uLightAttenuation" + i + ";");
+                    src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
-                src.push("varying vec4  SCENEJS_vViewLightVecAndDist" + i + ";");         // Vector from light to vertex
+
+                if (light.mode == "spot") {
+                    src.push("uniform vec3 SCENEJS_uLightPos" + i + ";");
+                }  
             }
         }
 
@@ -734,7 +660,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("\n" + customFragmentShader.code + "\n");
         }
 
-        if (diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel) {
+        if (fresnel) {
             src.push("float fresnel(vec3 viewDirection, vec3 worldNormal, float edgeBias, float centerBias, float power) {");
             src.push("    float fr = abs(dot(viewDirection, worldNormal));");
             src.push("    float finalFr = clamp((fr - edgeBias) / (centerBias - edgeBias), 0.0, 1.0);");
@@ -759,8 +685,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals) {
-            src.push("vec3 worldNormal = normalize(SCENEJS_vWorldNormal); ")
             src.push("vec3 worldEyeVec = normalize(SCENEJS_uWorldEye - SCENEJS_vWorldVertex.xyz);");            // World-space eye position
+
+            if (fresnel) {
+                src.push("vec3 worldNormal = normalize(SCENEJS_vWorldNormal); ")
+            }
 
             if (solid) {
 
@@ -960,6 +889,15 @@ var SceneJS_ProgramSourceFactory = new (function () {
             src.push("  float   dotN;");
             src.push("  float   lightDist;");
 
+            if (tangents) {
+
+                // Compute tangent-bitangent-normal matrix
+
+                src.push("vec3 tangent = normalize(SCENEJS_vTangent);");
+                src.push("vec3 bitangent = cross(SCENEJS_vViewNormal, tangent);");
+                src.push("mat3 TBM = mat3(tangent, bitangent, SCENEJS_vViewNormal);");
+            }
+
             var light;
 
             for (var i = 0, len = states.lights.lights.length; i < len; i++) {
@@ -969,14 +907,39 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     continue;
                 }
 
-                src.push("viewLightVec = SCENEJS_vViewLightVecAndDist" + i + ".xyz;");
-
                 if (light.mode == "point") {
+
+                    if (light.space == "world") {
+
+                        // World space
+
+                        src.push("viewLightVec = SCENEJS_uLightPos" + i + " - SCENEJS_vWorldVertex.xyz;"); // Vector from World coordinate to light pos
+
+                        // Transform to View space
+                        src.push("viewLightVec = vec3(SCENEJS_uVMatrix * vec4(viewLightVec, 0.0)).xyz;");
+
+                        if (tangents) {
+
+                            // Transform to Tangent space
+                            src.push("viewLightVec *= TBM;");
+                        }
+
+                    } else {
+
+                        // View space
+
+                        src.push("viewLightVec = SCENEJS_uLightPos" + i + ".xyz - SCENEJS_vViewVertex.xyz;"); // Vector from View coordinate to light pos
+
+                        if (tangents) {
+
+                            // Transform to tangent space
+                            src.push("viewLightVec *= TBM;");
+                        }
+                    }
 
                     src.push("dotN = max(dot(viewNormalVec, normalize(viewLightVec)), 0.0);");
 
-
-                    src.push("lightDist = SCENEJS_vViewLightVecAndDist" + i + ".w;");
+                    src.push("lightDist = length( SCENEJS_uLightPos" + i + " - SCENEJS_vWorldVertex.xyz);");
 
                     src.push("attenuation = 1.0 - (" +
                         "  SCENEJS_uLightAttenuation" + i + "[0] + " +
@@ -994,6 +957,36 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
 
                 if (light.mode == "dir") {
+
+                    if (light.space == "world") {
+
+                        // World space light
+
+                        src.push("viewLightVec = normalize(SCENEJS_uLightDir" + i + ");");
+
+                        // Transform to View space
+                        src.push("viewLightVec = vec3(SCENEJS_uVMatrix * vec4(viewLightVec, 0.0)).xyz;");
+
+                        if (tangents) {
+
+                            // Transform to Tangent space
+                            src.push("viewLightVec *= TBM;");
+                        }
+
+                    } else {
+
+                        // View space light
+
+                        src.push("viewLightVec = normalize(SCENEJS_uLightDir" + i + ");");
+
+                        if (tangents) {
+
+                            // Transform to Tangent space
+                            src.push("viewLightVec *= TBM;");
+                        }
+                    }
+
+                    src.push("viewLightVec = -viewLightVec;");
 
                     src.push("dotN = max(dot(viewNormalVec, normalize(viewLightVec)), 0.0);");
 
