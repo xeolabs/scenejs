@@ -393,13 +393,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (tangents) {
 
-            src.push("SCENEJS_vTangent = SCENEJS_aTangent.xyz;");
-
             // Compute tangent-bitangent-normal matrix
 
             src.push("vec3 tangent = normalize((SCENEJS_uVNMatrix * SCENEJS_uMNMatrix * SCENEJS_aTangent).xyz);");
             src.push("vec3 bitangent = cross(SCENEJS_vViewNormal, tangent);");
             src.push("mat3 TBM = mat3(tangent, bitangent, SCENEJS_vViewNormal);");
+
+            src.push("SCENEJS_vTangent = tangent;");
         }
 
         src.push("SCENEJS_vViewEyeVec = ((SCENEJS_uVMatrix * vec4(SCENEJS_uWorldEye, 0.0)).xyz  - viewVertex.xyz);");
@@ -622,7 +622,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (normals) {
 
-            src.push("uniform mat4 SCENEJS_uMNMatrix;");      // Model normal matrix
             src.push("uniform mat4 SCENEJS_uVNMatrix;"); 
             src.push("varying vec3 SCENEJS_vViewNormal;");
 
@@ -894,7 +893,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
                 // Compute tangent-bitangent-normal matrix
 
-                src.push("vec3 tangent = normalize((SCENEJS_uVNMatrix * SCENEJS_uMNMatrix * vec4(normalize(SCENEJS_vTangent), 0.0)).xyz);");
+                src.push("vec3 tangent = normalize(SCENEJS_vTangent);");
                 src.push("vec3 bitangent = cross(SCENEJS_vViewNormal, tangent);");
                 src.push("mat3 TBM = mat3(tangent, bitangent, SCENEJS_vViewNormal);");
             }
