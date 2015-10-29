@@ -1133,85 +1133,83 @@ SceneJS_Display.prototype._logPickList = function () {
 
                 getLocalRay(canvas, object, canvasPos, origin, dir);
 
-                if (SceneJS_math_rayTriangleIntersect(origin, dir, a, b, c, position)
-                    || SceneJS_math_rayTriangleIntersect(origin, dir, c, b, a, position)) {
+                // Since we've already picked the triangle, just grab the intersection
+                // point rather testing against the triangle again.
+                SceneJS_math_rayPlaneIntersect(origin, dir, a, b, c, position);
 
-                    // Ray intersects the triangle
+                // Get Local-space cartesian coordinates of the ray-triangle intersection
 
-                    // Get Local-space cartesian coordinates of the ray-triangle intersection
+                hit.position = position;
 
-                    hit.position = position;
+                // Get interpolated World-space coordinates
 
-                    // Get interpolated World-space coordinates
+                // Need to transform homogeneous coords
 
-                    // Need to transform homogeneous coords
+                tempVec4[0] = position[0];
+                tempVec4[1] = position[1];
+                tempVec4[2] = position[2];
+                tempVec4[3] = 1;
 
-                    tempVec4[0] = position[0];
-                    tempVec4[1] = position[1];
-                    tempVec4[2] = position[2];
-                    tempVec4[3] = 1;
+                // Get World-space cartesian coordinates of the ray-triangle intersection
 
-                    // Get World-space cartesian coordinates of the ray-triangle intersection
+                SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
 
-                    SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
+                worldPos[0] = tempVec4b[0];
+                worldPos[1] = tempVec4b[1];
+                worldPos[2] = tempVec4b[2];
 
-                    worldPos[0] = tempVec4b[0];
-                    worldPos[1] = tempVec4b[1];
-                    worldPos[2] = tempVec4b[2];
+                hit.worldPos = worldPos;
 
-                    hit.worldPos = worldPos;
+                // Get barycentric coordinates of the ray-triangle intersection
 
-                    // Get barycentric coordinates of the ray-triangle intersection
+                SceneJS_math_cartesianToBarycentric(position, a, b, c, barycentric);
 
-                    SceneJS_math_cartesianToBarycentric(position, a, b, c, barycentric);
+                hit.barycentric = barycentric;
 
-                    hit.barycentric = barycentric;
+                // Get interpolated normal vector
 
-                    // Get interpolated normal vector
+                var normals = geometry.arrays.normals;
 
-                    var normals = geometry.arrays.normals;
+                if (normals) {
 
-                    if (normals) {
+                    na[0] = normals[(ia * 3)];
+                    na[1] = normals[(ia * 3) + 1];
+                    na[2] = normals[(ia * 3) + 2];
 
-                        na[0] = normals[(ia * 3)];
-                        na[1] = normals[(ia * 3) + 1];
-                        na[2] = normals[(ia * 3) + 2];
+                    nb[0] = normals[(ib * 3)];
+                    nb[1] = normals[(ib * 3) + 1];
+                    nb[2] = normals[(ib * 3) + 2];
 
-                        nb[0] = normals[(ib * 3)];
-                        nb[1] = normals[(ib * 3) + 1];
-                        nb[2] = normals[(ib * 3) + 2];
+                    nc[0] = normals[(ic * 3)];
+                    nc[1] = normals[(ic * 3) + 1];
+                    nc[2] = normals[(ic * 3) + 2];
 
-                        nc[0] = normals[(ic * 3)];
-                        nc[1] = normals[(ic * 3) + 1];
-                        nc[2] = normals[(ic * 3) + 2];
+                    hit.normal = SceneJS_math_addVec3(SceneJS_math_addVec3(
+                            SceneJS_math_mulVec3Scalar(na, barycentric[0], tempVec3),
+                            SceneJS_math_mulVec3Scalar(nb, barycentric[1], tempVec3b), tempVec3c),
+                        SceneJS_math_mulVec3Scalar(nc, barycentric[2], tempVec3d), tempVec3e);
+                }
 
-                        hit.normal = SceneJS_math_addVec3(SceneJS_math_addVec3(
-                                SceneJS_math_mulVec3Scalar(na, barycentric[0], tempVec3),
-                                SceneJS_math_mulVec3Scalar(nb, barycentric[1], tempVec3b), tempVec3c),
-                            SceneJS_math_mulVec3Scalar(nc, barycentric[2], tempVec3d), tempVec3e);
-                    }
+                // Get interpolated UV coordinates
 
-                    // Get interpolated UV coordinates
+                var uvs = geometry.arrays.uv;
 
-                    var uvs = geometry.arrays.uv;
+                if (uvs) {
 
-                    if (uvs) {
+                    uva[0] = uvs[(ia * 2)];
+                    uva[1] = uvs[(ia * 2) + 1];
 
-                        uva[0] = uvs[(ia * 2)];
-                        uva[1] = uvs[(ia * 2) + 1];
+                    uvb[0] = uvs[(ib * 2)];
+                    uvb[1] = uvs[(ib * 2) + 1];
 
-                        uvb[0] = uvs[(ib * 2)];
-                        uvb[1] = uvs[(ib * 2) + 1];
+                    uvc[0] = uvs[(ic * 2)];
+                    uvc[1] = uvs[(ic * 2) + 1];
 
-                        uvc[0] = uvs[(ic * 2)];
-                        uvc[1] = uvs[(ic * 2) + 1];
-
-                        hit.uv = SceneJS_math_addVec3(
-                            SceneJS_math_addVec3(
-                                SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
-                                SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
-                            SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), tempVec3j);
-                    }
+                    hit.uv = SceneJS_math_addVec3(
+                        SceneJS_math_addVec3(
+                            SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
+                            SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
+                        SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), tempVec3j);
                 }
             }
         }

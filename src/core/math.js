@@ -2306,6 +2306,40 @@
     };
 
     /**
+     * Finds the intersection of a 3D ray with a plane defined by 3 points.
+     *
+     * @method rayPlaneIntersect
+     * @static
+     * @param {Array of Number} origin Ray origin.
+     * @param {Array of Number} dir Ray direction.
+     * @param {Array of Number} a First point on plane.
+     * @param {Array of Number} b Second point on plane.
+     * @param {Array of Number} c Third point on plane.
+     * @param {Array of Number} [isect] Intersection point.
+     * @returns {Array of Number} The intersection point.
+     */
+    window.SceneJS_math_rayPlaneIntersect = function (origin, dir, a, b, c, isect) {
+
+        isect = isect || SceneJS_math_vec3();
+        dir = SceneJS_math_normalizeVec3(dir, tempVec3);
+
+        var edge1 = SceneJS_math_subVec3(b, a, tempVec3b);
+        var edge2 = SceneJS_math_subVec3(c, a, tempVec3c);
+
+        var n = SceneJS_math_cross3Vec3(edge1, edge2, tempVec3d);
+        SceneJS_math_normalizeVec3(n, n);
+
+        var d = -SceneJS_math_dotVec3(a, n);
+
+        var t = -(SceneJS_math_dotVec3(origin, n) + d) / SceneJS_math_dotVec3(dir, n);
+        isect[0] = origin[0] + t * dir[0];
+        isect[1] = origin[1] + t * dir[1];
+        isect[2] = origin[2] + t * dir[2];
+
+        return isect;
+    };
+
+    /**
      * Gets barycentric coordinates from cartesian coordinates within a triangle.
      *
      * @method cartesianToBaryCentric
