@@ -583,6 +583,9 @@ SceneJS_Display.prototype.render = function (params) {
     }
 
     if (this.imageDirty || params.force) {
+        SceneJS_events.fireEvent(SceneJS_events.RENDER, {
+            forced: !!params.force
+        });
         this._doDrawList({ // Render, no pick
             clear: (params.clear !== false), // Clear buffers by default
             opaqueOnly: params.opaqueOnly

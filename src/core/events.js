@@ -12,6 +12,7 @@ var SceneJS_events = new (function () {
     this.OBJECT_COMPILING = 6;
     this.WEBGL_CONTEXT_LOST = 7;
     this.WEBGL_CONTEXT_RESTORED = 8;
+    this.RENDER = 9;
 
     /* Priority queue for each type of event
      */
