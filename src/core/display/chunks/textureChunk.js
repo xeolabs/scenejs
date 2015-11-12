@@ -45,7 +45,8 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (this._uTexSampler[i] && layer.texture) {    // Lazy-loads
 
-                    draw.bindTexture(this._uTexSampler[i], layer.texture, frameCtx.textureUnit++);
+                    draw.bindTexture(this._uTexSampler[i], layer.texture, frameCtx.textureUnit);
+                    frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
 
                     if (layer._matrixDirty && layer.buildMatrix) {
                         layer.buildMatrix.call(layer);
@@ -65,8 +66,5 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
 
-        if (frameCtx.textureUnit > 10) { // TODO: Find how many textures allowed
-            frameCtx.textureUnit = 0;
-        }
     }
 });

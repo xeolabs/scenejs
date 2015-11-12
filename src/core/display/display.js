@@ -1118,7 +1118,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.aspect = this._canvas.canvas.width / this._canvas.canvas.height;
 
     // The extensions needs to be re-queried in case the context was lost and has been recreated.
-    if (this._canvas.UINT_INDEX_ENABLED) {
+    if (SceneJS.WEBGL_INFO.SUPPORTED_EXTENSIONS["OES_element_index_uint"]) {
         gl.getExtension("OES_element_index_uint");
     }
 

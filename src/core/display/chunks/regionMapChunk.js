@@ -14,11 +14,9 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (texture) {
 
-            this.program.draw.bindTexture(this._uRegionMapSampler, texture, frameCtx.textureUnit++);
+            this.program.draw.bindTexture(this._uRegionMapSampler, texture, frameCtx.textureUnit);
+            frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
 
-            if (frameCtx.textureUnit > 10) { // TODO: Find how many textures allowed
-                frameCtx.textureUnit = 0;
-            }
         }
 
         if (this._uRegionMapHighlightColor) {
@@ -40,11 +38,9 @@ SceneJS_ChunkFactory.createChunkType({
 
             frameCtx.textureUnit = 0;
 
-            this.program.pick.bindTexture(this._uRegionMapSampler, texture, frameCtx.textureUnit++);
+            this.program.pick.bindTexture(this._uRegionMapSampler, texture, frameCtx.textureUnit);
+            frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
 
-            if (frameCtx.textureUnit > 10) { // TODO: Find how many textures allowed
-                frameCtx.textureUnit = 0;
-            }
         }
     }
 });

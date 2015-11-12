@@ -51,7 +51,7 @@ new (function () {
 
         var primitive = data.primitive || "triangles";
         var core = this._core;
-        var IndexArrayType = this._engine.canvas.UINT_INDEX_ENABLED ? Uint32Array : Uint16Array;
+        var IndexArrayType = SceneJS.WEBGL_INFO.SUPPORTED_EXTENSIONS["OES_element_index_uint"] ? Uint32Array : Uint16Array;
 
         core.primitive = this._getPrimitiveType(primitive);
 

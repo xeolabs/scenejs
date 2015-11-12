@@ -25,16 +25,15 @@ SceneJS_ChunkFactory.createChunkType({
             for (var i = 0, len = layers.length; i < len; i++) {
                 layer = layers[i];
                 if (this._uCubeMapSampler[i] && layer.texture) {
-                    draw.bindTexture(this._uCubeMapSampler[i], layer.texture, frameCtx.textureUnit++);
+
+                    draw.bindTexture(this._uCubeMapSampler[i], layer.texture, frameCtx.textureUnit);
+                    frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
+
                     if (this._uCubeMapIntensity[i]) {
                         this._uCubeMapIntensity[i].setValue(layer.intensity);
                     }
                 }
             }
-        }
-
-        if (frameCtx.textureUnit > 10) { // TODO: Find how many textures allowed
-            frameCtx.textureUnit = 0;
         }
     }
 });

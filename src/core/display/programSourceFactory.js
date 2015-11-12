@@ -95,10 +95,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var clipping = states.clips.clips.length > 0;
 
-        var floatPrecision = getFSFloatPrecision(states._canvas.gl);
-
         var src = [
-            "precision " + floatPrecision + " float;"
+            "precision " + SceneJS.WEBGL_INFO.FS_MAX_FLOAT_PRECISION + " float;"
         ];
 
         src.push("varying vec4 SCENEJS_vWorldVertex;");
@@ -471,11 +469,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         var fresnel = diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel;
 
-        var floatPrecision = getFSFloatPrecision(states._canvas.gl);
-
         var src = ["\n"];
 
-        src.push("precision " + floatPrecision + " float;");
+        src.push("precision " + SceneJS.WEBGL_INFO.FS_MAX_FLOAT_PRECISION + " float;");
 
         src.push("uniform mat4 SCENEJS_uVMatrix;");
 
@@ -1094,22 +1090,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
         return false;
-    }
-
-    function getFSFloatPrecision(gl) {
-        if (!gl.getShaderPrecisionFormat) {
-            return "mediump";
-        }
-
-        if (gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT).precision > 0) {
-            return "highp";
-        }
-
-        if (gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.MEDIUM_FLOAT).precision > 0) {
-            return "mediump";
-        }
-
-        return "lowp";
     }
 
 })
