@@ -24,9 +24,16 @@ var SceneJS = new (function () {
     this._engineIds = new SceneJS_Map();
 
     this.WEBGL_INFO = (function() {
-        var info = {};
+        var info = {
+            WEBGL: false
+        };
 
         var canvas = document.createElement("canvas");
+
+        if (!canvas) {
+            return info;
+        }
+
         var gl = canvas.getContext("webgl", { antialias: true }) || document.getContext("experimental-webgl", { antialias: true });
 
         info.WEBGL = !!gl;
