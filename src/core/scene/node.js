@@ -1378,8 +1378,11 @@ SceneJS.Node.prototype._destroyTree = function () {
 
     this._engine.destroyNode(this); // Release node object
 
+    var childNode;
     for (var i = 0, len = this.nodes.length; i < len; i++) {
-        this.nodes[i]._destroyTree();
+        childNode = this.nodes[i];
+        this._engine.scene.unpublish("nodes/" + childNode.id);
+        childNode._destroyTree();
     }
 };
 
