@@ -208,8 +208,10 @@ var SceneJS_modelXFormStack = new (function () {
     this.pop = function () {
 
         this.top = (--stackLen > 0) ? transformStack[stackLen - 1] : defaultCore;
-
-
+        if (this.top) {
+            this.top.cores.pop();
+            this.top.numCores--;
+        }
         dirty = true;
     };
 
