@@ -114,6 +114,10 @@ var SceneJS_Engine = function (json, options) {
         this.scene.addNodes(nodes); // then create sub-nodes
     }
 
+    SceneJS_events.addListener(SceneJS_events.RENDER, function(event) {
+        self.scene.publish("render", event);
+    });
+
     this.canvas.canvas.addEventListener(// WebGL context lost
         "webglcontextlost",
         function (event) {
