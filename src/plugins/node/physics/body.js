@@ -53,9 +53,11 @@ require([
 
                     this._bodyId = this._system.createBody(params,
                         function (pos, dir) { // Body update handler
-                            translate.setXYZ({ x:pos[0], y:pos[1], z:pos[2] });
+			    var tmp = pos.slice(3, 19);
+			    translate.setXYZ({ x:pos[0], y:pos[1], z:pos[2] });
                             if (rotate) {
-                                rotate.setElements(dir);
+				dir = SceneJS_math_transposeMat4(tmp);
+				rotate.setMatrix(dir);
                             }
                         });
                 } catch (e) {
