@@ -93,7 +93,7 @@ SceneJS_ChunkFactory.createChunkType({
         var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
         if (this.VAO) {
-            frameCtx.VAO.bindVertexArrayOES(this.VAO);
+            this.VAO.bindVertexArrayOES(this.VAO);
             if (doMorph) {
                 if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {
                     this.setDrawMorphFactor();
