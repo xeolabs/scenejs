@@ -293,7 +293,7 @@ require([
 
                         // Some plugins wrap things in this name to
                         // avoid them being picked, such as skyboxes
-                        if (hit.name == "__SceneJS_dontPickMe") {
+                        if (!hit.worldPos || hit.name == "__SceneJS_dontPickMe") {
                             return;
                         }
 
