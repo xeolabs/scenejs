@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #info {
+            position: absolute;
+            top: 200px;
+            width: 100%;
+            color: #ffffff;
+            padding: 5px;
+            font-family: Monospace;
+            font-size: 18px;
+            text-align: center;
+            background: black;
+            opacity: 0.6;
+            z-index: 100000;
+        }
+
+        #map {
+            position: absolute;
+            top: 200px;
+            left: 40px;
+            height: 256px;
+            width: 256px;
+        }
+
+        #map img {
+            width: 100%;
+        }
+
+        #map canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+</head>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - picking
+    <br>
+    try clicking on either teapot, or the background
+    <br>
+    learn more in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
+
+    <div id="infoTxt"></div>
+    <div id="map">
+        <img src="textures/uvGrid.jpg">
+        <canvas id="marker-canvas" width="256" height="256"></canvas>
+    </div>
+</div>
+
+<script>
+
+    // First 2D picking example.
+    // Shows how to:
+    // 1. Wrap name nodes around scene objects to make them pickable
+    // 2. Bind a pick handler
+    // 3. Do a pick on the canvas
+
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Define scene
+    var scene = SceneJS.createScene({
+        nodes: [
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -40,
+                zoom: 1.2,
+                zoomSensitivity: 0.1,
+
+                nodes: [
+
+                    // Pickable heightmap
+                    {
+                        type: "name",
+                        name: "myHeightmap",
+
+                        nodes: [
+                            {
+                                type: "texture",
+                                src: "textures/uvGrid.jpg",
+                                applyTo: "baseColor",
+
+                                nodes: [
+
+                                    // Sphere primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                    {
+                                        type: "geometry/heightmap",
+                                        src: "textures/terrainHeightMap.png",
+                                        xSegments: 60,
+                                        zSegments: 60
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    // Red sphere to indicate last picked position
+                    {
+                        type: "name",
+                        name: "mySphere",
+
+                        nodes: [
+                            {
+                                type: "flags",
+                                flags: {
+                                    // picking: false
+                                },
+                                nodes: [
+
+                                    {
+                                        type: "material",
+                                        color: {r: 1, g: 0.3, b: 0.3},
+
+                                        nodes: [
+                                            {
+                                                type: "translate",
+                                                id: "worldPosIndicator",
+                                                x: 0,
+                                                y: 0,
+                                                z: 0,
+
+                                                nodes: [
+                                                    {
+                                                        type: "scale",
+                                                        x: 0.02,
+                                                        y: 0.02,
+                                                        z: 0.02,
+
+                                                        nodes: [
+
+                                                            // Sphere primitive implemented by plugin at
+                                                            // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                            {
+                                                                type: "geometry/sphere"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+
+    // Pick hit handler
+    // Shows pick info in an HTML element
+
+    var pickInfo = document.getElementById("infoTxt");
+
+    // Mouse event handling to do a pick on each mouse click
+
+    var canvas = scene.getCanvas();
+    var markerCanvas = document.getElementById("marker-canvas");
+    var markerContext = markerCanvas.getContext("2d");
+    var pickX = 0;
+    var pickY = 0;
+    markerContext.fillStyle = "red";
+
+    canvas.addEventListener('mousemove',
+            function (event) {
+                pickX = event.clientX;
+                pickY = event.clientY;
+            }, false);
+
+    canvas.addEventListener('touchstart',
+            function touchStart(event) {
+                pickX = event.clientX;
+                pickY = event.clientY;
+            }, false);
+
+    //    scene.getNode("worldPosIndicator",
+    //            function (worldPosIndicator) {
+
+    (function drawMarkers() {
+        var hit = scene.pick(pickX, pickY, {rayPick: true});
+
+        markerContext.clearRect(0, 0, markerCanvas.width, markerCanvas.height);
+
+        if (hit) {
+            var uv = hit.uv;
+            var normal = hit.normal;
+            var worldPos = hit.worldPos;
+            var barycentric = hit.barycentric;
+            var primitiveIndex = hit.primitiveIndex;
+
+            pickInfo.innerHTML = "UV: " + uv[0] + ", " + uv[1];
+            pickInfo.innerHTML += "<BR>Normal: " + normal[0] + ", " + normal[1];
+            pickInfo.innerHTML += "<BR>World pos: " + worldPos[0] + ", " + worldPos[1] + ", " + worldPos[2];
+            pickInfo.innerHTML += "<BR>Barycentric: " + barycentric[0] + ", " + barycentric[1] + ", " + barycentric[2];
+            pickInfo.innerHTML += "<BR>Primitive Index: " + primitiveIndex;
+        }
+
+        requestAnimationFrame(drawMarkers);
+    })();
+
+    // Creates little red sphere at each given ray pick hit
+
+    function showHit(hit) {
+        scene.getNode("intersectIndicators")
+                .addNode({
+                    type: "material",
+                    color: {r: 1, g: 0.3, b: 0.3},
+                    nodes: [
+                        {
+                            type: "translate",
+                            x: hit.worldPos[0],
+                            y: hit.worldPos[1],
+                            z: hit.worldPos[2],
+                            nodes: [
+                                {
+                                    type: "scale",
+                                    x: 0.2,
+                                    y: 0.2,
+                                    z: 0.2,
+                                    nodes: [
+
+                                        // Sphere primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                        {
+                                            type: "geometry/sphere"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                });
+    }
+
+
+    //            });
+
+
+</script>
+</body>
+</html>
