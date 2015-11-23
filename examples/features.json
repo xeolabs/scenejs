@@ -121,12 +121,21 @@
     },
     {
         "title": "Physics",
+        "description": "Multithreaded physics with a choice of pluggable physics engines",
         "nodes": [
             {
                 "nodes": [
                     {
-                        "title": "Rigid body dynamics",
+                        "title": "JigLibJS",
                         "page": "physics_balls"
+                    }
+                ]
+            },
+            {
+                "nodes": [
+                    {
+                        "title": "CannonJS",
+                        "page": "physics_cannonjs"
                     }
                 ]
             },
