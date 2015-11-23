@@ -54,7 +54,8 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
     /**
      * Attributes given when initialising the WebGL context
      */
-    this.contextAttr = contextAttr;
+    this.contextAttr = contextAttr || {};
+    this.contextAttr.alpha = true;
 
     /**
      * The WebGL context

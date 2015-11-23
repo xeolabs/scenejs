@@ -107,7 +107,6 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.VAO.bindVertexArrayOES(null);
             this.VAO = frameCtx.VAO.createVertexArrayOES();
             frameCtx.VAO.bindVertexArrayOES(this.VAO);
-            var gl = this.program.gl;
         }
 
         if (doMorph) {
@@ -170,22 +169,61 @@ SceneJS_ChunkFactory.createChunkType({
 
     },
 
-    morphPick: function () {
+    morphPick: function (frameCtx) {
 
-        var target1 = this.core.targets[this.core.key1]; // Keys will update
-        var target2 = this.core.targets[this.core.key2];
+        var core = this.core;
+        var core2 = this.core2;
 
-        if (this._aMorphVertexPick) {
-            this._aVertexPick.bindFloatArrayBuffer(target1.vertexBuf);
-            this._aMorphVertexPick.bindFloatArrayBuffer(target2.vertexBuf);
-        } else if (this._aVertexPick) {
-            this._aVertexPick.bindFloatArrayBuffer(this.core2.vertexBuf);
+        var target1 = core.targets[core.key1];
+        var target2 = core.targets[core.key2];
+
+        if (frameCtx.pickObject || frameCtx.pickRegion) {
+
+            if (this._aMorphVertexPick) {
+
+                this._aVertexPick.bindFloatArrayBuffer(target1.vertexBuf);
+                this._aMorphVertexPick.bindFloatArrayBuffer(target2.vertexBuf);
+
+            } else if (this._aVertexPick) {
+                this._aVertexPick.bindFloatArrayBuffer(core2.vertexBuf);
+            }
+
+            core2.indexBuf.bind();
+
+        } else if (frameCtx.pickTriangle) {
+
+            if (this._aMorphVertexPick) {
+
+                var pickPositionsBuf = core.getPickPositions(core.key1, core2.arrays.indices);
+                if (pickPositionsBuf) {
+                    this._aVertexPick.bindFloatArrayBuffer(pickPositionsBuf);
+                }
+
+                pickPositionsBuf = core.getPickPositions(core.key2, core2.arrays.indices);
+                if (pickPositionsBuf) {
+                    this._aMorphVertexPick.bindFloatArrayBuffer(pickPositionsBuf);
+                }
+
+                if (this._aColorPick) {
+                    this._aColorPick.bindFloatArrayBuffer(core2.getPickColors());
+                }
+
+                var pickIndicesBuf = core2.getPickIndices();
+                if (pickIndicesBuf) {
+                    pickIndicesBuf.bind()
+                }
+
+            } else if (this._aVertexPick) {
+
+                this._aVertexPick.bindFloatArrayBuffer(core2.vertexBuf);
+
+                core2.indexBuf.bind();
+            }
         }
 
         if (this._uMorphFactorPick) {
-            this._uMorphFactorPick.setValue(this.core.factor); // Bind LERP factor
+            this._uMorphFactorPick.setValue(core.factor);
         }
-
     },
 
     pick: function (frameCtx) {
@@ -195,7 +233,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (core.targets && core.targets.length) {
 
-            this.morphPick();
+            this.morphPick(frameCtx);
 
         } else {
 

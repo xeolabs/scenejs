@@ -266,6 +266,10 @@ var SceneJS_Display = function (cfg) {
     this._objectList = [];
     this._objectListLen = 0;
 
+    this._objectPickList = [];
+    this._objectPickListLen = 0;
+
+
     /* The "draw list", comprised collectively of three lists of state chunks belong to visible objects
      * within #_objectList: a "pick" list to render a pick buffer for colour-indexed GPU picking, along with an
      * "draw" list for normal image rendering.  The chunks in these lists are held in the state-sorted order of
@@ -383,6 +387,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     object.texture = this.texture;
     object.cubemap = this.cubemap;
     object.geometry = this.geometry;
+    object.morphGeometry = this.morphGeometry;
     object.enable = this.enable;
     object.flags = this.flags;
     object.tag = this.tag;
@@ -426,18 +431,17 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 8, "depthBuffer", this.depthBuffer);
     this._setChunk(object, 9, "colorBuffer", this.colorBuffer);
     this._setChunk(object, 10, "view", this.view);
-    this._setChunk(object, 11, "name", this.name);
-    this._setChunk(object, 12, "lights", this.lights);
-    this._setChunk(object, 13, "material", this.material);
-    this._setChunk(object, 14, "texture", this.texture);
-    this._setChunk(object, 15, "regionMap", this.regionMap);
-    this._setChunk(object, 16, "fresnel", this.fresnel);
-    this._setChunk(object, 17, "cubemap", this.cubemap);
-    this._setChunk(object, 18, "clips", this.clips);
-    this._setChunk(object, 19, "renderer", this.renderer);
-    this._setChunk(object, 20, "geometry", this.morphGeometry, this.geometry);
-    this._setChunk(object, 21, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 22, "draw", this.geometry); // Must be last
+    this._setChunk(object, 11, "lights", this.lights);
+    this._setChunk(object, 12, "material", this.material);
+    this._setChunk(object, 13, "texture", this.texture);
+    this._setChunk(object, 14, "regionMap", this.regionMap);
+    this._setChunk(object, 15, "fresnel", this.fresnel);
+    this._setChunk(object, 16, "cubemap", this.cubemap);
+    this._setChunk(object, 17, "clips", this.clips);
+    this._setChunk(object, 18, "renderer", this.renderer);
+    this._setChunk(object, 19, "geometry", this.morphGeometry, this.geometry);
+    this._setChunk(object, 20, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 21, "draw", this.geometry); // Must be last
 
     // At the very least, the object sort order
     // will need be recomputed
@@ -647,6 +651,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
     this._drawListLen = 0;
     this._pickDrawListLen = 0;
+    this._objectPickListLen = 0;
 
     this._drawListTransparentIndex = -1;
 
@@ -749,7 +754,8 @@ SceneJS_Display.prototype._buildDrawList = function () {
 
         for (var j = 0, lenj = list.length; j < lenj; j++) {
             object = list[j];
-            pickable = object.stage && object.stage.pickable; // We'll only pick objects in pickable stages
+            pickable = object.stage && object.stage.pickable
+                && object.flags && object.flags.picking; // We'll only pick objects in pickable stages
             this._appendObjectToDrawLists(object, pickable);
         }
     }
@@ -763,7 +769,8 @@ SceneJS_Display.prototype._buildDrawList = function () {
     // Append chunks for objects not in render targets
     for (var i = 0, len = this._objectDrawListLen; i < len; i++) {
         object = this._objectDrawList[i];
-        pickable = !object.stage || (object.stage && object.stage.pickable); // We'll only pick objects in pickable stages
+        pickable = (!object.stage || (object.stage && object.stage.pickable))
+            && (object.flags && object.flags.picking); // We'll only pick objects in pickable stages
         this._appendObjectToDrawLists(object, pickable);
     }
 
@@ -783,7 +790,6 @@ SceneJS_Display.prototype._appendRenderTargetChunk = function (chunk) {
  */
 SceneJS_Display.prototype._appendObjectToDrawLists = function (object, pickable) {
     var chunks = object.chunks;
-    var picking = object.flags.picking;
     var chunk;
     for (var i = 0, len = chunks.length; i < len; i++) {
         chunk = chunks[i];
@@ -812,15 +818,16 @@ SceneJS_Display.prototype._appendObjectToDrawLists = function (object, pickable)
 
             if (chunk.pick) {
                 if (pickable !== false) {   // Don't pick objects in unpickable stages
-                    if (picking) {          // Don't pick unpickable objects
-                        if (chunk.unique || this._lastPickStateId[i] != chunk.id) { // Don't reapply repeated states
-                            this._pickDrawList[this._pickDrawListLen++] = chunk;
-                            this._lastPickStateId[i] = chunk.id;
-                        }
+                    if (chunk.unique || this._lastPickStateId[i] != chunk.id) { // Don't reapply repeated states
+                        this._pickDrawList[this._pickDrawListLen++] = chunk;
+                        this._lastPickStateId[i] = chunk.id;
                     }
                 }
             }
         }
+    }
+    if (pickable) {
+        this._objectPickList[this._objectPickListLen++] = object;
     }
 };
 
@@ -948,6 +955,8 @@ SceneJS_Display.prototype._logPickList = function () {
         origin[2] = local1[2];
 
         SceneJS_math_subVec3(local2, local1, dir);
+
+        SceneJS_math_normalizeVec3(dir);
     }
 
     /**
@@ -961,7 +970,7 @@ SceneJS_Display.prototype._logPickList = function () {
         var resolutionScaling = this._canvas.resolutionScaling;
         var canvasX = params.canvasX * resolutionScaling;
         var canvasY = params.canvasY * resolutionScaling;
-        var canvasPos= [canvasX, canvasY];
+        var canvasPos = [canvasX, canvasY];
         var pickBuf = this.pickBuf;
         var hit = null;
         var object;
@@ -996,12 +1005,9 @@ SceneJS_Display.prototype._logPickList = function () {
 
         var pix = pickBuf.read(canvasX, canvasY);
 
-        var pickedColorIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
-        var pickIndex = (pickedColorIndex >= 1) ? pickedColorIndex - 1 : -1;
+        var pickedColorIndex = pix[0] + (pix[1] * 256) + (pix[2] * 256 * 256) + (pix[3] * 256 * 256 * 256);
 
-        object = this._objectDrawList[pickIndex];
-
-        //var pickName = this._frameCtx.pickNames[pickIndex];
+        object = this._objectPickList[pickedColorIndex];
 
         if (object) {
 
@@ -1084,8 +1090,8 @@ SceneJS_Display.prototype._logPickList = function () {
             });
 
             pix = pickBuf.read(canvasX, canvasY);
-            var primitiveIndex = pix[0] + pix[1] * 256 + pix[2] * 65536;
-            primitiveIndex = (primitiveIndex >= 1) ? primitiveIndex - 1 : -1;
+            var primitiveIndex = pix[0] + (pix[1] * 256) + (pix[2] * 256 * 256) + (pix[3] * 256 * 256 * 256);
+            primitiveIndex *= 3; // Convert from triangle number to first vertex in indices
 
             hit.primitiveIndex = primitiveIndex;
 
@@ -1098,16 +1104,23 @@ SceneJS_Display.prototype._logPickList = function () {
 
                 hit.primitive = "triangle";
 
-                // Get the World-space positions of the triangle's vertices
+                // Attempt to ray-pick the triangle; in World-space, fire a ray
+                // from the eye position through the mouse position
+                // on the perspective projection plane
 
-                var i = hit.primitiveIndex; // Indicates the first triangle index in the indices array
+                getLocalRay(canvas, object, canvasPos, origin, dir);
+
+                // Get triangle indices
 
                 var indices = geometry.arrays.indices;
-                var positions = geometry.arrays.positions;
 
-                var ia = indices[i];
-                var ib = indices[i + 1];
-                var ic = indices[i + 2];
+                var ia = indices[primitiveIndex];
+                var ib = indices[primitiveIndex + 1];
+                var ic = indices[primitiveIndex + 2];
+
+                var ia3 = ia * 3;
+                var ib3 = ib * 3;
+                var ic3 = ic * 3;
 
                 triangleVertices[0] = ia;
                 triangleVertices[1] = ib;
@@ -1115,103 +1128,146 @@ SceneJS_Display.prototype._logPickList = function () {
 
                 hit.indices = triangleVertices;
 
-                a[0] = positions[(ia * 3)];
-                a[1] = positions[(ia * 3) + 1];
-                a[2] = positions[(ia * 3) + 2];
+                // Get World-space triangle vertex positions
 
-                b[0] = positions[(ib * 3)];
-                b[1] = positions[(ib * 3) + 1];
-                b[2] = positions[(ib * 3) + 2];
+                var morphGeometry = object.morphGeometry;
+                var targets = morphGeometry.targets;
 
-                c[0] = positions[(ic * 3)];
-                c[1] = positions[(ic * 3) + 1];
-                c[2] = positions[(ic * 3) + 2];
+                if (targets && targets.length > 0 && targets[0].positions) {
 
-                // Attempt to ray-pick the triangle; in World-space, fire a ray
-                // from the eye position through the mouse position
-                // on the perspective projection plane
+                    // Positions from morphGeometry
 
-                getLocalRay(canvas, object, canvasPos, origin, dir);
+                    this._lerpTargets(
+                        morphGeometry.keys,
+                        morphGeometry.targets,
+                        "positions",
+                        ia, ib, ic,
+                        morphGeometry.factor,
+                        a, b, c);
 
-                if (SceneJS_math_rayTriangleIntersect(origin, dir, a, b, c, position)
-                    || SceneJS_math_rayTriangleIntersect(origin, dir, c, b, a, position)) {
+                } else {
 
-                    // Ray intersects the triangle
+                    // Positions from static geometry
 
-                    // Get Local-space cartesian coordinates of the ray-triangle intersection
+                    var positions = geometry.arrays.positions;
 
-                    hit.position = position;
+                    a[0] = positions[ia3];
+                    a[1] = positions[ia3 + 1];
+                    a[2] = positions[ia3 + 2];
 
-                    // Get interpolated World-space coordinates
+                    b[0] = positions[ib3];
+                    b[1] = positions[ib3 + 1];
+                    b[2] = positions[ib3 + 2];
 
-                    // Need to transform homogeneous coords
+                    c[0] = positions[ic3];
+                    c[1] = positions[ic3 + 1];
+                    c[2] = positions[ic3 + 2];
+                }
 
-                    tempVec4[0] = position[0];
-                    tempVec4[1] = position[1];
-                    tempVec4[2] = position[2];
-                    tempVec4[3] = 1;
+                SceneJS_math_rayPlaneIntersect(origin, dir, a, b, c, position);
 
-                    // Get World-space cartesian coordinates of the ray-triangle intersection
+                // Get Local-space cartesian coordinates of the ray-triangle intersection
 
-                    SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
+                hit.position = position;
 
-                    worldPos[0] = tempVec4b[0];
-                    worldPos[1] = tempVec4b[1];
-                    worldPos[2] = tempVec4b[2];
+                // Get interpolated World-space coordinates
 
-                    hit.worldPos = worldPos;
+                // Need to transform homogeneous coords
 
-                    // Get barycentric coordinates of the ray-triangle intersection
+                tempVec4[0] = position[0];
+                tempVec4[1] = position[1];
+                tempVec4[2] = position[2];
+                tempVec4[3] = 1;
 
-                    SceneJS_math_cartesianToBarycentric(position, a, b, c, barycentric);
+                // Get World-space cartesian coordinates of the ray-triangle intersection
 
-                    hit.barycentric = barycentric;
+                SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
 
-                    // Get interpolated normal vector
+                worldPos[0] = tempVec4b[0];
+                worldPos[1] = tempVec4b[1];
+                worldPos[2] = tempVec4b[2];
+
+                hit.worldPos = worldPos;
+
+                // Get barycentric coordinates of the ray-triangle intersection
+
+                SceneJS_math_cartesianToBarycentric2(position, a, b, c, barycentric);
+
+                hit.barycentric = barycentric;
+
+                // Get interpolated normal vector
+
+                var gotNormals = false;
+
+                if (targets && targets.length > 0 && targets[0].normals) {
+
+                    // Normals from morphGeometry
+
+                    this._lerpTargets(
+                        morphGeometry.keys,
+                        morphGeometry.targets,
+                        "normals",
+                        ia, ib, ic,
+                        morphGeometry.factor,
+                        na, nb, nc);
+
+                    gotNormals = true;
+                }
+
+                if (!gotNormals) {
+
+                    // Normals from static geometry
 
                     var normals = geometry.arrays.normals;
 
                     if (normals) {
 
-                        na[0] = normals[(ia * 3)];
-                        na[1] = normals[(ia * 3) + 1];
-                        na[2] = normals[(ia * 3) + 2];
+                        na[0] = normals[ia3];
+                        na[1] = normals[ia3 + 1];
+                        na[2] = normals[ia3 + 2];
 
-                        nb[0] = normals[(ib * 3)];
-                        nb[1] = normals[(ib * 3) + 1];
-                        nb[2] = normals[(ib * 3) + 2];
+                        nb[0] = normals[ib3];
+                        nb[1] = normals[ib3 + 1];
+                        nb[2] = normals[ib3 + 2];
 
-                        nc[0] = normals[(ic * 3)];
-                        nc[1] = normals[(ic * 3) + 1];
-                        nc[2] = normals[(ic * 3) + 2];
+                        nc[0] = normals[ic3];
+                        nc[1] = normals[ic3 + 1];
+                        nc[2] = normals[ic3 + 2];
 
-                        hit.normal = SceneJS_math_addVec3(SceneJS_math_addVec3(
-                                SceneJS_math_mulVec3Scalar(na, barycentric[0], tempVec3),
-                                SceneJS_math_mulVec3Scalar(nb, barycentric[1], tempVec3b), tempVec3c),
-                            SceneJS_math_mulVec3Scalar(nc, barycentric[2], tempVec3d), tempVec3e);
+                        gotNormals = true;
                     }
+                }
 
-                    // Get interpolated UV coordinates
+                if (gotNormals) {
 
-                    var uvs = geometry.arrays.uv;
+                    // Interpolate on triangle
 
-                    if (uvs) {
+                    hit.normal = SceneJS_math_addVec3(SceneJS_math_addVec3(
+                            SceneJS_math_mulVec3Scalar(na, barycentric[0], tempVec3),
+                            SceneJS_math_mulVec3Scalar(nb, barycentric[1], tempVec3b), tempVec3c),
+                        SceneJS_math_mulVec3Scalar(nc, barycentric[2], tempVec3d), tempVec3e);
+                }
 
-                        uva[0] = uvs[(ia * 2)];
-                        uva[1] = uvs[(ia * 2) + 1];
+                // Get interpolated UV coordinates
 
-                        uvb[0] = uvs[(ib * 2)];
-                        uvb[1] = uvs[(ib * 2) + 1];
+                var uvs = geometry.arrays.uv;
 
-                        uvc[0] = uvs[(ic * 2)];
-                        uvc[1] = uvs[(ic * 2) + 1];
+                if (uvs) {
 
-                        hit.uv = SceneJS_math_addVec3(
-                            SceneJS_math_addVec3(
-                                SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
-                                SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
-                            SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), tempVec3j);
-                    }
+                    uva[0] = uvs[(ia * 2)];
+                    uva[1] = uvs[(ia * 2) + 1];
+
+                    uvb[0] = uvs[(ib * 2)];
+                    uvb[1] = uvs[(ib * 2) + 1];
+
+                    uvc[0] = uvs[(ic * 2)];
+                    uvc[1] = uvs[(ic * 2) + 1];
+
+                    hit.uv = SceneJS_math_addVec3(
+                        SceneJS_math_addVec3(
+                            SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
+                            SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
+                        SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), tempVec3j);
                 }
             }
         }
@@ -1220,6 +1276,105 @@ SceneJS_Display.prototype._logPickList = function () {
 
         return hit;
     };
+
+    SceneJS_Display.prototype._lerpTargets = function (times,
+                                                       targets,
+                                                       arrayName,
+                                                       ia, ib, ic,
+                                                       time,
+                                                       a, b, c) {
+
+        // Trivial case in which we can just return the
+        // positions at a target matching the given time
+
+        for (var i = 0; i < times.length; i++) {
+            if (times[i] === time) {
+
+                var array = targets[i][arrayName];
+
+                var ia3 = ia * 3;
+                var ib3 = ib * 3;
+                var ic3 = ic * 3;
+
+                a[0] = array[ia3];
+                a[1] = array[ia3 + 1];
+                a[2] = array[ia3 + 2];
+
+                b[0] = array[ib3];
+                b[1] = array[ib3 + 1];
+                b[2] = array[ib3 + 2];
+
+                c[0] = array[ic3];
+                c[1] = array[ic3 + 1];
+                c[2] = array[ic3 + 2];
+
+                return;
+            }
+        }
+
+        // Find the indexes of the targets that enclose the given time
+
+        var i2 = 0;
+
+        while (times[i2] < time) {
+            i2++;
+        }
+
+        var i1 = i2 - 1;
+
+        this._lerpTargetPair(
+            time,
+            times[i1],
+            times[i2],
+            targets[i1][arrayName],
+            targets[i2][arrayName],
+            ia, ib, ic,
+            a, b, c
+        );
+    };
+
+    var a1 = SceneJS_math_vec3();
+    var b1 = SceneJS_math_vec3();
+    var c1 = SceneJS_math_vec3();
+    var a2 = SceneJS_math_vec3();
+    var b2 = SceneJS_math_vec3();
+    var c2 = SceneJS_math_vec3();
+
+    SceneJS_Display.prototype._lerpTargetPair = function (time, time1, time2, target1, target2, ia, ib, ic, a, b, c) {
+
+        var ia3 = ia * 3;
+        var ib3 = ib * 3;
+        var ic3 = ic * 3;
+
+        a1[0] = target1[ia3];
+        a1[1] = target1[ia3 + 1];
+        a1[2] = target1[ia3 + 2];
+
+        b1[0] = target1[ib3];
+        b1[1] = target1[ib3 + 1];
+        b1[2] = target1[ib3 + 2];
+
+        c1[0] = target1[ic3];
+        c1[1] = target1[ic3 + 1];
+        c1[2] = target1[ic3 + 2];
+
+        a2[0] = target2[ia3];
+        a2[1] = target2[ia3 + 1];
+        a2[2] = target2[ia3 + 2];
+
+        b2[0] = target2[ib3];
+        b2[1] = target2[ib3 + 1];
+        b2[2] = target2[ib3 + 2];
+
+        c2[0] = target2[ic3];
+        c2[1] = target2[ic3 + 1];
+        c2[2] = target2[ic3 + 2];
+
+        SceneJS_math_lerpVec3(time, time1, time2, a1, a2, a);
+        SceneJS_math_lerpVec3(time, time1, time2, b1, b2, b);
+        SceneJS_math_lerpVec3(time, time1, time2, c1, c2, c);
+    };
+
 })();
 
 /** Renders either the draw or pick list.
@@ -1239,6 +1394,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     // Reset frame context
     var frameCtx = this._frameCtx;
+
     frameCtx.renderTarget = null;
     frameCtx.targetIndex = 0;
     frameCtx.renderBuf = null;
@@ -1253,6 +1409,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.blendEnabled = false;
     frameCtx.backfaces = true;
     frameCtx.frontface = "ccw";
+    frameCtx.picking = !!params.pickObject || !!params.pickTriangle || !!params.pickRegion;
     frameCtx.pickObject = !!params.pickObject;
     frameCtx.pickTriangle = !!params.pickTriangle;
     frameCtx.pickRegion = !!params.pickRegion;

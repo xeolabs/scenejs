@@ -131,7 +131,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         add("varying vec4  SCENEJS_vColor;");
 
         add("uniform float  SCENEJS_uPickMode;");                   // Z-pick mode when true else colour-pick
-        add("uniform vec3  SCENEJS_uPickColor;");                   // Used in colour-pick mode
+        add("uniform vec4  SCENEJS_uPickColor;");                   // Used in colour-pick mode
         add("uniform bool  SCENEJS_uClipping;");
 
         if (clipping) {
@@ -161,10 +161,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         add("    if  (SCENEJS_uPickMode == 0.0) {");  // Pick object
-        add("          gl_FragColor = vec4(SCENEJS_uPickColor.rgb, 1.0);  ");
+        add("          gl_FragColor = SCENEJS_uPickColor;  ");
 
         add("    } else if (SCENEJS_uPickMode == 1.0) {"); // Pick triangle
-        add("          gl_FragColor = vec4(SCENEJS_vColor.rgb, 1.0);  ");
+        add("          gl_FragColor = SCENEJS_vColor;  ");
 
         add("    } else {"); // Pick region
         if (regionMapping) {

@@ -250,16 +250,15 @@
         return dest;
     };
 
-    window.SceneJS_math_lerpVec3 = function (t, t1, t2, p1, p2) {
+    window.SceneJS_math_lerpVec3 = function (t, t1, t2, p1, p2, dest) {
+        dest = dest || SceneJS_math_vec3();
         var f2 = (t - t1) / (t2 - t1);
         var f1 = 1.0 - f2;
-        return {
-            x: p1.x * f1 + p2.x * f2,
-            y: p1.y * f1 + p2.y * f2,
-            z: p1.z * f1 + p2.z * f2
-        };
+        dest[0] = p1[0] * f1 + p2[0] * f2;
+        dest[1] = p1[1] * f1 + p2[1] * f2;
+        dest[2] = p1[2] * f1 + p2[2] * f2;
+        return dest;
     };
-
 
     /**
      * @param u vec2
@@ -2258,6 +2257,141 @@
     };
 
     /**
+     * Builds index array needed by color-indexed triangle picking (for morph target positions).
+     *
+     * @method getPickIndices
+     * @static
+     * @param {Array of Number} indices One-dimensional flattened array of indices.
+     * @returns {Array of Number} The pick indices.
+     */
+    window.SceneJS_math_getPickIndices = function (indices) {
+
+        var pickIndices = [];
+
+        var index2 = 0;
+        for (var location = 0; location < indices.length; location += 3) {
+            pickIndices.push(index2++);
+            pickIndices.push(index2++);
+            pickIndices.push(index2++);
+        }
+
+        return pickIndices;
+    };
+
+    /**
+     * Builds vertex array needed by color-indexed triangle picking (for morph target positions).
+     *
+     * @method getPickPositions
+     * @static
+     * @param {Array of Number} positions One-dimensional flattened array of positions.
+     * @param {Array of Number} indices One-dimensional flattened array of indices.
+     * @returns {Array of Number} The pick positions.
+     */
+    window.SceneJS_math_getPickPositions = function (positions, indices) {
+
+        var pickPositions = [];
+        var primIndex = 0;
+        var i;
+
+        for (var location = 0; location < indices.length; location += 3) {
+
+            // Primitive-indexed triangle pick color
+
+            primIndex++;
+            primIndex = location + 1;
+
+            // A
+
+            i = indices[location + 0];
+
+            pickPositions.push(positions[i * 3 + 0]);
+            pickPositions.push(positions[i * 3 + 1]);
+            pickPositions.push(positions[i * 3 + 2]);
+
+            // B
+
+            i = indices[location + 1];
+
+            pickPositions.push(positions[i * 3 + 0]);
+            pickPositions.push(positions[i * 3 + 1]);
+            pickPositions.push(positions[i * 3 + 2]);
+
+            // C
+
+            i = indices[location + 2];
+
+            pickPositions.push(positions[i * 3 + 0]);
+            pickPositions.push(positions[i * 3 + 1]);
+            pickPositions.push(positions[i * 3 + 2]);
+        }
+
+        return pickPositions;
+    };
+
+    /**
+     * Builds color arrays needed by color-indexed triangle picking.
+     *
+     * @method getPickPrimitives
+     * @static
+     * @param {Array of Number} indices One-dimensional flattened array of indices.
+     * @returns {Array of Number} The pick colors
+     */
+    window.SceneJS_math_getPickColors = function (indices) {
+
+        var pickColors = [];
+
+        var index2 = 0;
+        var primIndex = 0;
+
+        // Triangle indices
+
+        var r;
+        var g;
+        var b;
+        var a;
+
+        //if ((indices.length/3) > 4294967295) {
+        //    alert("!");
+        //}
+
+        for (var location = 0; location < indices.length; location += 3) {
+
+            // Primitive-indexed triangle pick color
+
+            a = (primIndex >> 24 & 0xFF) / 255.0;
+            b = (primIndex >> 16 & 0xFF) / 255.0;
+            g = (primIndex >> 8 & 0xFF) / 255.0;
+            r = (primIndex & 0xFF) / 255.0;
+
+            // A
+
+            pickColors.push(r);
+            pickColors.push(g);
+            pickColors.push(b);
+            pickColors.push(a);
+
+            // B
+
+            pickColors.push(r);
+            pickColors.push(g);
+            pickColors.push(b);
+            pickColors.push(a);
+
+            // C
+
+            pickColors.push(r);
+            pickColors.push(g);
+            pickColors.push(b);
+            pickColors.push(a);
+
+            primIndex++;
+        }
+
+        return pickColors;
+    };
+
+
+    /**
      * Finds the intersection of a 3D ray with a 3D triangle.
      *
      * @method rayTriangleIntersect
@@ -2306,6 +2440,41 @@
     };
 
     /**
+     * Finds the intersection of a 3D ray with a plane defined by 3 points.
+     *
+     * @method rayPlaneIntersect
+     * @static
+     * @param {Array of Number} origin Ray origin.
+     * @param {Array of Number} dir Ray direction.
+     * @param {Array of Number} a First point on plane.
+     * @param {Array of Number} b Second point on plane.
+     * @param {Array of Number} c Third point on plane.
+     * @param {Array of Number} [isect] Intersection point.
+     * @returns {Array of Number} The intersection point.
+     */
+    window.SceneJS_math_rayPlaneIntersect = function (origin, dir, a, b, c, isect) {
+
+        isect = isect || SceneJS_math_vec3();
+        dir = SceneJS_math_normalizeVec3(dir, tempVec3);
+
+        var edge1 = SceneJS_math_subVec3(b, a, tempVec3b);
+        var edge2 = SceneJS_math_subVec3(c, a, tempVec3c);
+
+        var n = SceneJS_math_cross3Vec3(edge1, edge2, tempVec3d);
+        SceneJS_math_normalizeVec3(n, n);
+
+        var d = -SceneJS_math_dotVec3(a, n);
+
+        var t = -(SceneJS_math_dotVec3(origin, n) + d) / SceneJS_math_dotVec3(dir, n);
+        isect[0] = origin[0] + t * dir[0];
+        isect[1] = origin[1] + t * dir[1];
+        isect[2] = origin[2] + t * dir[2];
+
+        return isect;
+    };
+
+
+    /**
      * Gets barycentric coordinates from cartesian coordinates within a triangle.
      *
      * @method cartesianToBaryCentric
@@ -2334,6 +2503,41 @@
         bary[2] = SceneJS_math_lenVec3(SceneJS_math_cross3Vec3(f1, f2, tempVec3f)) / a0;
 
         return bary;
+    };
+
+    window.SceneJS_math_cartesianToBarycentric2 = function (cartesian, a, b, c, dest) {
+
+        var v0 = SceneJS_math_subVec3(c, a, tempVec3);
+        var v1 = SceneJS_math_subVec3(b, a, tempVec3b);
+        var v2 = SceneJS_math_subVec3(cartesian, a, tempVec3c);
+
+        var dot00 = SceneJS_math_dotVector3(v0, v0);
+        var dot01 = SceneJS_math_dotVector3(v0, v1);
+        var dot02 = SceneJS_math_dotVector3(v0, v2);
+        var dot11 = SceneJS_math_dotVector3(v1, v1);
+        var dot12 = SceneJS_math_dotVector3(v1, v2);
+
+        var denom = ( dot00 * dot11 - dot01 * dot01 );
+
+        // Colinear or singular triangle
+
+        if (denom === 0) {
+
+            // Arbitrary location outside of triangle
+
+            return null;
+        }
+
+        var invDenom = 1 / denom;
+
+        var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+        var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+
+        dest[0] = 1 - u - v;
+        dest[1] = v;
+        dest[2] = u;
+
+        return dest;
     };
 
     /**

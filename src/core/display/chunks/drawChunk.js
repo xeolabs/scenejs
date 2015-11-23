@@ -18,7 +18,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         this._depthModeDraw = this.program.draw.getUniform("SCENEJS_uDepthMode");
 
-        this._uPickColor = this.program.pick.getUniform("xeo_uPickColor");
+        this._uPickColor = this.program.pick.getUniform("SCENEJS_uPickColor");
     },
 
 
@@ -47,13 +47,14 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (this._uPickColor) {
 
-                    frameCtx.pickIndex++;
-
+                    var a = frameCtx.pickIndex >> 24 & 0xFF;
                     var b = frameCtx.pickIndex >> 16 & 0xFF;
                     var g = frameCtx.pickIndex >> 8 & 0xFF;
                     var r = frameCtx.pickIndex & 0xFF;
 
-                    this._uPickColor.setValue([r / 255, g / 255, b / 255, 0]);
+                    frameCtx.pickIndex++;
+
+                    this._uPickColor.setValue([r / 255, g / 255, b / 255, a / 255]);
                 }
             }
 
