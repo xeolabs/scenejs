@@ -9,8 +9,8 @@
   someNode.addNode({
        type: "geometry/plane",
        wire: false, // Default
-       widthSegments: 200, // Default
-       heightSegments: 200 // Default
+       widthSegments: 20, // Default
+       heightSegments: 20 // Default
    });
  </pre>
  */
@@ -36,8 +36,8 @@ SceneJS.Types.addType("geometry/grid", {
                         {
                             type:"geometry/plane",
                             wire:params.wire != false,
-                            widthSegments:params.xSegments || 200,
-                            heightSegments:params.zSegments || 200
+                            widthSegments:params.xSegments || 100,
+                            heightSegments:params.zSegments || 100
                         }
                     ]
                 }

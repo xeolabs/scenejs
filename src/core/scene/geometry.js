@@ -54,6 +54,7 @@ new (function () {
         var IndexArrayType = SceneJS.WEBGL_INFO.SUPPORTED_EXTENSIONS["OES_element_index_uint"] ? Uint32Array : Uint16Array;
 
         core.primitive = this._getPrimitiveType(primitive);
+        core.primitiveName = primitive;
 
         // Generate normals
         if (data.normals) {
@@ -70,63 +71,63 @@ new (function () {
         core.arrays = {};
 
         if (data.positions) {
-          if (data.positions.constructor != Float32Array) {
-            data.positions = new Float32Array(data.positions);
-          }
+            if (data.positions.constructor != Float32Array) {
+                data.positions = new Float32Array(data.positions);
+            }
 
-          if (options.scale || options.origin) {
-            this._applyOptions(data.positions, options)
-          }
+            if (options.scale || options.origin) {
+                this._applyOptions(data.positions, options)
+            }
 
-          core.arrays.positions = data.positions;
+            core.arrays.positions = data.positions;
         }
 
         if (data.normals) {
-          if (data.normals.constructor != Float32Array) {
-            data.normals = new Float32Array(data.normals);
-          }
+            if (data.normals.constructor != Float32Array) {
+                data.normals = new Float32Array(data.normals);
+            }
 
-          core.arrays.normals = data.normals;
+            core.arrays.normals = data.normals;
         }
 
         if (data.uv) {
-          if (data.uv.constructor != Float32Array) {
-            data.uv = new Float32Array(data.uv);
-          }
+            if (data.uv.constructor != Float32Array) {
+                data.uv = new Float32Array(data.uv);
+            }
 
-          core.arrays.uv = data.uv;
+            core.arrays.uv = data.uv;
         }
 
         if (data.uv2) {
-          if (data.uv2.constructor != Float32Array) {
-            data.uv2 = new Float32Array(data.uv2);
-          }
+            if (data.uv2.constructor != Float32Array) {
+                data.uv2 = new Float32Array(data.uv2);
+            }
 
-          core.arrays.uv2 = data.uv2;
+            core.arrays.uv2 = data.uv2;
         }
 
         if (data.colors) {
-          if (data.colors.constructor != Float32Array) {
-            data.colors = new Float32Array(data.colors);
-          }
+            if (data.colors.constructor != Float32Array) {
+                data.colors = new Float32Array(data.colors);
+            }
 
-          core.arrays.colors = data.colors;
+            core.arrays.colors = data.colors;
         }
 
         if (data.indices) {
-          if (data.indices.constructor != Uint16Array && data.indices.constructor != Uint32Array) {
-            data.indices = new IndexArrayType(data.indices);
-          }
+            if (data.indices.constructor != Uint16Array && data.indices.constructor != Uint32Array) {
+                data.indices = new IndexArrayType(data.indices);
+            }
 
-          core.arrays.indices = data.indices;
+            core.arrays.indices = data.indices;
         }
 
         // Lazy-build tangents, only when needed as rendering
-        core.getTangentBuf = function () {
+        core.getTangents = function () {
             if (core.tangentBuf) {
                 return core.tangentBuf;
             }
-            var arrays =  core.arrays;
+            var arrays = core.arrays;
             if (arrays.positions && arrays.indices && arrays.uv) {
                 var gl = self._engine.canvas.gl;
                 var tangents = new Float32Array(self._buildTangents(arrays)); // Build tangents array;
@@ -134,8 +135,46 @@ new (function () {
                 var usage = gl.STATIC_DRAW;
                 return core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, usage);
             }
-        }
+        };
+
+        // Buffers for primitive-pick rendering
+
+        core.getPickPositions = function () {
+            if (core.pickPositionsBuf) {
+                return core.pickPositionsBuf;
+            }
+            if (core.arrays.positions) {
+                var gl = self._engine.canvas.gl;
+                var pickPositions = SceneJS_math_getPickPositions(core.arrays.positions, core.arrays.indices);
+                core.pickPositionsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickPositions), pickPositions.length, 3, gl.STATIC_DRAW);
+            }
+
+            return core.pickPositionsBuf;
+        };
+
+        core.getPickColors = function () {
+            if (core.pickColorsBuf) {
+                return core.pickColorsBuf;
+            }
+            var gl = self._engine.canvas.gl;
+            var pickColors = SceneJS_math_getPickColors(core.arrays.indices);
+            core.pickColorsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickColors), pickColors.length, 4, gl.STATIC_DRAW);
+            return core.pickColorsBuf;
+        };
+
+        core.getPickIndices = function () {
+            if (core.pickIndicesBuf) {
+                return core.pickIndicesBuf;
+            }
+            if (core.arrays.indices) {
+                var gl = self._engine.canvas.gl;
+                var pickIndices = SceneJS_math_getPickIndices(core.arrays.indices);
+                core.pickIndicesBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(pickIndices), pickIndices.length, 1, gl.STATIC_DRAW);
+            }
+            return core.pickIndicesBuf;
+        };
     };
+
 
     /**
      * Returns WebGL constant for primitive name
@@ -170,10 +209,10 @@ new (function () {
             default:
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "geometry primitive unsupported: '" +
-                        primitive +
-                        "' - supported types are: 'points', 'lines', 'line-loop', " +
-                        "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'");
+                    "geometry primitive unsupported: '" +
+                    primitive +
+                    "' - supported types are: 'points', 'lines', 'line-loop', " +
+                    "'line-strip', 'triangles', 'triangle-strip' and 'triangle-fan'");
         }
     };
 
@@ -182,33 +221,33 @@ new (function () {
      */
     SceneJS.Geometry.prototype._applyOptions = function (positions, options) {
 
-      if (options.scale) {
+        if (options.scale) {
 
-        var scaleX = options.scale.x != undefined ? options.scale.x : 1.0;
-        var scaleY = options.scale.y != undefined ? options.scale.y : 1.0;
-        var scaleZ = options.scale.z != undefined ? options.scale.z : 1.0;
+            var scaleX = options.scale.x != undefined ? options.scale.x : 1.0;
+            var scaleY = options.scale.y != undefined ? options.scale.y : 1.0;
+            var scaleZ = options.scale.z != undefined ? options.scale.z : 1.0;
 
-        for (var i = 0, len = positions.length; i < len; i += 3) {
-          positions[i    ] *= scaleX;
-          positions[i + 1] *= scaleY;
-          positions[i + 2] *= scaleZ;
+            for (var i = 0, len = positions.length; i < len; i += 3) {
+                positions[i] *= scaleX;
+                positions[i + 1] *= scaleY;
+                positions[i + 2] *= scaleZ;
+            }
         }
-      }
 
-      if (options.origin) {
+        if (options.origin) {
 
-        var originX = options.origin.x != undefined ? options.origin.x : 0.0;
-        var originY = options.origin.y != undefined ? options.origin.y : 0.0;
-        var originZ = options.origin.z != undefined ? options.origin.z : 0.0;
+            var originX = options.origin.x != undefined ? options.origin.x : 0.0;
+            var originY = options.origin.y != undefined ? options.origin.y : 0.0;
+            var originZ = options.origin.z != undefined ? options.origin.z : 0.0;
 
-        for (var i = 0, len = positions.length; i < len; i += 3) {
-          positions[i    ] -= originX;
-          positions[i + 1] -= originY;
-          positions[i + 2] -= originZ;
+            for (var i = 0, len = positions.length; i < len; i += 3) {
+                positions[i] -= originX;
+                positions[i + 1] -= originY;
+                positions[i + 2] -= originZ;
+            }
         }
-      }
 
-      return positions;
+        return positions;
     };
 
     /**
@@ -350,7 +389,7 @@ new (function () {
             destroyBuffers(core);
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ERROR,
-                    "Failed to allocate geometry: " + e);
+                "Failed to allocate geometry: " + e);
         }
     };
 
@@ -746,7 +785,9 @@ new (function () {
     SceneJS.Geometry.prototype._inheritVBOs = function (core) {
 
         var core2 = {
+            arrays: core.arrays,
             primitive: core.primitive,
+            primitiveName: core.primitiveName,
             boundary: core.boundary,
             normalBuf: core.normalBuf,
             uvBuf: core.uvBuf,
@@ -759,7 +800,10 @@ new (function () {
             interleavedNormalOffset: core.interleavedNormalOffset,
             interleavedUVOffset: core.interleavedUVOffset,
             interleavedUV2Offset: core.interleavedUV2Offset,
-            interleavedColorOffset: core.interleavedColorOffset
+            interleavedColorOffset: core.interleavedColorOffset,
+            getPickIndices: core.getPickIndices,
+            getPickPositions: core.getPickPositions,
+            getPickColors: core.getPickColors
         };
 
         for (var i = stackLen - 1; i >= 0; i--) {

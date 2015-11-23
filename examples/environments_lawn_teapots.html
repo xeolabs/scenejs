@@ -14,7 +14,7 @@
         }
     </style>
 
-    <script src="../api/latest/scenejs.min.js"></script>
+    <script src="../api/latest/scenejs.js"></script>
     <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
@@ -80,7 +80,13 @@
                     z: z,
                     nodes: [
                         {
-                            type: "geometry/teapot"
+                            type: "name",
+                            name: "" + x + "." + z,
+                            nodes: [
+                                {
+                                    type: "geometry/teapot"
+                                }
+                            ]
                         }
                     ]
                 });

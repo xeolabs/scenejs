@@ -44,10 +44,15 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.frontface = frontface;
         }
 
-        var transparent = this.core.transparent;
 
-        if (frameCtx.transparent != transparent) {
-            if (!frameCtx.pick) {
+        var picking = frameCtx.picking;
+
+        if (!picking) {
+
+            var transparent = this.core.transparent;
+
+            if (frameCtx.transparent != transparent) {
+
                 if (transparent) {
 
                     // Entering a transparency bin
@@ -64,10 +69,8 @@ SceneJS_ChunkFactory.createChunkType({
                     frameCtx.blendEnabled = false;
                 }
             }
-            frameCtx.transparent = transparent;
-        }
 
-        if (frameCtx.pick) {
+            frameCtx.transparent = transparent;
 
             if (this._uClippingPick) {
                 this._uClippingPick.setValue(this.core.clipping);
