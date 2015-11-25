@@ -151,6 +151,12 @@ var SceneJS_Display = function (cfg) {
     this.texture = null;
 
     /**
+     * Node state core for the last {@link SceneJS.Decal} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.decal = null;
+
+    /**
      * Node state core for the last {@link SceneJS.Fresnel} visited during scene graph compilation traversal
      * @type Object
      */
@@ -385,6 +391,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     object.layer = this.layer;
     object.renderTarget = this.renderTarget;
     object.texture = this.texture;
+    object.decal = this.decal;
     object.cubemap = this.cubemap;
     object.geometry = this.geometry;
     object.morphGeometry = this.morphGeometry;
@@ -401,6 +408,7 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.clips.hash,
         this.morphGeometry.hash,
         this.texture.hash,
+        this.decal.hash,
         this.fresnel.hash,
         this.cubemap.hash,
         this.lights.hash,
@@ -434,14 +442,15 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 11, "lights", this.lights);
     this._setChunk(object, 12, "material", this.material);
     this._setChunk(object, 13, "texture", this.texture);
-    this._setChunk(object, 14, "regionMap", this.regionMap);
-    this._setChunk(object, 15, "fresnel", this.fresnel);
-    this._setChunk(object, 16, "cubemap", this.cubemap);
-    this._setChunk(object, 17, "clips", this.clips);
-    this._setChunk(object, 18, "renderer", this.renderer);
-    this._setChunk(object, 19, "geometry", this.morphGeometry, this.geometry);
-    this._setChunk(object, 20, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 21, "draw", this.geometry); // Must be last
+    this._setChunk(object, 14, "decal", this.decal);
+    this._setChunk(object, 15, "regionMap", this.regionMap);
+    this._setChunk(object, 16, "fresnel", this.fresnel);
+    this._setChunk(object, 17, "cubemap", this.cubemap);
+    this._setChunk(object, 18, "clips", this.clips);
+    this._setChunk(object, 19, "renderer", this.renderer);
+    this._setChunk(object, 20, "geometry", this.morphGeometry, this.geometry);
+    this._setChunk(object, 21, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 22, "draw", this.geometry); // Must be last
 
     // At the very least, the object sort order
     // will need be recomputed
