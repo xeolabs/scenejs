@@ -44,33 +44,33 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.frontface = frontface;
         }
 
+        var transparent = this.core.transparent;
 
-        var picking = frameCtx.picking;
+        if (frameCtx.transparent != transparent) {
 
-        if (!picking) {
+            if (transparent) {
 
-            var transparent = this.core.transparent;
+                // Entering a transparency bin
 
-            if (frameCtx.transparent != transparent) {
+                gl.enable(gl.BLEND);
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                frameCtx.blendEnabled = true;
 
-                if (transparent) {
+            } else {
 
-                    // Entering a transparency bin
+                // Leaving a transparency bin
 
-                    gl.enable(gl.BLEND);
-                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-                    frameCtx.blendEnabled = true;
-
-                } else {
-
-                    // Leaving a transparency bin
-
-                    gl.disable(gl.BLEND);
-                    frameCtx.blendEnabled = false;
-                }
+                gl.disable(gl.BLEND);
+                frameCtx.blendEnabled = false;
             }
 
             frameCtx.transparent = transparent;
+        }
+
+
+        var picking = frameCtx.picking;
+
+        if (picking) {
 
             if (this._uClippingPick) {
                 this._uClippingPick.setValue(this.core.clipping);
