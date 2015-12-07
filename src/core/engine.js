@@ -114,7 +114,7 @@ var SceneJS_Engine = function (json, options) {
         this.scene.addNodes(nodes); // then create sub-nodes
     }
 
-    SceneJS_events.addListener(SceneJS_events.RENDER, function(event) {
+    SceneJS_events.addListener(SceneJS_events.RENDER, function (event) {
         self.scene.publish("render", event);
     });
 
@@ -123,7 +123,7 @@ var SceneJS_Engine = function (json, options) {
         function (event) {
             event.preventDefault();
             self.stop();
-            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_LOST, { scene: self.scene });
+            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_LOST, {scene: self.scene});
         },
         false);
 
@@ -133,7 +133,7 @@ var SceneJS_Engine = function (json, options) {
             self.canvas.initWebGL();
             self._coreFactory.webglRestored();  // Reallocate WebGL resources for node state cores
             self.display.webglRestored(); // Reallocate shaders and re-cache shader var locations for display state chunks
-            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_RESTORED, { scene: self.scene });
+            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_RESTORED, {scene: self.scene});
             self.start();
         },
         false);
@@ -230,7 +230,9 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
 SceneJS_Engine.prototype._doDestroyNodes = function () {
     var node;
     while (this._numNodesToDestroy > 0) {
-        node = this._nodesToDestroy[--this._numNodesToDestroy];
+        --this._numNodesToDestroy;
+        node = this._nodesToDestroy[this._numNodesToDestroy];
+        this._nodesToDestroy[this._numNodesToDestroy] = null; // Don't retain the node
         node._doDestroy();
         this._coreFactory.putCore(node._core);    // Release state core for reuse
         this._nodeFactory.putNode(node);         // Release node for reuse
@@ -323,7 +325,7 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
 
         var time = Date.now();
 
-        var force =  params && params.force;
+        var force = params && params.force;
 
         // Render the scene once for each pass
         for (var i = 0; i < this._numPasses; i++) {

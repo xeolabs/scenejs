@@ -785,5 +785,6 @@ new (function () {
         this._engine.display.renderer = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.renderer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 })();

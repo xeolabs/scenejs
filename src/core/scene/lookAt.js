@@ -398,6 +398,7 @@
         this._engine.display.viewTransform = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.viewTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.Lookat.prototype._destroy = function () {

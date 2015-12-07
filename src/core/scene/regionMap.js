@@ -23,7 +23,6 @@ new (function () {
             stackLen = 0;
         });
 
-    var coreStack = [];
     var stackLen = 0;
 
     /**

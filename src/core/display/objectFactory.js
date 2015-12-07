@@ -43,5 +43,5 @@ SceneJS_ObjectFactory.prototype.getObject = function(id) {
  */
 SceneJS_ObjectFactory.prototype.putObject = function (object) {
 
-    this._freeObjects[this._numFreeObjects++] = object;
+  //  this._freeObjects[this._numFreeObjects++] = object;
 };
