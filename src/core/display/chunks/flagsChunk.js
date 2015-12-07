@@ -44,30 +44,6 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.frontface = frontface;
         }
 
-        var transparent = this.core.transparent;
-
-        if (frameCtx.transparent != transparent) {
-
-            if (transparent) {
-
-                // Entering a transparency bin
-
-                gl.enable(gl.BLEND);
-                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-                frameCtx.blendEnabled = true;
-
-            } else {
-
-                // Leaving a transparency bin
-
-                gl.disable(gl.BLEND);
-                frameCtx.blendEnabled = false;
-            }
-
-            frameCtx.transparent = transparent;
-        }
-
-
         var picking = frameCtx.picking;
 
         if (picking) {
@@ -77,6 +53,29 @@ SceneJS_ChunkFactory.createChunkType({
             }
 
         } else {
+
+            var transparent = this.core.transparent;
+
+            if (frameCtx.transparent != transparent) {
+
+                if (transparent) {
+
+                    // Entering a transparency bin
+
+                    gl.enable(gl.BLEND);
+                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                    frameCtx.blendEnabled = true;
+
+                } else {
+
+                    // Leaving a transparency bin
+
+                    gl.disable(gl.BLEND);
+                    frameCtx.blendEnabled = false;
+                }
+
+                frameCtx.transparent = transparent;
+            }
 
             if (this._uClippingDraw) {
                 this._uClippingDraw.setValue(this.core.clipping);
