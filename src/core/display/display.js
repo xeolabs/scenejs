@@ -284,6 +284,9 @@ var SceneJS_Display = function (cfg) {
     this._targetList = [];
     this._targetListLen = 0;
 
+    this._objectDrawList = [];
+    this._objectDrawListLen = 0;
+
     // Tracks the index of the first chunk in the transparency pass. The first run of chunks
     // in the list are for opaque objects, while the remainder are for transparent objects.
     // This supports a mode in which we only render the opaque chunks.
@@ -533,6 +536,13 @@ SceneJS_Display.prototype.removeObject = function (objectId) {
     this._programFactory.putProgram(object.program);
     object.program = null;
     object.hash = null;
+    var chunk;
+    for (var i = 0, len = object.chunks.length; i < len; i++) {
+        chunk = object.chunks[i];
+        if (chunk) {
+            this._chunkFactory.putChunk(chunk);
+        }
+    }
     this._objectFactory.putObject(object);
     delete this._objects[objectId];
     this.objectListDirty = true;
@@ -594,12 +604,22 @@ SceneJS_Display.prototype.render = function (params) {
 };
 
 SceneJS_Display.prototype._buildObjectList = function () {
+    var lastObjectListLen = this._objectListLen;
     this._objectListLen = 0;
     for (var objectId in this._objects) {
         if (this._objects.hasOwnProperty(objectId)) {
             this._objectList[this._objectListLen++] = this._objects[objectId];
         }
     }
+
+    // Release memory
+
+    if (lastObjectListLen > this._objectListLen) {
+        for (i = this._objectListLen; i < lastObjectListLen; i++) {
+            this._objectList[i] = null;
+        }
+    }
+
 };
 
 SceneJS_Display.prototype._makeStateSortKeys = function () {
@@ -647,13 +667,21 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 25; i++) {
+    var i;
+
+    for (i = 0; i < 25; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
 
+    var lastDrawListLen = this._drawListLen;
+    var lastPickDrawListLen = this._pickDrawListLen;
+    var lastObjectDrawListLen = this._objectDrawListLen;
+    var lastObjectPickListLen = this._objectPickListLen;
+
     this._drawListLen = 0;
     this._pickDrawListLen = 0;
+    this._objectDrawListLen = 0;
     this._objectPickListLen = 0;
 
     this._drawListTransparentIndex = -1;
@@ -677,11 +705,8 @@ SceneJS_Display.prototype._buildDrawList = function () {
         tagMask = this._tagSelector.mask;
         tagRegex = this._tagSelector.regex;
     }
-
-    this._objectDrawList = this._objectDrawList || [];
-    this._objectDrawListLen = 0;
-
-    for (var i = 0, len = this._objectListLen; i < len; i++) {
+    
+    for (i = 0, len = this._objectListLen; i < len; i++) {
 
         object = this._objectList[i];
 
@@ -748,7 +773,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     var object;
     var pickable;
 
-    for (var i = 0, len = targetListList.length; i < len; i++) {
+    for (i = 0, len = targetListList.length; i < len; i++) {
 
         list = targetListList[i];
         target = targetList[i];
@@ -770,11 +795,38 @@ SceneJS_Display.prototype._buildDrawList = function () {
     }
 
     // Append chunks for objects not in render targets
-    for (var i = 0, len = this._objectDrawListLen; i < len; i++) {
+
+    for (i = 0, len = this._objectDrawListLen; i < len; i++) {
         object = this._objectDrawList[i];
         pickable = (!object.stage || (object.stage && object.stage.pickable))
             && (object.flags && object.flags.picking); // We'll only pick objects in pickable stages
         this._appendObjectToDrawLists(object, pickable);
+    }
+
+    // Release memory
+
+    if (lastDrawListLen > this._drawListLen) {
+        for (i = this._drawListLen; i < lastDrawListLen; i++) {
+            this._drawList[i] = null;
+        }
+    }
+
+    if (lastPickDrawListLen > this._pickDrawListLen) {
+        for (i = this._pickDrawListLen; i < lastPickDrawListLen; i++) {
+            this._pickDrawList[i] = null;
+        }
+    }
+
+    if (lastObjectDrawListLen > this._objectDrawListLen) {
+        for (i = this._objectDrawListLen; i < lastObjectDrawListLen; i++) {
+            this._objectDrawList[i] = null;
+        }
+    }
+
+    if (lastObjectPickListLen > this._objectPickListLen) {
+        for (i = this._objectPickListLen; i < lastObjectPickListLen; i++) {
+            this._objectPickList[i] = null;
+        }
     }
 
     this.drawListDirty = false;

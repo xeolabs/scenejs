@@ -212,6 +212,7 @@
         this._engine.display.projTransform = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.projTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.Camera.prototype._destroy = function () {

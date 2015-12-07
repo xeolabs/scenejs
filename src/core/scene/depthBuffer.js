@@ -166,6 +166,7 @@
         this._engine.display.depthBuffer = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.depthBuffer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 })();

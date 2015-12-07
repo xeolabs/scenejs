@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-11-23
+ * Built on 2015-12-07
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -2006,7 +2006,7 @@ var SceneJS_Engine = function (json, options) {
         this.scene.addNodes(nodes); // then create sub-nodes
     }
 
-    SceneJS_events.addListener(SceneJS_events.RENDER, function(event) {
+    SceneJS_events.addListener(SceneJS_events.RENDER, function (event) {
         self.scene.publish("render", event);
     });
 
@@ -2015,7 +2015,7 @@ var SceneJS_Engine = function (json, options) {
         function (event) {
             event.preventDefault();
             self.stop();
-            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_LOST, { scene: self.scene });
+            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_LOST, {scene: self.scene});
         },
         false);
 
@@ -2025,7 +2025,7 @@ var SceneJS_Engine = function (json, options) {
             self.canvas.initWebGL();
             self._coreFactory.webglRestored();  // Reallocate WebGL resources for node state cores
             self.display.webglRestored(); // Reallocate shaders and re-cache shader var locations for display state chunks
-            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_RESTORED, { scene: self.scene });
+            SceneJS_events.fireEvent(SceneJS_events.WEBGL_CONTEXT_RESTORED, {scene: self.scene});
             self.start();
         },
         false);
@@ -2122,7 +2122,9 @@ SceneJS_Engine.prototype.createNode = function (json, ok) {
 SceneJS_Engine.prototype._doDestroyNodes = function () {
     var node;
     while (this._numNodesToDestroy > 0) {
-        node = this._nodesToDestroy[--this._numNodesToDestroy];
+        --this._numNodesToDestroy;
+        node = this._nodesToDestroy[this._numNodesToDestroy];
+        this._nodesToDestroy[this._numNodesToDestroy] = null; // Don't retain the node
         node._doDestroy();
         this._coreFactory.putCore(node._core);    // Release state core for reuse
         this._nodeFactory.putNode(node);         // Release node for reuse
@@ -2215,7 +2217,7 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
 
         var time = Date.now();
 
-        var force =  params && params.force;
+        var force = params && params.force;
 
         // Render the scene once for each pass
         for (var i = 0; i < this._numPasses; i++) {
@@ -8228,11 +8230,13 @@ SceneJS.Node.prototype.destroy = function () {
 
         if (this.parent) {
 
-            /* Remove from parent's child node list
-             */
-            for (var i = 0; i < this.nodes.length; i++) {
-                if (this.parent.nodes[i].id === this.id) {
-                    this.parent.nodes.splice(i, 1);
+            // Remove from parent's child node list
+
+            var parentNodes = this.parent.nodes;
+            var len = parentNodes.length;
+            for (var i = 0; i < len; i++) {
+                if (parentNodes[i].id === this.id) {
+                    parentNodes.splice(i, 1);
                     break;
                 }
             }
@@ -8647,6 +8651,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.projTransform = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.projTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.Camera.prototype._destroy = function () {
@@ -8746,6 +8751,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.clips = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.clips = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 
@@ -8800,6 +8806,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.enable = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.enable = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 })();;(function () {
@@ -9066,6 +9073,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.flags = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.flags = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 })();
@@ -9121,6 +9129,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.renderTarget = this.__core;
         this._compileNodes(ctx);
         this._engine.display.renderTarget = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 
@@ -9184,6 +9193,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.renderTarget = this.__core;
         this._compileNodes(ctx);
         this._engine.display.renderTarget = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 
@@ -9977,6 +9987,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._compileNodes(ctx);
 
         stackLen--;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.Geometry.prototype._inheritVBOs = function (core) {
@@ -10118,6 +10129,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.stage = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.stage = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 })();
@@ -10201,6 +10213,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         this._engine.display.layer = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.layer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 })();
@@ -10476,6 +10489,7 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
         this._engine.display.lights = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.lights = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 })();;(function () {
@@ -10878,6 +10892,7 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
         this._engine.display.viewTransform = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.viewTransform = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.Lookat.prototype._destroy = function () {
@@ -11058,6 +11073,7 @@ new (function () {
         this._engine.display.material = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.material = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 })();;new (function () {
@@ -11361,6 +11377,7 @@ new (function () {
         this._engine.display.morphGeometry = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.morphGeometry = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.MorphGeometry.prototype._makeHash = function () {
@@ -11465,6 +11482,7 @@ new (function () {
 
         this._compileNodes(ctx);
         this._engine.display.name = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 })();;new (function () {
 
@@ -12253,6 +12271,7 @@ new (function () {
         this._engine.display.renderer = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.renderer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 })();;(function () {
 
@@ -12422,6 +12441,7 @@ new (function () {
         this._engine.display.depthBuffer = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.depthBuffer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 })();;(function () {
@@ -12507,6 +12527,7 @@ new (function () {
         this._engine.display.colorBuffer = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.colorBuffer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
         this._engine.display.imageDirty = true;
     };
 
@@ -12581,6 +12602,7 @@ new (function () {
         this._engine.display.view = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.view = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 })();;/**
@@ -13228,6 +13250,7 @@ SceneJS.Scene.prototype.getStatus = function () {
         this._engine.display.style = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.style = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 })();;(function() {
@@ -13288,6 +13311,7 @@ SceneJS.Scene.prototype.getStatus = function () {
         this._engine.display.tag = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.tag = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 })();;/**
  * @class Scene graph node which defines textures to apply to the objects in its subgraph
@@ -13797,6 +13821,7 @@ new (function () {
         this._engine.display.texture = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.texture = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.Texture.prototype._makeHash = function () {
@@ -14231,6 +14256,7 @@ new (function () {
         this._engine.display.texture = this.__core;
         this._compileNodes(ctx);
         this._engine.display.texture = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.TextureMap.prototype._makeHash = function (core) {
@@ -14428,6 +14454,7 @@ new (function () {
         this._engine.display.fresnel = this.__core;
         this._compileNodes(ctx);
         this._engine.display.fresnel = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.Fresnel.prototype._makeHash = function (core) {
@@ -14589,6 +14616,7 @@ new (function () {
         this._engine.display.cubemap = this.__core;
         this._compileNodes(ctx);
         this._engine.display.cubemap = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.Reflect.prototype._makeHash = function (core) {
@@ -14650,7 +14678,6 @@ new (function () {
             stackLen = 0;
         });
 
-    var coreStack = [];
     var stackLen = 0;
 
     /**
@@ -16074,6 +16101,9 @@ var SceneJS_Display = function (cfg) {
     this._targetList = [];
     this._targetListLen = 0;
 
+    this._objectDrawList = [];
+    this._objectDrawListLen = 0;
+
     // Tracks the index of the first chunk in the transparency pass. The first run of chunks
     // in the list are for opaque objects, while the remainder are for transparent objects.
     // This supports a mode in which we only render the opaque chunks.
@@ -16323,6 +16353,13 @@ SceneJS_Display.prototype.removeObject = function (objectId) {
     this._programFactory.putProgram(object.program);
     object.program = null;
     object.hash = null;
+    var chunk;
+    for (var i = 0, len = object.chunks.length; i < len; i++) {
+        chunk = object.chunks[i];
+        if (chunk) {
+            this._chunkFactory.putChunk(chunk);
+        }
+    }
     this._objectFactory.putObject(object);
     delete this._objects[objectId];
     this.objectListDirty = true;
@@ -16384,12 +16421,22 @@ SceneJS_Display.prototype.render = function (params) {
 };
 
 SceneJS_Display.prototype._buildObjectList = function () {
+    var lastObjectListLen = this._objectListLen;
     this._objectListLen = 0;
     for (var objectId in this._objects) {
         if (this._objects.hasOwnProperty(objectId)) {
             this._objectList[this._objectListLen++] = this._objects[objectId];
         }
     }
+
+    // Release memory
+
+    if (lastObjectListLen > this._objectListLen) {
+        for (i = this._objectListLen; i < lastObjectListLen; i++) {
+            this._objectList[i] = null;
+        }
+    }
+
 };
 
 SceneJS_Display.prototype._makeStateSortKeys = function () {
@@ -16437,13 +16484,21 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._lastStateId = this._lastStateId || [];
     this._lastPickStateId = this._lastPickStateId || [];
 
-    for (var i = 0; i < 25; i++) {
+    var i;
+
+    for (i = 0; i < 25; i++) {
         this._lastStateId[i] = null;
         this._lastPickStateId[i] = null;
     }
 
+    var lastDrawListLen = this._drawListLen;
+    var lastPickDrawListLen = this._pickDrawListLen;
+    var lastObjectDrawListLen = this._objectDrawListLen;
+    var lastObjectPickListLen = this._objectPickListLen;
+
     this._drawListLen = 0;
     this._pickDrawListLen = 0;
+    this._objectDrawListLen = 0;
     this._objectPickListLen = 0;
 
     this._drawListTransparentIndex = -1;
@@ -16467,11 +16522,8 @@ SceneJS_Display.prototype._buildDrawList = function () {
         tagMask = this._tagSelector.mask;
         tagRegex = this._tagSelector.regex;
     }
-
-    this._objectDrawList = this._objectDrawList || [];
-    this._objectDrawListLen = 0;
-
-    for (var i = 0, len = this._objectListLen; i < len; i++) {
+    
+    for (i = 0, len = this._objectListLen; i < len; i++) {
 
         object = this._objectList[i];
 
@@ -16538,7 +16590,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     var object;
     var pickable;
 
-    for (var i = 0, len = targetListList.length; i < len; i++) {
+    for (i = 0, len = targetListList.length; i < len; i++) {
 
         list = targetListList[i];
         target = targetList[i];
@@ -16560,11 +16612,38 @@ SceneJS_Display.prototype._buildDrawList = function () {
     }
 
     // Append chunks for objects not in render targets
-    for (var i = 0, len = this._objectDrawListLen; i < len; i++) {
+
+    for (i = 0, len = this._objectDrawListLen; i < len; i++) {
         object = this._objectDrawList[i];
         pickable = (!object.stage || (object.stage && object.stage.pickable))
             && (object.flags && object.flags.picking); // We'll only pick objects in pickable stages
         this._appendObjectToDrawLists(object, pickable);
+    }
+
+    // Release memory
+
+    if (lastDrawListLen > this._drawListLen) {
+        for (i = this._drawListLen; i < lastDrawListLen; i++) {
+            this._drawList[i] = null;
+        }
+    }
+
+    if (lastPickDrawListLen > this._pickDrawListLen) {
+        for (i = this._pickDrawListLen; i < lastPickDrawListLen; i++) {
+            this._pickDrawList[i] = null;
+        }
+    }
+
+    if (lastObjectDrawListLen > this._objectDrawListLen) {
+        for (i = this._objectDrawListLen; i < lastObjectDrawListLen; i++) {
+            this._objectDrawList[i] = null;
+        }
+    }
+
+    if (lastObjectPickListLen > this._objectPickListLen) {
+        for (i = this._objectPickListLen; i < lastObjectPickListLen; i++) {
+            this._objectPickList[i] = null;
+        }
     }
 
     this.drawListDirty = false;
@@ -18707,7 +18786,7 @@ SceneJS_ObjectFactory.prototype.getObject = function(id) {
  */
 SceneJS_ObjectFactory.prototype.putObject = function (object) {
 
-    this._freeObjects[this._numFreeObjects++] = object;
+  //  this._freeObjects[this._numFreeObjects++] = object;
 };;/**
  * @class An object within a {@link SceneJS_Display}
  * @private
@@ -18968,21 +19047,21 @@ SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core,
         return chunk;
     }
 
-    var freeChunks = SceneJS_ChunkFactory._freeChunks[type]; // Try to recycle a free chunk
-
-    if (freeChunks.chunksLen > 0) {
-        chunk = freeChunks.chunks[--freeChunks.chunksLen];
-    }
-
-    if (chunk) {    // Reinitialise the recycled chunk
-
-        chunk.init(chunkId, program, core, core2);
-
-    } else {        // Instantiate a fresh chunk
+    //var freeChunks = SceneJS_ChunkFactory._freeChunks[type]; // Try to recycle a free chunk
+    //
+    //if (freeChunks.chunksLen > 0) {
+    //    chunk = freeChunks.chunks[--freeChunks.chunksLen];
+    //}
+    //
+    //if (chunk) {    // Reinitialise the recycled chunk
+    //
+    //    chunk.init(chunkId, program, core, core2);
+    //
+    //} else {        // Instantiate a fresh chunk
 
         chunk = new chunkClass(chunkId, program, core, core2); // Create new chunk
 
-    }
+//    }
 
     chunk.type = type;
 
@@ -19012,9 +19091,9 @@ SceneJS_ChunkFactory.prototype.putChunk = function (chunk) {
 
         delete this._chunks[chunk.id];
 
-        var freeChunks = SceneJS_ChunkFactory._freeChunks[chunk.type];
+    //    var freeChunks = SceneJS_ChunkFactory._freeChunks[chunk.type];
 
-        freeChunks.chunks[freeChunks.chunksLen++] = chunk;
+    //    freeChunks.chunks[freeChunks.chunksLen++] = chunk;
     }
 };
 

@@ -92,6 +92,7 @@
         this._engine.display.clips = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.clips = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 

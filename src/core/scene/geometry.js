@@ -780,6 +780,7 @@ new (function () {
         this._compileNodes(ctx);
 
         stackLen--;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.Geometry.prototype._inheritVBOs = function (core) {

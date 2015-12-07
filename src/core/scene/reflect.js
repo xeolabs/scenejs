@@ -125,6 +125,7 @@
         this._engine.display.cubemap = this.__core;
         this._compileNodes(ctx);
         this._engine.display.cubemap = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.Reflect.prototype._makeHash = function (core) {

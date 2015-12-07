@@ -50,6 +50,7 @@ new (function () {
         this._engine.display.renderTarget = this.__core;
         this._compileNodes(ctx);
         this._engine.display.renderTarget = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 

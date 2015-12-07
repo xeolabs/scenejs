@@ -1346,11 +1346,13 @@ SceneJS.Node.prototype.destroy = function () {
 
         if (this.parent) {
 
-            /* Remove from parent's child node list
-             */
-            for (var i = 0; i < this.nodes.length; i++) {
-                if (this.parent.nodes[i].id === this.id) {
-                    this.parent.nodes.splice(i, 1);
+            // Remove from parent's child node list
+
+            var parentNodes = this.parent.nodes;
+            var len = parentNodes.length;
+            for (var i = 0; i < len; i++) {
+                if (parentNodes[i].id === this.id) {
+                    parentNodes.splice(i, 1);
                     break;
                 }
             }

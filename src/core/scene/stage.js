@@ -67,6 +67,7 @@
         this._engine.display.stage = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.stage = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
 })();
