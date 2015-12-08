@@ -67,7 +67,9 @@ define(
             var map = new Map(bodies);
 
             // Create physics engine in worker
-            var workerPath = SceneJS.getConfigs().pluginPath + "/lib/physics/worker.js";
+            var workerPath = SceneJS.getConfigs().pluginPath.concat(
+		"/lib/physics/", SceneJS.getConfigs().physicsEngine || "",
+		"worker.js");
             var worker = new Worker(workerPath);
 
             var workerOutputBuf = new ArrayBuffer(maxBodies * 20);
@@ -104,8 +106,8 @@ define(
                         body = bodies[bodyId];
                         if (body) { // May have been deleted
                             body.callback(
-                                output.subarray(i + 1, i + 4),
-                                null);
+                                //output.subarray(i + 1, i + 4),
+				output.subarray(i + 1, i + 20));
 //                                , // 3 elements for position
 //                                output.subarray(i + 4, i + 20)); // 16 elements for rotation matrix
                         }
