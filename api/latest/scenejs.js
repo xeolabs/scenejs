@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-12-08
+ * Built on 2015-12-09
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -16366,8 +16366,8 @@ var SceneJS_Display = function (cfg) {
     this._objectList = [];
     this._objectListLen = 0;
 
-    this._objectPickList = [];
-    this._objectPickListLen = 0;
+    this._objectPickList = [null];  // Index 0 reserved for background (i.e. no pick)
+    this._objectPickListLen = 1;
 
 
     /* The "draw list", comprised collectively of three lists of state chunks belong to visible objects
@@ -16785,7 +16785,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
     this._drawListLen = 0;
     this._pickDrawListLen = 0;
     this._objectDrawListLen = 0;
-    this._objectPickListLen = 0;
+    this._objectPickListLen = 1;
 
     this._drawListTransparentIndex = -1;
 
@@ -17571,7 +17571,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.pickObject = !!params.pickObject;
     frameCtx.pickTriangle = !!params.pickTriangle;
     frameCtx.pickRegion = !!params.pickRegion;
-    frameCtx.pickIndex = 0;
+    frameCtx.pickIndex = 1;
     frameCtx.textureUnit = 0;
     frameCtx.lineWidth = 1;
     frameCtx.transparent = false;
@@ -17588,7 +17588,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    if (this.transparent || params.pick) {
+    if (this.transparent || frameCtx.picking) {
         gl.clearColor(0, 0, 0, 0);
     } else {
         gl.clearColor(this._ambientColor[0], this._ambientColor[1], this._ambientColor[2], 1.0);
