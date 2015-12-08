@@ -44,10 +44,15 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.frontface = frontface;
         }
 
-
         var picking = frameCtx.picking;
 
-        if (!picking) {
+        if (picking) {
+
+            if (this._uClippingPick) {
+                this._uClippingPick.setValue(this.core.clipping);
+            }
+
+        } else {
 
             var transparent = this.core.transparent;
 
@@ -68,15 +73,9 @@ SceneJS_ChunkFactory.createChunkType({
                     gl.disable(gl.BLEND);
                     frameCtx.blendEnabled = false;
                 }
+
+                frameCtx.transparent = transparent;
             }
-
-            frameCtx.transparent = transparent;
-
-            if (this._uClippingPick) {
-                this._uClippingPick.setValue(this.core.clipping);
-            }
-
-        } else {
 
             if (this._uClippingDraw) {
                 this._uClippingDraw.setValue(this.core.clipping);
