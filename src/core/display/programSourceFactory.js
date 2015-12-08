@@ -7,6 +7,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var cache = {}; // Source codes are shared across all scenes
 
     var states; // Cache rendering state
+    var decal;
     var diffuseFresnel;
     var specularFresnel;
     var alphaFresnel;
@@ -39,6 +40,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         states = _states;
 
+        decal = states.decal && states.decal.texture;
         diffuseFresnel = states.fresnel.diffuse;
         specularFresnel = states.fresnel.specular;
         alphaFresnel = states.fresnel.alpha;
@@ -283,7 +285,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("varying   vec3 SCENEJS_vViewNormal;");    // Output view-space vertex normal
 
             if (fresnel) {
-            add("varying   vec3 SCENEJS_vWorldNormal;");    // Output view-space vertex normal
+                add("varying   vec3 SCENEJS_vWorldNormal;");    // Output view-space vertex normal
             }
 
             if (tangents) {
@@ -292,7 +294,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (texturing) {
+        if (decal || texturing) {
 
             if (states.geometry.uvBuf) {
                 add("attribute vec2 SCENEJS_aUVCoord;");      // UV coords
@@ -314,7 +316,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("varying vec4 SCENEJS_vViewVertex;");              // Varying for fragment view clip hook
 
-        if (texturing) {                                            // Varyings for fragment texturing
+        if (decal || texturing) {                                            // Varyings for fragment texturing
 
             if (states.geometry.uvBuf) {
                 add("varying vec2 SCENEJS_vUVCoord;");
@@ -386,8 +388,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
 
             if (fresnel) {
-            add("  SCENEJS_vWorldNormal = worldNormal;");
-        }
+                add("  SCENEJS_vWorldNormal = worldNormal;");
+            }
         }
 
         if (clipping || normals || fragmentHooks.worldPos) {
@@ -420,7 +422,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("SCENEJS_vViewEyeVec *= TBM;");
         }
 
-        if (texturing) {
+        if (decal || texturing) {
 
             if (states.geometry.uvBuf) {
                 add("SCENEJS_vUVCoord = SCENEJS_aUVCoord;");
@@ -505,21 +507,30 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (texturing) {
+        if (decal || texturing) {
             if (states.geometry.uvBuf) {
                 add("varying vec2 SCENEJS_vUVCoord;");
             }
             if (states.geometry.uvBuf2) {
                 add("varying vec2 SCENEJS_vUVCoord2;");
             }
-            var layer;
-            for (var i = 0, len = states.texture.layers.length; i < len; i++) {
-                layer = states.texture.layers[i];
-                add("uniform sampler2D SCENEJS_uSampler" + i + ";");
-                if (layer.matrix) {
-                    add("uniform mat4 SCENEJS_uLayer" + i + "Matrix;");
+            if (decal) {
+                add("uniform sampler2D SCENEJS_uDecalSampler;");
+                if (states.decal.matrix) {
+                    add("uniform mat4 SCENEJS_uDecalMatrix;");
                 }
-                add("uniform float SCENEJS_uLayer" + i + "BlendFactor;");
+                add("uniform float SCENEJS_uDecalBlendFactor;");
+            }
+            if (texturing) {
+                var layer;
+                for (var i = 0, len = states.texture.layers.length; i < len; i++) {
+                    layer = states.texture.layers[i];
+                    add("uniform sampler2D SCENEJS_uSampler" + i + ";");
+                    if (layer.matrix) {
+                        add("uniform mat4 SCENEJS_uLayer" + i + "Matrix;");
+                    }
+                    add("uniform float SCENEJS_uLayer" + i + "BlendFactor;");
+                }
             }
         }
 
@@ -627,7 +638,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("varying vec3 SCENEJS_vViewNormal;");
 
             if (fresnel) {
-            add("varying vec3 SCENEJS_vWorldNormal;");
+                add("varying vec3 SCENEJS_vWorldNormal;");
             }
 
             if (tangents) {
@@ -685,7 +696,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("vec3 worldEyeVec = normalize(SCENEJS_uWorldEye - SCENEJS_vWorldVertex.xyz);");            // World-space eye position
 
             if (fresnel) {
-            add("vec3 worldNormal = normalize(SCENEJS_vWorldNormal); ")
+                add("vec3 worldNormal = normalize(SCENEJS_vWorldNormal); ")
             }
 
             if (solid) {
@@ -757,97 +768,184 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         var layer;
-        if (texturing) {
+        if (decal || texturing) {
 
             add("  vec4    texturePos;");
             add("  vec2    textureCoord=vec2(0.0,0.0);");
 
-            for (var i = 0, len = states.texture.layers.length; i < len; i++) {
-                layer = states.texture.layers[i];
+            // ------------ Texture maps ------------------------------------
 
-                /* Texture input
-                 */
-                if (layer.applyFrom == "normal" && normals) {
+            if (texturing) {
+                for (var i = 0, len = states.texture.layers.length; i < len; i++) {
+                    layer = states.texture.layers[i];
+
+                    // Texture input                     
+                    if (layer.applyFrom == "normal" && normals) {
+                        if (states.geometry.normalBuf) {
+                            add("texturePos=vec4(viewNormalVec.xyz, 1.0);");
+                        } else {
+                            SceneJS.log.warn("Texture layer applyFrom='normal' but geo has no normal vectors");
+                            continue;
+                        }
+                    }
+                    if (layer.applyFrom == "uv") {
+                        if (states.geometry.uvBuf) {
+                            add("texturePos = vec4(SCENEJS_vUVCoord.s, SCENEJS_vUVCoord.t, 1.0, 1.0);");
+                        } else {
+                            SceneJS.log.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
+                            continue;
+                        }
+                    }
+                    if (layer.applyFrom == "uv2") {
+                        if (states.geometry.uvBuf2) {
+                            add("texturePos = vec4(SCENEJS_vUVCoord2.s, SCENEJS_vUVCoord2.t, 1.0, 1.0);");
+                        } else {
+                            SceneJS.log.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
+                            continue;
+                        }
+                    }
+
+                    /* Texture matrix
+                     */
+                    if (layer.matrix) {
+                        add("textureCoord=(SCENEJS_uLayer" + i + "Matrix * texturePos).xy;");
+                    } else {
+                        add("textureCoord=texturePos.xy;");
+                    }
+
+                    /* Alpha from Texture
+                     */
+                    if (layer.applyTo == "alpha") {
+                        if (layer.blendMode == "multiply") {
+                            add("alpha = alpha * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+                        } else if (layer.blendMode == "add") {
+                            add("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+                        }
+                    }
+
+                    /* Texture output
+                     */
+                    if (layer.applyTo == "baseColor") {
+                        if (layer.blendMode == "multiply") {
+                            add("color = color * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+                        } else {
+                            add("color = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * color) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+                        }
+                    }
+
+                    if (layer.applyTo == "emit") {
+                        if (layer.blendMode == "multiply") {
+                            add("emit  = emit * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        } else {
+                            add("emit = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * emit) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        }
+                    }
+
+                    if (layer.applyTo == "specular" && normals) {
+                        if (layer.blendMode == "multiply") {
+                            add("specular  = specular * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        } else {
+                            add("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        }
+                    }
+
+                    if (layer.applyTo == "shine") {
+                        if (layer.blendMode == "multiply") {
+                            add("shine  = shine * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        } else {
+                            add("shine = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * shine) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        }
+                    }
+
+                    if (layer.applyTo == "normals" && normals) {
+                        add("viewNormalVec = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
+                    }
+                }
+            }
+
+            // ------------ Decal texture ------------------------------------
+
+            if (decal) {
+
+                if (states.decal.applyFrom == "normal" && normals) {
                     if (states.geometry.normalBuf) {
                         add("texturePos=vec4(viewNormalVec.xyz, 1.0);");
                     } else {
-                        SceneJS.log.warn("Texture layer applyFrom='normal' but geo has no normal vectors");
-                        continue;
-                    }
-                }
-                if (layer.applyFrom == "uv") {
-                    if (states.geometry.uvBuf) {
-                        add("texturePos = vec4(SCENEJS_vUVCoord.s, SCENEJS_vUVCoord.t, 1.0, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
-                        continue;
-                    }
-                }
-                if (layer.applyFrom == "uv2") {
-                    if (states.geometry.uvBuf2) {
-                        add("texturePos = vec4(SCENEJS_vUVCoord2.s, SCENEJS_vUVCoord2.t, 1.0, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
-                        continue;
+                        SceneJS.log.warn("Texture decal applyFrom='normal' but geo has no normal vectors");
                     }
                 }
 
-                /* Texture matrix
-                 */
-                if (layer.matrix) {
-                    add("textureCoord=(SCENEJS_uLayer" + i + "Matrix * texturePos).xy;");
+                if (states.decal.applyFrom == "uv") {
+                    if (states.geometry.uvBuf) {
+                        add("texturePos = vec4(SCENEJS_vUVCoord.s, SCENEJS_vUVCoord.t, 1.0, 1.0);");
+                    } else {
+                        SceneJS.log.warn("Texture decal applyTo='uv' but geometry has no UV coordinates");
+                    }
+                }
+
+                if (states.decal.applyFrom == "uv2") {
+                    if (states.geometry.uvBuf2) {
+                        add("texturePos = vec4(SCENEJS_vUVCoord2.s, SCENEJS_vUVCoord2.t, 1.0, 1.0);");
+                    } else {
+                        SceneJS.log.warn("Texture decal applyTo='uv2' but geometry has no UV2 coordinates");
+                    }
+                }
+
+                // Decal texture matrix
+
+                if (states.decal.matrix) {
+                    add("textureCoord=(SCENEJS_uDecalMatrix * texturePos).xy;");
                 } else {
                     add("textureCoord=texturePos.xy;");
                 }
 
-                /* Alpha from Texture
-                 */
-                if (layer.applyTo == "alpha") {
-                    if (layer.blendMode == "multiply") {
-                        add("alpha = alpha * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
-                    } else if (layer.blendMode == "add") {
-                        add("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+                // Alpha from Texture
+
+                if (states.decal.applyTo == "alpha") {
+                    if (states.decal.blendMode == "multiply") {
+                        add("alpha = alpha * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+                    } else if (states.decal.blendMode == "add") {
+                        add("alpha = ((1.0 - SCENEJS_uDecalBlendFactor) * alpha) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
                     }
                 }
 
-                /* Texture output
-                 */
-                if (layer.applyTo == "baseColor") {
-                    if (layer.blendMode == "multiply") {
-                        add("color = color * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+                // Texture output
+
+                if (states.decal.applyTo == "baseColor") {
+                    if (states.decal.blendMode == "multiply") {
+                        add("color = color * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
                     } else {
-                        add("color = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * color) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+                        add("color = ((1.0 - SCENEJS_uDecalBlendFactor) * color) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
                     }
                 }
 
-                if (layer.applyTo == "emit") {
-                    if (layer.blendMode == "multiply") {
-                        add("emit  = emit * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                if (states.decal.applyTo == "emit") {
+                    if (states.decal.blendMode == "multiply") {
+                        add("emit  = emit * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
                     } else {
-                        add("emit = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * emit) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        add("emit = ((1.0 - SCENEJS_uDecalBlendFactor) * emit) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
                     }
                 }
 
-                if (layer.applyTo == "specular" && normals) {
-                    if (layer.blendMode == "multiply") {
-                        add("specular  = specular * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                if (states.decal.applyTo == "specular" && normals) {
+                    if (states.decal.blendMode == "multiply") {
+                        add("specular  = specular * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
                     } else {
-                        add("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        add("specular = ((1.0 - SCENEJS_uDecalBlendFactor) * specular) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
                     }
                 }
 
-                if (layer.applyTo == "shine") {
-                    if (layer.blendMode == "multiply") {
-                        add("shine  = shine * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                if (states.decal.applyTo == "shine") {
+                    if (states.decal.blendMode == "multiply") {
+                        add("shine  = shine * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
                     } else {
-                        add("shine = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * shine) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                        add("shine = ((1.0 - SCENEJS_uDecalBlendFactor) * shine) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
                     }
                 }
 
-                if (layer.applyTo == "normals" && normals) {
-                    add("viewNormalVec = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
+                if (states.decal.applyTo == "normals" && normals) {
+                    add("viewNormalVec = normalize(texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
                 }
-
             }
         }
 

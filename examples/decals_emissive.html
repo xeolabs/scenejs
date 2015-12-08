@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - decal mapping
+    <br><br>
+    Drawing on an object using a decal map
+    <br><br>
+    <img id="myImage" width="500px" height="500px" style="float: left;">
+</div>
+
+<script>
+
+    var image = document.getElementById('myImage');
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // ---------------------------------------------------------------
+    // Create scene graph
+    // ---------------------------------------------------------------
+
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 1.0,
+
+                nodes: [
+
+                    // The decal
+                    {
+                        type: "decal",
+                        id: "myDecal",
+                        image: image,
+                        applyFrom: "uv",
+                        applyTo: "emit",
+
+                        nodes: [
+
+                            // Diffuse texture
+                            {
+                                type: "texture",
+                                src: "textures/uvGrid.jpg",
+
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: {r: 1.0, g: 1.0, b: 1.0},
+                                        emitColor: {r: 1, g: 1, b: 1},
+                                        emit: 1.0,
+
+                                        nodes: [
+
+                                            // Box primitive implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            {
+                                                type: "geometry/box"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // ---------------------------------------------------------------
+    // Logic for writing to the "decal" node's image
+    // ---------------------------------------------------------------
+
+    scene.getNode("myDecal",
+            function (decalNode) {
+
+                // Create hidden drawingCanvas to draw to
+
+                var drawingCanvas = document.createElement('canvas');
+
+                drawingCanvas.width = 500;
+                drawingCanvas.height = 500;
+
+                var context = drawingCanvas.getContext("2d");
+
+                context.strokeStyle = '#99ff99';
+                context.lineWidth = 3;
+                context.rect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                context.fillStyle = "black";
+                context.fill();
+
+                var down = false; // True when mouse is down
+
+                var needBlit = false; // True when drawingCanvas needs to be copied into the "decal" node
+
+                // On each scene tick, copy the canvas into the decal node if dirty
+
+                scene.on("tick",
+                        function () {
+                            if (needBlit) {
+                                image.src = drawingCanvas.toDataURL();
+                                decalNode.setImage(image);
+                                needBlit = false;
+                            }
+                        });
+
+                // Indicates that the mouse is now down
+                function penDown() {
+                    down = true;
+                }
+
+                // Indicates that the mouse has moved
+                function penMove(uv) {
+
+                    var x = Math.floor(uv[0] * drawingCanvas.width);
+                    var y = Math.floor((1 - uv[1]) * drawingCanvas.height);
+
+                    if (!down) {
+                        context.moveTo(x, y);
+                        return;
+                    }
+
+                    context.lineTo(x, y);
+                    context.stroke();
+
+                    needBlit = true;
+                }
+
+                // Indicates that the mouse is now up
+                function penUp() {
+                    down = false;
+                }
+
+                // Clears the "decal" node's image
+                function clear() {
+                    context.rect(0, 0, drawingCanvas.width, drawingCanvas.height);
+                    context.fillStyle = "black";
+                    context.fill();
+                    needBlit = true;
+                }
+
+                //-------------------------------------------------
+                // For debug
+                // penDown();
+                // penMove([0.1, 0.1]);
+                // penMove([0.4, 0.4]);
+                // penUp();
+                //-------------------------------------------------
+
+                // ---------------------------------------------------------------
+                // Logic for picking
+                // ---------------------------------------------------------------
+
+                var sceneCanvas = scene.getCanvas();
+
+                var coords;
+                var spaceDown = false;
+
+                document.addEventListener("keydown", function (e) {
+                    if (e.keyCode === 32) {
+                        penDown();
+                        spaceDown = true;
+                    }
+                }, true);
+
+                document.addEventListener("keyup", function (e) {
+                    if (e.keyCode === 32) {
+                        penUp();
+                        spaceDown = false;
+                    }
+                }, true);
+
+                sceneCanvas.addEventListener('mousemove', function (e) {
+                    coords = getClickCoordsWithinElement(e);
+                }, true);
+
+                function getClickCoordsWithinElement(event) {
+                    var coords = [0, 0];
+                    if (!event) {
+                        event = window.event;
+                        coords.x = event.x;
+                        coords.y = event.y;
+                    }
+                    else {
+                        var element = event.target;
+                        var totalOffsetLeft = 0;
+                        var totalOffsetTop = 0;
+
+                        while (element.offsetParent) {
+                            totalOffsetLeft += element.offsetLeft;
+                            totalOffsetTop += element.offsetTop;
+                            element = element.offsetParent;
+                        }
+                        coords[0] = event.pageX - totalOffsetLeft;
+                        coords[1] = event.pageY - totalOffsetTop;
+                    }
+                    return coords;
+                }
+
+                scene.on("tick",
+                        function () {
+
+                            if (!coords) {
+                                return;
+                            }
+
+                            var hit = scene.pick(coords[0], coords[1], {rayPick: true});
+
+                            if (hit && hit.worldPos && hit.normal) {
+
+                                if (hit.uv) {
+
+                                    // Picked
+
+                                    if (spaceDown) {
+                                        penDown();
+                                    }
+
+                                    penMove(hit.uv);
+                                }
+
+                            } else {
+
+                                // Nothing picked
+
+                                if (!spaceDown) {
+                                    penUp();
+                                }
+                            }
+                        });
+            });
+
+</script>
+</body>
+</html>
