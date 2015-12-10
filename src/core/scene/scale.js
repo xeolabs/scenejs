@@ -68,7 +68,7 @@ SceneJS.Scale.prototype.setMultOrder = function (multOrder) {
 
     this._core.multOrder = multOrder;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -80,7 +80,7 @@ SceneJS.Scale.prototype.setXYZ = function (xyz) {
     this._core.y = xyz.y == undefined ? 1 : xyz.y;
     this._core.z = xyz.z == undefined ? 1 : xyz.z;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 };
@@ -95,19 +95,19 @@ SceneJS.Scale.prototype.getXYZ = function () {
 
 SceneJS.Scale.prototype.setX = function (x) {
     this._core.x = x;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
 SceneJS.Scale.prototype.setY = function (y) {
     this._core.y = y;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
 SceneJS.Scale.prototype.setZ = function (z) {
     this._core.z = z;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -125,7 +125,7 @@ SceneJS.Scale.prototype.getZ = function () {
 
 SceneJS.Scale.prototype.incX = function (x) {
     this._core.x += x;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -136,7 +136,7 @@ SceneJS.Scale.prototype.incY = function (y) {
 
 SceneJS.Scale.prototype.incZ = function (z) {
     this._core.z += z;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 

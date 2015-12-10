@@ -64,7 +64,7 @@ SceneJS.Matrix.prototype.setMatrix = function(elements) {
         }
     }
 
-    core.setDirty();
+    core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 

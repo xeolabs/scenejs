@@ -56,10 +56,16 @@
                                 z:0,
 
                                 nodes:[
-
-                                    // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                    // Dummy extra transform, to test that changes in parent transform are re-baked in child transforms.
                                     {
-                                        type:"geometry/teapot"
+                                        type:"translate",
+                                        x:0,y:0,z:0,
+                                        nodes:[
+                                        // Teapot primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                            {
+                                                type:"geometry/teapot"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
