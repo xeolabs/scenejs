@@ -70,13 +70,13 @@ SceneJS.Rotate.prototype.setMultOrder = function(multOrder) {
 
     this._core.multOrder = multOrder;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
 SceneJS.Rotate.prototype.setAngle = function(angle) {
     this._core.angle = angle || 0;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -92,7 +92,7 @@ SceneJS.Rotate.prototype.setXYZ = function(xyz) {
     this._core.y = xyz.y || 0;
     this._core.z = xyz.z || 0;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 };
@@ -107,7 +107,7 @@ SceneJS.Rotate.prototype.getXYZ = function() {
 
 SceneJS.Rotate.prototype.setX = function(x) {
     this._core.x = x;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -117,7 +117,7 @@ SceneJS.Rotate.prototype.getX = function() {
 
 SceneJS.Rotate.prototype.setY = function(y) {
     this._core.y = y;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -127,7 +127,7 @@ SceneJS.Rotate.prototype.getY = function() {
 
 SceneJS.Rotate.prototype.setZ = function(z) {
     this._core.z = z;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -137,7 +137,7 @@ SceneJS.Rotate.prototype.getZ = function() {
 
 SceneJS.Rotate.prototype.incAngle = function(angle) {
     this._core.angle += angle;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 

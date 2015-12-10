@@ -91,28 +91,20 @@ var SceneJS_modelXFormStack = new (function () {
 
         core.dirty = false;         // Does this subtree need matrices rebuilt
 
-        core.setDirty = function () {
-
-            core.matrixDirty = true;
-
-            if (core.dirty) {
-                // return;
-            }
-
-            setDirty(core);
+        core.setDirty = function (node) {
+            setDirty(node);
         };
 
         /**
          * Recursively flag this subtree of transforms cores as dirty,
          * ie. needing their matrices rebuilt.
          */
-        function setDirty(core) {
-
-            core.dirty = true;
-            core.matrixDirty = true;
-
-            for (var i = 0, len = core.numCores; i < len; i++) {
-                setDirty(core.cores[i]);
+        function setDirty(node) {
+            for (var n = 0; n < node.nodes.length; ++n)
+                setDirty(node.nodes[n]);
+            if ('matrixDirty' in node._core) { 
+                node._core.dirty = true;
+                node._core.matrixDirty = true;
             }
         }
 

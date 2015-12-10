@@ -15271,7 +15271,7 @@ SceneJS.XForm.prototype.setElements = function (elements) {
 //            SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
 
 
-    core.setDirty();
+    core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 
@@ -15349,7 +15349,7 @@ SceneJS.Matrix.prototype.setMatrix = function(elements) {
         }
     }
 
-    core.setDirty();
+    core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 
@@ -15440,13 +15440,13 @@ SceneJS.Rotate.prototype.setMultOrder = function(multOrder) {
 
     this._core.multOrder = multOrder;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
 SceneJS.Rotate.prototype.setAngle = function(angle) {
     this._core.angle = angle || 0;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -15462,7 +15462,7 @@ SceneJS.Rotate.prototype.setXYZ = function(xyz) {
     this._core.y = xyz.y || 0;
     this._core.z = xyz.z || 0;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 };
@@ -15477,7 +15477,7 @@ SceneJS.Rotate.prototype.getXYZ = function() {
 
 SceneJS.Rotate.prototype.setX = function(x) {
     this._core.x = x;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -15487,7 +15487,7 @@ SceneJS.Rotate.prototype.getX = function() {
 
 SceneJS.Rotate.prototype.setY = function(y) {
     this._core.y = y;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -15497,7 +15497,7 @@ SceneJS.Rotate.prototype.getY = function() {
 
 SceneJS.Rotate.prototype.setZ = function(z) {
     this._core.z = z;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -15507,7 +15507,7 @@ SceneJS.Rotate.prototype.getZ = function() {
 
 SceneJS.Rotate.prototype.incAngle = function(angle) {
     this._core.angle += angle;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -15587,7 +15587,7 @@ SceneJS.Translate.prototype.setMultOrder = function(multOrder) {
 
     this._core.multOrder = multOrder;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 };
@@ -15600,7 +15600,7 @@ SceneJS.Translate.prototype.setXYZ = function(xyz) {
     this._core.y = xyz.y || 0;
     this._core.z = xyz.z || 0;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 
@@ -15617,42 +15617,42 @@ SceneJS.Translate.prototype.getXYZ = function() {
 
 SceneJS.Translate.prototype.setX = function(x) {
     this._core.x = x;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
 
 SceneJS.Translate.prototype.setY = function(y) {
     this._core.y = y;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
 
 SceneJS.Translate.prototype.setZ = function(z) {
     this._core.z = z;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
 
 SceneJS.Translate.prototype.incX = function(x) {
     this._core.x += x;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
 
 SceneJS.Translate.prototype.incY = function(y) {
     this._core.y += y;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
 
 SceneJS.Translate.prototype.incZ = function(z) {
     this._core.z += z;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
@@ -15744,7 +15744,7 @@ SceneJS.Scale.prototype.setMultOrder = function (multOrder) {
 
     this._core.multOrder = multOrder;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -15756,7 +15756,7 @@ SceneJS.Scale.prototype.setXYZ = function (xyz) {
     this._core.y = xyz.y == undefined ? 1 : xyz.y;
     this._core.z = xyz.z == undefined ? 1 : xyz.z;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 };
@@ -15771,19 +15771,19 @@ SceneJS.Scale.prototype.getXYZ = function () {
 
 SceneJS.Scale.prototype.setX = function (x) {
     this._core.x = x;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
 SceneJS.Scale.prototype.setY = function (y) {
     this._core.y = y;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
 SceneJS.Scale.prototype.setZ = function (z) {
     this._core.z = z;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -15801,7 +15801,7 @@ SceneJS.Scale.prototype.getZ = function () {
 
 SceneJS.Scale.prototype.incX = function (x) {
     this._core.x += x;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -15812,7 +15812,7 @@ SceneJS.Scale.prototype.incY = function (y) {
 
 SceneJS.Scale.prototype.incZ = function (z) {
     this._core.z += z;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
 };
 
@@ -15914,28 +15914,20 @@ var SceneJS_modelXFormStack = new (function () {
 
         core.dirty = false;         // Does this subtree need matrices rebuilt
 
-        core.setDirty = function () {
-
-            core.matrixDirty = true;
-
-            if (core.dirty) {
-                // return;
-            }
-
-            setDirty(core);
+        core.setDirty = function (node) {
+            setDirty(node);
         };
 
         /**
          * Recursively flag this subtree of transforms cores as dirty,
          * ie. needing their matrices rebuilt.
          */
-        function setDirty(core) {
-
-            core.dirty = true;
-            core.matrixDirty = true;
-
-            for (var i = 0, len = core.numCores; i < len; i++) {
-                setDirty(core.cores[i]);
+        function setDirty(node) {
+            for (var n = 0; n < node.nodes.length; ++n)
+                setDirty(node.nodes[n]);
+            if ('matrixDirty' in node._core) { 
+                node._core.dirty = true;
+                node._core.matrixDirty = true;
             }
         }
 

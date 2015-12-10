@@ -66,7 +66,7 @@ SceneJS.XForm.prototype.setElements = function (elements) {
 //            SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
 
 
-    core.setDirty();
+    core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 

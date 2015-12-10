@@ -69,7 +69,7 @@ SceneJS.Translate.prototype.setMultOrder = function(multOrder) {
 
     this._core.multOrder = multOrder;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 };
@@ -82,7 +82,7 @@ SceneJS.Translate.prototype.setXYZ = function(xyz) {
     this._core.y = xyz.y || 0;
     this._core.z = xyz.z || 0;
 
-    this._core.setDirty();
+    this._core.setDirty(this);
 
     this._engine.display.imageDirty = true;
 
@@ -99,42 +99,42 @@ SceneJS.Translate.prototype.getXYZ = function() {
 
 SceneJS.Translate.prototype.setX = function(x) {
     this._core.x = x;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
 
 SceneJS.Translate.prototype.setY = function(y) {
     this._core.y = y;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
 
 SceneJS.Translate.prototype.setZ = function(z) {
     this._core.z = z;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
 
 SceneJS.Translate.prototype.incX = function(x) {
     this._core.x += x;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
 
 SceneJS.Translate.prototype.incY = function(y) {
     this._core.y += y;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
 
 SceneJS.Translate.prototype.incZ = function(z) {
     this._core.z += z;
-    this._core.setDirty();
+    this._core.setDirty(this);
     this._engine.display.imageDirty = true;
     return this;
 };
