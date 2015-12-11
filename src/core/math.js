@@ -40,6 +40,16 @@
     var tempVec3f = new Float32Array(3);
     var tempVec4 = new Float32Array(4);
 
+    var tempAABB2 = {
+        min: new Float32Array(2),
+        max: new Float32Array(2)
+    };
+
+    var tempAABB2b = {
+        min: new Float32Array(2),
+        max: new Float32Array(2)
+    };
+
     /**
      * Returns a new, uninitialized two-element vector.
      * @method vec2
@@ -88,6 +98,32 @@
      */
     window.SceneJS_math_mat4 = function () {
         return new Float32Array(16);
+    };
+
+    /**
+     * Returns a new, uninitialized 3D axis-aligned bounding box.
+     * @method AABB3
+     * @static
+     * @returns {*} The bounding box.
+     */
+    window.SceneJS_math_AABB3 = function () {
+        return {
+            min: new Float32Array(3),
+            max: new Float32Array(3)
+        }
+    };
+
+    /**
+     * Returns a new, uninitialized 2D axis-aligned bounding box.
+     * @method AABB2
+     * @static
+     * @returns {*} The bounding box.
+     */
+    window.SceneJS_math_AABB2 = function () {
+        return {
+            min: new Float32Array(2),
+            max: new Float32Array(2)
+        }
     };
 
     /**
@@ -2064,32 +2100,122 @@
         ];
     };
 
-    window.SceneJS_math_newMat4FromQuaternion = function (q) {
+
+    window.SceneJS_math_identityQuaternion= function (dest) {
+        dest = dest || SceneJS_math_vec4();
+        dest[0] = 0.0;
+        dest[1] = 0.0;
+        dest[2] = 0.0;
+        dest[3] = 1.0;
+        return dest;
+    };
+
+    window.SceneJS_math_vec3PairToQuaternion= function (u, v, dest) {
+
+        dest = dest || SceneJS_math_vec4();
+
+        var norm_u_norm_v = Math.sqrt(window.SceneJS_math_dotVec3(u, u) * window.SceneJS_math_dotVec3(v, v));
+        var real_part = norm_u_norm_v + window.SceneJS_math_dotVec3(u, v);
+
+        var w;
+
+        if (real_part < 0.00000001 * norm_u_norm_v) {
+
+            // If u and v are exactly opposite, rotate 180 degrees
+            // around an arbitrary orthogonal axis. Axis normalisation
+            // can happen later, when we normalise the quaternion.
+
+            real_part = 0.0;
+
+            if (Math.abs(u[0]) > Math.abs(u[2])) {
+
+                w[0] = -u[1];
+                w[1] = u[0];
+                w[2] = 0;
+
+            } else {
+                w[0] = 0;
+                w[1] = -u[2];
+                w[2] = u[1]
+            }
+
+        } else {
+
+            // Otherwise, build quaternion the standard way.
+            w = window.SceneJS_math_cross3Vec3(u, v);
+        }
+
+        dest[0] = w[0];
+        dest[1] = w[1];
+        dest[2] = w[2];
+        dest[3] = real_part;
+
+        return window.SceneJS_math_normalizeQuaternion(dest);
+    };
+
+    window.SceneJS_math_angleAxisToQuaternion= function (x, y, z, degrees, dest) {
+        dest = dest || XEO.math.vec4();
+        var angleRad = (degrees / 180.0) * Math.PI;
+        var halfAngle = angleRad / 2.0;
+        var fsin = Math.sin(halfAngle);
+        dest[0] = fsin * x;
+        dest[1] = fsin * y;
+        dest[2] = fsin * z;
+        dest[4] = Math.cos(halfAngle);
+        return dest;
+    };
+
+    window.SceneJS_math_mulQuaternions= function (p, q, dest) {
+        dest = dest || SceneJS_math_vec4();
+        var p0 = p[0], p1 = p[1], p2 = p[2], p3 = p[3];
         var q0 = q[0], q1 = q[1], q2 = q[2], q3 = q[3];
+        dest[0] = p3 * q0 + p0 * q3 + p1 * q2 - p2 * q1;
+        dest[1] = p3 * q1 + p1 * q3 + p2 * q0 - p0 * q2;
+        dest[2] = p3 * q2 + p2 * q3 + p0 * q1 - p1 * q0;
+        dest[3] = p3 * q3 - p0 * q0 - p1 * q1 - p2 * q2;
+        return dest;
+    };
+
+    window.SceneJS_math_quaternionToMat4 = function (q, dest) {
+
+        dest = SceneJS_math_identityMat4(dest);
+
+        var q0 = q[0];
+        var q1 = q[1];
+        var q2 = q[2];
+        var q3 = q[3];
+
         var tx = 2.0 * q0;
         var ty = 2.0 * q1;
         var tz = 2.0 * q2;
+
         var twx = tx * q3;
         var twy = ty * q3;
         var twz = tz * q3;
+
         var txx = tx * q0;
         var txy = ty * q0;
         var txz = tz * q0;
+
         var tyy = ty * q1;
         var tyz = tz * q1;
         var tzz = tz * q2;
-        var m = SceneJS_math_identityMat4();
-        SceneJS_math_setCellMat4(m, 0, 0, 1.0 - (tyy + tzz));
-        SceneJS_math_setCellMat4(m, 0, 1, txy - twz);
-        SceneJS_math_setCellMat4(m, 0, 2, txz + twy);
-        SceneJS_math_setCellMat4(m, 1, 0, txy + twz);
-        SceneJS_math_setCellMat4(m, 1, 1, 1.0 - (txx + tzz));
-        SceneJS_math_setCellMat4(m, 1, 2, tyz - twx);
-        SceneJS_math_setCellMat4(m, 2, 0, txz - twy);
-        SceneJS_math_setCellMat4(m, 2, 1, tyz + twx);
-        SceneJS_math_setCellMat4(m, 2, 2, 1.0 - (txx + tyy));
-        return m;
+
+        dest[0] = 1.0 - (tyy + tzz);
+        dest[1] = txy - twz;
+        dest[2] = txz + twy;
+
+        dest[4] = txy + twz;
+        dest[5] = 1.0 - (txx + tzz);
+        dest[6] = tyz - twx;
+
+        dest[8] = txz - twy;
+        dest[9] = tyz + twx;
+        dest[10] = 1.0 - (txx + tyy);
+
+        return dest;
     };
+
 
     window.SceneJS_math_slerp = function (t, q1, q2) {
         //var result = SceneJS_math_identityQuaternion();
@@ -2150,6 +2276,136 @@
                 angle: angle * 57.295779579
             };
         }
+    };
+
+    /**
+     * Generates UV coordinates for triangle positions and indices.
+     *
+     * Conceptually, this function rotates the triangles into the X,Y plane, packs
+     * them as rightly together as possible, then generates UV coordinates that
+     * correspond to the X,Y coordinates.
+     *
+     * Provides the option to specify the maximum 2D range within which the UV coordinates
+     * are generated, which is 1x1 by default.
+     *
+     * @method buildUVs
+     * @static
+     * @param {Array of Number} positions One-dimensional flattened array of vertex positions.
+     * @param {Array of Number} indices One-dimensional flattened array of triangle vertex indices.*
+     * @param {Array of Number} [uvRange=[1.0, 1.0]] Optional UV range, given as a 2D vector, into which to pack the UV coordinates.
+     * @returns {Array of Number} One-dimensional flattened array of UV coordinates.
+     */
+    window.SceneJS_math_buildUVs = function (positions, indices, uvRange) {
+
+        uvRange = uvRange || [1.0, 1.0];
+
+        var uvs = new Array(positions.length / 2);
+
+        var i;
+        var len;
+
+        // Triangle vertex indices
+        var j0;
+        var j1;
+        var j2;
+
+        // Local-space triangle vertex positions
+        var v1;
+        var v2;
+        var v3;
+
+        // Local-space triangle normal vector
+        var normal;
+
+        // Matrix to rotate triangle into the X,Y plane, built from normal
+        var matrix = SceneJS_math_mat4();
+
+        // Axis-aligned 2D boundary of each triangles on the X,Y plane
+        var aabbTriangle = tempAABB2;
+
+        // Axis-aligned 2D boundary enclosing all triangles on the X,Y plane
+        var aabbMesh = tempAABB2b;
+
+        SceneJS_math_collapseAABB2(aabbMesh);
+
+        var offsetX;
+        var offsetY;
+
+        var offsetBump = 0;
+
+        for (i = 0, len = indices.length; i < len; i += 3) {
+
+            // Get vertex indices
+
+            j0 = indices[i + 0];
+            j1 = indices[i + 1];
+            j2 = indices[i + 2];
+
+            // Get vertex positions
+
+            v1 = [positions[j0 * 3 + 0], positions[j0 * 3 + 1], positions[j0 * 3 + 2]];
+            v2 = [positions[j1 * 3 + 0], positions[j1 * 3 + 1], positions[j1 * 3 + 2]];
+            v3 = [positions[j2 * 3 + 0], positions[j2 * 3 + 1], positions[j2 * 3 + 2]];
+
+            v2 = SceneJS_math_subVec3(v2, v1, tempVec3);
+            v3 = SceneJS_math_subVec3(v3, v1, tempVec3b);
+
+            // Get triangle normal
+
+            normal = SceneJS_math_normalizeVec3(SceneJS_math_cross3Vec3(v2, v3, tempVec3c), tempVec3d);
+
+            // Get rotation matrix
+
+            matrix = SceneJS_math_quaternionToMat4(
+                SceneJS_math_vec3PairToQuaternion(normal, [0, -1, 0], tempVec4), tempMat1);
+
+            // Rotate the triangle into the X,Y plane
+
+            v1 = SceneJS_math_transformPoint3(matrix, v1, tempVec3d);
+            v2 = SceneJS_math_transformPoint3(matrix, v2, tempVec3e);
+            v3 = SceneJS_math_transformPoint3(matrix, v3, tempVec3f);
+
+            // Bump offsetX along by width of triangle on X-axis
+
+            SceneJS_math_collapseAABB2(aabbTriangle);
+
+            SceneJS_math_expandAABB2Point2(aabbTriangle, v1);
+            SceneJS_math_expandAABB2Point2(aabbTriangle, v2);
+            SceneJS_math_expandAABB2Point2(aabbTriangle, v3);
+
+            // "Pack" the triangle into a strip
+
+            offsetX = aabbTriangle.min[0] - offsetBump;
+            offsetY = aabbTriangle.min[2];
+
+            uvs.push([v1[0] - offsetX, v1[1] - offsetY]);
+            uvs.push([v2[0] - offsetX, v2[1] - offsetY]);
+            uvs.push([v3[0] - offsetX, v3[1] - offsetY]);
+
+            offsetBump += aabbTriangle.max[0] - aabbTriangle.min[0];
+
+            // Expand boundary of all triangles in X,Y plane
+
+            SceneJS_math_expandAABB2(aabbMesh, aabbTriangle);
+        }
+
+        // Transform the UVs into the given UV range
+
+        var meshSizeX = aabbMesh.max[0] - aabbMesh.min[0];
+        var meshSizeY = aabbMesh.max[1] - aabbMesh.min[1];
+
+        var halfMeshX = meshSizeX / 2;
+        var halfMeshY = meshSizeY / 2;
+
+        var scaleX = uvRange[0] / meshSizeX;
+        var scaleY = uvRange[1] / meshSizeY;
+
+        for (i = 0, len = uvs.length; i < len; i += 2) {
+            uvs[i] = (uvs[i] + halfMeshX) * scaleX;
+            uvs[i + 1] = (uvs[i + 1] + halfMeshY) * scaleY;
+        }
+
+        return uvs;
     };
 
     /**
@@ -2584,4 +2840,493 @@
 
         return cartesian;
     };
+
+    /**
+     * Gets the diagonal size of a boundary given as minima and maxima.
+     * @method getAABBDiag
+     * @static
+     */
+    SceneJS_math_getAABBDiag = function (boundary) {
+        SceneJS_math_subVec3(boundary.max, boundary.min, tempVec3c);
+        return Math.abs(SceneJS_math_lenVec3(tempVec3c));
+    };
+
+    /**
+     * Gets the center of a boundary given as minima and maxima.
+     * @method getAABBCenter
+     * @static
+     */
+    SceneJS_math_getAABBCenter = function (boundary, dest) {
+        var r = dest || this.vec3();
+
+        r[0] = (boundary.max[0] + boundary.min[0] ) * 0.5;
+        r[1] = (boundary.max[1] + boundary.min[1] ) * 0.5;
+        r[2] = (boundary.max[2] + boundary.min[2] ) * 0.5;
+
+        return r;
+    };
+
+    /**
+     * Gets the center of a 2D boundary given as minima and maxima.
+     * @method getAABB2Center
+     * @static
+     */
+    SceneJS_math_getAABB2Center = function (boundary, dest) {
+        var r = dest || this.vec2();
+
+        r[0] = (boundary.max[0] + boundary.min[0] ) / 2;
+        r[1] = (boundary.max[1] + boundary.min[1] ) / 2;
+
+        return r;
+    };
+
+    /**
+     * Converts an axis-aligned 3D boundary into an oriented boundary consisting of
+     * an array of eight 3D positions, one for each corner of the boundary.
+     *
+     * @method AABB3ToOBB3
+     * @static
+     * @param {*} aabb Axis-aligned boundary.
+     * @param {Array} [obb] Oriented bounding box.
+     * @returns {*} Oriented bounding box.
+     */
+    SceneJS_math_AABB3ToOBB3 = function (aabb, obb) {
+
+        obb = obb || [];
+
+        if (!obb[0]) {
+            obb[0] = [];
+        }
+
+        obb[0][0] = aabb.min[0];
+        obb[0][1] = aabb.min[1];
+        obb[0][2] = aabb.min[2];
+        obb[0][3] = 1;
+
+        if (!obb[1]) {
+            obb[1] = [];
+        }
+
+        obb[1][0] = aabb.max[0];
+        obb[1][1] = aabb.min[1];
+        obb[1][2] = aabb.min[2];
+        obb[1][3] = 1;
+
+        if (!obb[2]) {
+            obb[2] = [];
+        }
+
+        obb[2][0] = aabb.max[0];
+        obb[2][1] = aabb.max[1];
+        obb[2][2] = aabb.min[2];
+        obb[2][3] = 1;
+
+        if (!obb[3]) {
+            obb[3] = [];
+        }
+
+        obb[3][0] = aabb.min[0];
+        obb[3][1] = aabb.max[1];
+        obb[3][2] = aabb.min[2];
+        obb[3][3] = 1;
+
+        if (!obb[4]) {
+            obb[4] = [];
+        }
+
+        obb[4][0] = aabb.min[0];
+        obb[4][1] = aabb.min[1];
+        obb[4][2] = aabb.max[2];
+        obb[4][3] = 1;
+
+        if (!obb[5]) {
+            obb[5] = [];
+        }
+
+        obb[5][0] = aabb.max[0];
+        obb[5][1] = aabb.min[1];
+        obb[5][2] = aabb.max[2];
+        obb[5][3] = 1;
+
+        if (!obb[6]) {
+            obb[6] = [];
+        }
+
+        obb[6][0] = aabb.max[0];
+        obb[6][1] = aabb.max[1];
+        obb[6][2] = aabb.max[2];
+        obb[6][3] = 1;
+
+        if (!obb[7]) {
+            obb[7] = [];
+        }
+
+        obb[7][0] = aabb.min[0];
+        obb[7][1] = aabb.max[1];
+        obb[7][2] = aabb.max[2];
+        obb[7][3] = 1;
+
+        return obb;
+    };
+
+    /**
+     * Finds the minimum axis-aligned 3D boundary enclosing the 3D points given in a flattened,  1-dimensional array.
+     *
+     * @method positions3ToAABB3
+     * @static
+     * @param {Array} positions Flattened 3D positions array
+     * @param {*} [aabb] Axis-aligned bounding box.
+     * @returns {*} Axis-aligned bounding box.
+     */
+    SceneJS_math_positions3ToAABB3 = function (positions, aabb) {
+
+        aabb = aabb || SceneJS_math_AABB3();
+
+        var xmin = 100000;
+        var ymin = 100000;
+        var zmin = 100000;
+        var xmax = -100000;
+        var ymax = -100000;
+        var zmax = -100000;
+
+        var x, y, z;
+
+        for (var i = 0, len = positions.length - 2; i < len; i += 3) {
+
+            x = positions[i + 0];
+            y = positions[i + 1];
+            z = positions[i + 2];
+
+            if (x < xmin) {
+                xmin = x;
+            }
+
+            if (y < ymin) {
+                ymin = y;
+            }
+
+            if (z < zmin) {
+                zmin = z;
+            }
+
+            if (x > xmax) {
+                xmax = x;
+            }
+
+            if (y > ymax) {
+                ymax = y;
+            }
+
+            if (z > zmax) {
+                zmax = z;
+            }
+        }
+
+        aabb.min[0] = xmin;
+        aabb.min[1] = ymin;
+        aabb.min[2] = zmin;
+        aabb.max[0] = xmax;
+        aabb.max[1] = ymax;
+        aabb.max[2] = zmax;
+
+        return aabb;
+    };
+
+    /**
+     * Finds the minimum axis-aligned 3D boundary enclosing the given 3D points.
+     *
+     * @method points3ToAABB3
+     * @static
+     * @param {Array} points Oriented bounding box.
+     * @param {*} [aabb] Axis-aligned bounding box.
+     * @returns {*} Axis-aligned bounding box.
+     */
+    SceneJS_math_points3ToAABB3 = function (points, aabb) {
+
+        aabb = aabb || SceneJS_math_AABB3();
+
+        var xmin = 100000;
+        var ymin = 100000;
+        var zmin = 100000;
+        var xmax = -100000;
+        var ymax = -100000;
+        var zmax = -100000;
+
+        var x, y, z;
+
+        for (var i = 0, len = points.length; i < len; i++) {
+
+            x = points[i][0];
+            y = points[i][1];
+            z = points[i][2];
+
+            if (x < xmin) {
+                xmin = x;
+            }
+
+            if (y < ymin) {
+                ymin = y;
+            }
+
+            if (z < zmin) {
+                zmin = z;
+            }
+
+            if (x > xmax) {
+                xmax = x;
+            }
+
+            if (y > ymax) {
+                ymax = y;
+            }
+
+            if (z > zmax) {
+                zmax = z;
+            }
+        }
+
+        aabb.min[0] = xmin;
+        aabb.min[1] = ymin;
+        aabb.min[2] = zmin;
+        aabb.max[0] = xmax;
+        aabb.max[1] = ymax;
+        aabb.max[2] = zmax;
+
+        return aabb;
+    };
+
+    /**
+     * Expands the first axis-aligned 3D boundary to enclose the second, if required.
+     *
+     * @method expandAABB3
+     * @static
+     * @param {*} aabb1 First AABB
+     * @param {*} aabb2 Second AABB
+     * @returns {*} The second AABB
+     */
+    SceneJS_math_expandAABB3 = function (aabb1, aabb2) {
+
+        if (aabb1.min[0] < aabb2.min[0]) {
+            aabb2.min[0] = aabb1.min[0];
+        }
+
+        if (aabb1.min[1] < aabb2.min[1]) {
+            aabb2.min[1] = aabb1.min[1];
+        }
+
+        if (aabb1.min[2] < aabb2.min[2]) {
+            aabb2.min[2] = aabb1.min[2];
+        }
+
+        if (aabb1.max[0] > aabb2.max[0]) {
+            aabb2.max[0] = aabb1.max[0];
+        }
+
+        if (aabb1.max[1] > aabb2.max[1]) {
+            aabb2.max[1] = aabb1.max[1];
+        }
+
+        if (aabb1.max[2] > aabb2.max[2]) {
+            aabb2.max[2] = aabb1.max[2];
+        }
+
+        return aabb2;
+    };
+
+    /**
+     * Expands an axis-aligned 3D boundary to enclose the given point, if needed.
+     *
+     * @method expandAABB3Point3
+     * @static
+     * @param {*} aabb AABB
+     * @param {*} p Point
+     * @returns {*} The AABB
+     */
+    SceneJS_math_expandAABB3Point3 = function (aabb, p) {
+
+        if (aabb.min[0] < p[0]) {
+            aabb.min[0] = p[0];
+        }
+
+        if (aabb.min[1] < p[1]) {
+            aabb.min[1] = p[1];
+        }
+
+        if (aabb.min[2] < p[2]) {
+            aabb.min[2] = p[2];
+        }
+
+        if (aabb.max[0] > p[0]) {
+            aabb.max[0] = p[0];
+        }
+
+        if (aabb.max[1] > p[1]) {
+            aabb.max[1] = p[1];
+        }
+
+        if (aabb.max[2] > p[2]) {
+            aabb.max[2] = p[2];
+        }
+
+        return aabb;
+    };
+
+    /**
+     * Collapses a 2D axis-aligned boundary, ready to expand to fit 2D points.
+     * Creates new AABB if none supplied.
+     *
+     * @method collapseAABB2
+     * @static
+     * @param {*} [aabb] 2D axis-aligned bounding box.
+     * @returns {*} 2D axis-aligned bounding box.
+     */
+    SceneJS_math_collapseAABB2 = function (aabb) {
+
+        aabb = aabb || SceneJS_math_AABB2();
+
+        aabb.min[0] = 10000000;
+        aabb.min[1] = 10000000;
+        aabb.max[0] = -10000000;
+        aabb.max[1] = -10000000;
+
+        return aabb;
+    };
+
+    /**
+     * Finds the minimum 2D projected axis-aligned boundary enclosing the given 3D points.
+     *
+     * @method points3ToAABB2
+     * @static
+     * @param {Array} points 3D Points.
+     * @param {*} [aabb] 2D axis-aligned bounding box.
+     * @returns {*} 2D axis-aligned bounding box.
+     */
+    SceneJS_math_points3ToAABB2 = function (points, aabb) {
+
+        aabb = aabb || SceneJS_math_AABB2();
+
+        var xmin = 10000000;
+        var ymin = 10000000;
+        var xmax = -10000000;
+        var ymax = -10000000;
+
+        var x, y, z, w, f;
+
+        for (var i = 0, len = points.length; i < len; i++) {
+
+            x = points[i][0];
+            y = points[i][1];
+            z = points[i][2];
+            w = points[i][3] || 1.0;
+
+            f = 1.0 / w;
+
+            x *= f;
+            y *= f;
+
+            if (x < xmin) {
+                xmin = x;
+            }
+
+            if (y < ymin) {
+                ymin = y;
+            }
+
+            if (x > xmax) {
+                xmax = x;
+            }
+
+            if (y > ymax) {
+                ymax = y;
+            }
+        }
+
+        aabb.min[0] = xmin;
+        aabb.min[1] = ymin;
+        aabb.max[0] = xmax;
+        aabb.max[1] = ymax;
+
+        return aabb;
+    };
+
+    /**
+     * Expands the first axis-aligned 2D boundary to enclose the second, if required.
+     *
+     * @method expandAABB3
+     * @static
+     * @param {*} aabb1 First AABB
+     * @param {*} aabb2 Second AABB
+     * @returns {*} The second AABB
+     */
+    SceneJS_math_expandAABB2 = function (aabb1, aabb2) {
+
+        if (aabb2.min[0] < aabb1.min[0]) {
+            aabb1.min[0] = aabb2.min[0];
+        }
+
+        if (aabb2.min[1] < aabb1.min[1]) {
+            aabb1.min[1] = aabb2.min[1];
+        }
+
+        if (aabb2.max[0] > aabb1.max[0]) {
+            aabb1.max[0] = aabb2.max[0];
+        }
+
+        if (aabb2.max[1] > aabb1.max[1]) {
+            aabb1.max[1] = aabb2.max[1];
+        }
+
+        return aabb2;
+    };
+
+    /**
+     * Expands an axis-aligned 2D boundary to enclose the given point, if required.
+     *
+     * @method expandAABB2Point2
+     * @static
+     * @param {*} aabb AABB
+     * @param {*} p Point
+     * @returns {*} The AABB
+     */
+    SceneJS_math_expandAABB2Point2 = function (aabb, p) {
+
+        if (aabb.min[0] < p[0]) {
+            aabb.min[0] = p[0];
+        }
+
+        if (aabb.min[1] < p[1]) {
+            aabb.min[1] = p[1];
+        }
+
+        if (aabb.max[0] > p[0]) {
+            aabb.max[0] = p[0];
+        }
+
+        if (aabb.max[1] > p[1]) {
+            aabb.max[1] = p[1];
+        }
+
+        return aabb;
+    };
+
+    SceneJS_math_AABB2ToCanvas = function (aabb, canvasWidth, canvasHeight, aabb2) {
+
+        aabb2 = aabb2 || aabb;
+
+        var midx = canvasWidth * 0.5;
+        var midy = canvasHeight * 0.5;
+
+        var xmin = aabb.min[0];
+        var ymin = -aabb.min[1];
+        var xmax = aabb.max[0];
+        var ymax = -aabb.max[1];
+
+        aabb2.min[0] = Math.floor((xmin * midx) + midx);
+        aabb2.min[1] = canvasHeight - Math.floor((ymin * -midy) + midy);
+        aabb2.max[0] = Math.floor((xmax * midx) + midx);
+        aabb2.max[1] = canvasHeight - Math.floor((ymax * -midy) + midy);
+
+        return aabb;
+    };
+
 })();
