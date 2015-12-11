@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-12-09
+ * Built on 2015-12-11
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -14942,9 +14942,10 @@ new (function () {
         stateId: SceneJS._baseStateId++,
         empty: true,
         texture: null,
-        highlightColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
+        regionColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
         highlightFactor:[ 1.5, 1.5, 0.0 ],
         regionData: [],
+        mode: "highlight",
         hash: ""
     };
 
@@ -14956,6 +14957,11 @@ new (function () {
         });
 
     var stackLen = 0;
+    var validModes = {
+        highlight: true,
+        hide: true,
+        isolate: true,
+    };
 
     /**
      * @class Scene graph node which defines a color-coded region map
@@ -15016,11 +15022,10 @@ new (function () {
                 }
             };
 
-            this.setHighlightColor(params.highlightColor);
+            this.setRegionColor(params.regionColor);
             this.setHighlightFactor(params.highlightFactor);
             this.setRegionData(params.regionData);
-
-            this._core.hash = "reg";
+            this.setMode(params.mode);
         }
     };
 
@@ -15159,13 +15164,13 @@ new (function () {
         this._engine.display.imageDirty = true;
     };
 
-    SceneJS.RegionMap.prototype.setHighlightColor = function (color) {
-        var defaultHighlightColor = defaultCore.highlightColor;
-        this._core.highlightColor = color ? [
+    SceneJS.RegionMap.prototype.setRegionColor = function (color) {
+        var defaultHighlightColor = defaultCore.regionColor;
+        this._core.regionColor = color ? [
             color.r != undefined && color.r != null ? color.r : defaultHighlightColor[0],
             color.g != undefined && color.g != null ? color.g : defaultHighlightColor[1],
             color.b != undefined && color.b != null ? color.b : defaultHighlightColor[2]
-        ] : defaultCore.highlightColor;
+        ] : defaultCore.regionColor;
         this._engine.display.imageDirty = true;
         return this;
     };
@@ -15178,6 +15183,14 @@ new (function () {
             color.b != undefined && color.b != null ? color.b : defaultHighlightFactor[2]
         ] : defaultCore.highlightFactor;
         this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.RegionMap.prototype.setMode = function (mode) {
+        this._core.mode = mode && validModes[mode] ? mode : defaultCore.mode;
+        this._engine.branchDirty(this);
+        this._engine.display.imageDirty = true;
+        this._core.hash = "reg-" + mode;
         return this;
     };
 
@@ -17189,10 +17202,6 @@ SceneJS_Display.prototype._logPickList = function () {
             // Region picking is independent of having picked an object
             //------------------------------------------------------------------
 
-            hit = hit || {
-                    canvasPos: canvasPos
-                };
-
             pickBuf.clear();
 
             this._doDrawList({
@@ -17203,7 +17212,11 @@ SceneJS_Display.prototype._logPickList = function () {
 
             pix = pickBuf.read(canvasX, canvasY);
 
-            if (pix[0] !== 0 || pix[1] !== 0 || pix[2] === 0 || pix[3] === 0) {
+            if (pix[0] !== 0 || pix[1] !== 0 || pix[2] !== 0 || pix[3] !== 0) {
+
+                hit = hit || {
+                        canvasPos: canvasPos
+                    };
 
                 var regionColor = {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255};
                 var regionData = this._frameCtx.regionData;
@@ -18273,7 +18286,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (regionMapping) {
             add("varying vec2 SCENEJS_vRegionMapUV;");
             add("uniform sampler2D SCENEJS_uRegionMapSampler;");
-            add("uniform vec3 SCENEJS_uRegionMapHighlightColor;");
+            add("uniform vec3 SCENEJS_uRegionMapRegionColor;");
             add("uniform vec3 SCENEJS_uRegionMapHighlightFactor;");
         }
 
@@ -18857,10 +18870,22 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             add("vec3 regionColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t)).rgb;");
             add("float tolerance = 0.01;");
-            add("vec3 colorDelta = abs(SCENEJS_uRegionMapHighlightColor - regionColor);");
-            add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) < tolerance) {");
-            add("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
-            add("}");
+            add("vec3 colorDelta = abs(SCENEJS_uRegionMapRegionColor - regionColor);");
+            if (states.regionMap.mode === "highlight" || states.regionMap.mode === "hide") {
+                add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) < tolerance) {");
+                if (states.regionMap.mode === "highlight") {
+                    add("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
+                } else {
+                    // mode = "hide"
+                    add("  fragColor.a = 0.0;");
+                }
+                add("}");
+            } else {
+                // mode = "isolate"
+                add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) > tolerance) {");
+                add("  fragColor.a = 0.0;");
+                add("}");
+            }
         }
 
         if (fragmentHooks.pixelColor) {
@@ -20412,7 +20437,7 @@ SceneJS_ChunkFactory.createChunkType({
     type: "regionMap",
 
     build: function () {
-        this._uRegionMapHighlightColor = this.program.draw.getUniform("SCENEJS_uRegionMapHighlightColor");
+        this._uRegionMapRegionColor = this.program.draw.getUniform("SCENEJS_uRegionMapRegionColor");
         this._uRegionMapHighlightFactor = this.program.draw.getUniform("SCENEJS_uRegionMapHighlightFactor");
         this._uRegionMapSampler = "SCENEJS_uRegionMapSampler";
     },
@@ -20428,8 +20453,32 @@ SceneJS_ChunkFactory.createChunkType({
 
         }
 
-        if (this._uRegionMapHighlightColor) {
-            this._uRegionMapHighlightColor.setValue(this.core.highlightColor);
+        var gl = this.program.gl;
+        var transparent = this.core.mode === "hide" || this.core.mode === "isolate";
+
+        if (frameCtx.transparent != transparent) {
+
+            if (transparent) {
+
+                // Entering a transparency bin
+
+                gl.enable(gl.BLEND);
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                frameCtx.blendEnabled = true;
+
+            } else {
+
+                // Leaving a transparency bin
+
+                gl.disable(gl.BLEND);
+                frameCtx.blendEnabled = false;
+            }
+
+            frameCtx.transparent = transparent;
+        }
+
+        if (this._uRegionMapRegionColor) {
+            this._uRegionMapRegionColor.setValue(this.core.regionColor);
         }
 
         if (this._uRegionMapHighlightFactor) {

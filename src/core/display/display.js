@@ -1095,10 +1095,6 @@ SceneJS_Display.prototype._logPickList = function () {
             // Region picking is independent of having picked an object
             //------------------------------------------------------------------
 
-            hit = hit || {
-                    canvasPos: canvasPos
-                };
-
             pickBuf.clear();
 
             this._doDrawList({
@@ -1109,7 +1105,11 @@ SceneJS_Display.prototype._logPickList = function () {
 
             pix = pickBuf.read(canvasX, canvasY);
 
-            if (pix[0] !== 0 || pix[1] !== 0 || pix[2] === 0 || pix[3] === 0) {
+            if (pix[0] !== 0 || pix[1] !== 0 || pix[2] !== 0 || pix[3] !== 0) {
+
+                hit = hit || {
+                        canvasPos: canvasPos
+                    };
 
                 var regionColor = {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255};
                 var regionData = this._frameCtx.regionData;

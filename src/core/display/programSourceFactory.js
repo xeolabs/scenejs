@@ -547,7 +547,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (regionMapping) {
             add("varying vec2 SCENEJS_vRegionMapUV;");
             add("uniform sampler2D SCENEJS_uRegionMapSampler;");
-            add("uniform vec3 SCENEJS_uRegionMapHighlightColor;");
+            add("uniform vec3 SCENEJS_uRegionMapRegionColor;");
             add("uniform vec3 SCENEJS_uRegionMapHighlightFactor;");
         }
 
@@ -1131,10 +1131,22 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             add("vec3 regionColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t)).rgb;");
             add("float tolerance = 0.01;");
-            add("vec3 colorDelta = abs(SCENEJS_uRegionMapHighlightColor - regionColor);");
-            add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) < tolerance) {");
-            add("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
-            add("}");
+            add("vec3 colorDelta = abs(SCENEJS_uRegionMapRegionColor - regionColor);");
+            if (states.regionMap.mode === "highlight" || states.regionMap.mode === "hide") {
+                add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) < tolerance) {");
+                if (states.regionMap.mode === "highlight") {
+                    add("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
+                } else {
+                    // mode = "hide"
+                    add("  fragColor.a = 0.0;");
+                }
+                add("}");
+            } else {
+                // mode = "isolate"
+                add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) > tolerance) {");
+                add("  fragColor.a = 0.0;");
+                add("}");
+            }
         }
 
         if (fragmentHooks.pixelColor) {
