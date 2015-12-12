@@ -4,11 +4,11 @@ new (function () {
      * The default state core singleton for {@link SceneJS.MorphGeometry} nodes
      */
     var defaultCore = {
-        type:"morphGeometry",
-        stateId:SceneJS._baseStateId++,
-        hash:"",
+        type: "morphGeometry",
+        stateId: SceneJS._baseStateId++,
+        hash: "",
         //         empty: true,
-        morph:null
+        morph: null
     };
 
     var coreStack = [];
@@ -31,125 +31,30 @@ new (function () {
 
         if (this._core.useCount == 1) { // This node defines the resource
 
-            this._sourceConfigs = params.source;
-            this._source = null;
+            this._pickPositionsDirty = true;
 
-            if (params.source) {
-
-                /*---------------------------------------------------------------------------------------------------
-                 * Build node core (possibly asynchronously) using a factory object
-                 *--------------------------------------------------------------------------------------------------*/
-
-                if (!params.source.type) {
-                    throw SceneJS_error.fatalError(
-                        SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                        "morphGeometry config expected: source.type");
-                }
-
-                var self = this;
-
-                SceneJS.Plugins.getPlugin(
-                    "morphGeometry",
-                    this._sourceConfigs.type,
-                    function (sourceService) {
-
-                        if (!sourceService) {
-                            throw SceneJS_error.fatalError(
-                                SceneJS.errors.PLUGIN_INVALID,
-                                "morphGeometry: no support for source type '" + self._sourceConfigs.type + "' - need to include plugin for self source type, " +
-                                    "or install a custom source service with SceneJS.Plugins.addPlugin(SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN, '" + self._sourceConfigs.type + "', <your service>).");
-                        }
-
-                        if (!sourceService.getSource) {
-                            throw SceneJS_error.fatalError(
-                                SceneJS.errors.PLUGIN_INVALID,
-                                "morphGeometry: 'getSource' method not found on MorphGeoFactoryService (SceneJS.Plugins.MORPH_GEO_SOURCE_PLUGIN)");
-                        }
-
-                        self._source = sourceService.getSource();
-
-                        if (!self._source.subscribe) {
-                            throw SceneJS_error.fatalError(
-                                SceneJS.errors.PLUGIN_INVALID,
-                                "morphGeometry: 'subscribe' method not found on source provided by plugin type '" + params.source.type + "'");
-                        }
-
-                        var created = false;
-
-                        self._source.subscribe(// Get notification when factory creates the morph
-                            function (data) {
-
-                                if (!created) {
-                                    self._buildNodeCore(data);
-
-                                    self._core._loading = false;
-                                    self._fireEvent("loaded");
-
-                                    self._engine.branchDirty(self); // TODO
-
-                                    created = true;
-
-                                } else {
-
-                                    if (data.targets) {
-
-                                        var dataTargets = data.targets;
-                                        var dataTarget;
-                                        var index;
-                                        var morphTargets = self._core.targets;
-                                        var morphTarget;
-
-                                        for (var i = 0, len = dataTargets.length; i < len; i++) {
-                                            dataTarget = dataTargets[i];
-                                            index = dataTarget.targetIndex;
-                                            morphTarget = morphTargets[index];
-
-                                            if (dataTarget.positions && morphTarget.vertexBuf) {
-                                                morphTarget.vertexBuf.bind();
-                                                morphTarget.vertexBuf.setData(dataTarget.positions, 0);
-                                            }
-                                        }
-                                    }
-
-                                    // TODO: factory can update factor?
-                                    // self.setFactor(params.factor);
-
-                                    self._display.imageDirty = true;
-                                }
-                            });
-
-                        self._core._loading = true;
-
-                        self._fireEvent("loading");
-
-                        self._source.configure(self._sourceConfigs);
-                    });
-
-            } else if (params.create instanceof Function) {
-
-                /*---------------------------------------------------------------------------------------------------
-                 * Build node core from JSON arrays and primitive name returned by factory function
-                 *--------------------------------------------------------------------------------------------------*/
-
-                this._buildNodeCore(params.create());
-
-            } else {
-
-                /*---------------------------------------------------------------------------------------------------
-                 * Build node core from JSON arrays and primitive name given in node properties
-                 *--------------------------------------------------------------------------------------------------*/
-
-                this._buildNodeCore(params);
-            }
+            this._buildNodeCore(params);
 
             this._core.webglRestored = function () {
                 //self._buildNodeCore(self._engine.canvas.gl, self._core);
             };
 
+            var self = this;
+
+            // For the morph target at the given index,
+            // returns a positions VBO for triangle-picking,
+            // lazy-generated from the given indices if not yet existing.
+
+            this._core.getPickPositions = function (index, indices) {
+                if (self._pickPositionsDirty) {
+                    self._buildPickPositions(indices);
+                }
+                return self._core.targets[index].pickPositionsBuf;
+            };
+
             this.setFactor(params.factor);
         }
 
-        // TODO: factor shared on cores?
         this._core.factor = params.factor || 0;
         this._core.clamp = !!params.clamp;
     };
@@ -216,30 +121,30 @@ new (function () {
 
                 arry = targetData.positions || positions;
                 if (arry) {
-                  target.positions = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
-                  target.vertexBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.positions, arry.length, 3, usage);
-                  positions = arry;
+                    target.positions = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                    target.vertexBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.positions, arry.length, 3, usage);
+                    positions = arry;
                 }
 
                 arry = targetData.normals || normals;
                 if (arry) {
-                  target.normals = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
-                  target.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.normals, arry.length, 3, usage);
-                  normals = arry;
+                    target.normals = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                    target.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.normals, arry.length, 3, usage);
+                    normals = arry;
                 }
 
                 arry = targetData.uv || uv;
                 if (arry) {
-                  target.uv = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
-                  target.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv, arry.length, 2, usage);
-                  uv = arry;
+                    target.uv = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                    target.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv, arry.length, 2, usage);
+                    uv = arry;
                 }
 
                 arry = targetData.uv2 || uv2;
                 if (arry) {
-                  target.uv2 = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
-                  target.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv2, arry.length, 2, usage);
-                  uv2 = arry;
+                    target.uv2 = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                    target.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv2, arry.length, 2, usage);
+                    uv2 = arry;
                 }
 
                 core.targets.push(target);  // We'll iterate this to destroy targets when we recover from error
@@ -271,18 +176,39 @@ new (function () {
                 SceneJS.errors.ERROR,
                 "Failed to allocate VBO(s) for morphGeometry: " + e);
         }
+
+        this._pickPositionsDirty = true;
     };
 
-    SceneJS.MorphGeometry.prototype.setSource = function (sourceConfigs) {
-        this._sourceConfigs = sourceConfigs;
-        var source = this._source;
-        if (source) {
-            source.configure(sourceConfigs);
+    SceneJS.MorphGeometry.prototype._buildPickPositions = function (indices) {
+
+        var core = this._core;
+        var target = null;
+        var pickPositions;
+        var gl = this._engine.canvas.gl;
+        var usage = gl.STATIC_DRAW;
+
+        // On each morph target, build a positions array for
+        // color-indexed triangle-picking.
+
+        for (var i = 0, len = core.targets.length; i < len; i++) {
+
+            target = core.targets[i];
+
+            if (target.positions) {
+
+                if (target.pickPositionsBuf) {
+                    target.pickPositionsBuf.destroy();
+                    target.pickPositionsBuf = null;
+                }
+
+                pickPositions = SceneJS_math_getPickPositions(target.positions, indices);
+
+                target.pickPositionsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickPositions), pickPositions.length, 3, usage);
+            }
         }
-    };
 
-    SceneJS.MorphGeometry.prototype.getSource = function () {
-        return this._sourceConfigs;
+        this._pickPositionsDirty = false;
     };
 
     SceneJS.MorphGeometry.prototype.setFactor = function (factor) {
@@ -373,6 +299,7 @@ new (function () {
         this._engine.display.morphGeometry = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.morphGeometry = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.MorphGeometry.prototype._makeHash = function () {
@@ -402,6 +329,9 @@ new (function () {
                     if (target.vertexBuf) {
                         target.vertexBuf.destroy();
                     }
+                    if (target.pickPositionsBuf) {
+                        target.pickPositionsBuf.destroy();
+                    }
                     if (target.normalBuf) {
                         target.normalBuf.destroy();
                     }
@@ -412,9 +342,6 @@ new (function () {
                         target.uvBuf2.destroy();
                     }
                 }
-            }
-            if (this._source && this._source.destroy) {
-                this._source.destroy();
             }
         }
     };

@@ -187,7 +187,7 @@
     <div id="list">
         <h1><a href="../index.html">SceneJS</a> / Examples</h1>
 
-        <p>v0.1.0</p>
+        <p>v4.2.0</p>
     </div>
 </div>
 
@@ -242,7 +242,7 @@
             "scenegraph_flags_frontface",
             "scenegraph_flags_picking",
             "scenegraph_flags_transparent",
-            "scenegraph_flags_reflective",
+            "scenegraph_flags_reflective"
         ],
 
         "Canvas": [
@@ -364,6 +364,7 @@
             "lighting_defaults",
             "lighting_directional_view",
             "lighting_directional_world",
+            "lighting_directional_world_many",
             "lighting_directional_world_texture",
             "lighting_point_view",
             "lighting_point_world"
@@ -438,6 +439,11 @@
 
             "#configs",
             "configs_maxTextureSize"
+        ],
+
+        "Decals": [
+            "#drawing onto surfaces",
+            "decals_emissive"
         ],
 
         "Fresnel": [
@@ -541,10 +547,17 @@
         ],
 
         "Physics": [
+
+            "#CannonJS",
+            "physics_cannonjs",
+
+            "#JigLibJS",
             "physics_balls",
             "physics_boxes",
-            "#multiple physics systems in worker threads",
+
+            "#multiple JibLibJS physics systems in worker threads",
             "physics_multithreaded",
+
             "#physical material attributes",
             "physics_materials"
         ],
@@ -557,8 +570,13 @@
             "picking_throughTransparency",
             "picking_rayPicking",
             "picking_rayPicking_onTransparentObject",
+            "picking_rayPicking_triangles",
+            "picking_rayPicking_morphTargets",
             "picking_rayPicking_performance",
-            "picking_regions",
+            "picking_regions_info",
+            "picking_regions_highlight",
+            "picking_regions_hide",
+            "picking_regions_isolate",
             "picking_emptyPixels"
         ],
 

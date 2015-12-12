@@ -48,332 +48,321 @@
 <script>
 
 
-// Point SceneJS to the bundled plugins
-SceneJS.setConfigs({
-    pluginPath: "../api/latest/plugins"
-});
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
 
-// Create a scene with a bubble cloud, something dynamic to show
-// how context recovery is actually pretty quick
+    // Create a scene with a bubble cloud, something dynamic to show
+    // how context recovery is actually pretty quick
 
-var scene;
-var bubbles;
-var bubbleNames;
+    var scene;
+    var bubbles;
+    var bubbleNames;
 
-createScene();
-createBubbles();
+    createScene();
+    createBubbles();
 
-// Create scene
-function createScene() {
-    scene = SceneJS.createScene({
-                nodes: [
+    // Create scene
+    function createScene() {
+        scene = SceneJS.createScene({
+                    nodes: [
 
-                    // Mouse-orbited camera, implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
-                    {
-                        type: "cameras/orbit",
-                        yaw: 340,
-                        pitch: -10,
-                        zoom: 150,
-                        look: { y: 20 },
-                        zoomSensitivity: 15,
-                        spin: 0.2,
-                        nodes: [
+                        // Mouse-orbited camera, implemented by plugin at
+                        // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+                        {
+                            type: "cameras/orbit",
+                            yaw: 340,
+                            pitch: -10,
+                            zoom: 150,
+                            look: {y: 20},
+                            zoomSensitivity: 15,
+                            spin: 0.2,
+                            nodes: [
 
-                            // Override default lights
-                            {
-                                type: "lights",
-                                lights: [
-                                    {
-                                        mode: "ambient",
-                                        color: { r: 0.7, g: 0.7, b: 0.9 },
-                                        diffuse: true,
-                                        specular: false
-                                    },
-                                    {
-                                        mode: "dir",
-                                        color: { r: 1.0, g: 1.0, b: 0.2 },
-                                        diffuse: true,
-                                        specular: true,
-                                        dir: { x: 1.0, y: 0.9, z: -0.7 },
-                                        space: "world"
-                                    }
-                                ],
+                                // Override default lights
+                                {
+                                    type: "lights",
+                                    lights: [
+                                        {
+                                            mode: "ambient",
+                                            color: {r: 0.7, g: 0.7, b: 0.9},
+                                            diffuse: true,
+                                            specular: false
+                                        },
+                                        {
+                                            mode: "dir",
+                                            color: {r: 1.0, g: 1.0, b: 0.2},
+                                            diffuse: true,
+                                            specular: true,
+                                            dir: {x: 1.0, y: 0.9, z: -0.7},
+                                            space: "world"
+                                        }
+                                    ],
 
-                                nodes: [
+                                    nodes: [
 
-                                    // Miramar Clouds Skybox, implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/skybox/miramarClouds.js
-                                    {
-                                        type: "skybox/grimmNight",
-                                        size: 5000 // Box half-size on each axis - default is 5000
-                                    },
+                                        // Miramar Clouds Skybox, implemented by plugin at
+                                        // http://scenejs.org/api/latest/plugins/node/skybox/miramarClouds.js
+                                        {
+                                            type: "skybox/grimmNight",
+                                            size: 5000 // Box half-size on each axis - default is 5000
+                                        },
 
-                                    // Wire grid
-                                    {
-                                        id: "grid-floor",
-                                        type: "material",
-                                        color: { r: 0.4, g: 0.4, b: 0.6 },
-                                        emit: .01,
-                                        nodes: [
-                                            {
-                                                type: "shader",
-                                                shaders: [
-                                                    {
-                                                        stage: "vertex",
-                                                        code: "vec4 myModelPosFunc(vec4 pos){\n\
-                                                                          pos.z=pos.z+sin(pos.x*0.5 + pos.y*0.5)*5.0;\n\
-                                                                            return pos;\n\
-                                                                        }\n",
-                                                        hooks: {
-                                                            modelPos: "myModelPosFunc"
+                                        // Wire grid
+                                        {
+                                            id: "grid-floor",
+                                            type: "material",
+                                            color: {r: 0.4, g: 0.4, b: 0.6},
+                                            emit: .01,
+                                            nodes: [
+
+                                                {
+                                                    type: "scale",
+                                                    x: 1000,
+                                                    y: .5,
+                                                    z: 1000,
+                                                    nodes: [
+                                                        {
+                                                            type: "rotate",
+                                                            x: 1,
+                                                            angle: 90,
+                                                            nodes: [
+
+                                                                // Plane primitive implemented by plugin at
+                                                                // http://scenejs.org/api/latest/plugins/node/geometry/plane.js
+                                                                {
+                                                                    type: "geometry/plane",
+                                                                    width: 1,
+                                                                    height: 1,
+                                                                    wire: true,
+                                                                    widthSegments: 200,
+                                                                    heightSegments: 200
+                                                                }
+                                                            ]
                                                         }
-                                                    }
-                                                ],
-                                                nodes: [
-                                                    {
-                                                        type: "scale",
-                                                        x: 1000,
-                                                        y: .5,
-                                                        z: 1000,
-                                                        nodes: [
-                                                            {
-                                                                type: "rotate",
-                                                                x: 1,
-                                                                angle: 90,
-                                                                nodes: [
+                                                    ]
+                                                }
 
-                                                                    // Plane primitive implemented by plugin at
-                                                                    // http://scenejs.org/api/latest/plugins/node/geometry/plane.js
-                                                                    {
-                                                                        type: "geometry/plane",
-                                                                        width: 1,
-                                                                        height: 1,
-                                                                        wire: true,
-                                                                        widthSegments: 200,
-                                                                        heightSegments: 200
-                                                                    }
-                                                                ]
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
-                                            }
-                                        ]
-                                    },
+                                            ]
+                                        },
 
-                                    // Bubbles
+                                        // Bubbles
 
-                                    {
-                                        type: "fresnel",
-                                        applyTo: "alpha",
-                                        bias: 0.0,
-                                        power: 3,
+                                        // Alpha fresnel
+                                        {
+                                            type: "fresnel",
+                                            applyTo: "alpha",
+                                            edgeBias: 0.0,
+                                            centerBias: 1.0,
+                                            power: 1.0,
+                                            edgeColor: {r: 1.0, g: 1.0, b: 1.0},
+                                            centerColor: {r: 0.0, g: 0.0, b: 0.0},
 
-                                        nodes: [
-                                            {
-                                                type: "flags",
-                                                flags: {
-                                                    transparent: true,
-                                                    backfaces: false
-                                                },
-                                                nodes: [
-                                                    {
-                                                        type: "texture",
-                                                        src: "textures/oilySheen.jpg",
-                                                        applyTo: "color",
+                                            nodes: [
+                                                {
+                                                    type: "flags",
+                                                    flags: {
+                                                        transparent: true,
+                                                        backfaces: false
+                                                    },
+                                                    nodes: [
+                                                        {
+                                                            type: "texture",
+                                                            src: "textures/oilySheen.jpg",
+                                                            applyTo: "color",
 
-                                                        nodes: [
-                                                            {
-                                                                type: "material",
-                                                                coreId: "bubble",
-                                                                emit: 0.0,
-                                                                color: { r: 1.0, g: 1.0, b: 1.0 },
-                                                                specularColor: { r: 1.0, g: 1.0, b: 1.0 },
-                                                                alpha: 0.9,
+                                                            nodes: [
+                                                                {
+                                                                    type: "material",
+                                                                    coreId: "bubble",
+                                                                    emit: 0.0,
+                                                                    color: {r: 1.0, g: 1.0, b: 1.0},
+                                                                    specularColor: {r: 1.0, g: 1.0, b: 1.0},
+                                                                    alpha: 0.9,
 //                                                                specular: 1.0,
 //                                                                shine: 10.0,
 
-                                                                nodes: [
-                                                                    {
-                                                                        type: "node",
-                                                                        id: "content"
-                                                                    }
-                                                                ]
-                                                            }
-                                                        ]
-                                                    }
-                                                ]
+                                                                    nodes: [
+                                                                        {
+                                                                            type: "node",
+                                                                            id: "content"
+                                                                        }
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
 
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+
+                // Scene options: create scene to support forced WebGL context loss.
+                // This will slow the FPS down somewhat.
+                {
+                    simulateWebGLContextLost: true
+                });
+
+    }
+
+    // Bubble factory
+
+    function createBubbles() {
+
+        var num = 100;
+
+        // Get content node asynch because it's a child of the 'cameras/orbit' node,
+        // which is loaded from a node type plugin
+
+        scene.getNode("content",
+                function (contentNode) {
+                    bubbles = [];
+                    bubbleNames = {};
+                    var bubble;
+
+                    for (var i = 0; i < num; i++) {
+
+                        bubble = new (function () {
+
+                            var scale = 0.2 + (Math.random() * 2);
+
+                            this.reset = function () {
+                                this.pos = {
+                                    x: (Math.random() * 20) - 10,
+                                    y: 2,
+                                    z: (Math.random() * 20) - 10
+                                };
+                                this.dir = {
+                                    x: 0,
+                                    y: 0.1 + Math.random() * 0.1,
+                                    z: 0
+                                };
+                                this.age = 0;
+                                this.wobbleAge = 0;
+                                this.lifeSpan = 10000 + Math.random() * 10000;
+                                this.popped = false;
+                            };
+
+                            this.reset();
+
+                            var name = "o" + i;
+                            this.name = contentNode.addNode({
+                                type: "name",
+                                name: name
+                            });
+                            bubbleNames[name] = this;
+
+                            this.translate = this.name.addNode({
+                                type: "translate"
+                            });
+                            this.size = this.translate.addNode({
+                                type: "scale",
+                                x: scale,
+                                y: scale,
+                                z: scale
+                            });
+                            this.rotate = this.size.addNode({
+                                type: "rotate",
+                                x: Math.random() - 0.5,
+                                y: Math.random() - 0.5,
+                                z: Math.random() - 0.5,
+                                angle: 0
+                            });
+                            this.rotate.addNode(
+                                    // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                    {
+                                        type: "geometry/sphere"
+                                    });
+                            this.angle = 0;
+                            this.angleInc = Math.random() - 0.5;
+                        })();
+
+                        bubbles.push(bubble);
                     }
-                ]
-            },
 
-            // Scene options: create scene to support forced WebGL context loss.
-            // This will slow the FPS down somewhat.
-            {
-                simulateWebGLContextLost: true
-            });
+                    var t = (new Date()).getTime();
+                    scene.on("tick",
+                            function () {
+                                var timeNow = (new Date()).getTime();
+                                var timeSinceLast = timeNow - t;
+                                var bubble;
+                                var pos;
+                                for (var i = 0; i < num; i++) {
 
-}
+                                    bubble = bubbles[i];
 
-// Bubble factory
-
-function createBubbles() {
-
-    var num = 100;
-
-    // Get content node asynch because it's a child of the 'cameras/orbit' node,
-    // which is loaded from a node type plugin
-
-    scene.getNode("content",
-            function (contentNode) {
-                bubbles = [];
-                bubbleNames = {};
-                var bubble;
-
-                for (var i = 0; i < num; i++) {
-
-                    bubble = new (function () {
-
-                        var scale = 0.2 + (Math.random() * 2);
-
-                        this.reset = function () {
-                            this.pos = {
-                                x: (Math.random() * 20) - 10,
-                                y: 2,
-                                z: (Math.random() * 20) - 10
-                            };
-                            this.dir = {
-                                x: 0,
-                                y: 0.1 + Math.random() * 0.1,
-                                z: 0
-                            };
-                            this.age = 0;
-                            this.wobbleAge = 0;
-                            this.lifeSpan = 10000 + Math.random() * 10000;
-                            this.popped = false;
-                        };
-
-                        this.reset();
-
-                        var name = "o" + i;
-                        this.name = contentNode.addNode({
-                            type: "name",
-                            name: name
-                        });
-                        bubbleNames[name] = this;
-
-                        this.translate = this.name.addNode({
-                            type: "translate"
-                        });
-                        this.size = this.translate.addNode({
-                            type: "scale",
-                            x: scale,
-                            y: scale,
-                            z: scale
-                        });
-                        this.rotate = this.size.addNode({
-                            type: "rotate",
-                            x: Math.random() - 0.5,
-                            y: Math.random() - 0.5,
-                            z: Math.random() - 0.5,
-                            angle: 0
-                        });
-                        this.rotate.addNode(
-                                // Sphere geometry node implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
-                                {
-                                    type: "geometry/sphere"
-                                });
-                        this.angle = 0;
-                        this.angleInc = Math.random() - 0.5;
-                    })();
-
-                    bubbles.push(bubble);
-                }
-
-                var t = (new Date()).getTime();
-                scene.on("tick",
-                        function () {
-                            var timeNow = (new Date()).getTime();
-                            var timeSinceLast = timeNow - t;
-                            var bubble;
-                            var pos;
-                            for (var i = 0; i < num; i++) {
-
-                                bubble = bubbles[i];
-
-                                if (bubble.popped) {
-                                    bubble.reset();
-
-                                } else {
-
-                                    bubble.age += timeSinceLast;
-
-                                    pos = bubble.pos;
-
-                                    if (bubble.age > bubble.lifeSpan) {
+                                    if (bubble.popped) {
                                         bubble.reset();
+
                                     } else {
-                                        pos.x += bubble.dir.x;
-                                        pos.y += bubble.dir.y;
-                                        pos.z += bubble.dir.z;
+
+                                        bubble.age += timeSinceLast;
+
+                                        pos = bubble.pos;
+
+                                        if (bubble.age > bubble.lifeSpan) {
+                                            bubble.reset();
+                                        } else {
+                                            pos.x += bubble.dir.x;
+                                            pos.y += bubble.dir.y;
+                                            pos.z += bubble.dir.z;
+                                        }
                                     }
+
+                                    bubble.translate.setXYZ(pos);
+
+                                    if (++bubble.wobbleAge > 20 + (Math.random() * 10)) {
+                                        bubble.dir.x += (Math.random() - 0.5) * 0.1;
+                                        bubble.dir.z += (Math.random() - 0.5) * 0.1;
+                                        bubble.wobbleAge = 0;
+                                    }
+
+                                    bubble.rotate.setAngle(bubble.angle += bubble.angleInc);
                                 }
+                                t = timeNow;
+                            });
+                });
+    }
 
-                                bubble.translate.setXYZ(pos);
-
-                                if (++bubble.wobbleAge > 20 + (Math.random() * 10)) {
-                                    bubble.dir.x += (Math.random() - 0.5) * 0.1;
-                                    bubble.dir.z += (Math.random() - 0.5) * 0.1;
-                                    bubble.wobbleAge = 0;
-                                }
-
-                                bubble.rotate.setAngle(bubble.angle += bubble.angleInc);
-                            }
-                            t = timeNow;
-                        });
+    // Bubble pick handler, sets bubbles into 'popped' state when picked
+    scene.on("pick",
+            function (params) {
+                var bubble = bubbleNames[params.name];
+                bubble.popped = true;
             });
-}
 
-// Bubble pick handler, sets bubbles into 'popped' state when picked
-scene.on("pick",
-        function (params) {
-            var bubble = bubbleNames[params.name];
-            bubble.popped = true;
-        });
+    // Get message element
+    var info = document.getElementById("infoTxt");
 
-// Get message element
-var info = document.getElementById("infoTxt");
+    // Subscribe to WebGL context loss and restore notifications from SceneJS
+    SceneJS.on("webglcontextlost",
+            function (params) {
+                info.innerHTML = "WebGL context lost";
+            });
+    SceneJS.on("webglcontextrestored",
+            function (params) {
+                info.innerHTML = "WebGL context restored";
+            });
 
-// Subscribe to WebGL context loss and restore notifications from SceneJS
-SceneJS.on("webglcontextlost",
-        function (params) {
-            info.innerHTML = "WebGL context lost";
-        });
-SceneJS.on("webglcontextrestored",
-        function (params) {
-            info.innerHTML = "WebGL context restored";
-        });
-
-// Simulate WebGL context loss at interval
-var countDown = 5;
-window.setInterval(
-        function () {
-            if (countDown == 0) {
-                scene.loseWebGLContext();
-                countDown = 5;
-            } else {
-                info.innerHTML = "Forcing WebGL context loss in " + countDown + " seconds";
-                countDown--;
-            }
-        }, 1000);
+    // Simulate WebGL context loss at interval
+    var countDown = 5;
+    window.setInterval(
+            function () {
+                if (countDown == 0) {
+                    scene.loseWebGLContext();
+                    countDown = 5;
+                } else {
+                    info.innerHTML = "Forcing WebGL context loss in " + countDown + " seconds";
+                    countDown--;
+                }
+            }, 1000);
 
 
 </script>

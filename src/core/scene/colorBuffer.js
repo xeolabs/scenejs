@@ -81,6 +81,7 @@
         this._engine.display.colorBuffer = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.colorBuffer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
         this._engine.display.imageDirty = true;
     };
 

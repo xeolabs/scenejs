@@ -3,9 +3,9 @@
  */
 SceneJS_ChunkFactory.createChunkType({
 
-    type:"geometry",
+    type: "geometry",
 
-    build:function () {
+    build: function () {
 
         var draw = this.program.draw;
 
@@ -25,6 +25,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         this._aRegionMapUVPick = pick.getAttribute("SCENEJS_aRegionMapUV");
         this._aVertexPick = pick.getAttribute("SCENEJS_aVertex");
+        this._aColorPick = pick.getAttribute("SCENEJS_aColor");
         this._aMorphVertexPick = pick.getAttribute("SCENEJS_aMorphVertex");
         this._uMorphFactorPick = pick.getUniform("SCENEJS_uMorphFactor");
 
@@ -34,7 +35,7 @@ SceneJS_ChunkFactory.createChunkType({
         this.VAOHasInterleavedBuf = false;
     },
 
-    recycle:function () {
+    recycle: function () {
         if (this.VAO) {
             // Guarantee that the old VAO is deleted immediately when recycling the object.
             var VAOExt = this.program.gl.getExtension("OES_vertex_array_object");
@@ -43,7 +44,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
     },
 
-    morphDraw:function () {
+    morphDraw: function () {
         this.VAOMorphKey1 = this.core.key1;
         this.VAOMorphKey2 = this.core.key2;
 
@@ -79,7 +80,7 @@ SceneJS_ChunkFactory.createChunkType({
         this.setDrawMorphFactor();
     },
 
-    setDrawMorphFactor:function () {
+    setDrawMorphFactor: function () {
 
         if (this._uMorphFactorDraw) {
             this._uMorphFactorDraw.setValue(this.core.factor); // Bind LERP factor
@@ -87,7 +88,7 @@ SceneJS_ChunkFactory.createChunkType({
 
     },
 
-    draw:function (frameCtx) {
+    draw: function (frameCtx) {
         var doMorph = this.core.targets && this.core.targets.length;
         var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
@@ -106,7 +107,6 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.VAO.bindVertexArrayOES(null);
             this.VAO = frameCtx.VAO.createVertexArrayOES();
             frameCtx.VAO.bindVertexArrayOES(this.VAO);
-            var gl = this.program.gl;
         }
 
         if (doMorph) {
@@ -134,7 +134,7 @@ SceneJS_ChunkFactory.createChunkType({
 
                     // Lazy-compute tangents as soon as needed.
                     // Unfortunately we can't include them in interleaving because that happened earlier.
-                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangentBuf());
+                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangents());
                 }
             } else {
                 this.VAOHasInterleavedBuf = false;
@@ -156,7 +156,7 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aTangentDraw) {
 
                     // Lazy-compute tangents
-                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangentBuf());
+                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangents());
                 }
             }
         }
@@ -169,40 +169,103 @@ SceneJS_ChunkFactory.createChunkType({
 
     },
 
-    morphPick:function () {
+    morphPick: function (frameCtx) {
 
-        var target1 = this.core.targets[this.core.key1]; // Keys will update
-        var target2 = this.core.targets[this.core.key2];
+        var core = this.core;
+        var core2 = this.core2;
 
-        if (this._aMorphVertexPick) {
-            this._aVertexPick.bindFloatArrayBuffer(target1.vertexBuf);
-            this._aMorphVertexPick.bindFloatArrayBuffer(target2.vertexBuf);
-        } else if (this._aVertexPick) {
-            this._aVertexPick.bindFloatArrayBuffer(this.core2.vertexBuf);
+        var target1 = core.targets[core.key1];
+        var target2 = core.targets[core.key2];
+
+        if (frameCtx.pickObject || frameCtx.pickRegion) {
+
+            if (this._aMorphVertexPick) {
+
+                this._aVertexPick.bindFloatArrayBuffer(target1.vertexBuf);
+                this._aMorphVertexPick.bindFloatArrayBuffer(target2.vertexBuf);
+
+            } else if (this._aVertexPick) {
+                this._aVertexPick.bindFloatArrayBuffer(core2.vertexBuf);
+            }
+
+            core2.indexBuf.bind();
+
+        } else if (frameCtx.pickTriangle) {
+
+            if (this._aMorphVertexPick) {
+
+                var pickPositionsBuf = core.getPickPositions(core.key1, core2.arrays.indices);
+                if (pickPositionsBuf) {
+                    this._aVertexPick.bindFloatArrayBuffer(pickPositionsBuf);
+                }
+
+                pickPositionsBuf = core.getPickPositions(core.key2, core2.arrays.indices);
+                if (pickPositionsBuf) {
+                    this._aMorphVertexPick.bindFloatArrayBuffer(pickPositionsBuf);
+                }
+
+                if (this._aColorPick) {
+                    this._aColorPick.bindFloatArrayBuffer(core2.getPickColors());
+                }
+
+                var pickIndicesBuf = core2.getPickIndices();
+                if (pickIndicesBuf) {
+                    pickIndicesBuf.bind()
+                }
+
+            } else if (this._aVertexPick) {
+
+                this._aVertexPick.bindFloatArrayBuffer(core2.vertexBuf);
+
+                core2.indexBuf.bind();
+            }
         }
 
         if (this._uMorphFactorPick) {
-            this._uMorphFactorPick.setValue(this.core.factor); // Bind LERP factor
+            this._uMorphFactorPick.setValue(core.factor);
         }
-
     },
 
-    pick:function (frameCtx) {
+    pick: function (frameCtx) {
 
-        if (this.core.targets && this.core.targets.length) {
-            this.morphPick();
+        var core = this.core;
+        var core2 = this.core2;
+
+        if (core.targets && core.targets.length) {
+
+            this.morphPick(frameCtx);
 
         } else {
 
-            if (this._aVertexPick) {
-                this._aVertexPick.bindFloatArrayBuffer(this.core2.vertexBuf);
-            }
+            if (frameCtx.pickObject || frameCtx.pickRegion) {
 
-            if (this._aRegionMapUVPick) {
-                this._aRegionMapUVPick.bindFloatArrayBuffer(this.core2.uvBuf);
+                if (this._aVertexPick) {
+                    this._aVertexPick.bindFloatArrayBuffer(core2.vertexBuf);
+                }
+
+                if (this._aRegionMapUVPick) {
+                    this._aRegionMapUVPick.bindFloatArrayBuffer(core2.uvBuf);
+                }
+
+                core2.indexBuf.bind();
+
+            } else if (frameCtx.pickTriangle) {
+
+                if (this._aVertexPick) {
+                    this._aVertexPick.bindFloatArrayBuffer(core2.getPickPositions());
+                }
+
+                if (this._aColorPick) {
+                    this._aColorPick.bindFloatArrayBuffer(core2.getPickColors());
+                }
+
+                var pickIndices = core2.getPickIndices();
+
+                if (pickIndices) {
+                    pickIndices.bind()
+                }
+
             }
         }
-
-        this.core2.indexBuf.bind();
     }
 });

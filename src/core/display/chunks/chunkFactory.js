@@ -77,21 +77,21 @@ SceneJS_ChunkFactory.prototype.getChunk = function(chunkId, type, program, core,
         return chunk;
     }
 
-    var freeChunks = SceneJS_ChunkFactory._freeChunks[type]; // Try to recycle a free chunk
-
-    if (freeChunks.chunksLen > 0) {
-        chunk = freeChunks.chunks[--freeChunks.chunksLen];
-    }
-
-    if (chunk) {    // Reinitialise the recycled chunk
-
-        chunk.init(chunkId, program, core, core2);
-
-    } else {        // Instantiate a fresh chunk
+    //var freeChunks = SceneJS_ChunkFactory._freeChunks[type]; // Try to recycle a free chunk
+    //
+    //if (freeChunks.chunksLen > 0) {
+    //    chunk = freeChunks.chunks[--freeChunks.chunksLen];
+    //}
+    //
+    //if (chunk) {    // Reinitialise the recycled chunk
+    //
+    //    chunk.init(chunkId, program, core, core2);
+    //
+    //} else {        // Instantiate a fresh chunk
 
         chunk = new chunkClass(chunkId, program, core, core2); // Create new chunk
 
-    }
+//    }
 
     chunk.type = type;
 
@@ -121,9 +121,9 @@ SceneJS_ChunkFactory.prototype.putChunk = function (chunk) {
 
         delete this._chunks[chunk.id];
 
-        var freeChunks = SceneJS_ChunkFactory._freeChunks[chunk.type];
+    //    var freeChunks = SceneJS_ChunkFactory._freeChunks[chunk.type];
 
-        freeChunks.chunks[freeChunks.chunksLen++] = chunk;
+    //    freeChunks.chunks[freeChunks.chunksLen++] = chunk;
     }
 };
 

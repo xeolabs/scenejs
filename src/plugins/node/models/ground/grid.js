@@ -50,8 +50,8 @@ SceneJS.Types.addType("models/ground/grid", {
                         size: { x: 10000, z: 10000 },
                         width: 10000,
                         height: 10000,
-                        widthSegments: 100,
-                        heightSegments: 100
+                        widthSegments: 10,
+                        heightSegments: 10
                     }
                 ]
             },
@@ -74,8 +74,8 @@ SceneJS.Types.addType("models/ground/grid", {
                                 size: { x: 10000, z: 10000 },
                                 width: 10000,
                                 height: 10000,
-                                widthSegments: 2,
-                                heightSegments: 2,
+                                widthSegments: 100,
+                                heightSegments: 100,
                                 wire: false
                             }
                         ]

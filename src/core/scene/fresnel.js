@@ -154,6 +154,7 @@ new (function () {
         this._engine.display.fresnel = this.__core;
         this._compileNodes(ctx);
         this._engine.display.fresnel = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.Fresnel.prototype._makeHash = function (core) {

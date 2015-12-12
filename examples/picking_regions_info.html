@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #info {
+            position: absolute;
+            top: 200px;
+            width: 100%;
+            color: #ffffff;
+            padding: 5px;
+            font-family: Monospace;
+            font-size: 18px;
+            text-align: center;
+            background: black;
+            opacity: 0.6;
+            z-index: 100000;
+        }
+
+        #infoTxt {
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - region picking - info
+    <br>
+    SceneJS allows you to define regions on a surface using a texture. 
+    <br>
+    Arbitrary data can be associated with regions, and that data will be returned on pick. 
+    <br>
+    Regions can also be interacted with in three ways: highlight, hide, isolate
+    <br>
+    Hover your mouse over the surface below to retrieve region data.
+    <div id="infoTxt">Pick a region!
+    </div>
+</div>
+
+<script>
+
+    //
+    // Demonstrates how to define pickable regions
+    //
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbit for camera,
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 270,
+                pitch: -40,
+                maxPitch: -10,
+                minPitch: -80,
+                zoom: 2500,
+                eye: {x: 0, y: 550, z: -1500},
+                look: {x: 0, y: 150, z: 0},
+                zoomSensitivity: 20.0,
+                showCursor: true,
+                cursorSize: 4.0,
+
+                nodes: [
+                    {
+                        type: "layer",
+                        priority: -1,
+                        nodes: [
+                            {
+                                type:"skybox/cloudySea"
+                            }
+                        ]
+                    },
+
+                    // The region map
+                    {
+                        type: "regionMap",
+                        id: "myRegionMap",
+
+                        mode: "info",
+
+                        // Colors of the texture define regions of the surface
+                        src: 'textures/regions.png',
+
+                        // Arbitrary data can be associated with a particular region
+                        regionData: [
+                            {
+                                // Dark green
+                                color: {
+                                    r: 0,
+                                    g: 0.2,
+                                    b: 0
+                                },
+                                data: {
+                                    name: "Greenland"
+                                }
+                            },
+                            {
+                                color: {
+                                    r: 1,
+                                    g: 0,
+                                    b: 0
+                                },
+                                data: {
+                                    name: "Redland"
+                                }
+                            },
+                            {
+                                color: {
+                                    r: 1,
+                                    g: 1,
+                                    b: 0
+                                },
+                                data: {
+                                    name: "Yellowland"
+                                }
+                            },
+                            {
+                                color: {
+                                    r: 0.8,
+                                    g: 0,
+                                    b: 0.8
+                                },
+                                data: {
+                                    name: "Mauveland"
+                                }
+                            },
+                            {
+                                color: {
+                                    r: 0.8,
+                                    g: 0.2,
+                                    b: 0
+                                },
+                                data: {
+                                    name: "Brownland"
+                                }
+                            },
+                            {
+                                color: {
+                                    r: 0,
+                                    g: 0.6,
+                                    b: 1
+                                },
+                                data: {
+                                    name: "Skyland"
+                                }
+                            },
+                            {
+                                color: {
+                                    r: 0,
+                                    g: 0,
+                                    b: 1
+                                },
+                                data: {
+                                    name: "Blueland"
+                                }
+                            },
+                            {
+                                color: {
+                                    r: 0.4,
+                                    g: 0,
+                                    b: 0.8
+                                },
+                                data: {
+                                    name: "Purpleland"
+                                }
+                            }
+                        ],
+
+                        nodes: [
+
+                            // Color map, applying the region map
+                            // to base color so that we can visualise it
+                            {
+                                type: "texture",
+                                src: 'textures/regions.png',
+                                applyTo: "color",
+                                blendMode: "add",
+
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        "baseColor": {
+                                            "b": 0.0,
+                                            "g": 0.0,
+                                            "r": 0.0
+                                        },
+                                        "shine": 20.0,
+                                        "specular": 0.5,
+                                        "specularColor": {
+                                            "b": 0.5,
+                                            "g": 0.5,
+                                            "r": 0.5
+                                        },
+                                        "nodes": [
+
+                                            // Heightmap, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+                                            {
+                                                type: "geometry/heightmap",
+
+                                                // Texture image
+                                                src: 'textures/terrainHeightMap.png',
+
+                                                // Wireframe or solid - default is false
+                                                wire: false,
+
+                                                // Dimensions
+                                                xSize: 2000,
+                                                zSize: 2000,
+                                                ySize: 800,
+
+                                                // Segments on X and Z axis
+                                                xSegments: 150,
+                                                zSegments: 150
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Pick hit handler
+    // Shows pick info in an HTML element
+
+    var info = document.getElementById("infoTxt");
+
+    scene.on("pick",
+            function (hit) {
+
+                info.innerHTML = "You are in: " + (hit.regionData.name || "Nowhere!");
+
+                var color = hit.color; // Eg. { r: 0.3, g: 0.5, b: 1.0 }
+                var canvasPos = hit.canvasPos;
+
+                scene.getNode("myRegionMap",
+                        function (regionMap) {
+                            regionMap.setRegionColor(color);
+                        });
+            });
+
+    // Called when nothing picked
+
+    scene.on("nopick",
+            function () {
+                info.innerHTML = "Nothing picked.";
+            });
+
+    // Mouse event handling
+
+    var canvas = scene.getCanvas();
+
+    canvas.addEventListener('mousemove',
+            function (event) {
+                scene.pick(event.clientX, event.clientY, { regionPick: true });
+            }, true);
+
+</script>
+</body>
+</html>

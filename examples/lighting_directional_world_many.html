@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.min.js"></script>
+
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoLight">
+    <a href="http://scenejs.org">SceneJS</a> - 100 point light sources in World-space
+</div>
+
+<script>
+
+    var NUM_LIGHTS = 100;
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var lights = [];
+
+    for (var n = 0; n < NUM_LIGHTS; n++) {
+        lights.push({
+            mode: "point",
+            color: {
+                r: 0.2 + Math.random() * 0.8,
+                g: 0.2 + Math.random() * 0.8,
+                b: 0.2 + Math.random() * 0.8
+            },
+            diffuse: true,
+            specular: true,
+            pos: {
+                x: Math.random() * 20 - 10,
+                y: Math.random() * 20 - 10,
+                z: 0.5
+            },
+            constantAttenuation: 0.0, // [0..1]
+            linearAttenuation: 0.1, // [0..1]
+            quadraticAttenuation: 0.0, // [0..1]
+            space: "world"
+        });
+    }
+
+    var indicatorNodes = [];
+    var light;
+
+    for (var i = 0; i < lights.length; i++) {
+
+        light = lights[i];
+
+        indicatorNodes.push({
+            type: "translate",
+            id: "lightIndicator" + i,
+            x: light.pos.x,
+            y: light.pos.y,
+            z: light.pos.z,
+            nodes: [
+                {
+                    type: "material",
+                    emit: 0.1,
+                    color: {
+                        r: light.color.r,
+                        g: light.color.g,
+                        b: light.color.b
+                    },
+                    specularColor: {
+                        r: light.color.r,
+                        g: light.color.g,
+                        b: light.color.b
+                    },
+                    specular: 3.0,
+                    shine: 70.0,
+                    nodes: [
+
+                        // Sphere geometry node implemented by plugin at
+                        // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                        {
+                            type: "geometry/sphere",
+                            radius: 0.2
+                        }
+                    ]
+                }
+            ]
+        });
+    }
+
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 30,
+                zoomSensitivity: 5,
+                spin: 0.3,
+
+                nodes: [
+
+                    // Override default lights, defining a single directional light in World-space
+                    // that has both diffuse and specular components. Since the light is in World-space,
+                    // it will move relative to our changing viewpoint, as if it
+                    // were a fixture in the scene.
+                    {
+                        type: "lights",
+                        id: "myLights", // So we can reference this lights node
+                        lights: lights,
+                        nodes: [
+                            {
+                                type: "material",
+                                id: "myMaterial",
+                                color: {r: 0.5, g: 0.5, b: 1.0},
+                                specularColor: {r: 1.0, g: 1.0, b: 1.0},
+                                specular: 0.3,
+                                shine: 70.0,
+                                emit: 0,
+
+                                nodes: [
+                                    // Plane primitive, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/plane.js
+                                    {
+                                        type: "geometry/plane",
+                                        width: 25,
+                                        height: 25,
+                                        widthSegments: 10,
+                                        heightSegments: 10
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        nodes: indicatorNodes
+                    }
+                ]
+            }
+        ]
+    });
+
+
+
+
+</script>
+</body>
+</html>

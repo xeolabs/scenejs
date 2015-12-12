@@ -384,6 +384,7 @@ new (function () {
         this._engine.display.texture = this.__core;
         this._compileNodes(ctx);
         this._engine.display.texture = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
     };
 
     SceneJS.TextureMap.prototype._makeHash = function (core) {
