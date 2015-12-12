@@ -23,6 +23,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var clipping;
     var morphing;
     var regionMapping;
+    var regionInteraction;
     var depthTargeting;
 
     var src = ""; // Accumulates source code as it's being built
@@ -56,6 +57,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         clipping = states.clips.clips.length > 0;
         morphing = !!states.morphGeometry.targets;
         regionMapping = !states.regionMap.empty;
+        regionInteraction = regionMapping && states.regionMap.mode !== "info";
         depthTargeting = hasDepthTarget();
 
         source = new SceneJS_ProgramSource(
@@ -327,7 +329,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
             add("attribute vec2 SCENEJS_aRegionMapUV;");
             add("varying vec2 SCENEJS_vRegionMapUV;");
         }
@@ -437,7 +439,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("SCENEJS_vColor = SCENEJS_aVertexColor;");
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
             add("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
         }
 
@@ -544,10 +546,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
             add("varying vec2 SCENEJS_vRegionMapUV;");
             add("uniform sampler2D SCENEJS_uRegionMapSampler;");
-            add("uniform vec3 SCENEJS_uRegionMapHighlightColor;");
+            add("uniform vec3 SCENEJS_uRegionMapRegionColor;");
             add("uniform vec3 SCENEJS_uRegionMapHighlightFactor;");
         }
 
@@ -1125,16 +1127,28 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
 
             // Region map highlighting
 
             add("vec3 regionColor = texture2D(SCENEJS_uRegionMapSampler, vec2(SCENEJS_vRegionMapUV.s, 1.0 - SCENEJS_vRegionMapUV.t)).rgb;");
             add("float tolerance = 0.01;");
-            add("vec3 colorDelta = abs(SCENEJS_uRegionMapHighlightColor - regionColor);");
-            add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) < tolerance) {");
-            add("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
-            add("}");
+            add("vec3 colorDelta = abs(SCENEJS_uRegionMapRegionColor - regionColor);");
+            if (states.regionMap.mode === "highlight" || states.regionMap.mode === "hide") {
+                add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) < tolerance) {");
+                if (states.regionMap.mode === "highlight") {
+                    add("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
+                } else {
+                    // mode = "hide"
+                    add("  fragColor.a = 0.0;");
+                }
+                add("}");
+            } else {
+                // mode = "isolate"
+                add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) > tolerance) {");
+                add("  fragColor.a = 0.0;");
+                add("}");
+            }
         }
 
         if (fragmentHooks.pixelColor) {

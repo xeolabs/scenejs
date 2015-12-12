@@ -3,7 +3,7 @@ SceneJS_ChunkFactory.createChunkType({
     type: "regionMap",
 
     build: function () {
-        this._uRegionMapHighlightColor = this.program.draw.getUniform("SCENEJS_uRegionMapHighlightColor");
+        this._uRegionMapRegionColor = this.program.draw.getUniform("SCENEJS_uRegionMapRegionColor");
         this._uRegionMapHighlightFactor = this.program.draw.getUniform("SCENEJS_uRegionMapHighlightFactor");
         this._uRegionMapSampler = "SCENEJS_uRegionMapSampler";
     },
@@ -19,8 +19,32 @@ SceneJS_ChunkFactory.createChunkType({
 
         }
 
-        if (this._uRegionMapHighlightColor) {
-            this._uRegionMapHighlightColor.setValue(this.core.highlightColor);
+        var gl = this.program.gl;
+        var transparent = this.core.mode === "hide" || this.core.mode === "isolate";
+
+        if (frameCtx.transparent != transparent) {
+
+            if (transparent) {
+
+                // Entering a transparency bin
+
+                gl.enable(gl.BLEND);
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                frameCtx.blendEnabled = true;
+
+            } else {
+
+                // Leaving a transparency bin
+
+                gl.disable(gl.BLEND);
+                frameCtx.blendEnabled = false;
+            }
+
+            frameCtx.transparent = transparent;
+        }
+
+        if (this._uRegionMapRegionColor) {
+            this._uRegionMapRegionColor.setValue(this.core.regionColor);
         }
 
         if (this._uRegionMapHighlightFactor) {

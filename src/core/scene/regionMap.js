@@ -10,9 +10,10 @@ new (function () {
         stateId: SceneJS._baseStateId++,
         empty: true,
         texture: null,
-        highlightColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
+        regionColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
         highlightFactor:[ 1.5, 1.5, 0.0 ],
         regionData: [],
+        mode: "info",
         hash: ""
     };
 
@@ -24,6 +25,12 @@ new (function () {
         });
 
     var stackLen = 0;
+    var validModes = {
+        info: true,
+        highlight: true,
+        hide: true,
+        isolate: true
+    };
 
     /**
      * @class Scene graph node which defines a color-coded region map
@@ -84,11 +91,10 @@ new (function () {
                 }
             };
 
-            this.setHighlightColor(params.highlightColor);
+            this.setRegionColor(params.regionColor);
             this.setHighlightFactor(params.highlightFactor);
             this.setRegionData(params.regionData);
-
-            this._core.hash = "reg";
+            this.setMode(params.mode);
         }
     };
 
@@ -227,13 +233,13 @@ new (function () {
         this._engine.display.imageDirty = true;
     };
 
-    SceneJS.RegionMap.prototype.setHighlightColor = function (color) {
-        var defaultHighlightColor = defaultCore.highlightColor;
-        this._core.highlightColor = color ? [
+    SceneJS.RegionMap.prototype.setRegionColor = function (color) {
+        var defaultHighlightColor = defaultCore.regionColor;
+        this._core.regionColor = color ? [
             color.r != undefined && color.r != null ? color.r : defaultHighlightColor[0],
             color.g != undefined && color.g != null ? color.g : defaultHighlightColor[1],
             color.b != undefined && color.b != null ? color.b : defaultHighlightColor[2]
-        ] : defaultCore.highlightColor;
+        ] : defaultCore.regionColor;
         this._engine.display.imageDirty = true;
         return this;
     };
@@ -246,6 +252,14 @@ new (function () {
             color.b != undefined && color.b != null ? color.b : defaultHighlightFactor[2]
         ] : defaultCore.highlightFactor;
         this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.RegionMap.prototype.setMode = function (mode) {
+        this._core.mode = mode && validModes[mode] ? mode : defaultCore.mode;
+        this._engine.branchDirty(this);
+        this._engine.display.imageDirty = true;
+        this._core.hash = "reg-" + mode;
         return this;
     };
 
