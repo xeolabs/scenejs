@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-12-11
+ * Built on 2015-12-12
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -14945,7 +14945,7 @@ new (function () {
         regionColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
         highlightFactor:[ 1.5, 1.5, 0.0 ],
         regionData: [],
-        mode: "highlight",
+        mode: "info",
         hash: ""
     };
 
@@ -14958,9 +14958,10 @@ new (function () {
 
     var stackLen = 0;
     var validModes = {
+        info: true,
         highlight: true,
         hide: true,
-        isolate: true,
+        isolate: true
     };
 
     /**
@@ -17762,6 +17763,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var clipping;
     var morphing;
     var regionMapping;
+    var regionInteraction;
     var depthTargeting;
 
     var src = ""; // Accumulates source code as it's being built
@@ -17795,6 +17797,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         clipping = states.clips.clips.length > 0;
         morphing = !!states.morphGeometry.targets;
         regionMapping = !states.regionMap.empty;
+        regionInteraction = regionMapping && states.regionMap.mode !== "info";
         depthTargeting = hasDepthTarget();
 
         source = new SceneJS_ProgramSource(
@@ -18066,7 +18069,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
             add("attribute vec2 SCENEJS_aRegionMapUV;");
             add("varying vec2 SCENEJS_vRegionMapUV;");
         }
@@ -18176,7 +18179,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("SCENEJS_vColor = SCENEJS_aVertexColor;");
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
             add("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
         }
 
@@ -18283,7 +18286,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
             add("varying vec2 SCENEJS_vRegionMapUV;");
             add("uniform sampler2D SCENEJS_uRegionMapSampler;");
             add("uniform vec3 SCENEJS_uRegionMapRegionColor;");
@@ -18864,7 +18867,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
 
             // Region map highlighting
 
