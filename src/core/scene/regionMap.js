@@ -13,7 +13,7 @@ new (function () {
         regionColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
         highlightFactor:[ 1.5, 1.5, 0.0 ],
         regionData: [],
-        mode: "highlight",
+        mode: "info",
         hash: ""
     };
 
@@ -26,9 +26,10 @@ new (function () {
 
     var stackLen = 0;
     var validModes = {
+        info: true,
         highlight: true,
         hide: true,
-        isolate: true,
+        isolate: true
     };
 
     /**

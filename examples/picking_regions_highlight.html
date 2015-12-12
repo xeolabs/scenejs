@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
     <style>
         body {
             margin: 0;
@@ -26,19 +29,26 @@
             opacity: 0.6;
             z-index: 100000;
         }
+
+        #infoTxt {
+            color: black;
+        }
     </style>
-    <script src="../api/latest/scenejs.js"></script>
-    <link href="css/styles.css" rel="stylesheet"/>
 </head>
 
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org" target="_other">SceneJS</a> - picking - region mapping
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - region picking - highlight
     <br>
+    SceneJS allows you to define regions on a surface using a texture. 
     <br>
-
-    <div id="infoTxt">Click somewhere!
+    Arbitrary data can be associated with regions, and that data will be returned on pick. 
+    <br>
+    Regions can also be interacted with in three ways: highlight, hide, isolate
+    <br>
+    Hover your mouse over the surface below to highlight a region.
+    <div id="infoTxt">Pick a region!
     </div>
 </div>
 
@@ -73,61 +83,117 @@
                 cursorSize: 4.0,
 
                 nodes: [
+                    {
+                        type: "layer",
+                        priority: -1,
+                        nodes: [
+                            {
+                                type:"skybox/cloudySea"
+                            }
+                        ]
+                    },
 
                     // The region map
                     {
                         type: "regionMap",
                         id: "myRegionMap",
 
+                        mode: "highlight",
+
+                        // Yellow highlight
+                        highlightFactor: {
+                            r: 1.5,
+                            g: 1.5,
+                            b: 0
+                        },
+
                         // Colors of the texture define regions of the surface
-                        src: 'textures/terrainHeightMap.png',
+                        src: 'textures/regions.png',
 
                         // Arbitrary data can be associated with a particular region
                         regionData: [
                             {
+                                // Dark green
                                 color: {
-                                    r: 0.1,
-                                    g: 0.1,
-                                    b: 0.1
+                                    r: 0,
+                                    g: 0.2,
+                                    b: 0
                                 },
                                 data: {
-                                    message: "Getting started!"
+                                    name: "Greenland"
                                 }
                             },
                             {
                                 color: {
-                                    r: 0.33333,
-                                    g: 0.33333,
-                                    b: 0.33333
+                                    r: 1,
+                                    g: 0,
+                                    b: 0
                                 },
                                 data: {
-                                    message: "Halfway there!"
+                                    name: "Redland"
                                 }
                             },
                             {
                                 color: {
-                                    r: 0.5,
-                                    g: 0.5,
-                                    b: 0.5
+                                    r: 1,
+                                    g: 1,
+                                    b: 0
                                 },
                                 data: {
-                                    message: "Almost!"
+                                    name: "Yellowland"
                                 }
                             },
                             {
                                 color: {
-                                    r: 0.6666,
-                                    g: 0.6666,
-                                    b: 0.6666
+                                    r: 0.8,
+                                    g: 0,
+                                    b: 0.8
                                 },
                                 data: {
-                                    message: "Made it!"
+                                    name: "Mauveland"
                                 }
                             },
+                            {
+                                color: {
+                                    r: 0.8,
+                                    g: 0.2,
+                                    b: 0
+                                },
+                                data: {
+                                    name: "Brownland"
+                                }
+                            },
+                            {
+                                color: {
+                                    r: 0,
+                                    g: 0.6,
+                                    b: 1
+                                },
+                                data: {
+                                    name: "Skyland"
+                                }
+                            },
+                            {
+                                color: {
+                                    r: 0,
+                                    g: 0,
+                                    b: 1
+                                },
+                                data: {
+                                    name: "Blueland"
+                                }
+                            },
+                            {
+                                color: {
+                                    r: 0.4,
+                                    g: 0,
+                                    b: 0.8
+                                },
+                                data: {
+                                    name: "Purpleland"
+                                }
+                            }
                         ],
-                        highlightFactor: {
-                            r: 1.5, g: 1.5, b: 0.0
-                        },
 
                         nodes: [
 
@@ -195,7 +261,7 @@
     scene.on("pick",
             function (hit) {
 
-                info.innerHTML = "Message: " + (hit.regionData.message || "(None)");
+                info.innerHTML = "You are in: " + (hit.regionData.name || "Nowhere!");
 
                 var color = hit.color; // Eg. { r: 0.3, g: 0.5, b: 1.0 }
                 var canvasPos = hit.canvasPos;

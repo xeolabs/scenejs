@@ -39,7 +39,7 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org" target="_other">SceneJS</a> - region picking - isolate
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - region picking - info
     <br>
     SceneJS allows you to define regions on a surface using a texture. 
     <br>
@@ -47,7 +47,7 @@
     <br>
     Regions can also be interacted with in three ways: highlight, hide, isolate
     <br>
-    Hover your mouse over the surface below to isolate a region.
+    Hover your mouse over the surface below to retrieve region data.
     <div id="infoTxt">Pick a region!
     </div>
 </div>
@@ -98,7 +98,7 @@
                         type: "regionMap",
                         id: "myRegionMap",
 
-                        mode: "isolate",
+                        mode: "info",
 
                         // Colors of the texture define regions of the surface
                         src: 'textures/regions.png',
@@ -194,7 +194,7 @@
                             // to base color so that we can visualise it
                             {
                                 type: "texture",
-                                src: 'textures/terrainHeightMap.png',
+                                src: 'textures/regions.png',
                                 applyTo: "color",
                                 blendMode: "add",
 

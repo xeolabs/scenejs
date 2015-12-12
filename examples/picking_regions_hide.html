@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
     <style>
         body {
             margin: 0;
@@ -26,19 +29,26 @@
             opacity: 0.6;
             z-index: 100000;
         }
+
+        #infoTxt {
+            color: black;
+        }
     </style>
-    <script src="../api/latest/scenejs.js"></script>
-    <link href="css/styles.css" rel="stylesheet"/>
 </head>
 
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org" target="_other">SceneJS</a> - picking - region mapping
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - region picking - hide
     <br>
+    SceneJS allows you to define regions on a surface using a texture. 
     <br>
-
-    <div id="infoTxt">Click somewhere!
+    Arbitrary data can be associated with regions, and that data will be returned on pick. 
+    <br>
+    Regions can also be interacted with in three ways: highlight, hide, isolate
+    <br>
+    Hover your mouse over the surface below to hide a region.
+    <div id="infoTxt">Pick a region!
     </div>
 </div>
 
@@ -74,7 +84,13 @@
 
                 nodes: [
                     {
-                        type:"skybox/cloudySea"
+                        type: "layer",
+                        priority: -1,
+                        nodes: [
+                            {
+                                type:"skybox/cloudySea"
+                            }
+                        ]
                     },
 
                     // The region map
@@ -133,8 +149,8 @@
                             {
                                 color: {
                                     r: 0.8,
-                                    g: 0,
-                                    b: 0.2
+                                    g: 0.2,
+                                    b: 0
                                 },
                                 data: {
                                     name: "Brownland"
@@ -178,7 +194,7 @@
                             // to base color so that we can visualise it
                             {
                                 type: "texture",
-                                src: 'textures/regions.png',
+                                src: 'textures/terrainHeightMap.png',
                                 applyTo: "color",
                                 blendMode: "add",
 
