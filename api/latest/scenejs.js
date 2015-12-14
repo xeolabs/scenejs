@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-12-12
+ * Built on 2015-12-14
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -14944,6 +14944,7 @@ new (function () {
         texture: null,
         regionColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
         highlightFactor:[ 1.5, 1.5, 0.0 ],
+        hideAlpha: 0.0,
         regionData: [],
         mode: "info",
         hash: ""
@@ -15025,6 +15026,7 @@ new (function () {
 
             this.setRegionColor(params.regionColor);
             this.setHighlightFactor(params.highlightFactor);
+            this.setHideAlpha(params.hideAlpha);
             this.setRegionData(params.regionData);
             this.setMode(params.mode);
         }
@@ -15183,6 +15185,12 @@ new (function () {
             color.g != undefined && color.g != null ? color.g : defaultHighlightFactor[1],
             color.b != undefined && color.b != null ? color.b : defaultHighlightFactor[2]
         ] : defaultCore.highlightFactor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.RegionMap.prototype.setHideAlpha = function (hideAlpha) {
+        this._core.hideAlpha = hideAlpha != undefined ? hideAlpha : defaultCore.hideAlpha;
         this._engine.display.imageDirty = true;
         return this;
     };
@@ -18291,6 +18299,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("uniform sampler2D SCENEJS_uRegionMapSampler;");
             add("uniform vec3 SCENEJS_uRegionMapRegionColor;");
             add("uniform vec3 SCENEJS_uRegionMapHighlightFactor;");
+            add("uniform float SCENEJS_uRegionMapHideAlpha;");
         }
 
         // True when lighting
@@ -18880,13 +18889,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     add("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
                 } else {
                     // mode = "hide"
-                    add("  fragColor.a = 0.0;");
+                    add("  fragColor.a = SCENEJS_uRegionMapHideAlpha;");
                 }
                 add("}");
             } else {
                 // mode = "isolate"
                 add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) > tolerance) {");
-                add("  fragColor.a = 0.0;");
+                add("  fragColor.a = SCENEJS_uRegionMapHideAlpha;");
                 add("}");
             }
         }
@@ -20442,6 +20451,7 @@ SceneJS_ChunkFactory.createChunkType({
     build: function () {
         this._uRegionMapRegionColor = this.program.draw.getUniform("SCENEJS_uRegionMapRegionColor");
         this._uRegionMapHighlightFactor = this.program.draw.getUniform("SCENEJS_uRegionMapHighlightFactor");
+        this._uRegionMapHideAlpha = this.program.draw.getUniform("SCENEJS_uRegionMapHideAlpha");
         this._uRegionMapSampler = "SCENEJS_uRegionMapSampler";
     },
 
@@ -20486,6 +20496,10 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this._uRegionMapHighlightFactor) {
             this._uRegionMapHighlightFactor.setValue(this.core.highlightFactor);
+        }
+
+        if (this._uRegionMapHideAlpha) {
+            this._uRegionMapHideAlpha.setValue(this.core.hideAlpha);
         }
     },
 

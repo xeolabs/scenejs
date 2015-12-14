@@ -12,6 +12,7 @@ new (function () {
         texture: null,
         regionColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
         highlightFactor:[ 1.5, 1.5, 0.0 ],
+        hideAlpha: 0.0,
         regionData: [],
         mode: "info",
         hash: ""
@@ -93,6 +94,7 @@ new (function () {
 
             this.setRegionColor(params.regionColor);
             this.setHighlightFactor(params.highlightFactor);
+            this.setHideAlpha(params.hideAlpha);
             this.setRegionData(params.regionData);
             this.setMode(params.mode);
         }
@@ -251,6 +253,12 @@ new (function () {
             color.g != undefined && color.g != null ? color.g : defaultHighlightFactor[1],
             color.b != undefined && color.b != null ? color.b : defaultHighlightFactor[2]
         ] : defaultCore.highlightFactor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.RegionMap.prototype.setHideAlpha = function (hideAlpha) {
+        this._core.hideAlpha = hideAlpha != undefined ? hideAlpha : defaultCore.hideAlpha;
         this._engine.display.imageDirty = true;
         return this;
     };
