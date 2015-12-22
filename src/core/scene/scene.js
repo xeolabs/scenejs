@@ -172,7 +172,7 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
  *      { x: 100, y: 22,  r: 0, g: 0, b: 0 },
  *      { x: 120, y: 82,  r: 0, g: 0, b: 0 },
  *      { x: 12,  y: 345, r: 0, g: 0, b: 0 }
- * ], 3, opaqueonly);
+ * ], 3, opaqueOnly);
  * </pre>
  *
  * Then the r,g,b components of the entries will be set to the colors at those pixels.
