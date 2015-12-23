@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-12-11
+ * Built on 2015-12-22
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -12779,7 +12779,7 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
  *      { x: 100, y: 22,  r: 0, g: 0, b: 0 },
  *      { x: 120, y: 82,  r: 0, g: 0, b: 0 },
  *      { x: 12,  y: 345, r: 0, g: 0, b: 0 }
- * ], 3, opaqueonly);
+ * ], 3, opaqueOnly);
  * </pre>
  *
  * Then the r,g,b components of the entries will be set to the colors at those pixels.
@@ -14944,8 +14944,9 @@ new (function () {
         texture: null,
         regionColor:[ -1.0, -1.0, -1.0 ],    // Highlight off by default
         highlightFactor:[ 1.5, 1.5, 0.0 ],
+        hideAlpha: 0.0,
         regionData: [],
-        mode: "highlight",
+        mode: "info",
         hash: ""
     };
 
@@ -14958,9 +14959,10 @@ new (function () {
 
     var stackLen = 0;
     var validModes = {
+        info: true,
         highlight: true,
         hide: true,
-        isolate: true,
+        isolate: true
     };
 
     /**
@@ -15024,6 +15026,7 @@ new (function () {
 
             this.setRegionColor(params.regionColor);
             this.setHighlightFactor(params.highlightFactor);
+            this.setHideAlpha(params.hideAlpha);
             this.setRegionData(params.regionData);
             this.setMode(params.mode);
         }
@@ -15182,6 +15185,12 @@ new (function () {
             color.g != undefined && color.g != null ? color.g : defaultHighlightFactor[1],
             color.b != undefined && color.b != null ? color.b : defaultHighlightFactor[2]
         ] : defaultCore.highlightFactor;
+        this._engine.display.imageDirty = true;
+        return this;
+    };
+
+    SceneJS.RegionMap.prototype.setHideAlpha = function (hideAlpha) {
+        this._core.hideAlpha = hideAlpha != undefined ? hideAlpha : defaultCore.hideAlpha;
         this._engine.display.imageDirty = true;
         return this;
     };
@@ -17691,7 +17700,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 //    }
 };
 
-SceneJS_Display.prototype.readPixels = function (entries, size) {
+SceneJS_Display.prototype.readPixels = function (entries, size, opaqueOnly) {
 
     if (!this._readPixelBuf) {
         this._readPixelBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
@@ -17701,7 +17710,10 @@ SceneJS_Display.prototype.readPixels = function (entries, size) {
 
     this._readPixelBuf.clear();
 
-    this.render({force: true});
+    this.render({
+        force: true,
+        opaqueOnly: opaqueOnly
+    });
 
     var entry;
     var color;
@@ -17762,6 +17774,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var clipping;
     var morphing;
     var regionMapping;
+    var regionInteraction;
     var depthTargeting;
 
     var src = ""; // Accumulates source code as it's being built
@@ -17795,6 +17808,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         clipping = states.clips.clips.length > 0;
         morphing = !!states.morphGeometry.targets;
         regionMapping = !states.regionMap.empty;
+        regionInteraction = regionMapping && states.regionMap.mode !== "info";
         depthTargeting = hasDepthTarget();
 
         source = new SceneJS_ProgramSource(
@@ -18066,7 +18080,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
             add("attribute vec2 SCENEJS_aRegionMapUV;");
             add("varying vec2 SCENEJS_vRegionMapUV;");
         }
@@ -18176,7 +18190,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("SCENEJS_vColor = SCENEJS_aVertexColor;");
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
             add("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
         }
 
@@ -18283,11 +18297,12 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
             add("varying vec2 SCENEJS_vRegionMapUV;");
             add("uniform sampler2D SCENEJS_uRegionMapSampler;");
             add("uniform vec3 SCENEJS_uRegionMapRegionColor;");
             add("uniform vec3 SCENEJS_uRegionMapHighlightFactor;");
+            add("uniform float SCENEJS_uRegionMapHideAlpha;");
         }
 
         // True when lighting
@@ -18864,7 +18879,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("fragColor = vec4((color.rgb + (emit * color.rgb)) *  (vec3(1.0, 1.0, 1.0) + ambient.rgb), alpha);");
         }
 
-        if (regionMapping) {
+        if (regionInteraction) {
 
             // Region map highlighting
 
@@ -18877,13 +18892,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     add("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
                 } else {
                     // mode = "hide"
-                    add("  fragColor.a = 0.0;");
+                    add("  fragColor.a = SCENEJS_uRegionMapHideAlpha;");
                 }
                 add("}");
             } else {
                 // mode = "isolate"
                 add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) > tolerance) {");
-                add("  fragColor.a = 0.0;");
+                add("  fragColor.a = SCENEJS_uRegionMapHideAlpha;");
                 add("}");
             }
         }
@@ -20439,6 +20454,7 @@ SceneJS_ChunkFactory.createChunkType({
     build: function () {
         this._uRegionMapRegionColor = this.program.draw.getUniform("SCENEJS_uRegionMapRegionColor");
         this._uRegionMapHighlightFactor = this.program.draw.getUniform("SCENEJS_uRegionMapHighlightFactor");
+        this._uRegionMapHideAlpha = this.program.draw.getUniform("SCENEJS_uRegionMapHideAlpha");
         this._uRegionMapSampler = "SCENEJS_uRegionMapSampler";
     },
 
@@ -20483,6 +20499,10 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this._uRegionMapHighlightFactor) {
             this._uRegionMapHighlightFactor.setValue(this.core.highlightFactor);
+        }
+
+        if (this._uRegionMapHideAlpha) {
+            this._uRegionMapHideAlpha.setValue(this.core.hideAlpha);
         }
     },
 

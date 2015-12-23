@@ -551,6 +551,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("uniform sampler2D SCENEJS_uRegionMapSampler;");
             add("uniform vec3 SCENEJS_uRegionMapRegionColor;");
             add("uniform vec3 SCENEJS_uRegionMapHighlightFactor;");
+            add("uniform float SCENEJS_uRegionMapHideAlpha;");
         }
 
         // True when lighting
@@ -1140,13 +1141,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     add("  fragColor.rgb *= SCENEJS_uRegionMapHighlightFactor;");
                 } else {
                     // mode = "hide"
-                    add("  fragColor.a = 0.0;");
+                    add("  fragColor.a = SCENEJS_uRegionMapHideAlpha;");
                 }
                 add("}");
             } else {
                 // mode = "isolate"
                 add("if (max(colorDelta.x, max(colorDelta.y, colorDelta.z)) > tolerance) {");
-                add("  fragColor.a = 0.0;");
+                add("  fragColor.a = SCENEJS_uRegionMapHideAlpha;");
                 add("}");
             }
         }
