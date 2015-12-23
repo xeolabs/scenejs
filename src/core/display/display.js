@@ -1572,7 +1572,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 //    }
 };
 
-SceneJS_Display.prototype.readPixels = function (entries, size) {
+SceneJS_Display.prototype.readPixels = function (entries, size, opaqueOnly) {
 
     if (!this._readPixelBuf) {
         this._readPixelBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
@@ -1582,7 +1582,10 @@ SceneJS_Display.prototype.readPixels = function (entries, size) {
 
     this._readPixelBuf.clear();
 
-    this.render({force: true});
+    this.render({
+        force: true,
+        opaqueOnly: opaqueOnly
+    });
 
     var entry;
     var color;

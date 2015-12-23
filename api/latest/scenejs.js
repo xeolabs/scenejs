@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-12-16
+ * Built on 2015-12-22
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
@@ -12779,7 +12779,7 @@ SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
  *      { x: 100, y: 22,  r: 0, g: 0, b: 0 },
  *      { x: 120, y: 82,  r: 0, g: 0, b: 0 },
  *      { x: 12,  y: 345, r: 0, g: 0, b: 0 }
- * ], 3, opaqueonly);
+ * ], 3, opaqueOnly);
  * </pre>
  *
  * Then the r,g,b components of the entries will be set to the colors at those pixels.
@@ -17688,7 +17688,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 //    }
 };
 
-SceneJS_Display.prototype.readPixels = function (entries, size) {
+SceneJS_Display.prototype.readPixels = function (entries, size, opaqueOnly) {
 
     if (!this._readPixelBuf) {
         this._readPixelBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
@@ -17698,7 +17698,10 @@ SceneJS_Display.prototype.readPixels = function (entries, size) {
 
     this._readPixelBuf.clear();
 
-    this.render({force: true});
+    this.render({
+        force: true,
+        opaqueOnly: opaqueOnly
+    });
 
     var entry;
     var color;
