@@ -49,11 +49,10 @@
 
                 nodes: [
 
-                    // Procedural color texture implemented by plugin at
-                    // http://scenejs.org/api/latest/plugins/node/texture/procedural.js
                     {
                         type: "flags",
-                        id: "myFlags",
+                        
+                        // Skybox flag causes object to remain centered around the camera
                         flags: {
                             skybox: true
                         },
@@ -73,16 +72,8 @@
 
                                         nodes: [
                                             {
-                                                type: "node",
-                                                id: "rotation",
-                                                nodes: [
-                                                    // Box primitive implemented by plugin at
-                                                    // http://scenejs.org/api/latest/plugins/node/geometry/box.js
-                                                    {
-                                                        type: "geometry/cylinder"
-                                                    }
-                                                ]
-                                            }     
+                                                type: "geometry/cylinder"
+                                            }
                                         ]
                                     }
                                 ]
@@ -93,9 +84,6 @@
                         type:"material",
                         color:{ r:0.4, g:0.4, b:0.9 },
                         nodes:[
-
-                            // Teapot primitive,
-                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                             {
                                 type:"geometry/teapot"
                             }
