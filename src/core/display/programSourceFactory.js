@@ -19,6 +19,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var cubeMapping;
     var normals;// True when rendering state contains normals
     var solid;
+    var skybox;  // True when object should be treated as a skybox
     var tangents;
     var clipping;
     var morphing;
@@ -53,6 +54,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         cubeMapping = hasCubemap(states);
         normals = hasNormals(states);
         solid = states.flags.solid;
+        skybox = states.flags.skybox;
         tangents = hasTangents(states);
         clipping = states.clips.clips.length > 0;
         morphing = !!states.morphGeometry.targets;
@@ -125,7 +127,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
         add("  SCENEJS_vWorldVertex = SCENEJS_uMMatrix * tmpVertex; ");
 
-        add("  gl_Position =  SCENEJS_uPMatrix * (SCENEJS_uVMatrix * SCENEJS_vWorldVertex);");
+        add("mat4 vPosMatrix = SCENEJS_uVMatrix;");
+
+        if (skybox) {
+            add("vPosMatrix[3].xyz = vec3(0.0);");
+        }
+
+        add("  gl_Position =  SCENEJS_uPMatrix * (vPosMatrix * SCENEJS_vWorldVertex);");
 
         if (regionMapping) {
             add("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
@@ -375,11 +383,17 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("  vec4 worldVertex = SCENEJS_uMMatrix * modelVertex;");
 
-        if (vertexHooks.viewMatrix) {
-            add("vec4 viewVertex = " + vertexHooks.viewMatrix + "(SCENEJS_uVMatrix) * worldVertex;");
-        } else {
-            add("vec4 viewVertex  = SCENEJS_uVMatrix * worldVertex; ");
+        add("mat4 vPosMatrix = SCENEJS_uVMatrix;");
+
+        if (skybox) {
+            add("vPosMatrix[3].xyz = vec3(0.0);");
         }
+
+        if (vertexHooks.viewMatrix) {
+            add("vPosMatrix = " + vertexHooks.viewMatrix + "(vPosMatrix);");
+        }
+
+        add("vec4 viewVertex  = vPosMatrix * worldVertex; ");
 
         if (vertexHooks.viewPos) {
             add("viewVertex=" + vertexHooks.viewPos + "(viewVertex);");    // Vertex hook function

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <script src="../api/latest/scenejs.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #infoDark {
+            background-color: rgba(255, 255, 255, 0.5);
+            padding-bottom: 1em;
+        }
+    </style>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - skybox flag
+    <br>
+    The skybox flag allows any object to be used as a skybox.
+    <br> 
+    This example shows a cylinder with a video texture on it being used as as a skybox.
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Orbiting camera implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+
+                nodes: [
+
+                    // Procedural color texture implemented by plugin at
+                    // http://scenejs.org/api/latest/plugins/node/texture/procedural.js
+                    {
+                        type: "flags",
+                        id: "myFlags",
+                        flags: {
+                            skybox: true
+                        },
+
+                        nodes: [
+
+                            {
+                                type: "texture/video",
+                                src: "movies/bunny.ogg",
+
+                                nodes: [
+                                    {
+                                        type: "scale",
+                                        x: 500,
+                                        y: -500,
+                                        z: 500,
+
+                                        nodes: [
+                                            {
+                                                type: "node",
+                                                id: "rotation",
+                                                nodes: [
+                                                    // Box primitive implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                    {
+                                                        type: "geometry/cylinder"
+                                                    }
+                                                ]
+                                            }     
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        type:"material",
+                        color:{ r:0.4, g:0.4, b:0.9 },
+                        nodes:[
+
+                            // Teapot primitive,
+                            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                            {
+                                type:"geometry/teapot"
+                            }
+                        ]
+                    }
+
+                ]
+            }
+        ]
+    });
+
+</script>
+</body>
+</html>
