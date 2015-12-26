@@ -8,16 +8,17 @@
         stateId: SceneJS._baseStateId++,
         type: "flags",
 
-        picking: true,             // Picking enabled
-        clipping: true,            // User-defined clipping enabled
-        enabled: true,             // Node not culled from traversal
+        picking: true,              // Picking enabled
+        clipping: true,             // User-defined clipping enabled
+        enabled: true,              // Node not culled from traversal
         transparent: false,         // Node transparent - works in conjunction with matarial alpha properties
         backfaces: true,            // Show backfaces
         frontface: "ccw",           // Default vertex winding for front face
         reflective: true,           // Reflects reflection node cubemap, if it exists, by default.
         solid: false,               // When true, renders backfaces without texture or shading, for a cheap solid cross-section effect
-        solidColor: [1.0, 1.0, 1.0], // Solid cap color
-        hash: "refl;;"
+        solidColor: [1.0, 1.0, 1.0],// Solid cap color
+        skybox: false,              // Treat as a skybox
+        hash: "refl;;;"
     };
 
     var coreStack = [];
@@ -49,6 +50,7 @@
             this._core.reflective = true;        // Reflects reflection node cubemap, if it exists, by default.
             this._core.solid = false;            // Renders backfaces without texture or shading, for a cheap solid cross-section effect
             this._core.solidColor = [1.0, 1.0, 1.0 ]; // Solid cap color
+            this._core.skybox = false;              // Treat as a skybox
             if (params.flags) {                  // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
             }
@@ -91,14 +93,12 @@
 
         if (flags.reflective != undefined) {
             core.reflective = flags.reflective;
-            core.hash = (core.reflective ? "refl" : "") + (core.solid ? ";s" : ";;");
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
 
         if (flags.solid != undefined) {
             core.solid = flags.solid;
-            core.hash = (core.reflective ? "refl" : "") + (core.solid ? ";s" : ";;");
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
@@ -113,6 +113,14 @@
             ] : defaultCore.solidColor;
             this._engine.display.imageDirty = true;
         }
+
+        if (flags.skybox != undefined) {
+            core.skybox = flags.skybox;
+            this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
+        }
+
+        core.hash = getHash(core);
 
         return this;
     };
@@ -213,7 +221,7 @@
         reflective = !!reflective;
         if (this._core.reflective != reflective) {
             this._core.reflective = reflective;
-            this._core.hash = (reflective ? "refl" : "") + (this._core.solid ? ";s" : ";;");
+            this._core.hash = getHash(this._core);
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
@@ -228,7 +236,7 @@
         solid = !!solid;
         if (this._core.solid != solid) {
             this._core.solid = solid;
-            this._core.hash = (this._core.reflective ? "refl" : "") + (solid ? ";s;" : ";;");
+            this._core.hash = getHash(this._core);
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
@@ -258,11 +266,32 @@
         };
     };
 
+    SceneJS.Flags.prototype.setSkybox = function (skybox) {
+        skybox = !!skybox;
+        if (this._core.skybox != skybox) {
+            this._core.skybox = skybox;
+            this._core.hash = getHash(this._core);
+            this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getSkybox = function () {
+        return this._core.skybox;
+    };
+
     SceneJS.Flags.prototype._compile = function (ctx) {
         this._engine.display.flags = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.flags = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
         coreStack[stackLen] = null; // Release memory
     };
+
+    function getHash(core) {
+        return (core.reflective ? "refl" : "") + ";" +
+                (core.solid ? "s" : "") + ";" +
+                (core.skybox ? "sky" : "") + ";";
+    }
 
 })();
