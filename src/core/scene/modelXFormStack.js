@@ -208,7 +208,7 @@ var SceneJS_modelXFormStack = new (function () {
     this.pop = function () {
 
         this.top = (--stackLen > 0) ? transformStack[stackLen - 1] : defaultCore;
-        transformStack.length = stackLen;  // Release previous top node
+        transformStack[stackLen] = null;  // Release previous top node
 
         dirty = true;
     };
