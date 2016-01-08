@@ -30,8 +30,10 @@ SceneJS_ChunkFactory.createChunkType({
         if (this._depthModeDraw) {
             this._depthModeDraw.setValue(frameCtx.depthMode);
         }
+        var doDecal = frameCtx.decalling;
+        var indexBuf = (doDecal) ? core.getTriangleIndices() : core.indexBuf;
 
-        gl.drawElements(core.primitive, core.indexBuf.numItems, core.indexBuf.itemType, 0);
+        gl.drawElements(core.primitive, indexBuf.numItems, indexBuf.itemType, 0);
 
         //frameCtx.textureUnit = 0;
     },
@@ -62,7 +64,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         } else if (frameCtx.pickTriangle) {
 
-            var pickIndices = core.getPickIndices();
+            var pickIndices = core.getTriangleIndices();
 
             if (pickIndices) {
                 gl.drawElements(core.primitive, pickIndices.numItems, pickIndices.itemType, 0);

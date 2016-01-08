@@ -1021,7 +1021,13 @@ SceneJS_Display.prototype._logPickList = function () {
 
         object = this._objectPickList[pickedColorIndex];
 
+        // Establish if we are picking an object with a decal
+
+        var doDecal = (object && object.decal && object.decal.texture);
+
         if (object) {
+
+            // Object was picked
 
             hit = {
                 canvasPos: canvasPos
@@ -1029,257 +1035,303 @@ SceneJS_Display.prototype._logPickList = function () {
 
             var name = object.name;
 
-            if (name) {
+            if (name && name.name) { // name.name is undefined on the SceneJS.Name default state core
+
+                // Include object info in hit result
+
                 hit.name = name.name;
                 hit.path = name.path;
                 hit.nodeId = name.nodeId;
             }
-        }
 
-        if (params.pickRegion) {
 
-            //------------------------------------------------------------------
-            // Pick a region
-            // Region picking is independent of having picked an object
-            //------------------------------------------------------------------
+            if (params.pickRegion) {
 
-            hit = hit || {
-                    canvasPos: canvasPos
-                };
+                //------------------------------------------------------------------
+                // Pick a region
+                // Region picking is independent of having picked an object
+                //------------------------------------------------------------------
 
-            pickBuf.clear();
+                hit = hit || {
+                        canvasPos: canvasPos
+                    };
 
-            this._doDrawList({
-                pickRegion: true,
-                object: object,
-                clear: true
-            });
+                pickBuf.clear();
 
-            pix = pickBuf.read(canvasX, canvasY);
+                this._doDrawList({
+                    pickRegion: true,
+                    object: object, // May be undefined
+                    clear: true
+                });
 
-            if (pix[0] !== 0 || pix[1] !== 0 || pix[2] === 0 || pix[3] === 0) {
+                pix = pickBuf.read(canvasX, canvasY);
 
-                var regionColor = {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255};
-                var regionData = this._frameCtx.regionData;
-                var tolerance = 0.01;
-                var data = {};
-                var color, delta;
+                if (pix[0] !== 0 || pix[1] !== 0 || pix[2] === 0 || pix[3] === 0) {
 
-                for (var i = 0, len = regionData.length; i < len; i++) {
-                    color = regionData[i].color;
-                    if (regionColor && regionData[i].data) {
-                        delta = Math.max(
-                            Math.abs(regionColor.r - color.r),
-                            Math.abs(regionColor.g - color.g),
-                            Math.abs(regionColor.b - color.b),
-                            Math.abs(regionColor.a - (color.a === undefined ? regionColor.a : color.a))
-                        );
+                    // Region was picked,
+                    // include region info in hit result
 
-                        if (delta < tolerance) {
-                            data = regionData[i].data;
-                            break;
+                    var regionColor = {r: pix[0] / 255, g: pix[1] / 255, b: pix[2] / 255, a: pix[3] / 255};
+                    var regionData = this._frameCtx.regionData;
+                    var tolerance = 0.01;
+                    var data = {};
+                    var color, delta;
+
+                    for (var i = 0, len = regionData.length; i < len; i++) {
+                        color = regionData[i].color;
+                        if (regionColor && regionData[i].data) {
+                            delta = Math.max(
+                                Math.abs(regionColor.r - color.r),
+                                Math.abs(regionColor.g - color.g),
+                                Math.abs(regionColor.b - color.b),
+                                Math.abs(regionColor.a - (color.a === undefined ? regionColor.a : color.a))
+                            );
+
+                            if (delta < tolerance) {
+                                data = regionData[i].data;
+                                break;
+                            }
                         }
                     }
-                }
 
-                hit.color = regionColor;
-                hit.regionData = data;
+                    hit.color = regionColor;
+                    hit.regionData = data;
+                }
             }
-        }
 
-        if (params.pickTriangle && object) {
+            if (params.pickTriangle) {
 
-            //------------------------------------------------------------------
-            // Pick a triangle on the picked object
-            //------------------------------------------------------------------
+                //------------------------------------------------------------------
+                // Pick a triangle on the picked object
+                //------------------------------------------------------------------
 
-            pickBuf.clear();
+                pickBuf.clear();
 
-            this._doDrawList({
-                pickTriangle: true,
-                object: object,
-                clear: true
-            });
+                this._doDrawList({
+                    pickTriangle: true,
+                    object: object,
+                    clear: true
+                });
 
-            pix = pickBuf.read(canvasX, canvasY);
-            var primitiveIndex = pix[0] + (pix[1] * 256) + (pix[2] * 256 * 256) + (pix[3] * 256 * 256 * 256);
-            primitiveIndex *= 3; // Convert from triangle number to first vertex in indices
+                pix = pickBuf.read(canvasX, canvasY);
+                var primitiveIndex = pix[0] + (pix[1] * 256) + (pix[2] * 256 * 256) + (pix[3] * 256 * 256 * 256);
+                primitiveIndex *= 3; // Convert from triangle number to first vertex in indices
 
-            hit.primitiveIndex = primitiveIndex;
+                hit.primitiveIndex = primitiveIndex;
 
-            var geometry = object.geometry;
+                var geometry = object.geometry;
 
-            if (geometry.primitiveName === "triangles") {
+                if (geometry.primitiveName === "triangles") {
 
-                // Triangle picked; this only happens when the
-                // GameObject has a Geometry that has primitives of type "triangle"
+                    // Triangle was picked;
+                    // note that this only happens when the GameObject
+                    // has a Geometry that has primitives of type "triangle"
 
-                hit.primitive = "triangle";
+                    hit.primitive = "triangle";
 
-                // Attempt to ray-pick the triangle; in World-space, fire a ray
-                // from the eye position through the mouse position
-                // on the perspective projection plane
+                    // Attempt to find ray-intersection with the triangle;
+                    // in World-space, fire a ray from the eye position
+                    // through the mouse position on the perspective projection plane
 
-                getLocalRay(canvas, object, canvasPos, origin, dir);
+                    getLocalRay(canvas, object, canvasPos, origin, dir);
 
-                // Get triangle indices
+                    // Get triangle indices
 
-                var indices = geometry.arrays.indices;
+                    var indices = doDecal ? geometry.arrays.triangleIndices : geometry.arrays.indices;
 
-                var ia = indices[primitiveIndex];
-                var ib = indices[primitiveIndex + 1];
-                var ic = indices[primitiveIndex + 2];
+                    var ia = indices[primitiveIndex];
+                    var ib = indices[primitiveIndex + 1];
+                    var ic = indices[primitiveIndex + 2];
 
-                var ia3 = ia * 3;
-                var ib3 = ib * 3;
-                var ic3 = ic * 3;
+                    var ia3 = ia * 3;
+                    var ib3 = ib * 3;
+                    var ic3 = ic * 3;
 
-                triangleVertices[0] = ia;
-                triangleVertices[1] = ib;
-                triangleVertices[2] = ic;
+                    triangleVertices[0] = ia;
+                    triangleVertices[1] = ib;
+                    triangleVertices[2] = ic;
 
-                hit.indices = triangleVertices;
+                    hit.indices = triangleVertices;
 
-                // Get World-space triangle vertex positions
+                    // Get World-space triangle vertex positions
 
-                var morphGeometry = object.morphGeometry;
-                var targets = morphGeometry.targets;
+                    var morphGeometry = object.morphGeometry;
+                    var targets = morphGeometry.targets;
 
-                if (targets && targets.length > 0 && targets[0].positions) {
+                    if (targets && targets.length > 0 && targets[0].positions) {
 
-                    // Positions from morphGeometry
+                        // Positions from morphGeometry
 
-                    this._lerpTargets(
-                        morphGeometry.keys,
-                        morphGeometry.targets,
-                        "positions",
-                        ia, ib, ic,
-                        morphGeometry.factor,
-                        a, b, c);
+                        this._lerpTargets(
+                            morphGeometry.keys,
+                            morphGeometry.targets,
+                            "positions",
+                            ia, ib, ic,
+                            morphGeometry.factor,
+                            a, b, c);
 
-                } else {
+                    } else {
 
-                    // Positions from static geometry
+                        // Positions from static geometry
 
-                    var positions = geometry.arrays.positions;
+                        // If decalling, use the generated triangle
+                        // vertex positions, otherwise use the originals
 
-                    a[0] = positions[ia3];
-                    a[1] = positions[ia3 + 1];
-                    a[2] = positions[ia3 + 2];
+                        var positions = doDecal ? geometry.arrays.trianglePositions : geometry.arrays.positions;
 
-                    b[0] = positions[ib3];
-                    b[1] = positions[ib3 + 1];
-                    b[2] = positions[ib3 + 2];
+                        a[0] = positions[ia3];
+                        a[1] = positions[ia3 + 1];
+                        a[2] = positions[ia3 + 2];
 
-                    c[0] = positions[ic3];
-                    c[1] = positions[ic3 + 1];
-                    c[2] = positions[ic3 + 2];
-                }
+                        b[0] = positions[ib3];
+                        b[1] = positions[ib3 + 1];
+                        b[2] = positions[ib3 + 2];
 
-                SceneJS_math_rayPlaneIntersect(origin, dir, a, b, c, position);
+                        c[0] = positions[ic3];
+                        c[1] = positions[ic3 + 1];
+                        c[2] = positions[ic3 + 2];
+                    }
 
-                // Get Local-space cartesian coordinates of the ray-triangle intersection
+                    SceneJS_math_rayPlaneIntersect(origin, dir, a, b, c, position);
 
-                hit.position = position;
+                    // Get Local-space cartesian coordinates of the ray-triangle intersection
 
-                // Get interpolated World-space coordinates
+                    hit.position = position;
 
-                // Need to transform homogeneous coords
+                    // Get interpolated World-space coordinates
 
-                tempVec4[0] = position[0];
-                tempVec4[1] = position[1];
-                tempVec4[2] = position[2];
-                tempVec4[3] = 1;
+                    // Need to transform homogeneous coords
 
-                // Get World-space cartesian coordinates of the ray-triangle intersection
+                    tempVec4[0] = position[0];
+                    tempVec4[1] = position[1];
+                    tempVec4[2] = position[2];
+                    tempVec4[3] = 1;
 
-                SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
+                    // Get World-space cartesian coordinates of the ray-triangle intersection
 
-                worldPos[0] = tempVec4b[0];
-                worldPos[1] = tempVec4b[1];
-                worldPos[2] = tempVec4b[2];
+                    SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
 
-                hit.worldPos = worldPos;
+                    worldPos[0] = tempVec4b[0];
+                    worldPos[1] = tempVec4b[1];
+                    worldPos[2] = tempVec4b[2];
 
-                // Get barycentric coordinates of the ray-triangle intersection
+                    hit.worldPos = worldPos;
 
-                SceneJS_math_cartesianToBarycentric2(position, a, b, c, barycentric);
+                    // Get barycentric coordinates of the ray-triangle intersection
 
-                hit.barycentric = barycentric;
+                    SceneJS_math_cartesianToBarycentric2(position, a, b, c, barycentric);
 
-                // Get interpolated normal vector
+                    hit.barycentric = barycentric;
 
-                var gotNormals = false;
+                    // Get interpolated normal vector
 
-                if (targets && targets.length > 0 && targets[0].normals) {
+                    var gotNormals = false;
 
-                    // Normals from morphGeometry
+                    if (targets && targets.length > 0 && targets[0].normals) {
 
-                    this._lerpTargets(
-                        morphGeometry.keys,
-                        morphGeometry.targets,
-                        "normals",
-                        ia, ib, ic,
-                        morphGeometry.factor,
-                        na, nb, nc);
+                        // Normals from morphGeometry
 
-                    gotNormals = true;
-                }
-
-                if (!gotNormals) {
-
-                    // Normals from static geometry
-
-                    var normals = geometry.arrays.normals;
-
-                    if (normals) {
-
-                        na[0] = normals[ia3];
-                        na[1] = normals[ia3 + 1];
-                        na[2] = normals[ia3 + 2];
-
-                        nb[0] = normals[ib3];
-                        nb[1] = normals[ib3 + 1];
-                        nb[2] = normals[ib3 + 2];
-
-                        nc[0] = normals[ic3];
-                        nc[1] = normals[ic3 + 1];
-                        nc[2] = normals[ic3 + 2];
+                        this._lerpTargets(
+                            morphGeometry.keys,
+                            morphGeometry.targets,
+                            "normals",
+                            ia, ib, ic,
+                            morphGeometry.factor,
+                            na, nb, nc);
 
                         gotNormals = true;
                     }
-                }
 
-                if (gotNormals) {
+                    if (!gotNormals) {
 
-                    // Interpolate on triangle
+                        // Normals from static geometry
 
-                    hit.normal = SceneJS_math_addVec3(SceneJS_math_addVec3(
-                            SceneJS_math_mulVec3Scalar(na, barycentric[0], tempVec3),
-                            SceneJS_math_mulVec3Scalar(nb, barycentric[1], tempVec3b), tempVec3c),
-                        SceneJS_math_mulVec3Scalar(nc, barycentric[2], tempVec3d), tempVec3e);
-                }
+                        // If decalling, use the generated triangle
+                        // vertex normals, otherwise use the originals
 
-                // Get interpolated UV coordinates
+                        var normals = doDecal ? geometry.arrays.triangleNormals : geometry.arrays.normals;
 
-                var uvs = geometry.arrays.uv;
+                        if (normals) {
 
-                if (uvs) {
+                            na[0] = normals[ia3];
+                            na[1] = normals[ia3 + 1];
+                            na[2] = normals[ia3 + 2];
 
-                    uva[0] = uvs[(ia * 2)];
-                    uva[1] = uvs[(ia * 2) + 1];
+                            nb[0] = normals[ib3];
+                            nb[1] = normals[ib3 + 1];
+                            nb[2] = normals[ib3 + 2];
 
-                    uvb[0] = uvs[(ib * 2)];
-                    uvb[1] = uvs[(ib * 2) + 1];
+                            nc[0] = normals[ic3];
+                            nc[1] = normals[ic3 + 1];
+                            nc[2] = normals[ic3 + 2];
 
-                    uvc[0] = uvs[(ic * 2)];
-                    uvc[1] = uvs[(ic * 2) + 1];
+                            gotNormals = true;
+                        }
+                    }
 
-                    hit.uv = SceneJS_math_addVec3(
-                        SceneJS_math_addVec3(
-                            SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
-                            SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
-                        SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), tempVec3j);
+                    if (gotNormals) {
+
+                        // Interpolate on triangle
+
+                        hit.normal = SceneJS_math_addVec3(SceneJS_math_addVec3(
+                                SceneJS_math_mulVec3Scalar(na, barycentric[0], tempVec3),
+                                SceneJS_math_mulVec3Scalar(nb, barycentric[1], tempVec3b), tempVec3c),
+                            SceneJS_math_mulVec3Scalar(nc, barycentric[2], tempVec3d), tempVec3e);
+                    }
+
+                    // Get interpolated UV coordinates
+
+                    // If decalling, use the generated triangle
+                    // vertex UV coordinates, otherwise use the originals
+
+                    var uvs = doDecal ? geometry.arrays.triangleUVs : geometry.arrays.uv;
+
+                    if (uvs) {
+
+                        uva[0] = uvs[(ia * 2)];
+                        uva[1] = uvs[(ia * 2) + 1];
+
+                        uvb[0] = uvs[(ib * 2)];
+                        uvb[1] = uvs[(ib * 2) + 1];
+
+                        uvc[0] = uvs[(ic * 2)];
+                        uvc[1] = uvs[(ic * 2) + 1];
+
+                        hit.uv = SceneJS_math_addVec3(
+                            SceneJS_math_addVec3(
+                                SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
+                                SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
+                            SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), tempVec3j);
+                    }
+
+                    // If decalling, get interpolated UV drawing coordinates
+
+                    if (doDecal) {
+
+                        var decalTriangleUVs = geometry.arrays.decalTriangleUVs;
+
+                        if (decalTriangleUVs) {
+
+                            var dia = indices[primitiveIndex];
+                            var dib = indices[primitiveIndex + 1];
+                            var dic = indices[primitiveIndex + 2];
+
+                            uva[0] = decalTriangleUVs[(dia * 2)];
+                            uva[1] = decalTriangleUVs[(dia * 2) + 1];
+
+                            uvb[0] = decalTriangleUVs[(dib * 2)];
+                            uvb[1] = decalTriangleUVs[(dib * 2) + 1];
+
+                            uvc[0] = decalTriangleUVs[(dic * 2)];
+                            uvc[1] = decalTriangleUVs[(dic * 2) + 1];
+
+                            hit.decalUV = SceneJS_math_addVec3(
+                                SceneJS_math_addVec3(
+                                    SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
+                                    SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
+                                SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), tempVec3j);
+                        }
+                    }
                 }
             }
         }

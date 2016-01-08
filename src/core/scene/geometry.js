@@ -58,10 +58,10 @@ new (function () {
 
         // Generate normals
         if (data.normals) {
-            if (primitive == "triangles") {
+            if (primitive === "triangles") {
                 if (data.normals === "auto" || data.normals === true) {
                     if (data.positions && data.indices) {
-                        this._buildNormals(data); // Auto normal generation - build normals array
+                        data.normals = this._buildNormals(data.indices, data.positions);
                     }
                 }
             }
@@ -122,56 +122,114 @@ new (function () {
             core.arrays.indices = data.indices;
         }
 
-        // Lazy-build tangents, only when needed as rendering
+        // The following functions are for lazy-genarating geometry arrays on-demand,
+        // at either render or picking time. Note that we don't retain the array data,
+        // like we do for the standard arrays for when we need to rebuild WebGL buffers
+        // after context recovery. For these arrays, we would just set the buffers null
+        // and rebuild them from scratch in that event.
+
+        // Lazy-builds tangents buffer for normal mapping
+
         core.getTangents = function () {
             if (core.tangentBuf) {
                 return core.tangentBuf;
             }
             var arrays = core.arrays;
-            if (arrays.positions && arrays.indices && arrays.uv) {
+            if (arrays.indices && arrays.positions && arrays.uv) {
                 var gl = self._engine.canvas.gl;
-                var tangents = new Float32Array(self._buildTangents(arrays)); // Build tangents array;
-                core.arrays.tangents = tangents;
-                var usage = gl.STATIC_DRAW;
-                return core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, usage);
+                arrays.tangents = new Float32Array(SceneJS_math_buildTangents(arrays.indices, arrays.positions, arrays.uv));
+                return core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.tangents, arrays.tangents.length, 3, gl.STATIC_DRAW);
             }
         };
 
-        // Buffers for primitive-pick rendering
+        // Lazy-generates index buffer for triangle picking and decal texturing
 
-        core.getPickPositions = function () {
-            if (core.pickPositionsBuf) {
-                return core.pickPositionsBuf;
+        core.getTriangleIndices = function () {
+            if (core.triangleIndicesBuf) {
+                return core.triangleIndicesBuf;
             }
-            if (core.arrays.positions) {
+            var arrays = core.arrays;
+            if (arrays.indices) {
                 var gl = self._engine.canvas.gl;
-                var pickPositions = SceneJS_math_getPickPositions(core.arrays.positions, core.arrays.indices);
-                core.pickPositionsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickPositions), pickPositions.length, 3, gl.STATIC_DRAW);
+                arrays.triangleIndices = SceneJS_math_getTriangleIndices(arrays.indices);
+                core.triangleIndicesBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, arrays.triangleIndices, arrays.triangleIndices.length, 1, gl.STATIC_DRAW);
             }
-
-            return core.pickPositionsBuf;
+            return core.triangleIndicesBuf;
         };
 
-        core.getPickColors = function () {
-            if (core.pickColorsBuf) {
-                return core.pickColorsBuf;
+        // Lazy-generates vertex positions buffer for triangle picking and decal texture mapping
+
+        core.getTrianglePositions = function () {
+            if (core.trianglePositionsBuf) {
+                return core.trianglePositionsBuf;
             }
-            var gl = self._engine.canvas.gl;
-            var pickColors = SceneJS_math_getPickColors(core.arrays.indices);
-            core.pickColorsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickColors), pickColors.length, 4, gl.STATIC_DRAW);
-            return core.pickColorsBuf;
+            var arrays = core.arrays;
+            if (arrays.indices && arrays.positions) {
+                var gl = self._engine.canvas.gl;
+                arrays.trianglePositions = SceneJS_math_getTrianglePositions(arrays.indices, arrays.positions);
+                core.trianglePositionsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.trianglePositions, arrays.trianglePositions.length, 3, gl.STATIC_DRAW);
+            }
+            return core.trianglePositionsBuf;
         };
 
-        core.getPickIndices = function () {
-            if (core.pickIndicesBuf) {
-                return core.pickIndicesBuf;
+        core.getTriangleNormals = function () {
+            if (core.triangleNormalsBuf) {
+                return core.triangleNormalsBuf;
             }
-            if (core.arrays.indices) {
+            var arrays = core.arrays;
+            if (arrays.indices && arrays.normals) {
                 var gl = self._engine.canvas.gl;
-                var pickIndices = SceneJS_math_getPickIndices(core.arrays.indices);
-                core.pickIndicesBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(pickIndices), pickIndices.length, 1, gl.STATIC_DRAW);
+                arrays.triangleNormals = SceneJS_math_getTriangleNormals(arrays.indices, arrays.normals);
+                core.triangleNormalsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.triangleNormals, arrays.triangleNormals.length, 3, gl.STATIC_DRAW);
             }
-            return core.pickIndicesBuf;
+            return core.triangleNormalsBuf;
+        };
+
+        // Lazy-generates vertex colors buffer for triangle picking
+
+        core.getTriangleColors = function () {
+            if (core.triangleColorsBuf) {
+                return core.triangleColorsBuf;
+            }
+            var arrays = core.arrays;
+            if (arrays.indices) {
+                var gl = self._engine.canvas.gl;
+                arrays.triangleColors = SceneJS_math_getTriangleColors(arrays.indices);
+                core.triangleColorsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.triangleColors, arrays.triangleColors.length, 4, gl.STATIC_DRAW);
+            }
+            return core.triangleColorsBuf;
+        };
+
+        // Lazy-generates UV buffer for triangle picking
+
+        core.getTriangleUVs = function () {
+            if (core.triangleUVBuf) {
+                return core.triangleUVBuf;
+            }
+            var arrays = core.arrays;
+            if (arrays.indices && arrays.uv) {
+                var gl = self._engine.canvas.gl;
+                arrays.triangleUVs = SceneJS_math_getTriangleUVs(arrays.indices, arrays.uv);
+                core.triangleUVBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.triangleUVs, arrays.triangleUVs.length, 2, gl.STATIC_DRAW);
+            }
+            return core.triangleUVBuf;
+        };
+
+        // Lazy-generates UV  buffer for decal mapping.
+        // These UVs are packed snugly into the X-Y plane and scaled to fit within a 1x1 range.
+        // These UVs map to the drawing textures that are provided by "decal" nodes.
+
+        core.getDecalTriangleUVs = function () {
+            if (core.decalTriangleUVBuf) {
+                return core.decalTriangleUVBuf;
+            }
+            var arrays = core.arrays;
+            if (arrays.indices && arrays.positions) {
+                var gl = self._engine.canvas.gl;
+                arrays.decalTriangleUVs = SceneJS_math_getDecalTriangleUVs(arrays.indices, arrays.positions);
+                core.decalTriangleUVBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.decalTriangleUVs, arrays.decalTriangleUVs.length, 2, gl.STATIC_DRAW);
+            }
+            return core.decalTriangleUVBuf;
         };
     };
 
@@ -293,6 +351,36 @@ new (function () {
             core.interleavedBuf.destroy();
             core.interleavedBuf = null;
         }
+
+        if (core.trianglePositionsBuf) {
+            core.trianglePositionsBuf.destroy();
+            core.trianglePositionsBuf = null;
+        }
+
+        if (core.triangleNormalsBuf) {
+            core.triangleNormalsBuf.destroy();
+            core.triangleNormalsBuf = null;
+        }
+
+        if (core.triangleColorsBuf) {
+            core.triangleColorsBuf.destroy();
+            core.triangleColorsBuf = null;
+        }
+
+        if (core.triangleUVBuf) {
+            core.triangleUVBuf.destroy();
+            core.triangleUVBuf = null;
+        }
+
+        if (core.triangleIndicesBuf) {
+            core.triangleIndicesBuf.destroy();
+            core.triangleIndicesBuf = null;
+        }
+
+        if (core.decalTriangleUVBuf) {
+            core.decalTriangleUVBuf.destroy();
+            core.decalTriangleUVBuf = null;
+        }
     };
 
     /**
@@ -302,6 +390,19 @@ new (function () {
      * WebGL context is regained after being lost.
      */
     SceneJS.Geometry.prototype._buildNodeCore = function (gl, core) {
+
+        // First destroy any buffers that were lazy-allocated
+        // for triangle picking and decal texturing, so that
+        // they will lazy-allocated again when next required
+        // during rendering or picking. No need to destroy any
+        // buffers because they will have been destroyed.
+
+        core.trianglePositionsBuf = null;
+        core.triangleNormalsBuf = null;
+        core.triangleColorsBuf = null;
+        core.triangleUVBuf = null;
+        core.triangleIndicesBuf = null;
+        core.decalTriangleUVBuf = null;
 
         var usage = gl.STATIC_DRAW; //var usage = (!arrays.fixed) ? gl.STREAM_DRAW : gl.STATIC_DRAW;
 
@@ -406,148 +507,6 @@ new (function () {
             array[i] = items[j];
         }
 
-    };
-
-    /** Builds normal vectors from positions and indices
-     * @private
-     */
-    SceneJS.Geometry.prototype._buildNormals = function (data) {
-
-        var positions = data.positions;
-        var indices = data.indices;
-        var nvecs = new Array(positions.length / 3);
-        var j0;
-        var j1;
-        var j2;
-        var v1;
-        var v2;
-        var v3;
-
-        for (var i = 0, len = indices.length - 3; i < len; i += 3) {
-            j0 = indices[i + 0];
-            j1 = indices[i + 1];
-            j2 = indices[i + 2];
-
-            v1 = [positions[j0 * 3 + 0], positions[j0 * 3 + 1], positions[j0 * 3 + 2]];
-            v2 = [positions[j1 * 3 + 0], positions[j1 * 3 + 1], positions[j1 * 3 + 2]];
-            v3 = [positions[j2 * 3 + 0], positions[j2 * 3 + 1], positions[j2 * 3 + 2]];
-
-            v2 = SceneJS_math_subVec4(v2, v1, [0, 0, 0, 0]);
-            v3 = SceneJS_math_subVec4(v3, v1, [0, 0, 0, 0]);
-
-            var n = SceneJS_math_normalizeVec4(SceneJS_math_cross3Vec4(v2, v3, [0, 0, 0, 0]), [0, 0, 0, 0]);
-
-            if (!nvecs[j0]) nvecs[j0] = [];
-            if (!nvecs[j1]) nvecs[j1] = [];
-            if (!nvecs[j2]) nvecs[j2] = [];
-
-            nvecs[j0].push(n);
-            nvecs[j1].push(n);
-            nvecs[j2].push(n);
-        }
-
-        var normals = new Float32Array(positions.length);
-
-        // now go through and average out everything
-        for (var i = 0, len = nvecs.length; i < len; i++) {
-            var nvec = nvecs[i];
-            if (!nvec) {
-                continue;
-            }
-            var count = nvec.length;
-            var x = 0;
-            var y = 0;
-            var z = 0;
-            for (var j = 0; j < count; j++) {
-                x += nvec[j][0];
-                y += nvec[j][1];
-                z += nvec[j][2];
-            }
-            normals[i * 3 + 0] = (x / count);
-            normals[i * 3 + 1] = (y / count);
-            normals[i * 3 + 2] = (z / count);
-        }
-
-        data.normals = normals;
-    };
-
-
-    /**
-     * Builds vertex tangent vectors from positions, UVs and indices
-     *
-     * Based on code by @rollokb, in his fork of webgl-obj-loader:
-     * https://github.com/rollokb/webgl-obj-loader
-     *
-     * @private
-     **/
-    SceneJS.Geometry.prototype._buildTangents = function (arrays) {
-
-        var positions = arrays.positions;
-        var indices = arrays.indices;
-        var uv = arrays.uv;
-
-        var tangents = [];
-
-        // The vertex arrays needs to be calculated
-        // before the calculation of the tangents
-
-        for (var location = 0; location < indices.length; location += 3) {
-
-            // Recontructing each vertex and UV coordinate into the respective vectors
-
-            var index = indices[location];
-
-            var v0 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv0 = [uv[index * 2], uv[(index * 2) + 1]];
-
-            index = indices[location + 1];
-
-            var v1 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv1 = [uv[index * 2], uv[(index * 2) + 1]];
-
-            index = indices[location + 2];
-
-            var v2 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv2 = [uv[index * 2], uv[(index * 2) + 1]];
-
-            var deltaPos1 = SceneJS_math_subVec3(v1, v0, []);
-            var deltaPos2 = SceneJS_math_subVec3(v2, v0, []);
-
-            var deltaUV1 = SceneJS_math_subVec2(uv1, uv0, []);
-            var deltaUV2 = SceneJS_math_subVec2(uv2, uv0, []);
-
-            var r = 1 / ((deltaUV1[0] * deltaUV2[1]) - (deltaUV1[1] * deltaUV2[0]));
-
-            var tangent = SceneJS_math_mulVec3Scalar(
-                SceneJS_math_subVec3(
-                    SceneJS_math_mulVec3Scalar(deltaPos1, deltaUV2[1], []),
-                    SceneJS_math_mulVec3Scalar(deltaPos2, deltaUV1[1], []),
-                    []
-                ),
-                r,
-                []
-            );
-
-            // Average the value of the vectors outs
-            for (var v = 0; v < 3; v++) {
-                var addTo = indices[location + v];
-                if (typeof tangents[addTo] != "undefined") {
-                    tangents[addTo] = SceneJS_math_addVec3(tangents[addTo], tangent, []);
-                } else {
-                    tangents[addTo] = tangent;
-                }
-            }
-        }
-
-        // Deconstruct the vectors back into 1D arrays for WebGL
-
-        var tangents2 = [];
-
-        for (var i = 0; i < tangents.length; i++) {
-            tangents2 = tangents2.concat(tangents[i]);
-        }
-
-        return tangents2;
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
@@ -801,9 +760,11 @@ new (function () {
             interleavedUVOffset: core.interleavedUVOffset,
             interleavedUV2Offset: core.interleavedUV2Offset,
             interleavedColorOffset: core.interleavedColorOffset,
-            getPickIndices: core.getPickIndices,
-            getPickPositions: core.getPickPositions,
-            getPickColors: core.getPickColors
+            getTriangleIndices: core.getTriangleIndices,
+            getTrianglePositions: core.getTrianglePositions,
+            getTriangleColors: core.getTriangleColors,
+            getTriangleUVs: core.getTriangleUVs,
+            getDecalTriangleUVs: core.getDecalTriangleUVs
         };
 
         for (var i = stackLen - 1; i >= 0; i--) {

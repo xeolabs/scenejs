@@ -14,6 +14,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._aNormalDraw = draw.getAttribute("SCENEJS_aNormal");
         this._aUVDraw = draw.getAttribute("SCENEJS_aUVCoord");
         this._aUV2Draw = draw.getAttribute("SCENEJS_aUVCoord2");
+        this._aDecalUV = draw.getAttribute("SCENEJS_aDecalUV");
         this._aTangentDraw = draw.getAttribute("SCENEJS_aTangent");
         this._aColorDraw = draw.getAttribute("SCENEJS_aVertexColor");
 
@@ -68,9 +69,13 @@ SceneJS_ChunkFactory.createChunkType({
         if (this._aUVDraw) {
             this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
         }
-
+        
         if (this._aUV2Draw) {
             this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
+        }
+
+        if (this._aDecalUV) {
+            this._aDecalUV.bindFloatArrayBuffer(this.core2.triangleUVBuf || this.core2.getTriangleUVs());
         }
 
         if (this._aColorDraw) {
@@ -90,6 +95,7 @@ SceneJS_ChunkFactory.createChunkType({
 
     draw: function (frameCtx) {
         var doMorph = this.core.targets && this.core.targets.length;
+        var doDecal = frameCtx.decalling;
         var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
         if (this.VAO) {
@@ -112,61 +118,98 @@ SceneJS_ChunkFactory.createChunkType({
         if (doMorph) {
             this.morphDraw();
         } else {
-            if (cleanInterleavedBuf) {
-                this.VAOHasInterleavedBuf = true;
-                this.core2.interleavedBuf.bind();
-                if (this._aVertexDraw) {
-                    this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedPositionOffset);
-                }
-                if (this._aNormalDraw) {
-                    this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedNormalOffset);
-                }
-                if (this._aUVDraw) {
-                    this._aUVDraw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUVOffset);
-                }
-                if (this._aUV2Draw) {
-                    this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUV2Offset);
-                }
-                if (this._aColorDraw) {
-                    this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
-                }
-                if (this._aTangentDraw) {
-
-                    // Lazy-compute tangents as soon as needed.
-                    // Unfortunately we can't include them in interleaving because that happened earlier.
-                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangents());
-                }
-            } else {
+            //if (cleanInterleavedBuf) {
+            //    this.VAOHasInterleavedBuf = true;
+            //    this.core2.interleavedBuf.bind();
+            //    if (this._aVertexDraw) {
+            //        this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedPositionOffset);
+            //    }
+            //    if (this._aNormalDraw) {
+            //        this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedNormalOffset);
+            //    }
+            //    if (this._aUVDraw) {
+            //        this._aUVDraw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUVOffset);
+            //    }
+            //    if (this._aUV2Draw) {
+            //        this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUV2Offset);
+            //    }
+            //    if (this._aColorDraw) {
+            //        this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
+            //    }
+            //
+            //    // Lazy-compute tangents and decal UVsas soon as needed.
+            //    // Unfortunately we can't include them in interleaving because that happened earlier.
+            //
+            //    if (this._aTangentDraw) {
+            //        this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangents());
+            //    }
+            //
+            //    if (this._aDecalUV) {
+            //        this._aDecalUV.bindFloatArrayBuffer(this.core2.triangleUVBuf || this.core2.getTriangleUVs());
+            //    }
+            //
+            //} else {
                 this.VAOHasInterleavedBuf = false;
-                if (this._aVertexDraw) {
-                    this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
-                }
-                if (this._aNormalDraw) {
-                    this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
-                }
-                if (this._aUVDraw) {
-                    this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
-                }
-                if (this._aUV2Draw) {
-                    this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
-                }
-                if (this._aColorDraw) {
-                    this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
-                }
-                if (this._aTangentDraw) {
 
-                    // Lazy-compute tangents
-                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangents());
+                if (doDecal) {
+
+                    // Applying a decal texture; use lazy-generated geometry arrays
+                    // for decalling, in which triangles do not share vertices.
+
+                    if (this._aVertexDraw) {
+                        this._aVertexDraw.bindFloatArrayBuffer(this.core2.getTrianglePositions());
+                    }
+                    if (this._aNormalDraw) {
+                        this._aNormalDraw.bindFloatArrayBuffer(this.core2.getTriangleNormals());
+                    }
+                    if (this._aUVDraw) {
+                        this._aUVDraw.bindFloatArrayBuffer(this.core2.getTriangleUVs());
+                    }
+                    if (this._aUV2Draw) {
+                        // TODO
+                        //this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
+                    }
+                    if (this._aColorDraw) {
+                        this._aColorDraw.bindFloatArrayBuffer(this.core2.getTriangleColors());
+                    }
+                    if (this._aDecalUV) { // For applying the decal texture
+                        this._aDecalUV.bindFloatArrayBuffer(this.core2.getDecalTriangleUVs());
+                    }
+
+                    this.core2.getTriangleIndices().bind();
+
+                } else {
+
+                    if (this._aVertexDraw) {
+                        this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
+                    }
+                    if (this._aNormalDraw) {
+                        this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
+                    }
+                    if (this._aUVDraw) {
+                        this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
+                    }
+                    if (this._aUV2Draw) {
+                        this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
+                    }
+                    if (this._aColorDraw) {
+                        this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
+                    }
+
+                    // Lazy-compute tangents and decal UVs
+
+                    if (this._aTangentDraw) {
+                        this._aTangentDraw.bindFloatArrayBuffer(this.core2.getTangents());
+                    }
+
+                    this.core2.indexBuf.bind();
                 }
             }
-        }
+       // }
 
         if (this._aRegionMapUVDraw) {
             this._aRegionMapUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
         }
-
-        this.core2.indexBuf.bind();
-
     },
 
     morphPick: function (frameCtx) {
@@ -194,23 +237,23 @@ SceneJS_ChunkFactory.createChunkType({
 
             if (this._aMorphVertexPick) {
 
-                var pickPositionsBuf = core.getPickPositions(core.key1, core2.arrays.indices);
-                if (pickPositionsBuf) {
-                    this._aVertexPick.bindFloatArrayBuffer(pickPositionsBuf);
+                var trianglePositionsBuf = core.getTrianglePositions(core.key1, core2.arrays.indices);
+                if (trianglePositionsBuf) {
+                    this._aVertexPick.bindFloatArrayBuffer(trianglePositionsBuf);
                 }
 
-                pickPositionsBuf = core.getPickPositions(core.key2, core2.arrays.indices);
-                if (pickPositionsBuf) {
-                    this._aMorphVertexPick.bindFloatArrayBuffer(pickPositionsBuf);
+                trianglePositionsBuf = core.getTrianglePositions(core.key2, core2.arrays.indices);
+                if (trianglePositionsBuf) {
+                    this._aMorphVertexPick.bindFloatArrayBuffer(trianglePositionsBuf);
                 }
 
                 if (this._aColorPick) {
-                    this._aColorPick.bindFloatArrayBuffer(core2.getPickColors());
+                    this._aColorPick.bindFloatArrayBuffer(core2.getTriangleColors());
                 }
 
-                var pickIndicesBuf = core2.getPickIndices();
-                if (pickIndicesBuf) {
-                    pickIndicesBuf.bind()
+                var triangleIndicesBuf = core2.getTriangleIndices();
+                if (triangleIndicesBuf) {
+                    triangleIndicesBuf.bind()
                 }
 
             } else if (this._aVertexPick) {
@@ -252,14 +295,14 @@ SceneJS_ChunkFactory.createChunkType({
             } else if (frameCtx.pickTriangle) {
 
                 if (this._aVertexPick) {
-                    this._aVertexPick.bindFloatArrayBuffer(core2.getPickPositions());
+                    this._aVertexPick.bindFloatArrayBuffer(core2.getTrianglePositions());
                 }
 
                 if (this._aColorPick) {
-                    this._aColorPick.bindFloatArrayBuffer(core2.getPickColors());
+                    this._aColorPick.bindFloatArrayBuffer(core2.getTriangleColors());
                 }
 
-                var pickIndices = core2.getPickIndices();
+                var pickIndices = core2.getTriangleIndices();
 
                 if (pickIndices) {
                     pickIndices.bind()

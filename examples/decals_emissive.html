@@ -21,11 +21,12 @@
     <br><br>
     Drawing on an object using a decal map
     <br><br>
-    <img id="myImage" width="500px" height="500px" style="float: left;">
+    <img id="myImage" width="4000px" height="200px" style="float: left; display: none;">
 </div>
 
 <script>
 
+    // Image that we'll be drawing to, connected to our decal node
     var image = document.getElementById('myImage');
 
     // Point SceneJS to the bundled plugins
@@ -56,8 +57,7 @@
                         type: "decal",
                         id: "myDecal",
                         image: image,
-                        applyFrom: "uv",
-                        applyTo: "emit",
+                        applyTo: "emit", // Apply to material 'emit'
 
                         nodes: [
 
@@ -67,6 +67,8 @@
                                 src: "textures/uvGrid.jpg",
 
                                 nodes: [
+
+                                    // Blinn-Phong material
                                     {
                                         type: "material",
                                         color: {r: 1.0, g: 1.0, b: 1.0},
@@ -102,13 +104,13 @@
 
                 var drawingCanvas = document.createElement('canvas');
 
-                drawingCanvas.width = 500;
-                drawingCanvas.height = 500;
+                drawingCanvas.width = 4000;
+                drawingCanvas.height = 200;
 
                 var context = drawingCanvas.getContext("2d");
 
                 context.strokeStyle = '#99ff99';
-                context.lineWidth = 3;
+                context.lineWidth = 1;
                 context.rect(0, 0, drawingCanvas.width, drawingCanvas.height);
                 context.fillStyle = "black";
                 context.fill();
@@ -232,7 +234,7 @@
 
                             if (hit && hit.worldPos && hit.normal) {
 
-                                if (hit.uv) {
+                                if (hit.decalUV) {
 
                                     // Picked
 
@@ -240,7 +242,9 @@
                                         penDown();
                                     }
 
-                                    penMove(hit.uv);
+                                    console.log(hit.primitiveIndex)
+                                    console.log(JSON.stringify(hit.decalUV))
+                                    penMove(hit.decalUV);
                                 }
 
                             } else {

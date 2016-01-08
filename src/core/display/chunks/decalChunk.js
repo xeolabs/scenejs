@@ -37,7 +37,12 @@ SceneJS_ChunkFactory.createChunkType({
                 this._uDecalBlendFactor.setValue(core.blendFactor);
             }
 
+            frameCtx.decalling = true;
+
         } else {
+
+            frameCtx.decalling = false;
+
             // draw.bindTexture(this._uTexSampler[i], null, i); // Unbind
         }
     }

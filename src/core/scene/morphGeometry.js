@@ -45,11 +45,11 @@ new (function () {
             // returns a positions VBO for triangle-picking,
             // lazy-generated from the given indices if not yet existing.
 
-            this._core.getPickPositions = function (index, indices) {
+            this._core.getTrianglePositions = function (index, indices) {
                 if (self._pickPositionsDirty) {
                     self._buildPickPositions(indices);
                 }
-                return self._core.targets[index].pickPositionsBuf;
+                return self._core.targets[index].trianglePositionsBuf;
             };
 
             this.setFactor(params.factor);
@@ -197,14 +197,14 @@ new (function () {
 
             if (target.positions) {
 
-                if (target.pickPositionsBuf) {
-                    target.pickPositionsBuf.destroy();
-                    target.pickPositionsBuf = null;
+                if (target.trianglePositionsBuf) {
+                    target.trianglePositionsBuf.destroy();
+                    target.trianglePositionsBuf = null;
                 }
 
-                pickPositions = SceneJS_math_getPickPositions(target.positions, indices);
+                pickPositions = SceneJS_math_getTrianglePositions(target.positions, indices);
 
-                target.pickPositionsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickPositions), pickPositions.length, 3, usage);
+                target.trianglePositionsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickPositions), pickPositions.length, 3, usage);
             }
         }
 
@@ -328,8 +328,8 @@ new (function () {
                     if (target.vertexBuf) {
                         target.vertexBuf.destroy();
                     }
-                    if (target.pickPositionsBuf) {
-                        target.pickPositionsBuf.destroy();
+                    if (target.trianglePositionsBuf) {
+                        target.trianglePositionsBuf.destroy();
                     }
                     if (target.normalBuf) {
                         target.normalBuf.destroy();

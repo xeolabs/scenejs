@@ -2101,7 +2101,7 @@
     };
 
 
-    window.SceneJS_math_identityQuaternion= function (dest) {
+    window.SceneJS_math_identityQuaternion = function (dest) {
         dest = dest || SceneJS_math_vec4();
         dest[0] = 0.0;
         dest[1] = 0.0;
@@ -2110,14 +2110,12 @@
         return dest;
     };
 
-    window.SceneJS_math_vec3PairToQuaternion= function (u, v, dest) {
+    window.SceneJS_math_vec3PairToQuaternion = function (u, v, dest) {
 
         dest = dest || SceneJS_math_vec4();
 
         var norm_u_norm_v = Math.sqrt(window.SceneJS_math_dotVec3(u, u) * window.SceneJS_math_dotVec3(v, v));
         var real_part = norm_u_norm_v + window.SceneJS_math_dotVec3(u, v);
-
-        var w;
 
         if (real_part < 0.00000001 * norm_u_norm_v) {
 
@@ -2129,31 +2127,28 @@
 
             if (Math.abs(u[0]) > Math.abs(u[2])) {
 
-                w[0] = -u[1];
-                w[1] = u[0];
-                w[2] = 0;
+                dest[0] = -u[1];
+                dest[1] = u[0];
+                dest[2] = 0;
 
             } else {
-                w[0] = 0;
-                w[1] = -u[2];
-                w[2] = u[1]
+                dest[0] = 0;
+                dest[1] = -u[2];
+                dest[2] = u[1]
             }
 
         } else {
 
             // Otherwise, build quaternion the standard way.
-            w = window.SceneJS_math_cross3Vec3(u, v);
+            window.SceneJS_math_cross3Vec3(u, v, dest);
         }
 
-        dest[0] = w[0];
-        dest[1] = w[1];
-        dest[2] = w[2];
         dest[3] = real_part;
 
         return window.SceneJS_math_normalizeQuaternion(dest);
     };
 
-    window.SceneJS_math_angleAxisToQuaternion= function (x, y, z, degrees, dest) {
+    window.SceneJS_math_angleAxisToQuaternion = function (x, y, z, degrees, dest) {
         dest = dest || XEO.math.vec4();
         var angleRad = (degrees / 180.0) * Math.PI;
         var halfAngle = angleRad / 2.0;
@@ -2165,7 +2160,7 @@
         return dest;
     };
 
-    window.SceneJS_math_mulQuaternions= function (p, q, dest) {
+    window.SceneJS_math_mulQuaternions = function (p, q, dest) {
         dest = dest || SceneJS_math_vec4();
         var p0 = p[0], p1 = p[1], p2 = p[2], p3 = p[3];
         var q0 = q[0], q1 = q[1], q2 = q[2], q3 = q[3];
@@ -2279,273 +2274,41 @@
     };
 
     /**
-     * Generates UV coordinates for triangle positions and indices.
+     * Builds geometry indices for color-indexed triangle picking and decal texturing.
      *
-     * Conceptually, this function rotates the triangles into the X,Y plane, packs
-     * them as rightly together as possible, then generates UV coordinates that
-     * correspond to the X,Y coordinates.
-     *
-     * Provides the option to specify the maximum 2D range within which the UV coordinates
-     * are generated, which is 1x1 by default.
-     *
-     * @method buildUVs
+     * @method getTriangleIndices
      * @static
-     * @param {Array of Number} positions One-dimensional flattened array of vertex positions.
-     * @param {Array of Number} indices One-dimensional flattened array of triangle vertex indices.*
-     * @param {Array of Number} [uvRange=[1.0, 1.0]] Optional UV range, given as a 2D vector, into which to pack the UV coordinates.
-     * @returns {Array of Number} One-dimensional flattened array of UV coordinates.
+     * @param {Float32Array} indices One-dimensional flattened array of indices.
+     * @returns Float32Array The triangle indices.
      */
-    window.SceneJS_math_buildUVs = function (positions, indices, uvRange) {
+    window.SceneJS_math_getTriangleIndices = function (indices) {
 
-        uvRange = uvRange || [1.0, 1.0];
+        var triangleIndices = new Uint16Array(indices.length);
+        var lenTriangleIndices = 0;
+        var index = 0;
 
-        var uvs = new Array(positions.length / 2);
-
-        var i;
-        var len;
-
-        // Triangle vertex indices
-        var j0;
-        var j1;
-        var j2;
-
-        // Local-space triangle vertex positions
-        var v1;
-        var v2;
-        var v3;
-
-        // Local-space triangle normal vector
-        var normal;
-
-        // Matrix to rotate triangle into the X,Y plane, built from normal
-        var matrix = SceneJS_math_mat4();
-
-        // Axis-aligned 2D boundary of each triangles on the X,Y plane
-        var aabbTriangle = tempAABB2;
-
-        // Axis-aligned 2D boundary enclosing all triangles on the X,Y plane
-        var aabbMesh = tempAABB2b;
-
-        SceneJS_math_collapseAABB2(aabbMesh);
-
-        var offsetX;
-        var offsetY;
-
-        var offsetBump = 0;
-
-        for (i = 0, len = indices.length; i < len; i += 3) {
-
-            // Get vertex indices
-
-            j0 = indices[i + 0];
-            j1 = indices[i + 1];
-            j2 = indices[i + 2];
-
-            // Get vertex positions
-
-            v1 = [positions[j0 * 3 + 0], positions[j0 * 3 + 1], positions[j0 * 3 + 2]];
-            v2 = [positions[j1 * 3 + 0], positions[j1 * 3 + 1], positions[j1 * 3 + 2]];
-            v3 = [positions[j2 * 3 + 0], positions[j2 * 3 + 1], positions[j2 * 3 + 2]];
-
-            v2 = SceneJS_math_subVec3(v2, v1, tempVec3);
-            v3 = SceneJS_math_subVec3(v3, v1, tempVec3b);
-
-            // Get triangle normal
-
-            normal = SceneJS_math_normalizeVec3(SceneJS_math_cross3Vec3(v2, v3, tempVec3c), tempVec3d);
-
-            // Get rotation matrix
-
-            matrix = SceneJS_math_quaternionToMat4(
-                SceneJS_math_vec3PairToQuaternion(normal, [0, -1, 0], tempVec4), tempMat1);
-
-            // Rotate the triangle into the X,Y plane
-
-            v1 = SceneJS_math_transformPoint3(matrix, v1, tempVec3d);
-            v2 = SceneJS_math_transformPoint3(matrix, v2, tempVec3e);
-            v3 = SceneJS_math_transformPoint3(matrix, v3, tempVec3f);
-
-            // Bump offsetX along by width of triangle on X-axis
-
-            SceneJS_math_collapseAABB2(aabbTriangle);
-
-            SceneJS_math_expandAABB2Point2(aabbTriangle, v1);
-            SceneJS_math_expandAABB2Point2(aabbTriangle, v2);
-            SceneJS_math_expandAABB2Point2(aabbTriangle, v3);
-
-            // "Pack" the triangle into a strip
-
-            offsetX = aabbTriangle.min[0] - offsetBump;
-            offsetY = aabbTriangle.min[2];
-
-            uvs.push([v1[0] - offsetX, v1[1] - offsetY]);
-            uvs.push([v2[0] - offsetX, v2[1] - offsetY]);
-            uvs.push([v3[0] - offsetX, v3[1] - offsetY]);
-
-            offsetBump += aabbTriangle.max[0] - aabbTriangle.min[0];
-
-            // Expand boundary of all triangles in X,Y plane
-
-            SceneJS_math_expandAABB2(aabbMesh, aabbTriangle);
+        for (var i = 0; i < indices.length; i += 3) {
+            triangleIndices[lenTriangleIndices++] = index++;
+            triangleIndices[lenTriangleIndices++] = index++;
+            triangleIndices[lenTriangleIndices++] = index++;
         }
 
-        // Transform the UVs into the given UV range
-
-        var meshSizeX = aabbMesh.max[0] - aabbMesh.min[0];
-        var meshSizeY = aabbMesh.max[1] - aabbMesh.min[1];
-
-        var halfMeshX = meshSizeX / 2;
-        var halfMeshY = meshSizeY / 2;
-
-        var scaleX = uvRange[0] / meshSizeX;
-        var scaleY = uvRange[1] / meshSizeY;
-
-        for (i = 0, len = uvs.length; i < len; i += 2) {
-            uvs[i] = (uvs[i] + halfMeshX) * scaleX;
-            uvs[i + 1] = (uvs[i + 1] + halfMeshY) * scaleY;
-        }
-
-        return uvs;
+        return triangleIndices;
     };
 
     /**
-     * Builds vertex and index arrays needed by color-indexed triangle picking.
+     * Builds geometry positions for color-indexed triangle picking.
      *
-     * @method getPickPrimitives
+     * @method getTrianglePositions
      * @static
-     * @param {Array of Number} positions One-dimensional flattened array of positions.
-     * @param {Array of Number} indices One-dimensional flattened array of indices.
-     * @param {*} [pickTris] Optional object to return the arrays on.
-     * @param {Boolean} [debug] Assigns random colors to triangles when true.
-     * @returns {*} Object containing the arrays, created by this method or reused from 'pickTris' parameter.
+     * @param {Float32Array} positions One-dimensional flattened array of positions.
+     * @param {Float32Array} indices One-dimensional flattened array of indices.
+     * @returns Float32Array The triangle positions.
      */
-    window.SceneJS_math_getPickPrimitives = function (positions, indices, pickTris, debug) {
+    window.SceneJS_math_getTrianglePositions = function (indices, positions) {
 
-        pickTris = pickTris || {};
-
-        var pickPositions = [];
-        var pickColors = [];
-        var pickIndices = [];
-
-        var index2 = 0;
-        var primIndex = 0;
-
-        // Triangle indices
-
-        var i;
-        var r;
-        var g;
-        var b;
-        var a;
-
-        for (var location = 0; location < indices.length; location += 3) {
-
-            // Primitive-indexed triangle pick color
-
-            primIndex++;
-            primIndex = location + 1;
-
-
-            if (debug) {
-                r = Math.random();
-                g = Math.random();
-                b = Math.random();
-                a = 1.0;
-            } else {
-                b = (primIndex >> 16 & 0xFF) / 255;
-                g = (primIndex >> 8 & 0xFF) / 255;
-                r = (primIndex & 0xFF) / 255;
-                a = 1.0;
-            }
-
-
-            // A
-
-            i = indices[location + 0];
-
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
-
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
-
-            pickIndices.push(index2++);
-
-            // B
-
-            i = indices[location + 1];
-
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
-
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
-
-            pickIndices.push(index2++);
-
-            // C
-
-            i = indices[location + 2];
-
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
-
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
-
-            pickIndices.push(index2++);
-        }
-
-        pickTris.pickPositions = pickPositions;
-        pickTris.pickColors = pickColors;
-        pickTris.pickIndices = pickIndices;
-
-        return pickTris;
-    };
-
-    /**
-     * Builds index array needed by color-indexed triangle picking (for morph target positions).
-     *
-     * @method getPickIndices
-     * @static
-     * @param {Array of Number} indices One-dimensional flattened array of indices.
-     * @returns {Array of Number} The pick indices.
-     */
-    window.SceneJS_math_getPickIndices = function (indices) {
-
-        var pickIndices = [];
-
-        var index2 = 0;
-        for (var location = 0; location < indices.length; location += 3) {
-            pickIndices.push(index2++);
-            pickIndices.push(index2++);
-            pickIndices.push(index2++);
-        }
-
-        return pickIndices;
-    };
-
-    /**
-     * Builds vertex array needed by color-indexed triangle picking (for morph target positions).
-     *
-     * @method getPickPositions
-     * @static
-     * @param {Array of Number} positions One-dimensional flattened array of positions.
-     * @param {Array of Number} indices One-dimensional flattened array of indices.
-     * @returns {Array of Number} The pick positions.
-     */
-    window.SceneJS_math_getPickPositions = function (positions, indices) {
-
-        var pickPositions = [];
+        var pickPositions = new Float32Array(indices.length * 3);
+        var lenTriangleIndices = 0;
         var primIndex = 0;
         var i;
 
@@ -2560,45 +2323,45 @@
 
             i = indices[location + 0];
 
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
+            pickPositions[lenTriangleIndices++] = positions[i * 3 + 0];
+            pickPositions[lenTriangleIndices++] = positions[i * 3 + 1];
+            pickPositions[lenTriangleIndices++] = positions[i * 3 + 2];
 
             // B
 
             i = indices[location + 1];
 
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
+            pickPositions[lenTriangleIndices++] = positions[i * 3 + 0];
+            pickPositions[lenTriangleIndices++] = positions[i * 3 + 1];
+            pickPositions[lenTriangleIndices++] = positions[i * 3 + 2];
 
             // C
 
             i = indices[location + 2];
 
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
+            pickPositions[lenTriangleIndices++] = positions[i * 3 + 0];
+            pickPositions[lenTriangleIndices++] = positions[i * 3 + 1];
+            pickPositions[lenTriangleIndices++] = positions[i * 3 + 2];
         }
 
         return pickPositions;
     };
 
     /**
-     * Builds color arrays needed by color-indexed triangle picking.
+     * Builds geometry vertex colors for color-indexed triangle picking.
      *
      * @method getPickPrimitives
      * @static
-     * @param {Array of Number} indices One-dimensional flattened array of indices.
-     * @returns {Array of Number} The pick colors
+     * @param {Float32Array} indices One-dimensional flattened array of indices.
+     * @returns Float32Array The pick colors
      */
-    window.SceneJS_math_getPickColors = function (indices) {
+    window.SceneJS_math_getTriangleColors = function (indices) {
 
-        var pickColors = [];
-
-        var index2 = 0;
+        var lenIndices = indices.length;
+        var pickColors = new Float32Array(lenIndices * 4);
+        var lenPickColors = 0;
         var primIndex = 0;
-
+var i;
         // Triangle indices
 
         var r;
@@ -2610,7 +2373,7 @@
         //    alert("!");
         //}
 
-        for (var location = 0; location < indices.length; location += 3) {
+        for (var i = 0; i < lenIndices; i += 3) {
 
             // Primitive-indexed triangle pick color
 
@@ -2621,29 +2384,477 @@
 
             // A
 
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
+            pickColors[lenPickColors++] = r;
+            pickColors[lenPickColors++] = g;
+            pickColors[lenPickColors++] = b;
+            pickColors[lenPickColors++] = a;
 
             // B
 
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
+            pickColors[lenPickColors++] = r;
+            pickColors[lenPickColors++] = g;
+            pickColors[lenPickColors++] = b;
+            pickColors[lenPickColors++] = a;
 
             // C
 
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
+            pickColors[lenPickColors++] = r;
+            pickColors[lenPickColors++] = g;
+            pickColors[lenPickColors++] = b;
+            pickColors[lenPickColors++] = a;
 
             primIndex++;
         }
 
         return pickColors;
+    };
+
+
+    /**
+     * Builds geometry vertex normals for color-indexed triangle picking and decal texturing.
+     *
+     * @method getTriangleNormals
+     * @static
+     * @param {Float32Array} indices One-dimensional flattened array of indices.
+     * @param {Float32Array} normals One-dimensional flattened array of normals.
+     * @returns Float32Array The triangle normals.
+     */
+    window.SceneJS_math_getTriangleNormals = function (indices, normals) {
+
+        var lenIndices = indices.length;
+        var triangleNormals = new Float32Array(lenIndices * 3);
+        var lenTriangleNormals = 0;
+        var primIndex = 0;
+        var i;
+        var index;
+
+        for (i = 0; i < lenIndices; i += 3) {
+
+            // Primitive-indexed triangle pick color
+
+            primIndex++;
+            primIndex = i + 1;
+
+            // A
+
+            index = indices[i + 0];
+
+            triangleNormals[lenTriangleNormals++] = normals[index * 3 + 0];
+            triangleNormals[lenTriangleNormals++] = normals[index * 3 + 1];
+            triangleNormals[lenTriangleNormals++] = normals[index * 3 + 2];
+
+            // B
+
+            index = indices[i + 1];
+
+            triangleNormals[lenTriangleNormals++] = normals[index * 3 + 0];
+            triangleNormals[lenTriangleNormals++] = normals[index * 3 + 1];
+            triangleNormals[lenTriangleNormals++] = normals[index * 3 + 2];
+
+            // C
+
+            index = indices[i + 2];
+
+            triangleNormals[lenTriangleNormals++] = normals[index * 3 + 0];
+            triangleNormals[lenTriangleNormals++] = normals[index * 3 + 1];
+            triangleNormals[lenTriangleNormals++] = normals[index * 3 + 2];
+        }
+
+        return triangleNormals;
+    };
+
+
+    /**
+     * Builds geometry UVs for color-indexed triangle picking.
+     *
+     * Not to be confused with getDecalTriangleUVs, which builds UVs for use
+     * with SceneJS' internally generated decal textures.
+     *
+     * @method getTriangleUVs
+     * @static
+     * @param {Float32Array} indices One-dimensional flattened array of indices.
+     * @param {Float32Array} uvs One-dimensional flattened array of uvs.
+     * @returns Float32Array The triangle UVs.
+     */
+    window.SceneJS_math_getTriangleUVs = function (indices, uvs) {
+
+        var lenIndices = indices.length;
+        var triangleUVs = new Float32Array(lenIndices * 2);
+        var lenTriangleUVs = 0;
+        var primIndex = 0;
+        var i;
+        var index;
+
+        for (i = 0; i < lenIndices; i += 3) {
+
+            // Primitive-indexed triangle pick color
+
+            primIndex++;
+            primIndex = i + 1;
+
+            // A
+
+            index = indices[i + 0];
+
+            triangleUVs[lenTriangleUVs++] = uvs[index * 2 + 0];
+            triangleUVs[lenTriangleUVs++] = uvs[index * 2 + 1];
+
+            // B
+
+            index = indices[i + 1];
+
+            triangleUVs[lenTriangleUVs++] = uvs[index * 2 + 0];
+            triangleUVs[lenTriangleUVs++] = uvs[index * 2 + 1];
+
+            // C
+
+            index = indices[i + 2];
+
+            triangleUVs[lenTriangleUVs++] = uvs[index * 2 + 0];
+            triangleUVs[lenTriangleUVs++] = uvs[index * 2 + 1];
+        }
+
+        return triangleUVs;
+    };
+
+    /**
+     * Builds geometry UVs for decal texturing.
+     *
+     * Not to be confused with getTriangleUVs, which builds UVs for triangle picking.
+     *
+     * Conceptually, this function rotates the triangles into the X,Y plane, packs
+     * them together together as snugly as possible, then derives UVs by transforming
+     * the X,Y vertex coordinates into UV space, before normalizing to range [0..1, 0..1].
+     **
+     * @method buildUVs
+     * @static
+     * @param {Float32Array} indices One-dimensional flattened array of indices.
+     * @param {Float32Array} positions One-dimensional flattened array of positions.
+     * @returns Float32Array The decal triangle UVs.
+     */
+    window.SceneJS_math_getDecalTriangleUVs = function (indices, positions) {
+
+        var lenIndices = indices.length;
+        var triangleUVs = new Float32Array(lenIndices * 2);
+
+        // Temporary scratch variables we'll use with our math functions
+
+        var tempMat1 = new Float32Array(16);
+        var tempVec3 = new Float32Array(3);
+        var tempVec3b = new Float32Array(3);
+        var tempVec3c = new Float32Array(3);
+        var tempVec3d = new Float32Array(3);
+        var tempVec3e = new Float32Array(3);
+        var tempVec3f = new Float32Array(3);
+        var tempVec4 = new Float32Array(4);
+
+        var tempAABB2 = {
+            min: new Float32Array(2),
+            max: new Float32Array(2)
+        };
+
+        var tempAABB2b = {
+            min: new Float32Array(2),
+            max: new Float32Array(2)
+        };
+
+        var i;
+        var len;
+
+        var lenTriangleUVs = 0;
+
+        //  var numPrimitives = 0;
+
+        // Triangle vertex indices
+        var ia;
+        var ib;
+        var ic;
+
+        // Local-space triangle vertex positions
+        var va;
+        var vb;
+        var vc;
+
+        // Transformed triangle vertex positions
+        var tva;
+        var tvb;
+        var tvc;
+
+        // Local-space triangle center
+        var centerX;
+        var centerY;
+        var centerZ;
+
+        // Local-space vectors from vertex A to B, and A to C
+        var vecAB;
+        var vecAC;
+
+        // Local-space triangle normal
+        var normal;
+
+        // Matrix to rotate triangle into X,Y plane
+        var matrix = SceneJS_math_mat4();
+
+        // Axis-aligned 2D boundary of each triangle on X,Y plane
+        var aabbTriangle = tempAABB2;
+
+        // Axis-aligned 2D boundary enclosing all triangles on X,Y plane
+        var aabbMesh = tempAABB2b;
+
+        SceneJS_math_collapseAABB2(aabbMesh);
+
+        var offsetX;
+        var offsetY;
+
+        var offsetBump = 0;
+
+        for (i = 0; i < lenIndices; i += 3) {
+
+            // Get vertex indices
+
+            ia = indices[i + 0];
+            ib = indices[i + 1];
+            ic = indices[i + 2];
+
+            // Get vertex positions
+
+            va = [positions[ia * 3 + 0], positions[ia * 3 + 1], positions[ia * 3 + 2]];
+            vb = [positions[ib * 3 + 0], positions[ib * 3 + 1], positions[ib * 3 + 2]];
+            vc = [positions[ic * 3 + 0], positions[ic * 3 + 1], positions[ic * 3 + 2]];
+
+            // Get vertices center
+
+            centerX = (va[0] + vb[0] + vc[0]) / 3;
+            centerY = (va[1] + vb[1] + vc[1]) / 3;
+            centerZ = (va[2] + vb[2] + vc[2]) / 3;
+
+            // Translate vertices to origin
+
+            va[0] -= centerX;
+            va[1] -= centerY;
+            va[2] -= centerZ;
+
+            vb[0] -= centerX;
+            vb[1] -= centerY;
+            vb[2] -= centerZ;
+
+            vc[0] -= centerX;
+            vc[1] -= centerY;
+            vc[2] -= centerZ;
+
+            // Get triangle normal
+
+            vecAB = SceneJS_math_subVec3(vb, va, tempVec3);
+            vecAC = SceneJS_math_subVec3(vc, va, tempVec3b);
+
+            normal = SceneJS_math_normalizeVec3(SceneJS_math_cross3Vec3(vecAB, vecAC, tempVec3c), tempVec3d);
+
+            // Get rotation matrix
+
+            matrix = SceneJS_math_quaternionToMat4(SceneJS_math_vec3PairToQuaternion([0, 0, 1], normal, tempVec4), tempMat1);
+
+            // Rotate the triangle into the X,Y plane
+            // Their Z-coordinates are ignored for everything after this
+
+            tva = SceneJS_math_transformPoint3(matrix, va, tempVec3d);
+            tvb = SceneJS_math_transformPoint3(matrix, vb, tempVec3e);
+            tvc = SceneJS_math_transformPoint3(matrix, vc, tempVec3f);
+
+            // Get triangle's axis-aligned 2D boundary in X,Y plane
+
+            SceneJS_math_collapseAABB2(aabbTriangle);
+
+            SceneJS_math_expandAABB2Point2(aabbTriangle, tva);
+            SceneJS_math_expandAABB2Point2(aabbTriangle, tvb);
+            SceneJS_math_expandAABB2Point2(aabbTriangle, tvc);
+
+            // "Pack" the triangle against the other triangles within the X,Y plane
+
+            offsetX = aabbTriangle.min[0] - offsetBump;
+            offsetY = aabbTriangle.min[1];
+
+            offsetBump += (aabbTriangle.max[0] - aabbTriangle.min[0]);
+
+            tva[0] -= offsetX;
+            tva[1] -= offsetY;
+
+            tvb[0] -= offsetX;
+            tvb[1] -= offsetY;
+
+            tvc[0] -= offsetX;
+            tvc[1] -= offsetY;
+
+            // Expand total boundary to enclose the triangle
+
+            SceneJS_math_expandAABB2Point2(aabbMesh, tva);
+            SceneJS_math_expandAABB2Point2(aabbMesh, tvb);
+            SceneJS_math_expandAABB2Point2(aabbMesh, tvc);
+
+            // Maps geometry indices to packed indices;
+            // this is used to map indices from pick results
+            // to their corresponding packed indices.
+
+            //  primitiveMap[numPrimitives] = lenIndicesOut;
+
+            //  numPrimitives += 3;
+
+            triangleUVs[lenTriangleUVs++] = tva[0]; // A
+            triangleUVs[lenTriangleUVs++] = tva[1];
+            triangleUVs[lenTriangleUVs++] = tvb[0]; // B
+            triangleUVs[lenTriangleUVs++] = tvb[1];
+            triangleUVs[lenTriangleUVs++] = tvc[0]; // C
+            triangleUVs[lenTriangleUVs++] = tvc[1];
+        }
+
+        // Normalize the uvsIn into [0..1, 0..1] range
+
+        var meshSizeX = aabbMesh.max[0] - aabbMesh.min[0];
+        var meshSizeY = aabbMesh.max[1] - aabbMesh.min[1];
+
+        var scaleX = 1 / meshSizeX;
+        var scaleY = 1 / meshSizeY;
+
+        for (i = 0; i < lenTriangleUVs; i += 2) {
+            triangleUVs[i] *= scaleX;
+            triangleUVs[i + 1] *= scaleY;
+        }
+
+        return triangleUVs;
+    };
+
+        /**
+     * Builds vertex tangent vectors from positions, UVs and indices
+     *
+     * Based on code by @rollokb, in his fork of webgl-obj-loader:
+     * https://github.com/rollokb/webgl-obj-loader
+     *
+     * @private
+     **/
+    window.SceneJS_math_buildTangents = function (indices, positions, uv) {
+
+        var tangents = [];
+
+        // The vertex arrays needs to be calculated
+        // before the calculation of the tangents
+
+        for (var location = 0; location < indices.length; location += 3) {
+
+            // Recontructing each vertex and UV coordinate into the respective vectors
+
+            var index = indices[location];
+
+            var v0 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv0 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            index = indices[location + 1];
+
+            var v1 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv1 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            index = indices[location + 2];
+
+            var v2 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv2 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            var deltaPos1 = SceneJS_math_subVec3(v1, v0, []);
+            var deltaPos2 = SceneJS_math_subVec3(v2, v0, []);
+
+            var deltaUV1 = SceneJS_math_subVec2(uv1, uv0, []);
+            var deltaUV2 = SceneJS_math_subVec2(uv2, uv0, []);
+
+            var r = 1 / ((deltaUV1[0] * deltaUV2[1]) - (deltaUV1[1] * deltaUV2[0]));
+
+            var tangent = SceneJS_math_mulVec3Scalar(
+                SceneJS_math_subVec3(
+                    SceneJS_math_mulVec3Scalar(deltaPos1, deltaUV2[1], []),
+                    SceneJS_math_mulVec3Scalar(deltaPos2, deltaUV1[1], []),
+                    []
+                ),
+                r,
+                []
+            );
+
+            // Average the value of the vectors outs
+            for (var v = 0; v < 3; v++) {
+                var addTo = indices[location + v];
+                if (typeof tangents[addTo] != "undefined") {
+                    tangents[addTo] = SceneJS_math_addVec3(tangents[addTo], tangent, []);
+                } else {
+                    tangents[addTo] = tangent;
+                }
+            }
+        }
+
+        // Deconstruct the vectors back into 1D arrays for WebGL
+
+        var tangents2 = [];
+
+        for (var i = 0; i < tangents.length; i++) {
+            tangents2 = tangents2.concat(tangents[i]);
+        }
+
+        return tangents2;
+    };
+
+    /** Builds normal vectors from positions and indices
+     * @private
+     */
+    window.SceneJS_math_buildNormals = function (indices, positions) {
+
+        var nvecs = new Array(positions.length / 3);
+        var j0;
+        var j1;
+        var j2;
+        var v1;
+        var v2;
+        var v3;
+
+        for (var i = 0, len = indices.length - 3; i < len; i += 3) {
+            j0 = indices[i + 0];
+            j1 = indices[i + 1];
+            j2 = indices[i + 2];
+
+            v1 = [positions[j0 * 3 + 0], positions[j0 * 3 + 1], positions[j0 * 3 + 2]];
+            v2 = [positions[j1 * 3 + 0], positions[j1 * 3 + 1], positions[j1 * 3 + 2]];
+            v3 = [positions[j2 * 3 + 0], positions[j2 * 3 + 1], positions[j2 * 3 + 2]];
+
+            v2 = SceneJS_math_subVec4(v2, v1, [0, 0, 0, 0]);
+            v3 = SceneJS_math_subVec4(v3, v1, [0, 0, 0, 0]);
+
+            var n = SceneJS_math_normalizeVec4(SceneJS_math_cross3Vec4(v2, v3, [0, 0, 0, 0]), [0, 0, 0, 0]);
+
+            if (!nvecs[j0]) nvecs[j0] = [];
+            if (!nvecs[j1]) nvecs[j1] = [];
+            if (!nvecs[j2]) nvecs[j2] = [];
+
+            nvecs[j0].push(n);
+            nvecs[j1].push(n);
+            nvecs[j2].push(n);
+        }
+
+        var normals = new Float32Array(positions.length);
+
+        // now go through and average out everything
+        for (var i = 0, len = nvecs.length; i < len; i++) {
+            var nvec = nvecs[i];
+            if (!nvec) {
+                continue;
+            }
+            var count = nvec.length;
+            var x = 0;
+            var y = 0;
+            var z = 0;
+            for (var j = 0; j < count; j++) {
+                x += nvec[j][0];
+                y += nvec[j][1];
+                z += nvec[j][2];
+            }
+            normals[i * 3 + 0] = (x / count);
+            normals[i * 3 + 1] = (y / count);
+            normals[i * 3 + 2] = (z / count);
+        }
+
+        return normals;
     };
 
 
@@ -3290,19 +3501,19 @@
      */
     SceneJS_math_expandAABB2Point2 = function (aabb, p) {
 
-        if (aabb.min[0] < p[0]) {
+        if (aabb.min[0] > p[0]) {
             aabb.min[0] = p[0];
         }
 
-        if (aabb.min[1] < p[1]) {
+        if (aabb.min[1] > p[1]) {
             aabb.min[1] = p[1];
         }
 
-        if (aabb.max[0] > p[0]) {
+        if (aabb.max[0] < p[0]) {
             aabb.max[0] = p[0];
         }
 
-        if (aabb.max[1] > p[1]) {
+        if (aabb.max[1] < p[1]) {
             aabb.max[1] = p[1];
         }
 
