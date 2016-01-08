@@ -34,7 +34,7 @@ var SceneJS = new (function () {
             return info;
         }
 
-        var gl = canvas.getContext("webgl", { antialias: true }) || document.getContext("experimental-webgl", { antialias: true });
+        var gl = canvas.getContext("webgl", { antialias: true }) || canvas.getContext("experimental-webgl", { antialias: true });
 
         info.WEBGL = !!gl;
 
