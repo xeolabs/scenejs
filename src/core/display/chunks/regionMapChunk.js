@@ -5,6 +5,7 @@ SceneJS_ChunkFactory.createChunkType({
     build: function () {
         this._uRegionMapRegionColor = this.program.draw.getUniform("SCENEJS_uRegionMapRegionColor");
         this._uRegionMapHighlightFactor = this.program.draw.getUniform("SCENEJS_uRegionMapHighlightFactor");
+        this._uRegionMapHideAlpha = this.program.draw.getUniform("SCENEJS_uRegionMapHideAlpha");
         this._uRegionMapSampler = "SCENEJS_uRegionMapSampler";
     },
 
@@ -49,6 +50,10 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this._uRegionMapHighlightFactor) {
             this._uRegionMapHighlightFactor.setValue(this.core.highlightFactor);
+        }
+
+        if (this._uRegionMapHideAlpha) {
+            this._uRegionMapHideAlpha.setValue(this.core.hideAlpha);
         }
     },
 

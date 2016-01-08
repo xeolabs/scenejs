@@ -950,11 +950,6 @@ SceneJS_Display.prototype._logPickList = function () {
     var b = SceneJS_math_vec3();
     var c = SceneJS_math_vec3();
 
-    var triangleVertices = SceneJS_math_vec3();
-    var position = SceneJS_math_vec4();
-    var worldPos = SceneJS_math_vec4();
-    var barycentric = SceneJS_math_vec3();
-
     var na = SceneJS_math_vec3();
     var nb = SceneJS_math_vec3();
     var nc = SceneJS_math_vec3();
@@ -1186,6 +1181,8 @@ SceneJS_Display.prototype._logPickList = function () {
                 var ib3 = ib * 3;
                 var ic3 = ic * 3;
 
+                var triangleVertices = SceneJS_math_vec3();
+
                 triangleVertices[0] = ia;
                 triangleVertices[1] = ib;
                 triangleVertices[2] = ic;
@@ -1227,38 +1224,29 @@ SceneJS_Display.prototype._logPickList = function () {
                     c[1] = positions[ic3 + 1];
                     c[2] = positions[ic3 + 2];
                 }
-
-                SceneJS_math_rayPlaneIntersect(origin, dir, a, b, c, position);
+                
 
                 // Get Local-space cartesian coordinates of the ray-triangle intersection
 
-                hit.position = position;
+                var position = hit.position = SceneJS_math_rayPlaneIntersect(origin, dir, a, b, c, SceneJS_math_vec3());
 
                 // Get interpolated World-space coordinates
 
                 // Need to transform homogeneous coords
 
-                tempVec4[0] = position[0];
-                tempVec4[1] = position[1];
-                tempVec4[2] = position[2];
+                tempVec4.set(position);
                 tempVec4[3] = 1;
 
                 // Get World-space cartesian coordinates of the ray-triangle intersection
 
                 SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
 
-                worldPos[0] = tempVec4b[0];
-                worldPos[1] = tempVec4b[1];
-                worldPos[2] = tempVec4b[2];
-
-                hit.worldPos = worldPos;
+                hit.worldPos = tempVec4b.slice(0, 3);
 
                 // Get barycentric coordinates of the ray-triangle intersection
 
-                SceneJS_math_cartesianToBarycentric2(position, a, b, c, barycentric);
-
-                hit.barycentric = barycentric;
-
+                var barycentric = hit.barycentric = SceneJS_math_cartesianToBarycentric2(position, a, b, c, SceneJS_math_vec3());
+                
                 // Get interpolated normal vector
 
                 var gotNormals = false;
@@ -1309,7 +1297,7 @@ SceneJS_Display.prototype._logPickList = function () {
                     hit.normal = SceneJS_math_addVec3(SceneJS_math_addVec3(
                             SceneJS_math_mulVec3Scalar(na, barycentric[0], tempVec3),
                             SceneJS_math_mulVec3Scalar(nb, barycentric[1], tempVec3b), tempVec3c),
-                        SceneJS_math_mulVec3Scalar(nc, barycentric[2], tempVec3d), tempVec3e);
+                        SceneJS_math_mulVec3Scalar(nc, barycentric[2], tempVec3d), SceneJS_math_vec3());
                 }
 
                 // Get interpolated UV coordinates
@@ -1331,7 +1319,7 @@ SceneJS_Display.prototype._logPickList = function () {
                         SceneJS_math_addVec3(
                             SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
                             SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
-                        SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), tempVec3j);
+                        SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), SceneJS_math_vec3());
                 }
             }
         }
@@ -1584,7 +1572,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 //    }
 };
 
-SceneJS_Display.prototype.readPixels = function (entries, size) {
+SceneJS_Display.prototype.readPixels = function (entries, size, opaqueOnly) {
 
     if (!this._readPixelBuf) {
         this._readPixelBuf = new SceneJS._webgl.RenderBuffer({canvas: this._canvas});
@@ -1594,7 +1582,10 @@ SceneJS_Display.prototype.readPixels = function (entries, size) {
 
     this._readPixelBuf.clear();
 
-    this.render({force: true});
+    this.render({
+        force: true,
+        opaqueOnly: opaqueOnly
+    });
 
     var entry;
     var color;
