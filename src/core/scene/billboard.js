@@ -30,7 +30,7 @@ new (function () {
 
     SceneJS.Billboard.prototype._init = function (params) {
         if (this._core.useCount == 1) { // This node is the resource definer
-            this._core.spherical = (cfg.spherical !== false);
+            this._core.spherical = (params.spherical !== false);
         }
         this._core.hash = "bb;";
     };
