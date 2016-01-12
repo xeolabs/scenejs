@@ -187,6 +187,12 @@ var SceneJS_Display = function (cfg) {
     this.projTransform = null;
 
     /**
+     * Node state core for the last {@link SceneJS.Billboard} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.billboard = null;
+
+    /**
      * Node state core for the last {@link SceneJS.RegionMap} visited during scene graph compilation traversal
      * @type Object
      */
@@ -416,7 +422,8 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.cubemap.hash,
         this.lights.hash,
         this.flags.hash,
-        this.regionMap.hash
+        this.regionMap.hash,
+        this.billboard.hash
     ]).join(";");
 
     if (!object.program || hash != object.hash) {

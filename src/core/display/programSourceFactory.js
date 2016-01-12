@@ -20,6 +20,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var normals;// True when rendering state contains normals
     var solid;
     var skybox;  // True when object should be treated as a skybox
+    var billboard;
     var tangents;
     var clipping;
     var morphing;
@@ -55,6 +56,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         normals = hasNormals(states);
         solid = states.flags.solid;
         skybox = states.flags.skybox;
+        billboard = !states.billboard.empty;
         tangents = hasTangents(states);
         clipping = states.clips.clips.length > 0;
         morphing = !!states.morphGeometry.targets;
@@ -358,11 +360,32 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("\n" + customVertexShader.code + "\n");
         }
 
+        if (billboard) {
+
+            // Billboarding function which modifies the rotation
+            // elements of the given matrix
+
+            add("void billboard(inout mat4 mat) {");
+            add("   mat[0][0] = -1.0;");
+            add("   mat[0][1] = 0.0;");
+            add("   mat[0][2] = 0.0;");
+            if (states.billboard.spherical) {
+                add("   mat[1][0] = 0.0;");
+                add("   mat[1][1] = 1.0;");
+                add("   mat[1][2] = 0.0;");
+            }
+            add("   mat[2][0] = 0.0;");
+            add("   mat[2][1] = 0.0;");
+            add("   mat[2][2] =1.0;");
+            add("}");
+        }
+
         add("void main(void) {");
 
         add("  vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
 
         add("  vec4 modelVertex = tmpVertex; ");
+
         if (normals) {
             add("  vec4 modelNormal = vec4(SCENEJS_aNormal, 0.0); ");
         }
@@ -381,27 +404,67 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        add("  vec4 worldVertex = SCENEJS_uMMatrix * modelVertex;");
+        add("mat4 modelMatrix = SCENEJS_uMMatrix;");
+        add("mat4 viewMatrix = SCENEJS_uVMatrix;");
 
-        add("mat4 vPosMatrix = SCENEJS_uVMatrix;");
+        if (normals) {
+            add("mat4 modelNormalMatrix = SCENEJS_uMNMatrix;");
+            add("mat4 viewNormalMatrix = SCENEJS_uVNMatrix;");
+        }
+
+        add("vec4 worldVertex;");
+        add("vec4 viewVertex;");
 
         if (skybox) {
-            add("vPosMatrix[3].xyz = vec3(0.0);");
+            add("viewMatrix[3].xyz = vec3(0.0);");
         }
 
-        if (vertexHooks.viewMatrix) {
-            add("vPosMatrix = " + vertexHooks.viewMatrix + "(vPosMatrix);");
-        }
+        if (billboard) {
 
-        add("vec4 viewVertex  = vPosMatrix * worldVertex; ");
+            // Since billboard effect is not preserved
+            // in the product of two billboarded matrices,
+            // we need to get the product of the model and
+            // view matrices and billboard that
+
+            add("   mat4 modelViewMatrix =  viewMatrix * modelMatrix;");
+
+            add("   billboard(modelMatrix);");
+            add("   billboard(viewMatrix);");
+            add("   billboard(modelViewMatrix);");
+
+            if (normals) {
+
+                add("   mat4 modelViewNormalMatrix = viewNormalMatrix * modelNormalMatrix;");
+
+                add("   billboard(modelNormalMatrix);");
+                add("   billboard(viewNormalMatrix);");
+                add("   billboard(modelViewNormalMatrix);");
+            }
+
+            if (vertexHooks.viewMatrix) {
+                add("viewMatrix = " + vertexHooks.viewMatrix + "(viewMatrix);");
+            }
+
+            add("   worldVertex = modelMatrix * modelVertex;");
+            add("   viewVertex = modelViewMatrix * modelVertex;");
+
+        } else {
+
+            if (vertexHooks.viewMatrix) {
+                add("viewMatrix = " + vertexHooks.viewMatrix + "(viewMatrix);");
+            }
+
+            add("  worldVertex = modelMatrix * modelVertex;");
+            add("  viewVertex  = viewMatrix * worldVertex; ");
+        }
 
         if (vertexHooks.viewPos) {
             add("viewVertex=" + vertexHooks.viewPos + "(viewVertex);");    // Vertex hook function
         }
 
         if (normals) {
-            add("  vec3 worldNormal = (SCENEJS_uMNMatrix * modelNormal).xyz; ");
-            add("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
+            add("  vec3 worldNormal = (modelNormalMatrix * modelNormal).xyz; ");
+            add("  SCENEJS_vViewNormal = (viewNormalMatrix * vec4(worldNormal, 1.0)).xyz;");
 
             if (fresnel) {
                 add("  SCENEJS_vWorldNormal = worldNormal;");
@@ -424,14 +487,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             // Compute tangent-bitangent-normal matrix
 
-            add("vec3 tangent = normalize((SCENEJS_uVNMatrix * SCENEJS_uMNMatrix * SCENEJS_aTangent).xyz);");
+            add("vec3 tangent = normalize((viewNormalMatrix * modelNormalMatrix * SCENEJS_aTangent).xyz);");
             add("vec3 bitangent = cross(SCENEJS_vViewNormal, tangent);");
             add("mat3 TBM = mat3(tangent, bitangent, SCENEJS_vViewNormal);");
 
             add("SCENEJS_vTangent = tangent;");
         }
 
-        add("SCENEJS_vViewEyeVec = ((SCENEJS_uVMatrix * vec4(SCENEJS_uWorldEye, 0.0)).xyz  - viewVertex.xyz);");
+        add("SCENEJS_vViewEyeVec = ((viewMatrix * vec4(SCENEJS_uWorldEye, 0.0)).xyz  - viewVertex.xyz);");
 
         if (tangents) {
 

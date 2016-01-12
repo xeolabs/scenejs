@@ -4,10 +4,10 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2015-12-22
+ * Built on 2016-01-12
  *
  * MIT License
- * Copyright 2015, Lindsay Kay
+ * Copyright 2016, Lindsay Kay
  * http://xeolabs.com/
  *
  */
@@ -999,7 +999,7 @@ var SceneJS = new (function () {
             return info;
         }
 
-        var gl = canvas.getContext("webgl", { antialias: true }) || document.getContext("experimental-webgl", { antialias: true });
+        var gl = canvas.getContext("webgl", { antialias: true }) || canvas.getContext("experimental-webgl", { antialias: true });
 
         info.WEBGL = !!gl;
 
@@ -8437,7 +8437,71 @@ SceneJS_NodeFactory.prototype._loadScript = function (url, error) {
 SceneJS_NodeFactory.prototype.putNode = function (node) {
     this.nodes.removeItem(node.id);
 };
-;(function () {
+;/**
+ * @class Scene graph node which defines a billboard transform to apply to the objects in its subgraph
+ * @extends SceneJS.Node
+ */
+new (function () {
+
+    // The default state core singleton for {@link SceneJS.Billboard} nodes
+    var defaultCore = {
+        type: "billboard",
+        stateId: SceneJS._baseStateId++,
+        empty: true,
+        hash: ""
+    };
+
+    SceneJS_events.addListener(
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            params.engine.display.billboard = defaultCore;
+            stackLen = 0;
+        });
+
+    var coreStack = [];
+    var stackLen = 0;
+
+    /**
+     * @class Scene graph node which defines a billboard transform for nodes in its subgraph
+     * @extends SceneJS.Node
+     */
+    SceneJS.Billboard = SceneJS_NodeFactory.createNodeType("billboard");
+
+    SceneJS.Billboard.prototype._init = function (params) {
+        if (this._core.useCount == 1) { // This node is the resource definer
+            this._core.spherical = (params.spherical !== false);
+        }
+        this._core.hash = "bb;";
+    };
+
+    /** Sets whether this billboard is spherical (default), where it "rotates" about the X and Y-axis,
+     * if required, to face the viewpoint, or cylindrical, where it only rotates about the Y-axis.
+      * @param spherical
+     */
+    SceneJS.Billboard.prototype.setSpherical = function (spherical) {
+        this._core.spherical = spherical;
+        this._engine.branchDirty(this);
+        this._engine.display.imageDirty = true;
+    };
+
+    SceneJS.Billboard.prototype.getSpherical = function () {
+        return this._core.spherical;
+    };
+
+    SceneJS.Billboard.prototype._compile = function (ctx) {
+        coreStack[stackLen++] = this._core;
+        this._engine.display.billboard = this._core;
+        this._compileNodes(ctx);
+        this._engine.display.billboard = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+    };
+
+    SceneJS.Billboard.prototype._destroy = function () {
+        if (this._core) {
+            this._engine._coreFactory.putCore(this._core);
+        }
+    };
+
+})();;(function () {
 
     var defaultMatrix = SceneJS_math_perspectiveMatrix4(
         45, // fovy
@@ -8819,16 +8883,17 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         stateId: SceneJS._baseStateId++,
         type: "flags",
 
-        picking: true,             // Picking enabled
-        clipping: true,            // User-defined clipping enabled
-        enabled: true,             // Node not culled from traversal
+        picking: true,              // Picking enabled
+        clipping: true,             // User-defined clipping enabled
+        enabled: true,              // Node not culled from traversal
         transparent: false,         // Node transparent - works in conjunction with matarial alpha properties
         backfaces: true,            // Show backfaces
         frontface: "ccw",           // Default vertex winding for front face
         reflective: true,           // Reflects reflection node cubemap, if it exists, by default.
         solid: false,               // When true, renders backfaces without texture or shading, for a cheap solid cross-section effect
-        solidColor: [1.0, 1.0, 1.0], // Solid cap color
-        hash: "refl;;"
+        solidColor: [1.0, 1.0, 1.0],// Solid cap color
+        skybox: false,              // Treat as a skybox
+        hash: "refl;;;"
     };
 
     var coreStack = [];
@@ -8860,6 +8925,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             this._core.reflective = true;        // Reflects reflection node cubemap, if it exists, by default.
             this._core.solid = false;            // Renders backfaces without texture or shading, for a cheap solid cross-section effect
             this._core.solidColor = [1.0, 1.0, 1.0 ]; // Solid cap color
+            this._core.skybox = false;              // Treat as a skybox
             if (params.flags) {                  // 'flags' property is actually optional in the node definition
                 this.setFlags(params.flags);
             }
@@ -8902,14 +8968,12 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
 
         if (flags.reflective != undefined) {
             core.reflective = flags.reflective;
-            core.hash = (core.reflective ? "refl" : "") + (core.solid ? ";s" : ";;");
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
 
         if (flags.solid != undefined) {
             core.solid = flags.solid;
-            core.hash = (core.reflective ? "refl" : "") + (core.solid ? ";s" : ";;");
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
@@ -8924,6 +8988,14 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             ] : defaultCore.solidColor;
             this._engine.display.imageDirty = true;
         }
+
+        if (flags.skybox != undefined) {
+            core.skybox = flags.skybox;
+            this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
+        }
+
+        core.hash = getHash(core);
 
         return this;
     };
@@ -9024,7 +9096,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         reflective = !!reflective;
         if (this._core.reflective != reflective) {
             this._core.reflective = reflective;
-            this._core.hash = (reflective ? "refl" : "") + (this._core.solid ? ";s" : ";;");
+            this._core.hash = getHash(this._core);
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
@@ -9039,7 +9111,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         solid = !!solid;
         if (this._core.solid != solid) {
             this._core.solid = solid;
-            this._core.hash = (this._core.reflective ? "refl" : "") + (solid ? ";s;" : ";;");
+            this._core.hash = getHash(this._core);
             this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
@@ -9069,12 +9141,33 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
         };
     };
 
+    SceneJS.Flags.prototype.setSkybox = function (skybox) {
+        skybox = !!skybox;
+        if (this._core.skybox != skybox) {
+            this._core.skybox = skybox;
+            this._core.hash = getHash(this._core);
+            this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    SceneJS.Flags.prototype.getSkybox = function () {
+        return this._core.skybox;
+    };
+
     SceneJS.Flags.prototype._compile = function (ctx) {
         this._engine.display.flags = coreStack[stackLen++] = this._core;
         this._compileNodes(ctx);
         this._engine.display.flags = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
         coreStack[stackLen] = null; // Release memory
     };
+
+    function getHash(core) {
+        return (core.reflective ? "refl" : "") + ";" +
+                (core.solid ? "s" : "") + ";" +
+                (core.skybox ? "sky" : "") + ";";
+    }
 
 })();
 ;new (function () {
@@ -16053,10 +16146,8 @@ var SceneJS_modelXFormStack = new (function () {
     this.pop = function () {
 
         this.top = (--stackLen > 0) ? transformStack[stackLen - 1] : defaultCore;
-        if (this.top) {
-            this.top.cores.pop();
-            this.top.numCores--;
-        }
+        transformStack[stackLen] = null;  // Release previous top node
+
         dirty = true;
     };
 
@@ -16303,6 +16394,12 @@ var SceneJS_Display = function (cfg) {
     this.projTransform = null;
 
     /**
+     * Node state core for the last {@link SceneJS.Billboard} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.billboard = null;
+
+    /**
      * Node state core for the last {@link SceneJS.RegionMap} visited during scene graph compilation traversal
      * @type Object
      */
@@ -16532,7 +16629,8 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.cubemap.hash,
         this.lights.hash,
         this.flags.hash,
-        this.regionMap.hash
+        this.regionMap.hash,
+        this.billboard.hash
     ]).join(";");
 
     if (!object.program || hash != object.hash) {
@@ -17758,6 +17856,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var cubeMapping;
     var normals;// True when rendering state contains normals
     var solid;
+    var skybox;  // True when object should be treated as a skybox
+    var billboard;
     var tangents;
     var clipping;
     var morphing;
@@ -17792,6 +17892,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         cubeMapping = hasCubemap(states);
         normals = hasNormals(states);
         solid = states.flags.solid;
+        skybox = states.flags.skybox;
+        billboard = !states.billboard.empty;
         tangents = hasTangents(states);
         clipping = states.clips.clips.length > 0;
         morphing = !!states.morphGeometry.targets;
@@ -17864,7 +17966,13 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
         add("  SCENEJS_vWorldVertex = SCENEJS_uMMatrix * tmpVertex; ");
 
-        add("  gl_Position =  SCENEJS_uPMatrix * (SCENEJS_uVMatrix * SCENEJS_vWorldVertex);");
+        add("mat4 vPosMatrix = SCENEJS_uVMatrix;");
+
+        if (skybox) {
+            add("vPosMatrix[3].xyz = vec3(0.0);");
+        }
+
+        add("  gl_Position =  SCENEJS_uPMatrix * (vPosMatrix * SCENEJS_vWorldVertex);");
 
         if (regionMapping) {
             add("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
@@ -18089,11 +18197,32 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("\n" + customVertexShader.code + "\n");
         }
 
+        if (billboard) {
+
+            // Billboarding function which modifies the rotation
+            // elements of the given matrix
+
+            add("void billboard(inout mat4 mat) {");
+            add("   mat[0][0] = -1.0;");
+            add("   mat[0][1] = 0.0;");
+            add("   mat[0][2] = 0.0;");
+            if (states.billboard.spherical) {
+                add("   mat[1][0] = 0.0;");
+                add("   mat[1][1] = 1.0;");
+                add("   mat[1][2] = 0.0;");
+            }
+            add("   mat[2][0] = 0.0;");
+            add("   mat[2][1] = 0.0;");
+            add("   mat[2][2] =1.0;");
+            add("}");
+        }
+
         add("void main(void) {");
 
         add("  vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
 
         add("  vec4 modelVertex = tmpVertex; ");
+
         if (normals) {
             add("  vec4 modelNormal = vec4(SCENEJS_aNormal, 0.0); ");
         }
@@ -18112,12 +18241,58 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        add("  vec4 worldVertex = SCENEJS_uMMatrix * modelVertex;");
+        add("mat4 modelMatrix = SCENEJS_uMMatrix;");
+        add("mat4 viewMatrix = SCENEJS_uVMatrix;");
 
-        if (vertexHooks.viewMatrix) {
-            add("vec4 viewVertex = " + vertexHooks.viewMatrix + "(SCENEJS_uVMatrix) * worldVertex;");
+        if (normals) {
+            add("mat4 modelNormalMatrix = SCENEJS_uMNMatrix;");
+            add("mat4 viewNormalMatrix = SCENEJS_uVNMatrix;");
+        }
+
+        add("vec4 worldVertex;");
+        add("vec4 viewVertex;");
+
+        if (skybox) {
+            add("viewMatrix[3].xyz = vec3(0.0);");
+        }
+
+        if (billboard) {
+
+            // Since billboard effect is not preserved
+            // in the product of two billboarded matrices,
+            // we need to get the product of the model and
+            // view matrices and billboard that
+
+            add("   mat4 modelViewMatrix =  viewMatrix * modelMatrix;");
+
+            add("   billboard(modelMatrix);");
+            add("   billboard(viewMatrix);");
+            add("   billboard(modelViewMatrix);");
+
+            if (normals) {
+
+                add("   mat4 modelViewNormalMatrix = viewNormalMatrix * modelNormalMatrix;");
+
+                add("   billboard(modelNormalMatrix);");
+                add("   billboard(viewNormalMatrix);");
+                add("   billboard(modelViewNormalMatrix);");
+            }
+
+            if (vertexHooks.viewMatrix) {
+                add("viewMatrix = " + vertexHooks.viewMatrix + "(viewMatrix);");
+            }
+
+            add("   worldVertex = modelMatrix * modelVertex;");
+            add("   viewVertex = modelViewMatrix * modelVertex;");
+
         } else {
-            add("vec4 viewVertex  = SCENEJS_uVMatrix * worldVertex; ");
+
+            if (vertexHooks.viewMatrix) {
+                add("viewMatrix = " + vertexHooks.viewMatrix + "(viewMatrix);");
+            }
+
+            add("  worldVertex = modelMatrix * modelVertex;");
+            add("  viewVertex  = viewMatrix * worldVertex; ");
         }
 
         if (vertexHooks.viewPos) {
@@ -18125,8 +18300,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (normals) {
-            add("  vec3 worldNormal = (SCENEJS_uMNMatrix * modelNormal).xyz; ");
-            add("  SCENEJS_vViewNormal = (SCENEJS_uVNMatrix * vec4(worldNormal, 1.0)).xyz;");
+            add("  vec3 worldNormal = (modelNormalMatrix * modelNormal).xyz; ");
+            add("  SCENEJS_vViewNormal = (viewNormalMatrix * vec4(worldNormal, 1.0)).xyz;");
 
             if (fresnel) {
                 add("  SCENEJS_vWorldNormal = worldNormal;");
@@ -18149,14 +18324,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             // Compute tangent-bitangent-normal matrix
 
-            add("vec3 tangent = normalize((SCENEJS_uVNMatrix * SCENEJS_uMNMatrix * SCENEJS_aTangent).xyz);");
+            add("vec3 tangent = normalize((viewNormalMatrix * modelNormalMatrix * SCENEJS_aTangent).xyz);");
             add("vec3 bitangent = cross(SCENEJS_vViewNormal, tangent);");
             add("mat3 TBM = mat3(tangent, bitangent, SCENEJS_vViewNormal);");
 
             add("SCENEJS_vTangent = tangent;");
         }
 
-        add("SCENEJS_vViewEyeVec = ((SCENEJS_uVMatrix * vec4(SCENEJS_uWorldEye, 0.0)).xyz  - viewVertex.xyz);");
+        add("SCENEJS_vViewEyeVec = ((viewMatrix * vec4(SCENEJS_uWorldEye, 0.0)).xyz  - viewVertex.xyz);");
 
         if (tangents) {
 
