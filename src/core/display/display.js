@@ -187,6 +187,12 @@ var SceneJS_Display = function (cfg) {
     this.projTransform = null;
 
     /**
+     * Node state core for the last {@link SceneJS.Billboard} visited during scene graph compilation traversal
+     * @type Object
+     */
+    this.billboard = null;
+
+    /**
      * Node state core for the last {@link SceneJS.RegionMap} visited during scene graph compilation traversal
      * @type Object
      */
@@ -416,7 +422,8 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.cubemap.hash,
         this.lights.hash,
         this.flags.hash,
-        this.regionMap.hash
+        this.regionMap.hash,
+        this.billboard.hash
     ]).join(";");
 
     if (!object.program || hash != object.hash) {
@@ -447,13 +454,14 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 13, "texture", this.texture);
     this._setChunk(object, 14, "decal", this.decal);
     this._setChunk(object, 15, "regionMap", this.regionMap);
-    this._setChunk(object, 16, "fresnel", this.fresnel);
-    this._setChunk(object, 17, "cubemap", this.cubemap);
-    this._setChunk(object, 18, "clips", this.clips);
-    this._setChunk(object, 19, "renderer", this.renderer);
-    this._setChunk(object, 20, "geometry", this.morphGeometry, this.geometry);
-    this._setChunk(object, 21, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 22, "draw", this.geometry); // Must be last
+    this._setChunk(object, 16, "billboard", this.billboard);
+    this._setChunk(object, 17, "fresnel", this.fresnel);
+    this._setChunk(object, 18, "cubemap", this.cubemap);
+    this._setChunk(object, 19, "clips", this.clips);
+    this._setChunk(object, 20, "renderer", this.renderer);
+    this._setChunk(object, 21, "geometry", this.morphGeometry, this.geometry);
+    this._setChunk(object, 22, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 23, "draw", this.geometry); // Must be last
 
     // At the very least, the object sort order
     // will need be recomputed

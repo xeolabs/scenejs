@@ -20,6 +20,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var normals;// True when rendering state contains normals
     var solid;
     var skybox;  // True when object should be treated as a skybox
+    var billboard;
     var tangents;
     var clipping;
     var morphing;
@@ -55,6 +56,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         normals = hasNormals(states);
         solid = states.flags.solid;
         skybox = states.flags.skybox;
+        billboard = !states.billboard.empty;
         tangents = hasTangents(states);
         clipping = states.clips.clips.length > 0;
         morphing = !!states.morphGeometry.targets;
@@ -356,6 +358,23 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (customVertexShader.code) {
             add("\n" + customVertexShader.code + "\n");
+        }
+
+        if (billboard) {
+
+            add("void billboard(inout mat4 mat) {");
+            add("   mat[0][0] = -1.0;");
+            add("   mat[0][1] = 0.0;");
+            add("   mat[0][2] = 0.0;");
+            if (states.billboard.spherical) {
+                add("   mat[1][0] = 0.0;");
+                add("   mat[1][1] = 1.0;");
+                add("   mat[1][2] = 0.0;");
+            }
+            add("   mat[2][0] = 0.0;");
+            add("   mat[2][1] = 0.0;");
+            add("   mat[2][2] =1.0;");
+            add("}");
         }
 
         add("void main(void) {");

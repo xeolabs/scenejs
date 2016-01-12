@@ -34,6 +34,7 @@
         "src/core/scene/node.js",
         "src/core/scene/pubSubProxy.js",
         "src/core/scene/nodeFactory.js",
+        "src/core/scene/billboard.js",
         "src/core/scene/camera.js",
         "src/core/scene/clips.js",
         "src/core/scene/enable.js",
