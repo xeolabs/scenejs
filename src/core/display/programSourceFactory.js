@@ -781,11 +781,15 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("vec3 viewEyeVec = normalize(SCENEJS_vViewEyeVec);");
         }
 
+        if (texturing || decal) {
+            add("  vec4    texturePos;");
+            add("  vec2    textureCoord=vec2(0.0,0.0);");
+        }
+
         var layer;
         if (texturing) {
 
-            add("  vec4    texturePos;");
-            add("  vec2    textureCoord=vec2(0.0,0.0);");
+
 
             // ------------ Texture maps ------------------------------------
 

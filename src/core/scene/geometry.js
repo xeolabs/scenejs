@@ -231,6 +231,7 @@ new (function () {
             }
             return core.decalTriangleUVBuf;
         };
+
     };
 
 

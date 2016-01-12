@@ -266,7 +266,7 @@ SceneJS.Types.addType("cameras/trackball", {
             for (var i = 0, len = rotations.length; i < len; i++) {
                 this._q = SceneJS_math_mulQuaternions(this._q, rotations[i]);
             }
-            this._mat = SceneJS_math_newMat4FromQuaternion(this._q);
+            this._mat = SceneJS_math_quaternionToMat4(this._q);
         }
 
         var eye2;

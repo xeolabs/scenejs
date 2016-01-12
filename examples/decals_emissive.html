@@ -230,7 +230,9 @@
                                 return;
                             }
 
-                            var hit = scene.pick(coords[0], coords[1], {rayPick: true});
+                            var hit = scene.pick(coords[0], coords[1], {
+                                rayPick: true
+                            });
 
                             if (hit && hit.worldPos && hit.normal) {
 
@@ -242,8 +244,8 @@
                                         penDown();
                                     }
 
-                                    console.log(hit.primitiveIndex)
-                                    console.log(JSON.stringify(hit.decalUV))
+//                                    console.log(hit.primitiveIndex)
+//                                    console.log(JSON.stringify(hit.decalUV))
                                     penMove(hit.decalUV);
                                 }
 

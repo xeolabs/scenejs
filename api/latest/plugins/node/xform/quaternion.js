@@ -66,7 +66,7 @@ SceneJS.Types.addType("xform/quaternion", {
     setRotation: function (q) {
         q = q || {};
         this._q = SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0);
-        this._xform.setElements(SceneJS_math_newMat4FromQuaternion(this._q));
+        this._xform.setElements(SceneJS_math_quaternionToMat4(this._q));
     },
 
     getRotation: function () {
@@ -75,7 +75,7 @@ SceneJS.Types.addType("xform/quaternion", {
 
     addRotation: function (q) {
         this._q = SceneJS_math_mulQuaternions(SceneJS_math_angleAxisQuaternion(q.x || 0, q.y || 0, q.z || 0, q.angle || 0), this._q);
-        this._xform.setElements(SceneJS_math_newMat4FromQuaternion(this._q));
+        this._xform.setElements(SceneJS_math_quaternionToMat4(this._q));
     },
 
     getModelMatrix: function () {
@@ -88,7 +88,7 @@ SceneJS.Types.addType("xform/quaternion", {
 
     normalize: function () {
         this._q = SceneJS_math_normalizeQuaternion(this._q);
-        this._xform.setElements(SceneJS_math_newMat4FromQuaternion(this._q));
+        this._xform.setElements(SceneJS_math_quaternionToMat4(this._q));
     },
 
     getQuaternion: function () {

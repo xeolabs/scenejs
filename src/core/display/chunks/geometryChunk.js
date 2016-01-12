@@ -98,26 +98,26 @@ SceneJS_ChunkFactory.createChunkType({
         var doDecal = frameCtx.decalling;
         var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
-        if (this.VAO) {
-            frameCtx.VAO.bindVertexArrayOES(this.VAO);
-            if (doMorph) {
-                if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {
-                    this.setDrawMorphFactor();
-                    return;
-                }
-            } else if (cleanInterleavedBuf || !this.VAOHasInterleavedBuf) {
-                return;
-            }
-        } else if (frameCtx.VAO) {
-            // Start creating a new VAO by switching to the default VAO, which doesn't have attribs enabled.
-            frameCtx.VAO.bindVertexArrayOES(null);
-            this.VAO = frameCtx.VAO.createVertexArrayOES();
-            frameCtx.VAO.bindVertexArrayOES(this.VAO);
-        }
-
-        if (doMorph) {
-            this.morphDraw();
-        } else {
+        //if (this.VAO) {
+        //    frameCtx.VAO.bindVertexArrayOES(this.VAO);
+        //    if (doMorph) {
+        //        if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {
+        //            this.setDrawMorphFactor();
+        //            return;
+        //        }
+        //    } else if (cleanInterleavedBuf || !this.VAOHasInterleavedBuf) {
+        //        return;
+        //    }
+        //} else if (frameCtx.VAO) {
+        //    // Start creating a new VAO by switching to the default VAO, which doesn't have attribs enabled.
+        //    frameCtx.VAO.bindVertexArrayOES(null);
+        //    this.VAO = frameCtx.VAO.createVertexArrayOES();
+        //    frameCtx.VAO.bindVertexArrayOES(this.VAO);
+        //}
+        //
+        //if (doMorph) {
+        //    this.morphDraw();
+        //} else {
             //if (cleanInterleavedBuf) {
             //    this.VAOHasInterleavedBuf = true;
             //    this.core2.interleavedBuf.bind();
@@ -153,45 +153,59 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (doDecal) {
 
-                    // Applying a decal texture; use lazy-generated geometry arrays
-                    // for decalling, in which triangles do not share vertices.
+                    // Rendering a decal texture;
+                    // use generated triangle vertex arrays and indices
 
                     if (this._aVertexDraw) {
                         this._aVertexDraw.bindFloatArrayBuffer(this.core2.getTrianglePositions());
                     }
+
                     if (this._aNormalDraw) {
                         this._aNormalDraw.bindFloatArrayBuffer(this.core2.getTriangleNormals());
                     }
+
                     if (this._aUVDraw) {
                         this._aUVDraw.bindFloatArrayBuffer(this.core2.getTriangleUVs());
                     }
+
                     if (this._aUV2Draw) {
                         // TODO
                         //this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
                     }
+
                     if (this._aColorDraw) {
                         this._aColorDraw.bindFloatArrayBuffer(this.core2.getTriangleColors());
                     }
+
                     if (this._aDecalUV) { // For applying the decal texture
                         this._aDecalUV.bindFloatArrayBuffer(this.core2.getDecalTriangleUVs());
                     }
 
-                    this.core2.getTriangleIndices().bind();
+                    var indexBuf = this.core2.getTriangleIndices();
+
+                    indexBuf.bind();
 
                 } else {
+
+                    // Not rendering a decal texture;
+                    // use original vertex arrays and indices
 
                     if (this._aVertexDraw) {
                         this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
                     }
+
                     if (this._aNormalDraw) {
                         this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
                     }
+
                     if (this._aUVDraw) {
                         this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
                     }
+
                     if (this._aUV2Draw) {
                         this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
                     }
+
                     if (this._aColorDraw) {
                         this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
                     }
@@ -204,7 +218,7 @@ SceneJS_ChunkFactory.createChunkType({
 
                     this.core2.indexBuf.bind();
                 }
-            }
+         //   }
        // }
 
         if (this._aRegionMapUVDraw) {
@@ -282,6 +296,9 @@ SceneJS_ChunkFactory.createChunkType({
 
             if (frameCtx.pickObject || frameCtx.pickRegion) {
 
+                // Picking an object or region;
+                // bind regular vertex arrays and index buffer
+
                 if (this._aVertexPick) {
                     this._aVertexPick.bindFloatArrayBuffer(core2.vertexBuf);
                 }
@@ -293,6 +310,9 @@ SceneJS_ChunkFactory.createChunkType({
                 core2.indexBuf.bind();
 
             } else if (frameCtx.pickTriangle) {
+
+                // Picking a triangle;
+                // bind generated triangles vertex buffers and index array
 
                 if (this._aVertexPick) {
                     this._aVertexPick.bindFloatArrayBuffer(core2.getTrianglePositions());

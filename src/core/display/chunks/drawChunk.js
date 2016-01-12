@@ -30,6 +30,9 @@ SceneJS_ChunkFactory.createChunkType({
         if (this._depthModeDraw) {
             this._depthModeDraw.setValue(frameCtx.depthMode);
         }
+
+        // Use generated triangles index buffer if applying a decal texture
+
         var doDecal = frameCtx.decalling;
         var indexBuf = (doDecal) ? core.getTriangleIndices() : core.indexBuf;
 
@@ -44,6 +47,9 @@ SceneJS_ChunkFactory.createChunkType({
         var gl = this.program.gl;
 
         if (frameCtx.pickObject || frameCtx.pickRegion) {
+
+            // Picking an object or a region;
+            // draw using original index buffer
 
             if (frameCtx.pickObject) {
 
@@ -64,9 +70,13 @@ SceneJS_ChunkFactory.createChunkType({
 
         } else if (frameCtx.pickTriangle) {
 
+            // Picking a triangle;
+            // draw using generated triangle index buffer
+
             var pickIndices = core.getTriangleIndices();
 
             if (pickIndices) {
+
                 gl.drawElements(core.primitive, pickIndices.numItems, pickIndices.itemType, 0);
             }
         }
