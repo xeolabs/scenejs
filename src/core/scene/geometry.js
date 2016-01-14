@@ -61,7 +61,7 @@ new (function () {
             if (primitive === "triangles") {
                 if (data.normals === "auto" || data.normals === true) {
                     if (data.positions && data.indices) {
-                        data.normals = this._buildNormals(data.indices, data.positions);
+                        data.normals = SceneJS_math_buildNormals(data.indices, data.positions);
                     }
                 }
             }
