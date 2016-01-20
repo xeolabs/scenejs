@@ -21,7 +21,9 @@
     <br><br>
     Drawing on an object using a decal map
     <br><br>
-    <img id="myImage" width="4000px" height="200px" style="float: left; display: none;">
+    <img id="myImage" width="500px" height="200px" style="float: left; width:500px; height:500px; display:none; ">
+    <canvas id="myCanvas" width="500px" height="500px" style="float: left; width:500px; height:500px; z-index:100000; "/>
+
 </div>
 
 <script>
@@ -47,9 +49,8 @@
                 type: "cameras/orbit",
                 yaw: 30,
                 pitch: -30,
-                zoom: 5,
-                zoomSensitivity: 1.0,
-
+                zoom: 15,
+                zoomSensitivity: 2.0,
                 nodes: [
 
                     // The decal
@@ -63,7 +64,7 @@
 
                             // Diffuse texture
                             {
-                                type: "texture",
+//                                type: "texture",
                                 src: "textures/uvGrid.jpg",
 
                                 nodes: [
@@ -71,17 +72,52 @@
                                     // Blinn-Phong material
                                     {
                                         type: "material",
-                                        color: {r: 1.0, g: 1.0, b: 1.0},
+                                        color: {r: 0.0, g: 0.0, b: 1.0},
                                         emitColor: {r: 1, g: 1, b: 1},
                                         emit: 1.0,
 
                                         nodes: [
 
-                                            // Box primitive implemented by plugin at
-                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            // Plane primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/plane.js
+//                                            {
+//                                                type: "geometry/plane",
+//                                                width: 5,
+//                                                height: 5,
+//                                                widthSegments: 2,
+//                                                heightSegments: 2
+//                                            }
+
+                                            // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/torus.js
                                             {
-                                                type: "geometry/box"
+                                                type: "geometry/torus",
+                                                radius: 10.0,
+                                                tube: 3.00,
+                                                segmentsR: 4,
+                                                segmentsT: 4,
+                                                arc: Math.PI * 2
                                             }
+
+                                            // Heightmap, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/heightmap.js
+//                                            {
+//                                                type: "geometry/heightmap",
+//
+//                                                // Texture image
+//                                                src: 'textures/terrainHeightMap.png',
+//
+//                                                // Wireframe or solid - default is false
+//                                                wire: false,
+//
+//                                                // Dimensions
+//                                                xSize: 3000,
+//                                                zSize: 3000,
+//                                                ySize: 800,
+//
+//                                                // Segments on X and Z axis
+//                                                xSegments: 10,
+//                                                zSegments: 10
+//                                            }
                                         ]
                                     }
                                 ]
@@ -104,8 +140,8 @@
 
                 var drawingCanvas = document.createElement('canvas');
 
-                drawingCanvas.width = 4000;
-                drawingCanvas.height = 200;
+                drawingCanvas.width = 500;
+                drawingCanvas.height = 500;
 
                 var context = drawingCanvas.getContext("2d");
 
@@ -141,11 +177,16 @@
                     var x = Math.floor(uv[0] * drawingCanvas.width);
                     var y = Math.floor((1 - uv[1]) * drawingCanvas.height);
 
+
                     if (!down) {
-                        context.moveTo(x, y);
+//                        context.moveTo(x, y);
                         return;
                     }
 
+                    context.moveTo(x, y);
+                    context.lineTo(x + 1, y);
+                    context.lineTo(x + 1, y + 1);
+                    context.lineTo(x, y + 1);
                     context.lineTo(x, y);
                     context.stroke();
 
@@ -259,6 +300,9 @@
                             }
                         });
             });
+
+
+
 
 </script>
 </body>

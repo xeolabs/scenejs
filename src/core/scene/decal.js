@@ -131,12 +131,12 @@ new (function () {
 
         this._core.texture = new SceneJS._webgl.Texture2D(gl, {
             texture: texture,
-            minFilter: this._getGLOption("minFilter", gl.LINEAR_MIPMAP_NEAREST),
+            minFilter: this._getGLOption("minFilter", gl.LINEAR),
             magFilter: this._getGLOption("magFilter", gl.LINEAR),
-            wrapS: this._getGLOption("wrapS", gl.REPEAT),
-            wrapT: this._getGLOption("wrapT", gl.REPEAT),
-            isDepth: this._getOption(this._core.isDepth, false),
-            depthMode: this._getGLOption("depthMode", gl.LUMINANCE),
+            wrapS: gl.REPEAT,
+            wrapT: gl.REPEAT,
+            isDepth: false,
+            depthMode: gl.LUMINANCE,
             depthCompareMode: this._getGLOption("depthCompareMode", gl.COMPARE_R_TO_TEXTURE),
             depthCompareFunc: this._getGLOption("depthCompareFunc", gl.LEQUAL),
             flipY: this._getOption(this._core.flipY, true),

@@ -2361,7 +2361,7 @@
         var pickColors = new Float32Array(lenIndices * 4);
         var lenPickColors = 0;
         var primIndex = 0;
-var i;
+        var i;
         // Triangle indices
 
         var r;
@@ -2534,8 +2534,26 @@ var i;
      */
     window.SceneJS_math_getDecalTriangleUVs = function (indices, positions) {
 
+        var xmax = 500;
+        var ymax = 500;
+
         var lenIndices = indices.length;
         var triangleUVs = new Float32Array(lenIndices * 2);
+
+        var numTriangles = lenIndices / 2;
+        var numCells = Math.round(Math.sqrt(numTriangles)) + 1;
+
+        var cellWidth = xmax / numCells;
+        var cellHeight = ymax / numCells;
+
+        var cellXi = 0;
+        var cellYi = 0;
+
+        var cellX = 0;
+        var cellY = 0;
+
+        var scaleX;
+        var scaleY;
 
         // Temporary scratch variables we'll use with our math functions
 
@@ -2606,9 +2624,17 @@ var i;
         var offsetX;
         var offsetY;
 
-        var offsetBump = 0;
+        var xmin2;
+        var ymin2;
+
+        var xmax2;
+        var ymax2;
+
 
         for (i = 0; i < lenIndices; i += 3) {
+
+            cellX = cellXi * cellWidth;
+            cellY = cellYi * cellHeight;
 
             // Get vertex indices
 
@@ -2660,43 +2686,42 @@ var i;
             tvb = SceneJS_math_transformPoint3(matrix, vb, tempVec3e);
             tvc = SceneJS_math_transformPoint3(matrix, vc, tempVec3f);
 
-            // Get triangle's axis-aligned 2D boundary in X,Y plane
+            xmin2 = min3(tva[0], tvb[0], tvc[0]);
+            ymin2 = min3(tva[1], tvb[1], tvc[1]);
 
-            SceneJS_math_collapseAABB2(aabbTriangle);
+            xmax2 = max3(tva[0], tvb[0], tvc[0]);
+            ymax2 = max3(tva[1], tvb[1], tvc[1]);
 
-            SceneJS_math_expandAABB2Point2(aabbTriangle, tva);
-            SceneJS_math_expandAABB2Point2(aabbTriangle, tvb);
-            SceneJS_math_expandAABB2Point2(aabbTriangle, tvc);
+            var xwid = xmax2 - xmin2;
+            var ywid = ymax2 - ymin2;
+
+            scaleX = cellWidth / xwid;
+            scaleY = cellHeight / ywid;
+
+            //  scaleX = scaleY = 1;
+
+            tva[0] *= scaleX;
+            tva[1] *= scaleY;
+
+            tvb[0] *= scaleX;
+            tvb[1] *= scaleY;
+
+            tvc[0] *= scaleX;
+            tvc[1] *= scaleY;
 
             // "Pack" the triangle against the other triangles within the X,Y plane
 
-            offsetX = aabbTriangle.min[0] - offsetBump;
-            offsetY = aabbTriangle.min[1];
+            offsetX = cellX - xmin2;
+            offsetY = cellY - ymin2;
 
-            offsetBump += (aabbTriangle.max[0] - aabbTriangle.min[0]);
+            tva[0] += offsetX;
+            tva[1] += offsetY;
 
-            tva[0] -= offsetX;
-            tva[1] -= offsetY;
+            tvb[0] += offsetX;
+            tvb[1] += offsetY;
 
-            tvb[0] -= offsetX;
-            tvb[1] -= offsetY;
-
-            tvc[0] -= offsetX;
-            tvc[1] -= offsetY;
-
-            // Expand total boundary to enclose the triangle
-
-            SceneJS_math_expandAABB2Point2(aabbMesh, tva);
-            SceneJS_math_expandAABB2Point2(aabbMesh, tvb);
-            SceneJS_math_expandAABB2Point2(aabbMesh, tvc);
-
-            // Maps geometry indices to packed indices;
-            // this is used to map indices from pick results
-            // to their corresponding packed indices.
-
-            //  primitiveMap[numPrimitives] = lenIndicesOut;
-
-            //  numPrimitives += 3;
+            tvc[0] += offsetX;
+            tvc[1] += offsetY;
 
             triangleUVs[lenTriangleUVs++] = tva[0]; // A
             triangleUVs[lenTriangleUVs++] = tva[1];
@@ -2704,25 +2729,86 @@ var i;
             triangleUVs[lenTriangleUVs++] = tvb[1];
             triangleUVs[lenTriangleUVs++] = tvc[0]; // C
             triangleUVs[lenTriangleUVs++] = tvc[1];
+
+            //console.log("(" + tva[0].toFixed(2) + "," + tva[1].toFixed(2) + ") (" + tvb[0].toFixed(2) + "," + tvb[1].toFixed(2) + ") (" + tvc[0].toFixed(2) + "," + tvc[1].toFixed(2) + ")")
+
+            cellXi++;
+
+            if (cellXi > (numCells - 1)) {
+                cellXi = 0;
+                cellYi++;
+            }
         }
 
         // Normalize the uvsIn into [0..1, 0..1] range
 
-        var meshSizeX = aabbMesh.max[0] - aabbMesh.min[0];
-        var meshSizeY = aabbMesh.max[1] - aabbMesh.min[1];
+        var meshSizeX = xmax;
+        var meshSizeY = ymax;
 
-        var scaleX = 1 / meshSizeX;
-        var scaleY = 1 / meshSizeY;
+        var normScaleX = (1 / meshSizeX);
+        var normScaleY = (1 / meshSizeY);
 
         for (i = 0; i < lenTriangleUVs; i += 2) {
-            triangleUVs[i] *= scaleX;
-            triangleUVs[i + 1] *= scaleY;
+            triangleUVs[i] *= normScaleX;
+            triangleUVs[i + 1] *= normScaleY;
         }
+
+        drawUVs(triangleUVs);
 
         return triangleUVs;
     };
 
-        /**
+    function min3(a, b, c) {
+        var t = (a < b ? a : b);
+        return t < c ? t : c;
+    }
+
+    function max3(a, b, c) {
+        var t = (a > b ? a : b);
+        return t > c ? t : c;
+    }
+
+    // Visualizes the given triangle vertex UVs by drawing them
+    // as randomly-colored triangles on the drawing canvas.
+
+    var drawUVs = (function () {
+
+        var uvsDrawn = false;
+
+        return function (uvs) {
+
+            if (uvsDrawn) {
+                return;
+            }
+
+            var canvas = document.getElementById("myCanvas");
+            var context = canvas.getContext("2d");
+
+            context.strokeStyle = '#00';
+            context.lineWidth = 3;
+
+            var width = canvas.clientWidth;
+            var height = canvas.clientHeight;
+
+            for (var i = 0, len = uvs.length; i < len; i += 6) {
+
+                // Random color
+                context.fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
+
+                context.beginPath();
+                context.moveTo(width * uvs[i + 0], height * uvs[i + 1]);
+                context.lineTo(width * uvs[i + 2], height * uvs[i + 3]);
+                context.lineTo(width * uvs[i + 4], height * uvs[i + 5]);
+                context.lineTo(width * uvs[i + 0], height * uvs[i + 1]);
+                context.closePath();
+                context.fill();
+            }
+
+            uvsDrawn = true;
+        };
+    })();
+
+    /**
      * Builds vertex tangent vectors from positions, UVs and indices
      *
      * Based on code by @rollokb, in his fork of webgl-obj-loader:
