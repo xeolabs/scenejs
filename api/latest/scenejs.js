@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-01-12
+ * Built on 2016-01-20
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -5218,7 +5218,7 @@ SceneJS.log = new (function() {
         var pickColors = new Float32Array(lenIndices * 4);
         var lenPickColors = 0;
         var primIndex = 0;
-var i;
+        var i;
         // Triangle indices
 
         var r;
@@ -5391,8 +5391,28 @@ var i;
      */
     window.SceneJS_math_getDecalTriangleUVs = function (indices, positions) {
 
+        var xmax = 500;
+        var ymax = 500;
+
         var lenIndices = indices.length;
         var triangleUVs = new Float32Array(lenIndices * 2);
+
+        var numTriangles = lenIndices / 3;
+        var numCells = Math.round(Math.sqrt(numTriangles)) + 1;
+
+        var cellWidth = xmax / numCells;
+        var cellHeight = ymax / numCells;
+
+        // Index of current cell on X and Y axis
+        var cellXi = 0;
+        var cellYi = 0;
+
+        // Origin of current cell
+        var cellX = 0;
+        var cellY = 0;
+
+        var scaleX;
+        var scaleY;
 
         // Temporary scratch variables we'll use with our math functions
 
@@ -5405,18 +5425,7 @@ var i;
         var tempVec3f = new Float32Array(3);
         var tempVec4 = new Float32Array(4);
 
-        var tempAABB2 = {
-            min: new Float32Array(2),
-            max: new Float32Array(2)
-        };
-
-        var tempAABB2b = {
-            min: new Float32Array(2),
-            max: new Float32Array(2)
-        };
-
         var i;
-        var len;
 
         var lenTriangleUVs = 0;
 
@@ -5452,20 +5461,20 @@ var i;
         // Matrix to rotate triangle into X,Y plane
         var matrix = SceneJS_math_mat4();
 
-        // Axis-aligned 2D boundary of each triangle on X,Y plane
-        var aabbTriangle = tempAABB2;
-
-        // Axis-aligned 2D boundary enclosing all triangles on X,Y plane
-        var aabbMesh = tempAABB2b;
-
-        SceneJS_math_collapseAABB2(aabbMesh);
-
         var offsetX;
         var offsetY;
 
-        var offsetBump = 0;
+        var xmin2;
+        var ymin2;
+
+        var xmax2;
+        var ymax2;
+
 
         for (i = 0; i < lenIndices; i += 3) {
+
+            cellX = cellXi * cellWidth;
+            cellY = cellYi * cellHeight;
 
             // Get vertex indices
 
@@ -5517,43 +5526,50 @@ var i;
             tvb = SceneJS_math_transformPoint3(matrix, vb, tempVec3e);
             tvc = SceneJS_math_transformPoint3(matrix, vc, tempVec3f);
 
-            // Get triangle's axis-aligned 2D boundary in X,Y plane
+            // Get X,Y extents
 
-            SceneJS_math_collapseAABB2(aabbTriangle);
+            xmin2 = min3(tva[0], tvb[0], tvc[0]);
+            ymin2 = min3(tva[1], tvb[1], tvc[1]);
+            xmax2 = max3(tva[0], tvb[0], tvc[0]);
+            ymax2 = max3(tva[1], tvb[1], tvc[1]);
 
-            SceneJS_math_expandAABB2Point2(aabbTriangle, tva);
-            SceneJS_math_expandAABB2Point2(aabbTriangle, tvb);
-            SceneJS_math_expandAABB2Point2(aabbTriangle, tvc);
+            // Get width of extents
+
+            var xwid = xmax2 - xmin2;
+            var ywid = ymax2 - ymin2;
+
+            // Get scalar to scale triangle to fit texture cell
+
+            scaleX = cellWidth / xwid;
+            scaleY = cellHeight / ywid;
+
+            //  scaleX = scaleY = 1;
+
+            tva[0] *= scaleX;
+            tva[1] *= scaleY;
+
+            tvb[0] *= scaleX;
+            tvb[1] *= scaleY;
+
+            tvc[0] *= scaleX;
+            tvc[1] *= scaleY;
 
             // "Pack" the triangle against the other triangles within the X,Y plane
 
-            offsetX = aabbTriangle.min[0] - offsetBump;
-            offsetY = aabbTriangle.min[1];
+            xmin2 *= scaleX;
+            ymin2 *= scaleY;
 
-            offsetBump += (aabbTriangle.max[0] - aabbTriangle.min[0]);
+            offsetX = cellX - xmin2;
+            offsetY = cellY - ymin2;
 
-            tva[0] -= offsetX;
-            tva[1] -= offsetY;
+            tva[0] += offsetX;
+            tva[1] += offsetY;
 
-            tvb[0] -= offsetX;
-            tvb[1] -= offsetY;
+            tvb[0] += offsetX;
+            tvb[1] += offsetY;
 
-            tvc[0] -= offsetX;
-            tvc[1] -= offsetY;
-
-            // Expand total boundary to enclose the triangle
-
-            SceneJS_math_expandAABB2Point2(aabbMesh, tva);
-            SceneJS_math_expandAABB2Point2(aabbMesh, tvb);
-            SceneJS_math_expandAABB2Point2(aabbMesh, tvc);
-
-            // Maps geometry indices to packed indices;
-            // this is used to map indices from pick results
-            // to their corresponding packed indices.
-
-            //  primitiveMap[numPrimitives] = lenIndicesOut;
-
-            //  numPrimitives += 3;
+            tvc[0] += offsetX;
+            tvc[1] += offsetY;
 
             triangleUVs[lenTriangleUVs++] = tva[0]; // A
             triangleUVs[lenTriangleUVs++] = tva[1];
@@ -5561,25 +5577,86 @@ var i;
             triangleUVs[lenTriangleUVs++] = tvb[1];
             triangleUVs[lenTriangleUVs++] = tvc[0]; // C
             triangleUVs[lenTriangleUVs++] = tvc[1];
+
+            //console.log("(" + tva[0].toFixed(2) + "," + tva[1].toFixed(2) + ") (" + tvb[0].toFixed(2) + "," + tvb[1].toFixed(2) + ") (" + tvc[0].toFixed(2) + "," + tvc[1].toFixed(2) + ")")
+
+            cellXi++;
+
+            if (cellXi >= numCells) {
+                cellXi = 0;
+                cellYi++;
+            }
         }
 
         // Normalize the uvsIn into [0..1, 0..1] range
 
-        var meshSizeX = aabbMesh.max[0] - aabbMesh.min[0];
-        var meshSizeY = aabbMesh.max[1] - aabbMesh.min[1];
+        var meshSizeX = xmax;
+        var meshSizeY = ymax;
 
-        var scaleX = 1 / meshSizeX;
-        var scaleY = 1 / meshSizeY;
+        var normScaleX = (1 / meshSizeX);
+        var normScaleY = (1 / meshSizeY);
 
         for (i = 0; i < lenTriangleUVs; i += 2) {
-            triangleUVs[i] *= scaleX;
-            triangleUVs[i + 1] *= scaleY;
+            triangleUVs[i] *= normScaleX;
+            triangleUVs[i + 1] *= normScaleY;
         }
+
+        drawUVs(triangleUVs);
 
         return triangleUVs;
     };
 
-        /**
+    function min3(a, b, c) {
+        var t = (a < b ? a : b);
+        return t < c ? t : c;
+    }
+
+    function max3(a, b, c) {
+        var t = (a > b ? a : b);
+        return t > c ? t : c;
+    }
+
+    // Visualizes the given triangle vertex UVs by drawing them
+    // as randomly-colored triangles on the drawing canvas.
+
+    var drawUVs = (function () {
+
+        var uvsDrawn = false;
+
+        return function (uvs) {
+
+            if (uvsDrawn) {
+                return;
+            }
+
+            var canvas = document.getElementById("myCanvas");
+            var context = canvas.getContext("2d");
+
+            context.strokeStyle = '#00';
+            context.lineWidth = 3;
+
+            var width = canvas.clientWidth;
+            var height = canvas.clientHeight;
+
+            for (var i = 0, len = uvs.length; i < len; i += 6) {
+
+                // Random color
+                context.fillStyle = '#' + Math.floor(Math.random() * 16777215).toString(16);
+
+                context.beginPath();
+                context.moveTo(width * uvs[i + 0], height * uvs[i + 1]);
+                context.lineTo(width * uvs[i + 2], height * uvs[i + 3]);
+                context.lineTo(width * uvs[i + 4], height * uvs[i + 5]);
+                context.lineTo(width * uvs[i + 0], height * uvs[i + 1]);
+                context.closePath();
+                context.fill();
+            }
+
+            uvsDrawn = true;
+        };
+    })();
+
+    /**
      * Builds vertex tangent vectors from positions, UVs and indices
      *
      * Based on code by @rollokb, in his fork of webgl-obj-loader:
@@ -10215,7 +10292,7 @@ SceneJS_NodeFactory.prototype.putNode = function (node) {
             if (primitive === "triangles") {
                 if (data.normals === "auto" || data.normals === true) {
                     if (data.positions && data.indices) {
-                        data.normals = this._buildNormals(data.indices, data.positions);
+                        data.normals = SceneJS_math_buildNormals(data.indices, data.positions);
                     }
                 }
             }
@@ -15324,12 +15401,12 @@ new (function () {
 
         this._core.texture = new SceneJS._webgl.Texture2D(gl, {
             texture: texture,
-            minFilter: this._getGLOption("minFilter", gl.LINEAR_MIPMAP_NEAREST),
+            minFilter: this._getGLOption("minFilter", gl.LINEAR),
             magFilter: this._getGLOption("magFilter", gl.LINEAR),
-            wrapS: this._getGLOption("wrapS", gl.REPEAT),
-            wrapT: this._getGLOption("wrapT", gl.REPEAT),
-            isDepth: this._getOption(this._core.isDepth, false),
-            depthMode: this._getGLOption("depthMode", gl.LUMINANCE),
+            wrapS: gl.REPEAT,
+            wrapT: gl.REPEAT,
+            isDepth: false,
+            depthMode: gl.LUMINANCE,
             depthCompareMode: this._getGLOption("depthCompareMode", gl.COMPARE_R_TO_TEXTURE),
             depthCompareFunc: this._getGLOption("depthCompareFunc", gl.LEQUAL),
             flipY: this._getOption(this._core.flipY, true),
@@ -20557,8 +20634,7 @@ SceneJS_ChunkFactory.createChunkType({
             this._depthModeDraw.setValue(frameCtx.depthMode);
         }
 
-        // When rendering decals, we use the modified triangles indices for
-        // both drawing and picking
+        // Use generated triangles index buffer if applying a decal texture
 
         var doDecal = frameCtx.decalling;
         var indexBuf = (doDecal) ? core.getTriangleIndices() : core.indexBuf;
@@ -20575,6 +20651,9 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (frameCtx.pickObject || frameCtx.pickRegion) {
 
+            // Picking an object or a region;
+            // draw using original index buffer
+
             if (frameCtx.pickObject) {
 
                 if (this._uPickColor) {
@@ -20590,16 +20669,17 @@ SceneJS_ChunkFactory.createChunkType({
                 }
             }
 
-            var doDecal = frameCtx.decalling;
-            var indexBuf = (doDecal) ? core.getTriangleIndices() : core.indexBuf;
-
-            gl.drawElements(core.primitive, indexBuf.numItems, indexBuf.itemType, 0);
+            gl.drawElements(core.primitive, core.indexBuf.numItems, core.indexBuf.itemType, 0);
 
         } else if (frameCtx.pickTriangle) {
+
+            // Picking a triangle;
+            // draw using generated triangle index buffer
 
             var pickIndices = core.getTriangleIndices();
 
             if (pickIndices) {
+
                 gl.drawElements(core.primitive, pickIndices.numItems, pickIndices.itemType, 0);
             }
         }
@@ -20848,26 +20928,26 @@ SceneJS_ChunkFactory.createChunkType({
         var doDecal = frameCtx.decalling;
         var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
-        if (this.VAO) {
-            frameCtx.VAO.bindVertexArrayOES(this.VAO);
-            if (doMorph) {
-                if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {
-                    this.setDrawMorphFactor();
-                    return;
-                }
-            } else if (cleanInterleavedBuf || !this.VAOHasInterleavedBuf) {
-                return;
-            }
-        } else if (frameCtx.VAO) {
-            // Start creating a new VAO by switching to the default VAO, which doesn't have attribs enabled.
-            frameCtx.VAO.bindVertexArrayOES(null);
-            this.VAO = frameCtx.VAO.createVertexArrayOES();
-            frameCtx.VAO.bindVertexArrayOES(this.VAO);
-        }
-
-        if (doMorph) {
-            this.morphDraw();
-        } else {
+        //if (this.VAO) {
+        //    frameCtx.VAO.bindVertexArrayOES(this.VAO);
+        //    if (doMorph) {
+        //        if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {
+        //            this.setDrawMorphFactor();
+        //            return;
+        //        }
+        //    } else if (cleanInterleavedBuf || !this.VAOHasInterleavedBuf) {
+        //        return;
+        //    }
+        //} else if (frameCtx.VAO) {
+        //    // Start creating a new VAO by switching to the default VAO, which doesn't have attribs enabled.
+        //    frameCtx.VAO.bindVertexArrayOES(null);
+        //    this.VAO = frameCtx.VAO.createVertexArrayOES();
+        //    frameCtx.VAO.bindVertexArrayOES(this.VAO);
+        //}
+        //
+        //if (doMorph) {
+        //    this.morphDraw();
+        //} else {
             //if (cleanInterleavedBuf) {
             //    this.VAOHasInterleavedBuf = true;
             //    this.core2.interleavedBuf.bind();
@@ -20903,8 +20983,8 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (doDecal) {
 
-                    // Applying a decal texture; use lazy-generated geometry arrays
-                    // for decalling, in which triangles do not share vertices.
+                    // Rendering a decal texture;
+                    // use generated triangle vertex arrays and indices
 
                     if (this._aVertexDraw) {
                         this._aVertexDraw.bindFloatArrayBuffer(this.core2.getTrianglePositions());
@@ -20937,18 +21017,25 @@ SceneJS_ChunkFactory.createChunkType({
 
                 } else {
 
+                    // Not rendering a decal texture;
+                    // use original vertex arrays and indices
+
                     if (this._aVertexDraw) {
                         this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
                     }
+
                     if (this._aNormalDraw) {
                         this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
                     }
+
                     if (this._aUVDraw) {
                         this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
                     }
+
                     if (this._aUV2Draw) {
                         this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
                     }
+
                     if (this._aColorDraw) {
                         this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
                     }
@@ -20961,7 +21048,7 @@ SceneJS_ChunkFactory.createChunkType({
 
                     this.core2.indexBuf.bind();
                 }
-            }
+         //   }
        // }
 
         if (this._aRegionMapUVDraw) {
@@ -21039,7 +21126,8 @@ SceneJS_ChunkFactory.createChunkType({
 
             if (frameCtx.pickObject || frameCtx.pickRegion) {
 
-                // Picking an object or region, don't care about triangles
+                // Picking an object or region;
+                // bind regular vertex arrays and index buffer
 
                 if (this._aVertexPick) {
                     this._aVertexPick.bindFloatArrayBuffer(core2.vertexBuf);
@@ -21053,7 +21141,8 @@ SceneJS_ChunkFactory.createChunkType({
 
             } else if (frameCtx.pickTriangle) {
 
-                // Picking an object and a triangle
+                // Picking a triangle;
+                // bind generated triangles vertex buffers and index array
 
                 if (this._aVertexPick) {
                     this._aVertexPick.bindFloatArrayBuffer(core2.getTrianglePositions());
@@ -21069,9 +21158,6 @@ SceneJS_ChunkFactory.createChunkType({
                     pickIndices.bind()
                 }
 
-            } else {
-
-                alert("pciking no object or triangle")
             }
         }
     }

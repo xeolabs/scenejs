@@ -2540,15 +2540,17 @@
         var lenIndices = indices.length;
         var triangleUVs = new Float32Array(lenIndices * 2);
 
-        var numTriangles = lenIndices / 2;
+        var numTriangles = lenIndices / 3;
         var numCells = Math.round(Math.sqrt(numTriangles)) + 1;
 
         var cellWidth = xmax / numCells;
         var cellHeight = ymax / numCells;
 
+        // Index of current cell on X and Y axis
         var cellXi = 0;
         var cellYi = 0;
 
+        // Origin of current cell
         var cellX = 0;
         var cellY = 0;
 
@@ -2667,14 +2669,19 @@
             tvb = SceneJS_math_transformPoint3(matrix, vb, tempVec3e);
             tvc = SceneJS_math_transformPoint3(matrix, vc, tempVec3f);
 
+            // Get X,Y extents
+
             xmin2 = min3(tva[0], tvb[0], tvc[0]);
             ymin2 = min3(tva[1], tvb[1], tvc[1]);
-
             xmax2 = max3(tva[0], tvb[0], tvc[0]);
             ymax2 = max3(tva[1], tvb[1], tvc[1]);
 
+            // Get width of extents
+
             var xwid = xmax2 - xmin2;
             var ywid = ymax2 - ymin2;
+
+            // Get scalar to scale triangle to fit texture cell
 
             scaleX = cellWidth / xwid;
             scaleY = cellHeight / ywid;
@@ -2691,6 +2698,9 @@
             tvc[1] *= scaleY;
 
             // "Pack" the triangle against the other triangles within the X,Y plane
+
+            xmin2 *= scaleX;
+            ymin2 *= scaleY;
 
             offsetX = cellX - xmin2;
             offsetY = cellY - ymin2;
@@ -2715,7 +2725,7 @@
 
             cellXi++;
 
-            if (cellXi > (numCells - 1)) {
+            if (cellXi >= numCells) {
                 cellXi = 0;
                 cellYi++;
             }
