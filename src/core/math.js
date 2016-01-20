@@ -30,6 +30,13 @@
 
     // Some temporary vars to help avoid garbage collection
 
+    
+    var tempVec2 = new Float32Array(2);
+    var tempVec2b = new Float32Array(2);
+    var tempVec2c = new Float32Array(2);
+    var tempVec2d = new Float32Array(2);
+    var tempVec2e = new Float32Array(2);
+    var tempVec2f = new Float32Array(2);
     var tempMat1 = new Float32Array(16);
     var tempMat2 = new Float32Array(16);
     var tempVec3 = new Float32Array(3);
@@ -159,6 +166,24 @@
         dest[1] = -v[1];
         dest[2] = -v[2];
         dest[3] = -v[3];
+
+        return dest;
+    };
+
+    /**
+     * @param u vec2
+     * @param v vec2
+     * @param dest vec2 - optional destination
+     * @return {vec2} dest if specified, u otherwise
+     * @private
+     */
+    window.SceneJS_math_addVec2 = function (u, v, dest) {
+        if (!dest) {
+            dest = u;
+        }
+
+        dest[0] = u[0] + v[0];
+        dest[1] = u[1] + v[1];
 
         return dest;
     };
@@ -539,6 +564,10 @@
     };
 
     /** @private */
+    window.SceneJS_math_cross2Vec2 = function (a, b) {
+        return a[0] * b[1] - a[1] * b[0];
+    }
+
     window.SceneJS_math_cross3Vec4 = function (u, v) {
         var u0 = u[0], u1 = u[1], u2 = u[2];
         var v0 = v[0], v1 = v[1], v2 = v[2];
@@ -2934,6 +2963,112 @@
         return normals;
     };
 
+    /**
+     * Clips a line segment to the interior of a triangle in 2D.
+     * Based on: http://goombas.org/1112_clipping-a-line-segment-to-a-triangle.html
+     *
+     * @method clipLineToTriangle2D
+     * @static
+     * @param {vec2} t1 Triangle vertex 1.
+     * @param {vec2} t2 Triangle vertex 2.
+     * @param {vec2} t3 Triangle vertex 3.
+     * @param {vec2} l1 Line vertex 1.
+     * @param {vec2} l2 Line vertex 2.
+     * @param {vec2} dest1 Clipped line vertex1.
+     * @param {vec2} dest2 Clipped line vertex2.
+     * @returns {boolean} True if clipped, false if line completely exterior to triangle.
+     */
+    window.SceneJS_math_clipLineToTriangle2D = function (t1, t2, t3, l1, l2, dest1, dest2) {
+        dest1 = dest1 || SceneJS_math_vec2();
+        dest2 = dest2 || SceneJS_math_vec2();
+
+        dest1.set(l1);
+        dest2.set(l2);
+
+        if (!SceneJS_math_clipLineToTriangleEdge2D(t1, t2, t3, dest1, dest2)) {
+            return false;
+        }
+
+        if (!SceneJS_math_clipLineToTriangleEdge2D(t1, t3, t2, dest1, dest2)) {
+            return false;
+        }
+
+        if (!SceneJS_math_clipLineToTriangleEdge2D(t2, t3, t1, dest1, dest2)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Clips a line segment to the edge of a triangle in 2D.
+     *
+     * @method clipLineToTriangleEdge2D
+     * @static
+     * @param {vec2} e1 Edge vertex 1.
+     * @param {vec2} e2 Edge vertex 2.
+     * @param {vec2} otherVertex Triangle's third vertex.
+     * @param {vec2} l1 Line vertex 1.
+     * @param {vec2} l2 Line vertex 2.
+     * @returns {boolean} True if line segment interior to edge, false otherwise.
+     */
+    window.SceneJS_math_clipLineToTriangleEdge2D = function (e1, e2, otherVertex, l1, l2) {
+
+        var v1 = SceneJS_math_subVec2(e2, e1, tempVec2);
+        var v2 = SceneJS_math_subVec2(otherVertex, e1, tempVec2b);
+        var proj = SceneJS_math_mulVec2Scalar(
+            v1,
+            SceneJS_math_dotVector2(v2, v1) / SceneJS_math_dotVector2(v1, v1),
+            tempVec2c
+        );
+        var n = SceneJS_math_subVec2(v2, proj, tempVec2d);
+
+        var p1 = SceneJS_math_subVec2(l1, e1, tempVec2e);
+        var p2 = SceneJS_math_subVec2(l2, e1, tempVec2f);
+
+        var l1Out = SceneJS_math_dotVector2(p1, n) < 0;
+        var l2Out = SceneJS_math_dotVector2(p2, n) < 0;
+
+        if (l1Out && l2Out) {
+            return false;
+        }
+
+        if (l1Out) {
+            SceneJS_math_lineLineIntersect2D(e1, e2, l1, l2, l1);
+        }
+
+        if (l2Out) {
+            SceneJS_math_lineLineIntersect2D(e1, e2, l1, l2, l2);
+        }
+
+        return true;
+    }
+
+    /**
+     * Find intersection point between two line segments in 2D.
+     * Based on: http://stackoverflow.com/a/565282
+     *
+     * @method lineLineIntersect2D
+     * @static
+     * @param {vec2} a1 Line 1 vertex 1.
+     * @param {vec2} b2 Line 1 vertex 2.
+     * @param {vec2} a2 Line 2 vertex 1.
+     * @param {vec2} b2 Line 2 vertex 2.
+     * @param {vec2} dest Intersection point.
+     */
+    window.SceneJS_math_lineLineIntersect2D = function (a1, b1, a2, b2, dest) {
+        dest = dest || SceneJS_math_vec2();
+
+        var v1 = SceneJS_math_subVec2(b1, a1, tempVec2);
+        var v2 = SceneJS_math_subVec2(b2, a2, tempVec2b);
+
+        var d = SceneJS_math_subVec2(a2, a1, tempVec2c);
+
+        var t = SceneJS_math_cross2Vec2(d, v2) / SceneJS_math_cross2Vec2(v1, v2);
+
+        SceneJS_math_mulVec2Scalar(v1, t, v1);
+        SceneJS_math_addVec2(a1, v1, dest);
+    }
 
     /**
      * Finds the intersection of a 3D ray with a 3D triangle.
