@@ -2566,18 +2566,7 @@
         var tempVec3f = new Float32Array(3);
         var tempVec4 = new Float32Array(4);
 
-        var tempAABB2 = {
-            min: new Float32Array(2),
-            max: new Float32Array(2)
-        };
-
-        var tempAABB2b = {
-            min: new Float32Array(2),
-            max: new Float32Array(2)
-        };
-
         var i;
-        var len;
 
         var lenTriangleUVs = 0;
 
@@ -2612,14 +2601,6 @@
 
         // Matrix to rotate triangle into X,Y plane
         var matrix = SceneJS_math_mat4();
-
-        // Axis-aligned 2D boundary of each triangle on X,Y plane
-        var aabbTriangle = tempAABB2;
-
-        // Axis-aligned 2D boundary enclosing all triangles on X,Y plane
-        var aabbMesh = tempAABB2b;
-
-        SceneJS_math_collapseAABB2(aabbMesh);
 
         var offsetX;
         var offsetY;
