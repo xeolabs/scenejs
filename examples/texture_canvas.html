@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - canvas texture - simulation <BR>
+    Using a DOM canvas as a texture allows you to <BR>
+    programatically control the contents of the texture.
+</div>
+
+<script>
+
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+
+    canvas.width = 1024;
+    canvas.height = 1024;
+
+    var balls = [];
+
+    var numBalls = 100;
+
+    while (numBalls--) {
+        balls.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            color: randomColor(),
+            vx: Math.random() * 4 - 2,
+            vy: Math.random() * 4 - 2,
+            r: Math.random() * 30 + 10
+        });
+    }
+
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 1.0,
+
+                nodes: [
+
+                    // The color map
+                    {
+                        id: "texture",
+                        type: "texture",
+                        image: canvas,
+                        applyTo: "color",  // Apply to material "color" property (default)
+
+                        nodes: [
+
+                            // Box primitive implemented by plugin at
+                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                            {
+                                type: "geometry/box"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    scene.getNode("texture", function (canvasNode) {
+        scene.on("tick", function() {
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            balls.forEach(function(b) {
+                b.x += b.vx;
+                b.y += b.vy;
+
+                if (b.x - b.r < 0) {
+                    b.x = b.r;
+                    b.vx *= -1;
+                }
+
+                if (b.y - b.r < 0) {
+                    b.y = b.r;
+                    b.vy *= -1;
+                }
+
+                if (b.x + b.r > canvas.width) {
+                    b.x = canvas.width - b.r;
+                    b.vx *= -1;
+                }
+
+                if (b.y + b.r > canvas.height) {
+                    b.y = canvas.height - b.r;
+                    b.vy *= -1;
+                }
+
+                ctx.fillStyle = b.color;
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+
+            canvasNode.setImage(canvas);
+        });
+    });
+
+    function randomColor() {
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+
+        return "rgb(" + r + "," + g + "," + b + ")";
+    }
+
+</script>
+</body>
+</html>
