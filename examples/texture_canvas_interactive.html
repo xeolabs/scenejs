@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - canvas texture - interactive <BR>
+    Here, a canvas texture is used to allow interactivity with texture contents. <BR>
+    Click and drag a ball to move it around.
+</div>
+
+<script>
+
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+
+    canvas.width = 1024;
+    canvas.height = 1024;
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    var balls = [];
+    var pickedBalls = [];
+
+    var numBalls = 20;
+
+    while (numBalls--) {
+        balls.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            color: randomColor(),
+            r: Math.random() * 60 + 30
+        });
+    }
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            {
+                type: "lookAt", 
+                eye: {
+                    x: 2,
+                    y: 2,
+                    z: 2
+                },
+                
+                nodes: [
+                    // The canvas texture
+                    {
+                        id: "canvas",
+                        type: "texture",
+                        image: canvas,
+                        applyTo: "color",  // Apply to material "color" property (default)
+                        nodes: [
+
+                            {
+                                type: "geometry/box"
+                            }
+                        ]
+                    }
+                ]
+            }
+    
+        ]
+    });
+
+    var pickX;
+    var pickY;
+    var lastU;
+    var lastV;
+    var pickU;
+    var pickV;
+
+    document.addEventListener("mousedown", function(e) {
+
+        var hit = scene.pick(e.clientX, e.clientY, {rayPick: true});
+
+        if (!hit) {
+            return;
+        }
+
+        var uv = hit.uv;
+
+        pickU = lastU = uv[0];
+        pickV = lastV = uv[1];
+
+        var x = pickU * canvas.width;
+        var y = canvas.height - pickV * canvas.height;
+
+        balls.forEach(function(b) {
+            var dx = b.x - x;
+            var dy = b.y - y;
+
+            if (dx * dx + dy * dy < b.r * b.r) {
+                pickedBalls.push(b);
+            }
+        });
+    });
+
+    document.addEventListener("mousemove", function(e) {
+        pickX = e.clientX;
+        pickY = e.clientY;
+    });
+
+    document.addEventListener("mouseup", function() {
+        pickedBalls.length = 0;
+    });
+
+
+
+    scene.getNode("canvas", function (canvasNode) {
+
+        balls.forEach(function(b) {
+
+            if (b.x - b.r < 0) {
+                b.x = b.r;
+            }
+
+            if (b.y - b.r < 0) {
+                b.y = b.r;
+            }
+
+            if (b.x + b.r > canvas.width) {
+                b.x = canvas.width - b.r;
+            }
+
+            if (b.y + b.r > canvas.height) {
+                b.y = canvas.height - b.r;
+            }
+
+            ctx.fillStyle = b.color;
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.r, 0, 2 * Math.PI);
+            ctx.fill();
+        });
+
+        canvasNode.setImage(canvas);
+
+        scene.on("tick", function() {
+            if (pickedBalls.length > 0) {
+                ctx.fillStyle = "white";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                var hit = scene.pick(pickX, pickY, {rayPick: true});
+
+                if (hit) {
+                    var uv = hit.uv;
+
+                    pickU = uv[0];
+                    pickV = uv[1];
+
+                    var du = pickU - lastU;
+                    var dv = pickV - lastV;
+
+                    var dx = du * canvas.width;
+                    var dy = dv * -canvas.height;
+
+                    pickedBalls.forEach(function(b) {
+                        b.x += dx;
+                        b.y += dy;
+                    });
+
+                    lastU = pickU;
+                    lastV = pickV;
+                }
+
+                balls.forEach(function(b) {
+
+                    if (b.x - b.r < 0) {
+                        b.x = b.r;
+                    }
+
+                    if (b.y - b.r < 0) {
+                        b.y = b.r;
+                    }
+
+                    if (b.x + b.r > canvas.width) {
+                        b.x = canvas.width - b.r;
+                    }
+
+                    if (b.y + b.r > canvas.height) {
+                        b.y = canvas.height - b.r;
+                    }
+
+                    ctx.fillStyle = b.color;
+                    ctx.beginPath();
+                    ctx.arc(b.x, b.y, b.r, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+
+                canvasNode.setImage(canvas);
+            }
+        });
+
+    });
+
+    function randomColor() {
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+
+        return "rgb(" + r + "," + g + "," + b + ")";
+    }
+
+</script>
+</body>
+</html>

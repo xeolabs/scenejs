@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - canvas texture - drawing <BR>
+    Here, a canvas texture is used to allow drawing to the texture being used.<BR>
+    Click and drag on the surface to draw.
+</div>
+
+<script>
+
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+
+    canvas.width = 1024;
+    canvas.height = 1024;
+
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            {
+                type: "lookAt", 
+                eye: {
+                    x: 2,
+                    y: 2,
+                    z: 2
+                },
+                nodes: [
+                    {
+                        type: "material",
+                        baseColor: {
+                            r: 0,
+                            g: 0,
+                            b: 1
+                        },
+                        emitColor: {
+                            r: 1,
+                            g: 0,
+                            b: 0
+                        },
+                        nodes: [
+                            // The color map
+                            {
+                                id: "canvas",
+                                type: "texture",
+                                image: canvas,
+                                applyTo: "emit",  // Apply to material "emit"
+                                blendMode: "add",
+                                nodes: [
+
+                                    // Box primitive implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                    {
+                                        type: "geometry/torus"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    
+        ]
+    });
+
+    var drawing = false;
+    var pickX;
+    var pickY;
+
+    document.addEventListener("mousedown", function(e) {
+        drawing = true
+        pickX = e.clientX;
+        pickY = e.clientY;
+    });
+
+    document.addEventListener("mousemove", function(e) {
+        pickX = e.clientX;
+        pickY = e.clientY;
+    });
+    document.addEventListener("mouseup", function() {
+        drawing = false;
+    });
+
+    scene.on("tick", function() {
+        if (drawing) {
+            scene.pick(pickX, pickY, {rayPick: true});
+        }
+    });
+
+    scene.getNode("canvas", function (canvasNode) {
+
+        scene.on("pick", function(hit) {
+            var uv = hit.uv;
+
+            var x = uv[0] * canvas.width;
+            var y = canvas.height - uv[1] * canvas.height;
+
+            ctx.fillStyle = "white";
+            ctx.fillRect(x, y, 5, 5);
+
+            canvasNode.setImage(canvas);
+        });
+
+    });
+
+</script>
+</body>
+</html>
