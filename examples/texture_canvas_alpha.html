@@ -70,7 +70,14 @@
                                 z: 0.2,
                                 nodes: [
                                     {
-                                        type: "geometry/teapot"
+                                        type: "rotate",
+                                        id: "rotate",
+                                        x:1, y:1, z:1,
+                                        nodes: [
+                                            {
+                                                type: "geometry/teapot"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -129,50 +136,54 @@
         radius = Math.max(20, Math.min(radius, 150));
     });
 
-    scene.getNode("canvas", function (canvasNode) {
+    scene.getNode("rotate", function(rotateNode) {
+        scene.getNode("canvas", function (canvasNode) {
 
-        scene.on("tick", function() {
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            scene.on("tick", function() {
+                rotateNode.setAngle(rotateNode.getAngle() + 0.5);
 
-            var hit = scene.pick(pickX, pickY, {rayPick: true});
+                ctx.fillStyle = "white";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            if (hit) {
-                var uv = hit.uv;
+                var hit = scene.pick(pickX, pickY, {rayPick: true});
 
-                var x = uv[0] * canvas.width;
-                var y = canvas.height - uv[1] * canvas.height;
+                if (hit) {
+                    var uv = hit.uv;
 
-                ctx.fillStyle = "rgb(200, 200, 200)";
-                ctx.beginPath();
-                ctx.arc(x, y, radius + 12, 0, 2 * Math.PI);
-                ctx.fill();
+                    var x = uv[0] * canvas.width;
+                    var y = canvas.height - uv[1] * canvas.height;
 
-                ctx.fillStyle = "rgb(150, 150, 150)";
-                ctx.beginPath();
-                ctx.arc(x, y, radius + 9, 0, 2 * Math.PI);
-                ctx.fill();
+                    ctx.fillStyle = "rgb(200, 200, 200)";
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius + 12, 0, 2 * Math.PI);
+                    ctx.fill();
 
-                ctx.fillStyle = "rgb(100, 100, 100)";
-                ctx.beginPath();
-                ctx.arc(x, y, radius + 6, 0, 2 * Math.PI);
-                ctx.fill();
+                    ctx.fillStyle = "rgb(150, 150, 150)";
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius + 9, 0, 2 * Math.PI);
+                    ctx.fill();
 
-                ctx.fillStyle = "rgb(50, 50, 50)";
-                ctx.beginPath();
-                ctx.arc(x, y, radius + 3, 0, 2 * Math.PI);
-                ctx.fill();
+                    ctx.fillStyle = "rgb(100, 100, 100)";
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius + 6, 0, 2 * Math.PI);
+                    ctx.fill();
 
-                ctx.fillStyle = "black";
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, 2 * Math.PI);
-                ctx.fill();
-                
-            }
+                    ctx.fillStyle = "rgb(50, 50, 50)";
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius + 3, 0, 2 * Math.PI);
+                    ctx.fill();
 
-            canvasNode.setImage(canvas);
+                    ctx.fillStyle = "black";
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                }
+
+                canvasNode.setImage(canvas);
+            });
+
         });
-
     });
 
     function randomColor() {
