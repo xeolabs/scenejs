@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - canvas texture - interactive transparency <BR>
+    Here, a canvas texture is used to create an interactive, transparent spot. <BR>
+    Hover the mouse cursor over the surface to view what's underneath. <BR>
+    Use the mouse wheel to change the size of the transparent zone.
+</div>
+
+<script>
+
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+
+    canvas.width = 1024;
+    canvas.height = 1024;
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    var radius = 50;
+
+    // Create scene
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            {
+                type: "lookAt", 
+                eye: {
+                    x: -2,
+                    y: 2,
+                    z: 2
+                },
+                
+                nodes: [
+                    {
+                        type: "material",
+                        baseColor: {
+                            r: 0,
+                            g: 1,
+                            b: 0
+                        },
+                        nodes: [
+                            {
+                                type: "scale",
+                                x: 0.2,
+                                y: 0.2,
+                                z: 0.2,
+                                nodes: [
+                                    {
+                                        type: "rotate",
+                                        id: "rotate",
+                                        x:1, y:1, z:1,
+                                        nodes: [
+                                            {
+                                                type: "geometry/teapot"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        type: "material",
+                        baseColor: {
+                            r: 0,
+                            g: 0,
+                            b: 1
+
+                        },
+                        nodes: [
+                            {
+                                type: "flags",
+                                flags: {
+                                    transparent: true
+                                },
+                                nodes: [
+                                    {
+                                        id: "canvas",
+                                        type: "texture",
+                                        image: canvas,
+                                        applyTo: "alpha",  // Apply to material "color" property (default)
+                                        nodes: [
+
+                                            // Box primitive implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            {
+                                                type: "geometry/sphere"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+    
+        ]
+    });
+
+    var pickX;
+    var pickY;
+
+    document.addEventListener("mousemove", function(e) {
+        pickX = e.clientX;
+        pickY = e.clientY;
+    });
+
+    document.addEventListener("mousewheel", function(e) {
+        radius += 3 * Math.max(-1, Math.min(1, (event.wheelDelta || -event.detail)));
+
+        radius = Math.max(20, Math.min(radius, 150));
+    });
+
+    scene.getNode("rotate", function(rotateNode) {
+        scene.getNode("canvas", function (canvasNode) {
+
+            scene.on("tick", function() {
+                rotateNode.setAngle(rotateNode.getAngle() + 0.5);
+
+                ctx.fillStyle = "white";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                var hit = scene.pick(pickX, pickY, {rayPick: true});
+
+                if (hit) {
+                    var uv = hit.uv;
+
+                    var x = uv[0] * canvas.width;
+                    var y = canvas.height - uv[1] * canvas.height;
+
+                    ctx.fillStyle = "rgb(200, 200, 200)";
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius + 12, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    ctx.fillStyle = "rgb(150, 150, 150)";
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius + 9, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    ctx.fillStyle = "rgb(100, 100, 100)";
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius + 6, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    ctx.fillStyle = "rgb(50, 50, 50)";
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius + 3, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    ctx.fillStyle = "black";
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                    ctx.fill();
+                    
+                }
+
+                canvasNode.setImage(canvas);
+            });
+
+        });
+    });
+
+    function randomColor() {
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+
+        return "rgb(" + r + "," + g + "," + b + ")";
+    }
+
+</script>
+</body>
+</html>
