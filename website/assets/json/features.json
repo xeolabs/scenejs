@@ -1,56 +1,82 @@
 {
-  "Main features": [
-    "Data-driven, entity-component scene graph",
-    "Dynamically-editable scenes",
-    "Fully-observable scene state",
-    "[[JSON-persistable scene state|components_toJSON]]",
-    "[[Cloneable scene components|components_cloning]]",
-    "[[Multiple scenes in a page|scene_multipleScenes]]",
-    "[[Performance monitoring|profiling_statistics]]",
-    "Fast [[ray picking|interaction_picking_triangles_normalAndUV]] for large numbers of dynamic entities"
+  "Scene graph": [
+    "Transform hierarchies",
+    "transforms_modelling_hierarchy",
+    "Multiple scenes",
+    "Auto WebGLContextLost recovery"
   ],
-  "Optimizations": [
-    "Scene graph dynamically compiled to fast internal render graph",
-    "WebGL state management (sorting, batching, caching etc.)",
-    "Task queuing with per-frame budget",
-    "#See the <a href='https://github.com/xeolabs/xeoengine/wiki/Implementation-Notes' target='_wiki'>wiki</a> for implementation notes on optimizations in xeoEngine."
+  "Effects": [
+    "[[Depth-of-field|postprocessing_depthOfField]]",
+    "[[Blur|postprocessing_blur]]",
+    "[[Fog|shaders_fog]]",
+    "[[X-Ray|shaders_xray]]",
+    "[[Vertex displacement|shaders_vertexDisplacement]]",
+    "[[Reflection|reflections_custom]]",
+    "Fresnel terms: [[diffuse|fresnel_diffuse]], [[specular|fresnel_specular]], [[emissivity|fresnel_emit]], [[opacity|fresnel_alpha]], [[fragment|fresnel_fragment]], [[reflectivity|fresnel_reflect]]",
+    "[[Transparency sorting|layers_transparencySort]]",
+    "[[Anaglyph 3D|effects_anaglyph_pickFlyOrbit]]",
+    "[[Stereo|effects_stereo_pickFlyOrbit]]",
+    "[[Cross-sections|effects_clipping]]"
+  ],
+  "Physics": [
+    "Multithreaded physics with a choice of pluggable physics engines such as [[JigLibJS|physics_multithreaded]] and [[CannonJS|physics_cannonjs]]"
+  ],
+  "Importers": [
+    "[[.OBJ|importing_obj_raptor]]",
+    "[[.3DS|importing_3ds_lexus]]",
+    "[[.MD2|importing_md2_lion]]"
+  ],
+  "Optimization": [
+    "[[Frustum Culling|optimization_frustumClipping]]",
+    "[[Level-of-Detail|optimization_discreteLOD]]",
+    "[[Instancing|optimization_instancing]]",
+    "[[Vertex sharing|optimization_vertexSharing]]",
+    "[[Texture atlases|optimization_textureAtlas]]",
+    "[[Resolution scaling|canvas_resolutionScaling]]"
+  ],
+  "Picking": [
+    "[[Object picking|picking_names]]",
+    "[[Triangle picking|picking_rayPicking_triangles]]",
+    "[[Mesh region picking|picking_rayPicking_triangles]]"
+  ],
+  "Lighting": [
+    "[[Ambient|lighting_ambient]]",
+    "[[Directional|lighting_directional_world]]",
+    "[[Positional|lighting_point_world]]"
   ],
   "Cameras": [
-    "[[Orthographic|camera_ortho]], [[perspective|camera_perspective]] and [[frustum|camera_frustum]] projection",
-    "Camera [[controls|interaction_CameraControl]]"
+    "[[Orthographic|transforms_projection_ortho]]",
+    "[[Perspective|transforms_projection_perspective]]",
+    "[[Frustum|transforms_projection_frustum]]",
+    "[[Orbiting|cameras_orbit]]",
+    "[[Pick-Fly-Orbit|cameras_pickFlyOrbit_city]]"
   ],
   "Geometry": [
-    "[[Dynamic meshes|geometry_modifying]]",
-    "[[Height maps|geometry_HeightmapGeometry]]",
-    "[[Vector text|geometry_VectorTextGeometry]]",
-    "Parametric shapes ([[lathe|geometry_LatheGeometry]], [[heightmap|geometry_HeightmapGeometry]], [[plane|geometry_PlaneGeometry]],  [[box|geometry_BoxGeometry]], [[cylinder|geometry_CylinderGeometry]],  [[sphere|geometry_SphereGeometry]] etc.)",
-    "[[Vertex colors|geometry_vertexColors]]",
-    "Primitives ([[lines|geometry_lines]], [[points|geometry_points]] and [[triangles|geometry_triangles]])"
+    "[[Triangles|geometry_triangles]], [[Lines|geometry_lines]], [[Points|geometry_points]]",
+    "[[Plane|geometry_plane]]",
+    "[[Box|geometry_box]]",
+    "[[Cylinder|geometry_cylinder]]",
+    "[[Sphere|geometry_sphere]]",
+    "[[Torus|geometry_torus]]",
+    "[[Teapot|geometry_teapot]]",
+    "[[Terrain|geometry_heightmap]]",
+    "[[Text|geometry_vectorText]]",
+    "[[Vertex coloring|geometry_vertexColors]]",
+    "[[Automatic normals|geometry_autoNormals]], [[OES_element_index_uint|optimization_uintIndex]]"
   ],
-  "Textures": [
-    "Texture maps ([[diffuse|materials_texture_diffuse]], [[specular|materials_texture_specular]], [[opacity|materials_texture_opacity]], [[emissive|materials_texture_emissive]], [[bump|materials_texture_normalMap]] and [[ambient|materials_texture_ambient]])",
-    "[[Video textures|materials_texture_video]]",
-    "[[Animated textures|materials_texture_animation]]",
-    "[[Render target textures|materials_texture_rtt]]",
-    "[[Procedural textures|materials_texture_procedural]]"
-  ],
-  "Shaders / Rendering": [
-    "Lights ([[ambient|lights_ambient]], [[directional|lights_directional_view]] and [[point|lights_point_view]]), unlimited number in View or World-space",
-    "Fresnel term for [[diffuse|materials_fresnel_diffuse]], [[opacity|materials_fresnel_opacity]], [[emissive|materials_fresnel_emissive]], [[specular|materials_fresnel_specular]] and [[reflectivity|materials_fresnel_reflection]]",
-    "Custom shaders"
-  ],
-  "Animation and Transformation": [
-    "[[Dynamic transform hierarchies|transforms_hierarchy]]",
-    "[[Camera fly-to|animation_CameraFlight_Entity]]"
-  ],
-  "Importers and Tools": [
-    "Importers for [[glTF|importing_gltf_gearbox]], [[OBJ|importing_obj_raptor]] and [[3DS|importing_3ds_lexus]]",
-    "3D debugging [[helper|interaction_picking_triangles]]"
-  ],
-  "FX": [
-    "[[Transparency|materials_techniques_transparencySort]] with depth-sort",
-    "Billboarding ([[spherical|billboards_spherical]] and [[cylindrical|billboards_cylindrical]])",
-    "[[Skyboxes|skyboxes_skybox]]",
-    "Rendering layers"
+  "Texture": [
+    "[[Color|texture_color]]",
+    "[[Alpha|texture_alpha]]",
+    "[[Specular|texture_specular]]",
+    "[[Normal|texture_normal]]",
+    "[[Glow|texture_emit]]",
+    "[[Procedural|texture_procedural_color_water]]",
+    "[[Reflection|reflections_custom]]",
+    "[[Multi-texturing|texture_multiTexture]]",
+    "[[Animation|texture_animation]]",
+    "[[Render-to-texture|texture_rtt_color]]",
+    "[[Video|texture_video_color]]",
+    "[[UV layers|texture_uvLayers]]",
+    "[[Low-res preload|texture_preload]]"
   ]
 }

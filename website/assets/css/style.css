@@ -95,8 +95,8 @@ a:active {
 
 img {
     display: block;
-    max-width: 100%;
-    height: auto;
+    width: 100%;
+    height: 100%;
 }
 
 .list-unstyled li {
@@ -137,7 +137,7 @@ blockquote {
 ----------------------------------------------------------------------------- */
 .header {
     color: #ffffff;
-    background-color: rgba(0, 0, 0, 1);
+    background-color: #339BEB;
     padding: 10px 0;
     -webkit-transition: all 0.2s ease-in-out;
     -moz-transition: all 0.2s ease-in-out;
@@ -166,7 +166,7 @@ blockquote {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.55);
+    background-color: rgba(0, 0, 0, 0.0);
     content: "";
 }
 
@@ -583,7 +583,7 @@ textarea {
 /* Fixed Header
 ----------------------------------------------------------------------------- */
 .fixed-header-on .header {
-    background-color: rgba(0, 0, 0, 0.95);
+    background-color: #339BEB;
     padding: 5px 0;
 }
 
