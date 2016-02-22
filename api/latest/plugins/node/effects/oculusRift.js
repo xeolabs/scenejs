@@ -314,13 +314,11 @@ SceneJS.Types.addType("effects/oculusRift", {
                         self._localLookat.setEye(rightEye);
                         self._localLookat.setLook(rightLook);
 
-                        self._camera.set({
-                            optics: {
-                                left: -self._aspect * wd2 - 0.5 * eyeSep * ndfl,
-                                right: self._aspect * wd2 - 0.5 * eyeSep * ndfl,
-                                top: wd2,
-                                bottom: -wd2
-                            }
+                        self._camera.setOptics({
+                            left: -self._aspect * wd2 - 0.5 * eyeSep * ndfl,
+                            right: self._aspect * wd2 - 0.5 * eyeSep * ndfl,
+                            top: wd2,
+                            bottom: -wd2
                         });
 
                         self._shader.setParams({
@@ -343,13 +341,11 @@ SceneJS.Types.addType("effects/oculusRift", {
                         self._localLookat.setEye(leftEye);
                         self._localLookat.setLook(leftLook);
 
-                        self._camera.set({
-                            optics: {
-                                left: -self._aspect * wd2 + 0.5 * eyeSep * ndfl,
-                                right: self._aspect * wd2 + 0.5 * eyeSep * ndfl,
-                                top: wd2,
-                                bottom: -wd2
-                            }
+                        self._camera.setOptics({
+                            left: -self._aspect * wd2 + 0.5 * eyeSep * ndfl,
+                            right: self._aspect * wd2 + 0.5 * eyeSep * ndfl,
+                            top: wd2,
+                            bottom: -wd2
                         });
 
                         self._shader.setParams({
