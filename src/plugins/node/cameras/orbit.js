@@ -46,11 +46,9 @@ SceneJS.Types.addType("cameras/orbit", {
         var eye = params.eye || { x: 0, y: 0, z: 0 };
         var look = params.look || { x: 0, y: 0, z: 0};
 
-        lookat.set({
-            eye: { x: eye.x, y: eye.y, z: -zoom },
-            look: { x: look.x, y: look.y, z: look.z },
-            up: { x: 0, y: 1, z: 0 }
-        });
+        lookat.setEye({ x: eye.x, y: eye.y, z: -zoom });
+        lookat.setLook({ x: look.x, y: look.y, z: look.z });
+        lookat.setUp({ x: 0, y: 1, z: 0 });
 
         var spin = params.spin;
 

@@ -299,8 +299,8 @@ var teapotYaw = scene.getNode("teapot-yaw");
 
 scene.on("tick",
         function () {
-            teapotYaw.inc("angle", 1);
-            teapotPitch.inc("angle", .3);
+            teapotYaw.incAngle(1);
+            teapotPitch.incAngle(.3);
 
         });
 
