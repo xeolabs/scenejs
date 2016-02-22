@@ -225,22 +225,22 @@ SceneJS.GUI = function (scene, nodeIds) {
             var self = this;
 
             var update = function () {
-                material.set({
-                    color:{
-                        r:self["color.r"],
-                        g:self["color.g"],
-                        b:self["color.b"]
-                    },
-                    specularColor:{
-                        r:self["specularColor.r"],
-                        g:self["specularColor.g"],
-                        b:self["specularColor.b"]
-                    },
-                    specular:self.specular,
-                    shine:self.shine,
-                    emit:self.emit,
-                    alpha:self.alpha
+
+                material.setColor({
+                    r: self["color.r"],
+                    g: self["color.g"],
+                    b: self["color.b"]
                 });
+                material.setSpecularColor({
+                    r: self["specularColor.r"],
+                    g: self["specularColor.g"],
+                    b: self["specularColor.b"]
+                });
+                material.setSpecular(self.specular);
+                material.setShine(self.shine);
+                material.setEmit(self.emit);
+                material.setAlpha(self.alpha);
+
                 requestAnimationFrame(update);
             };
             update();
@@ -269,12 +269,12 @@ SceneJS.GUI = function (scene, nodeIds) {
             this.angle = 0.0;
             var self = this;
             var update = function () {
-                rotate.set({
+                rotate.setXYZ({
                     x:self.x,
                     y:self.y,
-                    z:self.z,
-                    angle:self.angle
+                    z:self.z
                 });
+                rotate.setAngle(self.angle);
                 requestAnimationFrame(update);
             };
             update();
@@ -295,7 +295,7 @@ SceneJS.GUI = function (scene, nodeIds) {
             this.z = 0.0;
             var self = this;
             var update = function () {
-                scale.set({
+                scale.setXYZ({
                     x:self.x,
                     y:self.y,
                     z:self.z
@@ -319,7 +319,7 @@ SceneJS.GUI = function (scene, nodeIds) {
             this.z = 0.0;
             var self = this;
             var update = function () {
-                translate.set({
+                translate.setXYZ({
                     x:self.x,
                     y:self.y,
                     z:self.z
@@ -349,15 +349,13 @@ SceneJS.GUI = function (scene, nodeIds) {
 
             var self = this;
             var update = function () {
-                flags.set({
-                    picking:self.picking,
-                    enabled:self.enabled,
-                    transparent:self.transparent,
-                    backfaces:self.backfaces,
-                    frontface:self.frontface,
-                    reflective: self.reflective,
-                    solid: self.solid
-                });
+                flags.setPicking(self.picking);
+                flags.setEnabled(self.enabled);
+                flags.setTransparent(self.transparent);
+                flags.setBackfaces(self.backfaces);
+                flags.setFrontface(self.frontface);
+                flags.setReflective(self.reflective);
+                flags.setSolid(self.solid);
                 requestAnimationFrame(update);
             };
             update();

@@ -215,13 +215,11 @@ SceneJS.Types.addType("effects/stereo", {
                         self._localLookat.setEye(rightEye);
                         self._localLookat.setLook(rightLook);
 
-                        self._camera.set({
-                            optics: {
-                                left: -ratio * wd2 - 0.5 * self._eyeSep * ndfl,
-                                right: ratio * wd2 - 0.5 * self._eyeSep * ndfl,
-                                top: wd2,
-                                bottom: -wd2
-                            }
+                        self._camera.setOptics({
+                            left: -ratio * wd2 - 0.5 * self._eyeSep * ndfl,
+                            right: ratio * wd2 - 0.5 * self._eyeSep * ndfl,
+                            top: wd2,
+                            bottom: -wd2
                         });
 
                         //
@@ -246,13 +244,11 @@ SceneJS.Types.addType("effects/stereo", {
                         self._localLookat.setEye(leftEye);
                         self._localLookat.setLook(leftLook);
 
-                        self._camera.set({
-                            optics: {
-                                left: -ratio * wd2 + 0.5 * self._eyeSep * ndfl,
-                                right: ratio * wd2 + 0.5 * self._eyeSep * ndfl,
-                                top: wd2,
-                                bottom: -wd2
-                            }
+                        self._camera.setOptics({
+                            left: -ratio * wd2 + 0.5 * self._eyeSep * ndfl,
+                            right: ratio * wd2 + 0.5 * self._eyeSep * ndfl,
+                            top: wd2,
+                            bottom: -wd2
                         });
 
                         //

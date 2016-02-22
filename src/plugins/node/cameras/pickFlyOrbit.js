@@ -173,7 +173,9 @@ require([
                     look: { x: look.x, y: look.y, z: look.z },
                     up: { x: 0, y: 1, z: 0 }
                 };
-                lookat.set(lookatArgs);
+                lookat.setEye(lookatArgs.eye);
+                lookat.setLook(lookatArgs.look);
+                lookat.setUp(lookatArgs.up);
                 this.publish("updated", lookatArgs);
 
                 var canvas = this.getScene().getCanvas();

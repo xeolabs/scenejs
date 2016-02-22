@@ -256,8 +256,8 @@ scene.getNode("pitch", function (pitch) {
     scene.getNode("yaw", function (yaw) {
         scene.on("tick",
                 function () {
-                    yaw.inc("angle", 1);
-                    pitch.inc("angle", .3);
+                    yaw.incAngle(1);
+                    pitch.incAngle(.3);
                 });
     });
 });
