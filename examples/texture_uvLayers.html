@@ -4,14 +4,6 @@
     <title>SceneJS Example</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <style>
-        body {
-            margin: 0;
-            -moz-user-select: -moz-none;
-            -khtml-user-select: none;
-            -webkit-user-select: none;
-        }
-    </style>
     <script src="../api/latest/scenejs.min.js"></script>
     <link href="css/styles.css" rel="stylesheet"/>
 
@@ -20,7 +12,7 @@
 <div id="infoDark">
     <a href="http://scenejs.org">SceneJS</a> - UV layers
     <br>
-    geometry supports two independent UV coordinate arrays
+    geometry supports three independent UV coordinate arrays
     <br>
     this lets you apply a different texture to each UV array
 </div>
@@ -53,14 +45,14 @@
                     // (a texture maps to first UV array by default)
                     {
                         type: "texture",
-                        src: "textures/superman.jpg",
+                        src: "textures/general-zod.jpg",
 
                         nodes: [
 
                             // Second texture layer is a color map that maps to the geometry's second UV array
                             {
                                 type: "texture",
-                                src: "textures/superman.jpg",
+                                src: "textures/general-zod.jpg",
                                 applyFrom: "uv2", // Apply to second set of UVs
                                 blendFactor: 0.5,
                                 wrapS: "repeat",
@@ -69,46 +61,67 @@
 
                                 nodes: [
 
-                                    // Custom box geometry with two arrays of UV coordinates
+                                    // Third texture layer is a color map that maps to the geometry's third UV array
                                     {
-                                        type: "geometry",
-                                        primitive: "triangles",
-                                        positions: [
-                                            5, 5, 5, -5, 5, 5, -5, -5, 5, 5, -5, 5,
-                                            5, 5, 5, 5, -5, 5, 5, -5, -5, 5, 5, -5,
-                                            5, 5, 5, 5, 5, -5, -5, 5, -5, -5, 5, 5,
-                                            -5, 5, 5, -5, 5, -5, -5, -5, -5, -5, -5, 5,
-                                            -5, -5, -5, 5, -5, -5, 5, -5, 5, -5, -5, 5,
-                                            5, -5, -5, -5, -5, -5, -5, 5, -5, 5, 5, -5
-                                        ],
+                                        type: "texture",
+                                        src: "textures/general-zod.jpg",
+                                        applyFrom: "uv3", // Apply to third set of UVs
+                                        blendFactor: 0.3,
+                                        wrapS: "repeat",
+                                        wrapT: "repeat",
+                                        blendMode: "add",
 
-                                        normals: [
-                                            0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-                                            1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-                                            0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-                                            -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
-                                            0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
-                                            0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1
-                                        ],
+                                        nodes: [
 
-                                        // First UV array for first UV layer
-                                        uv: [
-                                            1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1,
-                                            1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0,
-                                            0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1
-                                        ],
+                                            // Custom box geometry with two arrays of UV coordinates
+                                            {
+                                                type: "geometry",
+                                                primitive: "triangles",
+                                                positions: [
+                                                    5, 5, 5, -5, 5, 5, -5, -5, 5, 5, -5, 5,
+                                                    5, 5, 5, 5, -5, 5, 5, -5, -5, 5, 5, -5,
+                                                    5, 5, 5, 5, 5, -5, -5, 5, -5, -5, 5, 5,
+                                                    -5, 5, 5, -5, 5, -5, -5, -5, -5, -5, -5, 5,
+                                                    -5, -5, -5, 5, -5, -5, 5, -5, 5, -5, -5, 5,
+                                                    5, -5, -5, -5, -5, -5, -5, 5, -5, 5, 5, -5
+                                                ],
 
-                                        // Second UV array for second UV layer
-                                        uv2: [
-                                            2, 2, 0, 2, 0, 0, 2, 0, 0, 2, 0, 0, 2, 0, 2, 2,
-                                            2, 0, 2, 2, 0, 2, 0, 0, 2, 2, 0, 2, 0, 0, 2, 0,
-                                            0, 0, 2, 0, 2, 2, 0, 2, 0, 0, 2, 0, 2, 2, 0, 2
-                                        ],
+                                                normals: [
+                                                    0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+                                                    1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+                                                    0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+                                                    -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
+                                                    0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+                                                    0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1
+                                                ],
 
-                                        indices: [
-                                            0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15,
-                                            16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23
+                                                // First UV array for first UV layer
+                                                uv: [
+                                                    1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1,
+                                                    1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0,
+                                                    0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1
+                                                ],
 
+                                                // Second UV array for second UV layer
+                                                uv2: [
+                                                    3, 3, 0, 3, 0, 0, 3, 0, 0, 3, 0, 0, 3, 0, 3, 3,
+                                                    3, 0, 3, 3, 0, 3, 0, 0, 3, 3, 0, 3, 0, 0, 3, 0,
+                                                    0, 0, 3, 0, 3, 3, 0, 3, 0, 0, 3, 0, 3, 3, 0, 3
+                                                ],
+
+                                                // Third UV array for third UV layer
+                                                uv3: [
+                                                    2, 2, 0, 2, 0, 0, 2, 0, 0, 2, 0, 0, 2, 0, 2, 2,
+                                                    2, 0, 2, 2, 0, 2, 0, 0, 2, 2, 0, 2, 0, 0, 2, 0,
+                                                    0, 0, 2, 0, 2, 2, 0, 2, 0, 0, 2, 0, 2, 2, 0, 2
+                                                ],
+
+                                                indices: [
+                                                    0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15,
+                                                    16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23
+
+                                                ]
+                                            }
                                         ]
                                     }
                                 ]

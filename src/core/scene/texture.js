@@ -37,6 +37,7 @@ new (function () {
             if (params.applyFrom) {
                 if (params.applyFrom != "uv" &&
                     params.applyFrom != "uv2" &&
+                    params.applyFrom != "uv3" &&
                     params.applyFrom != "normal" &&
                     params.applyFrom != "geometry") {
                     throw SceneJS_error.fatalError(

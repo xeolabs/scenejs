@@ -14,6 +14,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._aNormalDraw = draw.getAttribute("SCENEJS_aNormal");
         this._aUVDraw = draw.getAttribute("SCENEJS_aUVCoord");
         this._aUV2Draw = draw.getAttribute("SCENEJS_aUVCoord2");
+        this._aUV3Draw = draw.getAttribute("SCENEJS_aUVCoord3");
         this._aTangentDraw = draw.getAttribute("SCENEJS_aTangent");
         this._aColorDraw = draw.getAttribute("SCENEJS_aVertexColor");
 
@@ -73,6 +74,10 @@ SceneJS_ChunkFactory.createChunkType({
             this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
         }
 
+        if (this._aUV3Draw) {
+            this._aUV3Draw.bindFloatArrayBuffer(this.core2.uvBuf3);
+        }
+
         if (this._aColorDraw) {
             this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
         }
@@ -127,6 +132,9 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aUV2Draw) {
                     this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUV2Offset);
                 }
+                if (this._aUV3Draw) {
+                    this._aUV3Draw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUV3Offset);
+                }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
                 }
@@ -149,6 +157,9 @@ SceneJS_ChunkFactory.createChunkType({
                 }
                 if (this._aUV2Draw) {
                     this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
+                }
+                if (this._aUV3Draw) {
+                    this._aUV3Draw.bindFloatArrayBuffer(this.core2.uvBuf3);
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);

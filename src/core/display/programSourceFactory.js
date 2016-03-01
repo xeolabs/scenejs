@@ -207,7 +207,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
     function hasTextures() {
         if (states.texture.layers && states.texture.layers.length > 0) {
-            if (states.geometry.uvBuf || states.geometry.uvBuf2) {
+            if (states.geometry.uvBuf || states.geometry.uvBuf2 || states.geometry.uvBuf3) {
                 return true;
             }
             if (states.morphGeometry.targets && (states.morphGeometry.targets[0].uvBuf || states.morphGeometry.targets[0].uvBuf2)) {
@@ -315,6 +315,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (states.geometry.uvBuf2) {
                 add("attribute vec2 SCENEJS_aUVCoord2;");     // UV2 coords
             }
+
+            if (states.geometry.uvBuf3) {
+                add("attribute vec2 SCENEJS_aUVCoord3;");     // UV3 coords
+            }
         }
 
         if (states.geometry.colorBuf) {
@@ -336,6 +340,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             if (states.geometry.uvBuf2) {
                 add("varying vec2 SCENEJS_vUVCoord2;");
+            }
+
+            if (states.geometry.uvBuf3) {
+                add("varying vec2 SCENEJS_vUVCoord3;");
             }
         }
 
@@ -510,6 +518,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (states.geometry.uvBuf2) {
                 add("SCENEJS_vUVCoord2 = SCENEJS_aUVCoord2;");
             }
+
+            if (states.geometry.uvBuf3) {
+                add("SCENEJS_vUVCoord3 = SCENEJS_aUVCoord3;");
+            }
         }
 
         if (states.geometry.colorBuf) {
@@ -592,6 +604,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
             if (states.geometry.uvBuf2) {
                 add("varying vec2 SCENEJS_vUVCoord2;");
+            }
+            if (states.geometry.uvBuf3) {
+                add("varying vec2 SCENEJS_vUVCoord3;");
             }
             if (decal) {
                 add("uniform sampler2D SCENEJS_uDecalSampler;");
@@ -885,6 +900,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
                             continue;
                         }
                     }
+                    if (layer.applyFrom == "uv3") {
+                        if (states.geometry.uvBuf3) {
+                            add("texturePos = vec4(SCENEJS_vUVCoord3.s, SCENEJS_vUVCoord3.t, 1.0, 1.0);");
+                        } else {
+                            SceneJS.log.warn("Texture layer applyTo='uv3' but geometry has no UV3 coordinates");
+                            continue;
+                        }
+                    }
 
                     /* Texture matrix
                      */
@@ -969,6 +992,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         add("texturePos = vec4(SCENEJS_vUVCoord2.s, SCENEJS_vUVCoord2.t, 1.0, 1.0);");
                     } else {
                         SceneJS.log.warn("Texture decal applyTo='uv2' but geometry has no UV2 coordinates");
+                    }
+                }
+
+                if (states.decal.applyFrom == "uv3") {
+                    if (states.geometry.uvBuf3) {
+                        add("texturePos = vec4(SCENEJS_vUVCoord3.s, SCENEJS_vUVCoord3.t, 1.0, 1.0);");
+                    } else {
+                        SceneJS.log.warn("Texture decal applyTo='uv3' but geometry has no UV3 coordinates");
                     }
                 }
 
