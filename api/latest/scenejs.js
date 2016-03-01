@@ -9234,6 +9234,14 @@ new (function () {
             core.arrays.uv2 = data.uv2;
         }
 
+        if (data.uv3) {
+            if (data.uv3.constructor != Float32Array) {
+                data.uv3 = new Float32Array(data.uv3);
+            }
+
+            core.arrays.uv3 = data.uv3;
+        }
+
         if (data.colors) {
             if (data.colors.constructor != Float32Array) {
                 data.colors = new Float32Array(data.colors);
@@ -9480,6 +9488,13 @@ new (function () {
                     core.interleavedUV2Offset = prepareInterleaveBuffer(arrays.uv2, 2);
                 }
                 core.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv2, arrays.uv2.length, 2, usage);
+            }
+
+            if (arrays.uv3) {
+                if (canInterleave) {
+                    core.interleavedUV3Offset = prepareInterleaveBuffer(arrays.uv3, 2);
+                }
+                core.uvBuf3 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv3, arrays.uv3.length, 2, usage);
             }
 
             if (arrays.colors) {
@@ -9792,6 +9807,23 @@ new (function () {
         return this._core.arrays ? this._core.arrays.uv2 : null;
     };
 
+    SceneJS.Geometry.prototype.setUV3 = function (data) {
+        if (data.uv3 && this._core.uv3Buf) {
+            var core = this._core;
+            core.uv3Buf.bind();
+            core.uv3Buf.setData(new Float32Array(data.uv3), data.uv3Offset || 0);
+            core.arrays.uv3.set(data.uv3, data.uv3Offset || 0);
+            this._engine.display.imageDirty = true;
+            if (core.interleavedBuf) {
+                core.interleavedBuf.dirty = true;
+            }
+        }
+    };
+
+    SceneJS.Geometry.prototype.getUv3 = function () {
+        return this._core.arrays ? this._core.arrays.uv3 : null;
+    };
+
     SceneJS.Geometry.prototype.getPrimitive = function () {
         return this.primitive;
     };
@@ -9886,6 +9918,7 @@ new (function () {
                 core.arrays && core.arrays.tangents ? "t" : "f",
                 core.uvBuf ? "t" : "f",
                 core.uvBuf2 ? "t" : "f",
+                core.uvBuf3 ? "t" : "f",
                 core.colorBuf ? "t" : "f",
                 core.primitive
             ]).join("");
@@ -9921,6 +9954,7 @@ new (function () {
             normalBuf: core.normalBuf,
             uvBuf: core.uvBuf,
             uvBuf2: core.uvBuf2,
+            uvBuf3: core.uvBuf3,
             colorBuf: core.colorBuf,
             interleavedBuf: core.interleavedBuf,
             indexBuf: core.indexBuf,
@@ -9929,6 +9963,7 @@ new (function () {
             interleavedNormalOffset: core.interleavedNormalOffset,
             interleavedUVOffset: core.interleavedUVOffset,
             interleavedUV2Offset: core.interleavedUV2Offset,
+            interleavedUV3Offset: core.interleavedUV3Offset,
             interleavedColorOffset: core.interleavedColorOffset,
             getPickIndices: core.getPickIndices,
             getPickPositions: core.getPickPositions,
@@ -9942,6 +9977,7 @@ new (function () {
                 core2.normalBuf = coreStack[i].normalBuf;
                 core2.uvBuf = coreStack[i].uvBuf;           // Vertex and UVs are a package
                 core2.uvBuf2 = coreStack[i].uvBuf2;
+                core2.uvBuf3 = coreStack[i].uvBuf3;
                 core2.colorBuf = coreStack[i].colorBuf;
                 core2.interleavedBuf = coreStack[i].interleavedBuf;
                 core2.interleavedStride = coreStack[i].interleavedStride;
@@ -9949,6 +9985,7 @@ new (function () {
                 core2.interleavedNormalOffset = coreStack[i].interleavedNormalOffset;
                 core2.interleavedUVOffset = coreStack[i].interleavedUVOffset;
                 core2.interleavedUV2Offset = coreStack[i].interleavedUV2Offset;
+                core2.interleavedUV3Offset = coreStack[i].interleavedUV3Offset;
                 core2.interleavedColorOffset = coreStack[i].interleavedColorOffset;
                 return core2;
             }
@@ -13830,6 +13867,7 @@ new (function () {
             if (params.applyFrom) {
                 if (params.applyFrom != "uv" &&
                     params.applyFrom != "uv2" &&
+                    params.applyFrom != "uv3" &&
                     params.applyFrom != "normal" &&
                     params.applyFrom != "geometry") {
                     throw SceneJS_error.fatalError(
@@ -17874,7 +17912,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
     function hasTextures() {
         if (states.texture.layers && states.texture.layers.length > 0) {
-            if (states.geometry.uvBuf || states.geometry.uvBuf2) {
+            if (states.geometry.uvBuf || states.geometry.uvBuf2 || states.geometry.uvBuf3) {
                 return true;
             }
             if (states.morphGeometry.targets && (states.morphGeometry.targets[0].uvBuf || states.morphGeometry.targets[0].uvBuf2)) {
@@ -17982,6 +18020,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (states.geometry.uvBuf2) {
                 add("attribute vec2 SCENEJS_aUVCoord2;");     // UV2 coords
             }
+
+            if (states.geometry.uvBuf3) {
+                add("attribute vec2 SCENEJS_aUVCoord3;");     // UV3 coords
+            }
         }
 
         if (states.geometry.colorBuf) {
@@ -18003,6 +18045,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             if (states.geometry.uvBuf2) {
                 add("varying vec2 SCENEJS_vUVCoord2;");
+            }
+
+            if (states.geometry.uvBuf3) {
+                add("varying vec2 SCENEJS_vUVCoord3;");
             }
         }
 
@@ -18177,6 +18223,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             if (states.geometry.uvBuf2) {
                 add("SCENEJS_vUVCoord2 = SCENEJS_aUVCoord2;");
             }
+
+            if (states.geometry.uvBuf3) {
+                add("SCENEJS_vUVCoord3 = SCENEJS_aUVCoord3;");
+            }
         }
 
         if (states.geometry.colorBuf) {
@@ -18259,6 +18309,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
             if (states.geometry.uvBuf2) {
                 add("varying vec2 SCENEJS_vUVCoord2;");
+            }
+            if (states.geometry.uvBuf3) {
+                add("varying vec2 SCENEJS_vUVCoord3;");
             }
             if (decal) {
                 add("uniform sampler2D SCENEJS_uDecalSampler;");
@@ -18552,6 +18605,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
                             continue;
                         }
                     }
+                    if (layer.applyFrom == "uv3") {
+                        if (states.geometry.uvBuf3) {
+                            add("texturePos = vec4(SCENEJS_vUVCoord3.s, SCENEJS_vUVCoord3.t, 1.0, 1.0);");
+                        } else {
+                            SceneJS.log.warn("Texture layer applyTo='uv3' but geometry has no UV3 coordinates");
+                            continue;
+                        }
+                    }
 
                     /* Texture matrix
                      */
@@ -18636,6 +18697,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         add("texturePos = vec4(SCENEJS_vUVCoord2.s, SCENEJS_vUVCoord2.t, 1.0, 1.0);");
                     } else {
                         SceneJS.log.warn("Texture decal applyTo='uv2' but geometry has no UV2 coordinates");
+                    }
+                }
+
+                if (states.decal.applyFrom == "uv3") {
+                    if (states.geometry.uvBuf3) {
+                        add("texturePos = vec4(SCENEJS_vUVCoord3.s, SCENEJS_vUVCoord3.t, 1.0, 1.0);");
+                    } else {
+                        SceneJS.log.warn("Texture decal applyTo='uv3' but geometry has no UV3 coordinates");
                     }
                 }
 
@@ -19904,6 +19973,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._aNormalDraw = draw.getAttribute("SCENEJS_aNormal");
         this._aUVDraw = draw.getAttribute("SCENEJS_aUVCoord");
         this._aUV2Draw = draw.getAttribute("SCENEJS_aUVCoord2");
+        this._aUV3Draw = draw.getAttribute("SCENEJS_aUVCoord3");
         this._aTangentDraw = draw.getAttribute("SCENEJS_aTangent");
         this._aColorDraw = draw.getAttribute("SCENEJS_aVertexColor");
 
@@ -19963,6 +20033,10 @@ SceneJS_ChunkFactory.createChunkType({
             this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
         }
 
+        if (this._aUV3Draw) {
+            this._aUV3Draw.bindFloatArrayBuffer(this.core2.uvBuf3);
+        }
+
         if (this._aColorDraw) {
             this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
         }
@@ -20017,6 +20091,9 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aUV2Draw) {
                     this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUV2Offset);
                 }
+                if (this._aUV3Draw) {
+                    this._aUV3Draw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUV3Offset);
+                }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
                 }
@@ -20039,6 +20116,9 @@ SceneJS_ChunkFactory.createChunkType({
                 }
                 if (this._aUV2Draw) {
                     this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
+                }
+                if (this._aUV3Draw) {
+                    this._aUV3Draw.bindFloatArrayBuffer(this.core2.uvBuf3);
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
