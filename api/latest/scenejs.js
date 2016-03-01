@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-02-24
+ * Built on 2016-03-01
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -13834,8 +13834,8 @@ new (function () {
                     params.applyFrom != "geometry") {
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture applyFrom value is unsupported - " +
-                            "should be either 'uv', 'uv2', 'normal' or 'geometry'");
+                        "texture applyFrom value is unsupported - " +
+                        "should be either 'uv', 'uv2', 'normal' or 'geometry'");
                 }
             }
 
@@ -13849,8 +13849,8 @@ new (function () {
                     params.applyTo != "shine") { // Shininess map
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture applyTo value is unsupported - " +
-                            "should be either 'color', 'baseColor', 'specular' or 'normals'");
+                        "texture applyTo value is unsupported - " +
+                        "should be either 'color', 'baseColor', 'specular' or 'normals'");
                 }
             }
 
@@ -13858,8 +13858,8 @@ new (function () {
                 if (params.blendMode != "add" && params.blendMode != "multiply") {
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture layer blendMode value is unsupported - " +
-                            "should be either 'add' or 'multiply'");
+                        "texture layer blendMode value is unsupported - " +
+                        "should be either 'add' or 'multiply'");
                 }
             }
 
@@ -13904,7 +13904,7 @@ new (function () {
             }
 
             this._core.webglRestored = function () {
-                
+
                 if (self._core.image) {
                     self._initTexture(params.preloadColor);
                     self._setTextureImage(self._core.image);
@@ -13982,8 +13982,8 @@ new (function () {
                     self._setTextureImage(preloadImage);
                     SceneJS_sceneStatusModule.taskFinished(taskId);
                     taskFinished = true;
-                    self._engine.display.imageDirty = true; 
-                }   
+                    self._engine.display.imageDirty = true;
+                }
             };
 
             this._fetchImage(preloadImage, preloadSrc);
@@ -14013,9 +14013,11 @@ new (function () {
     };
 
     SceneJS.TextureMap.prototype._setTextureImage = function (image) {
+
         var gl = this._engine.canvas.gl;
-        var texture = this._core.texture ? this._core.texture.texture : gl.createTexture(); 
-       
+        var core = this._core;
+        var texture = core.texture && core.texture.texture ? core.texture.texture : gl.createTexture();
+
         gl.bindTexture(gl.TEXTURE_2D, texture);
 
         var maxTextureSize = SceneJS_configsModule.configs.maxTextureSize;
@@ -14025,7 +14027,7 @@ new (function () {
 
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, SceneJS._webgl.ensureImageSizePowerOfTwo(image));
 
-        this._core.image = image;
+        core.image = image;
 
         this._setCoreTexture(texture);
     };
@@ -14069,7 +14071,7 @@ new (function () {
         if (glName == undefined) {
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "Unrecognised value for texture node property '" + name + "' value: '" + value + "'");
+                "Unrecognised value for texture node property '" + name + "' value: '" + value + "'");
         }
         return gl[glName];
     };
