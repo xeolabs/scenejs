@@ -36,11 +36,11 @@ SceneJS.Types.addType("models/backgrounds/water", {
                     stage: "vertex",
                     code: [
                         "attribute vec3 SCENEJS_aVertex;",
-                        "attribute vec2 SCENEJS_aUVCoord;",
+                        "attribute vec2 SCENEJS_aUVCoord0;",
                         "varying vec2 surfacePosition;",
                         "void main () {",
                         "    gl_Position = vec4(SCENEJS_aVertex.x, SCENEJS_aVertex.y, 0.98, 1.0);",
-                        "    surfacePosition = SCENEJS_aUVCoord;",
+                        "    surfacePosition = SCENEJS_aUVCoord0;",
                         "}"
                     ]
                 },
