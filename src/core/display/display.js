@@ -1040,6 +1040,8 @@ SceneJS_Display.prototype._logPickList = function () {
         var pickBuf = this.pickBuf;
         var hit = null;
         var object;
+        var i;
+        var len;
 
         // Lazy-create pick buffer
 
@@ -1119,7 +1121,7 @@ SceneJS_Display.prototype._logPickList = function () {
                 var data = {};
                 var color, delta;
 
-                for (var i = 0, len = regionData.length; i < len; i++) {
+                for (i = 0, len = regionData.length; i < len; i++) {
                     color = regionData[i].color;
                     if (regionColor && regionData[i].data) {
                         delta = Math.max(
@@ -1307,26 +1309,52 @@ SceneJS_Display.prototype._logPickList = function () {
                         SceneJS_math_mulVec3Scalar(nc, barycentric[2], tempVec3d), SceneJS_math_vec3());
                 }
 
-                // Get interpolated UV coordinates
+                // Get interpolated UV coordinates in each UV layer
 
-                var uvs = geometry.arrays.uv;
+                var uvLayers = geometry.arrays.uvs;
 
-                if (uvs) {
+                if (uvLayers.length > 0) {
 
-                    uva[0] = uvs[(ia * 2)];
-                    uva[1] = uvs[(ia * 2) + 1];
+                    hit.uvs = []; // TODO: Optimize for GC
 
-                    uvb[0] = uvs[(ib * 2)];
-                    uvb[1] = uvs[(ib * 2) + 1];
+                    var uvs;
+                    var uv;
+                    var ia2 = ia * 2;
+                    var ib2 = ib * 2;
+                    var ic2 = ic * 2;
 
-                    uvc[0] = uvs[(ic * 2)];
-                    uvc[1] = uvs[(ic * 2) + 1];
+                    for (i = 0, len = uvLayers.length; i < len; i++) {
 
-                    hit.uv = SceneJS_math_addVec3(
-                        SceneJS_math_addVec3(
-                            SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
-                            SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
-                        SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), SceneJS_math_vec3());
+                        uvs = uvLayers[i];
+
+                        if (!uvs) {
+
+                            uvs.push(null);
+
+                        } else {
+
+                            uva[0] = uvs[ia2];
+                            uva[1] = uvs[ia2 + 1];
+
+                            uvb[0] = uvs[ib2];
+                            uvb[1] = uvs[ib2 + 1];
+
+                            uvc[0] = uvs[ic2];
+                            uvc[1] = uvs[ic2 + 1];
+
+                            uv = SceneJS_math_addVec3(
+                                SceneJS_math_addVec3(
+                                    SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
+                                    SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
+                                SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), SceneJS_math_vec3());
+
+                            hit.uvs.push(uv);
+                        }
+                    }
+
+                    if (uvLayers.length > 0) {
+                        hit.uv = hit.uvs[0]; // Backward compatibility
+                    }
                 }
             }
         }

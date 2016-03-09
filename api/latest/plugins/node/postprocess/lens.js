@@ -55,14 +55,14 @@ SceneJS.Types.addType("postprocess/lens", {
                                         stage: "vertex",
                                         code: [
                                             "attribute vec3 SCENEJS_aVertex;",
-                                            "attribute vec2 SCENEJS_aUVCoord;",
+                                            "attribute vec2 SCENEJS_aUVCoord0;",
 
                                             "varying vec2 vUv;",
                                             "varying vec3 vVertexPosition;",
 
                                             "void main () {",
                                             "    gl_Position = vec4(SCENEJS_aVertex, 1.0);",
-                                            "    vUv = SCENEJS_aUVCoord;",
+                                            "    vUv = SCENEJS_aUVCoord0;",
                                             "}"
                                         ]
                                     },

@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-03-01
+ * Built on 2016-03-09
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -1323,6 +1323,16 @@ var SceneJS = new (function () {
             if (hasOwnProperty.call(obj, key)) return false;
         }
         return true;
+    };
+
+    /**
+     * Tests if the given value is a number
+     * @param value
+     * @returns {boolean}
+     * @private
+     */
+    this._isNumeric = function (value) {
+        return !isNaN(parseFloat(value)) && isFinite(value);
     };
 
     /**
@@ -9218,29 +9228,61 @@ new (function () {
             core.arrays.normals = data.normals;
         }
 
+        if (data.uvs) {
+            var uvs = data.uvs;
+            var uv;
+            for (var i = 0, len = uvs.length; i < len; i++) {
+                uv = uvs[i];
+                if (uv.constructor != Float32Array) {
+                    uvs[i] = new Float32Array(uvs[i]);
+                }
+            }
+            core.arrays.uvs = uvs;
+        }
+
+        // ---------------- Backward-compatibility -------------------
+
         if (data.uv) {
             if (data.uv.constructor != Float32Array) {
                 data.uv = new Float32Array(data.uv);
             }
+            if (!core.arrays.uvs) {
+                core.arrays.uvs = [];
+            }
+            core.arrays.uvs[0] = data.uv;
+        }
 
-            core.arrays.uv = data.uv;
+        if (data.uv1) {
+            if (data.uv1.constructor != Float32Array) {
+                data.uv1 = new Float32Array(data.uv1);
+            }
+            if (!core.arrays.uvs) {
+                core.arrays.uvs = [];
+            }
+            core.arrays.uvs[1] = data.uv2;
         }
 
         if (data.uv2) {
             if (data.uv2.constructor != Float32Array) {
                 data.uv2 = new Float32Array(data.uv2);
             }
-
-            core.arrays.uv2 = data.uv2;
+            if (!core.arrays.uvs) {
+                core.arrays.uvs = [];
+            }
+            core.arrays.uvs[2] = data.uv2;
         }
 
         if (data.uv3) {
             if (data.uv3.constructor != Float32Array) {
                 data.uv3 = new Float32Array(data.uv3);
             }
-
-            core.arrays.uv3 = data.uv3;
+            if (!core.arrays.uvs) {
+                core.arrays.uvs = [];
+            }
+            core.arrays.uvs[3] = data.uv3;
         }
+
+        // ----------------------------------------------------------
 
         if (data.colors) {
             if (data.colors.constructor != Float32Array) {
@@ -9264,7 +9306,7 @@ new (function () {
                 return core.tangentBuf;
             }
             var arrays = core.arrays;
-            if (arrays.positions && arrays.indices && arrays.uv) {
+            if (arrays.positions && arrays.indices && arrays.uvs && arrays.uvs[0]) {
                 var gl = self._engine.canvas.gl;
                 var tangents = new Float32Array(self._buildTangents(arrays)); // Build tangents array;
                 core.arrays.tangents = tangents;
@@ -9400,14 +9442,16 @@ new (function () {
             core.normalBuf = null;
         }
 
-        if (core.uvBuf) {
-            core.uvBuf.destroy();
-            core.uvBuf = null;
-        }
-
-        if (core.uvBuf2) {
-            core.uvBuf2.destroy();
-            core.uvBuf2 = null;
+        if (core.uvBufs) {
+            var uvBufs = core.uvBufs;
+            var uvBuf;
+            for (var i = 0, len = uvBufs.length; i < len; i++) {
+                uvBuf = uvBufs[i];
+                if (uvBuf) {
+                    uvBuf.destroy();
+                }
+            }
+            core.uvBufs = null;
         }
 
         if (core.colorBuf) {
@@ -9476,25 +9520,30 @@ new (function () {
                 core.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.normals, arrays.normals.length, 3, usage);
             }
 
-            if (arrays.uv) {
-                if (canInterleave) {
-                    core.interleavedUVOffset = prepareInterleaveBuffer(arrays.uv, 2);
-                }
-                core.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv, arrays.uv.length, 2, usage);
-            }
+            if (arrays.uvs) {
 
-            if (arrays.uv2) {
-                if (canInterleave) {
-                    core.interleavedUV2Offset = prepareInterleaveBuffer(arrays.uv2, 2);
-                }
-                core.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv2, arrays.uv2.length, 2, usage);
-            }
+                var uvs = arrays.uvs;
+                var offsets;
+                var i;
+                var len;
+                var uv;
 
-            if (arrays.uv3) {
                 if (canInterleave) {
-                    core.interleavedUV3Offset = prepareInterleaveBuffer(arrays.uv3, 2);
+                    core.interleavedUVOffsets = [];
+                    offsets = core.interleavedUVOffsets;
+                    for (i = 0, len = uvs.length; i < len; i++) {
+                        offsets.push(prepareInterleaveBuffer(arrays.uvs[i], 2));
+                    }
                 }
-                core.uvBuf3 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv3, arrays.uv3.length, 2, usage);
+
+                core.uvBufs = [];
+
+                for (i = 0, len = uvs.length; i < len; i++) {
+                    uv = arrays.uvs[i];
+                    if (uv.length > 0) {
+                        core.uvBufs.push(new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, uv, uv.length, 2, usage));
+                    }
+                }
             }
 
             if (arrays.colors) {
@@ -9627,7 +9676,7 @@ new (function () {
 
         var positions = arrays.positions;
         var indices = arrays.indices;
-        var uv = arrays.uv;
+        var uv = arrays.uvs[0];
 
         var tangents = [];
 
@@ -9773,55 +9822,20 @@ new (function () {
         return this._core.arrays ? this._core.arrays.indices : null;
     };
 
-    SceneJS.Geometry.prototype.setUV = function (data) {
-        if (data.uv && this._core.uvBuf) {
-            var core = this._core;
-            core.uvBuf.bind();
-            core.uvBuf.setData(new Float32Array(data.uv), data.uvOffset || 0);
-            core.arrays.uv.set(data.uv, data.uvOffset || 0);
-            this._engine.display.imageDirty = true;
-            if (core.interleavedBuf) {
-                core.interleavedBuf.dirty = true;
-            }
-        }
-    };
-
     SceneJS.Geometry.prototype.getUV = function () {
-        return this._core.arrays ? this._core.arrays.uv : null;
-    };
-
-    SceneJS.Geometry.prototype.setUV2 = function (data) {
-        if (data.uv2 && this._core.uv2Buf) {
-            var core = this._core;
-            core.uv2Buf.bind();
-            core.uv2Buf.setData(new Float32Array(data.uv2), data.uv2Offset || 0);
-            core.arrays.uv2.set(data.uv2, data.uv2Offset || 0);
-            this._engine.display.imageDirty = true;
-            if (core.interleavedBuf) {
-                core.interleavedBuf.dirty = true;
-            }
-        }
+        return this._core.arrays ? this._core.arrays.uvs[0] : null;
     };
 
     SceneJS.Geometry.prototype.getUV2 = function () {
-        return this._core.arrays ? this._core.arrays.uv2 : null;
+        return this._core.arrays ? this._core.arrays.uvs[1] : null;
     };
 
-    SceneJS.Geometry.prototype.setUV3 = function (data) {
-        if (data.uv3 && this._core.uv3Buf) {
-            var core = this._core;
-            core.uv3Buf.bind();
-            core.uv3Buf.setData(new Float32Array(data.uv3), data.uv3Offset || 0);
-            core.arrays.uv3.set(data.uv3, data.uv3Offset || 0);
-            this._engine.display.imageDirty = true;
-            if (core.interleavedBuf) {
-                core.interleavedBuf.dirty = true;
-            }
-        }
+    SceneJS.Geometry.prototype.getUV2 = function () {
+        return this._core.arrays ? this._core.arrays.uvs[2] : null;
     };
 
     SceneJS.Geometry.prototype.getUv3 = function () {
-        return this._core.arrays ? this._core.arrays.uv3 : null;
+        return this._core.arrays ? this._core.arrays.uvs[3] : null;
     };
 
     SceneJS.Geometry.prototype.getPrimitive = function () {
@@ -9913,15 +9927,24 @@ new (function () {
 
         if (core.indexBuf) { // Can only render when we have indices
 
-            core.hash = ([                           // Safe to build geometry hash here - geometry is immutable
+            var parts = [                           // Safe to build geometry hash here - geometry is immutable
                 core.normalBuf ? "t" : "f",
                 core.arrays && core.arrays.tangents ? "t" : "f",
-                core.uvBuf ? "t" : "f",
-                core.uvBuf2 ? "t" : "f",
-                core.uvBuf3 ? "t" : "f",
                 core.colorBuf ? "t" : "f",
                 core.primitive
-            ]).join("");
+            ];
+
+            // Hash parts for UVs
+
+            parts.push(";uvs");
+            var uvBufs = core.uvBufs;
+            if (uvBufs) {
+                for (var i = 0, len = uvBufs.length; i < len; i++) {
+                    parts.push(uvBufs[i] ? "t" : "f");
+                }
+            }
+
+            core.hash = parts.join("");
 
             core.stateId = this._core.stateId;
             core.type = "geometry";
@@ -9952,9 +9975,7 @@ new (function () {
             primitiveName: core.primitiveName,
             boundary: core.boundary,
             normalBuf: core.normalBuf,
-            uvBuf: core.uvBuf,
-            uvBuf2: core.uvBuf2,
-            uvBuf3: core.uvBuf3,
+            uvBufs: core.uvBufs,
             colorBuf: core.colorBuf,
             interleavedBuf: core.interleavedBuf,
             indexBuf: core.indexBuf,
@@ -9975,9 +9996,7 @@ new (function () {
                 core2.vertexBuf = coreStack[i].vertexBuf;
                 core2.boundary = coreStack[i].boundary;
                 core2.normalBuf = coreStack[i].normalBuf;
-                core2.uvBuf = coreStack[i].uvBuf;           // Vertex and UVs are a package
-                core2.uvBuf2 = coreStack[i].uvBuf2;
-                core2.uvBuf3 = coreStack[i].uvBuf3;
+                core2.uvBufs = coreStack[i].uvBufs;           // Vertex and UVs are a package
                 core2.colorBuf = coreStack[i].colorBuf;
                 core2.interleavedBuf = coreStack[i].interleavedBuf;
                 core2.interleavedStride = coreStack[i].interleavedStride;
@@ -13865,26 +13884,36 @@ new (function () {
         if (this._core.useCount == 1) { // This node is the resource definer
 
             if (params.applyFrom) {
-                if (params.applyFrom != "uv" &&
-                    params.applyFrom != "uv2" &&
-                    params.applyFrom != "uv3" &&
-                    params.applyFrom != "normal" &&
-                    params.applyFrom != "geometry") {
-                    throw SceneJS_error.fatalError(
-                        SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "texture applyFrom value is unsupported - " +
-                        "should be either 'uv', 'uv2', 'normal' or 'geometry'");
+
+                var applyFrom = params.applyFrom;
+
+                if (applyFrom !== "normal" &&
+                    applyFrom !== "geometry" &&
+                    applyFrom !== "uv") {
+
+                    var matches = applyFrom.match(/uv\d+/);
+
+                    if (!matches || matches.length === 0) {
+                        throw SceneJS_error.fatalError(
+                            SceneJS.errors.NODE_CONFIG_EXPECTED,
+                            "texture applyFrom value is unsupported - " +
+                            "should be either 'uv', 'uv2', 'normal' or 'geometry'");
+                    }
                 }
             }
 
             if (params.applyTo) {
-                if (params.applyTo != "baseColor" && // Colour map (deprecated)
-                    params.applyTo != "color" && // Colour map
-                    params.applyTo != "specular" && // Specular map
-                    params.applyTo != "emit" && // Emission map
-                    params.applyTo != "alpha" && // Alpha map
-                    params.applyTo != "normals" && // Normal map
-                    params.applyTo != "shine") { // Shininess map
+
+                var applyTo = params.applyTo;
+
+                if (applyTo != "baseColor" && // Colour map (deprecated)
+                    applyTo != "color" && // Colour map
+                    applyTo != "specular" && // Specular map
+                    applyTo != "emit" && // Emission map
+                    applyTo != "alpha" && // Alpha map
+                    applyTo != "normals" && // Normal map
+                    applyTo != "shine") { // Shininess map
+
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
                         "texture applyTo value is unsupported - " +
@@ -17115,6 +17144,8 @@ SceneJS_Display.prototype._logPickList = function () {
         var pickBuf = this.pickBuf;
         var hit = null;
         var object;
+        var i;
+        var len;
 
         // Lazy-create pick buffer
 
@@ -17194,7 +17225,7 @@ SceneJS_Display.prototype._logPickList = function () {
                 var data = {};
                 var color, delta;
 
-                for (var i = 0, len = regionData.length; i < len; i++) {
+                for (i = 0, len = regionData.length; i < len; i++) {
                     color = regionData[i].color;
                     if (regionColor && regionData[i].data) {
                         delta = Math.max(
@@ -17382,26 +17413,52 @@ SceneJS_Display.prototype._logPickList = function () {
                         SceneJS_math_mulVec3Scalar(nc, barycentric[2], tempVec3d), SceneJS_math_vec3());
                 }
 
-                // Get interpolated UV coordinates
+                // Get interpolated UV coordinates in each UV layer
 
-                var uvs = geometry.arrays.uv;
+                var uvLayers = geometry.arrays.uvs;
 
-                if (uvs) {
+                if (uvLayers.length > 0) {
 
-                    uva[0] = uvs[(ia * 2)];
-                    uva[1] = uvs[(ia * 2) + 1];
+                    hit.uvs = []; // TODO: Optimize for GC
 
-                    uvb[0] = uvs[(ib * 2)];
-                    uvb[1] = uvs[(ib * 2) + 1];
+                    var uvs;
+                    var uv;
+                    var ia2 = ia * 2;
+                    var ib2 = ib * 2;
+                    var ic2 = ic * 2;
 
-                    uvc[0] = uvs[(ic * 2)];
-                    uvc[1] = uvs[(ic * 2) + 1];
+                    for (i = 0, len = uvLayers.length; i < len; i++) {
 
-                    hit.uv = SceneJS_math_addVec3(
-                        SceneJS_math_addVec3(
-                            SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
-                            SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
-                        SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), SceneJS_math_vec3());
+                        uvs = uvLayers[i];
+
+                        if (!uvs) {
+
+                            uvs.push(null);
+
+                        } else {
+
+                            uva[0] = uvs[ia2];
+                            uva[1] = uvs[ia2 + 1];
+
+                            uvb[0] = uvs[ib2];
+                            uvb[1] = uvs[ib2 + 1];
+
+                            uvc[0] = uvs[ic2];
+                            uvc[1] = uvs[ic2 + 1];
+
+                            uv = SceneJS_math_addVec3(
+                                SceneJS_math_addVec3(
+                                    SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
+                                    SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
+                                SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), SceneJS_math_vec3());
+
+                            hit.uvs.push(uv);
+                        }
+                    }
+
+                    if (uvLayers.length > 0) {
+                        hit.uv = hit.uvs[0]; // Backward compatibility
+                    }
                 }
             }
         }
@@ -17765,7 +17822,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         tangents = hasTangents(states);
         clipping = states.clips.clips.length > 0;
         morphing = !!states.morphGeometry.targets;
-        regionMapping = !states.regionMap.empty;
+        regionMapping = hasRegionMap();
         regionInteraction = regionMapping && states.regionMap.mode !== "info";
         depthTargeting = hasDepthTarget();
 
@@ -17910,14 +17967,26 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return end();
     }
 
+    function hasRegionMap() {
+        if (!states.regionMap.empty) {
+            return hasUVs();
+        }
+        return false;
+    }
+
     function hasTextures() {
         if (states.texture.layers && states.texture.layers.length > 0) {
-            if (states.geometry.uvBuf || states.geometry.uvBuf2 || states.geometry.uvBuf3) {
-                return true;
-            }
-            if (states.morphGeometry.targets && (states.morphGeometry.targets[0].uvBuf || states.morphGeometry.targets[0].uvBuf2)) {
-                return true;
-            }
+            return hasUVs();
+        }
+        return false;
+    }
+
+    function hasUVs() {
+        if (states.geometry.uvBufs) { // TODO only if there is at least one defined member in this array
+            return true;
+        }
+        if (states.morphGeometry.targets && (states.morphGeometry.targets[0].uvBuf || states.morphGeometry.targets[0].uvBuf2)) {
+            return true;
         }
         return false;
     }
@@ -17981,6 +18050,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var customFragmentShader = customShaders.fragment || {};
         var fragmentHooks = customFragmentShader.hooks || {};
 
+        var i;
+        var uvBufs;
+
         begin();
 
         add("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
@@ -18013,21 +18085,19 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (decal || texturing) {
 
-            if (states.geometry.uvBuf) {
-                add("attribute vec2 SCENEJS_aUVCoord;");      // UV coords
-            }
+            uvBufs = states.geometry.uvBufs;
 
-            if (states.geometry.uvBuf2) {
-                add("attribute vec2 SCENEJS_aUVCoord2;");     // UV2 coords
-            }
-
-            if (states.geometry.uvBuf3) {
-                add("attribute vec2 SCENEJS_aUVCoord3;");     // UV3 coords
+            if (uvBufs) {
+                for (var i = 0, len = uvBufs.length; i < len; i++) {
+                    if (uvBufs[i]) {
+                        add("attribute vec2 SCENEJS_aUVCoord" + i + ";");
+                    }
+                }
             }
         }
 
         if (states.geometry.colorBuf) {
-            add("attribute vec4 SCENEJS_aVertexColor;");       // UV2 coords
+            add("attribute vec4 SCENEJS_aVertexColor;");
             add("varying vec4 SCENEJS_vColor;");               // Varying for fragment texturing
         }
 
@@ -18039,16 +18109,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (decal || texturing) {                                            // Varyings for fragment texturing
 
-            if (states.geometry.uvBuf) {
-                add("varying vec2 SCENEJS_vUVCoord;");
-            }
+            uvBufs = states.geometry.uvBufs;
 
-            if (states.geometry.uvBuf2) {
-                add("varying vec2 SCENEJS_vUVCoord2;");
-            }
-
-            if (states.geometry.uvBuf3) {
-                add("varying vec2 SCENEJS_vUVCoord3;");
+            if (uvBufs) {
+                for (i = 0, len = uvBufs.length; i < len; i++) {
+                    if (uvBufs[i]) {
+                        add("varying vec2 SCENEJS_vUVCoord" + i + ";");
+                    }
+                }
             }
         }
 
@@ -18216,16 +18284,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (decal || texturing) {
 
-            if (states.geometry.uvBuf) {
-                add("SCENEJS_vUVCoord = SCENEJS_aUVCoord;");
-            }
+            uvBufs = states.geometry.uvBufs;
 
-            if (states.geometry.uvBuf2) {
-                add("SCENEJS_vUVCoord2 = SCENEJS_aUVCoord2;");
-            }
-
-            if (states.geometry.uvBuf3) {
-                add("SCENEJS_vUVCoord3 = SCENEJS_aUVCoord3;");
+            if (uvBufs) {
+                for (i = 0, len = uvBufs.length; i < len; i++) {
+                    if (uvBufs[i]) {
+                        add("SCENEJS_vUVCoord" + i + " = SCENEJS_aUVCoord" + i + ";");
+                    }
+                }
             }
         }
 
@@ -18304,15 +18370,15 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (decal || texturing) {
-            if (states.geometry.uvBuf) {
-                add("varying vec2 SCENEJS_vUVCoord;");
+            var uvBufs = states.geometry.uvBufs;
+            if (uvBufs) {
+                for (var i = 0, len = uvBufs.length; i < len; i++) {
+                    if (uvBufs[i]) {
+                        add("varying vec2  SCENEJS_vUVCoord" + i + ";");
+                    }
+                }
             }
-            if (states.geometry.uvBuf2) {
-                add("varying vec2 SCENEJS_vUVCoord2;");
-            }
-            if (states.geometry.uvBuf3) {
-                add("varying vec2 SCENEJS_vUVCoord3;");
-            }
+
             if (decal) {
                 add("uniform sampler2D SCENEJS_uDecalSampler;");
                 if (states.decal.matrix) {
@@ -18510,9 +18576,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("  vec3 ambient= SCENEJS_uAmbientColor;");
 
-        if (texturing && states.geometry.uvBuf && fragmentHooks.texturePos) {
-            add(fragmentHooks.texturePos + "(SCENEJS_vUVCoord);");
-        }
+        //if (texturing && states.geometry.uvBuf && fragmentHooks.texturePos) {
+        //    add(fragmentHooks.texturePos + "(SCENEJS_vUVCoord);");
+        //}
 
         if (fragmentHooks.viewPos) {
             add(fragmentHooks.viewPos + "(SCENEJS_vViewVertex);");
@@ -18580,36 +18646,32 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 for (var i = 0, len = states.texture.layers.length; i < len; i++) {
                     layer = states.texture.layers[i];
 
-                    // Texture input                     
-                    if (layer.applyFrom == "normal" && normals) {
+                    var applyFrom = layer.applyFrom;
+
+                    // Texture input
+
+                    if (applyFrom == "normal" && normals) {
+
                         if (states.geometry.normalBuf) {
                             add("texturePos=vec4(viewNormalVec.xyz, 1.0);");
                         } else {
                             SceneJS.log.warn("Texture layer applyFrom='normal' but geo has no normal vectors");
                             continue;
                         }
-                    }
-                    if (layer.applyFrom == "uv") {
-                        if (states.geometry.uvBuf) {
-                            add("texturePos = vec4(SCENEJS_vUVCoord.s, SCENEJS_vUVCoord.t, 1.0, 1.0);");
+
+                    } else {
+
+                        // Apply from UV layers
+
+                        var matches = applyFrom.match(/\d+$/);
+                        var uvLayerIndex = matches ? parseInt(matches[0]) : 0;
+
+                        var uvBufs = states.geometry.uvBufs;
+
+                        if (uvBufs[uvLayerIndex]) {
+                            add("texturePos = vec4(SCENEJS_vUVCoord" + uvLayerIndex + ".s, SCENEJS_vUVCoord" + uvLayerIndex + ".t, 1.0, 1.0);");
                         } else {
-                            SceneJS.log.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
-                            continue;
-                        }
-                    }
-                    if (layer.applyFrom == "uv2") {
-                        if (states.geometry.uvBuf2) {
-                            add("texturePos = vec4(SCENEJS_vUVCoord2.s, SCENEJS_vUVCoord2.t, 1.0, 1.0);");
-                        } else {
-                            SceneJS.log.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
-                            continue;
-                        }
-                    }
-                    if (layer.applyFrom == "uv3") {
-                        if (states.geometry.uvBuf3) {
-                            add("texturePos = vec4(SCENEJS_vUVCoord3.s, SCENEJS_vUVCoord3.t, 1.0, 1.0);");
-                        } else {
-                            SceneJS.log.warn("Texture layer applyTo='uv3' but geometry has no UV3 coordinates");
+                            SceneJS.log.warn("Texture layer applyTo='uv' but geometry has no UV coordinates for layer " + uvLayerIndex);
                             continue;
                         }
                     }
@@ -19971,9 +20033,19 @@ SceneJS_ChunkFactory.createChunkType({
         this._aRegionMapUVDraw = draw.getAttribute("SCENEJS_aRegionMapUV");
         this._aVertexDraw = draw.getAttribute("SCENEJS_aVertex");
         this._aNormalDraw = draw.getAttribute("SCENEJS_aNormal");
-        this._aUVDraw = draw.getAttribute("SCENEJS_aUVCoord");
-        this._aUV2Draw = draw.getAttribute("SCENEJS_aUVCoord2");
-        this._aUV3Draw = draw.getAttribute("SCENEJS_aUVCoord3");
+
+        // Get attributes for unlimited UV layers
+
+        this._aUVDraw = [];
+        var aUV;
+        for (var i = 0; i < 1000; i++) { // Assuming we'll never have more than 1000 UV layers
+            aUV = draw.getAttribute("SCENEJS_aUVCoord" + i);
+            if (!aUV) {
+                break;
+            }
+            this._aUVDraw.push(aUV);
+        }
+
         this._aTangentDraw = draw.getAttribute("SCENEJS_aTangent");
         this._aColorDraw = draw.getAttribute("SCENEJS_aVertexColor");
 
@@ -20085,14 +20157,8 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aNormalDraw) {
                     this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedNormalOffset);
                 }
-                if (this._aUVDraw) {
-                    this._aUVDraw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUVOffset);
-                }
-                if (this._aUV2Draw) {
-                    this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUV2Offset);
-                }
-                if (this._aUV3Draw) {
-                    this._aUV3Draw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUV3Offset);
+                for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
+                    this._aUVDraw[i].bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUVOffsets[i]);
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
@@ -20111,14 +20177,12 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aNormalDraw) {
                     this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
                 }
-                if (this._aUVDraw) {
-                    this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
-                }
-                if (this._aUV2Draw) {
-                    this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
-                }
-                if (this._aUV3Draw) {
-                    this._aUV3Draw.bindFloatArrayBuffer(this.core2.uvBuf3);
+                var uvBuf;
+                for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
+                    uvBuf = this.core2.uvBufs[i];
+                    if (uvBuf) {
+                        this._aUVDraw[i].bindFloatArrayBuffer(uvBuf);
+                    }
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
@@ -20132,7 +20196,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (this._aRegionMapUVDraw) {
-            this._aRegionMapUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
+            this._aRegionMapUVDraw.bindFloatArrayBuffer(this.core2.uvBufs[0]); // TODO: Make region maps work with all UV layers
         }
 
         this.core2.indexBuf.bind();
@@ -20214,7 +20278,7 @@ SceneJS_ChunkFactory.createChunkType({
                 }
 
                 if (this._aRegionMapUVPick) {
-                    this._aRegionMapUVPick.bindFloatArrayBuffer(core2.uvBuf);
+                    this._aRegionMapUVPick.bindFloatArrayBuffer(core2.uvBufs[0]); // TODO: Make region maps work with all UV layers
                 }
 
                 core2.indexBuf.bind();

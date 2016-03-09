@@ -90,29 +90,61 @@ new (function () {
             core.arrays.normals = data.normals;
         }
 
+        if (data.uvs) {
+            var uvs = data.uvs;
+            var uv;
+            for (var i = 0, len = uvs.length; i < len; i++) {
+                uv = uvs[i];
+                if (uv.constructor != Float32Array) {
+                    uvs[i] = new Float32Array(uvs[i]);
+                }
+            }
+            core.arrays.uvs = uvs;
+        }
+
+        // ---------------- Backward-compatibility -------------------
+
         if (data.uv) {
             if (data.uv.constructor != Float32Array) {
                 data.uv = new Float32Array(data.uv);
             }
+            if (!core.arrays.uvs) {
+                core.arrays.uvs = [];
+            }
+            core.arrays.uvs[0] = data.uv;
+        }
 
-            core.arrays.uv = data.uv;
+        if (data.uv1) {
+            if (data.uv1.constructor != Float32Array) {
+                data.uv1 = new Float32Array(data.uv1);
+            }
+            if (!core.arrays.uvs) {
+                core.arrays.uvs = [];
+            }
+            core.arrays.uvs[1] = data.uv2;
         }
 
         if (data.uv2) {
             if (data.uv2.constructor != Float32Array) {
                 data.uv2 = new Float32Array(data.uv2);
             }
-
-            core.arrays.uv2 = data.uv2;
+            if (!core.arrays.uvs) {
+                core.arrays.uvs = [];
+            }
+            core.arrays.uvs[2] = data.uv2;
         }
 
         if (data.uv3) {
             if (data.uv3.constructor != Float32Array) {
                 data.uv3 = new Float32Array(data.uv3);
             }
-
-            core.arrays.uv3 = data.uv3;
+            if (!core.arrays.uvs) {
+                core.arrays.uvs = [];
+            }
+            core.arrays.uvs[3] = data.uv3;
         }
+
+        // ----------------------------------------------------------
 
         if (data.colors) {
             if (data.colors.constructor != Float32Array) {
@@ -136,7 +168,7 @@ new (function () {
                 return core.tangentBuf;
             }
             var arrays = core.arrays;
-            if (arrays.positions && arrays.indices && arrays.uv) {
+            if (arrays.positions && arrays.indices && arrays.uvs && arrays.uvs[0]) {
                 var gl = self._engine.canvas.gl;
                 var tangents = new Float32Array(self._buildTangents(arrays)); // Build tangents array;
                 core.arrays.tangents = tangents;
@@ -272,14 +304,16 @@ new (function () {
             core.normalBuf = null;
         }
 
-        if (core.uvBuf) {
-            core.uvBuf.destroy();
-            core.uvBuf = null;
-        }
-
-        if (core.uvBuf2) {
-            core.uvBuf2.destroy();
-            core.uvBuf2 = null;
+        if (core.uvBufs) {
+            var uvBufs = core.uvBufs;
+            var uvBuf;
+            for (var i = 0, len = uvBufs.length; i < len; i++) {
+                uvBuf = uvBufs[i];
+                if (uvBuf) {
+                    uvBuf.destroy();
+                }
+            }
+            core.uvBufs = null;
         }
 
         if (core.colorBuf) {
@@ -348,25 +382,30 @@ new (function () {
                 core.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.normals, arrays.normals.length, 3, usage);
             }
 
-            if (arrays.uv) {
-                if (canInterleave) {
-                    core.interleavedUVOffset = prepareInterleaveBuffer(arrays.uv, 2);
-                }
-                core.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv, arrays.uv.length, 2, usage);
-            }
+            if (arrays.uvs) {
 
-            if (arrays.uv2) {
-                if (canInterleave) {
-                    core.interleavedUV2Offset = prepareInterleaveBuffer(arrays.uv2, 2);
-                }
-                core.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv2, arrays.uv2.length, 2, usage);
-            }
+                var uvs = arrays.uvs;
+                var offsets;
+                var i;
+                var len;
+                var uv;
 
-            if (arrays.uv3) {
                 if (canInterleave) {
-                    core.interleavedUV3Offset = prepareInterleaveBuffer(arrays.uv3, 2);
+                    core.interleavedUVOffsets = [];
+                    offsets = core.interleavedUVOffsets;
+                    for (i = 0, len = uvs.length; i < len; i++) {
+                        offsets.push(prepareInterleaveBuffer(arrays.uvs[i], 2));
+                    }
                 }
-                core.uvBuf3 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, arrays.uv3, arrays.uv3.length, 2, usage);
+
+                core.uvBufs = [];
+
+                for (i = 0, len = uvs.length; i < len; i++) {
+                    uv = arrays.uvs[i];
+                    if (uv.length > 0) {
+                        core.uvBufs.push(new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, uv, uv.length, 2, usage));
+                    }
+                }
             }
 
             if (arrays.colors) {
@@ -499,7 +538,7 @@ new (function () {
 
         var positions = arrays.positions;
         var indices = arrays.indices;
-        var uv = arrays.uv;
+        var uv = arrays.uvs[0];
 
         var tangents = [];
 
@@ -645,55 +684,20 @@ new (function () {
         return this._core.arrays ? this._core.arrays.indices : null;
     };
 
-    SceneJS.Geometry.prototype.setUV = function (data) {
-        if (data.uv && this._core.uvBuf) {
-            var core = this._core;
-            core.uvBuf.bind();
-            core.uvBuf.setData(new Float32Array(data.uv), data.uvOffset || 0);
-            core.arrays.uv.set(data.uv, data.uvOffset || 0);
-            this._engine.display.imageDirty = true;
-            if (core.interleavedBuf) {
-                core.interleavedBuf.dirty = true;
-            }
-        }
-    };
-
     SceneJS.Geometry.prototype.getUV = function () {
-        return this._core.arrays ? this._core.arrays.uv : null;
-    };
-
-    SceneJS.Geometry.prototype.setUV2 = function (data) {
-        if (data.uv2 && this._core.uv2Buf) {
-            var core = this._core;
-            core.uv2Buf.bind();
-            core.uv2Buf.setData(new Float32Array(data.uv2), data.uv2Offset || 0);
-            core.arrays.uv2.set(data.uv2, data.uv2Offset || 0);
-            this._engine.display.imageDirty = true;
-            if (core.interleavedBuf) {
-                core.interleavedBuf.dirty = true;
-            }
-        }
+        return this._core.arrays ? this._core.arrays.uvs[0] : null;
     };
 
     SceneJS.Geometry.prototype.getUV2 = function () {
-        return this._core.arrays ? this._core.arrays.uv2 : null;
+        return this._core.arrays ? this._core.arrays.uvs[1] : null;
     };
 
-    SceneJS.Geometry.prototype.setUV3 = function (data) {
-        if (data.uv3 && this._core.uv3Buf) {
-            var core = this._core;
-            core.uv3Buf.bind();
-            core.uv3Buf.setData(new Float32Array(data.uv3), data.uv3Offset || 0);
-            core.arrays.uv3.set(data.uv3, data.uv3Offset || 0);
-            this._engine.display.imageDirty = true;
-            if (core.interleavedBuf) {
-                core.interleavedBuf.dirty = true;
-            }
-        }
+    SceneJS.Geometry.prototype.getUV2 = function () {
+        return this._core.arrays ? this._core.arrays.uvs[2] : null;
     };
 
     SceneJS.Geometry.prototype.getUv3 = function () {
-        return this._core.arrays ? this._core.arrays.uv3 : null;
+        return this._core.arrays ? this._core.arrays.uvs[3] : null;
     };
 
     SceneJS.Geometry.prototype.getPrimitive = function () {
@@ -785,15 +789,24 @@ new (function () {
 
         if (core.indexBuf) { // Can only render when we have indices
 
-            core.hash = ([                           // Safe to build geometry hash here - geometry is immutable
+            var parts = [                           // Safe to build geometry hash here - geometry is immutable
                 core.normalBuf ? "t" : "f",
                 core.arrays && core.arrays.tangents ? "t" : "f",
-                core.uvBuf ? "t" : "f",
-                core.uvBuf2 ? "t" : "f",
-                core.uvBuf3 ? "t" : "f",
                 core.colorBuf ? "t" : "f",
                 core.primitive
-            ]).join("");
+            ];
+
+            // Hash parts for UVs
+
+            parts.push(";uvs");
+            var uvBufs = core.uvBufs;
+            if (uvBufs) {
+                for (var i = 0, len = uvBufs.length; i < len; i++) {
+                    parts.push(uvBufs[i] ? "t" : "f");
+                }
+            }
+
+            core.hash = parts.join("");
 
             core.stateId = this._core.stateId;
             core.type = "geometry";
@@ -824,9 +837,7 @@ new (function () {
             primitiveName: core.primitiveName,
             boundary: core.boundary,
             normalBuf: core.normalBuf,
-            uvBuf: core.uvBuf,
-            uvBuf2: core.uvBuf2,
-            uvBuf3: core.uvBuf3,
+            uvBufs: core.uvBufs,
             colorBuf: core.colorBuf,
             interleavedBuf: core.interleavedBuf,
             indexBuf: core.indexBuf,
@@ -847,9 +858,7 @@ new (function () {
                 core2.vertexBuf = coreStack[i].vertexBuf;
                 core2.boundary = coreStack[i].boundary;
                 core2.normalBuf = coreStack[i].normalBuf;
-                core2.uvBuf = coreStack[i].uvBuf;           // Vertex and UVs are a package
-                core2.uvBuf2 = coreStack[i].uvBuf2;
-                core2.uvBuf3 = coreStack[i].uvBuf3;
+                core2.uvBufs = coreStack[i].uvBufs;           // Vertex and UVs are a package
                 core2.colorBuf = coreStack[i].colorBuf;
                 core2.interleavedBuf = coreStack[i].interleavedBuf;
                 core2.interleavedStride = coreStack[i].interleavedStride;

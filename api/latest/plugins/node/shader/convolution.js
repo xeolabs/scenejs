@@ -46,10 +46,10 @@ SceneJS.Types.addType("shader/convolution", {
                     code: [
                         "uniform vec2 uImageIncrement;",
                         "varying vec2 vUv;",
-                        "attribute vec2 SCENEJS_aUVCoord;",
+                        "attribute vec2 SCENEJS_aUVCoord0;",
                         "attribute vec3 SCENEJS_aVertex;",
                         "void main() {",
-                        "   vUv = SCENEJS_aUVCoord - ( ( 25.0 - 1.0 ) / 2.0 ) * uImageIncrement;",
+                        "   vUv = SCENEJS_aUVCoord0 - ( ( 25.0 - 1.0 ) / 2.0 ) * uImageIncrement;",
                         "   gl_Position = vec4( SCENEJS_aVertex, 1.0 );",
                         "}"
                     ]

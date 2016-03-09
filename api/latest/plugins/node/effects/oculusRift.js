@@ -137,7 +137,7 @@ SceneJS.Types.addType("effects/oculusRift", {
                     code: [
 
                         "attribute vec3 SCENEJS_aVertex;",
-                        "attribute vec2 SCENEJS_aUVCoord;",
+                        "attribute vec2 SCENEJS_aUVCoord0;",
 
                         "varying vec3 vPos;",
                         "varying vec2 vUv;",
@@ -145,7 +145,7 @@ SceneJS.Types.addType("effects/oculusRift", {
                         "void main () {",
                         "   vPos = SCENEJS_aVertex;",
                         "   gl_Position = vec4(SCENEJS_aVertex, 1.0);",
-                        "   vUv = SCENEJS_aUVCoord;",
+                        "   vUv = SCENEJS_aUVCoord0;",
                         "}"
                     ]
                 },
