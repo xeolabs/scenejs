@@ -361,6 +361,16 @@ var SceneJS = new (function () {
     };
 
     /**
+     * Tests if the given value is a number
+     * @param value
+     * @returns {boolean}
+     * @private
+     */
+    this._isNumeric = function (value) {
+        return !isNaN(parseFloat(value)) && isFinite(value);
+    };
+
+    /**
      * Resets SceneJS, destroying all existing scenes
      */
     this.reset = function () {

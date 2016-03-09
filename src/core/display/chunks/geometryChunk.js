@@ -12,9 +12,19 @@ SceneJS_ChunkFactory.createChunkType({
         this._aRegionMapUVDraw = draw.getAttribute("SCENEJS_aRegionMapUV");
         this._aVertexDraw = draw.getAttribute("SCENEJS_aVertex");
         this._aNormalDraw = draw.getAttribute("SCENEJS_aNormal");
-        this._aUVDraw = draw.getAttribute("SCENEJS_aUVCoord");
-        this._aUV2Draw = draw.getAttribute("SCENEJS_aUVCoord2");
-        this._aUV3Draw = draw.getAttribute("SCENEJS_aUVCoord3");
+
+        // Get attributes for unlimited UV layers
+
+        this._aUVDraw = [];
+        var aUV;
+        for (var i = 0; i < 1000; i++) { // Assuming we'll never have more than 1000 UV layers
+            aUV = draw.getAttribute("SCENEJS_aUVCoord" + i);
+            if (!aUV) {
+                break;
+            }
+            this._aUVDraw.push(aUV);
+        }
+
         this._aTangentDraw = draw.getAttribute("SCENEJS_aTangent");
         this._aColorDraw = draw.getAttribute("SCENEJS_aVertexColor");
 
@@ -126,14 +136,8 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aNormalDraw) {
                     this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedNormalOffset);
                 }
-                if (this._aUVDraw) {
-                    this._aUVDraw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUVOffset);
-                }
-                if (this._aUV2Draw) {
-                    this._aUV2Draw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUV2Offset);
-                }
-                if (this._aUV3Draw) {
-                    this._aUV3Draw.bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUV3Offset);
+                for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
+                    this._aUVDraw[i].bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUVOffsets[i]);
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
@@ -152,14 +156,12 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aNormalDraw) {
                     this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
                 }
-                if (this._aUVDraw) {
-                    this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
-                }
-                if (this._aUV2Draw) {
-                    this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
-                }
-                if (this._aUV3Draw) {
-                    this._aUV3Draw.bindFloatArrayBuffer(this.core2.uvBuf3);
+                var uvBuf;
+                for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
+                    uvBuf = this.core2.uvBufs[i];
+                    if (uvBuf) {
+                        this._aUVDraw[i].bindFloatArrayBuffer(uvBuf);
+                    }
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
@@ -173,7 +175,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (this._aRegionMapUVDraw) {
-            this._aRegionMapUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
+            this._aRegionMapUVDraw.bindFloatArrayBuffer(this.core2.uvBufs[0]); // TODO: Make region maps work with all UV layers
         }
 
         this.core2.indexBuf.bind();
@@ -255,7 +257,7 @@ SceneJS_ChunkFactory.createChunkType({
                 }
 
                 if (this._aRegionMapUVPick) {
-                    this._aRegionMapUVPick.bindFloatArrayBuffer(core2.uvBuf);
+                    this._aRegionMapUVPick.bindFloatArrayBuffer(core2.uvBufs[0]); // TODO: Make region maps work with all UV layers
                 }
 
                 core2.indexBuf.bind();

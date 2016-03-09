@@ -60,7 +60,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         tangents = hasTangents(states);
         clipping = states.clips.clips.length > 0;
         morphing = !!states.morphGeometry.targets;
-        regionMapping = !states.regionMap.empty;
+        regionMapping = hasRegionMap();
         regionInteraction = regionMapping && states.regionMap.mode !== "info";
         depthTargeting = hasDepthTarget();
 
@@ -205,14 +205,26 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return end();
     }
 
+    function hasRegionMap() {
+        if (!states.regionMap.empty) {
+            return hasUVs();
+        }
+        return false;
+    }
+
     function hasTextures() {
         if (states.texture.layers && states.texture.layers.length > 0) {
-            if (states.geometry.uvBuf || states.geometry.uvBuf2 || states.geometry.uvBuf3) {
-                return true;
-            }
-            if (states.morphGeometry.targets && (states.morphGeometry.targets[0].uvBuf || states.morphGeometry.targets[0].uvBuf2)) {
-                return true;
-            }
+            return hasUVs();
+        }
+        return false;
+    }
+
+    function hasUVs() {
+        if (states.geometry.uvBufs) { // TODO only if there is at least one defined member in this array
+            return true;
+        }
+        if (states.morphGeometry.targets && (states.morphGeometry.targets[0].uvBuf || states.morphGeometry.targets[0].uvBuf2)) {
+            return true;
         }
         return false;
     }
@@ -276,6 +288,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         var customFragmentShader = customShaders.fragment || {};
         var fragmentHooks = customFragmentShader.hooks || {};
 
+        var i;
+        var uvBufs;
+
         begin();
 
         add("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
@@ -308,21 +323,19 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (decal || texturing) {
 
-            if (states.geometry.uvBuf) {
-                add("attribute vec2 SCENEJS_aUVCoord;");      // UV coords
-            }
+            uvBufs = states.geometry.uvBufs;
 
-            if (states.geometry.uvBuf2) {
-                add("attribute vec2 SCENEJS_aUVCoord2;");     // UV2 coords
-            }
-
-            if (states.geometry.uvBuf3) {
-                add("attribute vec2 SCENEJS_aUVCoord3;");     // UV3 coords
+            if (uvBufs) {
+                for (var i = 0, len = uvBufs.length; i < len; i++) {
+                    if (uvBufs[i]) {
+                        add("attribute vec2 SCENEJS_aUVCoord" + i + ";");
+                    }
+                }
             }
         }
 
         if (states.geometry.colorBuf) {
-            add("attribute vec4 SCENEJS_aVertexColor;");       // UV2 coords
+            add("attribute vec4 SCENEJS_aVertexColor;");
             add("varying vec4 SCENEJS_vColor;");               // Varying for fragment texturing
         }
 
@@ -334,16 +347,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (decal || texturing) {                                            // Varyings for fragment texturing
 
-            if (states.geometry.uvBuf) {
-                add("varying vec2 SCENEJS_vUVCoord;");
-            }
+            uvBufs = states.geometry.uvBufs;
 
-            if (states.geometry.uvBuf2) {
-                add("varying vec2 SCENEJS_vUVCoord2;");
-            }
-
-            if (states.geometry.uvBuf3) {
-                add("varying vec2 SCENEJS_vUVCoord3;");
+            if (uvBufs) {
+                for (i = 0, len = uvBufs.length; i < len; i++) {
+                    if (uvBufs[i]) {
+                        add("varying vec2 SCENEJS_vUVCoord" + i + ";");
+                    }
+                }
             }
         }
 
@@ -511,16 +522,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         if (decal || texturing) {
 
-            if (states.geometry.uvBuf) {
-                add("SCENEJS_vUVCoord = SCENEJS_aUVCoord;");
-            }
+            uvBufs = states.geometry.uvBufs;
 
-            if (states.geometry.uvBuf2) {
-                add("SCENEJS_vUVCoord2 = SCENEJS_aUVCoord2;");
-            }
-
-            if (states.geometry.uvBuf3) {
-                add("SCENEJS_vUVCoord3 = SCENEJS_aUVCoord3;");
+            if (uvBufs) {
+                for (i = 0, len = uvBufs.length; i < len; i++) {
+                    if (uvBufs[i]) {
+                        add("SCENEJS_vUVCoord" + i + " = SCENEJS_aUVCoord" + i + ";");
+                    }
+                }
             }
         }
 
@@ -599,15 +608,15 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         if (decal || texturing) {
-            if (states.geometry.uvBuf) {
-                add("varying vec2 SCENEJS_vUVCoord;");
+            var uvBufs = states.geometry.uvBufs;
+            if (uvBufs) {
+                for (var i = 0, len = uvBufs.length; i < len; i++) {
+                    if (uvBufs[i]) {
+                        add("varying vec2  SCENEJS_vUVCoord" + i + ";");
+                    }
+                }
             }
-            if (states.geometry.uvBuf2) {
-                add("varying vec2 SCENEJS_vUVCoord2;");
-            }
-            if (states.geometry.uvBuf3) {
-                add("varying vec2 SCENEJS_vUVCoord3;");
-            }
+
             if (decal) {
                 add("uniform sampler2D SCENEJS_uDecalSampler;");
                 if (states.decal.matrix) {
@@ -805,9 +814,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("  vec3 ambient= SCENEJS_uAmbientColor;");
 
-        if (texturing && states.geometry.uvBuf && fragmentHooks.texturePos) {
-            add(fragmentHooks.texturePos + "(SCENEJS_vUVCoord);");
-        }
+        //if (texturing && states.geometry.uvBuf && fragmentHooks.texturePos) {
+        //    add(fragmentHooks.texturePos + "(SCENEJS_vUVCoord);");
+        //}
 
         if (fragmentHooks.viewPos) {
             add(fragmentHooks.viewPos + "(SCENEJS_vViewVertex);");
@@ -875,36 +884,32 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 for (var i = 0, len = states.texture.layers.length; i < len; i++) {
                     layer = states.texture.layers[i];
 
-                    // Texture input                     
-                    if (layer.applyFrom == "normal" && normals) {
+                    var applyFrom = layer.applyFrom;
+
+                    // Texture input
+
+                    if (applyFrom == "normal" && normals) {
+
                         if (states.geometry.normalBuf) {
                             add("texturePos=vec4(viewNormalVec.xyz, 1.0);");
                         } else {
                             SceneJS.log.warn("Texture layer applyFrom='normal' but geo has no normal vectors");
                             continue;
                         }
-                    }
-                    if (layer.applyFrom == "uv") {
-                        if (states.geometry.uvBuf) {
-                            add("texturePos = vec4(SCENEJS_vUVCoord.s, SCENEJS_vUVCoord.t, 1.0, 1.0);");
+
+                    } else {
+
+                        // Apply from UV layers
+
+                        var matches = applyFrom.match(/\d+$/);
+                        var uvLayerIndex = matches ? parseInt(matches[0]) : 0;
+
+                        var uvBufs = states.geometry.uvBufs;
+
+                        if (uvBufs[uvLayerIndex]) {
+                            add("texturePos = vec4(SCENEJS_vUVCoord" + uvLayerIndex + ".s, SCENEJS_vUVCoord" + uvLayerIndex + ".t, 1.0, 1.0);");
                         } else {
-                            SceneJS.log.warn("Texture layer applyTo='uv' but geometry has no UV coordinates");
-                            continue;
-                        }
-                    }
-                    if (layer.applyFrom == "uv2") {
-                        if (states.geometry.uvBuf2) {
-                            add("texturePos = vec4(SCENEJS_vUVCoord2.s, SCENEJS_vUVCoord2.t, 1.0, 1.0);");
-                        } else {
-                            SceneJS.log.warn("Texture layer applyTo='uv2' but geometry has no UV2 coordinates");
-                            continue;
-                        }
-                    }
-                    if (layer.applyFrom == "uv3") {
-                        if (states.geometry.uvBuf3) {
-                            add("texturePos = vec4(SCENEJS_vUVCoord3.s, SCENEJS_vUVCoord3.t, 1.0, 1.0);");
-                        } else {
-                            SceneJS.log.warn("Texture layer applyTo='uv3' but geometry has no UV3 coordinates");
+                            SceneJS.log.warn("Texture layer applyTo='uv' but geometry has no UV coordinates for layer " + uvLayerIndex);
                             continue;
                         }
                     }

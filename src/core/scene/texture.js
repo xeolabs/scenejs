@@ -35,26 +35,36 @@ new (function () {
         if (this._core.useCount == 1) { // This node is the resource definer
 
             if (params.applyFrom) {
-                if (params.applyFrom != "uv" &&
-                    params.applyFrom != "uv2" &&
-                    params.applyFrom != "uv3" &&
-                    params.applyFrom != "normal" &&
-                    params.applyFrom != "geometry") {
-                    throw SceneJS_error.fatalError(
-                        SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "texture applyFrom value is unsupported - " +
-                        "should be either 'uv', 'uv2', 'normal' or 'geometry'");
+
+                var applyFrom = params.applyFrom;
+
+                if (applyFrom !== "normal" &&
+                    applyFrom !== "geometry" &&
+                    applyFrom !== "uv") {
+
+                    var matches = applyFrom.match(/uv\d+/);
+
+                    if (!matches || matches.length === 0) {
+                        throw SceneJS_error.fatalError(
+                            SceneJS.errors.NODE_CONFIG_EXPECTED,
+                            "texture applyFrom value is unsupported - " +
+                            "should be either 'uv', 'uv2', 'normal' or 'geometry'");
+                    }
                 }
             }
 
             if (params.applyTo) {
-                if (params.applyTo != "baseColor" && // Colour map (deprecated)
-                    params.applyTo != "color" && // Colour map
-                    params.applyTo != "specular" && // Specular map
-                    params.applyTo != "emit" && // Emission map
-                    params.applyTo != "alpha" && // Alpha map
-                    params.applyTo != "normals" && // Normal map
-                    params.applyTo != "shine") { // Shininess map
+
+                var applyTo = params.applyTo;
+
+                if (applyTo != "baseColor" && // Colour map (deprecated)
+                    applyTo != "color" && // Colour map
+                    applyTo != "specular" && // Specular map
+                    applyTo != "emit" && // Emission map
+                    applyTo != "alpha" && // Alpha map
+                    applyTo != "normals" && // Normal map
+                    applyTo != "shine") { // Shininess map
+
                     throw SceneJS_error.fatalError(
                         SceneJS.errors.NODE_CONFIG_EXPECTED,
                         "texture applyTo value is unsupported - " +
