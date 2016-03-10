@@ -106,6 +106,13 @@ SceneJS.Scene.prototype.renderFrame = function (params) {
 };
 
 /**
+ * Force compilation of the scene graph.
+ */
+SceneJS.Scene.prototype.compile = function (params) {
+    return this._engine.compile();
+};
+
+/**
  * Signals that a new frame will be needed
  * @param params
  */

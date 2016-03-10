@@ -336,7 +336,7 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
             });
 
             // Compile scene graph to display graph, if necessary
-            this._doCompile();
+            this.compile();
 
             // Render display graph
             // Clear buffers only on first frame
@@ -435,7 +435,7 @@ SceneJS_Engine.prototype.start = function () {
                     scene.publish("rendering", renderingEvent);
 
                     // Compile scene graph to display graph, if necessary
-                    self._doCompile();
+                    self.compile();
 
                     // Render display graph
                     // Clear buffers only on first frame
@@ -538,7 +538,7 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
 
     // Do any pending scene compilations
     if (this._needCompile()) {
-        this._doCompile();
+        this.compile();
     }
 
     var hit = this.display.pick({
@@ -558,7 +558,7 @@ SceneJS_Engine.prototype.readPixels = function (entries, size, opaqueOnly) {
 
     // Do any pending scene compilations
     if (this._needCompile()) {
-        this._doCompile();
+        this.compile();
     }
 
     return this.display.readPixels(entries, size, opaqueOnly);
@@ -582,7 +582,7 @@ SceneJS_Engine.prototype._needCompile = function () {
 /**
  * Performs any pending scene compilations or display rebuilds
  */
-SceneJS_Engine.prototype._doCompile = function () {
+SceneJS_Engine.prototype.compile = function () {
     if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
         this._sceneBranchesDirty = false;
         SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
