@@ -1304,6 +1304,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelEdgeColor.rgb, SCENEJS_uFragmentFresnelCenterColor.rgb, fragmentFresnel);");
         }
 
+        if (!depthTargeting) {
+            add("fragColor.rgb *= fragColor.a;");
+        }
+
         add("gl_FragColor = fragColor;");
 
         add("}");
