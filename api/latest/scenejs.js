@@ -18769,6 +18769,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("fragColor.rgb *= mix(SCENEJS_uFragmentFresnelEdgeColor.rgb, SCENEJS_uFragmentFresnelCenterColor.rgb, fragmentFresnel);");
         }
 
+        if (!depthTargeting) {
+            add("fragColor.rgb *= fragColor.a;");
+        }
+
         add("gl_FragColor = fragColor;");
 
         add("}");
@@ -19645,7 +19649,7 @@ SceneJS_ChunkFactory.createChunkType({
                     // Entering a transparency bin
 
                     gl.enable(gl.BLEND);
-                    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
                     frameCtx.blendEnabled = true;
 
                 } else {
@@ -19711,7 +19715,7 @@ SceneJS_ChunkFactory.createChunkType({
             //  Enable blending for non-depth targets
             if (frameCtx.blendEnabled) {
                 gl.enable(gl.BLEND);
-                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             }
         }
 
@@ -20359,7 +20363,7 @@ SceneJS_ChunkFactory.createChunkType({
                 // Entering a transparency bin
 
                 gl.enable(gl.BLEND);
-                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
                 frameCtx.blendEnabled = true;
 
             } else {
