@@ -50,6 +50,24 @@ new (function () {
                 },
                 this._core);
 
+            // Index of UV layer for this region map
+
+            var applyFrom = params.applyFrom || "uv";
+            if (applyFrom.substring(0,2) !== "uv") {
+                throw SceneJS_error.fatalError(
+                    SceneJS.errors.NODE_CONFIG_EXPECTED,
+                    "texture applyFrom value is unsupported - should be 'uv<index>'");
+            }
+            var uvLayerIdx = 0;
+            if (applyFrom !== "uv") {
+                uvLayerIdx = applyFrom.substring(2);
+                if (isNaN(uvLayerIdx)) {
+                    throw SceneJS_error.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "texture applyFrom value invalid - should be 'uv<index>'");
+                }
+            }
+            this._core.uvLayerIdx = uvLayerIdx;
 
             if (params.src) {
 

@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-03-09
+ * Built on 2016-03-16
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -2238,7 +2238,7 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
             });
 
             // Compile scene graph to display graph, if necessary
-            this._doCompile();
+            this.compile();
 
             // Render display graph
             // Clear buffers only on first frame
@@ -2337,7 +2337,7 @@ SceneJS_Engine.prototype.start = function () {
                     scene.publish("rendering", renderingEvent);
 
                     // Compile scene graph to display graph, if necessary
-                    self._doCompile();
+                    self.compile();
 
                     // Render display graph
                     // Clear buffers only on first frame
@@ -2440,7 +2440,7 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
 
     // Do any pending scene compilations
     if (this._needCompile()) {
-        this._doCompile();
+        this.compile();
     }
 
     var hit = this.display.pick({
@@ -2460,7 +2460,7 @@ SceneJS_Engine.prototype.readPixels = function (entries, size, opaqueOnly) {
 
     // Do any pending scene compilations
     if (this._needCompile()) {
-        this._doCompile();
+        this.compile();
     }
 
     return this.display.readPixels(entries, size, opaqueOnly);
@@ -2484,7 +2484,7 @@ SceneJS_Engine.prototype._needCompile = function () {
 /**
  * Performs any pending scene compilations or display rebuilds
  */
-SceneJS_Engine.prototype._doCompile = function () {
+SceneJS_Engine.prototype.compile = function () {
     if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
         this._sceneBranchesDirty = false;
         SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
@@ -2907,6 +2907,8 @@ SceneJS.log = new (function() {
     var tempVec3d = new Float32Array(3);
     var tempVec3e = new Float32Array(3);
     var tempVec3f = new Float32Array(3);
+    var tempVec3g = new Float32Array(3);
+    var tempVec3h = new Float32Array(3);
     var tempVec4 = new Float32Array(4);
 
     /**
@@ -5453,6 +5455,84 @@ SceneJS.log = new (function() {
 
         return cartesian;
     };
+
+
+    /**
+     * Builds vertex tangent vectors from positions, UVs and indices
+     *
+     * @method buildTangents
+     * @static
+     * @param {Array of Number} positions One-dimensional flattened array of positions.
+     * @param {Array of Number} indices One-dimensional flattened array of indices.
+     * @param {Array of Number} uv One-dimensional flattened array of UV coordinates.
+     * @returns {Array of Number} One-dimensional flattened array of tangents.
+     */
+    window.SceneJS_math_buildTangents = function (positions, indices, uv) {
+
+        var tangents = [];
+
+        // The vertex arrays needs to be calculated
+        // before the calculation of the tangents
+
+        for (var location = 0; location < indices.length; location += 3) {
+
+            // Recontructing each vertex and UV coordinate into the respective vectors
+
+            var index = indices[location];
+
+            var v0 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv0 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            index = indices[location + 1];
+
+            var v1 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv1 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            index = indices[location + 2];
+
+            var v2 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv2 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            var deltaPos1 = SceneJS_math_subVec3(v1, v0, tempVec3);
+            var deltaPos2 = SceneJS_math_subVec3(v2, v0, tempVec3b);
+
+            var deltaUV1 = SceneJS_math_subVec2(uv1, uv0, tempVec3c);
+            var deltaUV2 = SceneJS_math_subVec2(uv2, uv0, tempVec3d);
+
+            var r = 1 / ((deltaUV1[0] * deltaUV2[1]) - (deltaUV1[1] * deltaUV2[0]));
+
+            var tangent = SceneJS_math_mulVec3Scalar(
+                SceneJS_math_subVec3(
+                    SceneJS_math_mulVec3Scalar(deltaPos1, deltaUV2[1], tempVec3e),
+                    SceneJS_math_mulVec3Scalar(deltaPos2, deltaUV1[1], tempVec3f),
+                    tempVec3g
+                ),
+                r,
+                []
+            );
+
+            // Average the value of the vectors outs
+            for (var v = 0; v < 3; v++) {
+                var addTo = indices[location + v];
+                if (typeof tangents[addTo] != "undefined") {
+                    tangents[addTo] = SceneJS_math_addVec3(tangents[addTo], tangent, []);
+                } else {
+                    tangents[addTo] = tangent;
+                }
+            }
+        }
+
+        // Deconstruct the vectors back into 1D arrays for WebGL
+
+        var tangents2 = [];
+
+        for (var i = 0; i < tangents.length; i++) {
+            tangents2 = tangents2.concat(tangents[i]);
+        }
+
+        return tangents2;
+    }
+
 })();;/**
  * Backend that tracks statistics on loading states of nodes during scene traversal.
  *
@@ -9171,6 +9251,12 @@ new (function () {
             var self = this;
 
             this._core.webglRestored = function () {
+
+                // Ensure that we recreate these in subsequent calls to
+                // core.getTangents and core.getPickPositions
+                self._core.tangentBufs = null;
+                self._core.pickPositionsBuf = null;
+
                 self._buildNodeCore(self._engine.canvas.gl, self._core);
             };
 
@@ -9284,6 +9370,10 @@ new (function () {
 
         // ----------------------------------------------------------
 
+        if (core.arrays.normals && core.arrays.uvs) {
+            core.arrays.tangents = [];
+        }
+
         if (data.colors) {
             if (data.colors.constructor != Float32Array) {
                 data.colors = new Float32Array(data.colors);
@@ -9301,17 +9391,33 @@ new (function () {
         }
 
         // Lazy-build tangents, only when needed as rendering
-        core.getTangents = function () {
-            if (core.tangentBuf) {
-                return core.tangentBuf;
+        core.getTangents = function (uvLayerIdx) {
+
+            // We're only allowed one normal map per drawable, but we'll
+            // cache tangents for each UV layer. In practice the cache would
+            // only contain one array of tangents, for the UV layer that
+            // happens to be used for normal mapping.
+
+            if (!core.tangentBufs) {
+                core.tangentBufs = [];
+            }
+            if (core.tangentBufs[uvLayerIdx]) {
+                return core.tangentBufs[uvLayerIdx];
             }
             var arrays = core.arrays;
-            if (arrays.positions && arrays.indices && arrays.uvs && arrays.uvs[0]) {
-                var gl = self._engine.canvas.gl;
-                var tangents = new Float32Array(self._buildTangents(arrays)); // Build tangents array;
-                core.arrays.tangents = tangents;
-                var usage = gl.STATIC_DRAW;
-                return core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, usage);
+            var tangents = core.arrays.tangents[uvLayerIdx];
+            if (!tangents) {
+                // Retaining tangents data after WebGL context recovery
+                if (arrays.positions && arrays.indices && arrays.uvs && arrays.uvs[uvLayerIdx]) {
+                    var gl = self._engine.canvas.gl;
+                    tangents = new Float32Array(SceneJS_math_buildTangents(arrays.positions, arrays.indices, arrays.uvs[uvLayerIdx])); // Build tangents array;
+                    core.arrays.tangents[uvLayerIdx] = tangents;
+                }
+            }
+            if (tangents) {
+                return core.tangentBufs[uvLayerIdx] = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, gl.STATIC_DRAW);
+            } else {
+                return null;
             }
         };
 
@@ -9459,9 +9565,16 @@ new (function () {
             core.colorBuf = null;
         }
 
-        if (core.tangentBuf) {
-            core.tangentBuf.destroy();
-            core.tangentBuf = null;
+        if (core.tangentBufs) {
+            var tangentBufs = core.tangentBufs;
+            var tangentBuf;
+            for (var j = 0, lenj = tangentBufs.length; j < lenj; j++) {
+                tangentBuf = tangentBufs[j];
+                if (tangentBuf) {
+                    tangentBuf.destroy();
+                }
+            }
+            core.tangentBufs = null;
         }
 
         if (core.indexBuf) {
@@ -9661,85 +9774,6 @@ new (function () {
         }
 
         data.normals = normals;
-    };
-
-
-    /**
-     * Builds vertex tangent vectors from positions, UVs and indices
-     *
-     * Based on code by @rollokb, in his fork of webgl-obj-loader:
-     * https://github.com/rollokb/webgl-obj-loader
-     *
-     * @private
-     **/
-    SceneJS.Geometry.prototype._buildTangents = function (arrays) {
-
-        var positions = arrays.positions;
-        var indices = arrays.indices;
-        var uv = arrays.uvs[0];
-
-        var tangents = [];
-
-        // The vertex arrays needs to be calculated
-        // before the calculation of the tangents
-
-        for (var location = 0; location < indices.length; location += 3) {
-
-            // Recontructing each vertex and UV coordinate into the respective vectors
-
-            var index = indices[location];
-
-            var v0 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv0 = [uv[index * 2], uv[(index * 2) + 1]];
-
-            index = indices[location + 1];
-
-            var v1 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv1 = [uv[index * 2], uv[(index * 2) + 1]];
-
-            index = indices[location + 2];
-
-            var v2 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv2 = [uv[index * 2], uv[(index * 2) + 1]];
-
-            var deltaPos1 = SceneJS_math_subVec3(v1, v0, []);
-            var deltaPos2 = SceneJS_math_subVec3(v2, v0, []);
-
-            var deltaUV1 = SceneJS_math_subVec2(uv1, uv0, []);
-            var deltaUV2 = SceneJS_math_subVec2(uv2, uv0, []);
-
-            var r = 1 / ((deltaUV1[0] * deltaUV2[1]) - (deltaUV1[1] * deltaUV2[0]));
-
-            var tangent = SceneJS_math_mulVec3Scalar(
-                SceneJS_math_subVec3(
-                    SceneJS_math_mulVec3Scalar(deltaPos1, deltaUV2[1], []),
-                    SceneJS_math_mulVec3Scalar(deltaPos2, deltaUV1[1], []),
-                    []
-                ),
-                r,
-                []
-            );
-
-            // Average the value of the vectors outs
-            for (var v = 0; v < 3; v++) {
-                var addTo = indices[location + v];
-                if (typeof tangents[addTo] != "undefined") {
-                    tangents[addTo] = SceneJS_math_addVec3(tangents[addTo], tangent, []);
-                } else {
-                    tangents[addTo] = tangent;
-                }
-            }
-        }
-
-        // Deconstruct the vectors back into 1D arrays for WebGL
-
-        var tangents2 = [];
-
-        for (var i = 0; i < tangents.length; i++) {
-            tangents2 = tangents2.concat(tangents[i]);
-        }
-
-        return tangents2;
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
@@ -9982,9 +10016,7 @@ new (function () {
             interleavedStride: core.interleavedStride,
             interleavedPositionOffset: core.interleavedPositionOffset,
             interleavedNormalOffset: core.interleavedNormalOffset,
-            interleavedUVOffset: core.interleavedUVOffset,
-            interleavedUV2Offset: core.interleavedUV2Offset,
-            interleavedUV3Offset: core.interleavedUV3Offset,
+            interleavedUVOffsets: core.interleavedUVOffsets,
             interleavedColorOffset: core.interleavedColorOffset,
             getPickIndices: core.getPickIndices,
             getPickPositions: core.getPickPositions,
@@ -10002,9 +10034,7 @@ new (function () {
                 core2.interleavedStride = coreStack[i].interleavedStride;
                 core2.interleavedPositionOffset = coreStack[i].interleavedPositionOffset;
                 core2.interleavedNormalOffset = coreStack[i].interleavedNormalOffset;
-                core2.interleavedUVOffset = coreStack[i].interleavedUVOffset;
-                core2.interleavedUV2Offset = coreStack[i].interleavedUV2Offset;
-                core2.interleavedUV3Offset = coreStack[i].interleavedUV3Offset;
+                core2.interleavedUVOffsets = coreStack[i].interleavedUVOffsets;
                 core2.interleavedColorOffset = coreStack[i].interleavedColorOffset;
                 return core2;
             }
@@ -11105,6 +11135,28 @@ new (function () {
                     self._buildPickPositions(indices);
                 }
                 return self._core.targets[index].pickPositionsBuf;
+            };
+
+            // For the morph target at the given index,
+            // returns tangents for normal mapping
+            // lazy-generated from the given indices if not yet existing.
+
+            this._core.getTangents = function (index, indices, uv) {
+                var core = self._core;
+                var target = core.targets[index];
+                if (target.tangentBuf) {
+                    return target.tangentBuf;
+                }
+                var positions = target.positions;
+                uv = target.uv || uv;
+                if (positions && indices && uv) {
+                    var gl = self._engine.canvas.gl;
+                    var tangents = new Float32Array(SceneJS_math_buildTangents(positions, indices, uv));
+                    target.tangents = tangents;
+                    var usage = gl.STATIC_DRAW;
+                    target.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, usage);
+                    return target.tangentBuf;
+                }
             };
 
             this.setFactor(params.factor);
@@ -12690,6 +12742,13 @@ SceneJS.Scene.prototype.renderFrame = function (params) {
 };
 
 /**
+ * Force compilation of the scene graph.
+ */
+SceneJS.Scene.prototype.compile = function (params) {
+    return this._engine.compile();
+};
+
+/**
  * Signals that a new frame will be needed
  * @param params
  */
@@ -13883,22 +13942,19 @@ new (function () {
 
         if (this._core.useCount == 1) { // This node is the resource definer
 
-            if (params.applyFrom) {
-
-                var applyFrom = params.applyFrom;
-
-                if (applyFrom !== "normal" &&
-                    applyFrom !== "geometry" &&
-                    applyFrom !== "uv") {
-
-                    var matches = applyFrom.match(/uv\d+/);
-
-                    if (!matches || matches.length === 0) {
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture applyFrom value is unsupported - " +
-                            "should be either 'uv', 'uv2', 'normal' or 'geometry'");
-                    }
+            var applyFrom = params.applyFrom || "uv";
+            if (applyFrom.substring(0,2) !== "uv") {
+                    throw SceneJS_error.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "texture applyFrom value is unsupported - should be 'uv<index>'");
+            }
+            var uvLayerIdx = 0;
+            if (applyFrom !== "uv") {
+                uvLayerIdx = applyFrom.substring(2);
+                if (isNaN(uvLayerIdx)) {
+                    throw SceneJS_error.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "texture applyFrom value invalid - should be 'uv<index>'");
                 }
             }
 
@@ -13937,7 +13993,9 @@ new (function () {
             SceneJS._apply({
                     waitForLoad: params.waitForLoad == undefined ? true : params.waitForLoad,
                     texture: null,
-                    applyFrom: !!params.applyFrom ? params.applyFrom : "uv",
+                    uvLayerIdx: uvLayerIdx,
+                    isNormalMap: params.applyTo === "normals",
+                    applyFrom: applyFrom,
                     applyTo: !!params.applyTo ? params.applyTo : "baseColor",
                     blendMode: !!params.blendMode ? params.blendMode : "multiply",
                     blendFactor: (params.blendFactor != undefined && params.blendFactor != null) ? params.blendFactor : 1.0,
@@ -14277,283 +14335,6 @@ new (function () {
     };
 
     SceneJS.TextureMap.prototype._destroy = function () {
-        if (this._core.useCount == 1) { // Last core user
-            if (this._core.texture && !this._core.target) { // Don't wipe out target texture
-                this._core.texture.destroy();
-                this._core.texture = null;
-            }
-        }
-        if (this._core) {
-            this._engine._coreFactory.putCore(this._core);
-        }
-    };
-
-})();;/**
- * @class Scene graph node which defines textures to apply to the objects in its subgraph
- * @extends SceneJS.Node
- */
-new (function () {
-
-    // The default state core singleton for {@link SceneJS.Texture} nodes
-    var defaultCore = {
-        type: "decal",
-        stateId: SceneJS._baseStateId++,
-        empty: true,
-        hash: ""
-    };
-
-    SceneJS_events.addListener(
-        SceneJS_events.SCENE_COMPILING,
-        function (params) {
-            params.engine.display.decal = defaultCore;
-            stackLen = 0;
-        });
-
-    var coreStack = [];
-    var stackLen = 0;
-
-    /**
-     * @class Scene graph node which defines a texture for drawinging on the {@link SceneJS.Geometry} nodes in its subgraph
-     * @extends SceneJS.Node
-     */
-    SceneJS.Decal = SceneJS_NodeFactory.createNodeType("decal");
-
-    SceneJS.Decal.prototype._init = function (params) {
-
-        var self = this;
-
-        if (this._core.useCount == 1) { // This node is the resource definer
-
-            if (params.applyFrom) {
-                if (params.applyFrom != "uv" &&
-                    params.applyFrom != "uv2") {
-                    throw SceneJS_error.fatalError(
-                        SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "decal applyFrom value is unsupported - " +
-                        "should be either 'uv' or 'uv2'");
-                }
-            }
-
-            if (params.applyTo) {
-                if (params.applyTo != "baseColor" && // Colour map (deprecated)
-                    params.applyTo != "color" && // Colour map
-                    params.applyTo != "specular" && // Specular map
-                    params.applyTo != "emit" && // Emission map
-                    params.applyTo != "alpha" && // Alpha map
-                    params.applyTo != "normals" && // Normal map
-                    params.applyTo != "shine") { // Shininess map
-                    throw SceneJS_error.fatalError(
-                        SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "decal applyTo value is unsupported - " +
-                        "should be either 'color', 'baseColor', 'specular' or 'normals'");
-                }
-            }
-
-            if (params.blendMode) {
-                if (params.blendMode != "add" && params.blendMode != "multiply") {
-                    throw SceneJS_error.fatalError(
-                        SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "decal layer blendMode value is unsupported - " +
-                        "should be either 'add' or 'multiply'");
-                }
-            }
-
-            if (params.applyTo == "color") {
-                params.applyTo = "baseColor";
-            }
-
-            SceneJS._apply({
-                    texture: null,
-                    applyFrom: !!params.applyFrom ? params.applyFrom : "uv",
-                    applyTo: !!params.applyTo ? params.applyTo : "baseColor",
-                    blendMode: !!params.blendMode ? params.blendMode : "multiply",
-                    blendFactor: (params.blendFactor != undefined && params.blendFactor != null) ? params.blendFactor : 1.0,
-                    translate: params.translate ? SceneJS._apply(params.translate, {x: 0, y: 0}) : {x: 0, y: 0},
-                    scale: params.scale ? SceneJS._apply(params.scale, {x: 1, y: 1}) : {x: 1, y: 1},
-                    rotate: params.rotate || 0,
-                    matrix: null,
-                    _matrixDirty: true,
-                    buildMatrix: buildMatrix
-                },
-                this._core);
-
-            buildMatrix.call(this._core);
-
-            this._setTextureImage(params.image);
-
-            this._core.webglRestored = function () {
-                self._setTextureImage(self._core.image);
-            };
-        }
-    };
-
-    function buildMatrix() {
-        var matrix;
-        var t;
-        if (this.translate.x != 0 || this.translate.y != 0) {
-            matrix = SceneJS_math_translationMat4v([this.translate.x || 0, this.translate.y || 0, 0]);
-        }
-        if (this.scale.x != 1 || this.scale.y != 1) {
-            t = SceneJS_math_scalingMat4v([this.scale.x || 1, this.scale.y || 1, 1]);
-            matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
-        }
-        if (this.rotate != 0) {
-            t = SceneJS_math_rotationMat4v(this.rotate * 0.0174532925, [0, 0, 1]);
-            matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
-        }
-        if (matrix) {
-            this.matrix = matrix;
-            if (!this.matrixAsArray) {
-                this.matrixAsArray = new Float32Array(this.matrix);
-            } else {
-                this.matrixAsArray.set(this.matrix);
-            }
-        }
-        this._matrixDirty = false;
-    }
-
-    SceneJS.Decal.prototype._setTextureImage = function (image) {
-
-        var gl = this._engine.canvas.gl;
-        var texture = this._core.texture ? this._core.texture.texture : gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, SceneJS._webgl.ensureImageSizePowerOfTwo(image));
-
-        this._core.texture = new SceneJS._webgl.Texture2D(gl, {
-            texture: texture,
-            minFilter: this._getGLOption("minFilter", gl.LINEAR_MIPMAP_NEAREST),
-            magFilter: this._getGLOption("magFilter", gl.LINEAR),
-            wrapS: this._getGLOption("wrapS", gl.REPEAT),
-            wrapT: this._getGLOption("wrapT", gl.REPEAT),
-            isDepth: this._getOption(this._core.isDepth, false),
-            depthMode: this._getGLOption("depthMode", gl.LUMINANCE),
-            depthCompareMode: this._getGLOption("depthCompareMode", gl.COMPARE_R_TO_TEXTURE),
-            depthCompareFunc: this._getGLOption("depthCompareFunc", gl.LEQUAL),
-            flipY: this._getOption(this._core.flipY, true),
-            width: this._getOption(this._core.width, 1),
-            height: this._getOption(this._core.height, 1),
-            internalFormat: this._getGLOption("internalFormat", gl.ALPHA),
-            sourceFormat: this._getGLOption("sourceFormat", gl.ALPHA),
-            sourceType: this._getGLOption("sourceType", gl.UNSIGNED_BYTE),
-            update: null
-        });
-
-        this._core.image = image;
-
-        this._engine.display.imageDirty = true;
-    };
-
-    SceneJS.Decal.prototype._getGLOption = function (name, defaultVal) {
-        var gl = this._engine.canvas.gl;
-        var value = this._core[name];
-        if (value == undefined) {
-            return defaultVal;
-        }
-        var glName = SceneJS._webgl.enumMap[value];
-        if (glName == undefined) {
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Unrecognised value for texture node property '" + name + "' value: '" + value + "'");
-        }
-        return gl[glName];
-    };
-
-    SceneJS.Decal.prototype._getOption = function (value, defaultVal) {
-        return (value == undefined) ? defaultVal : value;
-    };
-
-    SceneJS.Decal.prototype.setImage = function (image) {
-        this._core.image = image;
-        this._core.src = null;
-        this._core.target = null;
-        this._setTextureImage(image);
-    };
-
-    /**
-     * Sets the texture's blend factor with respect to other active textures.
-     * @param {number} blendFactor The blend factor, in range [0..1]
-     */
-    SceneJS.Decal.prototype.setBlendFactor = function (blendFactor) {
-        this._core.blendFactor = blendFactor;
-        this._engine.display.imageDirty = true;
-    };
-
-    SceneJS.Decal.prototype.getBlendFactor = function () {
-        return this._core.blendFactor;
-    };
-
-    SceneJS.Decal.prototype.setTranslate = function (t) {
-        if (!this._core.translate) {
-            this._core.translate = {x: 0, y: 0};
-        }
-        this._core.translate.x = t.x;
-        this._core.translate.y = t.y;
-        this._core._matrixDirty = true;
-        this._engine.display.imageDirty = true;
-    };
-
-    SceneJS.Decal.prototype.getTranslate = function () {
-        return this._core.translate;
-    };
-
-    SceneJS.Decal.prototype.setScale = function (s) {
-        if (!this._core.scale) {
-            this._core.scale = {x: 0, y: 0};
-        }
-        this._core.scale.x = s.x;
-        this._core.scale.y = s.y;
-        this._core._matrixDirty = true;
-        this._engine.display.imageDirty = true;
-    };
-
-    SceneJS.Decal.prototype.getScale = function () {
-        return this._core.scale;
-    };
-
-    SceneJS.Decal.prototype.setRotate = function (angle) {
-        this._core.rotate = angle;
-        this._core._matrixDirty = true;
-        this._engine.display.imageDirty = true;
-    };
-
-    SceneJS.Decal.prototype.getRotate = function () {
-        return this._core.rotate;
-    };
-
-    SceneJS.Decal.prototype.getMatrix = function () {
-        if (this._core._matrixDirty) {
-            this._core.buildMatrix.call(this.core)()
-        }
-        return this.core.matrix;
-    };
-
-    SceneJS.Decal.prototype._compile = function (ctx) {
-        this._makeHash();
-        coreStack[stackLen++] = this._core;
-        this._engine.display.decal = this._core;
-        this._compileNodes(ctx);
-        this._engine.display.decal = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
-    };
-
-    SceneJS.Decal.prototype._makeHash = function () {
-        var hash;
-        var hashParts = [];
-        hashParts.push("/");
-        hashParts.push(this._core.applyFrom);
-        hashParts.push("/");
-        hashParts.push(this._core.applyTo);
-        hashParts.push("/");
-        hashParts.push(this._core.blendMode);
-        if (this._core.matrix) {
-            hashParts.push("/anim");
-        }
-        hash = hashParts.join("");
-        if (this._core.hash != hash) {
-            this._core.hash = hash;
-        }
-    };
-
-    SceneJS.Decal.prototype._destroy = function () {
         if (this._core.useCount == 1) { // Last core user
             if (this._core.texture && !this._core.target) { // Don't wipe out target texture
                 this._core.texture.destroy();
@@ -14972,6 +14753,24 @@ new (function () {
                 },
                 this._core);
 
+            // Index of UV layer for this region map
+
+            var applyFrom = params.applyFrom || "uv";
+            if (applyFrom.substring(0,2) !== "uv") {
+                throw SceneJS_error.fatalError(
+                    SceneJS.errors.NODE_CONFIG_EXPECTED,
+                    "texture applyFrom value is unsupported - should be 'uv<index>'");
+            }
+            var uvLayerIdx = 0;
+            if (applyFrom !== "uv") {
+                uvLayerIdx = applyFrom.substring(2);
+                if (isNaN(uvLayerIdx)) {
+                    throw SceneJS_error.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "texture applyFrom value invalid - should be 'uv<index>'");
+                }
+            }
+            this._core.uvLayerIdx = uvLayerIdx;
 
             if (params.src) {
 
@@ -16255,12 +16054,6 @@ var SceneJS_Display = function (cfg) {
     this.texture = null;
 
     /**
-     * Node state core for the last {@link SceneJS.Decal} visited during scene graph compilation traversal
-     * @type Object
-     */
-    this.decal = null;
-
-    /**
      * Node state core for the last {@link SceneJS.Fresnel} visited during scene graph compilation traversal
      * @type Object
      */
@@ -16504,7 +16297,6 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     object.layer = this.layer;
     object.renderTarget = this.renderTarget;
     object.texture = this.texture;
-    object.decal = this.decal;
     object.cubemap = this.cubemap;
     object.geometry = this.geometry;
     object.morphGeometry = this.morphGeometry;
@@ -16521,7 +16313,6 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
         this.clips.hash,
         this.morphGeometry.hash,
         this.texture.hash,
-        this.decal.hash,
         this.fresnel.hash,
         this.cubemap.hash,
         this.lights.hash,
@@ -16556,15 +16347,14 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 11, "lights", this.lights);
     this._setChunk(object, 12, "material", this.material);
     this._setChunk(object, 13, "texture", this.texture);
-    this._setChunk(object, 14, "decal", this.decal);
-    this._setChunk(object, 15, "regionMap", this.regionMap);
-    this._setChunk(object, 16, "fresnel", this.fresnel);
-    this._setChunk(object, 17, "cubemap", this.cubemap);
-    this._setChunk(object, 18, "clips", this.clips);
-    this._setChunk(object, 19, "renderer", this.renderer);
-    this._setChunk(object, 20, "geometry", this.morphGeometry, this.geometry);
-    this._setChunk(object, 21, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 22, "draw", this.geometry); // Must be last
+    this._setChunk(object, 14, "regionMap", this.regionMap);
+    this._setChunk(object, 15, "fresnel", this.fresnel);
+    this._setChunk(object, 16, "cubemap", this.cubemap);
+    this._setChunk(object, 17, "clips", this.clips);
+    this._setChunk(object, 18, "renderer", this.renderer);
+    this._setChunk(object, 19, "geometry", this.morphGeometry, this.geometry);
+    this._setChunk(object, 20, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 21, "draw", this.geometry); // Must be last
 
     // At the very least, the object sort order
     // will need be recomputed
@@ -17417,7 +17207,7 @@ SceneJS_Display.prototype._logPickList = function () {
 
                 var uvLayers = geometry.arrays.uvs;
 
-                if (uvLayers.length > 0) {
+                if (uvLayers && uvLayers.length > 0) {
 
                     hit.uvs = []; // TODO: Optimize for GC
 
@@ -17610,6 +17400,9 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.transparent = false;
     frameCtx.ambientColor = this._ambientColor;
     frameCtx.aspect = this._canvas.canvas.width / this._canvas.canvas.height;
+    frameCtx.texture = null;
+    frameCtx.normalMapUVLayerIdx = -1;
+    frameCtx.regionMapUVLayerIdx = -1;
 
     // The extensions needs to be re-queried in case the context was lost and has been recreated.
     if (SceneJS.WEBGL_INFO.SUPPORTED_EXTENSIONS["OES_element_index_uint"]) {
@@ -17769,7 +17562,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var cache = {}; // Source codes are shared across all scenes
 
     var states; // Cache rendering state
-    var decal;
     var diffuseFresnel;
     var specularFresnel;
     var alphaFresnel;
@@ -17805,7 +17597,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         states = _states;
 
-        decal = states.decal && states.decal.texture;
         diffuseFresnel = states.fresnel.diffuse;
         specularFresnel = states.fresnel.specular;
         alphaFresnel = states.fresnel.alpha;
@@ -18083,7 +17874,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (decal || texturing) {
+        if (texturing) {
 
             uvBufs = states.geometry.uvBufs;
 
@@ -18107,7 +17898,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("varying vec4 SCENEJS_vViewVertex;");              // Varying for fragment view clip hook
 
-        if (decal || texturing) {                                            // Varyings for fragment texturing
+        if ( texturing) {                                            // Varyings for fragment texturing
 
             uvBufs = states.geometry.uvBufs;
 
@@ -18134,6 +17925,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 if (states.morphGeometry.targets[0].normalBuf) {
                     add("attribute vec3 SCENEJS_aMorphNormal;");
                 }
+            }
+            if (tangents) {
+                //if (states.morphGeometry.targets[0].normalBuf) {
+                    add("attribute vec3 SCENEJS_aMorphTangent;");
+               // }
             }
         }
 
@@ -18163,6 +17959,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("void main(void) {");
 
+        if (tangents) {
+            add("vec3 modelTangent = SCENEJS_aTangent.xyz;");
+        }
+
         add("  vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
 
         add("  vec4 modelVertex = tmpVertex; ");
@@ -18182,6 +17982,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     add("  vec4 vMorphNormal = vec4(SCENEJS_aMorphNormal, 1.0); ");
                     add("  modelNormal = vec4( mix(modelNormal.xyz, vMorphNormal.xyz, SCENEJS_uMorphFactor), 1.0); ");
                 }
+            }
+            if (tangents) {
+                add("  modelTangent = mix(modelTangent, SCENEJS_aMorphTangent, SCENEJS_uMorphFactor); ");
             }
         }
 
@@ -18268,11 +18071,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             // Compute tangent-bitangent-normal matrix
 
-            add("vec3 tangent = normalize((viewNormalMatrix * modelNormalMatrix * SCENEJS_aTangent).xyz);");
-            add("vec3 bitangent = cross(SCENEJS_vViewNormal, tangent);");
-            add("mat3 TBM = mat3(tangent, bitangent, SCENEJS_vViewNormal);");
+            add("modelTangent = normalize((viewNormalMatrix * modelNormalMatrix * vec4(modelTangent, 1.0)).xyz);");
+            add("vec3 bitangent = cross(SCENEJS_vViewNormal, modelTangent);");
+            add("mat3 TBM = mat3(modelTangent, bitangent, SCENEJS_vViewNormal);");
 
-            add("SCENEJS_vTangent = tangent;");
+            add("SCENEJS_vTangent = modelTangent;");
         }
 
         add("SCENEJS_vViewEyeVec = ((viewMatrix * vec4(SCENEJS_uWorldEye, 0.0)).xyz  - viewVertex.xyz);");
@@ -18282,7 +18085,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("SCENEJS_vViewEyeVec *= TBM;");
         }
 
-        if (decal || texturing) {
+        if (texturing) {
 
             uvBufs = states.geometry.uvBufs;
 
@@ -18369,7 +18172,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (decal || texturing) {
+        if (texturing) {
             var uvBufs = states.geometry.uvBufs;
             if (uvBufs) {
                 for (var i = 0, len = uvBufs.length; i < len; i++) {
@@ -18379,13 +18182,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
             }
 
-            if (decal) {
-                add("uniform sampler2D SCENEJS_uDecalSampler;");
-                if (states.decal.matrix) {
-                    add("uniform mat4 SCENEJS_uDecalMatrix;");
-                }
-                add("uniform float SCENEJS_uDecalBlendFactor;");
-            }
             if (texturing) {
                 var layer;
                 for (var i = 0, len = states.texture.layers.length; i < len; i++) {
@@ -18635,7 +18431,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         var layer;
-        if (decal || texturing) {
+        if (texturing) {
 
             add("  vec4    texturePos;");
             add("  vec2    textureCoord=vec2(0.0,0.0);");
@@ -18731,99 +18527,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (layer.applyTo == "normals" && normals) {
                         add("viewNormalVec = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
                     }
-                }
-            }
-
-            // ------------ Decal texture ------------------------------------
-
-            if (decal) {
-
-                if (states.decal.applyFrom == "normal" && normals) {
-                    if (states.geometry.normalBuf) {
-                        add("texturePos=vec4(viewNormalVec.xyz, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture decal applyFrom='normal' but geo has no normal vectors");
-                    }
-                }
-
-                if (states.decal.applyFrom == "uv") {
-                    if (states.geometry.uvBuf) {
-                        add("texturePos = vec4(SCENEJS_vUVCoord.s, SCENEJS_vUVCoord.t, 1.0, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture decal applyTo='uv' but geometry has no UV coordinates");
-                    }
-                }
-
-                if (states.decal.applyFrom == "uv2") {
-                    if (states.geometry.uvBuf2) {
-                        add("texturePos = vec4(SCENEJS_vUVCoord2.s, SCENEJS_vUVCoord2.t, 1.0, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture decal applyTo='uv2' but geometry has no UV2 coordinates");
-                    }
-                }
-
-                if (states.decal.applyFrom == "uv3") {
-                    if (states.geometry.uvBuf3) {
-                        add("texturePos = vec4(SCENEJS_vUVCoord3.s, SCENEJS_vUVCoord3.t, 1.0, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture decal applyTo='uv3' but geometry has no UV3 coordinates");
-                    }
-                }
-
-                // Decal texture matrix
-
-                if (states.decal.matrix) {
-                    add("textureCoord=(SCENEJS_uDecalMatrix * texturePos).xy;");
-                } else {
-                    add("textureCoord=texturePos.xy;");
-                }
-
-                // Alpha from Texture
-
-                if (states.decal.applyTo == "alpha") {
-                    if (states.decal.blendMode == "multiply") {
-                        add("alpha = alpha * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
-                    } else if (states.decal.blendMode == "add") {
-                        add("alpha = ((1.0 - SCENEJS_uDecalBlendFactor) * alpha) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
-                    }
-                }
-
-                // Texture output
-
-                if (states.decal.applyTo == "baseColor") {
-                    if (states.decal.blendMode == "multiply") {
-                        add("color = color * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
-                    } else {
-                        add("color = ((1.0 - SCENEJS_uDecalBlendFactor) * color) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
-                    }
-                }
-
-                if (states.decal.applyTo == "emit") {
-                    if (states.decal.blendMode == "multiply") {
-                        add("emit  = emit * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    } else {
-                        add("emit = ((1.0 - SCENEJS_uDecalBlendFactor) * emit) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    }
-                }
-
-                if (states.decal.applyTo == "specular" && normals) {
-                    if (states.decal.blendMode == "multiply") {
-                        add("specular  = specular * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    } else {
-                        add("specular = ((1.0 - SCENEJS_uDecalBlendFactor) * specular) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    }
-                }
-
-                if (states.decal.applyTo == "shine") {
-                    if (states.decal.blendMode == "multiply") {
-                        add("shine  = shine * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    } else {
-                        add("shine = ((1.0 - SCENEJS_uDecalBlendFactor) * shine) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    }
-                }
-
-                if (states.decal.applyTo == "normals" && normals) {
-                    add("viewNormalVec = normalize(texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
                 }
             }
         }
@@ -20051,6 +19754,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         this._aMorphVertexDraw = draw.getAttribute("SCENEJS_aMorphVertex");
         this._aMorphNormalDraw = draw.getAttribute("SCENEJS_aMorphNormal");
+        this._aMorphTangentDraw = draw.getAttribute("SCENEJS_aMorphTangent");
         this._uMorphFactorDraw = draw.getUniform("SCENEJS_uMorphFactor");
 
         var pick = this.program.pick;
@@ -20076,12 +19780,16 @@ SceneJS_ChunkFactory.createChunkType({
         }
     },
 
-    morphDraw: function () {
+    morphDraw: function (frameCtx) {
+
         this.VAOMorphKey1 = this.core.key1;
         this.VAOMorphKey2 = this.core.key2;
 
-        var target1 = this.core.targets[this.core.key1]; // Keys will update
-        var target2 = this.core.targets[this.core.key2];
+        var key1 = this.core.key1;
+        var key2 = this.core.key2;
+
+        var target1 = this.core.targets[key1]; // Keys will update
+        var target2 = this.core.targets[key2];
 
         if (this._aMorphVertexDraw) {
             this._aVertexDraw.bindFloatArrayBuffer(target1.vertexBuf);
@@ -20097,16 +19805,38 @@ SceneJS_ChunkFactory.createChunkType({
             this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
         }
 
-        if (this._aUVDraw) {
-            this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
+        if (this._aMorphTangentDraw || this._aTangentDraw) {
+
+            // Bind tangent arrays from geometry and morphGeometry
+
+            // In the texture chunk we remembered which UV layer we're using for the normal
+            // map so that we can lazy-generate the tangents from the appropriate UV layer
+            // in the geometry chunk.
+
+            // Note that only one normal map is allowed per drawable, so there
+            // will be only one UV layer used for normal mapping.
+
+            var normalMapUVLayerIdx = frameCtx.normalMapUVLayerIdx;
+            if (normalMapUVLayerIdx >= 0) {
+                if (this._aMorphTangentDraw) {
+                    this._aTangentDraw.bindFloatArrayBuffer(this.core.getTangents(key1, this.core2.arrays.indices, this.core2.arrays.uvs[normalMapUVLayerIdx]));
+                    this._aMorphTangentDraw.bindFloatArrayBuffer(this.core.getTangents(key2, this.core2.arrays.indices, this.core2.arrays.uvs[normalMapUVLayerIdx]));
+                } else if (this._aTangentDraw) {
+
+                    // TODO: What's this for?
+                    //this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf);
+                }
+            }
         }
 
-        if (this._aUV2Draw) {
-            this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
-        }
+        // Bind UV layer from geometry
 
-        if (this._aUV3Draw) {
-            this._aUV3Draw.bindFloatArrayBuffer(this.core2.uvBuf3);
+        var uvBuf;
+        for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
+            uvBuf = this.core2.uvBufs[i];
+            if (uvBuf) {
+                this._aUVDraw[i].bindFloatArrayBuffer(uvBuf);
+            }
         }
 
         if (this._aColorDraw) {
@@ -20128,7 +19858,7 @@ SceneJS_ChunkFactory.createChunkType({
         var doMorph = this.core.targets && this.core.targets.length;
         var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
-        if (this.VAO) {
+        if (this.VAO && frameCtx.VAO) { // Workaround for https://github.com/xeolabs/scenejs/issues/459
             frameCtx.VAO.bindVertexArrayOES(this.VAO);
             if (doMorph) {
                 if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {
@@ -20146,7 +19876,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (doMorph) {
-            this.morphDraw();
+            this.morphDraw(frameCtx);
         } else {
             if (cleanInterleavedBuf) {
                 this.VAOHasInterleavedBuf = true;
@@ -20162,12 +19892,6 @@ SceneJS_ChunkFactory.createChunkType({
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
-                }
-                if (this._aTangentDraw) {
-
-                    // Lazy-compute tangents as soon as needed.
-                    // Unfortunately we can't include them in interleaving because that happened earlier.
-                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangents());
                 }
             } else {
                 this.VAOHasInterleavedBuf = false;
@@ -20187,20 +19911,35 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
                 }
-                if (this._aTangentDraw) {
+            }
 
-                    // Lazy-compute tangents
-                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangents());
+            if (this._aTangentDraw) {
+
+                // In the texture chunk we remembered which UV layer we're using for the normal
+                // map so that we can lazy-generate the tangents from the appropriate UV layer
+                // in the geometry chunk.
+
+                // Note that only one normal map is allowed per drawable, so there
+                // will be only one UV layer used for normal mapping.
+
+                var normalMapUVLayerIdx = frameCtx.normalMapUVLayerIdx;
+                if (normalMapUVLayerIdx >= 0) {
+                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.getTangents(normalMapUVLayerIdx));
                 }
             }
         }
 
         if (this._aRegionMapUVDraw) {
-            this._aRegionMapUVDraw.bindFloatArrayBuffer(this.core2.uvBufs[0]); // TODO: Make region maps work with all UV layers
+            var regionMapUVLayerIdx = frameCtx.regionMapUVLayerIdx; // Set by regionMapChunk
+            if (regionMapUVLayerIdx >= 0) {
+                var uvBufs = this.core2.uvBufs;
+                if (regionMapUVLayerIdx < uvBufs.length) {
+                    this._aRegionMapUVDraw.bindFloatArrayBuffer(uvBufs[regionMapUVLayerIdx]);
+                }
+            }
         }
 
         this.core2.indexBuf.bind();
-
     },
 
     morphPick: function (frameCtx) {
@@ -20278,7 +20017,7 @@ SceneJS_ChunkFactory.createChunkType({
                 }
 
                 if (this._aRegionMapUVPick) {
-                    this._aRegionMapUVPick.bindFloatArrayBuffer(core2.uvBufs[0]); // TODO: Make region maps work with all UV layers
+                    this._aRegionMapUVPick.bindFloatArrayBuffer(core2.uvBufs[frameCtx.regionMapUVLayerIdx]); // Set by regionMapChunk
                 }
 
                 core2.indexBuf.bind();
@@ -20608,7 +20347,6 @@ SceneJS_ChunkFactory.createChunkType({
 
             this.program.draw.bindTexture(this._uRegionMapSampler, texture, frameCtx.textureUnit);
             frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
-
         }
 
         var gl = this.program.gl;
@@ -20635,16 +20373,25 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.transparent = transparent;
         }
 
-        if (this._uRegionMapRegionColor) {
-            this._uRegionMapRegionColor.setValue(this.core.regionColor);
-        }
+        if (texture) {
 
-        if (this._uRegionMapHighlightFactor) {
-            this._uRegionMapHighlightFactor.setValue(this.core.highlightFactor);
-        }
+            if (this._uRegionMapRegionColor) {
+                this._uRegionMapRegionColor.setValue(this.core.regionColor);
+            }
 
-        if (this._uRegionMapHideAlpha) {
-            this._uRegionMapHideAlpha.setValue(this.core.hideAlpha);
+            if (this._uRegionMapHighlightFactor) {
+                this._uRegionMapHighlightFactor.setValue(this.core.highlightFactor);
+            }
+
+            if (this._uRegionMapHideAlpha) {
+                this._uRegionMapHideAlpha.setValue(this.core.hideAlpha);
+            }
+
+            frameCtx.regionMapUVLayerIdx = this.core.uvLayerIdx;
+
+        } else {
+
+            frameCtx.regionMapUVLayerIdx = -1;
         }
     },
 
@@ -20661,6 +20408,11 @@ SceneJS_ChunkFactory.createChunkType({
             this.program.pick.bindTexture(this._uRegionMapSampler, texture, frameCtx.textureUnit);
             frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
 
+            frameCtx.regionMapUVLayerIdx = this.core.uvLayerIdx;
+
+        } else {
+
+            frameCtx.regionMapUVLayerIdx = -1;
         }
     }
 });;/**
@@ -20884,6 +20636,7 @@ SceneJS_ChunkFactory.createChunkType({
     draw : function(frameCtx) {
 
         frameCtx.textureUnit = 0;
+        frameCtx.normalMapUVLayerIdx = -1;
 
         var layers = this.core.layers;
 
@@ -20913,55 +20666,25 @@ SceneJS_ChunkFactory.createChunkType({
                         this._uTexBlendFactor[i].setValue(layer.blendFactor);
                     }
 
+                    if (layer.isNormalMap) {
+
+                        // Remember which UV layer we're using for the normal
+                        // map so that we can lazy-generate the tangents from the
+                        // appropriate UV layer in the geometry chunk.
+
+                        // Note that only one normal map is allowed per drawable, so there
+                        // will be only one UV layer used for normal mapping.
+
+                        frameCtx.normalMapUVLayerIdx = layer.uvLayerIdx;
+                    }
+
                 } else {
                      // draw.bindTexture(this._uTexSampler[i], null, i); // Unbind
                 }
             }
         }
 
-    }
-});;SceneJS_ChunkFactory.createChunkType({
-
-    type: "decal",
-
-    build: function () {
-
-        var draw = this.program.draw;
-
-        this._uDecalSampler = "SCENEJS_uDecalSampler";
-        this._uDecalMatrix = draw.getUniform("SCENEJS_uDecalMatrix");
-        this._uDecalBlendFactor = draw.getUniform("SCENEJS_uDecalBlendFactor");
-    },
-
-    draw: function (frameCtx) {
-
-        // Previous "texture" chunk will have reset frameCtx.textureUnit to zero,
-        // then advanced it by however many textures that chunk applied.
-
-        var core = this.core;
-
-        if (this._uDecalSampler && core.texture) {
-
-            var draw = this.program.draw;
-
-            draw.bindTexture(this._uDecalSampler, core.texture, frameCtx.textureUnit);
-            frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
-
-            if (core._matrixDirty && core.buildMatrix) {
-                core.buildMatrix.call(core);
-            }
-
-            if (this._uDecalMatrix) {
-                this._uDecalMatrix.setValue(core.matrixAsArray);
-            }
-
-            if (this._uDecalBlendFactor) {
-                this._uDecalBlendFactor.setValue(core.blendFactor);
-            }
-
-        } else {
-            // draw.bindTexture(this._uTexSampler[i], null, i); // Unbind
-        }
+        frameCtx.texture = this.core;
     }
 });;SceneJS_ChunkFactory.createChunkType({
 

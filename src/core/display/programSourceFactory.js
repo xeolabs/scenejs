@@ -7,7 +7,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var cache = {}; // Source codes are shared across all scenes
 
     var states; // Cache rendering state
-    var decal;
     var diffuseFresnel;
     var specularFresnel;
     var alphaFresnel;
@@ -43,7 +42,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         states = _states;
 
-        decal = states.decal && states.decal.texture;
         diffuseFresnel = states.fresnel.diffuse;
         specularFresnel = states.fresnel.specular;
         alphaFresnel = states.fresnel.alpha;
@@ -321,7 +319,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (decal || texturing) {
+        if (texturing) {
 
             uvBufs = states.geometry.uvBufs;
 
@@ -345,7 +343,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("varying vec4 SCENEJS_vViewVertex;");              // Varying for fragment view clip hook
 
-        if (decal || texturing) {                                            // Varyings for fragment texturing
+        if ( texturing) {                                            // Varyings for fragment texturing
 
             uvBufs = states.geometry.uvBufs;
 
@@ -372,6 +370,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 if (states.morphGeometry.targets[0].normalBuf) {
                     add("attribute vec3 SCENEJS_aMorphNormal;");
                 }
+            }
+            if (tangents) {
+                //if (states.morphGeometry.targets[0].normalBuf) {
+                    add("attribute vec3 SCENEJS_aMorphTangent;");
+               // }
             }
         }
 
@@ -401,6 +404,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("void main(void) {");
 
+        if (tangents) {
+            add("vec3 modelTangent = SCENEJS_aTangent.xyz;");
+        }
+
         add("  vec4 tmpVertex=vec4(SCENEJS_aVertex, 1.0); ");
 
         add("  vec4 modelVertex = tmpVertex; ");
@@ -420,6 +427,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     add("  vec4 vMorphNormal = vec4(SCENEJS_aMorphNormal, 1.0); ");
                     add("  modelNormal = vec4( mix(modelNormal.xyz, vMorphNormal.xyz, SCENEJS_uMorphFactor), 1.0); ");
                 }
+            }
+            if (tangents) {
+                add("  modelTangent = mix(modelTangent, SCENEJS_aMorphTangent, SCENEJS_uMorphFactor); ");
             }
         }
 
@@ -506,11 +516,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             // Compute tangent-bitangent-normal matrix
 
-            add("vec3 tangent = normalize((viewNormalMatrix * modelNormalMatrix * SCENEJS_aTangent).xyz);");
-            add("vec3 bitangent = cross(SCENEJS_vViewNormal, tangent);");
-            add("mat3 TBM = mat3(tangent, bitangent, SCENEJS_vViewNormal);");
+            add("modelTangent = normalize((viewNormalMatrix * modelNormalMatrix * vec4(modelTangent, 1.0)).xyz);");
+            add("vec3 bitangent = cross(SCENEJS_vViewNormal, modelTangent);");
+            add("mat3 TBM = mat3(modelTangent, bitangent, SCENEJS_vViewNormal);");
 
-            add("SCENEJS_vTangent = tangent;");
+            add("SCENEJS_vTangent = modelTangent;");
         }
 
         add("SCENEJS_vViewEyeVec = ((viewMatrix * vec4(SCENEJS_uWorldEye, 0.0)).xyz  - viewVertex.xyz);");
@@ -520,7 +530,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("SCENEJS_vViewEyeVec *= TBM;");
         }
 
-        if (decal || texturing) {
+        if (texturing) {
 
             uvBufs = states.geometry.uvBufs;
 
@@ -607,7 +617,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
         }
 
-        if (decal || texturing) {
+        if (texturing) {
             var uvBufs = states.geometry.uvBufs;
             if (uvBufs) {
                 for (var i = 0, len = uvBufs.length; i < len; i++) {
@@ -617,13 +627,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
             }
 
-            if (decal) {
-                add("uniform sampler2D SCENEJS_uDecalSampler;");
-                if (states.decal.matrix) {
-                    add("uniform mat4 SCENEJS_uDecalMatrix;");
-                }
-                add("uniform float SCENEJS_uDecalBlendFactor;");
-            }
             if (texturing) {
                 var layer;
                 for (var i = 0, len = states.texture.layers.length; i < len; i++) {
@@ -873,7 +876,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         var layer;
-        if (decal || texturing) {
+        if (texturing) {
 
             add("  vec4    texturePos;");
             add("  vec2    textureCoord=vec2(0.0,0.0);");
@@ -969,99 +972,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     if (layer.applyTo == "normals" && normals) {
                         add("viewNormalVec = normalize(texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
                     }
-                }
-            }
-
-            // ------------ Decal texture ------------------------------------
-
-            if (decal) {
-
-                if (states.decal.applyFrom == "normal" && normals) {
-                    if (states.geometry.normalBuf) {
-                        add("texturePos=vec4(viewNormalVec.xyz, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture decal applyFrom='normal' but geo has no normal vectors");
-                    }
-                }
-
-                if (states.decal.applyFrom == "uv") {
-                    if (states.geometry.uvBuf) {
-                        add("texturePos = vec4(SCENEJS_vUVCoord.s, SCENEJS_vUVCoord.t, 1.0, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture decal applyTo='uv' but geometry has no UV coordinates");
-                    }
-                }
-
-                if (states.decal.applyFrom == "uv2") {
-                    if (states.geometry.uvBuf2) {
-                        add("texturePos = vec4(SCENEJS_vUVCoord2.s, SCENEJS_vUVCoord2.t, 1.0, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture decal applyTo='uv2' but geometry has no UV2 coordinates");
-                    }
-                }
-
-                if (states.decal.applyFrom == "uv3") {
-                    if (states.geometry.uvBuf3) {
-                        add("texturePos = vec4(SCENEJS_vUVCoord3.s, SCENEJS_vUVCoord3.t, 1.0, 1.0);");
-                    } else {
-                        SceneJS.log.warn("Texture decal applyTo='uv3' but geometry has no UV3 coordinates");
-                    }
-                }
-
-                // Decal texture matrix
-
-                if (states.decal.matrix) {
-                    add("textureCoord=(SCENEJS_uDecalMatrix * texturePos).xy;");
-                } else {
-                    add("textureCoord=texturePos.xy;");
-                }
-
-                // Alpha from Texture
-
-                if (states.decal.applyTo == "alpha") {
-                    if (states.decal.blendMode == "multiply") {
-                        add("alpha = alpha * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
-                    } else if (states.decal.blendMode == "add") {
-                        add("alpha = ((1.0 - SCENEJS_uDecalBlendFactor) * alpha) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
-                    }
-                }
-
-                // Texture output
-
-                if (states.decal.applyTo == "baseColor") {
-                    if (states.decal.blendMode == "multiply") {
-                        add("color = color * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
-                    } else {
-                        add("color = ((1.0 - SCENEJS_uDecalBlendFactor) * color) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
-                    }
-                }
-
-                if (states.decal.applyTo == "emit") {
-                    if (states.decal.blendMode == "multiply") {
-                        add("emit  = emit * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    } else {
-                        add("emit = ((1.0 - SCENEJS_uDecalBlendFactor) * emit) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    }
-                }
-
-                if (states.decal.applyTo == "specular" && normals) {
-                    if (states.decal.blendMode == "multiply") {
-                        add("specular  = specular * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    } else {
-                        add("specular = ((1.0 - SCENEJS_uDecalBlendFactor) * specular) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    }
-                }
-
-                if (states.decal.applyTo == "shine") {
-                    if (states.decal.blendMode == "multiply") {
-                        add("shine  = shine * (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    } else {
-                        add("shine = ((1.0 - SCENEJS_uDecalBlendFactor) * shine) + (SCENEJS_uDecalBlendFactor * texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
-                    }
-                }
-
-                if (states.decal.applyTo == "normals" && normals) {
-                    add("viewNormalVec = normalize(texture2D(SCENEJS_uDecalSampler, vec2(textureCoord.x, -textureCoord.y)).xyz * 2.0 - 1.0);");
                 }
             }
         }

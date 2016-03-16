@@ -31,6 +31,7 @@ SceneJS_ChunkFactory.createChunkType({
     draw : function(frameCtx) {
 
         frameCtx.textureUnit = 0;
+        frameCtx.normalMapUVLayerIdx = -1;
 
         var layers = this.core.layers;
 
@@ -60,11 +61,24 @@ SceneJS_ChunkFactory.createChunkType({
                         this._uTexBlendFactor[i].setValue(layer.blendFactor);
                     }
 
+                    if (layer.isNormalMap) {
+
+                        // Remember which UV layer we're using for the normal
+                        // map so that we can lazy-generate the tangents from the
+                        // appropriate UV layer in the geometry chunk.
+
+                        // Note that only one normal map is allowed per drawable, so there
+                        // will be only one UV layer used for normal mapping.
+
+                        frameCtx.normalMapUVLayerIdx = layer.uvLayerIdx;
+                    }
+
                 } else {
                      // draw.bindTexture(this._uTexSampler[i], null, i); // Unbind
                 }
             }
         }
 
+        frameCtx.texture = this.core;
     }
 });
