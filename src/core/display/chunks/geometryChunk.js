@@ -30,6 +30,7 @@ SceneJS_ChunkFactory.createChunkType({
 
         this._aMorphVertexDraw = draw.getAttribute("SCENEJS_aMorphVertex");
         this._aMorphNormalDraw = draw.getAttribute("SCENEJS_aMorphNormal");
+        this._aMorphTangentDraw = draw.getAttribute("SCENEJS_aMorphTangent");
         this._uMorphFactorDraw = draw.getUniform("SCENEJS_uMorphFactor");
 
         var pick = this.program.pick;
@@ -55,12 +56,16 @@ SceneJS_ChunkFactory.createChunkType({
         }
     },
 
-    morphDraw: function () {
+    morphDraw: function (frameCtx) {
+
         this.VAOMorphKey1 = this.core.key1;
         this.VAOMorphKey2 = this.core.key2;
 
-        var target1 = this.core.targets[this.core.key1]; // Keys will update
-        var target2 = this.core.targets[this.core.key2];
+        var key1 = this.core.key1;
+        var key2 = this.core.key2;
+
+        var target1 = this.core.targets[key1]; // Keys will update
+        var target2 = this.core.targets[key2];
 
         if (this._aMorphVertexDraw) {
             this._aVertexDraw.bindFloatArrayBuffer(target1.vertexBuf);
@@ -76,16 +81,38 @@ SceneJS_ChunkFactory.createChunkType({
             this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
         }
 
-        if (this._aUVDraw) {
-            this._aUVDraw.bindFloatArrayBuffer(this.core2.uvBuf);
+        if (this._aMorphTangentDraw || this._aTangentDraw) {
+
+            // Bind tangent arrays from geometry and morphGeometry
+
+            // In the texture chunk we remembered which UV layer we're using for the normal
+            // map so that we can lazy-generate the tangents from the appropriate UV layer
+            // in the geometry chunk.
+
+            // Note that only one normal map is allowed per drawable, so there
+            // will be only one UV layer used for normal mapping.
+
+            var normalMapUVLayerIdx = frameCtx.normalMapUVLayerIdx;
+            if (normalMapUVLayerIdx >= 0) {
+                if (this._aMorphTangentDraw) {
+                    this._aTangentDraw.bindFloatArrayBuffer(this.core.getTangents(key1, this.core2.arrays.indices, this.core2.arrays.uvs[normalMapUVLayerIdx]));
+                    this._aMorphTangentDraw.bindFloatArrayBuffer(this.core.getTangents(key2, this.core2.arrays.indices, this.core2.arrays.uvs[normalMapUVLayerIdx]));
+                } else if (this._aTangentDraw) {
+
+                    // TODO: What's this for?
+                    //this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf);
+                }
+            }
         }
 
-        if (this._aUV2Draw) {
-            this._aUV2Draw.bindFloatArrayBuffer(this.core2.uvBuf2);
-        }
+        // Bind UV layer from geometry
 
-        if (this._aUV3Draw) {
-            this._aUV3Draw.bindFloatArrayBuffer(this.core2.uvBuf3);
+        var uvBuf;
+        for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
+            uvBuf = this.core2.uvBufs[i];
+            if (uvBuf) {
+                this._aUVDraw[i].bindFloatArrayBuffer(uvBuf);
+            }
         }
 
         if (this._aColorDraw) {
@@ -107,7 +134,7 @@ SceneJS_ChunkFactory.createChunkType({
         var doMorph = this.core.targets && this.core.targets.length;
         var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
-        if (this.VAO) {
+        if (this.VAO && frameCtx.VAO) { // Workaround for https://github.com/xeolabs/scenejs/issues/459
             frameCtx.VAO.bindVertexArrayOES(this.VAO);
             if (doMorph) {
                 if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {
@@ -125,7 +152,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (doMorph) {
-            this.morphDraw();
+            this.morphDraw(frameCtx);
         } else {
             if (cleanInterleavedBuf) {
                 this.VAOHasInterleavedBuf = true;
@@ -141,12 +168,6 @@ SceneJS_ChunkFactory.createChunkType({
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
-                }
-                if (this._aTangentDraw) {
-
-                    // Lazy-compute tangents as soon as needed.
-                    // Unfortunately we can't include them in interleaving because that happened earlier.
-                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangents());
                 }
             } else {
                 this.VAOHasInterleavedBuf = false;
@@ -166,20 +187,35 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
                 }
-                if (this._aTangentDraw) {
+            }
 
-                    // Lazy-compute tangents
-                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.tangentBuf || this.core2.getTangents());
+            if (this._aTangentDraw) {
+
+                // In the texture chunk we remembered which UV layer we're using for the normal
+                // map so that we can lazy-generate the tangents from the appropriate UV layer
+                // in the geometry chunk.
+
+                // Note that only one normal map is allowed per drawable, so there
+                // will be only one UV layer used for normal mapping.
+
+                var normalMapUVLayerIdx = frameCtx.normalMapUVLayerIdx;
+                if (normalMapUVLayerIdx >= 0) {
+                    this._aTangentDraw.bindFloatArrayBuffer(this.core2.getTangents(normalMapUVLayerIdx));
                 }
             }
         }
 
         if (this._aRegionMapUVDraw) {
-            this._aRegionMapUVDraw.bindFloatArrayBuffer(this.core2.uvBufs[0]); // TODO: Make region maps work with all UV layers
+            var regionMapUVLayerIdx = frameCtx.regionMapUVLayerIdx; // Set by regionMapChunk
+            if (regionMapUVLayerIdx >= 0) {
+                var uvBufs = this.core2.uvBufs;
+                if (regionMapUVLayerIdx < uvBufs.length) {
+                    this._aRegionMapUVDraw.bindFloatArrayBuffer(uvBufs[regionMapUVLayerIdx]);
+                }
+            }
         }
 
         this.core2.indexBuf.bind();
-
     },
 
     morphPick: function (frameCtx) {
@@ -257,7 +293,7 @@ SceneJS_ChunkFactory.createChunkType({
                 }
 
                 if (this._aRegionMapUVPick) {
-                    this._aRegionMapUVPick.bindFloatArrayBuffer(core2.uvBufs[0]); // TODO: Make region maps work with all UV layers
+                    this._aRegionMapUVPick.bindFloatArrayBuffer(core2.uvBufs[frameCtx.regionMapUVLayerIdx]); // Set by regionMapChunk
                 }
 
                 core2.indexBuf.bind();

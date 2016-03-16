@@ -34,22 +34,19 @@ new (function () {
 
         if (this._core.useCount == 1) { // This node is the resource definer
 
-            if (params.applyFrom) {
-
-                var applyFrom = params.applyFrom;
-
-                if (applyFrom !== "normal" &&
-                    applyFrom !== "geometry" &&
-                    applyFrom !== "uv") {
-
-                    var matches = applyFrom.match(/uv\d+/);
-
-                    if (!matches || matches.length === 0) {
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture applyFrom value is unsupported - " +
-                            "should be either 'uv', 'uv2', 'normal' or 'geometry'");
-                    }
+            var applyFrom = params.applyFrom || "uv";
+            if (applyFrom.substring(0,2) !== "uv") {
+                    throw SceneJS_error.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "texture applyFrom value is unsupported - should be 'uv<index>'");
+            }
+            var uvLayerIdx = 0;
+            if (applyFrom !== "uv") {
+                uvLayerIdx = applyFrom.substring(2);
+                if (isNaN(uvLayerIdx)) {
+                    throw SceneJS_error.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "texture applyFrom value invalid - should be 'uv<index>'");
                 }
             }
 
@@ -88,7 +85,9 @@ new (function () {
             SceneJS._apply({
                     waitForLoad: params.waitForLoad == undefined ? true : params.waitForLoad,
                     texture: null,
-                    applyFrom: !!params.applyFrom ? params.applyFrom : "uv",
+                    uvLayerIdx: uvLayerIdx,
+                    isNormalMap: params.applyTo === "normals",
+                    applyFrom: applyFrom,
                     applyTo: !!params.applyTo ? params.applyTo : "baseColor",
                     blendMode: !!params.blendMode ? params.blendMode : "multiply",
                     blendFactor: (params.blendFactor != undefined && params.blendFactor != null) ? params.blendFactor : 1.0,

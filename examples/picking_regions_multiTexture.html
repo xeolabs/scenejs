@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoLight">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - <a href="index.html#picking_regions_info"
+                                                                  target="_top">region picking</a> combined with <a
+        href="index.html#texture_multiTexture"
+        target="_top">multiple textures</a>
+    <br><br>
+    This scene contains a multiple texture layers in conjunction with a region map<br>
+    that will tell you whether your mouse is over water or land.
+
+    <div id="infoTxt">Move your mouse over the Earth
+    </div>
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 90,
+                pitch: -30,
+                zoom: 7,
+                zoomSensitivity: 0.5,
+                spin: -0.1,
+
+                nodes: [
+
+                    // Depth-of-field blur effect, implemented by plugin at:
+                    // http://scenejs.org/api/latest/plugins/node/postprocess/dof.js
+                    {
+                        type: "lights",
+                        lights: [
+                            {
+                                mode: "dir",
+                                color: {r: 1.0, g: 1.0, b: 1.0},
+                                diffuse: true,
+                                specular: true,
+                                dir: {x: -0.5, y: -0.5, z: -0.75}
+                            }
+                        ],
+
+                        nodes: [
+
+
+                            // Custom lighting to simulate the Sun
+                            {
+                                type: "lights",
+                                lights: [
+                                    {
+                                        mode: "dir",
+                                        color: {r: 1.0, g: 1.0, b: 1.0},
+                                        diffuse: true,
+                                        specular: true,
+                                        dir: {x: -0.5, y: -0.5, z: -0.75}
+                                    }
+                                ],
+
+                                nodes: [
+                                    {
+                                        type: "rotate",
+                                        z: 1,
+                                        angle: 195,
+
+                                        nodes: [
+                                            {
+                                                type: "rotate",
+                                                y: 1,
+                                                id: "earth-rotate",
+
+                                                nodes: [
+
+                                                    // Layer 0: Earth's surface with color, specular
+                                                    // and emissive maps
+                                                    //
+                                                    // The priority on this layer ensure that it's rendered before the
+                                                    // clouds in the second layer
+                                                    {
+                                                        type: "layer",
+                                                        priority: 0,
+                                                        enabled: true,
+
+                                                        nodes: [
+                                                            {
+                                                                type: "flags",
+                                                                flags: {
+                                                                    backfaces: false
+                                                                },
+
+                                                                nodes: [
+
+                                                                    {
+                                                                        type: "scale",
+                                                                        x: 2,
+                                                                        y: 2,
+                                                                        z: 2,
+
+                                                                        nodes: [
+                                                                            {
+                                                                                type: "material",
+                                                                                emit: 0,
+                                                                                color: {r: 1.0, g: 1.0, b: 1.0},
+                                                                                specularColor: {r: 0.5, g: 0.5, b: 0.5},
+                                                                                emitColor: {r: 0.8, g: 0.8, b: 0.6},
+                                                                                specular: 5.0,
+                                                                                shine: 70.0,
+
+
+                                                                                nodes: [
+
+
+                                                                                    {
+                                                                                        type: "fresnel",
+                                                                                        applyTo: "specular",
+                                                                                        bias: 0.0,
+                                                                                        power: 1.0,
+                                                                                        topColor: {
+                                                                                            r: 1.0,
+                                                                                            g: 1.0,
+                                                                                            b: 1.0
+                                                                                        },
+                                                                                        bottomColor: {
+                                                                                            r: 0.0,
+                                                                                            g: 0.0,
+                                                                                            b: 0.0
+                                                                                        },
+
+                                                                                        nodes: [
+
+                                                                                            // Color map
+                                                                                            {
+                                                                                                type: "texture",
+                                                                                                src: "textures/earthDiffuse.jpg",
+                                                                                                preloadSrc: "textures/earthDiffusePreload.jpg",
+                                                                                                applyTo: "color",
+
+                                                                                                nodes: [
+
+                                                                                                    // Normal map
+                                                                                                    {
+                                                                                                        type: "texture",
+                                                                                                        src: "textures/earthNormal.jpg",
+                                                                                                        preloadSrc: "textures/earthNormalPreload.jpg",
+                                                                                                        applyTo: "normals",
+
+                                                                                                        nodes: [
+
+                                                                                                            // Specular map for shiny oceans
+                                                                                                            {
+                                                                                                                type: "texture",
+                                                                                                                src: "textures/earthSpecular.png",
+                                                                                                                preloadSrc: "textures/earthSpecularPreload.png",
+                                                                                                                applyTo: "specular",
+
+                                                                                                                nodes: [
+
+                                                                                                                    // Glow map for lights on night side
+                                                                                                                    {
+                                                                                                                        //type: "texture",
+                                                                                                                        src: "textures/earthEmit.gif",
+                                                                                                                        preloadSrc: "textures/earthEmitPreload.png",
+                                                                                                                        applyTo: "emit",
+                                                                                                                        blendMode: "add",
+
+                                                                                                                        nodes: [
+
+                                                                                                                            // The region map
+                                                                                                                            {
+                                                                                                                                type: "regionMap",
+                                                                                                                                id: "myRegionMap",
+
+                                                                                                                                mode: "info",
+
+                                                                                                                                // Colors of the texture define regions of the surface
+                                                                                                                                src: 'textures/earthWaterRegionMap.png',
+
+                                                                                                                                // Arbitrary data can be associated with a particular region
+                                                                                                                                regionData: [
+                                                                                                                                    {
+                                                                                                                                        // Black
+                                                                                                                                        color: {
+                                                                                                                                            r: 0,
+                                                                                                                                            g: 0,
+                                                                                                                                            b: 0
+                                                                                                                                        },
+                                                                                                                                        data: {
+                                                                                                                                            name: "Land"
+                                                                                                                                        }
+                                                                                                                                    },
+                                                                                                                                    {
+                                                                                                                                        // White
+                                                                                                                                        color: {
+                                                                                                                                            r: 1,
+                                                                                                                                            g: 1,
+                                                                                                                                            b: 1
+                                                                                                                                        },
+                                                                                                                                        data: {
+                                                                                                                                            name: "Water"
+                                                                                                                                        }
+                                                                                                                                    }
+                                                                                                                                ],
+
+                                                                                                                                nodes: [
+
+                                                                                                                                    // Sphere geometry node implemented by plugin at
+                                                                                                                                    // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                                                                                                    {
+                                                                                                                                        type: "geometry/sphere",
+                                                                                                                                        latitudeBands: 120,
+                                                                                                                                        longitudeBands: 120
+                                                                                                                                    }
+                                                                                                                                ]
+                                                                                                                            }
+                                                                                                                        ]
+                                                                                                                    }
+                                                                                                                ]
+                                                                                                            }
+                                                                                                        ]
+                                                                                                    }
+
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    },
+
+                                                    // Layer 1: Clouds with alpha map
+                                                    // The priority on this this layer ensures that it's rendered after the
+                                                    // Earth surface in the previously-defined layer
+                                                    {
+                                                        type: "layer",
+                                                        priority: 1,
+
+                                                        nodes: [
+
+                                                            // Flags to enable cloud transparency
+                                                            {
+                                                                type: "flags",
+                                                                flags: {
+                                                                    transparent: true,
+                                                                    specular: true,
+                                                                    backfaces: false,
+                                                                    picking: false
+                                                                },
+
+                                                                nodes: [
+
+                                                                    {
+                                                                        //  type: "fresnel",
+                                                                        applyTo: "emit",
+                                                                        bias: 0.8,
+                                                                        power: 2.0,
+                                                                        topColor: {r: 1.0, g: 1.0, b: 1.0},
+                                                                        bottomColor: {r: 0.0, g: 0.0, b: 0.0},
+
+                                                                        nodes: [
+
+                                                                            // Material with alpha channel
+                                                                            {
+                                                                                type: "material",
+                                                                                emit: 0.0,
+                                                                                alpha: 0.0,
+                                                                                color: {r: 1, g: 1, b: 1},
+                                                                                specularColor: {r: 1.0, g: 1.0, b: 1.0},
+
+                                                                                specular: 0.5,
+                                                                                shine: 1.0,
+
+
+                                                                                nodes: [
+                                                                                    {
+                                                                                        type: "scale",
+                                                                                        x: 2.02,
+                                                                                        y: 2.02,
+                                                                                        z: 2.02,
+
+                                                                                        nodes: [
+
+                                                                                            // Alpha map for clouds
+                                                                                            {
+                                                                                                type: "texture",
+                                                                                                src: "textures/earthAlpha.jpg",
+                                                                                                preloadSrc: "textures/earthAlphaPreload.jpg",
+                                                                                                applyTo: "alpha", // Apply to material "alpha" property
+                                                                                                blendMode: "add",
+
+                                                                                                nodes: [
+                                                                                                    {
+                                                                                                        type: "rotate",
+                                                                                                        y: 1,
+                                                                                                        id: "clouds-rotate",
+                                                                                                        nodes: [
+
+                                                                                                            // Sphere geometry node implemented by plugin at
+                                                                                                            // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                                                                                            {
+                                                                                                                type: "geometry/sphere",
+                                                                                                                latitudeBands: 120,
+                                                                                                                longitudeBands: 120
+                                                                                                            }
+                                                                                                        ]
+
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    var earthRotateAngle = 0;
+    var cloudsRotateAngle = 0;
+
+    // Get the Earth and cloud transform nodes and animate them
+
+    scene.on("tick",
+            function () {
+
+                // Note that for efficiency, you would normally
+                // get these nodes once and reuse their references
+
+                scene.getNode("earth-rotate",
+                        function (earthRotate) {
+                            earthRotate.setAngle(earthRotateAngle);
+                        });
+
+                scene.getNode("clouds-rotate",
+                        function (cloudsRotate) {
+                            cloudsRotate.setAngle(cloudsRotateAngle);
+                        });
+
+                earthRotateAngle -= 0.02;
+                cloudsRotateAngle -= 0.01;
+            });
+
+
+    // Pick hit handler
+    // Shows pick info in an HTML element
+
+    var info = document.getElementById("infoTxt");
+
+    scene.on("pick",
+            function (hit) {
+
+                info.innerHTML = "You are over: " + (hit.regionData.name || "Water"); // We'll assume Water by default
+
+                var color = hit.color; // Eg. { r: 0.3, g: 0.5, b: 1.0 }
+                var canvasPos = hit.canvasPos;
+
+                scene.getNode("myRegionMap",
+                        function (regionMap) {
+                            regionMap.setRegionColor(color);
+                        });
+            });
+
+    // Called when nothing picked
+
+    scene.on("nopick",
+            function () {
+                info.innerHTML = "Nothing picked.";
+            });
+
+    // Mouse event handling
+
+    var canvas = scene.getCanvas();
+
+    canvas.addEventListener('mousemove',
+            function (event) {
+                scene.pick(event.clientX, event.clientY, {regionPick: true});
+            }, true);
+
+
+</script>
+</body>
+</html>

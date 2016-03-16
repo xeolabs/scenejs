@@ -17,7 +17,6 @@ SceneJS_ChunkFactory.createChunkType({
 
             this.program.draw.bindTexture(this._uRegionMapSampler, texture, frameCtx.textureUnit);
             frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
-
         }
 
         var gl = this.program.gl;
@@ -44,16 +43,25 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.transparent = transparent;
         }
 
-        if (this._uRegionMapRegionColor) {
-            this._uRegionMapRegionColor.setValue(this.core.regionColor);
-        }
+        if (texture) {
 
-        if (this._uRegionMapHighlightFactor) {
-            this._uRegionMapHighlightFactor.setValue(this.core.highlightFactor);
-        }
+            if (this._uRegionMapRegionColor) {
+                this._uRegionMapRegionColor.setValue(this.core.regionColor);
+            }
 
-        if (this._uRegionMapHideAlpha) {
-            this._uRegionMapHideAlpha.setValue(this.core.hideAlpha);
+            if (this._uRegionMapHighlightFactor) {
+                this._uRegionMapHighlightFactor.setValue(this.core.highlightFactor);
+            }
+
+            if (this._uRegionMapHideAlpha) {
+                this._uRegionMapHideAlpha.setValue(this.core.hideAlpha);
+            }
+
+            frameCtx.regionMapUVLayerIdx = this.core.uvLayerIdx;
+
+        } else {
+
+            frameCtx.regionMapUVLayerIdx = -1;
         }
     },
 
@@ -70,6 +78,11 @@ SceneJS_ChunkFactory.createChunkType({
             this.program.pick.bindTexture(this._uRegionMapSampler, texture, frameCtx.textureUnit);
             frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
 
+            frameCtx.regionMapUVLayerIdx = this.core.uvLayerIdx;
+
+        } else {
+
+            frameCtx.regionMapUVLayerIdx = -1;
         }
     }
 });
