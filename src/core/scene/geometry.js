@@ -33,6 +33,12 @@ new (function () {
             var self = this;
 
             this._core.webglRestored = function () {
+
+                // Ensure that we recreate these in subsequent calls to
+                // core.getTangents and core.getPickPositions
+                self._core.tangentBufs = null;
+                self._core.pickPositionsBuf = null;
+
                 self._buildNodeCore(self._engine.canvas.gl, self._core);
             };
 
@@ -146,6 +152,10 @@ new (function () {
 
         // ----------------------------------------------------------
 
+        if (core.arrays.normals && core.arrays.uvs) {
+            core.arrays.tangents = [];
+        }
+
         if (data.colors) {
             if (data.colors.constructor != Float32Array) {
                 data.colors = new Float32Array(data.colors);
@@ -163,17 +173,33 @@ new (function () {
         }
 
         // Lazy-build tangents, only when needed as rendering
-        core.getTangents = function () {
-            if (core.tangentBuf) {
-                return core.tangentBuf;
+        core.getTangents = function (uvLayerIdx) {
+
+            // We're only allowed one normal map per drawable, but we'll
+            // cache tangents for each UV layer. In practice the cache would
+            // only contain one array of tangents, for the UV layer that
+            // happens to be used for normal mapping.
+
+            if (!core.tangentBufs) {
+                core.tangentBufs = [];
+            }
+            if (core.tangentBufs[uvLayerIdx]) {
+                return core.tangentBufs[uvLayerIdx];
             }
             var arrays = core.arrays;
-            if (arrays.positions && arrays.indices && arrays.uvs && arrays.uvs[0]) {
-                var gl = self._engine.canvas.gl;
-                var tangents = new Float32Array(self._buildTangents(arrays)); // Build tangents array;
-                core.arrays.tangents = tangents;
-                var usage = gl.STATIC_DRAW;
-                return core.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, usage);
+            var tangents = core.arrays.tangents[uvLayerIdx];
+            if (!tangents) {
+                // Retaining tangents data after WebGL context recovery
+                if (arrays.positions && arrays.indices && arrays.uvs && arrays.uvs[uvLayerIdx]) {
+                    var gl = self._engine.canvas.gl;
+                    tangents = new Float32Array(SceneJS_math_buildTangents(arrays.positions, arrays.indices, arrays.uvs[uvLayerIdx])); // Build tangents array;
+                    core.arrays.tangents[uvLayerIdx] = tangents;
+                }
+            }
+            if (tangents) {
+                return core.tangentBufs[uvLayerIdx] = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, gl.STATIC_DRAW);
+            } else {
+                return null;
             }
         };
 
@@ -321,9 +347,16 @@ new (function () {
             core.colorBuf = null;
         }
 
-        if (core.tangentBuf) {
-            core.tangentBuf.destroy();
-            core.tangentBuf = null;
+        if (core.tangentBufs) {
+            var tangentBufs = core.tangentBufs;
+            var tangentBuf;
+            for (var j = 0, lenj = tangentBufs.length; j < lenj; j++) {
+                tangentBuf = tangentBufs[j];
+                if (tangentBuf) {
+                    tangentBuf.destroy();
+                }
+            }
+            core.tangentBufs = null;
         }
 
         if (core.indexBuf) {
@@ -523,85 +556,6 @@ new (function () {
         }
 
         data.normals = normals;
-    };
-
-
-    /**
-     * Builds vertex tangent vectors from positions, UVs and indices
-     *
-     * Based on code by @rollokb, in his fork of webgl-obj-loader:
-     * https://github.com/rollokb/webgl-obj-loader
-     *
-     * @private
-     **/
-    SceneJS.Geometry.prototype._buildTangents = function (arrays) {
-
-        var positions = arrays.positions;
-        var indices = arrays.indices;
-        var uv = arrays.uvs[0];
-
-        var tangents = [];
-
-        // The vertex arrays needs to be calculated
-        // before the calculation of the tangents
-
-        for (var location = 0; location < indices.length; location += 3) {
-
-            // Recontructing each vertex and UV coordinate into the respective vectors
-
-            var index = indices[location];
-
-            var v0 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv0 = [uv[index * 2], uv[(index * 2) + 1]];
-
-            index = indices[location + 1];
-
-            var v1 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv1 = [uv[index * 2], uv[(index * 2) + 1]];
-
-            index = indices[location + 2];
-
-            var v2 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv2 = [uv[index * 2], uv[(index * 2) + 1]];
-
-            var deltaPos1 = SceneJS_math_subVec3(v1, v0, []);
-            var deltaPos2 = SceneJS_math_subVec3(v2, v0, []);
-
-            var deltaUV1 = SceneJS_math_subVec2(uv1, uv0, []);
-            var deltaUV2 = SceneJS_math_subVec2(uv2, uv0, []);
-
-            var r = 1 / ((deltaUV1[0] * deltaUV2[1]) - (deltaUV1[1] * deltaUV2[0]));
-
-            var tangent = SceneJS_math_mulVec3Scalar(
-                SceneJS_math_subVec3(
-                    SceneJS_math_mulVec3Scalar(deltaPos1, deltaUV2[1], []),
-                    SceneJS_math_mulVec3Scalar(deltaPos2, deltaUV1[1], []),
-                    []
-                ),
-                r,
-                []
-            );
-
-            // Average the value of the vectors outs
-            for (var v = 0; v < 3; v++) {
-                var addTo = indices[location + v];
-                if (typeof tangents[addTo] != "undefined") {
-                    tangents[addTo] = SceneJS_math_addVec3(tangents[addTo], tangent, []);
-                } else {
-                    tangents[addTo] = tangent;
-                }
-            }
-        }
-
-        // Deconstruct the vectors back into 1D arrays for WebGL
-
-        var tangents2 = [];
-
-        for (var i = 0; i < tangents.length; i++) {
-            tangents2 = tangents2.concat(tangents[i]);
-        }
-
-        return tangents2;
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
@@ -844,9 +798,7 @@ new (function () {
             interleavedStride: core.interleavedStride,
             interleavedPositionOffset: core.interleavedPositionOffset,
             interleavedNormalOffset: core.interleavedNormalOffset,
-            interleavedUVOffset: core.interleavedUVOffset,
-            interleavedUV2Offset: core.interleavedUV2Offset,
-            interleavedUV3Offset: core.interleavedUV3Offset,
+            interleavedUVOffsets: core.interleavedUVOffsets,
             interleavedColorOffset: core.interleavedColorOffset,
             getPickIndices: core.getPickIndices,
             getPickPositions: core.getPickPositions,
@@ -864,9 +816,7 @@ new (function () {
                 core2.interleavedStride = coreStack[i].interleavedStride;
                 core2.interleavedPositionOffset = coreStack[i].interleavedPositionOffset;
                 core2.interleavedNormalOffset = coreStack[i].interleavedNormalOffset;
-                core2.interleavedUVOffset = coreStack[i].interleavedUVOffset;
-                core2.interleavedUV2Offset = coreStack[i].interleavedUV2Offset;
-                core2.interleavedUV3Offset = coreStack[i].interleavedUV3Offset;
+                core2.interleavedUVOffsets = coreStack[i].interleavedUVOffsets;
                 core2.interleavedColorOffset = coreStack[i].interleavedColorOffset;
                 return core2;
             }

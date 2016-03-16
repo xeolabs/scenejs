@@ -52,6 +52,28 @@ new (function () {
                 return self._core.targets[index].pickPositionsBuf;
             };
 
+            // For the morph target at the given index,
+            // returns tangents for normal mapping
+            // lazy-generated from the given indices if not yet existing.
+
+            this._core.getTangents = function (index, indices, uv) {
+                var core = self._core;
+                var target = core.targets[index];
+                if (target.tangentBuf) {
+                    return target.tangentBuf;
+                }
+                var positions = target.positions;
+                uv = target.uv || uv;
+                if (positions && indices && uv) {
+                    var gl = self._engine.canvas.gl;
+                    var tangents = new Float32Array(SceneJS_math_buildTangents(positions, indices, uv));
+                    target.tangents = tangents;
+                    var usage = gl.STATIC_DRAW;
+                    target.tangentBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, tangents, tangents.length, 3, usage);
+                    return target.tangentBuf;
+                }
+            };
+
             this.setFactor(params.factor);
         }
 

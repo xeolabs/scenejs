@@ -12,7 +12,7 @@
             -webkit-user-select: none;
         }
     </style>
-    <script src="../api/latest/scenejs.js"></script>
+    <script src="../api/latest/scenejs.min.js"></script>
     <link href="css/styles.css" rel="stylesheet"/>
 <body>
 
@@ -56,8 +56,8 @@
 
                     // The decal
                     {
-                        type: "decal",
-                        id: "myDecal",
+                        type: "texture",
+                        id: "myDrawingTexture",
                         image: image,
                         applyFrom: "uv",
                         applyTo: "emit",
@@ -95,10 +95,10 @@
     });
 
     // ---------------------------------------------------------------
-    // Logic for writing to the "decal" node's image
+    // Logic for writing to the drawing texture's node's image
     // ---------------------------------------------------------------
 
-    scene.getNode("myDecal",
+    scene.getNode("myDrawingTexture",
             function (decalNode) {
 
                 // Create hidden drawingCanvas to draw to
@@ -118,7 +118,7 @@
 
                 var down = false; // True when mouse is down
 
-                var needBlit = false; // True when drawingCanvas needs to be copied into the "decal" node
+                var needBlit = false; // True when drawingCanvas needs to be copied into the drawing texture node
 
                 // On each scene tick, copy the canvas into the decal node if dirty
 
@@ -158,7 +158,7 @@
                     down = false;
                 }
 
-                // Clears the "decal" node's image
+                // Clears the drawing texture node's image
                 function clear() {
                     context.rect(0, 0, drawingCanvas.width, drawingCanvas.height);
                     context.fillStyle = "black";

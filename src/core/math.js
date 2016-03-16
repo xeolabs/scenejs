@@ -38,6 +38,8 @@
     var tempVec3d = new Float32Array(3);
     var tempVec3e = new Float32Array(3);
     var tempVec3f = new Float32Array(3);
+    var tempVec3g = new Float32Array(3);
+    var tempVec3h = new Float32Array(3);
     var tempVec4 = new Float32Array(4);
 
     /**
@@ -2584,4 +2586,82 @@
 
         return cartesian;
     };
+
+
+    /**
+     * Builds vertex tangent vectors from positions, UVs and indices
+     *
+     * @method buildTangents
+     * @static
+     * @param {Array of Number} positions One-dimensional flattened array of positions.
+     * @param {Array of Number} indices One-dimensional flattened array of indices.
+     * @param {Array of Number} uv One-dimensional flattened array of UV coordinates.
+     * @returns {Array of Number} One-dimensional flattened array of tangents.
+     */
+    window.SceneJS_math_buildTangents = function (positions, indices, uv) {
+
+        var tangents = [];
+
+        // The vertex arrays needs to be calculated
+        // before the calculation of the tangents
+
+        for (var location = 0; location < indices.length; location += 3) {
+
+            // Recontructing each vertex and UV coordinate into the respective vectors
+
+            var index = indices[location];
+
+            var v0 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv0 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            index = indices[location + 1];
+
+            var v1 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv1 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            index = indices[location + 2];
+
+            var v2 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
+            var uv2 = [uv[index * 2], uv[(index * 2) + 1]];
+
+            var deltaPos1 = SceneJS_math_subVec3(v1, v0, tempVec3);
+            var deltaPos2 = SceneJS_math_subVec3(v2, v0, tempVec3b);
+
+            var deltaUV1 = SceneJS_math_subVec2(uv1, uv0, tempVec3c);
+            var deltaUV2 = SceneJS_math_subVec2(uv2, uv0, tempVec3d);
+
+            var r = 1 / ((deltaUV1[0] * deltaUV2[1]) - (deltaUV1[1] * deltaUV2[0]));
+
+            var tangent = SceneJS_math_mulVec3Scalar(
+                SceneJS_math_subVec3(
+                    SceneJS_math_mulVec3Scalar(deltaPos1, deltaUV2[1], tempVec3e),
+                    SceneJS_math_mulVec3Scalar(deltaPos2, deltaUV1[1], tempVec3f),
+                    tempVec3g
+                ),
+                r,
+                []
+            );
+
+            // Average the value of the vectors outs
+            for (var v = 0; v < 3; v++) {
+                var addTo = indices[location + v];
+                if (typeof tangents[addTo] != "undefined") {
+                    tangents[addTo] = SceneJS_math_addVec3(tangents[addTo], tangent, []);
+                } else {
+                    tangents[addTo] = tangent;
+                }
+            }
+        }
+
+        // Deconstruct the vectors back into 1D arrays for WebGL
+
+        var tangents2 = [];
+
+        for (var i = 0; i < tangents.length; i++) {
+            tangents2 = tangents2.concat(tangents[i]);
+        }
+
+        return tangents2;
+    }
+
 })();
