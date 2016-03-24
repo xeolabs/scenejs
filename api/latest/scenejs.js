@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-03-16
+ * Built on 2016-03-24
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -5469,7 +5469,7 @@ SceneJS.log = new (function() {
      */
     window.SceneJS_math_buildTangents = function (positions, indices, uv) {
 
-        var tangents = [];
+        var tangents = new Float32Array(positions.length);
 
         // The vertex arrays needs to be calculated
         // before the calculation of the tangents
@@ -5480,18 +5480,18 @@ SceneJS.log = new (function() {
 
             var index = indices[location];
 
-            var v0 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv0 = [uv[index * 2], uv[(index * 2) + 1]];
+            var v0 = positions.subarray(index * 3, index * 3 + 3);
+            var uv0 = uv.subarray(index * 2, index * 2 + 2);
 
             index = indices[location + 1];
 
-            var v1 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv1 = [uv[index * 2], uv[(index * 2) + 1]];
+            var v1 = positions.subarray(index * 3, index * 3 + 3);
+            var uv1 = uv.subarray(index * 2, index * 2 + 2);
 
             index = indices[location + 2];
 
-            var v2 = [positions[index * 3], positions[(index * 3) + 1], positions[(index * 3) + 2]];
-            var uv2 = [uv[index * 2], uv[(index * 2) + 1]];
+            var v2 = positions.subarray(index * 3, index * 3 + 3);
+            var uv2 = uv.subarray(index * 2, index * 2 + 2);
 
             var deltaPos1 = SceneJS_math_subVec3(v1, v0, tempVec3);
             var deltaPos2 = SceneJS_math_subVec3(v2, v0, tempVec3b);
@@ -5508,29 +5508,20 @@ SceneJS.log = new (function() {
                     tempVec3g
                 ),
                 r,
-                []
+                tempVec3f
             );
 
             // Average the value of the vectors outs
             for (var v = 0; v < 3; v++) {
-                var addTo = indices[location + v];
-                if (typeof tangents[addTo] != "undefined") {
-                    tangents[addTo] = SceneJS_math_addVec3(tangents[addTo], tangent, []);
-                } else {
-                    tangents[addTo] = tangent;
-                }
+                var addTo = indices[location + v] * 3;
+
+                tangents[addTo]     += tangent[0];
+                tangents[addTo + 1] += tangent[1];
+                tangents[addTo + 2] += tangent[2];
             }
         }
 
-        // Deconstruct the vectors back into 1D arrays for WebGL
-
-        var tangents2 = [];
-
-        for (var i = 0; i < tangents.length; i++) {
-            tangents2 = tangents2.concat(tangents[i]);
-        }
-
-        return tangents2;
+        return tangents;
     }
 
 })();;/**
