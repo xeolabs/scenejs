@@ -62,10 +62,10 @@ SceneJS_ChunkFactory.createChunkType({
 
         } else if (frameCtx.pickTriangle) {
 
-            var pickIndices = core.getPickIndices();
+            var pickPositions = core.getPickPositions();
 
-            if (pickIndices) {
-                gl.drawElements(core.primitive, pickIndices.numItems, pickIndices.itemType, 0);
+            if (pickPositions) {
+                gl.drawArrays(core.primitive, 0, pickPositions.numItems / 3);
             }
         }
     }

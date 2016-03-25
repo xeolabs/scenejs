@@ -257,11 +257,6 @@ SceneJS_ChunkFactory.createChunkType({
                     this._aColorPick.bindFloatArrayBuffer(core2.getPickColors());
                 }
 
-                var pickIndicesBuf = core2.getPickIndices();
-                if (pickIndicesBuf) {
-                    pickIndicesBuf.bind()
-                }
-
             } else if (this._aVertexPick) {
 
                 this._aVertexPick.bindFloatArrayBuffer(core2.vertexBuf);
@@ -306,12 +301,6 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (this._aColorPick) {
                     this._aColorPick.bindFloatArrayBuffer(core2.getPickColors());
-                }
-
-                var pickIndices = core2.getPickIndices();
-
-                if (pickIndices) {
-                    pickIndices.bind()
                 }
 
             }
