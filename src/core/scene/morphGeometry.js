@@ -226,7 +226,7 @@ new (function () {
 
                 pickPositions = SceneJS_math_getPickPositions(target.positions, indices);
 
-                target.pickPositionsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickPositions), pickPositions.length, 3, usage);
+                target.pickPositionsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, pickPositions, pickPositions.length, 3, usage);
             }
         }
 

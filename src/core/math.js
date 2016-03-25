@@ -2161,20 +2161,25 @@
      * @static
      * @param {Array of Number} positions One-dimensional flattened array of positions.
      * @param {Array of Number} indices One-dimensional flattened array of indices.
-     * @param {*} [pickTris] Optional object to return the arrays on.
-     * @param {Boolean} [debug] Assigns random colors to triangles when true.
      * @returns {*} Object containing the arrays, created by this method or reused from 'pickTris' parameter.
      */
-    window.SceneJS_math_getPickPrimitives = function (positions, indices, pickTris, debug) {
+    window.SceneJS_math_getPickPrimitives = function (positions, indices) {
 
-        pickTris = pickTris || {};
+        var numIndices = indices.length;
 
-        var pickPositions = [];
-        var pickColors = [];
-        var pickIndices = [];
+        var pickPositions = new Float32Array(numIndices * 3);
+        var pickColors = new Float32Array(numIndices * 4);
 
-        var index2 = 0;
         var primIndex = 0;
+
+        // Positions array index
+        var vi;
+
+        // Picking positions array index
+        var pvi;
+
+        // Picking color array index
+        var pci;
 
         // Triangle indices
 
@@ -2184,100 +2189,69 @@
         var b;
         var a;
 
-        for (var location = 0; location < indices.length; location += 3) {
+        for (var location = 0; location < numIndices; location += 3) {
+
+            pvi = location * 3;
+            pci = location * 4;
 
             // Primitive-indexed triangle pick color
 
-            primIndex++;
-            primIndex = location + 1;
-
-
-            if (debug) {
-                r = Math.random();
-                g = Math.random();
-                b = Math.random();
-                a = 1.0;
-            } else {
-                b = (primIndex >> 16 & 0xFF) / 255;
-                g = (primIndex >> 8 & 0xFF) / 255;
-                r = (primIndex & 0xFF) / 255;
-                a = 1.0;
-            }
-
+            a = (primIndex >> 24 & 0xFF) / 255.0;
+            b = (primIndex >> 16 & 0xFF) / 255.0;
+            g = (primIndex >> 8 & 0xFF) / 255.0;
+            r = (primIndex & 0xFF) / 255.0;
 
             // A
 
-            i = indices[location + 0];
+            i = indices[location];
+            vi = i * 3;
 
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
+            pickPositions[pvi]     = positions[vi];
+            pickPositions[pvi + 1] = positions[vi + 1];
+            pickPositions[pvi + 2] = positions[vi + 2];
 
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
+            pickColors[pci]     = r;
+            pickColors[pci + 1] = g;
+            pickColors[pci + 2] = b;
+            pickColors[pci + 3] = a;
 
-            pickIndices.push(index2++);
 
             // B
 
             i = indices[location + 1];
+            vi = i * 3;
 
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
+            pickPositions[pvi + 3] = positions[vi];
+            pickPositions[pvi + 4] = positions[vi + 1];
+            pickPositions[pvi + 5] = positions[vi + 2];
 
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
+            pickColors[pci + 4] = r;
+            pickColors[pci + 5] = g;
+            pickColors[pci + 6] = b;
+            pickColors[pci + 7] = a;
 
-            pickIndices.push(index2++);
 
             // C
 
             i = indices[location + 2];
+            vi = i * 3;
 
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
+            pickPositions[pvi + 6] = positions[vi];
+            pickPositions[pvi + 7] = positions[vi + 1];
+            pickPositions[pvi + 8] = positions[vi + 2];
 
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
+            pickColors[pci + 8]  = r;
+            pickColors[pci + 9]  = g;
+            pickColors[pci + 10] = b;
+            pickColors[pci + 11] = a;
 
-            pickIndices.push(index2++);
+            primIndex++;
         }
 
-        pickTris.pickPositions = pickPositions;
-        pickTris.pickColors = pickColors;
-        pickTris.pickIndices = pickIndices;
-
-        return pickTris;
-    };
-
-    /**
-     * Builds index array needed by color-indexed triangle picking (for morph target positions).
-     *
-     * @method getPickIndices
-     * @static
-     * @param {Array of Number} indices One-dimensional flattened array of indices.
-     * @returns {Array of Number} The pick indices.
-     */
-    window.SceneJS_math_getPickIndices = function (indices) {
-
-        var pickIndices = [];
-
-        var index2 = 0;
-        for (var location = 0; location < indices.length; location += 3) {
-            pickIndices.push(index2++);
-            pickIndices.push(index2++);
-            pickIndices.push(index2++);
-        }
-
-        return pickIndices;
+        return {
+            positions: pickPositions,
+            colors: pickColors
+        };
     };
 
     /**
@@ -2291,40 +2265,26 @@
      */
     window.SceneJS_math_getPickPositions = function (positions, indices) {
 
-        var pickPositions = [];
-        var primIndex = 0;
+        var numIndices = indices.length;
+
+        var pickPositions = new Float32Array(numIndices * 3);
+        var pvi, vi;
         var i;
 
-        for (var location = 0; location < indices.length; location += 3) {
+        for (var location = 0; location < numIndices; location++) {
 
-            // Primitive-indexed triangle pick color
+            // Picking position array index
+            pvi = location * 3;
 
-            primIndex++;
-            primIndex = location + 1;
+            i = indices[location];
 
-            // A
+            // Drawing position index
+            vi = i * 3;
 
-            i = indices[location + 0];
+            pickPositions[pvi]     = positions[vi];
+            pickPositions[pvi + 1] = positions[vi + 1];
+            pickPositions[pvi + 2] = positions[vi + 2];
 
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
-
-            // B
-
-            i = indices[location + 1];
-
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
-
-            // C
-
-            i = indices[location + 2];
-
-            pickPositions.push(positions[i * 3 + 0]);
-            pickPositions.push(positions[i * 3 + 1]);
-            pickPositions.push(positions[i * 3 + 2]);
         }
 
         return pickPositions;
@@ -2340,10 +2300,12 @@
      */
     window.SceneJS_math_getPickColors = function (indices) {
 
-        var pickColors = [];
+        var numIndices = indices.length;
 
-        var index2 = 0;
+        var pickColors = new Float32Array(numIndices * 4);
+
         var primIndex = 0;
+        var pci;
 
         // Triangle indices
 
@@ -2352,11 +2314,10 @@
         var b;
         var a;
 
-        //if ((indices.length/3) > 4294967295) {
-        //    alert("!");
-        //}
+        for (var location = 0; location < numIndices; location += 3) {
 
-        for (var location = 0; location < indices.length; location += 3) {
+            // Picking color array index;
+            pci = location * 4;
 
             // Primitive-indexed triangle pick color
 
@@ -2367,24 +2328,24 @@
 
             // A
 
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
+            pickColors[pci]     = r;
+            pickColors[pci + 1] = g;
+            pickColors[pci + 2] = b;
+            pickColors[pci + 3] = a;
 
             // B
 
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
+            pickColors[pci + 4] = r;
+            pickColors[pci + 5] = g;
+            pickColors[pci + 6] = b;
+            pickColors[pci + 7] = a;
 
             // C
 
-            pickColors.push(r);
-            pickColors.push(g);
-            pickColors.push(b);
-            pickColors.push(a);
+            pickColors[pci + 8]  = r;
+            pickColors[pci + 9]  = g;
+            pickColors[pci + 10] = b;
+            pickColors[pci + 11] = a;
 
             primIndex++;
         }

@@ -209,11 +209,8 @@ new (function () {
             if (core.pickPositionsBuf) {
                 return core.pickPositionsBuf;
             }
-            if (core.arrays.positions) {
-                var gl = self._engine.canvas.gl;
-                var pickPositions = SceneJS_math_getPickPositions(core.arrays.positions, core.arrays.indices);
-                core.pickPositionsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickPositions), pickPositions.length, 3, gl.STATIC_DRAW);
-            }
+            
+            createPickArrays();
 
             return core.pickPositionsBuf;
         };
@@ -222,23 +219,28 @@ new (function () {
             if (core.pickColorsBuf) {
                 return core.pickColorsBuf;
             }
-            var gl = self._engine.canvas.gl;
-            var pickColors = SceneJS_math_getPickColors(core.arrays.indices);
-            core.pickColorsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(pickColors), pickColors.length, 4, gl.STATIC_DRAW);
+            
+            createPickArrays();
+
             return core.pickColorsBuf;
         };
 
-        core.getPickIndices = function () {
-            if (core.pickIndicesBuf) {
-                return core.pickIndicesBuf;
+        function createPickArrays() {
+            var gl = self._engine.canvas.gl;
+
+            var pickArrays, pickPositions, pickColors;
+
+            if (core.arrays.positions) {
+                pickArrays = SceneJS_math_getPickPrimitives(core.arrays.positions, core.arrays.indices);
+                pickPositions = pickArrays.positions;
+                pickColors = pickArrays.colors;
+                core.pickPositionsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, pickPositions, pickPositions.length, 3, gl.STATIC_DRAW);
+            } else {
+                pickColors = SceneJS_math_getPickColors(core.arrays.indices);
             }
-            if (core.arrays.indices) {
-                var gl = self._engine.canvas.gl;
-                var pickIndices = SceneJS_math_getPickIndices(core.arrays.indices);
-                core.pickIndicesBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(pickIndices), pickIndices.length, 1, gl.STATIC_DRAW);
-            }
-            return core.pickIndicesBuf;
-        };
+
+            core.pickColorsBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, pickColors, pickColors.length, 4, gl.STATIC_DRAW);
+        } 
     };
 
 
