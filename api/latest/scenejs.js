@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-03-25
+ * Built on 2016-04-04
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -17897,7 +17897,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
             // elements of the given matrix
 
             add("void billboard(inout mat4 mat) {");
-            add("   mat[0][0] = -1.0;");
+            add("   mat[0][0] = 1.0;");
             add("   mat[0][1] = 0.0;");
             add("   mat[0][2] = 0.0;");
             if (states.billboard.spherical) {
