@@ -768,6 +768,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     add("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
 
+                if (light.mode == "spot") {
+                    add("uniform vec3  SCENEJS_uLightAttenuation" + i + ";");
+                    add("uniform vec3 SCENEJS_uLightPos" + i + ";");
+                    add("uniform vec3 SCENEJS_uLightDir" + i + ";");
+                    add("uniform float SCENEJS_uInnerCone" + i + ";");
+                    add("uniform float SCENEJS_uOuterCone" + i + ";");
+                }
+
             }
         }
 
@@ -1008,8 +1016,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("  vec3    lightValue      = vec3(0.0, 0.0, 0.0);");
             add("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
             add("  vec3    viewLightVec;");
+            add("  vec3    viewLightDir;")
             add("  float   dotN;");
+            add("  float   spotDirRatio;");
             add("  float   lightDist;");
+            add("  float   coneDiff;");
 
             if (tangents) {
 
@@ -1067,6 +1078,69 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         "  SCENEJS_uLightAttenuation" + i + "[0] + " +
                         "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
                         "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
+
+                    if (light.diffuse) {
+                        add("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
+                    }
+
+                    if (light.specular) {
+                        add("    specularValue += specularColor * SCENEJS_uLightColor" + i +
+                            " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine) * attenuation;");
+                    }
+                }
+
+                if (light.mode == "spot") {
+
+                    add("viewLightDir = SCENEJS_uLightDir" + i + ";")
+
+                    if (light.space == "world") {
+
+                        // World space
+
+                        add("viewLightVec = SCENEJS_uLightPos" + i + " - SCENEJS_vWorldVertex.xyz;"); // Vector from World coordinate to light pos
+
+                        // Transform to View space
+                        add("viewLightVec = vec3(SCENEJS_uVMatrix * vec4(viewLightVec, 0.0)).xyz;");
+                        add("viewLightDir = vec3(SCENEJS_uVMatrix * vec4(viewLightDir, 0.0)).xyz;");
+
+                        if (tangents) {
+
+                            // Transform to Tangent space
+                            add("viewLightVec *= TBM;");
+                            add("viewLightDir *= TBM;");
+                        }
+
+                    } else {
+
+                        // View space
+
+                        add("viewLightVec = SCENEJS_uLightPos" + i + ".xyz - SCENEJS_vViewVertex.xyz;"); // Vector from View coordinate to light pos
+
+                        if (tangents) {
+
+                            // Transform to tangent space
+                            add("viewLightVec *= TBM;");
+                            add("viewLightDir *= TBM;");
+                        }
+                    }
+
+                    add("dotN = max(dot(viewNormalVec, normalize(viewLightVec)), 0.0);");
+                    add("spotDirRatio = 1.0 - max(dot(normalize(viewLightDir), normalize(-viewLightVec)), 0.0);");
+
+                    add("lightDist = length( SCENEJS_uLightPos" + i + " - SCENEJS_vWorldVertex.xyz);");
+
+                    add("attenuation = 1.0 - (" +
+                        "  SCENEJS_uLightAttenuation" + i + "[0] + " +
+                        "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
+                        "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
+
+                    add("coneDiff = SCENEJS_uOuterCone" + i + " - SCENEJS_uInnerCone" + i + ";");
+
+                    add("if (coneDiff == 0.0) {");
+                    add("  attenuation *= 1.0 - step(SCENEJS_uInnerCone" + i + ", spotDirRatio);");
+                    add("} else {");
+                    add("  attenuation *= 1.0 - clamp((spotDirRatio - SCENEJS_uInnerCone" + i + ") / coneDiff, 0.0, 1.0);");
+                    add("}");
 
                     if (light.diffuse) {
                         add("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
