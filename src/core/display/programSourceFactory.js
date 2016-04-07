@@ -1075,9 +1075,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     add("lightDist = length( SCENEJS_uLightPos" + i + " - SCENEJS_vWorldVertex.xyz);");
 
                     add("attenuation = 1.0 - (" +
-                        "  SCENEJS_uLightAttenuation" + i + "[0] + " +
-                        "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
-                        "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
+                        "  SCENEJS_uLightAttenuation" + i + ".x + " +
+                        "  SCENEJS_uLightAttenuation" + i + ".y * lightDist + " +
+                        "  SCENEJS_uLightAttenuation" + i + ".z * lightDist * lightDist);");
 
                     if (light.diffuse) {
                         add("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
@@ -1130,9 +1130,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     add("lightDist = length( SCENEJS_uLightPos" + i + " - SCENEJS_vWorldVertex.xyz);");
 
                     add("attenuation = 1.0 - (" +
-                        "  SCENEJS_uLightAttenuation" + i + "[0] + " +
-                        "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
-                        "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
+                        "  SCENEJS_uLightAttenuation" + i + ".x + " +
+                        "  SCENEJS_uLightAttenuation" + i + ".y * lightDist + " +
+                        "  SCENEJS_uLightAttenuation" + i + ".z * lightDist * lightDist);");
 
                     add("coneDiff = SCENEJS_uOuterCone" + i + " - SCENEJS_uInnerCone" + i + ";");
 
