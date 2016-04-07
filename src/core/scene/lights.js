@@ -101,10 +101,10 @@
         this._core.lights[index] = light;
 
         var mode = cfg.mode || "dir";
-        if (mode != "dir" && mode != "point" && mode != "ambient") {
+        if (mode != "dir" && mode != "point" && mode != "ambient" && mode != "spot") {
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Light mode not supported - should be 'dir' or 'point' or 'ambient'");
+                "Light mode not supported - should be 'dir' or 'point' or 'spot' or 'ambient'");
         }
 
         var pos = cfg.pos;
@@ -121,8 +121,10 @@
         light.mode = mode;
         light.diffuse = (mode == "ambient") ? true : ((cfg.diffuse != undefined) ? cfg.diffuse : true);
         light.specular = (mode == "ambient") ? false : ((cfg.specular != undefined) ? cfg.specular : true);
-        light.pos = cfg.pos ? [ pos.x || 0, pos.y || 0, pos.z || 0 ] : [0, 0, 0];
+        light.pos = cfg.pos ? [pos.x || 0, pos.y || 0, pos.z || 0 ] : [0, 0, 0];
         light.dir = cfg.dir ? [dir.x || 0, dir.y || 0, dir.z || 0] : [0, 0, 1];
+        light.innerCone = cfg.innerCone != undefined ? cfg.innerCone : 0.25;
+        light.outerCone = cfg.outerCone != undefined ? cfg.outerCone : 0.5;
         light.attenuation = [
                 cfg.constantAttenuation != undefined ? cfg.constantAttenuation : 0.0,
                 cfg.linearAttenuation || 0.0,
@@ -206,6 +208,16 @@
         var dir = cfg.dir;
         if (dir) {
             light.dir = [dir.x || 0, dir.y || 0, dir.z || 0];
+            imageDirty = true;
+        }
+
+        if (cfg.innerCone != undefined && cfg.innerCone != light.innerCone) {
+            light.innerCone = cfg.innerCone;
+            imageDirty = true;
+        }
+
+        if (cfg.outerCone != undefined && cfg.outerCone != light.outerCone) {
+            light.outerCone = cfg.outerCone;
             imageDirty = true;
         }
 

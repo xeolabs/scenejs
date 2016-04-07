@@ -14,6 +14,8 @@ SceneJS_ChunkFactory.createChunkType({
         this._uLightCutOff = this._uLightCutOff || [];
         this._uLightSpotExp = this._uLightSpotExp || [];
         this._uLightAttenuation = this._uLightAttenuation || [];
+        this._uInnerCone = this._uInnerCone || [];
+        this._uOuterCone = this._uOuterCone || [];
 
         var lights = this.core.lights;
         var program = this.program;
@@ -37,6 +39,15 @@ SceneJS_ChunkFactory.createChunkType({
                     this._uLightPos[i] = program.draw.getUniform("SCENEJS_uLightPos" + i);
                     this._uLightDir[i] = null;
                     this._uLightAttenuation[i] = program.draw.getUniform("SCENEJS_uLightAttenuation" + i);
+                    break;
+
+                case "spot":
+                    this._uLightColor[i] = program.draw.getUniform("SCENEJS_uLightColor" + i);
+                    this._uLightPos[i] = program.draw.getUniform("SCENEJS_uLightPos" + i);
+                    this._uLightDir[i] = program.draw.getUniform("SCENEJS_uLightDir" + i);
+                    this._uLightAttenuation[i] = program.draw.getUniform("SCENEJS_uLightAttenuation" + i);
+                    this._uInnerCone[i] = program.draw.getUniform("SCENEJS_uInnerCone" + i);
+                    this._uOuterCone[i] = program.draw.getUniform("SCENEJS_uOuterCone" + i);
                     break;
             }
         }
@@ -76,6 +87,14 @@ SceneJS_ChunkFactory.createChunkType({
 
                 if (this._uLightDir[i]) {
                     this._uLightDir[i].setValue(light.dir);
+                }
+
+                if (this._uInnerCone[i]) {
+                    this._uInnerCone[i].setValue(light.innerCone);
+                }
+
+                if (this._uOuterCone[i]) {
+                    this._uOuterCone[i].setValue(light.outerCone);
                 }
             }
         }

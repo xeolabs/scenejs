@@ -17,7 +17,11 @@ SceneJS.GUI = function (scene, nodeIds) {
                         lookat(node);
                         break;
                     case "lights":
-                        pointLight(node, 0);
+                        if (node._core.lights[0].mode === "spot") {
+                            spotLight(node, 0);
+                        } else {
+                            pointLight(node, 0);
+                        }
                         break;
                     case "material":
                         material(node);
@@ -147,6 +151,82 @@ SceneJS.GUI = function (scene, nodeIds) {
         folder.add(menu, 'color.r', 0.0, 1.0);
         folder.add(menu, 'color.g', 0.0, 1.0);
         folder.add(menu, 'color.b', 0.0, 1.0);
+        folder.add(menu, 'specular');
+        folder.add(menu, 'diffuse');
+        folder.add(menu, 'constantAttenuation', 0.0, 1.0);
+        folder.add(menu, 'linearAttenuation', 0.0, 1.0);
+        folder.add(menu, 'quadraticAttenuation', 0.0, 1.0);
+        folder.open();
+    }
+
+    function spotLight(lights) {
+        var Menu = function () {
+            var light = lights._core.lights[0];
+
+            this["pos.x"] = light.pos[0];
+            this["pos.y"] = light.pos[1];
+            this["pos.z"] = light.pos[2];
+            this["color.r"] = light.color[0];
+            this["color.g"] = light.color[1];
+            this["color.b"] = light.color[2];
+            this["dir.x"] = light.dir[0];
+            this["dir.y"] = light.dir[1];
+            this["dir.z"] = light.dir[2];
+            this.innerCone = light.innerCone;
+            this.outerCone = light.outerCone;
+            this.constantAttenuation = light.attenuation[0];
+            this.linearAttenuation = light.attenuation[1];
+            this.quadraticAttenuation = light.attenuation[2];
+            this.specular = light.specular;
+            this.diffuse = light.diffuse;
+
+            var self = this;
+
+            var update = function () {
+                lights.setLights({
+                    "0":{
+                        pos:{
+                            x:self["pos.x"],
+                            y:self["pos.y"],
+                            z:self["pos.z"]
+                        },
+                        color:{
+                            r:self["color.r"],
+                            g:self["color.g"],
+                            b:self["color.b"]
+                        },
+                        dir:{
+                            x:self["dir.x"],
+                            y:self["dir.y"],
+                            z:self["dir.z"]
+                        },
+                        innerCone:self.innerCone,
+                        outerCone:self.outerCone,
+                        constantAttenuation:self.constantAttenuation,
+                        linearAttenuation:self.linearAttenuation,
+                        quadraticAttenuation:self.quadraticAttenuation,
+                        specular:self.specular,
+                        diffuse:self.diffuse
+                    }
+                });
+                requestAnimationFrame(update);
+            };
+            update();
+        };
+
+        var folder = gui.addFolder('Light 0');
+        var menu = new Menu();
+        folder.add(menu, 'pos.x', -1.0, 1.0);
+        folder.add(menu, 'pos.y', -1.0, 1.0);
+        folder.add(menu, 'pos.z', -1.0, 1.0);
+        folder.add(menu, 'color.r', 0.0, 1.0);
+        folder.add(menu, 'color.g', 0.0, 1.0);
+        folder.add(menu, 'color.b', 0.0, 1.0);
+        folder.add(menu, 'dir.x', -1.0, 1.0);
+        folder.add(menu, 'dir.y', -1.0, 1.0);
+        folder.add(menu, 'dir.z', -1.0, 1.0);
+        folder.add(menu, 'innerCone', 0.0, 1.0);
+        folder.add(menu, 'outerCone', 0.0, 1.0);
         folder.add(menu, 'specular');
         folder.add(menu, 'diffuse');
         folder.add(menu, 'constantAttenuation', 0.0, 1.0);
