@@ -17,7 +17,7 @@ SceneJS.GUI = function (scene, nodeIds) {
                         lookat(node);
                         break;
                     case "lights":
-                        spotLight(node, 0);
+                        pointLight(node, 0);
                         break;
                     case "material":
                         material(node);
@@ -147,80 +147,6 @@ SceneJS.GUI = function (scene, nodeIds) {
         folder.add(menu, 'color.r', 0.0, 1.0);
         folder.add(menu, 'color.g', 0.0, 1.0);
         folder.add(menu, 'color.b', 0.0, 1.0);
-        folder.add(menu, 'specular');
-        folder.add(menu, 'diffuse');
-        folder.add(menu, 'constantAttenuation', 0.0, 1.0);
-        folder.add(menu, 'linearAttenuation', 0.0, 1.0);
-        folder.add(menu, 'quadraticAttenuation', 0.0, 1.0);
-        folder.open();
-    }
-
-    function spotLight(lights) {
-        var Menu = function () {
-            this["pos.x"] = 10.0;
-            this["pos.y"] = 10.0;
-            this["pos.z"] = 10.0;
-            this["color.r"] = 1.0;
-            this["color.g"] = 1.0;
-            this["color.b"] = 1.0;
-            this["dir.x"] = 0.0;
-            this["dir.y"] = 0.0;
-            this["dir.z"] = -1.0;
-            this.innerCone = 0.25;
-            this.outerCone = 0.3;
-            this.constantAttenuation = 0.0;
-            this.linearAttenuation = 0.0;
-            this.quadraticAttenuation = 0.0;
-            this.specular = true;
-            this.diffuse = true;
-
-            var self = this;
-
-            var update = function () {
-                lights.setLights({
-                    "0":{
-                        pos:{
-                            x:self["pos.x"],
-                            y:self["pos.y"],
-                            z:self["pos.z"]
-                        },
-                        color:{
-                            r:self["color.r"],
-                            g:self["color.g"],
-                            b:self["color.b"]
-                        },
-                        dir:{
-                            x:self["dir.x"],
-                            y:self["dir.y"],
-                            z:self["dir.z"]
-                        },
-                        innerCone:self.innerCone,
-                        outerCone:self.outerCone,
-                        constantAttenuation:self.constantAttenuation,
-                        linearAttenuation:self.linearAttenuation,
-                        quadraticAttenuation:self.quadraticAttenuation,
-                        specular:self.specular,
-                        diffuse:self.diffuse
-                    }
-                });
-                requestAnimationFrame(update);
-            };
-            update();
-        };
-
-        var folder = gui.addFolder('Light ' + index);
-        var menu = new Menu();
-        folder.add(menu, 'pos.x', -10.0, 10.0);
-        folder.add(menu, 'pos.y', -10.0, 10.0);
-        folder.add(menu, 'pos.z', -10.0, 10.0);
-        folder.add(menu, 'color.r', 0.0, 1.0);
-        folder.add(menu, 'color.g', 0.0, 1.0);
-        folder.add(menu, 'color.b', 0.0, 1.0);
-        folder.add(menu, 'dir.x', 0.0, 1.0);
-        folder.add(menu, 'dir.y', 0.0, 1.0);
-        folder.add(menu, 'dir.z', 0.0, 1.0);
-        folder.add(menu, 'innerCone', 0.0, 1.0);
-        folder.add(menu, 'outerCone', 0.0, 1.0);
         folder.add(menu, 'specular');
         folder.add(menu, 'diffuse');
         folder.add(menu, 'constantAttenuation', 0.0, 1.0);
