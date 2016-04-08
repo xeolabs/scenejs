@@ -1020,7 +1020,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("  float   dotN;");
             add("  float   spotDirRatio;");
             add("  float   lightDist;");
-            add("  float   coneDiff;");
 
             if (tangents) {
 
@@ -1134,13 +1133,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         "  SCENEJS_uLightAttenuation" + i + ".y * lightDist + " +
                         "  SCENEJS_uLightAttenuation" + i + ".z * lightDist * lightDist);");
 
-                    add("coneDiff = SCENEJS_uOuterCone" + i + " - SCENEJS_uInnerCone" + i + ";");
-
-                    add("if (coneDiff == 0.0) {");
-                    add("  attenuation *= 1.0 - step(SCENEJS_uInnerCone" + i + ", spotDirRatio);");
-                    add("} else {");
-                    add("  attenuation *= 1.0 - clamp((spotDirRatio - SCENEJS_uInnerCone" + i + ") / coneDiff, 0.0, 1.0);");
-                    add("}");
+                    // Attenuations due to spotlight cones
+                    add("attenuation *= 1.0 - clamp((spotDirRatio - SCENEJS_uInnerCone" + i + ") / max(SCENEJS_uOuterCone" + i + " - SCENEJS_uInnerCone" + i + ", 0.0001), 0.0, 1.0);");
 
                     if (light.diffuse) {
                         add("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
