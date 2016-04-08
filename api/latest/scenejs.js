@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-04-04
+ * Built on 2016-04-08
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -6460,32 +6460,41 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         };
 
     } else if (type === gl.BOOL_VEC2) {
+        value = new Array(2);
 
         func = function (v) {
             if (value !== null && value[0] === v[0] && value[1] === v[1]) {
                 return;
             }
-            value = v;
+            value[0] = v[0];
+            value[1] = v[1];
             gl.uniform2iv(location, v);
         };
 
     } else if (type === gl.BOOL_VEC3) {
+        value = new Array(3);
 
         func = function (v) {
             if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
                 return;
             }
-            value = v;
+            value[0] = v[0];
+            value[1] = v[1];
+            value[2] = v[2];
             gl.uniform3iv(location, v);
         };
 
     } else if (type === gl.BOOL_VEC4) {
+        value = new Array(4);
 
         func = function (v) {
             if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
                 return;
             }
-            value = v;
+            value[0] = v[0];
+            value[1] = v[1];
+            value[2] = v[2];
+            value[3] = v[3];
             gl.uniform4iv(location, v);
         };
 
@@ -6500,32 +6509,35 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         };
 
     } else if (type === gl.INT_VEC2) {
+        value = new Uint32Array(2);
 
         func = function (v) {
             if (value !== null && value[0] === v[0] && value[1] === v[1]) {
                 return;
             }
-            value = v;
+            value.set(v);
             gl.uniform2iv(location, v);
         };
 
     } else if (type === gl.INT_VEC3) {
+        value = new Uint32Array(3);
 
         func = function (v) {
             if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
                 return;
             }
-            value = v;
+            value.set(v);
             gl.uniform3iv(location, v);
         };
 
     } else if (type === gl.INT_VEC4) {
+        value = new Uint32Array(4);
 
         func = function (v) {
             if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
                 return;
             }
-            value = v;
+            value.set(v);
             gl.uniform4iv(location, v);
         };
 
@@ -6540,32 +6552,35 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         };
 
     } else if (type === gl.FLOAT_VEC2) {
+        value = new Float32Array(2);
 
         func = function (v) {
             if (value !== null && value[0] === v[0] && value[1] === v[1]) {
                 return;
             }
-            value = v;
+            value.set(v);
             gl.uniform2fv(location, v);
         };
 
     } else if (type === gl.FLOAT_VEC3) {
+        value = new Float32Array(3);
 
         func = function (v) {
             if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
                 return;
             }
-            value = v;
+            value.set(v);
             gl.uniform3fv(location, v);
         };
 
     } else if (type === gl.FLOAT_VEC4) {
+        value = new Float32Array(4);
 
         func = function (v) {
             if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
                 return;
             }
-            value = v;
+            value.set(v);
             gl.uniform4fv(location, v);
         };
 
@@ -10290,10 +10305,10 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
         this._core.lights[index] = light;
 
         var mode = cfg.mode || "dir";
-        if (mode != "dir" && mode != "point" && mode != "ambient") {
+        if (mode != "dir" && mode != "point" && mode != "ambient" && mode != "spot") {
             throw SceneJS_error.fatalError(
                 SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Light mode not supported - should be 'dir' or 'point' or 'ambient'");
+                "Light mode not supported - should be 'dir' or 'point' or 'spot' or 'ambient'");
         }
 
         var pos = cfg.pos;
@@ -10310,8 +10325,10 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
         light.mode = mode;
         light.diffuse = (mode == "ambient") ? true : ((cfg.diffuse != undefined) ? cfg.diffuse : true);
         light.specular = (mode == "ambient") ? false : ((cfg.specular != undefined) ? cfg.specular : true);
-        light.pos = cfg.pos ? [ pos.x || 0, pos.y || 0, pos.z || 0 ] : [0, 0, 0];
+        light.pos = cfg.pos ? [pos.x || 0, pos.y || 0, pos.z || 0 ] : [0, 0, 0];
         light.dir = cfg.dir ? [dir.x || 0, dir.y || 0, dir.z || 0] : [0, 0, 1];
+        light.innerCone = cfg.innerCone != undefined ? cfg.innerCone : 0.25;
+        light.outerCone = cfg.outerCone != undefined ? cfg.outerCone : 0.5;
         light.attenuation = [
                 cfg.constantAttenuation != undefined ? cfg.constantAttenuation : 0.0,
                 cfg.linearAttenuation || 0.0,
@@ -10398,6 +10415,16 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
             imageDirty = true;
         }
 
+        if (cfg.innerCone != undefined && cfg.innerCone != light.innerCone) {
+            light.innerCone = cfg.innerCone;
+            imageDirty = true;
+        }
+
+        if (cfg.outerCone != undefined && cfg.outerCone != light.outerCone) {
+            light.outerCone = cfg.outerCone;
+            imageDirty = true;
+        }
+
         if (cfg.constantAttenuation != undefined) {
             light.attenuation[0] = cfg.constantAttenuation;
             imageDirty = true;
@@ -10453,7 +10480,8 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
         coreStack[stackLen] = null; // Release memory
     };
 
-})();;(function () {
+})();
+;(function () {
 
     var defaultMatrix = SceneJS_math_lookAtMat4c(0, 0, 10, 0, 0, 0, 0, 1, 0);
     var defaultMat = new Float32Array(defaultMatrix);
@@ -18277,6 +18305,14 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     add("uniform vec3 SCENEJS_uLightPos" + i + ";");
                 }
 
+                if (light.mode == "spot") {
+                    add("uniform vec3  SCENEJS_uLightAttenuation" + i + ";");
+                    add("uniform vec3 SCENEJS_uLightPos" + i + ";");
+                    add("uniform vec3 SCENEJS_uLightDir" + i + ";");
+                    add("uniform float SCENEJS_uInnerCone" + i + ";");
+                    add("uniform float SCENEJS_uOuterCone" + i + ";");
+                }
+
             }
         }
 
@@ -18517,8 +18553,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("  vec3    lightValue      = vec3(0.0, 0.0, 0.0);");
             add("  vec3    specularValue   = vec3(0.0, 0.0, 0.0);");
             add("  vec3    viewLightVec;");
+            add("  vec3    viewLightDir;")
             add("  float   dotN;");
+            add("  float   spotDirRatio;");
             add("  float   lightDist;");
+            add("  float   coneDiff;");
 
             if (tangents) {
 
@@ -18573,9 +18612,72 @@ var SceneJS_ProgramSourceFactory = new (function () {
                     add("lightDist = length( SCENEJS_uLightPos" + i + " - SCENEJS_vWorldVertex.xyz);");
 
                     add("attenuation = 1.0 - (" +
-                        "  SCENEJS_uLightAttenuation" + i + "[0] + " +
-                        "  SCENEJS_uLightAttenuation" + i + "[1] * lightDist + " +
-                        "  SCENEJS_uLightAttenuation" + i + "[2] * lightDist * lightDist);");
+                        "  SCENEJS_uLightAttenuation" + i + ".x + " +
+                        "  SCENEJS_uLightAttenuation" + i + ".y * lightDist + " +
+                        "  SCENEJS_uLightAttenuation" + i + ".z * lightDist * lightDist);");
+
+                    if (light.diffuse) {
+                        add("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
+                    }
+
+                    if (light.specular) {
+                        add("    specularValue += specularColor * SCENEJS_uLightColor" + i +
+                            " * specular * pow(max(dot(reflect(normalize(-viewLightVec), normalize(-viewNormalVec)), normalize(-SCENEJS_vViewVertex.xyz)), 0.0), shine) * attenuation;");
+                    }
+                }
+
+                if (light.mode == "spot") {
+
+                    add("viewLightDir = SCENEJS_uLightDir" + i + ";")
+
+                    if (light.space == "world") {
+
+                        // World space
+
+                        add("viewLightVec = SCENEJS_uLightPos" + i + " - SCENEJS_vWorldVertex.xyz;"); // Vector from World coordinate to light pos
+
+                        // Transform to View space
+                        add("viewLightVec = vec3(SCENEJS_uVMatrix * vec4(viewLightVec, 0.0)).xyz;");
+                        add("viewLightDir = vec3(SCENEJS_uVMatrix * vec4(viewLightDir, 0.0)).xyz;");
+
+                        if (tangents) {
+
+                            // Transform to Tangent space
+                            add("viewLightVec *= TBM;");
+                            add("viewLightDir *= TBM;");
+                        }
+
+                    } else {
+
+                        // View space
+
+                        add("viewLightVec = SCENEJS_uLightPos" + i + ".xyz - SCENEJS_vViewVertex.xyz;"); // Vector from View coordinate to light pos
+
+                        if (tangents) {
+
+                            // Transform to tangent space
+                            add("viewLightVec *= TBM;");
+                            add("viewLightDir *= TBM;");
+                        }
+                    }
+
+                    add("dotN = max(dot(viewNormalVec, normalize(viewLightVec)), 0.0);");
+                    add("spotDirRatio = 1.0 - max(dot(normalize(viewLightDir), normalize(-viewLightVec)), 0.0);");
+
+                    add("lightDist = length( SCENEJS_uLightPos" + i + " - SCENEJS_vWorldVertex.xyz);");
+
+                    add("attenuation = 1.0 - (" +
+                        "  SCENEJS_uLightAttenuation" + i + ".x + " +
+                        "  SCENEJS_uLightAttenuation" + i + ".y * lightDist + " +
+                        "  SCENEJS_uLightAttenuation" + i + ".z * lightDist * lightDist);");
+
+                    add("coneDiff = SCENEJS_uOuterCone" + i + " - SCENEJS_uInnerCone" + i + ";");
+
+                    add("if (coneDiff == 0.0) {");
+                    add("  attenuation *= 1.0 - step(SCENEJS_uInnerCone" + i + ", spotDirRatio);");
+                    add("} else {");
+                    add("  attenuation *= 1.0 - clamp((spotDirRatio - SCENEJS_uInnerCone" + i + ") / coneDiff, 0.0, 1.0);");
+                    add("}");
 
                     if (light.diffuse) {
                         add("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
@@ -18767,7 +18869,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
     }
 
 })
-();;/**
+();
+;/**
  * @class Source code for pick and draw shader programs, to be compiled into one or more {@link SceneJS_Program}s
  * @private
  * 
@@ -20005,6 +20108,8 @@ SceneJS_ChunkFactory.createChunkType({
         this._uLightCutOff = this._uLightCutOff || [];
         this._uLightSpotExp = this._uLightSpotExp || [];
         this._uLightAttenuation = this._uLightAttenuation || [];
+        this._uInnerCone = this._uInnerCone || [];
+        this._uOuterCone = this._uOuterCone || [];
 
         var lights = this.core.lights;
         var program = this.program;
@@ -20028,6 +20133,15 @@ SceneJS_ChunkFactory.createChunkType({
                     this._uLightPos[i] = program.draw.getUniform("SCENEJS_uLightPos" + i);
                     this._uLightDir[i] = null;
                     this._uLightAttenuation[i] = program.draw.getUniform("SCENEJS_uLightAttenuation" + i);
+                    break;
+
+                case "spot":
+                    this._uLightColor[i] = program.draw.getUniform("SCENEJS_uLightColor" + i);
+                    this._uLightPos[i] = program.draw.getUniform("SCENEJS_uLightPos" + i);
+                    this._uLightDir[i] = program.draw.getUniform("SCENEJS_uLightDir" + i);
+                    this._uLightAttenuation[i] = program.draw.getUniform("SCENEJS_uLightAttenuation" + i);
+                    this._uInnerCone[i] = program.draw.getUniform("SCENEJS_uInnerCone" + i);
+                    this._uOuterCone[i] = program.draw.getUniform("SCENEJS_uOuterCone" + i);
                     break;
             }
         }
@@ -20068,10 +20182,19 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._uLightDir[i]) {
                     this._uLightDir[i].setValue(light.dir);
                 }
+
+                if (this._uInnerCone[i]) {
+                    this._uInnerCone[i].setValue(light.innerCone);
+                }
+
+                if (this._uOuterCone[i]) {
+                    this._uOuterCone[i].setValue(light.outerCone);
+                }
             }
         }
     }
-});;/**
+});
+;/**
  *
  */
 SceneJS_ChunkFactory.createChunkType({
