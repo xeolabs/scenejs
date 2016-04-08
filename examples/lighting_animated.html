@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.min.js"></script>
+    <script src="libs/dat.gui.min.js"></script>
+    <script src="libs/gui/gui.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoLight">
+    <a href="http://scenejs.org">SceneJS</a> - Animated spot and point lights
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                yaw:10,
+                pitch:-20,
+                zoom:50,
+                zoomSensitivity:5,
+
+                nodes:[
+
+                    // Override default lights with a single positional light source in View-space.
+                    // Since our light is in View-space, it will remain locked in alignment with
+                    // the view frustum and will therefore not change position relative to our
+                    // changing viewpoint. It will behave as if it were head-mounted.
+                    {
+                        type:"lights",
+                        id:"myLights", // So we can reference this lights node
+                        lights:[
+                            {
+                                mode:"spot",
+                                color:{ r:0.6, g:0.6, b:0.6 },
+                                diffuse:true,
+                                specular:true,
+                                pos:{ x:0, y:10, z:0 },
+                                dir:{ x:0, y:-1, z:0 },
+                                innerCone: 0.5,
+                                outerCone: 0.65,
+                                space:"world"
+                            },
+                            {
+                                mode:"point",
+                                color:{ r:0, g:0, b:1.0 },
+                                diffuse:true,
+                                specular:true,
+                                pos:{ x:5, y:10, z:0 },
+                                dir:{ x:0, y:-1, z:0 },
+                                innerCone: 0.5,
+                                outerCone: 0.65,
+                                linearAttenuation: 0.02,
+                                space:"world"
+                            },
+                            {
+                                mode:"point",
+                                color:{ r:1.0, g:0, b:0 },
+                                diffuse:true,
+                                specular:true,
+                                pos:{ x:-5, y:-10, z:0 },
+                                dir:{ x:0, y:-1, z:0 },
+                                innerCone: 0.5,
+                                outerCone: 0.65,
+                                linearAttenuation: 0.02,
+                                space:"world"
+                            }
+                        ],
+
+                        nodes:[
+                            {
+                                type:"material",
+                                id:"myMaterial",
+                                color:{ r:1, g:1, b:1 },
+                                specularColor:{ r:1.0, g:1.0, b:1.0 },
+                                specular:1.0,
+                                shine:70.0,
+                                emit:0,
+                                alpha:1.0,
+
+                                nodes:getTeapots()
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    scene.getNode("myLights", function(lights) {
+        var lightCore = lights._core.lights;
+
+        var spotLightDir = {
+            x: lightCore[0].dir[0],
+            y: lightCore[0].dir[1],
+            z: lightCore[0].dir[2]
+        };
+
+        var pointLightPos1 = {
+            x: lightCore[1].pos[0],
+            y: lightCore[1].pos[1],
+            z: lightCore[1].pos[2]
+        };
+
+        var pointLightPos2 = {
+            x: lightCore[2].pos[0],
+            y: lightCore[2].pos[1],
+            z: lightCore[2].pos[2]
+        };
+
+        var vSpot = 0.01;
+        var vPoint1 = 0.1;
+        var vPoint2 = -0.1;
+
+        scene.on("tick", function() {
+            if (spotLightDir.x > 1 || spotLightDir.x < -1) {
+                vSpot *= -1;
+            }
+
+            spotLightDir.x += vSpot;
+
+            if (pointLightPos1.y > 10 || pointLightPos1.y < -10) {
+                vPoint1 *= -1;
+            }
+
+            pointLightPos1.y += vPoint1;
+
+            if (pointLightPos2.y > 10 || pointLightPos2.y < -10) {
+                vPoint2 *= -1;
+            }
+
+            pointLightPos2.y += vPoint2;
+
+            lights.setLights([
+                {
+                    dir: spotLightDir
+                },
+                {
+                    pos: pointLightPos1
+                },
+                {
+                    pos: pointLightPos2
+                }
+            ])
+
+        });
+    });
+
+    // Simple GUI for playing around with the lights and material nodes
+
+    function getTeapots() {
+        var nodes = [];
+        var extent = 50;
+        var inc = extent / 5;
+        for (var x = -extent; x < extent; x += inc) {
+            for (var z = -extent; z < extent; z += inc) {
+                nodes.push({
+                    type: "translate",
+                    x: x,
+                    y: 0,
+                    z: z,
+                    nodes: [
+                        {
+                            type: "name",
+                            name: "" + x + "." + z,
+                            nodes: [
+                                {
+                                    type: "geometry/teapot"
+                                }
+                            ]
+                        }
+                    ]
+                });
+            }
+        }
+        return nodes;
+    }
+
+</script>
+</body>
+</html>
