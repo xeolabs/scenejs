@@ -10328,7 +10328,7 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
         light.pos = cfg.pos ? [pos.x || 0, pos.y || 0, pos.z || 0 ] : [0, 0, 0];
         light.dir = cfg.dir ? [dir.x || 0, dir.y || 0, dir.z || 0] : [0, 0, 1];
         light.innerCone = cfg.innerCone != undefined ? cfg.innerCone : 0.25;
-        light.outerCone = cfg.outerCone != undefined ? cfg.outerCone : 0.5;
+        light.outerCone = cfg.outerCone != undefined ? cfg.outerCone : 0;
         light.attenuation = [
                 cfg.constantAttenuation != undefined ? cfg.constantAttenuation : 0.0,
                 cfg.linearAttenuation || 0.0,
@@ -18557,7 +18557,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("  float   dotN;");
             add("  float   spotDirRatio;");
             add("  float   lightDist;");
-            add("  float   coneDiff;");
 
             if (tangents) {
 
@@ -18671,13 +18670,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         "  SCENEJS_uLightAttenuation" + i + ".y * lightDist + " +
                         "  SCENEJS_uLightAttenuation" + i + ".z * lightDist * lightDist);");
 
-                    add("coneDiff = SCENEJS_uOuterCone" + i + " - SCENEJS_uInnerCone" + i + ";");
-
-                    add("if (coneDiff == 0.0) {");
-                    add("  attenuation *= 1.0 - step(SCENEJS_uInnerCone" + i + ", spotDirRatio);");
-                    add("} else {");
-                    add("  attenuation *= 1.0 - clamp((spotDirRatio - SCENEJS_uInnerCone" + i + ") / coneDiff, 0.0, 1.0);");
-                    add("}");
+                    // Attenuations due to spotlight cones
+                    add("attenuation *= 1.0 - clamp((spotDirRatio - SCENEJS_uInnerCone" + i + ") / max(SCENEJS_uOuterCone" + i + " - SCENEJS_uInnerCone" + i + ", 0.0001), 0.0, 1.0);");
 
                     if (light.diffuse) {
                         add("      lightValue += dotN * SCENEJS_uLightColor" + i + " * attenuation;");
