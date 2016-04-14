@@ -371,6 +371,28 @@ var SceneJS = new (function () {
     };
 
     /**
+    * Shim for slicing arrays regardless of the array type.
+    * (Primarily because TypedArray.prototype.slice is
+    * not supported on all platforms)
+    */
+    this._sliceArray = function(array, start, end) {
+        if (typeof array.slice === "function") {
+            return array.slice(start, end);
+        }
+
+        end = end || array.length;
+
+        var length = end - start;
+        var newArray = new array.constructor(length);
+
+        for (var i = 0; i < length; i++) {
+            newArray[i] = array[start + i];
+        }
+
+        return newArray;
+    };
+
+    /**
      * Resets SceneJS, destroying all existing scenes
      */
     this.reset = function () {
