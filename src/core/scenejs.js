@@ -376,7 +376,7 @@ var SceneJS = new (function () {
     * not supported on all platforms)
     */
     this._sliceArray = function(array, start, end) {
-        if (typeof array.slice === "function") {
+        if (array.slice) {
             return array.slice(start, end);
         }
 
