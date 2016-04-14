@@ -712,7 +712,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
         tagMask = this._tagSelector.mask;
         tagRegex = this._tagSelector.regex;
     }
-    
+
     for (i = 0, len = this._objectListLen; i < len; i++) {
 
         object = this._objectList[i];
@@ -1224,7 +1224,7 @@ SceneJS_Display.prototype._logPickList = function () {
                     c[1] = positions[ic3 + 1];
                     c[2] = positions[ic3 + 2];
                 }
-                
+
 
                 // Get Local-space cartesian coordinates of the ray-triangle intersection
 
@@ -1241,12 +1241,12 @@ SceneJS_Display.prototype._logPickList = function () {
 
                 SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
 
-                hit.worldPos = tempVec4b.slice(0, 3);
+                hit.worldPos = SceneJS._sliceArray(tempVec4b, 0, 3);
 
                 // Get barycentric coordinates of the ray-triangle intersection
 
                 var barycentric = hit.barycentric = SceneJS_math_cartesianToBarycentric2(position, a, b, c, SceneJS_math_vec3());
-                
+
                 // Get interpolated normal vector
 
                 var gotNormals = false;
