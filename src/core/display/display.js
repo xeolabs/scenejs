@@ -637,14 +637,13 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
         object = this._objectList[i];
         if (!object.program) {
             // Non-visual object (eg. sound)
-            object.sortKey = -1;
+            object.sortKey0 = -1;
         } else {
-            object.sortKey =
-                ((object.stage.priority + 1) * 1000000000000)
-                + ((object.flags.transparent ? 2 : 1) * 1000000000)
-                + ((object.layer.priority + 1) * 1000000)
-                + ((object.program.id + 1) * 1000)
-                + object.texture.stateId;
+            object.sortKey0 = object.stage.priority;
+            object.sortKey1 = object.flags.transparent ? 2 : 1;
+            object.sortKey2 = object.layer.priority;
+            object.sortKey3 = object.program.id;
+            object.sortKey4 = object.texture.stateId;
         }
     }
     //  console.log("--------------------------------------------------------------------------------------------------");
@@ -656,7 +655,11 @@ SceneJS_Display.prototype._stateSort = function () {
 };
 
 SceneJS_Display.prototype._stateSortObjects = function (a, b) {
-    return a.sortKey - b.sortKey;
+    return  (a.sortKey0 - b.sortKey0) ||
+            (a.sortKey1 - b.sortKey1) ||
+            (a.sortKey2 - b.sortKey2) ||
+            (a.sortKey3 - b.sortKey3) ||
+            (a.sortKey4 - b.sortKey4);
 };
 
 SceneJS_Display.prototype._logObjectList = function () {
