@@ -342,16 +342,6 @@ new (function () {
             magFilter: this._getGLOption("magFilter", gl, layer, gl.LINEAR),
             wrapS: this._getGLOption("wrapS", gl, layer, gl.REPEAT),
             wrapT: this._getGLOption("wrapT", gl, layer, gl.REPEAT),
-            isDepth: this._getOption(layer.isDepth, false),
-            depthMode: this._getGLOption("depthMode", gl, layer, gl.LUMINANCE),
-            depthCompareMode: this._getGLOption("depthCompareMode", gl, layer, gl.COMPARE_R_TO_TEXTURE),
-            depthCompareFunc: this._getGLOption("depthCompareFunc", gl, layer, gl.LEQUAL),
-            flipY: this._getOption(layer.flipY, true),
-            width: this._getOption(layer.width, 1),
-            height: this._getOption(layer.height, 1),
-            internalFormat: this._getGLOption("internalFormat", gl, layer, gl.LEQUAL),
-            sourceFormat: this._getGLOption("sourceType", gl, layer, gl.ALPHA),
-            sourceType: this._getGLOption("sourceType", gl, layer, gl.UNSIGNED_BYTE),
             update: null
         });
 

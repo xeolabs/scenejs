@@ -85,6 +85,10 @@ new (function () {
             SceneJS._apply({
                     waitForLoad: params.waitForLoad == undefined ? true : params.waitForLoad,
                     texture: null,
+                    minFilter: params.minFilter,
+                    magFilter: params.magFilter,
+                    wrapS: params.wrapS,
+                    wrapT: params.wrapT,
                     uvLayerIdx: uvLayerIdx,
                     isNormalMap: params.applyTo === "normals",
                     applyFrom: applyFrom,
@@ -258,16 +262,6 @@ new (function () {
             magFilter: this._getGLOption("magFilter", gl.LINEAR),
             wrapS: this._getGLOption("wrapS", gl.REPEAT),
             wrapT: this._getGLOption("wrapT", gl.REPEAT),
-            isDepth: this._getOption(this._core.isDepth, false),
-            depthMode: this._getGLOption("depthMode", gl.LUMINANCE),
-            depthCompareMode: this._getGLOption("depthCompareMode", gl.COMPARE_R_TO_TEXTURE),
-            depthCompareFunc: this._getGLOption("depthCompareFunc", gl.LEQUAL),
-            flipY: this._getOption(this._core.flipY, true),
-            width: this._getOption(this._core.width, 1),
-            height: this._getOption(this._core.height, 1),
-            internalFormat: this._getGLOption("internalFormat", gl.ALPHA),
-            sourceFormat: this._getGLOption("sourceFormat", gl.ALPHA),
-            sourceType: this._getGLOption("sourceType", gl.UNSIGNED_BYTE),
             update: null
         });
 
