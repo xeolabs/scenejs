@@ -459,6 +459,8 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this.stateOrderDirty = true;
 };
 
+
+
 SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, core2) {
 
     var chunkId;
@@ -577,7 +579,7 @@ SceneJS_Display.prototype.render = function (params) {
         this.stateOrderDirty = true;        // Now needs state ordering
     }
 
-    if (this.stateOrderDirty) {
+    if (this.stateOrderDirty || this.imageDirty) {
         this._makeStateSortKeys();       // Compute state sort order
         this.stateOrderDirty = false;
         this.stateSortDirty = true;     // Now needs state sorting
@@ -639,11 +641,14 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
             // Non-visual object (eg. sound)
             object.sortKey0 = -1;
         } else {
+            var transparent = object.flags.transparent;
+            var depth = object.getDepth();
             object.sortKey0 = object.stage.priority;
-            object.sortKey1 = object.flags.transparent ? 2 : 1;
+            object.sortKey1 = transparent ? 2 : 1;
             object.sortKey2 = object.layer.priority;
-            object.sortKey3 = object.program.id;
-            object.sortKey4 = object.texture.stateId;
+            object.sortKey3 = transparent ? -depth : depth;
+            object.sortKey4 = object.program.id;
+            object.sortKey5 = object.texture.stateId;
         }
     }
     //  console.log("--------------------------------------------------------------------------------------------------");
@@ -659,7 +664,8 @@ SceneJS_Display.prototype._stateSortObjects = function (a, b) {
             (a.sortKey1 - b.sortKey1) ||
             (a.sortKey2 - b.sortKey2) ||
             (a.sortKey3 - b.sortKey3) ||
-            (a.sortKey4 - b.sortKey4);
+            (a.sortKey4 - b.sortKey4) ||
+            (a.sortKey5 - b.sortKey5);
 };
 
 SceneJS_Display.prototype._logObjectList = function () {

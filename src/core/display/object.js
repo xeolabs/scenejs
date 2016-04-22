@@ -60,3 +60,66 @@ var SceneJS_Object = function(id) {
      */
     this.tag = null;
 };
+
+(function() {
+    var tempVec4 = SceneJS_math_vec4();
+    var tempMat4 = SceneJS_math_mat4();
+
+    SceneJS_Object.prototype.getDepth = function() {
+        if (!this.centroid) {
+            this.centroid = this._calculateCentroid(this);
+        }
+
+        this.modelTransform.build();
+        this.viewTransform.rebuild();
+
+        var modelMatrix = this.modelTransform.mat;
+        var viewMatrix = this.viewTransform.mat;
+
+        var mvMatrix = SceneJS_math_mulMat4(viewMatrix, modelMatrix, tempMat4);
+        var viewCentroid = SceneJS_math_transformVector4(mvMatrix, this.centroid, tempVec4);
+
+        return -viewCentroid[2];
+    };
+
+    SceneJS_Object.prototype._calculateCentroid = function() {
+
+        var centroid = SceneJS_math_vec4();
+
+        var positions = this.geometry.arrays.positions;
+        var indices = this.geometry.arrays.indices;
+
+        var xmin = Infinity;
+        var ymin = Infinity;
+        var zmin = Infinity;
+        var xmax = -Infinity;
+        var ymax = -Infinity;
+        var zmax = -Infinity;
+
+        var min = Math.min;
+        var max = Math.max;
+
+        for (var i = 0, len = indices.length; i < len; i++) {
+            var vi = indices[i] * 3;
+            var x = positions[vi];
+            var y = positions[vi + 1];
+            var z = positions[vi + 2];
+
+            xmin = min(x, xmin);
+            ymin = min(y, ymin);
+            zmin = min(z, zmin);
+            xmax = max(x, xmax);
+            ymax = max(y, ymax);
+            zmax = max(z, zmax);
+        }
+
+        centroid[0] = 0.5 * (xmin + xmax);
+        centroid[1] = 0.5 * (ymin + ymax);
+        centroid[2] = 0.5 * (zmin + zmax);
+        centroid[3] = 1;
+
+        return centroid;
+    };
+})();
+
+
