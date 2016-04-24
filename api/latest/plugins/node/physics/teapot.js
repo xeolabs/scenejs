@@ -1,9 +1,9 @@
 /**
  * A teapot with physics behaviour
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
- * <p>Documentation at: http://xeolabs.com/articles/scenejs-physics/</p>
+ * <p>Documentation at: http://xeographics.com/articles/scenejs-physics/</p>
  */
 SceneJS.Types.addType("physics/teapot", {
     construct:function (params) {

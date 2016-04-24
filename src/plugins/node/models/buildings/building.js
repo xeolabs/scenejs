@@ -1,7 +1,7 @@
 /**
     A building model
 
-    @author xeolabs / http://xeolabs.com
+    @author xeographics / http://xeographics.com
 
  */
 (function () {

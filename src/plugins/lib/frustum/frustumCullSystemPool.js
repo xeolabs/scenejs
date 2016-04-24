@@ -1,7 +1,7 @@
 /**
  * Container of frustum culling systems
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  */
 define([

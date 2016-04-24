@@ -1,7 +1,7 @@
 /**
  Scanlines shader
 
- @author xeolabs / http://xeolabs.com
+ @author xeographics / http://xeographics.com
 
  */
 SceneJS.Types.addType("shader/scanline", {

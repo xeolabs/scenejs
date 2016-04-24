@@ -2,16 +2,16 @@
   "name": "scenejs",
   "title": "SceneJS",
   "version": "4.2.2",
-  "description": "A WebGL-based 3D scene graph from xeoLabs",
+  "description": "A WebGL-based 3D scene graph from xeographics",
   "homepage": "http://scenejs.org/",
   "author": {
     "name": "Lindsay Kay",
-    "email": "lindsay.kay@xeolabs.com"
+    "email": "lindsay.kay@xeographics.com"
   },
   "license": "MIT License",
   "repository": {
     "type": "git",
-    "url": "http://github.com/xeolabs/scenejs.git"
+    "url": "http://github.com/xeographics/scenejs.git"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

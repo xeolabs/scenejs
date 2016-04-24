@@ -2,7 +2,7 @@
  * A spinning teapot node type.
  * <p>Demonstrates how to hook the type into the scene animation loop for autonomous animation.</p>
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  */
 SceneJS.Types.addType("demos/spinningTeapot", {

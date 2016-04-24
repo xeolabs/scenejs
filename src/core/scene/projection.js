@@ -45,7 +45,7 @@
             this.setOptics(params.optics); // Can be undefined
 
 //            // Rebuild on every scene tick
-//            // https://github.com/xeolabs/scenejs/issues/277
+//            // https://github.com/xeographics/scenejs/issues/277
 //            var self = this;
 //            this._tick = this.getScene().on("tick", function () {
 //                if (self._core.dirty) {

@@ -2,7 +2,7 @@
 
  Pre-made scene environment
 
- @author xeolabs / http://xeolabs.com
+ @author xeographics / http://xeographics.com
 
  */
 SceneJS.Types.addType("environments/holodeck", {

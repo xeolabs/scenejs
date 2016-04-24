@@ -134,7 +134,7 @@ SceneJS_ChunkFactory.createChunkType({
         var doMorph = this.core.targets && this.core.targets.length;
         var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
-        if (this.VAO && frameCtx.VAO) { // Workaround for https://github.com/xeolabs/scenejs/issues/459
+        if (this.VAO && frameCtx.VAO) { // Workaround for https://github.com/xeographics/scenejs/issues/459
             frameCtx.VAO.bindVertexArrayOES(this.VAO);
             if (doMorph) {
                 if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {

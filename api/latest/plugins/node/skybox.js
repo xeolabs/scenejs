@@ -2,7 +2,7 @@
 
  Customizable skybox node type, which allows you to customize its texture
 
- @author xeolabs / http://xeolabs.com
+ @author xeographics / http://xeographics.com
 
  <p>Usage example:</p>
 

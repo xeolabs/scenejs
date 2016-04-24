@@ -2,7 +2,7 @@
 
  Depth-of-Field post-process effect.
 
- @author xeolabs / http://xeolabs.com
+ @author xeographics / http://xeographics.com
 
  <p>Based on the article at Nutty Software: http://www.nutty.ca/?page_id=352&link=depth_of_field</p>
 

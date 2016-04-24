@@ -3,7 +3,7 @@
  * in frustumCullEngine.js
  *
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  *
  * This worker accepts various commands to configure the engine, add or remove

@@ -101,7 +101,7 @@
             this._core.dirty = true;
 
             // Rebuild on every scene tick
-            // https://github.com/xeolabs/scenejs/issues/277
+            // https://github.com/xeographics/scenejs/issues/277
             this._tick = this.getScene().on("tick", function () {
                 if (self._core.dirty) {
                     self._core.rebuild();

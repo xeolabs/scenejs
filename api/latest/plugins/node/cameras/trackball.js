@@ -2,7 +2,7 @@
  *
  * Quaternion-based viewing transform with pan, zoom and rotate, plus separate orbit and first-person modes.
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  * <p>Example #1</p>
  * <pre>

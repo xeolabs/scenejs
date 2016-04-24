@@ -1,7 +1,7 @@
 /**
  * A procedurally-generated tree
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  * <p>This is a quick bit of fun that borrows the procedural tree generation
  * code from the "Ghost Trees" Chrome Experiment by Marek Kapolka:</p>

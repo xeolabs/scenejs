@@ -1,7 +1,7 @@
 /**
  A simple procedurally-generated city model
 
- @author xeolabs / http://xeolabs.com
+ @author xeographics / http://xeographics.com
 
  <p>Usage example:</p>
 

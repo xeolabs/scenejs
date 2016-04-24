@@ -1,9 +1,9 @@
 /**
  * Configures a physics system
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
- * <p>Documentation at: http://xeolabs.com/articles/scenejs-physics/</p>
+ * <p>Documentation at: http://xeographics.com/articles/scenejs-physics/</p>
  */
 require([
     // Prefix routes to plugin support libs

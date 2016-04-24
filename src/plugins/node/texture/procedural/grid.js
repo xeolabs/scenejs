@@ -2,9 +2,9 @@
 
  Procedural grid texture
 
- @author xeolabs / http://xeolabs.com
+ @author xeographics / http://xeographics.com
 
- @author xeolabs / http://xeolabs.com
+ @author xeographics / http://xeographics.com
 
  <p>Usage: </p>
  <pre>

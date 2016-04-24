@@ -1,7 +1,7 @@
 /**
  * Frustum detail culling body
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  */
 SceneJS.Types.addType("cull/detail", {

@@ -22,7 +22,7 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-.xeolabsLogo {
+.xeographicsLogo {
 
     position: absolute;
     left: 0;
@@ -572,7 +572,7 @@ h3.subtitle {
     font-weight: bold;
     -webkit-transform-origin: 0% 100%;
     text-shadow: 0 0 1px #114166;
-    background: url('../examples/images/a-xeolabs-project.png') no-repeat top right;
+    background: url('../examples/images/a-xeographics-project.png') no-repeat top right;
 }
 
 article.fill h3 {

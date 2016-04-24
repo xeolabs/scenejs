@@ -1,7 +1,7 @@
 /**
  * MD2 importer
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  * Uses the K3D library to parse .MD2
  * © 2012 Ivan Kuckir

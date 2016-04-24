@@ -1,7 +1,7 @@
 /**
  * Cloudy skybox node type, with clouds reflected in a calm sea
  *
- *  @author xeolabs / http://xeolabs.com
+ *  @author xeographics / http://xeographics.com
  *
  * Usage example:
  *

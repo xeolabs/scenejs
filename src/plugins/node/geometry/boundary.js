@@ -1,7 +1,7 @@
 /**
  * Boundary geometry node type
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  * <p>Usage example:</p>
  *

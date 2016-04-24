@@ -1,7 +1,7 @@
 /**
  * Basic frustim visibility and detail clipping body
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  */
 require([

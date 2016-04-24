@@ -1,7 +1,7 @@
 /**
  * Skybox node type, with firey apocalyptic clouds
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  * Usage example:
  *

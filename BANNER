@@ -8,7 +8,7 @@
  *
  * <%= pkg.license %>
  * Copyright <%= grunt.template.today("yyyy") %>, <%= pkg.author.name %>
- * http://xeolabs.com/
+ * http://xeographics.com/
  *
  */
 

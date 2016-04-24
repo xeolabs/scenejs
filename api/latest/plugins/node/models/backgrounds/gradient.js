@@ -1,7 +1,7 @@
 /*
  * A gradient background
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  * The background is a quad that sits at the back of the view frustum.
  *

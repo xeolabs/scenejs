@@ -1,7 +1,7 @@
 /**
  * Reflection map of a numbered grid
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  * Usage example:
  *

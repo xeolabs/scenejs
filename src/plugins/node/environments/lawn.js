@@ -1,7 +1,7 @@
 /**
  * Pre-made scene environment
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  * <p>This environment has:</p>
  *

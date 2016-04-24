@@ -2,7 +2,7 @@
 
  <p>Convolution shader</p>
 
- @author xeolabs / http://xeolabs.org
+ @author xeographics / http://xeographics.org
 
  IN DEVELOPMENT
 

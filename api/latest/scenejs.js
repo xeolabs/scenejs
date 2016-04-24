@@ -1,26 +1,26 @@
 /*
  * SceneJS V4.2.2
  *
- * A WebGL-based 3D scene graph from xeoLabs
+ * A WebGL-based 3D scene graph from xeographics
  * http://scenejs.org/
  *
  * Built on 2016-04-08
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
- * http://xeolabs.com/
+ * http://xeographics.com/
  *
  */
 
 /*
  * SceneJS Latest
  *
- * A WebGL-based 3D scene graph from xeoLabs
+ * A WebGL-based 3D scene graph from xeographics
  * http://scenejs.org/
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
- * http://xeolabs.com/
+ * http://xeographics.com/
  *
  */
 
@@ -10584,7 +10584,7 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
             this._core.dirty = true;
 
             // Rebuild on every scene tick
-            // https://github.com/xeolabs/scenejs/issues/277
+            // https://github.com/xeographics/scenejs/issues/277
             this._tick = this.getScene().on("tick", function () {
                 if (self._core.dirty) {
                     self._core.rebuild();
@@ -19913,7 +19913,7 @@ SceneJS_ChunkFactory.createChunkType({
         var doMorph = this.core.targets && this.core.targets.length;
         var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
-        if (this.VAO && frameCtx.VAO) { // Workaround for https://github.com/xeolabs/scenejs/issues/459
+        if (this.VAO && frameCtx.VAO) { // Workaround for https://github.com/xeographics/scenejs/issues/459
             frameCtx.VAO.bindVertexArrayOES(this.VAO);
             if (doMorph) {
                 if (this.VAOMorphKey1 == this.core.key1 && this.VAOMorphKey2 == this.core.key2) {

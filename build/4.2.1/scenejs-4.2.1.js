@@ -1,26 +1,26 @@
 /*
  * SceneJS V4.2.1
  *
- * A WebGL-based 3D scene graph from xeoLabs
+ * A WebGL-based 3D scene graph from xeographics
  * http://scenejs.org/
  *
  * Built on 2015-06-17
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
- * http://xeolabs.com/
+ * http://xeographics.com/
  *
  */
 
 /*
  * SceneJS Latest
  *
- * A WebGL-based 3D scene graph from xeoLabs
+ * A WebGL-based 3D scene graph from xeographics
  * http://scenejs.org/
  *
  * MIT License
  * Copyright 2015, Lindsay Kay
- * http://xeolabs.com/
+ * http://xeographics.com/
  *
  */
 
@@ -9905,7 +9905,7 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
             this._core.dirty = true;
 
             // Rebuild on every scene tick
-            // https://github.com/xeolabs/scenejs/issues/277
+            // https://github.com/xeographics/scenejs/issues/277
             this._tick = this.getScene().on("tick", function () {
                 if (self._core.dirty) {
                     self._core.rebuild();

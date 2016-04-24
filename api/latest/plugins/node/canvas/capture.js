@@ -1,7 +1,7 @@
 /**
  * Custom node which captures images of the scene canvas
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  * <p>Usage example:</p>
  *

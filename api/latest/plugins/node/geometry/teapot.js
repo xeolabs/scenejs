@@ -1,7 +1,7 @@
 /**
  * Utah Teapot geometry node type
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  * <p><a href="http://en.wikipedia.org/wiki/Utah_teapot">http://en.wikipedia.org/wiki/Utah_teapot</a></p>
  *

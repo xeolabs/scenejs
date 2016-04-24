@@ -1,7 +1,7 @@
 /**
  * Container of physics systems
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  */
 define(

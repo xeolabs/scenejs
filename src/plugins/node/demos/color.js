@@ -1,7 +1,7 @@
 /**
  * Trivial example of a node type plugin
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  */
 SceneJS.Types.addType("demos/color", {

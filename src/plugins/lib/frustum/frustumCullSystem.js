@@ -1,7 +1,7 @@
 /**
  * A frustum cuilling system, which manages a frustum culling worker implemented in frustumCullWorker.js
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  */
 (function () {

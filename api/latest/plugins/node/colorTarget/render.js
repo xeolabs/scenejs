@@ -1,7 +1,7 @@
 /**
  * Renders a colorTarget to the entire canvas.
  *
- * @author xeolabs / http://xeolabs.com
+ * @author xeographics / http://xeographics.com
  *
  * <p>This is really just for debugging effects pipelines that use colorTargets.</p>
  */
