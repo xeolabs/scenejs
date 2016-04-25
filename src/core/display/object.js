@@ -20,7 +20,8 @@ var SceneJS_Object = function(id) {
      * State sort key, computed from {@link #layer}, {@link #program} and {@link #texture}
      * @type Number
      */
-    this.sortKey = null;
+    this.sortKey1 = null;
+    this.sortKey2 = null;
 
     /**
      * Sequence of state chunks applied to render this object
@@ -59,6 +60,11 @@ var SceneJS_Object = function(id) {
      * State core for the {@link SceneJS.Tag} that this object was compiled from, used for visibility cull
      */
     this.tag = null;
+
+    /**
+    *   Used to calculate the depth for depth sorting
+    */
+    this.centroid = null;
 };
 
 (function() {

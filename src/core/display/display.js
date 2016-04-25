@@ -580,9 +580,12 @@ SceneJS_Display.prototype.render = function (params) {
     }
 
     if (this.stateOrderDirty || this.imageDirty) {
-        this._makeStateSortKeys();       // Compute state sort order
+
+        // State sort will be dirty if the state order was dirty (due to priority or
+        // or transparency change) or if depth is re-calculated in _makeStateSortKeys
+        this.stateSortDirty = this.stateOrderDirty;     // Now needs state sorting
+        this._makeStateSortKeys();                      // Compute state sort order
         this.stateOrderDirty = false;
-        this.stateSortDirty = true;     // Now needs state sorting
     }
 
     if (this.stateSortDirty) {
@@ -639,16 +642,24 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
         object = this._objectList[i];
         if (!object.program) {
             // Non-visual object (eg. sound)
-            object.sortKey0 = -1;
+            object.sortKey1 = -1;
         } else {
             var transparent = object.flags.transparent;
-            var depth = object.getDepth();
-            object.sortKey0 = object.stage.priority;
-            object.sortKey1 = transparent ? 2 : 1;
-            object.sortKey2 = object.layer.priority;
-            object.sortKey3 = transparent ? -depth : depth;
-            object.sortKey4 = object.program.id;
-            object.sortKey5 = object.texture.stateId;
+            var depth;
+
+            if (transparent) {
+                depth = object.getDepth();
+                this.stateSortDirty = true;
+            } else {
+                depth = 0;
+            }
+
+            object.sortKey1 = (object.stage.priority + 1) * 3000000 +
+                              (transparent ? 2 : 1) * 1000000 +
+                              (object.layer.priority + 1) * 10000 +
+                              (transparent ?  9999 - depth : depth);
+            object.sortKey2 = (object.program.id + 1) * 100000
+                              object.texture.stateId;
         }
     }
     //  console.log("--------------------------------------------------------------------------------------------------");
@@ -660,12 +671,8 @@ SceneJS_Display.prototype._stateSort = function () {
 };
 
 SceneJS_Display.prototype._stateSortObjects = function (a, b) {
-    return  (a.sortKey0 - b.sortKey0) ||
-            (a.sortKey1 - b.sortKey1) ||
-            (a.sortKey2 - b.sortKey2) ||
-            (a.sortKey3 - b.sortKey3) ||
-            (a.sortKey4 - b.sortKey4) ||
-            (a.sortKey5 - b.sortKey5);
+    return  (a.sortKey1 - b.sortKey1) ||
+            (a.sortKey2 - b.sortKey2);
 };
 
 SceneJS_Display.prototype._logObjectList = function () {
@@ -871,29 +878,21 @@ SceneJS_Display.prototype._appendObjectToDrawLists = function (object, pickable)
             // 'unique' flag, because we don't want to cull runs of draw chunks because they contain the GL
             // drawElements calls which render the objects.
 
-            if (chunk.draw) {
-                if (chunk.unique || this._lastStateId[i] != chunk.id) { // Don't reapply repeated states
-                    this._drawList[this._drawListLen] = chunk;
-                    this._lastStateId[i] = chunk.id;
+            if (chunk.draw && (chunk.unique || this._lastStateId[i] != chunk.id)) {
+                this._drawList[this._drawListLen] = chunk;
+                this._lastStateId[i] = chunk.id;
 
-                    // Get index of first chunk in transparency pass
+                // Get index of first chunk in transparency pass
 
-                    if (chunk.core && chunk.core && chunk.core.transparent) {
-                        if (this._drawListTransparentIndex < 0) {
-                            this._drawListTransparentIndex = this._drawListLen;
-                        }
-                    }
-                    this._drawListLen++;
+                if (chunk.core && chunk.core.transparent && this._drawListTransparentIndex < 0) {
+                    this._drawListTransparentIndex = this._drawListLen;
                 }
+                this._drawListLen++;
             }
 
-            if (chunk.pick) {
-                if (pickable !== false) {   // Don't pick objects in unpickable stages
-                    if (chunk.unique || this._lastPickStateId[i] != chunk.id) { // Don't reapply repeated states
-                        this._pickDrawList[this._pickDrawListLen++] = chunk;
-                        this._lastPickStateId[i] = chunk.id;
-                    }
-                }
+            if (pickable !== false && chunk.pick && (chunk.unique || this._lastPickStateId[i] != chunk.id)) {
+                this._pickDrawList[this._pickDrawListLen++] = chunk;
+                this._lastPickStateId[i] = chunk.id;
             }
         }
     }
