@@ -12,6 +12,11 @@
             -khtml-user-select: none;
             -webkit-user-select: none;
         }
+
+        #sort-status {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 
     <script src="../api/latest/scenejs.js"></script>
@@ -20,32 +25,13 @@
 <body>
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - layers - transparency sorting<br><br>
-    Layers are typically used to partition your scene into prioritised "render bins",<br>
-    which will render in a specified order, which is useful for <a href="http://xeolabs.com/articles/scenejs-transparency/" target="parent">transparency sorting</a>.<br><br>
-    Layers may also be individually enabled or disabled, as shown in <a href="http://scenejs.org/examples/index.html#layers_enableDisable" target="parent">this other example</a>.
-
+    <a href="http://scenejs.org">SceneJS</a> - Depth Sorting<br><br>
+    SceneJS will automatically sort transparent objects by depth to ensure correct rendering.<br>
+    Without depth sorting, transparent objects can block rendering of objects behind them. <br>
+    Depth sorting in this scene is currently: <span id="sort-status"></span>
 </div>
 
 <script>
-
-    // Demonstrates how to use layer nodes to control the order in which geometry is rendered
-    //
-    // Layer nodes effectively put their sub-geometries into a proritized render bin, ordered
-    // with respect to other layers. The layer with the lowest priority value is rendered first.
-    // Geometry not defined within a layer is binned within an implicit layer of priority 0.
-    //
-    // Layer nodes are normally used to control the rendering order of transparent geometries,
-    // rendering them back-to-front to ensure that each object's pixels are not rejected by
-    // previous pixels in the Z-buffer and thus blend with the pixels of all other transparent
-    // objects.
-    //
-    // More info on transparency sorting here: http://www.opengl.org/wiki/Transparency_Sorting
-    //
-    // In the example below, we render three nested boxes, the innermost of which is opaque,
-    // with the outer two boxes transparent. We render the inner box first, then with
-    // transparency enabled, render the next two boxes, rendering the outermost box last.
-    //
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
@@ -62,14 +48,9 @@
                 type:"cameras/orbit",
                 zoom:10,
                 zoomSensitivity:5,
+                spin: 0.8,
 
                 nodes:[
-                    // Layer priority 0
-                    // Middle transparent red box
-                    //  See how we cull backfaces because we can't control the order in which faces
-                    // render. We don't want front faces rendering before back faces, which would
-                    // cause the back faces to be rejected by the depth buffer and deny the
-                    // opportunity to blend the faces - easy fix is just to not render the backfaces.
                     {
                         type:"flags",
                         flags:{
@@ -96,17 +77,7 @@
                                         ]
                                     }
                                 ]
-                            }
-                        ]
-                    },
-                    {
-                        type:"flags",
-                        flags:{
-                            transparent:true,
-                            backfaces:false    // Hide backfaces
-                        },
-
-                        nodes:[
+                            },
                             {
                                 type:"material",
                                 color:{ r:0.2, g:0.2, b:1 },
@@ -125,6 +96,44 @@
                                         ]
                                     }
                                 ]
+                            },
+                            {
+                                type:"material",
+                                color:{ r:0.2, g:1, b:0.2 },
+                                alpha:0.2,
+                                nodes:[
+                                    {
+                                        type:"translate",
+                                        x: -3,
+                                        nodes:[
+
+                                            // Box primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            {
+                                                type:"geometry/box"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                type:"material",
+                                color:{ r:0.2, g:1, b:1 },
+                                alpha:0.2,
+                                nodes:[
+                                    {
+                                        type:"translate",
+                                        x: 3,
+                                        nodes:[
+
+                                            // Box primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            {
+                                                type:"geometry/box"
+                                            }
+                                        ]
+                                    }
+                                ]
                             }
                         ]
                     }
@@ -132,6 +141,22 @@
             }
         ]
     });
+
+    var sortStatus = document.getElementById("sort-status");
+    var depthSorting = true;
+
+    function update() {
+        if (depthSorting) {
+            sortStatus.innerText = "ENABLED";
+        } else {
+            sortStatus.innerText = "DISABLED";
+        }
+        scene.setDepthSort(depthSorting);
+        depthSorting = !depthSorting;
+    }
+
+    update();
+    setInterval(update, 5000)
 
 </script>
 </body>

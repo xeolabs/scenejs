@@ -85,6 +85,11 @@ var SceneJS_Display = function (cfg) {
     this.transparent = cfg.transparent === true;
 
     /**
+     * Depth sort mode. Default to only sorting transparent objects.
+     */
+    this.depthSort = cfg.depthSort !== false;
+
+    /**
      * Node state core for the last {@link SceneJS.Enable} visited during scene graph compilation traversal
      * @type Object
      */
@@ -558,6 +563,13 @@ SceneJS_Display.prototype.removeObject = function (objectId) {
 };
 
 /**
+ * Enable or disable depth sorting
+ */
+SceneJS_Display.prototype.setDepthSort = function (enabled) {
+    this.depthSort = enabled;
+};
+
+/**
  * Set a tag selector to selectively activate objects that have matching SceneJS.Tag nodes
  */
 SceneJS_Display.prototype.selectTags = function (tagSelector) {
@@ -579,7 +591,8 @@ SceneJS_Display.prototype.render = function (params) {
         this.stateOrderDirty = true;        // Now needs state ordering
     }
 
-    if (this.stateOrderDirty || this.imageDirty) {
+
+    if (this.stateOrderDirty || (this.imageDirty && this.depthSort)) {
 
         // State sort will be dirty if the state order was dirty (due to priority or
         // or transparency change) or if depth is re-calculated in _makeStateSortKeys
@@ -647,7 +660,7 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
             var transparent = object.flags.transparent;
             var depth;
 
-            if (transparent) {
+            if (transparent && this.depthSort) {
                 depth = object.getDepth();
                 this.stateSortDirty = true;
             } else {
@@ -657,7 +670,7 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
             object.sortKey1 = (object.stage.priority + 1) * 3000000 +
                               (transparent ? 2 : 1) * 1000000 +
                               (object.layer.priority + 1) * 10000 +
-                              (transparent ?  9999 - depth : depth);
+                              (9999 - depth);
             object.sortKey2 = (object.program.id + 1) * 100000
                               object.texture.stateId;
         }
