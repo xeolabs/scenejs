@@ -119,6 +119,9 @@ var SceneJS_modelXFormStack = new (function () {
         /**
          * Pre-multiply matrices at cores on path up to root into matrix at this core
          */
+
+        var matrix = new SceneJS_math_mat4();
+
         core.build = function () {
 
             if (core.matrixDirty) {
@@ -130,11 +133,9 @@ var SceneJS_modelXFormStack = new (function () {
 
             var parent = core.parent;
 
-            var matrix;
-
             if (parent) {
 
-                matrix = core.matrix.slice(0);
+                matrix.set(core.matrix);
 
                 while (parent) {
 
@@ -144,9 +145,8 @@ var SceneJS_modelXFormStack = new (function () {
                             parent.buildMatrix();
                         }
                         parent.mat.set(parent.matrix);
-                        parent.normalMat.set(
-                            SceneJS_math_transposeMat4(
-                                SceneJS_math_inverseMat4(parent.matrix, SceneJS_math_mat4())));
+                        SceneJS_math_inverseMat4(parent.matrix, parent.normalMat);
+                        SceneJS_math_transposeMat4(parent.normalMat, parent.normalMat);
 
                         parent.matrixDirty = false;
                     }
@@ -164,7 +164,7 @@ var SceneJS_modelXFormStack = new (function () {
 
             } else {
 
-                matrix = core.matrix;
+                matrix.set(core.matrix);
             }
 
             //            if (!core.mat) {
@@ -178,12 +178,10 @@ var SceneJS_modelXFormStack = new (function () {
 
             core.mat.set(matrix);
 
-            core.normalMat.set(
-                SceneJS_math_transposeMat4(
-                    SceneJS_math_inverseMat4(matrix, SceneJS_math_mat4())));
-            //}
+            SceneJS_math_inverseMat4(matrix, core.normalMat);
+            SceneJS_math_transposeMat4(core.normalMat, core.normalMat);
 
-           core.dirty = false;
+            core.dirty = false;
         };
     };
 

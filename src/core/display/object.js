@@ -62,22 +62,19 @@ var SceneJS_Object = function(id) {
 };
 
 (function() {
-    var tempVec4 = SceneJS_math_vec4();
-    var tempMat4 = SceneJS_math_mat4();
+    var tempVec4 = new SceneJS_math_vec4();
 
     SceneJS_Object.prototype.getDepth = function() {
         if (!this.centroid) {
             this.centroid = this._calculateCentroid(this);
         }
 
-        this.modelTransform.build();
-        this.viewTransform.rebuild();
-
         var modelMatrix = this.modelTransform.mat;
         var viewMatrix = this.viewTransform.mat;
 
-        var mvMatrix = SceneJS_math_mulMat4(viewMatrix, modelMatrix, tempMat4);
-        var viewCentroid = SceneJS_math_transformVector4(mvMatrix, this.centroid, tempVec4);
+        var viewCentroid = SceneJS_math_transformVector4(modelMatrix, this.centroid, tempVec4);
+
+        SceneJS_math_transformVector4(viewMatrix, viewCentroid, viewCentroid);
 
         return -viewCentroid[2];
     };
