@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-04-08
+ * Built on 2016-04-26
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -1336,6 +1336,28 @@ var SceneJS = new (function () {
     };
 
     /**
+    * Shim for slicing arrays regardless of the array type.
+    * (Primarily because TypedArray.prototype.slice is
+    * not supported on all platforms)
+    */
+    this._sliceArray = function(array, start, end) {
+        if (array.slice) {
+            return array.slice(start, end);
+        }
+
+        end = end || array.length;
+
+        var length = end - start;
+        var newArray = new array.constructor(length);
+
+        for (var i = 0; i < length; i++) {
+            newArray[i] = array[start + i];
+        }
+
+        return newArray;
+    };
+
+    /**
      * Resets SceneJS, destroying all existing scenes
      */
     this.reset = function () {
@@ -1907,6 +1929,8 @@ SceneJS_Canvas.prototype.setResolutionScaling = function (resolutionScaling) {
  * @private
  */
 var SceneJS_Engine = function (json, options) {
+    options = options || {};
+
     json.type = "scene"; // The type property supplied by user on the root JSON node is ignored - would always be 'scene'
 
     /**
@@ -1950,7 +1974,8 @@ var SceneJS_Engine = function (json, options) {
     this.display = new SceneJS_Display({
         canvas: this.canvas,
         transparent: json.transparent,
-        dof: json.dof
+        dof: json.dof,
+        depthSort: options.depthSort
     });
 
     /**
@@ -2498,6 +2523,13 @@ SceneJS_Engine.prototype.compile = function () {
         this.sceneDirty = false;
     }
     this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true
+};
+
+/**
+ * Enable or disable depth sorting
+ */
+SceneJS_Engine.prototype.setDepthSort = function (enabled) {
+    this.display.setDepthSort(enabled);
 };
 
 /**
@@ -3485,20 +3517,10 @@ SceneJS.log = new (function() {
         return SceneJS_math_mulVec3Scalar(v, f, dest);
     };
 
-// @private
+    // @private
     window.SceneJS_math_normalizeVec2 = function (v, dest) {
         var f = 1.0 / SceneJS_math_lenVec2(v);
         return SceneJS_math_mulVec2Scalar(v, f, dest);
-    };
-
-    /** @private */
-    window.SceneJS_math_mat4 = function () {
-        return new Array(16);
-    };
-
-    /** @private */
-    window.SceneJS_math_dupMat4 = function (m) {
-        return m.slice(0, 16);
     };
 
     /** @private */
@@ -5485,7 +5507,8 @@ SceneJS.log = new (function() {
         return tangents;
     }
 
-})();;/**
+})();
+;/**
  * Backend that tracks statistics on loading states of nodes during scene traversal.
  *
  * This supports the "loading-status" events that we can listen for on scene nodes.
@@ -6463,7 +6486,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         value = new Array(2);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1]) {
+            if (value[0] === v[0] && value[1] === v[1]) {
                 return;
             }
             value[0] = v[0];
@@ -6475,7 +6498,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         value = new Array(3);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
                 return;
             }
             value[0] = v[0];
@@ -6488,7 +6511,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         value = new Array(4);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
                 return;
             }
             value[0] = v[0];
@@ -6512,7 +6535,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         value = new Uint32Array(2);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1]) {
+            if (value[0] === v[0] && value[1] === v[1]) {
                 return;
             }
             value.set(v);
@@ -6523,7 +6546,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         value = new Uint32Array(3);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
                 return;
             }
             value.set(v);
@@ -6534,7 +6557,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         value = new Uint32Array(4);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
                 return;
             }
             value.set(v);
@@ -6555,7 +6578,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         value = new Float32Array(2);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1]) {
+            if (value[0] === v[0] && value[1] === v[1]) {
                 return;
             }
             value.set(v);
@@ -6566,7 +6589,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         value = new Float32Array(3);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
                 return;
             }
             value.set(v);
@@ -6577,7 +6600,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
         value = new Float32Array(4);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
                 return;
             }
             value.set(v);
@@ -12894,6 +12917,13 @@ SceneJS.Scene.prototype.hasCore = function (type, coreId) {
 };
 
 /**
+ * Enable or disable depth sorting
+ */
+SceneJS.Scene.prototype.setDepthSort = function (enabled) {
+    this._engine.setDepthSort(enabled);
+};
+
+/**
  * Returns the current status of this scene.
  *
  * When the scene has been destroyed, the returned status will be a map like this:
@@ -13675,16 +13705,6 @@ new (function () {
             magFilter: this._getGLOption("magFilter", gl, layer, gl.LINEAR),
             wrapS: this._getGLOption("wrapS", gl, layer, gl.REPEAT),
             wrapT: this._getGLOption("wrapT", gl, layer, gl.REPEAT),
-            isDepth: this._getOption(layer.isDepth, false),
-            depthMode: this._getGLOption("depthMode", gl, layer, gl.LUMINANCE),
-            depthCompareMode: this._getGLOption("depthCompareMode", gl, layer, gl.COMPARE_R_TO_TEXTURE),
-            depthCompareFunc: this._getGLOption("depthCompareFunc", gl, layer, gl.LEQUAL),
-            flipY: this._getOption(layer.flipY, true),
-            width: this._getOption(layer.width, 1),
-            height: this._getOption(layer.height, 1),
-            internalFormat: this._getGLOption("internalFormat", gl, layer, gl.LEQUAL),
-            sourceFormat: this._getGLOption("sourceType", gl, layer, gl.ALPHA),
-            sourceType: this._getGLOption("sourceType", gl, layer, gl.UNSIGNED_BYTE),
             update: null
         });
 
@@ -13888,7 +13908,8 @@ new (function () {
         }
     };
 
-})();;/**
+})();
+;/**
  * @class Scene graph node which defines textures to apply to the objects in its subgraph
  * @extends SceneJS.Node
  */
@@ -13975,6 +13996,10 @@ new (function () {
             SceneJS._apply({
                     waitForLoad: params.waitForLoad == undefined ? true : params.waitForLoad,
                     texture: null,
+                    minFilter: params.minFilter,
+                    magFilter: params.magFilter,
+                    wrapS: params.wrapS,
+                    wrapT: params.wrapT,
                     uvLayerIdx: uvLayerIdx,
                     isNormalMap: params.applyTo === "normals",
                     applyFrom: applyFrom,
@@ -14148,16 +14173,6 @@ new (function () {
             magFilter: this._getGLOption("magFilter", gl.LINEAR),
             wrapS: this._getGLOption("wrapS", gl.REPEAT),
             wrapT: this._getGLOption("wrapT", gl.REPEAT),
-            isDepth: this._getOption(this._core.isDepth, false),
-            depthMode: this._getGLOption("depthMode", gl.LUMINANCE),
-            depthCompareMode: this._getGLOption("depthCompareMode", gl.COMPARE_R_TO_TEXTURE),
-            depthCompareFunc: this._getGLOption("depthCompareFunc", gl.LEQUAL),
-            flipY: this._getOption(this._core.flipY, true),
-            width: this._getOption(this._core.width, 1),
-            height: this._getOption(this._core.height, 1),
-            internalFormat: this._getGLOption("internalFormat", gl.ALPHA),
-            sourceFormat: this._getGLOption("sourceFormat", gl.ALPHA),
-            sourceType: this._getGLOption("sourceType", gl.UNSIGNED_BYTE),
             update: null
         });
 
@@ -14328,7 +14343,8 @@ new (function () {
         }
     };
 
-})();;/**
+})();
+;/**
  * @class Scene graph node which defines fresnels to apply to the objects in its subgraph
  * @extends SceneJS.Node
  */
@@ -15735,6 +15751,9 @@ var SceneJS_modelXFormStack = new (function () {
         /**
          * Pre-multiply matrices at cores on path up to root into matrix at this core
          */
+
+        var matrix = new SceneJS_math_mat4();
+
         core.build = function () {
 
             if (core.matrixDirty) {
@@ -15746,11 +15765,9 @@ var SceneJS_modelXFormStack = new (function () {
 
             var parent = core.parent;
 
-            var matrix;
-
             if (parent) {
 
-                matrix = core.matrix.slice(0);
+                matrix.set(core.matrix);
 
                 while (parent) {
 
@@ -15760,9 +15777,8 @@ var SceneJS_modelXFormStack = new (function () {
                             parent.buildMatrix();
                         }
                         parent.mat.set(parent.matrix);
-                        parent.normalMat.set(
-                            SceneJS_math_transposeMat4(
-                                SceneJS_math_inverseMat4(parent.matrix, SceneJS_math_mat4())));
+                        SceneJS_math_inverseMat4(parent.matrix, parent.normalMat);
+                        SceneJS_math_transposeMat4(parent.normalMat, parent.normalMat);
 
                         parent.matrixDirty = false;
                     }
@@ -15780,7 +15796,7 @@ var SceneJS_modelXFormStack = new (function () {
 
             } else {
 
-                matrix = core.matrix;
+                matrix.set(core.matrix);
             }
 
             //            if (!core.mat) {
@@ -15794,12 +15810,10 @@ var SceneJS_modelXFormStack = new (function () {
 
             core.mat.set(matrix);
 
-            core.normalMat.set(
-                SceneJS_math_transposeMat4(
-                    SceneJS_math_inverseMat4(matrix, SceneJS_math_mat4())));
-            //}
+            SceneJS_math_inverseMat4(matrix, core.normalMat);
+            SceneJS_math_transposeMat4(core.normalMat, core.normalMat);
 
-           core.dirty = false;
+            core.dirty = false;
         };
     };
 
@@ -15968,6 +15982,11 @@ var SceneJS_Display = function (cfg) {
      * @type {boolean}
      */
     this.transparent = cfg.transparent === true;
+
+    /**
+     * Depth sort mode. Default to only sorting transparent objects.
+     */
+    this.depthSort = cfg.depthSort === true;
 
     /**
      * Node state core for the last {@link SceneJS.Enable} visited during scene graph compilation traversal
@@ -16344,6 +16363,8 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this.stateOrderDirty = true;
 };
 
+
+
 SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, core2) {
 
     var chunkId;
@@ -16441,6 +16462,13 @@ SceneJS_Display.prototype.removeObject = function (objectId) {
 };
 
 /**
+ * Enable or disable depth sorting
+ */
+SceneJS_Display.prototype.setDepthSort = function (enabled) {
+    this.depthSort = enabled;
+};
+
+/**
  * Set a tag selector to selectively activate objects that have matching SceneJS.Tag nodes
  */
 SceneJS_Display.prototype.selectTags = function (tagSelector) {
@@ -16462,10 +16490,14 @@ SceneJS_Display.prototype.render = function (params) {
         this.stateOrderDirty = true;        // Now needs state ordering
     }
 
-    if (this.stateOrderDirty) {
-        this._makeStateSortKeys();       // Compute state sort order
+
+    if (this.stateOrderDirty || (this.imageDirty && this.depthSort)) {
+
+        // State sort will be dirty if the state order was dirty (due to priority or
+        // or transparency change) or if depth is re-calculated in _makeStateSortKeys
+        this.stateSortDirty = this.stateOrderDirty;     // Now needs state sorting
+        this._makeStateSortKeys();                      // Compute state sort order
         this.stateOrderDirty = false;
-        this.stateSortDirty = true;     // Now needs state sorting
     }
 
     if (this.stateSortDirty) {
@@ -16522,14 +16554,24 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
         object = this._objectList[i];
         if (!object.program) {
             // Non-visual object (eg. sound)
-            object.sortKey = -1;
+            object.sortKey1 = -1;
         } else {
-            object.sortKey =
-                ((object.stage.priority + 1) * 1000000000000)
-                + ((object.flags.transparent ? 2 : 1) * 1000000000)
-                + ((object.layer.priority + 1) * 1000000)
-                + ((object.program.id + 1) * 1000)
-                + object.texture.stateId;
+            var transparent = object.flags.transparent;
+            var depth;
+
+            if (transparent && this.depthSort) {
+                depth = object.getDepth();
+                this.stateSortDirty = true;
+            } else {
+                depth = 0;
+            }
+
+            object.sortKey1 = (object.stage.priority + 1) * 3000000 +
+                              (transparent ? 2 : 1) * 1000000 +
+                              (object.layer.priority + 1) * 10000 +
+                              1 / depth;
+            object.sortKey2 = (object.program.id + 1) * 100000
+                              object.texture.stateId;
         }
     }
     //  console.log("--------------------------------------------------------------------------------------------------");
@@ -16541,7 +16583,8 @@ SceneJS_Display.prototype._stateSort = function () {
 };
 
 SceneJS_Display.prototype._stateSortObjects = function (a, b) {
-    return a.sortKey - b.sortKey;
+    return  (a.sortKey1 - b.sortKey1) ||
+            (a.sortKey2 - b.sortKey2);
 };
 
 SceneJS_Display.prototype._logObjectList = function () {
@@ -16597,7 +16640,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
         tagMask = this._tagSelector.mask;
         tagRegex = this._tagSelector.regex;
     }
-    
+
     for (i = 0, len = this._objectListLen; i < len; i++) {
 
         object = this._objectList[i];
@@ -16747,29 +16790,21 @@ SceneJS_Display.prototype._appendObjectToDrawLists = function (object, pickable)
             // 'unique' flag, because we don't want to cull runs of draw chunks because they contain the GL
             // drawElements calls which render the objects.
 
-            if (chunk.draw) {
-                if (chunk.unique || this._lastStateId[i] != chunk.id) { // Don't reapply repeated states
-                    this._drawList[this._drawListLen] = chunk;
-                    this._lastStateId[i] = chunk.id;
+            if (chunk.draw && (chunk.unique || this._lastStateId[i] != chunk.id)) {
+                this._drawList[this._drawListLen] = chunk;
+                this._lastStateId[i] = chunk.id;
 
-                    // Get index of first chunk in transparency pass
+                // Get index of first chunk in transparency pass
 
-                    if (chunk.core && chunk.core && chunk.core.transparent) {
-                        if (this._drawListTransparentIndex < 0) {
-                            this._drawListTransparentIndex = this._drawListLen;
-                        }
-                    }
-                    this._drawListLen++;
+                if (chunk.core && chunk.core.transparent && this._drawListTransparentIndex < 0) {
+                    this._drawListTransparentIndex = this._drawListLen;
                 }
+                this._drawListLen++;
             }
 
-            if (chunk.pick) {
-                if (pickable !== false) {   // Don't pick objects in unpickable stages
-                    if (chunk.unique || this._lastPickStateId[i] != chunk.id) { // Don't reapply repeated states
-                        this._pickDrawList[this._pickDrawListLen++] = chunk;
-                        this._lastPickStateId[i] = chunk.id;
-                    }
-                }
+            if (pickable !== false && chunk.pick && (chunk.unique || this._lastPickStateId[i] != chunk.id)) {
+                this._pickDrawList[this._pickDrawListLen++] = chunk;
+                this._lastPickStateId[i] = chunk.id;
             }
         }
     }
@@ -17109,7 +17144,7 @@ SceneJS_Display.prototype._logPickList = function () {
                     c[1] = positions[ic3 + 1];
                     c[2] = positions[ic3 + 2];
                 }
-                
+
 
                 // Get Local-space cartesian coordinates of the ray-triangle intersection
 
@@ -17126,12 +17161,12 @@ SceneJS_Display.prototype._logPickList = function () {
 
                 SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
 
-                hit.worldPos = tempVec4b.slice(0, 3);
+                hit.worldPos = SceneJS._sliceArray(tempVec4b, 0, 3);
 
                 // Get barycentric coordinates of the ray-triangle intersection
 
                 var barycentric = hit.barycentric = SceneJS_math_cartesianToBarycentric2(position, a, b, c, SceneJS_math_vec3());
-                
+
                 // Get interpolated normal vector
 
                 var gotNormals = false;
@@ -19120,7 +19155,8 @@ var SceneJS_Object = function(id) {
      * State sort key, computed from {@link #layer}, {@link #program} and {@link #texture}
      * @type Number
      */
-    this.sortKey = null;
+    this.sortKey1 = null;
+    this.sortKey2 = null;
 
     /**
      * Sequence of state chunks applied to render this object
@@ -19159,7 +19195,73 @@ var SceneJS_Object = function(id) {
      * State core for the {@link SceneJS.Tag} that this object was compiled from, used for visibility cull
      */
     this.tag = null;
-};;/**
+
+    /**
+    *   Used to calculate the depth for depth sorting
+    */
+    this.centroid = null;
+};
+
+(function() {
+    var tempVec4 = new SceneJS_math_vec4();
+
+    SceneJS_Object.prototype.getDepth = function() {
+        if (!this.centroid) {
+            this.centroid = this._calculateCentroid(this);
+        }
+
+        var modelMatrix = this.modelTransform.mat;
+        var viewMatrix = this.viewTransform.mat;
+
+        var viewCentroid = SceneJS_math_transformVector4(modelMatrix, this.centroid, tempVec4);
+
+        SceneJS_math_transformVector4(viewMatrix, viewCentroid, viewCentroid);
+
+        return -viewCentroid[2];
+    };
+
+    SceneJS_Object.prototype._calculateCentroid = function() {
+
+        var centroid = SceneJS_math_vec4();
+
+        var positions = this.geometry.arrays.positions;
+        var indices = this.geometry.arrays.indices;
+
+        var xmin = Infinity;
+        var ymin = Infinity;
+        var zmin = Infinity;
+        var xmax = -Infinity;
+        var ymax = -Infinity;
+        var zmax = -Infinity;
+
+        var min = Math.min;
+        var max = Math.max;
+
+        for (var i = 0, len = indices.length; i < len; i++) {
+            var vi = indices[i] * 3;
+            var x = positions[vi];
+            var y = positions[vi + 1];
+            var z = positions[vi + 2];
+
+            xmin = min(x, xmin);
+            ymin = min(y, ymin);
+            zmin = min(z, zmin);
+            xmax = max(x, xmax);
+            ymax = max(y, ymax);
+            zmax = max(z, zmax);
+        }
+
+        centroid[0] = 0.5 * (xmin + xmax);
+        centroid[1] = 0.5 * (ymin + ymax);
+        centroid[2] = 0.5 * (zmin + zmax);
+        centroid[3] = 1;
+
+        return centroid;
+    };
+})();
+
+
+;/**
  * @class A facade which exposes internal scene rendering state to "rendered" event listeners bound to scene graph nodes with {@link SceneJS.Node#bind}.
  *
  * <p>The listener is fired for each {@link SceneJS.Geometry} that is rendered within the subgraph of the bound node.
