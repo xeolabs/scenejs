@@ -5,6 +5,8 @@
  * @private
  */
 var SceneJS_Engine = function (json, options) {
+    options = options || {};
+
     json.type = "scene"; // The type property supplied by user on the root JSON node is ignored - would always be 'scene'
 
     /**
@@ -48,7 +50,8 @@ var SceneJS_Engine = function (json, options) {
     this.display = new SceneJS_Display({
         canvas: this.canvas,
         transparent: json.transparent,
-        dof: json.dof
+        dof: json.dof,
+        depthSort: options.depthSort
     });
 
     /**
@@ -596,6 +599,13 @@ SceneJS_Engine.prototype.compile = function () {
         this.sceneDirty = false;
     }
     this._doDestroyNodes(); // Garbage collect destroyed nodes - node destructions set imageDirty true
+};
+
+/**
+ * Enable or disable depth sorting
+ */
+SceneJS_Engine.prototype.setDepthSort = function (enabled) {
+    this.display.setDepthSort(enabled);
 };
 
 /**

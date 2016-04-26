@@ -23,7 +23,7 @@
 <body>
 
 <div id="info">
-    5000 boxes with unique materials
+    5000 transparent boxes with unique materials being depth-sorted
 </div>
 
 <script>
@@ -57,26 +57,27 @@
                     // http://scenejs.org/api/latest/plugins/node/geometry/randomObjects.js
                     {
                         type: "geometry/randomObjects",
-                        numObjects: 5000
+                        numObjects: 10000,
+                        alpha: 0.5
                     }
                 ]
             }
         ]
+    }, { depthSort: true });
+
+
+    var container = document.createElement('div');
+    document.body.appendChild(container);
+
+    var stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+
+    container.appendChild(stats.domElement);
+
+    scene.on("tick", function () {
+        stats.update();
     });
-
-
-        var container = document.createElement('div');
-        document.body.appendChild(container);
-
-        var stats = new Stats();
-        stats.domElement.style.position = 'absolute';
-        stats.domElement.style.top = '0px';
-        //   stats.domElement.style["z-index"] = 100000;
-        container.appendChild(stats.domElement);
-
-        scene.on("tick", function () {
-            stats.update();
-        });
 
 
 </script>
