@@ -276,6 +276,13 @@ SceneJS.Scene.prototype.hasCore = function (type, coreId) {
 };
 
 /**
+ * Enable or disable depth sorting
+ */
+SceneJS.Scene.prototype.setDepthSort = function (enabled) {
+    this._engine.setDepthSort(enabled);
+};
+
+/**
  * Returns the current status of this scene.
  *
  * When the scene has been destroyed, the returned status will be a map like this:

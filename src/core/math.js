@@ -616,20 +616,10 @@
         return SceneJS_math_mulVec3Scalar(v, f, dest);
     };
 
-// @private
+    // @private
     window.SceneJS_math_normalizeVec2 = function (v, dest) {
         var f = 1.0 / SceneJS_math_lenVec2(v);
         return SceneJS_math_mulVec2Scalar(v, f, dest);
-    };
-
-    /** @private */
-    window.SceneJS_math_mat4 = function () {
-        return new Array(16);
-    };
-
-    /** @private */
-    window.SceneJS_math_dupMat4 = function (m) {
-        return m.slice(0, 16);
     };
 
     /** @private */

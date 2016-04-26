@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+
+        #sort-status {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - Depth Sorting<br><br>
+    SceneJS can automatically sort transparent objects by depth to ensure correct rendering.<br>
+    Without depth sorting, transparent objects can block rendering of objects behind them. <br>
+    Depth sorting in this scene is currently: <span id="sort-status"></span>
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath:"../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes:[
+
+            // Mouse-orbited camera, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type:"cameras/orbit",
+                zoom:10,
+                zoomSensitivity:5,
+                spin: 0.8,
+
+                nodes:[
+                    {
+                        type:"flags",
+                        flags:{
+                            transparent:true,
+                            backfaces:false    // Hide backfaces
+                        },
+
+                        nodes:[
+                            {
+                                type:"material",
+                                color:{ r:1.0, g:0.2, b:0.2 },
+                                alpha:0.2,
+                                nodes:[
+                                    {
+                                        type:"translate",
+                                        z: 3,
+                                        nodes:[
+
+                                            // Box primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            {
+                                                type:"geometry/box"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                type:"material",
+                                color:{ r:0.2, g:0.2, b:1 },
+                                alpha:0.2,
+                                nodes:[
+                                    {
+                                        type:"translate",
+                                        z: -3,
+                                        nodes:[
+
+                                            // Box primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            {
+                                                type:"geometry/box"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                type:"material",
+                                color:{ r:0.2, g:1, b:0.2 },
+                                alpha:0.2,
+                                nodes:[
+                                    {
+                                        type:"translate",
+                                        x: -3,
+                                        nodes:[
+
+                                            // Box primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            {
+                                                type:"geometry/box"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                type:"material",
+                                color:{ r:0.2, g:1, b:1 },
+                                alpha:0.2,
+                                nodes:[
+                                    {
+                                        type:"translate",
+                                        x: 3,
+                                        nodes:[
+
+                                            // Box primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                            {
+                                                type:"geometry/box"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }, { depthSort: true });
+
+    var sortStatus = document.getElementById("sort-status");
+    var depthSorting = true;
+
+    function update() {
+        if (depthSorting) {
+            sortStatus.innerText = "ENABLED";
+        } else {
+            sortStatus.innerText = "DISABLED";
+        }
+        scene.setDepthSort(depthSorting);
+        depthSorting = !depthSorting;
+    }
+
+    update();
+    setInterval(update, 5000)
+
+</script>
+</body>
+</html>

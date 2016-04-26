@@ -18,7 +18,7 @@ SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, inde
         value = new Array(2);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1]) {
+            if (value[0] === v[0] && value[1] === v[1]) {
                 return;
             }
             value[0] = v[0];
@@ -30,7 +30,7 @@ SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, inde
         value = new Array(3);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
                 return;
             }
             value[0] = v[0];
@@ -43,7 +43,7 @@ SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, inde
         value = new Array(4);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
                 return;
             }
             value[0] = v[0];
@@ -67,7 +67,7 @@ SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, inde
         value = new Uint32Array(2);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1]) {
+            if (value[0] === v[0] && value[1] === v[1]) {
                 return;
             }
             value.set(v);
@@ -78,7 +78,7 @@ SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, inde
         value = new Uint32Array(3);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
                 return;
             }
             value.set(v);
@@ -89,7 +89,7 @@ SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, inde
         value = new Uint32Array(4);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
                 return;
             }
             value.set(v);
@@ -110,7 +110,7 @@ SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, inde
         value = new Float32Array(2);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1]) {
+            if (value[0] === v[0] && value[1] === v[1]) {
                 return;
             }
             value.set(v);
@@ -121,7 +121,7 @@ SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, inde
         value = new Float32Array(3);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
                 return;
             }
             value.set(v);
@@ -132,7 +132,7 @@ SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, inde
         value = new Float32Array(4);
 
         func = function (v) {
-            if (value !== null && value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+            if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
                 return;
             }
             value.set(v);
