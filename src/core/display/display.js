@@ -85,6 +85,11 @@ var SceneJS_Display = function (cfg) {
     this.transparent = cfg.transparent === true;
 
     /**
+     * Depth sort mode. Default to only sorting transparent objects.
+     */
+    this.depthSort = cfg.depthSort === true;
+
+    /**
      * Node state core for the last {@link SceneJS.Enable} visited during scene graph compilation traversal
      * @type Object
      */
@@ -459,6 +464,8 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this.stateOrderDirty = true;
 };
 
+
+
 SceneJS_Display.prototype._setChunk = function (object, order, chunkType, core, core2) {
 
     var chunkId;
@@ -556,6 +563,13 @@ SceneJS_Display.prototype.removeObject = function (objectId) {
 };
 
 /**
+ * Enable or disable depth sorting
+ */
+SceneJS_Display.prototype.setDepthSort = function (enabled) {
+    this.depthSort = enabled;
+};
+
+/**
  * Set a tag selector to selectively activate objects that have matching SceneJS.Tag nodes
  */
 SceneJS_Display.prototype.selectTags = function (tagSelector) {
@@ -577,10 +591,14 @@ SceneJS_Display.prototype.render = function (params) {
         this.stateOrderDirty = true;        // Now needs state ordering
     }
 
-    if (this.stateOrderDirty) {
-        this._makeStateSortKeys();       // Compute state sort order
+
+    if (this.stateOrderDirty || (this.imageDirty && this.depthSort)) {
+
+        // State sort will be dirty if the state order was dirty (due to priority or
+        // or transparency change) or if depth is re-calculated in _makeStateSortKeys
+        this.stateSortDirty = this.stateOrderDirty;     // Now needs state sorting
+        this._makeStateSortKeys();                      // Compute state sort order
         this.stateOrderDirty = false;
-        this.stateSortDirty = true;     // Now needs state sorting
     }
 
     if (this.stateSortDirty) {
@@ -637,14 +655,24 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
         object = this._objectList[i];
         if (!object.program) {
             // Non-visual object (eg. sound)
-            object.sortKey = -1;
+            object.sortKey1 = -1;
         } else {
-            object.sortKey =
-                ((object.stage.priority + 1) * 1000000000000)
-                + ((object.flags.transparent ? 2 : 1) * 1000000000)
-                + ((object.layer.priority + 1) * 1000000)
-                + ((object.program.id + 1) * 1000)
-                + object.texture.stateId;
+            var transparent = object.flags.transparent;
+            var depth;
+
+            if (transparent && this.depthSort) {
+                depth = object.getDepth();
+                this.stateSortDirty = true;
+            } else {
+                depth = 0;
+            }
+
+            object.sortKey1 = (object.stage.priority + 1) * 3000000 +
+                              (transparent ? 2 : 1) * 1000000 +
+                              (object.layer.priority + 1) * 10000 +
+                              1 / depth;
+            object.sortKey2 = (object.program.id + 1) * 100000
+                              object.texture.stateId;
         }
     }
     //  console.log("--------------------------------------------------------------------------------------------------");
@@ -656,7 +684,8 @@ SceneJS_Display.prototype._stateSort = function () {
 };
 
 SceneJS_Display.prototype._stateSortObjects = function (a, b) {
-    return a.sortKey - b.sortKey;
+    return  (a.sortKey1 - b.sortKey1) ||
+            (a.sortKey2 - b.sortKey2);
 };
 
 SceneJS_Display.prototype._logObjectList = function () {
@@ -712,7 +741,7 @@ SceneJS_Display.prototype._buildDrawList = function () {
         tagMask = this._tagSelector.mask;
         tagRegex = this._tagSelector.regex;
     }
-    
+
     for (i = 0, len = this._objectListLen; i < len; i++) {
 
         object = this._objectList[i];
@@ -862,29 +891,21 @@ SceneJS_Display.prototype._appendObjectToDrawLists = function (object, pickable)
             // 'unique' flag, because we don't want to cull runs of draw chunks because they contain the GL
             // drawElements calls which render the objects.
 
-            if (chunk.draw) {
-                if (chunk.unique || this._lastStateId[i] != chunk.id) { // Don't reapply repeated states
-                    this._drawList[this._drawListLen] = chunk;
-                    this._lastStateId[i] = chunk.id;
+            if (chunk.draw && (chunk.unique || this._lastStateId[i] != chunk.id)) {
+                this._drawList[this._drawListLen] = chunk;
+                this._lastStateId[i] = chunk.id;
 
-                    // Get index of first chunk in transparency pass
+                // Get index of first chunk in transparency pass
 
-                    if (chunk.core && chunk.core && chunk.core.transparent) {
-                        if (this._drawListTransparentIndex < 0) {
-                            this._drawListTransparentIndex = this._drawListLen;
-                        }
-                    }
-                    this._drawListLen++;
+                if (chunk.core && chunk.core.transparent && this._drawListTransparentIndex < 0) {
+                    this._drawListTransparentIndex = this._drawListLen;
                 }
+                this._drawListLen++;
             }
 
-            if (chunk.pick) {
-                if (pickable !== false) {   // Don't pick objects in unpickable stages
-                    if (chunk.unique || this._lastPickStateId[i] != chunk.id) { // Don't reapply repeated states
-                        this._pickDrawList[this._pickDrawListLen++] = chunk;
-                        this._lastPickStateId[i] = chunk.id;
-                    }
-                }
+            if (pickable !== false && chunk.pick && (chunk.unique || this._lastPickStateId[i] != chunk.id)) {
+                this._pickDrawList[this._pickDrawListLen++] = chunk;
+                this._lastPickStateId[i] = chunk.id;
             }
         }
     }
@@ -1224,7 +1245,7 @@ SceneJS_Display.prototype._logPickList = function () {
                     c[1] = positions[ic3 + 1];
                     c[2] = positions[ic3 + 2];
                 }
-                
+
 
                 // Get Local-space cartesian coordinates of the ray-triangle intersection
 
@@ -1241,12 +1262,12 @@ SceneJS_Display.prototype._logPickList = function () {
 
                 SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
 
-                hit.worldPos = tempVec4b.slice(0, 3);
+                hit.worldPos = SceneJS._sliceArray(tempVec4b, 0, 3);
 
                 // Get barycentric coordinates of the ray-triangle intersection
 
                 var barycentric = hit.barycentric = SceneJS_math_cartesianToBarycentric2(position, a, b, c, SceneJS_math_vec3());
-                
+
                 // Get interpolated normal vector
 
                 var gotNormals = false;

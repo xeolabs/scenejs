@@ -20,6 +20,7 @@ SceneJS.Types.addType("geometry/randomObjects", {
 
         var numObjects = params.numObjects || 1000;
         var materials = params.materials != false;
+        var alpha = params.alpha || 1;
         var node;
 
         for (var i = 0, len = numObjects; i < len; i++) {
@@ -58,6 +59,16 @@ SceneJS.Types.addType("geometry/randomObjects", {
             });
 
             if (materials) {
+
+                if (alpha < 1) {
+                    node = node.addNode({
+                        type: "flags",
+                        flags: {
+                            transparent: true
+                        }
+                    });
+                }
+
                 // Random material
                 node = node.addNode({
                     type: "material",
@@ -65,7 +76,8 @@ SceneJS.Types.addType("geometry/randomObjects", {
                         r: Math.random(),
                         g: Math.random(),
                         b: Math.random()
-                    }
+                    },
+                    alpha: alpha
                 });
             }
 
