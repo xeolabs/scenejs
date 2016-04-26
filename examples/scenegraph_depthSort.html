@@ -26,7 +26,7 @@
 
 <div id="infoDark">
     <a href="http://scenejs.org">SceneJS</a> - Depth Sorting<br><br>
-    SceneJS will automatically sort transparent objects by depth to ensure correct rendering.<br>
+    SceneJS can automatically sort transparent objects by depth to ensure correct rendering.<br>
     Without depth sorting, transparent objects can block rendering of objects behind them. <br>
     Depth sorting in this scene is currently: <span id="sort-status"></span>
 </div>
@@ -140,7 +140,7 @@
                 ]
             }
         ]
-    });
+    }, { depthSort: true });
 
     var sortStatus = document.getElementById("sort-status");
     var depthSorting = true;

@@ -87,7 +87,7 @@ var SceneJS_Display = function (cfg) {
     /**
      * Depth sort mode. Default to only sorting transparent objects.
      */
-    this.depthSort = cfg.depthSort !== false;
+    this.depthSort = cfg.depthSort === true;
 
     /**
      * Node state core for the last {@link SceneJS.Enable} visited during scene graph compilation traversal
@@ -670,7 +670,7 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
             object.sortKey1 = (object.stage.priority + 1) * 3000000 +
                               (transparent ? 2 : 1) * 1000000 +
                               (object.layer.priority + 1) * 10000 +
-                              (9999 - depth);
+                              1 / depth;
             object.sortKey2 = (object.program.id + 1) * 100000
                               object.texture.stateId;
         }
