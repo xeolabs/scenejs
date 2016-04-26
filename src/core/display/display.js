@@ -671,7 +671,7 @@ SceneJS_Display.prototype._makeStateSortKeys = function () {
                               (transparent ? 2 : 1) * 1000000 +
                               (object.layer.priority + 1) * 10000 +
                               1 / depth;
-            object.sortKey2 = (object.program.id + 1) * 100000
+            object.sortKey2 = (object.program.id + 1) * 100000 +
                               object.texture.stateId;
         }
     }
