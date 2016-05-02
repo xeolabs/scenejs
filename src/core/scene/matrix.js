@@ -78,6 +78,10 @@ SceneJS.Matrix.prototype.setMatrix = function(elements) {
  */
 SceneJS.Matrix.prototype.setElements = SceneJS.Matrix.prototype.setMatrix;
 
+SceneJS.Matrix.prototype._branchDirty = function() {
+    SceneJS_modelXFormStack.compileCore(this._core);
+};
+
 SceneJS.Matrix.prototype._compile = function(ctx) {
     SceneJS_modelXFormStack.push(this._core);
     this._compileNodes(ctx);
