@@ -9,7 +9,7 @@ SceneJS.Translate.prototype._init = function(params) {
     if (this._core.useCount == 1) { // This node is the resource definer
 
         SceneJS_modelXFormStack.buildCore(this._core);
-        
+
         this.setMultOrder(params.multOrder);
 
         this.setXYZ({
@@ -149,6 +149,10 @@ SceneJS.Translate.prototype.getY = function() {
 
 SceneJS.Translate.prototype.getZ = function() {
     return this._core.z;
+};
+
+SceneJS.Translate.prototype._branchDirty = function() {
+    SceneJS_modelXFormStack.compileCore(this._core);
 };
 
 SceneJS.Translate.prototype._compile = function(ctx) {

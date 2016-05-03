@@ -302,6 +302,10 @@ SceneJS_Engine.prototype.branchDirty = function (node) {
     node.branchDirty = true;
     node.dirty = true;
 
+    if (node._branchDirty) {
+        node._branchDirty();
+    }
+
     for (var n = node.parent; n && !(n.dirty || n.branchDirty); n = n.parent) { // Flag path down to this node
         n.dirty = true;
     }

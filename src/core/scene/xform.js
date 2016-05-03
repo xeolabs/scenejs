@@ -73,6 +73,10 @@ SceneJS.XForm.prototype.setElements = function (elements) {
     return this;
 };
 
+SceneJS.XForm.prototype._branchDirty = function() {
+    SceneJS_modelXFormStack.compileCore(this._core);
+};
+
 SceneJS.XForm.prototype._compile = function (ctx) {
     SceneJS_modelXFormStack.push(this._core);
     this._compileNodes(ctx);

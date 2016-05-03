@@ -9,7 +9,7 @@ SceneJS.Rotate.prototype._init = function(params) {
     if (this._core.useCount == 1) { // This node is the resource definer
 
         SceneJS_modelXFormStack.buildCore(this._core);
-        
+
         this.setMultOrder(params.multOrder);
 
         this.setAngle(params.angle);
@@ -139,6 +139,10 @@ SceneJS.Rotate.prototype.incAngle = function(angle) {
     this._core.angle += angle;
     this._core.setDirty();
     this._engine.display.imageDirty = true;
+};
+
+SceneJS.Rotate.prototype._branchDirty = function() {
+    SceneJS_modelXFormStack.compileCore(this._core);
 };
 
 SceneJS.Rotate.prototype._compile = function(ctx) {
