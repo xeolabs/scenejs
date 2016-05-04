@@ -299,7 +299,9 @@ SceneJS_ChunkFactory.createChunkType({
                     this._aRegionMapUVPick.bindFloatArrayBuffer(core2.uvBufs[frameCtx.regionMapUVLayerIdx]); // Set by regionMapChunk
                 }
 
-                core2.indexBuf.bind();
+                if (core2.indexBuf) {
+                    core2.indexBuf.bind();                    
+                }
 
             } else if (frameCtx.pickTriangle) {
 
