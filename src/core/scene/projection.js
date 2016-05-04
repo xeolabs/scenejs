@@ -165,7 +165,7 @@
     };
 
     SceneJS.Camera.prototype.getMatrix = function () {
-        return this._core.matrix.slice(0);
+        return SceneJS._sliceArray(this._core.matrix, 0);
     };
 
     /**
