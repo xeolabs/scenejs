@@ -32,6 +32,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._aMorphNormalDraw = draw.getAttribute("SCENEJS_aMorphNormal");
         this._aMorphTangentDraw = draw.getAttribute("SCENEJS_aMorphTangent");
         this._uMorphFactorDraw = draw.getUniform("SCENEJS_uMorphFactor");
+        this._uPointSizeDraw = draw.getUniform("SCENEJS_uPointSize");
 
         var pick = this.program.pick;
 
@@ -40,6 +41,7 @@ SceneJS_ChunkFactory.createChunkType({
         this._aColorPick = pick.getAttribute("SCENEJS_aColor");
         this._aMorphVertexPick = pick.getAttribute("SCENEJS_aMorphVertex");
         this._uMorphFactorPick = pick.getUniform("SCENEJS_uMorphFactor");
+        this._uPointSizePick = draw.getUniform("SCENEJS_uPointSize");
 
         this.VAO = null;
         this.VAOMorphKey1 = 0;
@@ -134,6 +136,10 @@ SceneJS_ChunkFactory.createChunkType({
         var doMorph = this.core.targets && this.core.targets.length;
         var cleanInterleavedBuf = this.core2.interleavedBuf && !this.core2.interleavedBuf.dirty;
 
+        if (this._uPointSizeDraw) {
+            this._uPointSizeDraw.setValue(this.core2.pointSize);
+        }
+
         if (this.VAO && frameCtx.VAO) { // Workaround for https://github.com/xeolabs/scenejs/issues/459
             frameCtx.VAO.bindVertexArrayOES(this.VAO);
             if (doMorph) {
@@ -215,7 +221,9 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
 
-        this.core2.indexBuf.bind();
+        if (this.core2.indexBuf) {
+            this.core2.indexBuf.bind();
+        }
     },
 
     morphPick: function (frameCtx) {
@@ -303,6 +311,10 @@ SceneJS_ChunkFactory.createChunkType({
                     this._aColorPick.bindFloatArrayBuffer(core2.getPickColors());
                 }
 
+            }
+
+            if (this._uPointSizePick) {
+                this._uPointSizePick.setValue(this.core2.pointSize);
             }
         }
     }

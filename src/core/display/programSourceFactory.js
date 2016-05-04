@@ -26,6 +26,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var regionMapping;
     var regionInteraction;
     var depthTargeting;
+    var points;
 
     var src = ""; // Accumulates source code as it's being built
 
@@ -61,6 +62,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         regionMapping = hasRegionMap();
         regionInteraction = regionMapping && states.regionMap.mode !== "info";
         depthTargeting = hasDepthTarget();
+        points = states.geometry.primitiveName === "points";
 
         source = new SceneJS_ProgramSource(
             hash,
@@ -99,6 +101,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
         add("uniform mat4 SCENEJS_uVMatrix;");
         add("uniform mat4 SCENEJS_uVNMatrix;");
         add("uniform mat4 SCENEJS_uPMatrix;");
+
+        if (points) {
+            add("uniform float SCENEJS_uPointSize;");
+        }
 
         add("varying vec4 SCENEJS_vWorldVertex;");
 
@@ -140,6 +146,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
         }
 
         add("SCENEJS_vColor = SCENEJS_aColor;");
+
+        if (points) {
+            add("gl_PointSize = SCENEJS_uPointSize;");
+        }
 
         add("}");
 
@@ -300,6 +310,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
         add("uniform vec3 SCENEJS_uWorldEye;");            // World-space eye position
 
         add("varying vec3 SCENEJS_vViewEyeVec;");          // View-space vector from origin to eye
+
+        if (points) {
+            add("uniform float SCENEJS_uPointSize;");
+        }
 
         if (normals) {
 
@@ -551,7 +565,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("SCENEJS_vRegionMapUV = SCENEJS_aRegionMapUV;");
         }
 
-        add("gl_PointSize = 3.0;");
+        if (points) {
+            add("gl_PointSize = SCENEJS_uPointSize;");
+        }
 
         add("}");
 

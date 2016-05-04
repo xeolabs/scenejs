@@ -61,6 +61,7 @@ new (function () {
 
         core.primitive = this._getPrimitiveType(primitive);
         core.primitiveName = primitive;
+        core.pointSize = data.pointSize || 1;
 
         // Generate normals
         if (data.normals) {
@@ -660,6 +661,17 @@ new (function () {
         return this.primitive;
     };
 
+    SceneJS.Geometry.prototype.getPointSize = function () {
+        return this._core.pointSize;
+    };
+
+    SceneJS.Geometry.prototype.setPointSize = function (size) {
+        if (size && this._core.pointSize !== size) {
+            this._core.pointSize = size;
+            this._engine.display.imageDirty = true;
+        }
+    };
+
     /** Returns the Model-space boundary of this geometry
      *
      * @returns {*}
@@ -743,7 +755,7 @@ new (function () {
             core = this._inheritVBOs(core);
         }
 
-        if (core.indexBuf) { // Can only render when we have indices
+        if (core.indexBuf || core.primitiveName === "points") { // Can only render when we have indices or are drawing points
 
             var parts = [                           // Safe to build geometry hash here - geometry is immutable
                 core.normalBuf ? "t" : "f",
