@@ -83,95 +83,8 @@ new (function () {
 
     SceneJS.MorphGeometry.prototype._buildNodeCore = function (data) {
 
-        var targetsData = data.targets || [];
-        if (targetsData.length < 2) {
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "morphGeometry node should have at least two targets");
-        }
-
-        var keysData = data.keys || [];
-        if (keysData.length != targetsData.length) {
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "morphGeometry node mismatch in number of keys and targets");
-        }
-
-        var core = this._core;
-        var gl = this._engine.canvas.gl;
-        var usage = gl.STATIC_DRAW; //var usage = (!arrays.fixed) ? gl.STREAM_DRAW : gl.STATIC_DRAW;
-
-        core.keys = keysData;
-        core.targets = [];
-        core.key1 = 0;
-        core.key2 = 1;
-
-        /* First target's arrays are defaults for where not given on previous and subsequent targets.
-         * When target does have array, subsequent targets without array inherit it.
-         */
-
-        var positions;
-        var normals;
-        var uv;
-        var uv2;
-
-        var targetData;
-
-        for (var i = 0, len = targetsData.length; i < len; i++) {
-            targetData = targetsData[i];
-            if (!positions && targetData.positions) {
-                positions = targetData.positions;
-            }
-            if (!normals && targetData.normals) {
-                normals = targetData.normals;
-            }
-            if (!uv && targetData.uv) {
-                uv = targetData.uv;
-            }
-            if (!uv2 && targetData.uv2) {
-                uv2 = targetData.uv2;
-            }
-        }
-
         try {
-            var target;
-            var arry;
-
-            for (var i = 0, len = targetsData.length; i < len; i++) {
-                targetData = targetsData[i];
-                target = {};
-
-                arry = targetData.positions || positions;
-                if (arry) {
-                    target.positions = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
-                    target.vertexBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.positions, arry.length, 3, usage);
-                    positions = arry;
-                }
-
-                arry = targetData.normals || normals;
-                if (arry) {
-                    target.normals = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
-                    target.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.normals, arry.length, 3, usage);
-                    normals = arry;
-                }
-
-                arry = targetData.uv || uv;
-                if (arry) {
-                    target.uv = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
-                    target.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv, arry.length, 2, usage);
-                    uv = arry;
-                }
-
-                arry = targetData.uv2 || uv2;
-                if (arry) {
-                    target.uv2 = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
-                    target.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv2, arry.length, 2, usage);
-                    uv2 = arry;
-                }
-
-                core.targets.push(target);  // We'll iterate this to destroy targets when we recover from error
-            }
-
+            buildCore(this, data);
         } catch (e) {
 
             /* Allocation failure - deallocate target VBOs
@@ -199,7 +112,6 @@ new (function () {
                 "Failed to allocate VBO(s) for morphGeometry: " + e);
         }
 
-        this._pickPositionsDirty = true;
     };
 
     SceneJS.MorphGeometry.prototype._buildPickPositions = function (indices) {
@@ -367,5 +279,97 @@ new (function () {
             }
         }
     };
+
+    function buildCore(node, data) {
+        var targetsData = data.targets || [];
+        if (targetsData.length < 2) {
+            throw SceneJS_error.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "morphGeometry node should have at least two targets");
+        }
+
+        var keysData = data.keys || [];
+        if (keysData.length != targetsData.length) {
+            throw SceneJS_error.fatalError(
+                SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                "morphGeometry node mismatch in number of keys and targets");
+        }
+
+        var core = node._core;
+        var gl = node._engine.canvas.gl;
+        var usage = gl.STATIC_DRAW; //var usage = (!arrays.fixed) ? gl.STREAM_DRAW : gl.STATIC_DRAW;
+
+        core.keys = keysData;
+        core.targets = [];
+        core.key1 = 0;
+        core.key2 = 1;
+
+        /* First target's arrays are defaults for where not given on previous and subsequent targets.
+         * When target does have array, subsequent targets without array inherit it.
+         */
+
+        var positions;
+        var normals;
+        var uv;
+        var uv2;
+
+        var targetData;
+
+        for (var i = 0, len = targetsData.length; i < len; i++) {
+            targetData = targetsData[i];
+            if (!positions && targetData.positions) {
+                positions = targetData.positions;
+            }
+            if (!normals && targetData.normals) {
+                normals = targetData.normals;
+            }
+            if (!uv && targetData.uv) {
+                uv = targetData.uv;
+            }
+            if (!uv2 && targetData.uv2) {
+                uv2 = targetData.uv2;
+            }
+        }
+
+        var target;
+        var arry;
+
+        for (var i = 0, len = targetsData.length; i < len; i++) {
+            targetData = targetsData[i];
+            target = {};
+
+            arry = targetData.positions || positions;
+            if (arry) {
+                target.positions = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                target.vertexBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.positions, arry.length, 3, usage);
+                positions = arry;
+            }
+
+            arry = targetData.normals || normals;
+            if (arry) {
+                target.normals = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                target.normalBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.normals, arry.length, 3, usage);
+                normals = arry;
+            }
+
+            arry = targetData.uv || uv;
+            if (arry) {
+                target.uv = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                target.uvBuf = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv, arry.length, 2, usage);
+                uv = arry;
+            }
+
+            arry = targetData.uv2 || uv2;
+            if (arry) {
+                target.uv2 = (arry.constructor == Float32Array) ? arry : new Float32Array(arry);
+                target.uvBuf2 = new SceneJS._webgl.ArrayBuffer(gl, gl.ARRAY_BUFFER, target.uv2, arry.length, 2, usage);
+                uv2 = arry;
+            }
+
+            core.targets.push(target);  // We'll iterate this to destroy targets when we recover from error
+        }
+
+        node._pickPositionsDirty = true;
+    }
 
 })();
