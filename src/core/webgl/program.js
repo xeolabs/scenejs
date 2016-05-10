@@ -21,8 +21,6 @@ SceneJS._webgl.Program = function (gl, vertexSources, fragmentSources) {
     this._samplers = {};
     this._attributes = {};
 
-    this.uniformValues = [];
-
     this.materialSettings = {
         specularColor: [0, 0, 0],
         specular: 0,
@@ -76,7 +74,6 @@ SceneJS._webgl.Program = function (gl, vertexSources, fragmentSources) {
                     this._samplers[u_name] = new SceneJS._webgl.Sampler(gl, this.handle, u_name, u.type, u.size, location);
                 } else {
                     this._uniforms[u_name] = new SceneJS._webgl.Uniform(gl, this.handle, u_name, u.type, u.size, location, valueIndex);
-                    this.uniformValues[valueIndex] = null;
                     ++valueIndex;
                 }
             }
@@ -105,7 +102,6 @@ SceneJS._webgl.Program.prototype.bind = function () {
         return;
     }
     this.gl.useProgram(this.handle);
-    this.uniformValues.length = 0;
 };
 
 SceneJS._webgl.Program.prototype.getUniformLocation = function (name) {
@@ -182,9 +178,6 @@ SceneJS._webgl.Program.prototype.setUniform = function (name, value) {
     }
     var u = this._uniforms[name];
     if (u) {
-        if (this.uniformValues[u.index] !== value || !u.numberValue) {
-            u.setValue(value);
-            this.uniformValues[u.index] = value;
-        }
+        u.setValue(value);
     }
 };
