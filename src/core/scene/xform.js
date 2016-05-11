@@ -11,6 +11,9 @@ SceneJS.XForm.prototype._init = function (params) {
         SceneJS_modelXFormStack.buildCore(this._core);
 
         this.setElements(params.elements);
+
+        this.xformParent = null;
+        this.xformChildren = [];
     }
 };
 
@@ -73,12 +76,62 @@ SceneJS.XForm.prototype.setElements = function (elements) {
     return this;
 };
 
-SceneJS.XForm.prototype._branchDirty = function() {
-    SceneJS_modelXFormStack.compileCore(this._core);
-};
-
 SceneJS.XForm.prototype._compile = function (ctx) {
-    SceneJS_modelXFormStack.push(this._core);
+    var core = this._core;
+    var i, len;
+
+    core.numCores = 0;
+    for (i = 0, len = this.xformChildren.length; i < len; i++) {
+        var child = this.xformChildren[i];
+        if (!this.branchDirty && !child.dirty) {
+            core.cores[core.numCores++] = child._core;
+        }
+    }
+
+    for (i = core.numCores, len = core.cores.length; i < len; i++) {
+        core.cores[i] = null;
+    }
+
+    SceneJS_modelXFormStack.push(core);
     this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
+};
+
+SceneJS.XForm.prototype._connect = function () {
+    if (this.xformParent) {
+        return;
+    }
+
+    var n = this;
+
+    while (n.parent) {
+        n = n.parent;
+
+        if (n.xformChildren && this.xformParent !== n) {
+            this.xformParent = n;
+            n.xformChildren.push(this);
+            break;
+        }
+    }
+};
+
+SceneJS.XForm.prototype._disconnect = function () {
+    if (!this.xformParent) {
+        return;
+    }
+
+    var n = this;
+
+    while (n.parent) {
+        n = n.parent;
+
+        // Still connected to xformParent
+        if (this.xformParent === n) {
+            return;
+        }
+    }
+
+    var siblings = this.xformParent.xformChildren;
+    siblings.splice(siblings.indexOf(this), 1);
+    this.xformParent = null;
 };

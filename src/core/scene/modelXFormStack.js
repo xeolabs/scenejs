@@ -29,8 +29,7 @@ var SceneJS_modelXFormStack = new (function () {
         cores:[], // Child transform cores
         numCores:0, // Number of child transform cores
         dirty:false, // Does this subtree need matrices rebuilt
-        matrixDirty:false,
-        compiling: false // Does this core belong to a node that's compiling?
+        matrixDirty:false
     };
 
     var transformStack = [];
@@ -193,13 +192,10 @@ var SceneJS_modelXFormStack = new (function () {
 
         core.parent = this.top;
         core.dirty = true;
-        core.compiling = false;
 
         if (this.top) {
             this.top.cores[this.top.numCores++] = core;
         }
-
-        core.numCores = filterCores(core.cores, core.numCores);
 
         this.top = core;
 
@@ -213,32 +209,5 @@ var SceneJS_modelXFormStack = new (function () {
 
         dirty = true;
     };
-
-    // Mark core as needing to be pushed back on the stack.
-    // Occurs when the core belongs to a node that's compiling.
-    this.compileCore = function (core) {
-        core.compiling = true;
-    };
-
-    function filterCores(cores, numCores) {
-        var skip = 0;
-        var i;
-
-        for (i = 0; i < numCores; i++) {
-            if (cores[i].compiling) {
-                skip++;
-                continue;
-            }
-            cores[i - skip] = cores[i];
-        }
-
-        var newNumCores = numCores - skip;
-
-        for (i = newNumCores; i < numCores; i++) {
-            cores[i] = null;  // Free memory
-        }
-
-        return newNumCores;
-    }
 
 })();
