@@ -12,7 +12,7 @@
             -webkit-user-select: none;
         }
     </style>
-    <script src="../api/latest/scenejs.min.js"></script>
+    <script src="../api/latest/scenejs.js"></script>
     <link href="css/styles.css" rel="stylesheet"/>
 
 </head>
@@ -59,18 +59,19 @@ var scene = SceneJS.createScene({
                     nodes: [
                         // Table leg #1
                         {
-                            type: "translate",
-                            x: -2.0, y: 0.0, z: -2.0,
+                            // Materials can appear anywhere in the hierarchy
+                            type: "material",
+                            color: { r: 1.0, g: 0.4, b: 0.4 },
+
                             nodes: [
                                 {
                                     type: "scale",
                                     x: 0.2, y: 1.0, z: 0.2,
                                     nodes: [
-                                        // Materials can appear anywhere in the hierarchy
-                                        {
-                                            type: "material",
-                                            color: { r: 1.0, g: 0.4, b: 0.4 },
 
+                                        {
+                                            type: "translate",
+                                            x: -2.0, y: 0.0, z: -2.0,
                                             nodes: [
 
                                                 // Box primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/box.js

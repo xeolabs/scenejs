@@ -409,6 +409,7 @@ SceneJS.Node.prototype.getNode = function (id) {
 SceneJS.Node.prototype.disconnectNodeAt = function (index) {
     var r = this.nodes.splice(index, 1);
     if (r.length > 0) {
+        r[0]._disconnectFromScene();
         r[0].parent = null;
         this._engine.branchDirty(this);
         return r[0];
@@ -426,13 +427,41 @@ SceneJS.Node.prototype.disconnect = function () {
         for (var i = 0; i < this.parent.nodes.length; i++) {
             if (this.parent.nodes[i] === this) {
                 var node = this.parent.disconnectNodeAt(i);
+                this._disconnectFromScene();
                 this.parent = null;
                 return node;
             }
         }
+        this._disconnectFromScene();
         this.parent = null;
     }
     return null;
+};
+
+/**
+ * Connection callback that can be overridden in
+ * specific node types
+ */
+SceneJS.Node.prototype._connectToScene = function () {
+    if (this._connect) {
+        this._connect();
+    }
+    for (var i = 0, len = this.nodes.length; i < len; i++) {
+        this.nodes[i]._connectToScene();
+    }
+};
+
+/**
+ * Disconnection callback that can be overridden in
+ * specific node types
+ */
+SceneJS.Node.prototype._disconnectFromScene = function () {
+    if (this._disconnect) {
+        this._disconnect();
+    }
+    for (var i = 0, len = this.nodes.length; i < len; i++) {
+        this.nodes[i]._disconnectFromScene();
+    }
 };
 
 /** Removes the child node at the given index
@@ -488,6 +517,7 @@ SceneJS.Node.prototype.removeNode = function (node) {
 SceneJS.Node.prototype.disconnectNodes = function () {
     var len = this.nodes.length;
     for (var i = 0; i < len; i++) {  // Unlink nodes from this
+        this.nodes[i]._disconnectFromScene();
         this.nodes[i].parent = null;
     }
     var nodes = this.nodes;
@@ -518,6 +548,7 @@ SceneJS.Node.prototype.splice = function () {
     var nodes = this.disconnectNodes();
     for (i = 0, len = nodes.length; i < len; i++) {  // Link this node's nodes to new parent
         nodes[i].parent = this.parent;
+        nodes[i]._connectToScene();
     }
     for (i = 0, len = parent.nodes.length; i < len; i++) { // Replace node on parent's nodes with this node's nodes
         if (parent.nodes[i] === this) {
@@ -525,6 +556,7 @@ SceneJS.Node.prototype.splice = function () {
             parent.nodes.splice.apply(parent.nodes, [i, 1].concat(nodes));
 
             this.nodes = [];
+            this._disconnectFromScene();
             this.parent = null;
 
             this.destroy();
@@ -601,6 +633,7 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
         }
         this.nodes.push(node);
         node.parent = this;
+        node._connectToScene();
         this._engine.branchDirty(node);
         if (ok) {
             ok(node);
@@ -624,6 +657,7 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
         }
         this.nodes.push(node);
         node.parent = this;
+        node._connectToScene();
         this._engine.branchDirty(node);
         if (ok) {
             ok(node);
@@ -645,6 +679,7 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
         node = this._engine.createNode(node);
         this.nodes.push(node);
         node.parent = this;
+        node._connectToScene();
         this._engine.branchDirty(node);
         if (ok) {
             ok(node);
@@ -662,6 +697,7 @@ SceneJS.Node.prototype.addNode = function (node, ok) {
             function (node) {
                 self.nodes.push(node);
                 node.parent = self;
+                node._connectToScene();
                 self._engine.branchDirty(node);
                 if (ok) {
                     ok(node);
@@ -717,6 +753,7 @@ SceneJS.Node.prototype.insertNode = function (node, i) {
     }
 
     node.parent = this;
+    node._connectToScene();
     return node;
 };
 

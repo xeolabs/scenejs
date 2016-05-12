@@ -12,6 +12,9 @@ SceneJS.Matrix.prototype._init = function(params) {
         SceneJS_modelXFormStack.buildCore(this._core);
 
         this.setElements(params.elements);
+
+        this.xformParent = null;
+        this.xformChildren = [];
     }
 };
 
@@ -78,12 +81,60 @@ SceneJS.Matrix.prototype.setMatrix = function(elements) {
  */
 SceneJS.Matrix.prototype.setElements = SceneJS.Matrix.prototype.setMatrix;
 
-SceneJS.Matrix.prototype._branchDirty = function() {
-    SceneJS_modelXFormStack.compileCore(this._core);
-};
+SceneJS.Matrix.prototype._compile = function (ctx) {
+    var core = this._core;
+    core.numCores = 0;
+    for (var i = 0, len = this.xformChildren.length; i < len; i++) {
+        var child = this.xformChildren[i];
+        if (!this.branchDirty && !child.dirty) {
+            core.cores[core.numCores++] = child._core;
+        }
+    }
 
-SceneJS.Matrix.prototype._compile = function(ctx) {
-    SceneJS_modelXFormStack.push(this._core);
+    for (i = core.numCores, len = core.cores.length; i < len; i++) {
+        core.cores[i] = null;
+    }
+
+    SceneJS_modelXFormStack.push(core);
     this._compileNodes(ctx);
     SceneJS_modelXFormStack.pop();
+};
+
+SceneJS.Matrix.prototype._connect = function () {
+    if (this.xformParent) {
+        return;
+    }
+
+    var n = this;
+
+    while (n.parent) {
+        n = n.parent;
+
+        if (n.xformChildren && this.xformParent !== n) {
+            this.xformParent = n;
+            n.xformChildren.push(this);
+            break;
+        }
+    }
+};
+
+SceneJS.Matrix.prototype._disconnect = function () {
+    if (!this.xformParent) {
+        return;
+    }
+
+    var n = this;
+
+    while (n.parent) {
+        n = n.parent;
+
+        // Still connected to xformParent
+        if (this.xformParent === n) {
+            return;
+        }
+    }
+
+    var siblings = this.xformParent.xformChildren;
+    siblings.splice(siblings.indexOf(this), 1);
+    this.xformParent = null;
 };
