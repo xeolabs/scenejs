@@ -962,6 +962,9 @@ var SceneJS_Map = function(items, _baseId) {
      */
     this.removeItem = function(id) {
         delete this.items[id];
+        if (SceneJS._isNumeric(id)) {
+            lastUniqueId = id;
+        }
     };
 };;/**
  * The SceneJS object.
