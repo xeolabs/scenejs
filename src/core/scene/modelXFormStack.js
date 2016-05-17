@@ -81,6 +81,7 @@ var SceneJS_modelXFormStack = new (function () {
         core.cores = [];            // Child transform cores
         core.numCores = 0;          // Number of child transform cores
         core.matrixDirty = false;
+        core.compiling = false;
 
         core.matrix = SceneJS_math_identityMat4();
 
@@ -195,8 +196,6 @@ var SceneJS_modelXFormStack = new (function () {
         if (this.top) {
             this.top.cores[this.top.numCores++] = core;
         }
-
-        core.numCores = 0;
 
         this.top = core;
 

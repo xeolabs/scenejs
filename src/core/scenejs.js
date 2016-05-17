@@ -380,6 +380,7 @@ var SceneJS = new (function () {
             return array.slice(start, end);
         }
 
+        start = start || 0;
         end = end || array.length;
 
         var length = end - start;
