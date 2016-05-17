@@ -1,5 +1,15 @@
 
 SceneJS._webgl.Texture2D = function (gl, cfg) {
+
+    try {
+        this._init(gl, cfg);
+    } catch (e) {
+        throw SceneJS_error.fatalError(SceneJS.errors.OUT_OF_VRAM, "Failed to create texture: " + e.message || e);
+    }
+
+};
+
+SceneJS._webgl.Texture2D.prototype._init = function (gl, cfg) {
     /**
      * True as soon as this texture is allocated and ready to go
      * @type {boolean}
@@ -19,39 +29,34 @@ SceneJS._webgl.Texture2D = function (gl, cfg) {
     this.depthCompareMode = 0;
     this.depthCompareFunc = 0;
 
-    try {
-        gl.bindTexture(this.target, this.texture);
+    gl.bindTexture(this.target, this.texture);
 
-        if (cfg.minFilter) {
-            gl.texParameteri(this.target, gl.TEXTURE_MIN_FILTER, cfg.minFilter);
-        }
-
-        if (cfg.magFilter) {
-            gl.texParameteri(this.target, gl.TEXTURE_MAG_FILTER, cfg.magFilter);
-        }
-
-        if (cfg.wrapS) {
-            gl.texParameteri(this.target, gl.TEXTURE_WRAP_S, cfg.wrapS);
-        }
-
-        if (cfg.wrapT) {
-            gl.texParameteri(this.target, gl.TEXTURE_WRAP_T, cfg.wrapT);
-        }
-
-        if (cfg.minFilter == gl.NEAREST_MIPMAP_NEAREST ||
-            cfg.minFilter == gl.LINEAR_MIPMAP_NEAREST ||
-            cfg.minFilter == gl.NEAREST_MIPMAP_LINEAR ||
-            cfg.minFilter == gl.LINEAR_MIPMAP_LINEAR) {
-            gl.generateMipmap(this.target);
-        }
-
-        gl.bindTexture(this.target, null);
-
-        this.allocated = true;
-
-    } catch (e) {
-        throw SceneJS_error.fatalError(SceneJS.errors.OUT_OF_VRAM, "Failed to create texture: " + e.message || e);
+    if (cfg.minFilter) {
+        gl.texParameteri(this.target, gl.TEXTURE_MIN_FILTER, cfg.minFilter);
     }
+
+    if (cfg.magFilter) {
+        gl.texParameteri(this.target, gl.TEXTURE_MAG_FILTER, cfg.magFilter);
+    }
+
+    if (cfg.wrapS) {
+        gl.texParameteri(this.target, gl.TEXTURE_WRAP_S, cfg.wrapS);
+    }
+
+    if (cfg.wrapT) {
+        gl.texParameteri(this.target, gl.TEXTURE_WRAP_T, cfg.wrapT);
+    }
+
+    if (cfg.minFilter == gl.NEAREST_MIPMAP_NEAREST ||
+        cfg.minFilter == gl.LINEAR_MIPMAP_NEAREST ||
+        cfg.minFilter == gl.NEAREST_MIPMAP_LINEAR ||
+        cfg.minFilter == gl.LINEAR_MIPMAP_LINEAR) {
+        gl.generateMipmap(this.target);
+    }
+
+    gl.bindTexture(this.target, null);
+
+    this.allocated = true;
 
     this.bind = function (unit) {
         if (!this.allocated) {
@@ -87,7 +92,7 @@ SceneJS._webgl.Texture2D = function (gl, cfg) {
             this.texture = null;
         }
     };
-};
+}
 
 SceneJS._webgl.clampImageSize = function (image, numPixels) {
     var n = image.width * image.height;
@@ -136,4 +141,3 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
     }
     return x + 1;
 };
-
