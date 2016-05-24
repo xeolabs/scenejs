@@ -65,6 +65,11 @@ var SceneJS_Engine = function (json, options) {
     this._sceneBranchesDirty = false;
 
     /**
+     * Flag to prevent engine from re-compiling the scene graph
+     */
+    this._compilationPaused = false;
+
+    /**
      * List of nodes scheduled for destruction by #destroyNode
      * Destructions are done in a batch at the end of each render so as not to disrupt the render.
      */
@@ -583,9 +588,27 @@ SceneJS_Engine.prototype._needCompile = function () {
 };
 
 /**
+ * Prevent engine from compiling the scene graph
+ */
+SceneJS_Engine.prototype.pauseCompilation = function () {
+    this._compilationPaused = true;
+};
+
+/**
+ * Resume compilation of scene graph
+ */
+SceneJS_Engine.prototype.resumeCompilation = function () {
+    this._compilationPaused = false;
+};
+
+/**
  * Performs any pending scene compilations or display rebuilds
  */
 SceneJS_Engine.prototype.compile = function () {
+    if (this._compilationPaused) {
+        return;
+    }
+
     if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
         this._sceneBranchesDirty = false;
         SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
