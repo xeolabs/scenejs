@@ -9,7 +9,8 @@ new (function () {
         type: "texture",
         stateId: SceneJS._baseStateId++,
         empty: true,
-        hash: ""
+        hash: "",
+        megaTexture: null // Optional "megaTexture" node
     };
 
     SceneJS_events.addListener(
@@ -104,6 +105,16 @@ new (function () {
                 },
                 this._core);
 
+            //if (this._core.megaTexture) {
+            //    SceneJS._apply({
+            //            minFilter: params.minFilter,
+            //            magFilter: params.magFilter,
+            //            wrapS: params.wrapS,
+            //            wrapT: params.wrapT
+            //        },
+            //        this._core);
+            //}
+
             buildMatrix.call(this._core);
 
 
@@ -124,6 +135,22 @@ new (function () {
                     });
             }
 
+            // Megatexture
+
+            var megaTextureId = params.megaTexture;
+
+            if (megaTextureId !== undefined && megaTextureId !== null) {
+                var megaTexture = this.getScene().getNode(megaTextureId);
+
+                if (!megaTexture) {
+                    throw SceneJS_error.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "Failed to find 'megaTexture' node with ID '" + megaTextureId + "'");
+                }
+
+                this._core.megaTexture = megaTexture._core;
+            }
+            
             this._core.webglRestored = function () {
 
                 if (self._core.image) {
@@ -256,14 +283,31 @@ new (function () {
     SceneJS.TextureMap.prototype._setCoreTexture = function (texture) {
         var gl = this._engine.canvas.gl;
 
-        this._core.texture = new SceneJS._webgl.Texture2D(gl, {
-            texture: texture, // WebGL texture object
-            minFilter: this._getGLOption("minFilter", gl.LINEAR_MIPMAP_NEAREST),
-            magFilter: this._getGLOption("magFilter", gl.LINEAR),
-            wrapS: this._getGLOption("wrapS", gl.REPEAT),
-            wrapT: this._getGLOption("wrapT", gl.REPEAT),
-            update: null
-        });
+        if (this._core.megaTexture) {
+
+            // When megaTexturing, this node's texture is the lookup table,
+            // in which case it must have the right properties for that purpose.
+
+            this._core.texture = new SceneJS._webgl.Texture2D(gl, {
+                texture: texture, // WebGL texture object
+                minFilter:  gl.NEAREST,
+                magFilter: gl.NEAREST,
+                wrapS: gl.CLAMP_TO_EDGE,
+                wrapT: gl.CLAMP_TO_EDGE,
+                update: null
+            });
+
+        } else {
+
+            this._core.texture = new SceneJS._webgl.Texture2D(gl, {
+                texture: texture, // WebGL texture object
+                minFilter: this._getGLOption("minFilter", gl.LINEAR_MIPMAP_NEAREST),
+                magFilter: this._getGLOption("magFilter", gl.LINEAR),
+                wrapS: this._getGLOption("wrapS", gl.REPEAT),
+                wrapT: this._getGLOption("wrapT", gl.REPEAT),
+                update: null
+            });
+        }
 
         if (this.destroyed) { // Node was destroyed while loading
             this._core.texture.destroy();
@@ -407,6 +451,9 @@ new (function () {
                 hashParts.push(texLayer.applyTo);
                 hashParts.push("/");
                 hashParts.push(texLayer.blendMode);
+                if (texLayer.megaTexture) {
+                    hashParts.push("m/");
+                }
                 if (texLayer.matrix) {
                     hashParts.push("/anim");
                 }

@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-05-17
+ * Built on 2016-06-09
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -1993,6 +1993,11 @@ var SceneJS_Engine = function (json, options) {
     this._sceneBranchesDirty = false;
 
     /**
+     * Flag to prevent engine from re-compiling the scene graph
+     */
+    this._compilationPaused = false;
+
+    /**
      * List of nodes scheduled for destruction by #destroyNode
      * Destructions are done in a batch at the end of each render so as not to disrupt the render.
      */
@@ -2511,9 +2516,27 @@ SceneJS_Engine.prototype._needCompile = function () {
 };
 
 /**
+ * Prevent engine from compiling the scene graph
+ */
+SceneJS_Engine.prototype.pauseCompilation = function () {
+    this._compilationPaused = true;
+};
+
+/**
+ * Resume compilation of scene graph
+ */
+SceneJS_Engine.prototype.resumeCompilation = function () {
+    this._compilationPaused = false;
+};
+
+/**
  * Performs any pending scene compilations or display rebuilds
  */
 SceneJS_Engine.prototype.compile = function () {
+    if (this._compilationPaused) {
+        return;
+    }
+
     if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
         this._sceneBranchesDirty = false;
         SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
@@ -2950,51 +2973,56 @@ SceneJS.log = new (function() {
     /**
      * Returns a new, uninitialized two-element vector.
      * @method vec2
+     * @param [values] Initial values.
      * @static
      * @returns {Float32Array}
      */
-    window.SceneJS_math_vec2 = function () {
-        return new Float32Array(2);
+    window.SceneJS_math_vec2 = function (values) {
+        return new Float32Array(values || 2);
     };
 
     /**
      * Returns a new, uninitialized three-element vector.
      * @method vec3
+     * @param [values] Initial values.
      * @static
      * @returns {Float32Array}
      */
-    window.SceneJS_math_vec3 = function () {
-        return new Float32Array(3);
+    window.SceneJS_math_vec3 = function (values) {
+        return new Float32Array(values || 3);
     };
 
     /**
      * Returns a new, uninitialized four-element vector.
      * @method vec4
+     * @param [values] Initial values.
      * @static
      * @returns {Float32Array}
      */
-    window.SceneJS_math_vec4 = function () {
-        return new Float32Array(4);
+    window.SceneJS_math_vec4 = function (values) {
+        return new Float32Array(values || 4);
     };
 
     /**
      * Returns a new, uninitialized 3x3 matrix.
      * @method mat3
+     * @param [values] Initial values.
      * @static
      * @returns {Float32Array}
      */
-    window.SceneJS_math_mat3 = function () {
-        return new Float32Array(9);
+    window.SceneJS_math_mat3 = function (values) {
+        return new Float32Array(values || 9);
     };
 
     /**
      * Returns a new, uninitialized 4x4 matrix.
      * @method mat4
+     * @param [values] Initial values.
      * @static
      * @returns {Float32Array}
      */
-    window.SceneJS_math_mat4 = function () {
-        return new Float32Array(16);
+    window.SceneJS_math_mat4 = function (values) {
+        return new Float32Array(values || 16);
     };
 
     /**
@@ -6423,7 +6451,7 @@ SceneJS._webgl.Texture2D.prototype._init = function (gl, cfg) {
             this.texture = null;
         }
     };
-}
+};
 
 SceneJS._webgl.clampImageSize = function (image, numPixels) {
     var n = image.width * image.height;
@@ -12809,9 +12837,23 @@ SceneJS.Scene.prototype.renderFrame = function (params) {
 };
 
 /**
+ * Prevent re-compilation of scene graph.
+ */
+SceneJS.Scene.prototype.pauseCompilation = function () {
+    return this._engine.pauseCompilation();
+};
+
+/**
+ * Resume re-compilation of scene graph.
+ */
+SceneJS.Scene.prototype.resumeCompilation = function () {
+    return this._engine.resumeCompilation();
+};
+
+/**
  * Force compilation of the scene graph.
  */
-SceneJS.Scene.prototype.compile = function (params) {
+SceneJS.Scene.prototype.compile = function () {
     return this._engine.compile();
 };
 
@@ -13425,7 +13467,6 @@ SceneJS.Scene.prototype.getStatus = function () {
     };
 })();;/**
  * @class Scene graph node which defines textures to apply to the objects in its subgraph
- * <p>This is the deprecated node type from SceneJS v3.2, which has been replaced by the "texture" node in ./texture.js</p>
  * @extends SceneJS.Node
  */
 new (function () {
@@ -13435,554 +13476,8 @@ new (function () {
         type: "texture",
         stateId: SceneJS._baseStateId++,
         empty: true,
-        hash: ""
-    };
-
-    var coreStack = [];
-    var stackLen = 0;
-
-    SceneJS_events.addListener(
-        SceneJS_events.SCENE_COMPILING,
-        function (params) {
-            params.engine.display.texture = defaultCore;
-            stackLen = 0;
-        });
-
-    /**
-     * @class Scene graph node which defines one or more textures to apply to the {@link SceneJS.Geometry} nodes in its subgraph
-     * @extends SceneJS.Node
-     */
-    SceneJS.Texture = SceneJS_NodeFactory.createNodeType("_texture");
-
-    SceneJS.Texture.prototype._init = function (params) {
-
-        if (this._core.useCount == 1) { // This node is the resource definer
-
-            this._core.layers = [];
-            this._core.params = {};
-
-            // By default, wait for texture to load before building subgraph
-            var waitForLoad = params.waitForLoad == undefined ? true : params.waitForLoad;
-
-            if (!params.layers) {
-                throw SceneJS_error.fatalError(
-                    SceneJS.errors.NODE_CONFIG_EXPECTED,
-                    "texture layers missing");
-            }
-
-            if (!SceneJS._isArray(params.layers)) {
-                throw SceneJS_error.fatalError(
-                    SceneJS.errors.NODE_CONFIG_EXPECTED,
-                    "texture layers should be an array");
-            }
-
-            var layerParams;
-            var gl = this._engine.canvas.gl;
-
-            for (var i = 0; i < params.layers.length; i++) {
-
-                layerParams = params.layers[i];
-
-                if (!layerParams.source && !layerParams.uri && !layerParams.src && !layerParams.colorTarget && !layerParams.video) {
-
-                    throw SceneJS_error.fatalError(
-                        SceneJS.errors.NODE_CONFIG_EXPECTED,
-                        "texture layer " + i + "  has no uri, src, source, colorTarget, video or canvasId specified");
-                }
-
-                if (layerParams.applyFrom) {
-                    if (layerParams.applyFrom != "uv" &&
-                        layerParams.applyFrom != "uv2" &&
-                        layerParams.applyFrom != "normal" &&
-                        layerParams.applyFrom != "geometry") {
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture layer " + i + "  applyFrom value is unsupported - " +
-                            "should be either 'uv', 'uv2', 'normal' or 'geometry'");
-                    }
-                }
-
-                if (layerParams.applyTo) {
-                    if (layerParams.applyTo != "baseColor" && // Colour map (deprecated)
-                        layerParams.applyTo != "color" && // Colour map
-                        layerParams.applyTo != "specular" && // Specular map
-                        layerParams.applyTo != "emit" && // Emission map
-                        layerParams.applyTo != "alpha" && // Alpha map
-                        layerParams.applyTo != "normals" && // Normal map
-                        layerParams.applyTo != "shine") { // Shininess map
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture layer " + i + " applyTo value is unsupported - " +
-                            "should be either 'color', 'baseColor', 'specular' or 'normals'");
-                    }
-                }
-
-                if (layerParams.blendMode) {
-                    if (layerParams.blendMode != "add" && layerParams.blendMode != "multiply" && layerParams.blendMode != "mix") {
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.NODE_CONFIG_EXPECTED,
-                            "texture layer " + i + " blendMode value is unsupported - " +
-                            "should be either 'add', 'multiply' or 'mix'");
-                    }
-                }
-
-                if (layerParams.applyTo == "color") {
-                    layerParams.applyTo = "baseColor";
-                }
-
-                var layer = SceneJS._apply(layerParams, {
-                    waitForLoad: waitForLoad,
-                    texture: null,
-                    applyFrom: layerParams.applyFrom || "uv",
-                    applyTo: layerParams.applyTo || "baseColor",
-                    blendMode: layerParams.blendMode || "multiply",
-                    blendFactor: (layerParams.blendFactor != undefined && layerParams.blendFactor != null) ? layerParams.blendFactor : 1.0,
-                    translate: {x: 0, y: 0},
-                    scale: {x: 1, y: 1},
-                    rotate: {z: 0.0}
-                });
-
-                this._core.layers.push(layer);
-
-                this._setLayerTransform(layerParams, layer);
-
-                if (layer.colorTarget) { // Create from a colorTarget node preceeding this texture in the scene graph
-                    var targetNode = this._engine.findNode(layer.colorTarget);
-                    if (targetNode && targetNode.type == "colorTarget") {
-                        layer.texture = targetNode._core.colorTarget.getTexture(); // TODO: what happens when the colorTarget is destroyed?
-                    }
-                } else { // Create from texture node's layer configs
-                    this._loadLayerTexture(gl, layer);
-                }
-
-                if (layer.image && layer.applyTo == "baseColor" && !this._imagePublished) {
-                    this.publish("image", layer.image);
-                    this._imagePublished = true;
-                }
-            }
-
-            var self = this;
-
-            // WebGL restored handler - rebuilds the texture layers
-            this._core.webglRestored = function () {
-
-                var layers = self._core.layers;
-                var gl = self._engine.canvas.gl;
-
-                for (var i = 0, len = layers.length; i < len; i++) {
-                    self._loadLayerTexture(gl, layers[i]);
-                }
-            };
-        }
-    };
-
-    SceneJS.Texture.prototype._loadLayerTexture = function (gl, layer) {
-
-        var self = this;
-
-        var sourceConfigs = layer.source;
-
-        if (sourceConfigs) {
-
-            if (!sourceConfigs.type) {
-                throw SceneJS_error.fatalError(
-                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                    "texture layer config expected: source.type");
-            }
-
-            SceneJS.Plugins.getPlugin(
-                "texture",
-                sourceConfigs.type,
-                function (plugin) {
-
-                    if (!plugin.getSource) {
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "texture: 'getSource' method missing on plugin for texture source type '" + sourceConfigs.type + "'.");
-                    }
-
-                    var source = plugin.getSource({gl: gl});
-
-                    if (!source.subscribe) {
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.PLUGIN_INVALID,
-                            "texture: 'subscribe' method missing on plugin for texture source type '" + sourceConfigs.type + "'");
-                    }
-
-                    var taskId = SceneJS_sceneStatusModule.taskStarted(self, "Loading texture");
-
-                    source.subscribe(// Get notification whenever source updates the texture
-                        (function () {
-                            var loaded = false;
-                            return function (texture) {
-                                if (!loaded) { // Texture first initialised - create layer
-                                    loaded = true;
-                                    self._setLayerTexture(gl, layer, texture);
-                                    SceneJS_sceneStatusModule.taskFinished(taskId);
-                                } else { // Texture updated - layer already has the handle to it, so just signal a redraw
-                                    self._engine.display.imageDirty = true;
-                                }
-                            };
-                        })());
-
-                    if (source.configure) {
-                        source.configure(sourceConfigs); // Configure the source, which may cause it to update the texture
-                    }
-
-                    layer._source = source;
-                });
-
-        } else {
-
-            /* Load from URL
-             */
-
-            var src = layer.uri || layer.src;
-            var preloadSrc = layer.preloadURI || layer.preloadSrc;
-            var preloadColor = layer.preloadColor || {r: 0.57735, g: 0.57735, b: 0.57735};
-            preloadColor.a = preloadColor.a === undefined ? 1 : preloadColor.a;
-
-            preloadColor = new Uint8Array([
-                Math.floor(preloadColor.r * 255),
-                Math.floor(preloadColor.g * 255),
-                Math.floor(preloadColor.b * 255),
-                Math.floor(preloadColor.a * 255)
-            ]);
-
-            var taskId = SceneJS_sceneStatusModule.taskStarted(this, "Loading texture");
-
-            var texture = gl.createTexture();
-
-            var loaded = false;
-            var taskFinished = false;
-
-            gl.bindTexture(gl.TEXTURE_2D, texture);
-
-            if (layer.image) {
-                self._setTextureImage(gl, texture, layer.image);
-                self._setLayerTexture(gl, layer, texture);
-                SceneJS_sceneStatusModule.taskFinished(taskId);
-                return;
-            }
-
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, preloadColor);
-            self._setLayerTexture(gl, layer, texture);
-
-            if (preloadSrc) {
-                var preloadImage = new Image();
-
-                preloadImage.onload = function () {
-                    if (!loaded) {
-                        self._setTextureImage(gl, texture, preloadImage);
-                        self._setLayerTexture(gl, layer, texture);
-                        SceneJS_sceneStatusModule.taskFinished(taskId);
-                        taskFinished = true;
-                    }
-                };
-
-                self._fetchImage(preloadImage, preloadSrc);
-            }
-
-            var image = new Image();
-
-            image.onload = function () {
-                self._setTextureImage(gl, texture, image);
-                self._setLayerTexture(gl, layer, texture);
-                if (!taskFinished) {
-                    SceneJS_sceneStatusModule.taskFinished(taskId);
-                }
-                layer.image = image;
-                loaded = true;
-
-                self.publish("image", image);
-            };
-
-            image.onerror = function () {
-                SceneJS_sceneStatusModule.taskFailed(taskId);
-            };
-
-            self._fetchImage(image, src);
-        }
-    };
-
-    SceneJS.Texture.prototype._fetchImage = function (image, src) {
-        if (src.indexOf("data") == 0) {  // Image data
-            image.src = src;
-        } else { // Image file
-            image.crossOrigin = "Anonymous";
-            image.src = src;
-        }
-    };
-
-    SceneJS.Texture.prototype._setTextureImage = function (gl, texture, image) {
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-
-        var maxTextureSize = SceneJS_configsModule.configs.maxTextureSize;
-        if (maxTextureSize) {
-            image = SceneJS._webgl.clampImageSize(image, maxTextureSize);
-        }
-
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._ensureImageSizePowerOfTwo(image));
-        this._engine.display.imageDirty = true;
-        return image;
-    };
-
-    SceneJS.Texture.prototype._ensureImageSizePowerOfTwo = function (image) {
-
-        if (!this._isPowerOfTwo(image.width) || !this._isPowerOfTwo(image.height)) {
-
-            var canvas = document.createElement("canvas");
-            canvas.width = this._nextHighestPowerOfTwo(image.width);
-            canvas.height = this._nextHighestPowerOfTwo(image.height);
-
-            var ctx = canvas.getContext("2d");
-
-            ctx.drawImage(image,
-                0, 0, image.width, image.height,
-                0, 0, canvas.width, canvas.height);
-
-            image = canvas;
-            image.crossOrigin = "";
-        }
-        return image;
-    };
-
-    SceneJS.Texture.prototype._isPowerOfTwo = function (x) {
-        return (x & (x - 1)) == 0;
-    };
-
-    SceneJS.Texture.prototype._nextHighestPowerOfTwo = function (x) {
-        --x;
-        for (var i = 1; i < 32; i <<= 1) {
-            x = x | x >> i;
-        }
-        return x + 1;
-    };
-
-    SceneJS.Texture.prototype._setLayerTexture = function (gl, layer, texture) {
-
-        layer.texture = new SceneJS._webgl.Texture2D(gl, {
-            texture: texture, // WebGL texture object
-            minFilter: this._getGLOption("minFilter", gl, layer, gl.LINEAR_MIPMAP_NEAREST),
-            magFilter: this._getGLOption("magFilter", gl, layer, gl.LINEAR),
-            wrapS: this._getGLOption("wrapS", gl, layer, gl.REPEAT),
-            wrapT: this._getGLOption("wrapT", gl, layer, gl.REPEAT),
-            update: null
-        });
-
-        if (this.destroyed) { // Node was destroyed while loading
-            layer.texture.destroy();
-        }
-
-        this._engine.display.imageDirty = true;
-    };
-
-    SceneJS.Texture.prototype._getGLOption = function (name, gl, layer, defaultVal) {
-        var value = layer[name];
-        if (value == undefined) {
-            return defaultVal;
-        }
-        var glName = SceneJS._webgl.enumMap[value];
-        if (glName == undefined) {
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Unrecognised value for texture node property '" + name + "' value: '" + value + "'");
-        }
-        var glValue = gl[glName];
-        //                if (!glValue) {
-        //                    throw new SceneJS.errors.WebGLUnsupportedNodeConfigException(
-        //                            "This browser's WebGL does not support value of SceneJS.texture node property '" + name + "' value: '" + value + "'");
-        //                }
-        return glValue;
-    };
-
-    SceneJS.Texture.prototype._getOption = function (value, defaultVal) {
-        return (value == undefined) ? defaultVal : value;
-    };
-
-    /**
-     * Set some writeable properties on a layer
-     */
-    SceneJS.Texture.prototype.setLayer = function (cfg) {
-
-        if (cfg.index == undefined || cfg.index == null) {
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Invalid texture set layer argument: index null or undefined");
-        }
-
-        if (cfg.index < 0 || cfg.index >= this._core.layers.length) {
-            throw SceneJS_error.fatalError(
-                SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                "Invalid texture set layer argument: index out of range (" + this._core.layers.length + " layers defined)");
-        }
-
-        this._setLayer(parseInt(cfg.index), cfg);
-
-        this._engine.display.imageDirty = true;
-    };
-
-    /**
-     * Set some writeable properties on multiple layers
-     */
-    SceneJS.Texture.prototype.setLayers = function (layers) {
-        var indexNum;
-        for (var index in layers) {
-            if (layers.hasOwnProperty(index)) {
-                if (index != undefined || index != null) {
-                    indexNum = parseInt(index);
-                    if (indexNum < 0 || indexNum >= this._core.layers.length) {
-                        throw SceneJS_error.fatalError(
-                            SceneJS.errors.ILLEGAL_NODE_CONFIG,
-                            "Invalid texture set layer argument: index out of range (" + this._core.layers.length + " layers defined)");
-                    }
-                    this._setLayer(indexNum, layers[index] || {});
-                }
-            }
-        }
-        this._engine.display.imageDirty = true;
-    };
-
-    SceneJS.Texture.prototype._setLayer = function (index, cfg) {
-
-        cfg = cfg || {};
-
-        var layer = this._core.layers[index];
-
-        if (cfg.blendFactor != undefined && cfg.blendFactor != null) {
-            layer.blendFactor = cfg.blendFactor;
-        }
-
-        if (cfg.source) {
-            var source = layer._source;
-            if (source && source.configure) {
-                source.configure(cfg.source);
-            }
-        }
-
-        if (cfg.translate || cfg.rotate || cfg.scale) {
-            this._setLayerTransform(cfg, layer);
-        }
-    };
-
-    SceneJS.Texture.prototype._setLayerTransform = function (cfg, layer) {
-
-        var matrix;
-        var t;
-
-        if (cfg.translate) {
-            var translate = cfg.translate;
-            if (translate.x != undefined) {
-                layer.translate.x = translate.x;
-            }
-            if (translate.y != undefined) {
-                layer.translate.y = translate.y;
-            }
-            matrix = SceneJS_math_translationMat4v([translate.x || 0, translate.y || 0, 0]);
-        }
-
-        if (cfg.scale) {
-            var scale = cfg.scale;
-            if (scale.x != undefined) {
-                layer.scale.x = scale.x;
-            }
-            if (scale.y != undefined) {
-                layer.scale.y = scale.y;
-            }
-            t = SceneJS_math_scalingMat4v([scale.x || 1, scale.y || 1, 1]);
-            matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
-        }
-
-        if (cfg.rotate) {
-            var rotate = cfg.rotate;
-            if (rotate.z != undefined) {
-                layer.rotate.z = rotate.z || 0;
-            }
-            t = SceneJS_math_rotationMat4v(rotate.z * 0.0174532925, [0, 0, 1]);
-            matrix = matrix ? SceneJS_math_mulMat4(matrix, t) : t;
-        }
-
-        if (matrix) {
-            layer.matrix = matrix;
-            if (!layer.matrixAsArray) {
-                layer.matrixAsArray = new Float32Array(layer.matrix);
-            } else {
-                layer.matrixAsArray.set(layer.matrix);
-            }
-
-            layer.matrixAsArray = new Float32Array(layer.matrix); // TODO - reinsert into array
-        }
-    };
-
-    SceneJS.Texture.prototype._compile = function (ctx) {
-        if (!this._core.hash) {
-            this._makeHash();
-        }
-        this._engine.display.texture = coreStack[stackLen++] = this._core;
-        this._compileNodes(ctx);
-        this._engine.display.texture = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
-        coreStack[stackLen] = null; // Release memory
-    };
-
-    SceneJS.Texture.prototype._makeHash = function () {
-        var core = this._core;
-        var hash;
-        if (core.layers && core.layers.length > 0) {
-            var layers = core.layers;
-            var hashParts = [];
-            var texLayer;
-            for (var i = 0, len = layers.length; i < len; i++) {
-                texLayer = layers[i];
-                hashParts.push("/");
-                hashParts.push(texLayer.applyFrom);
-                hashParts.push("/");
-                hashParts.push(texLayer.applyTo);
-                hashParts.push("/");
-                hashParts.push(texLayer.blendMode);
-                if (texLayer.matrix) {
-                    hashParts.push("/anim");
-                }
-            }
-            hash = hashParts.join("");
-        } else {
-            hash = "";
-        }
-        if (core.hash != hash) {
-            core.hash = hash;
-        }
-    };
-
-    SceneJS.Texture.prototype._destroy = function () {
-        if (this._core.useCount == 1) { // Last resource user
-            var layers = this._core.layers;
-            var layer;
-            var source;
-            for (var i = 0, len = layers.length; i < len; i++) {
-                layer = layers[i];
-                if (layer.texture) {
-                    layer.texture.destroy();
-                }
-                source = layer._source;
-                if (source && source.destroy) {
-                    source.destroy();
-                }
-            }
-        }
-    };
-
-})();
-;/**
- * @class Scene graph node which defines textures to apply to the objects in its subgraph
- * @extends SceneJS.Node
- */
-new (function () {
-
-    // The default state core singleton for {@link SceneJS.Texture} nodes
-    var defaultCore = {
-        type: "texture",
-        stateId: SceneJS._baseStateId++,
-        empty: true,
-        hash: ""
+        hash: "",
+        megaTexture: null // Optional "megaTexture" node
     };
 
     SceneJS_events.addListener(
@@ -14077,6 +13572,16 @@ new (function () {
                 },
                 this._core);
 
+            //if (this._core.megaTexture) {
+            //    SceneJS._apply({
+            //            minFilter: params.minFilter,
+            //            magFilter: params.magFilter,
+            //            wrapS: params.wrapS,
+            //            wrapT: params.wrapT
+            //        },
+            //        this._core);
+            //}
+
             buildMatrix.call(this._core);
 
 
@@ -14097,6 +13602,22 @@ new (function () {
                     });
             }
 
+            // Megatexture
+
+            var megaTextureId = params.megaTexture;
+
+            if (megaTextureId !== undefined && megaTextureId !== null) {
+                var megaTexture = this.getScene().getNode(megaTextureId);
+
+                if (!megaTexture) {
+                    throw SceneJS_error.fatalError(
+                        SceneJS.errors.NODE_CONFIG_EXPECTED,
+                        "Failed to find 'megaTexture' node with ID '" + megaTextureId + "'");
+                }
+
+                this._core.megaTexture = megaTexture._core;
+            }
+            
             this._core.webglRestored = function () {
 
                 if (self._core.image) {
@@ -14229,14 +13750,31 @@ new (function () {
     SceneJS.TextureMap.prototype._setCoreTexture = function (texture) {
         var gl = this._engine.canvas.gl;
 
-        this._core.texture = new SceneJS._webgl.Texture2D(gl, {
-            texture: texture, // WebGL texture object
-            minFilter: this._getGLOption("minFilter", gl.LINEAR_MIPMAP_NEAREST),
-            magFilter: this._getGLOption("magFilter", gl.LINEAR),
-            wrapS: this._getGLOption("wrapS", gl.REPEAT),
-            wrapT: this._getGLOption("wrapT", gl.REPEAT),
-            update: null
-        });
+        if (this._core.megaTexture) {
+
+            // When megaTexturing, this node's texture is the lookup table,
+            // in which case it must have the right properties for that purpose.
+
+            this._core.texture = new SceneJS._webgl.Texture2D(gl, {
+                texture: texture, // WebGL texture object
+                minFilter:  gl.NEAREST,
+                magFilter: gl.NEAREST,
+                wrapS: gl.CLAMP_TO_EDGE,
+                wrapT: gl.CLAMP_TO_EDGE,
+                update: null
+            });
+
+        } else {
+
+            this._core.texture = new SceneJS._webgl.Texture2D(gl, {
+                texture: texture, // WebGL texture object
+                minFilter: this._getGLOption("minFilter", gl.LINEAR_MIPMAP_NEAREST),
+                magFilter: this._getGLOption("magFilter", gl.LINEAR),
+                wrapS: this._getGLOption("wrapS", gl.REPEAT),
+                wrapT: this._getGLOption("wrapT", gl.REPEAT),
+                update: null
+            });
+        }
 
         if (this.destroyed) { // Node was destroyed while loading
             this._core.texture.destroy();
@@ -14380,6 +13918,9 @@ new (function () {
                 hashParts.push(texLayer.applyTo);
                 hashParts.push("/");
                 hashParts.push(texLayer.blendMode);
+                if (texLayer.megaTexture) {
+                    hashParts.push("m/");
+                }
                 if (texLayer.matrix) {
                     hashParts.push("/anim");
                 }
@@ -14396,6 +13937,134 @@ new (function () {
     SceneJS.TextureMap.prototype._destroy = function () {
         if (this._core.useCount == 1) { // Last core user
             if (this._core.texture && !this._core.target) { // Don't wipe out target texture
+                this._core.texture.destroy();
+                this._core.texture = null;
+            }
+        }
+        if (this._core) {
+            this._engine._coreFactory.putCore(this._core);
+        }
+    };
+
+})();
+;new (function () {
+
+    /**
+     * @class Scene graph node which defines a megatexture
+     * @extends SceneJS.Node
+     */
+    SceneJS.MegaTexture = SceneJS_NodeFactory.createNodeType("megaTexture");
+
+    SceneJS.MegaTexture.prototype._init = function (params) {
+
+        var self = this;
+
+        if (this._core.useCount == 1) { // This node is the resource definer
+
+            this._pixelsPerSide = params.pixelsPerSide || 1000;
+
+            if (this._pixelsPerSide <= 0) {
+                throw SceneJS_error.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "SceneJS.MegaTexture param 'pixelsPerSide' should be greater than zero");
+            }
+
+            // Number of cache tiles on each side
+
+            this._tilesPerSide = params.tilesPerSide || 10;
+
+            if (this._tilesPerSide <= 0) {
+                throw SceneJS_error.fatalError(
+                    SceneJS.errors.ILLEGAL_NODE_CONFIG,
+                    "SceneJS.MegaTexture param 'tilesPerSide' should be greater than zero");
+            }
+
+            this._core.info = SceneJS_math_vec2([
+                this._pixelsPerSide,
+                this._tilesPerSide
+            ]);
+
+            // Cache texture
+
+            var gl = this._engine.canvas.gl;
+            var texture = gl.createTexture();
+
+            this._core.texture = new SceneJS._webgl.Texture2D(gl, {
+                texture: texture,
+                minFilter: gl.NEAREST,
+                magFilter: gl.NEAREST,
+                wrapS: gl.CLAMP_TO_EDGE,
+                wrapT: gl.CLAMP_TO_EDGE
+            });
+
+            this.clear();
+
+            // TODO: handle WebGLContextRestore
+        }
+    };
+
+    /**
+     * Gets the number of pixels along each side of this MegaTexture.
+     * @returns {Number}
+     */
+    SceneJS.MegaTexture.prototype.getPixelsPerSide = function () {
+        return this._pixelsPerSide;
+    };
+
+    /**
+     * Gets the number of tiles along each side of this MegaTexture.
+     * @returns {Number}
+     */
+    SceneJS.MegaTexture.prototype.getTilesPerSide = function () {
+        return this._tilesPerSide;
+    };
+
+    /**
+     * Clears this MegaTexture.
+     */
+    SceneJS.MegaTexture.prototype.clear = function () {
+
+        var canvas = document.createElement('canvas');
+
+        var pixelsPerSide = this._core.info[0];
+
+        canvas.width = pixelsPerSide;
+        canvas.height = pixelsPerSide;
+
+        var ctx = canvas.getContext("2d");
+        ctx.rect(0, 0, pixelsPerSide, pixelsPerSide);
+        ctx.fillStyle = "black";
+        ctx.fill();
+
+        var image = new Image();
+        image.src = canvas.toDataURL();
+
+        var gl = this._engine.canvas.gl;
+        gl.bindTexture(gl.TEXTURE_2D, this._core.texture.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+
+        this._engine.display.imageDirty = true;
+    };
+
+    /**
+     * Copies an image into this MegaTexture at the given pixel coordinates.
+     *
+     * @param {HTMLImageElement} image Source image.
+     * @param {Number} x X coordinate within MegaTexture
+     * @param {Number} y Y coordinate within MegaTexture
+     */
+    SceneJS.MegaTexture.prototype.draw = function (image, x, y) {
+        var gl = this._engine.canvas.gl;
+        gl.bindTexture(gl.TEXTURE_2D, this._core.texture.texture);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, x, y, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+        this._engine.display.imageDirty = true;
+    };
+
+    SceneJS.MegaTexture.prototype._destroy = function () {
+        if (this._core.useCount == 1) { // Last core user
+            if (this._core.texture) { // Don't wipe out target texture
                 this._core.texture.destroy();
                 this._core.texture = null;
             }
@@ -17925,6 +17594,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var fragmentFresnel;
     var fresnel;
     var texturing;// True when rendering state contains textures
+    var megaTexturing; // True when one or more textures are virtual
     var cubeMapping;
     var normals;// True when rendering state contains normals
     var solid;
@@ -17961,6 +17631,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         fragmentFresnel = states.fresnel.fragment;
         fresnel = diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel;
         texturing = hasTextures(states);
+        megaTexturing = texturing && hasMegaTextures();
         cubeMapping = hasCubemap(states);
         normals = hasNormals(states);
         solid = states.flags.solid;
@@ -18137,6 +17808,16 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return false;
     }
 
+    function hasMegaTextures() {
+        var layers = states.texture.layers;
+        for (var i = 0, len = layers.length; i < len; i++) {
+            if (layers[i].megaTexture) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function hasUVs() {
         if (states.geometry.uvBufs) { // TODO only if there is at least one defined member in this array
             return true;
@@ -18211,6 +17892,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         begin();
 
+        if (megaTexturing) {
+            add("#extension GL_OES_standard_derivatives : enable");
+            //add("#extension GL_OES_texture_float_linear : enable");
+        }
+
         add("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
         add("uniform mat4 SCENEJS_uVMatrix;");             // View matrix
         add("uniform mat4 SCENEJS_uPMatrix;");             // Projection matrix
@@ -18267,7 +17953,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("varying vec4 SCENEJS_vViewVertex;");              // Varying for fragment view clip hook
 
-        if ( texturing) {                                            // Varyings for fragment texturing
+        if (texturing) {                                            // Varyings for fragment texturing
 
             uvBufs = states.geometry.uvBufs;
 
@@ -18297,8 +17983,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
             if (tangents) {
                 //if (states.morphGeometry.targets[0].normalBuf) {
-                    add("attribute vec3 SCENEJS_aMorphTangent;");
-               // }
+                add("attribute vec3 SCENEJS_aMorphTangent;");
+                // }
             }
         }
 
@@ -18553,15 +18239,42 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
             }
 
-            if (texturing) {
-                var layer;
-                for (var i = 0, len = states.texture.layers.length; i < len; i++) {
-                    layer = states.texture.layers[i];
-                    add("uniform sampler2D SCENEJS_uSampler" + i + ";");
-                    if (layer.matrix) {
-                        add("uniform mat4 SCENEJS_uLayer" + i + "Matrix;");
-                    }
-                    add("uniform float SCENEJS_uLayer" + i + "BlendFactor;");
+            var layer;
+            for (var i = 0, len = states.texture.layers.length; i < len; i++) {
+                layer = states.texture.layers[i];
+                add("uniform sampler2D SCENEJS_uSampler" + i + ";");
+                if (layer.matrix) {
+                    add("uniform mat4 SCENEJS_uLayer" + i + "Matrix;");
+                }
+                add("uniform float SCENEJS_uLayer" + i + "BlendFactor;");
+
+                if (layer.megaTexture) {
+                    add("uniform vec2       SCENEJS_uLayer" + i + "MegaTextureInfo;");
+                    add("uniform sampler2D  SCENEJS_uLayer" + i + "MegaTextureSampler;");
+                }
+
+                if (megaTexturing) {
+
+                    add([
+                        "vec4 sampleMegaTexture(",
+                        "   const in vec2 megaTextureInfo,",
+                        "         in sampler2D megaTextureSampler,",
+                        "         in sampler2D lookupSampler,",
+                        "   const in vec2 uv) {",
+
+                        "   float tilesPerSide = megaTextureInfo[1];",
+                        "   float tileUVWidth = 1.0 / tilesPerSide;",
+
+                        "   float offsetS = uv.s - (tileUVWidth * floor(tilesPerSide * uv.s));",
+                        "   float offsetT = uv.t - (tileUVWidth * floor(tilesPerSide * uv.t));",
+
+                        "   vec3 color = texture2D(lookupSampler, uv).rgb;",
+
+                        "   vec2 cacheUV = vec2(color.r + 0.0, color.g + 0.0);",
+
+                        "   return texture2D(megaTextureSampler, cacheUV);",
+                        "}"
+                    ].join("\n"));
                 }
             }
         }
@@ -18859,47 +18572,62 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         add("textureCoord=texturePos.xy;");
                     }
 
-                    /* Alpha from Texture
-                     */
+                    add("vec3 textureSample;");
+
+                    if (layer.megaTexture) {
+
+                        // Layer is megatextured; sample color-encoded UV coords
+                        // from layer's texture, then sample megatexture at those UVs.
+
+                        add([
+                            "textureSample = sampleMegaTexture(",
+                            "   SCENEJS_uLayer" + i + "MegaTextureInfo, ",
+                            "   SCENEJS_uLayer" + i + "MegaTextureSampler,",
+                            "   SCENEJS_uSampler" + i + ",",
+                            "   vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;"
+                        ].join("\n"));
+
+                    } else {
+                        add("textureSample = texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
+                    }
+
                     if (layer.applyTo == "alpha") {
                         if (layer.blendMode == "multiply") {
-                            add("alpha = alpha * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+                            add("alpha = alpha * (SCENEJS_uLayer" + i + "BlendFactor * textureSample.b);");
                         } else if (layer.blendMode == "add") {
-                            add("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+                            add("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * textureSample.b);");
                         }
                     }
 
-                    /* Texture output
-                     */
                     if (layer.applyTo == "baseColor") {
                         if (layer.blendMode == "multiply") {
-                            add("color = color * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+                            add("color = color * (SCENEJS_uLayer" + i + "BlendFactor * textureSample);");
                         } else {
-                            add("color = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * color) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+                            add("color = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * color) + (SCENEJS_uLayer" + i + "BlendFactor * textureSample);");
                         }
                     }
 
                     if (layer.applyTo == "emit") {
                         if (layer.blendMode == "multiply") {
-                            add("emit  = emit * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("emit  = emit * (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         } else {
-                            add("emit = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * emit) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("emit = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * emit) + (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         }
                     }
 
                     if (layer.applyTo == "specular" && normals) {
                         if (layer.blendMode == "multiply") {
-                            add("specular  = specular * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("specular  = specular * (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         } else {
-                            add("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         }
                     }
 
                     if (layer.applyTo == "shine") {
                         if (layer.blendMode == "multiply") {
-                            add("shine  = shine * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("shine  = shine * (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         } else {
-                            add("shine = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * shine) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("shine = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * shine) + (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         }
                     }
 
@@ -21154,6 +20882,9 @@ SceneJS_ChunkFactory.createChunkType({
         this._uTexSampler = this._uTexSampler || [];
         this._uTexMatrix = this._uTexMatrix || [];
         this._uTexBlendFactor = this._uTexBlendFactor || [];
+        
+        this._uMegaTextureInfo = this._uMegaTextureInfo || [];
+        this._uMegaTextureSampler = this._uMegaTextureSampler || [];
 
         var layers = this.core.layers;
 
@@ -21171,6 +20902,11 @@ SceneJS_ChunkFactory.createChunkType({
                 this._uTexMatrix[i] = draw.getUniform("SCENEJS_uLayer" + i + "Matrix");
 
                 this._uTexBlendFactor[i] = draw.getUniform("SCENEJS_uLayer" + i + "BlendFactor");
+
+                // Virtual texturing
+
+                this._uMegaTextureInfo[i] = draw.getUniform("SCENEJS_uLayer" + i + "MegaTextureInfo");
+                this._uMegaTextureSampler[i] = "SCENEJS_uLayer" + i + "MegaTextureSampler";
             }
         }
     },
@@ -21218,6 +20954,26 @@ SceneJS_ChunkFactory.createChunkType({
                         // will be only one UV layer used for normal mapping.
 
                         frameCtx.normalMapUVLayerIdx = layer.uvLayerIdx;
+                    }
+
+                    if (layer.megaTexture) {
+
+                        // Megatexturing
+
+                        var megaTexture = layer.megaTexture;
+                        var mtTexture = megaTexture.texture;
+
+                        if (mtTexture) { // Lazy-loads
+                            
+                            if (this._uMegaTextureInfo[i]) {
+                                this._uMegaTextureInfo[i].setValue(megaTexture.info);
+                            }
+                            
+                            draw.bindTexture(this._uMegaTextureSampler[i], mtTexture, frameCtx.textureUnit);
+                            
+                            frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
+
+                        }
                     }
 
                 } else {

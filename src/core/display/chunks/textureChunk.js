@@ -7,6 +7,9 @@ SceneJS_ChunkFactory.createChunkType({
         this._uTexSampler = this._uTexSampler || [];
         this._uTexMatrix = this._uTexMatrix || [];
         this._uTexBlendFactor = this._uTexBlendFactor || [];
+        
+        this._uMegaTextureInfo = this._uMegaTextureInfo || [];
+        this._uMegaTextureSampler = this._uMegaTextureSampler || [];
 
         var layers = this.core.layers;
 
@@ -24,6 +27,11 @@ SceneJS_ChunkFactory.createChunkType({
                 this._uTexMatrix[i] = draw.getUniform("SCENEJS_uLayer" + i + "Matrix");
 
                 this._uTexBlendFactor[i] = draw.getUniform("SCENEJS_uLayer" + i + "BlendFactor");
+
+                // Virtual texturing
+
+                this._uMegaTextureInfo[i] = draw.getUniform("SCENEJS_uLayer" + i + "MegaTextureInfo");
+                this._uMegaTextureSampler[i] = "SCENEJS_uLayer" + i + "MegaTextureSampler";
             }
         }
     },
@@ -71,6 +79,26 @@ SceneJS_ChunkFactory.createChunkType({
                         // will be only one UV layer used for normal mapping.
 
                         frameCtx.normalMapUVLayerIdx = layer.uvLayerIdx;
+                    }
+
+                    if (layer.megaTexture) {
+
+                        // Megatexturing
+
+                        var megaTexture = layer.megaTexture;
+                        var mtTexture = megaTexture.texture;
+
+                        if (mtTexture) { // Lazy-loads
+                            
+                            if (this._uMegaTextureInfo[i]) {
+                                this._uMegaTextureInfo[i].setValue(megaTexture.info);
+                            }
+                            
+                            draw.bindTexture(this._uMegaTextureSampler[i], mtTexture, frameCtx.textureUnit);
+                            
+                            frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
+
+                        }
                     }
 
                 } else {

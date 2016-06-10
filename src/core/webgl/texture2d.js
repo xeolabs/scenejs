@@ -92,7 +92,7 @@ SceneJS._webgl.Texture2D.prototype._init = function (gl, cfg) {
             this.texture = null;
         }
     };
-}
+};
 
 SceneJS._webgl.clampImageSize = function (image, numPixels) {
     var n = image.width * image.height;

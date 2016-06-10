@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - virtual texturing
+</div>
+
+<script>
+
+    // Scene supports the basic mechanism of virtual texturing through a "virtualTexture" node type.
+    //
+    // The "virtualTexture" node is used to define a sort of "page table" which indicates which portions
+    // of a parent "texture" are applied to the object. Within the shader, it effectively translates the
+    // "virtual" UV coordinates of child geometries into the "real" coordinate space of the texture node.
+    //
+    //
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Orbiting camera node, implemented by plugin at
+            // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 1.0,
+
+                nodes: [
+
+                    // The virtual texture
+
+                    {
+                        type: "megaTexture",
+                        id: "myMegaTexture",
+
+                        pixelsPerSide: 2000,
+                        tilesPerSide: 100
+                    },
+
+                    // Two objects, each consisting of a geometry
+                    // wrapped with a lookup texture
+
+                    // First object
+
+                    {
+                        type: "texture",
+                        id: "lookup1",
+                        megaTexture: "myMegaTexture",
+                        // src: "textures/BrickWall.jpg",
+                        applyTo: "color",
+
+                        nodes: [
+                            {
+                                type: "translate",
+                                x: 1.5,
+
+                                nodes: [
+                                    {
+                                        type: "geometry",
+                                        positions: [1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0],
+                                        normals: [0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1],
+                                        uv: [1, 1, 0, 1, 0, 0, 1, 0],
+                                        indices: [0, 1, 2, 0, 2, 3]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+//                    ,
+//
+//                    // Second object
+//
+//                    {
+//                        type: "texture",
+//                        id: "lookup2",
+//                        megaTexture: "myMegaTexture",
+//                        src: "textures/BrickWall.jpg",
+//                        applyTo: "color",
+//
+//                        nodes: [
+//                            {
+//                                type: "translate",
+//                                x: -1.5,
+//
+//                                nodes: [
+//                                    {
+//                                        type: "geometry",
+//                                        positions: [1, 1, 0, -1, 1, 0, -1, -1, 0, 1, -1, 0],
+//                                        normals: [0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1],
+//                                        uv: [1, 1, 0, 1, 0, 0, 1, 0],
+//                                        indices: [0, 1, 2, 0, 2, 3]
+//                                    }
+//                                ]
+//                            }
+//                        ]
+//                    }
+                ]
+            }
+        ]
+    });
+
+    // Get the megatexture,
+    // create a Drawing,
+    // draw on each object
+
+    scene.findNode("myMegaTexture",
+            function (megaTexture) {
+
+                var drawing = new Drawing(megaTexture);
+
+                scene.findNode("lookup1",
+                        function (lookupTexture1) {
+
+                            for (var s = 0; s < 1; s += 0.1) {
+                                for (var t = 0; t < 1; t += 0.1) {
+
+                                    //    if (Math.random() > 0.3)
+
+                                    drawing.draw(lookupTexture1, s, t);
+                                }
+                            }
+
+//                            drawing.draw(lookupTexture1, [0.3, 0.3]);
+//
+//                            drawing.draw(lookupTexture1, [0.31, 0.7]);
+//
+//                            drawing.draw(lookupTexture1, [0.71, 0.8]);
+                        });
+
+//                scene.findNode("lookup2",
+//                        function (lookupTexture2) {
+//
+//                            drawing.draw(lookupTexture2, [0.2, 0.3]);
+//                        });
+            });
+
+    /*
+
+    Database - stores Tiles for Drawings
+    Drawing - a drawing
+    Cache - manages texture storage for an entire Drawing
+    Decal - a portion of drawing for a scene object
+    Tile
+
+    */
+
+    /**
+     * Data store for drawings.
+     *
+     * The data store proxy is simply notified whenever a tile is created, updated or destroyed, and is free to
+     * decide how best to update the real data store. For example, it may batch the texture data from updated
+     * tiles and send them to the server in a batch.
+     */
+    var Database = function () {
+
+    };
+
+    Database.prototype.tileCreated = function (tile) {
+
+    };
+
+    Database.prototype.tileEdited = function (tile) {
+
+    };
+
+    Database.prototype.tileDestroyed = function (tile) {
+
+    };
+
+    /**
+     * A Drawing.
+     *
+     * @param {SceneJS.MegaTexture} megaTexture The "megaTexture" node in the scene graph.
+     * @param {Database} db The drawings database.
+     * @constructor
+     */
+    var Drawing = function (megaTexture, db) {
+
+        this.cache = new Cache(megaTexture);
+
+        this.db = db;
+
+        this.decals = {};
+    };
+
+    /**
+     * Draws on a drawing.
+     *
+     * The drawing is directed at a lookup texture in the scenegraph. The lookup texture is wrapped
+     * around a geometry node that we want to draw on.
+     *
+     * @param {SceneJS.Texture} lookupTexture Target lookup texture.
+     * @param {Number} s Texture S coordinate on geometry surface
+     * @param {Number} s Texture T coordinate on geometry surface
+     */
+    Drawing.prototype.draw = function (lookupTexture, s, t) {
+
+        var id = lookupTexture.getId();
+
+        // Get the Decal for the lookup texture
+
+        var decal = this.decals[id];
+
+        if (!decal) {
+
+            decal = new Decal(this, lookupTexture);
+
+            this.decals[id] = decal;
+        }
+
+        decal.draw(s, t); // Draw on the Decal
+    };
+
+    /**
+     * Clears the drawing.
+     */
+    Drawing.prototype.clear = function () {
+
+        var decal;
+
+        for (var id in this.decals) {
+            if (this.decals.hasOwnProperty(id)) {
+
+                decal = this.decals[id];
+
+                decal.clear(); // Clears the Decal's lookup texture
+                decal.destroy(); // Destroys Decal's Tiles in the Cache
+            }
+        }
+
+        this.decals = {};
+    };
+
+
+    /**
+     * Virtual texture cache.
+     *
+     * This
+     *
+     * @param megaTexture
+     * @constructor
+     */
+    var Cache = function (megaTexture) {
+
+        var pixelsPerSide = megaTexture.getPixelsPerSide();
+        var tilesPerSide = megaTexture.getTilesPerSide();
+
+        this.megaTexture = megaTexture;
+        this.pixelsPerSide = pixelsPerSide;
+        this.tilesPerSide = tilesPerSide;
+        this.tilePixelSize = pixelsPerSide / tilesPerSide;
+
+        this.tiles = []; // Sparse tiles array
+
+        this._nextTileIndex = 0; // Index of next free slot in tiles array
+        this._numTiles = 0; // Count of filled slots in tiles array
+    };
+
+    /**
+     * Creates a new tile in this cache.
+     */
+    Cache.prototype.createTile = function (decal, decalS, decalT) {
+
+        var maxTiles = this.tilesPerSide * this.tilesPerSide;
+
+        // Check cache not full
+
+        if (this._numTiles >= maxTiles) {
+            console.log("Cache is full - contains max number of tiles: " + this._numTiles);
+            return;
+        }
+
+        // Find empty slot in sparse tile array
+
+        var index = this._nextTileIndex;
+
+        while (true) {
+            if (!this.tiles[index]) {
+                this._nextTileIndex = (index < maxTiles - 1) ? index + 1 : 0;
+                break;
+            }
+            index++;
+            if (index >= maxTiles) {
+                index = 0;
+            }
+        }
+
+        // Pack tile into flow layout within texture;
+        // position corresponds to index in array.
+
+        var x = (index % this.tilesPerSide) * this.tilePixelSize;
+        var y = Math.floor(index / this.tilesPerSide) * this.tilePixelSize;
+
+        // console.log("new tile : " + x + ", " + y);
+
+        var tile = new Tile(decal, x, y, this.tilePixelSize, decalS, decalT);
+
+        this.tiles[index] = tile;
+
+        this._numTiles++;
+
+        return tile;
+    };
+
+    /**
+     * Removes a Tile from this Cache.
+     */
+    Cache.prototype.destroyTile = function (tile) {
+
+        // We don't repack the list when removing a Tile because each Tile's
+        // list position must continue to correspond to its position within
+        // the Tile flow layout within the megatexture pixel space.
+
+        for (var i = 0, len = this.tiles.length; i < len; i++) {
+            if (this.tiles[i] === tile) {
+
+                this.tiles[i].destroy();
+                this.tiles[i] = null;
+
+                this._numTiles--;
+
+                this._nextTileIndex = i; // Use vacant slot for next new Tile
+            }
+        }
+    };
+
+    /**
+     * A Tile within a Cache.
+     */
+    var Tile = function (decal, x, y, size, decalS, decalT) {
+
+        this.decal = decal;
+        this.drawing = decal.drawing;
+
+        // Pixel coordinates within cache
+        this.x = x;
+        this.y = y;
+
+        // UV coordinates within cache
+        this.s = x / cache.pixelsPerSide;
+        this.t = y / cache.pixelsPerSide;
+
+        // Pixel size on each side of tile
+        this.size = size;
+
+        // Virtual UV coordinates
+        this.decalS = decalS;
+        this.decalT = decalT;
+
+        this._canvas = document.createElement("canvas");
+        this._canvas.width = size;
+        this._canvas.height = size;
+
+        this._ctx = this._canvas.getContext("2d");
+
+        this.clear();
+    };
+
+    /**
+     * Clears this tile.
+     */
+    Tile.prototype.clear = function () {
+
+        this._ctx.fillStyle = "black";
+        this._ctx.fillRect(0, 0, this.size, this.size);
+
+        this._updateCacheTexture();
+    };
+
+    Tile.prototype._updateCacheTexture = function () {
+        this.drawing.cache.megaTexture.draw(this._canvas, this.x, this.y);
+    };
+
+    /**
+     * Draws a dot on this tile.
+     *
+     * Given UV coordinates are within tile's unit UV space of [0..1].
+     */
+    Tile.prototype.draw = function (s, t) {
+
+        var x = Math.floor(s * this.size);
+        var y = Math.floor(t * this.size);
+
+        this._ctx.rect(x, y, 1, 1);
+        this._ctx.fillStyle = "yellow";
+        this._ctx.fill();
+
+        this._updateCacheTexture();
+    };
+
+    /**
+     * Destroys this Tile
+     */
+    Tile.prototype.destroy = function () {
+        this._canvas = null;
+        this._ctx = null;
+    };
+
+
+    /**
+     * A decal is a portion of a drawing that covers a single object in the scene.
+     *
+     * A decal stores its portion of the drawing in a sparse array of texture tiles,
+     * which are stored in a cache.
+     */
+    var Decal = function (drawing, lookupTexture) {
+
+        this._tilesPerSide = 10;
+
+        this.drawing = drawing;
+
+        this._lookupTexture = lookupTexture;
+
+        this._lookupCanvas = document.createElement("canvas");
+        this._lookupCanvas.width = this._tilesPerSide;
+        this._lookupCanvas.height = this._tilesPerSide;
+
+        this._lookupContext = this._lookupCanvas.getContext("2d");
+
+        this.tiles = {};
+
+        this.clear();
+    };
+
+    /**
+     * Clears this decal.
+     */
+    Decal.prototype.clear = function () {
+
+        // Clear the lookup texture
+
+        this._lookupContext.fillStyle = "black";
+        this._lookupContext.fillRect(0, 0, this._tilesPerSide, this._tilesPerSide);
+
+        this._updateLookupTexture();
+
+        // Clear tiles
+
+        this._destroyTiles();
+
+        this.tiles = {};
+    };
+
+    Decal.prototype._destroyTiles = function () {
+        var cache = this.drawing.cache;
+        var db = this.drawing.db;
+        var tile;
+        for (var id in this.tiles) {
+            if (this.tiles.hasOwnProperty(id)) {
+                tile = this.tiles[id];
+                cache.destroyTile(tile);
+                db.tileDestroyed(tile);
+            }
+        }
+        this.tiles = {};
+    };
+
+
+    /**
+     * Draws on this decal.
+     */
+    Decal.prototype.draw = (function () {
+
+        var tiles = [];
+
+        return function (s, t) {
+
+            // Clamp UVs to [0..1]
+
+            s = s < 0 ? 0 : (s > 1 ? 1 : s);
+            t = t < 0 ? 0 : (t > 1 ? 1 : t);
+
+            var numTiles = this._getTiles(s, t, tiles);
+            var tile;
+            var db = this.drawing.db;
+
+            for (var i = 0; i < numTiles; i++) {
+
+                tile = tiles[i];
+
+                tile.draw( // Draw within tile's UVs
+                        s - tile.decalS,
+                        t - tile.decalT
+                );
+
+                db.tileEdited(tile);
+            }
+        };
+    })();
+
+    /**
+     * Finds the tiles that intersect the given geometry UV coordinates.
+     */
+    Decal.prototype._getTiles = function (s, t, tiles) {
+
+        var lookupTextureDirty = false;
+
+        // Convert UVs to tile coordinates
+
+        var x = Math.round(s * this._tilesPerSide);
+        var y = Math.round(t * this._tilesPerSide);
+
+        console.log(x + ", " + y);
+
+        // Convert tile coordinates to ID
+
+        var id = ["" + x + "." + y].join();
+
+        // Find tile by ID
+
+        var tile = this.tiles[id];
+
+        if (!tile) {
+
+            // Lazy-create tile
+
+            tile = this.drawing.cache.createTile(this, s, t);
+
+            this.tiles[id] = tile;
+
+            // Register in lookup texture
+
+            this._lookupContext.fillStyle = "rgb(" + Math.round(tile.s * 255) + "," + Math.round(tile.t * 255) + ", 0)";
+            this._lookupContext.fillRect(x, y, 1, 1);
+
+            lookupTextureDirty = true;
+
+            this.drawing.db.tileCreated(tile);
+        }
+
+        tiles[0] = tile; // TODO: Multiple tiles when drawing on edges
+
+        if (lookupTextureDirty) {
+            this._updateLookupTexture();
+        }
+
+        return 1;
+    };
+
+    Decal.prototype._updateLookupTexture = function () {
+        this._lookupTexture.setImage(this._lookupCanvas);
+    };
+
+    /**
+     * Destroys this Decal.
+     */
+    Decal.prototype.destroy = function () {
+        this._destroyTiles();
+    };
+
+
+</script>
+</body>
+</html>

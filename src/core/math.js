@@ -45,51 +45,56 @@
     /**
      * Returns a new, uninitialized two-element vector.
      * @method vec2
+     * @param [values] Initial values.
      * @static
      * @returns {Float32Array}
      */
-    window.SceneJS_math_vec2 = function () {
-        return new Float32Array(2);
+    window.SceneJS_math_vec2 = function (values) {
+        return new Float32Array(values || 2);
     };
 
     /**
      * Returns a new, uninitialized three-element vector.
      * @method vec3
+     * @param [values] Initial values.
      * @static
      * @returns {Float32Array}
      */
-    window.SceneJS_math_vec3 = function () {
-        return new Float32Array(3);
+    window.SceneJS_math_vec3 = function (values) {
+        return new Float32Array(values || 3);
     };
 
     /**
      * Returns a new, uninitialized four-element vector.
      * @method vec4
+     * @param [values] Initial values.
      * @static
      * @returns {Float32Array}
      */
-    window.SceneJS_math_vec4 = function () {
-        return new Float32Array(4);
+    window.SceneJS_math_vec4 = function (values) {
+        return new Float32Array(values || 4);
     };
 
     /**
      * Returns a new, uninitialized 3x3 matrix.
      * @method mat3
+     * @param [values] Initial values.
      * @static
      * @returns {Float32Array}
      */
-    window.SceneJS_math_mat3 = function () {
-        return new Float32Array(9);
+    window.SceneJS_math_mat3 = function (values) {
+        return new Float32Array(values || 9);
     };
 
     /**
      * Returns a new, uninitialized 4x4 matrix.
      * @method mat4
+     * @param [values] Initial values.
      * @static
      * @returns {Float32Array}
      */
-    window.SceneJS_math_mat4 = function () {
-        return new Float32Array(16);
+    window.SceneJS_math_mat4 = function (values) {
+        return new Float32Array(values || 16);
     };
 
     /**

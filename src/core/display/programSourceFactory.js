@@ -15,6 +15,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var fragmentFresnel;
     var fresnel;
     var texturing;// True when rendering state contains textures
+    var megaTexturing; // True when one or more textures are virtual
     var cubeMapping;
     var normals;// True when rendering state contains normals
     var solid;
@@ -51,6 +52,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         fragmentFresnel = states.fresnel.fragment;
         fresnel = diffuseFresnel || specularFresnel || alphaFresnel || reflectFresnel || emitFresnel || fragmentFresnel;
         texturing = hasTextures(states);
+        megaTexturing = texturing && hasMegaTextures();
         cubeMapping = hasCubemap(states);
         normals = hasNormals(states);
         solid = states.flags.solid;
@@ -227,6 +229,16 @@ var SceneJS_ProgramSourceFactory = new (function () {
         return false;
     }
 
+    function hasMegaTextures() {
+        var layers = states.texture.layers;
+        for (var i = 0, len = layers.length; i < len; i++) {
+            if (layers[i].megaTexture) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     function hasUVs() {
         if (states.geometry.uvBufs) { // TODO only if there is at least one defined member in this array
             return true;
@@ -301,6 +313,11 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         begin();
 
+        if (megaTexturing) {
+            add("#extension GL_OES_standard_derivatives : enable");
+            //add("#extension GL_OES_texture_float_linear : enable");
+        }
+
         add("uniform mat4 SCENEJS_uMMatrix;");             // Model matrix
         add("uniform mat4 SCENEJS_uVMatrix;");             // View matrix
         add("uniform mat4 SCENEJS_uPMatrix;");             // Projection matrix
@@ -357,7 +374,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("varying vec4 SCENEJS_vViewVertex;");              // Varying for fragment view clip hook
 
-        if ( texturing) {                                            // Varyings for fragment texturing
+        if (texturing) {                                            // Varyings for fragment texturing
 
             uvBufs = states.geometry.uvBufs;
 
@@ -387,8 +404,8 @@ var SceneJS_ProgramSourceFactory = new (function () {
             }
             if (tangents) {
                 //if (states.morphGeometry.targets[0].normalBuf) {
-                    add("attribute vec3 SCENEJS_aMorphTangent;");
-               // }
+                add("attribute vec3 SCENEJS_aMorphTangent;");
+                // }
             }
         }
 
@@ -643,15 +660,42 @@ var SceneJS_ProgramSourceFactory = new (function () {
                 }
             }
 
-            if (texturing) {
-                var layer;
-                for (var i = 0, len = states.texture.layers.length; i < len; i++) {
-                    layer = states.texture.layers[i];
-                    add("uniform sampler2D SCENEJS_uSampler" + i + ";");
-                    if (layer.matrix) {
-                        add("uniform mat4 SCENEJS_uLayer" + i + "Matrix;");
-                    }
-                    add("uniform float SCENEJS_uLayer" + i + "BlendFactor;");
+            var layer;
+            for (var i = 0, len = states.texture.layers.length; i < len; i++) {
+                layer = states.texture.layers[i];
+                add("uniform sampler2D SCENEJS_uSampler" + i + ";");
+                if (layer.matrix) {
+                    add("uniform mat4 SCENEJS_uLayer" + i + "Matrix;");
+                }
+                add("uniform float SCENEJS_uLayer" + i + "BlendFactor;");
+
+                if (layer.megaTexture) {
+                    add("uniform vec2       SCENEJS_uLayer" + i + "MegaTextureInfo;");
+                    add("uniform sampler2D  SCENEJS_uLayer" + i + "MegaTextureSampler;");
+                }
+
+                if (megaTexturing) {
+
+                    add([
+                        "vec4 sampleMegaTexture(",
+                        "   const in vec2 megaTextureInfo,",
+                        "         in sampler2D megaTextureSampler,",
+                        "         in sampler2D lookupSampler,",
+                        "   const in vec2 uv) {",
+
+                        "   float tilesPerSide = megaTextureInfo[1];",
+                        "   float tileUVWidth = 1.0 / tilesPerSide;",
+
+                        "   float offsetS = uv.s - (tileUVWidth * floor(tilesPerSide * uv.s));",
+                        "   float offsetT = uv.t - (tileUVWidth * floor(tilesPerSide * uv.t));",
+
+                        "   vec3 color = texture2D(lookupSampler, uv).rgb;",
+
+                        "   vec2 cacheUV = vec2(color.r + offsetS, color.g + offsetT);",
+
+                        "   return texture2D(megaTextureSampler, cacheUV);",
+                        "}"
+                    ].join("\n"));
                 }
             }
         }
@@ -949,47 +993,62 @@ var SceneJS_ProgramSourceFactory = new (function () {
                         add("textureCoord=texturePos.xy;");
                     }
 
-                    /* Alpha from Texture
-                     */
+                    add("vec3 textureSample;");
+
+                    if (layer.megaTexture) {
+
+                        // Layer is megatextured; sample color-encoded UV coords
+                        // from layer's texture, then sample megatexture at those UVs.
+
+                        add([
+                            "textureSample = sampleMegaTexture(",
+                            "   SCENEJS_uLayer" + i + "MegaTextureInfo, ",
+                            "   SCENEJS_uLayer" + i + "MegaTextureSampler,",
+                            "   SCENEJS_uSampler" + i + ",",
+                            "   vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;"
+                        ].join("\n"));
+
+                    } else {
+                        add("textureSample = texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb;");
+                    }
+
                     if (layer.applyTo == "alpha") {
                         if (layer.blendMode == "multiply") {
-                            add("alpha = alpha * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+                            add("alpha = alpha * (SCENEJS_uLayer" + i + "BlendFactor * textureSample.b);");
                         } else if (layer.blendMode == "add") {
-                            add("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).b);");
+                            add("alpha = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * alpha) + (SCENEJS_uLayer" + i + "BlendFactor * textureSample.b);");
                         }
                     }
 
-                    /* Texture output
-                     */
                     if (layer.applyTo == "baseColor") {
                         if (layer.blendMode == "multiply") {
-                            add("color = color * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+                            add("color = color * (SCENEJS_uLayer" + i + "BlendFactor * textureSample);");
                         } else {
-                            add("color = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * color) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).rgb);");
+                            add("color = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * color) + (SCENEJS_uLayer" + i + "BlendFactor * textureSample);");
                         }
                     }
 
                     if (layer.applyTo == "emit") {
                         if (layer.blendMode == "multiply") {
-                            add("emit  = emit * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("emit  = emit * (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         } else {
-                            add("emit = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * emit) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("emit = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * emit) + (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         }
                     }
 
                     if (layer.applyTo == "specular" && normals) {
                         if (layer.blendMode == "multiply") {
-                            add("specular  = specular * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("specular  = specular * (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         } else {
-                            add("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("specular = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * specular) + (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         }
                     }
 
                     if (layer.applyTo == "shine") {
                         if (layer.blendMode == "multiply") {
-                            add("shine  = shine * (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("shine  = shine * (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         } else {
-                            add("shine = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * shine) + (SCENEJS_uLayer" + i + "BlendFactor * texture2D(SCENEJS_uSampler" + i + ", vec2(textureCoord.x, 1.0 - textureCoord.y)).r);");
+                            add("shine = ((1.0 - SCENEJS_uLayer" + i + "BlendFactor) * shine) + (SCENEJS_uLayer" + i + "BlendFactor * textureSample.r);");
                         }
                     }
 
