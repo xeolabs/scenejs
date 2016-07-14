@@ -106,9 +106,23 @@ SceneJS.Scene.prototype.renderFrame = function (params) {
 };
 
 /**
+ * Prevent re-compilation of scene graph.
+ */
+SceneJS.Scene.prototype.pauseCompilation = function () {
+    return this._engine.pauseCompilation();
+};
+
+/**
+ * Resume re-compilation of scene graph.
+ */
+SceneJS.Scene.prototype.resumeCompilation = function () {
+    return this._engine.resumeCompilation();
+};
+
+/**
  * Force compilation of the scene graph.
  */
-SceneJS.Scene.prototype.compile = function (params) {
+SceneJS.Scene.prototype.compile = function () {
     return this._engine.compile();
 };
 

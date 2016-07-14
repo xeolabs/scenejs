@@ -960,7 +960,7 @@ SceneJS_Display.prototype._logPickList = function () {
 
 (function () {
 
-// Cached vectors to avoid garbage collection
+    // Cached vectors to avoid garbage collection
 
     var origin = SceneJS_math_vec3();
     var dir = SceneJS_math_vec3();
@@ -982,21 +982,19 @@ SceneJS_Display.prototype._logPickList = function () {
 
     var tempVec4 = SceneJS_math_vec4();
     var tempVec4b = SceneJS_math_vec4();
-    var tempVec4c = SceneJS_math_vec4();
 
     var tempVec3 = SceneJS_math_vec3();
     var tempVec3b = SceneJS_math_vec3();
     var tempVec3c = SceneJS_math_vec3();
     var tempVec3d = SceneJS_math_vec3();
-    var tempVec3e = SceneJS_math_vec3();
-    var tempVec3f = SceneJS_math_vec3();
-    var tempVec3g = SceneJS_math_vec3();
-    var tempVec3h = SceneJS_math_vec3();
-    var tempVec3i = SceneJS_math_vec3();
-    var tempVec3j = SceneJS_math_vec3();
+
+    var tempVec2 = SceneJS_math_vec2();
+    var tempVec2b = SceneJS_math_vec2();
+    var tempVec2c = SceneJS_math_vec2();
+    var tempVec2d = SceneJS_math_vec2();
 
 
-    // Given a GameObject and camvas coordinates, gets a ray
+    // Given an Object and canvas coordinates, gets a ray
     // originating at the World-space eye position that passes
     // through the perspective projection plane. The ray is
     // returned via the origin and dir arguments.
@@ -1354,11 +1352,11 @@ SceneJS_Display.prototype._logPickList = function () {
                             uvc[0] = uvs[ic2];
                             uvc[1] = uvs[ic2 + 1];
 
-                            uv = SceneJS_math_addVec3(
-                                SceneJS_math_addVec3(
-                                    SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
-                                    SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
-                                SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), SceneJS_math_vec3());
+                            uv = SceneJS_math_addVec2(
+                                SceneJS_math_addVec2(
+                                    SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec2),
+                                    SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec2b), tempVec2c),
+                                SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec2d), SceneJS_math_vec2());
 
                             hit.uvs.push(uv);
                         }
