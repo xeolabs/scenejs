@@ -126,6 +126,12 @@ var SceneJS_Display = function (cfg) {
     this.depthBuffer = null;
 
     /**
+     * Node state core for the last {@link SceneJS.StencilBuf} visited during scene graph compilation traversal
+     * @type Object 
+     */
+    this.stencilBuffer = null;
+
+    /**
      * Node state core for the last {@link SceneJS.ColorBuf} visited during scene graph compilation traversal
      * @type Object
      */
@@ -444,19 +450,20 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 6, "shaderParams", this.shaderParams);
     this._setChunk(object, 7, "style", this.style);
     this._setChunk(object, 8, "depthBuffer", this.depthBuffer);
-    this._setChunk(object, 9, "colorBuffer", this.colorBuffer);
-    this._setChunk(object, 10, "view", this.view);
-    this._setChunk(object, 11, "lights", this.lights);
-    this._setChunk(object, 12, "material", this.material);
-    this._setChunk(object, 13, "texture", this.texture);
-    this._setChunk(object, 14, "regionMap", this.regionMap);
-    this._setChunk(object, 15, "fresnel", this.fresnel);
-    this._setChunk(object, 16, "cubemap", this.cubemap);
-    this._setChunk(object, 17, "clips", this.clips);
-    this._setChunk(object, 18, "renderer", this.renderer);
-    this._setChunk(object, 19, "geometry", this.morphGeometry, this.geometry);
-    this._setChunk(object, 20, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 21, "draw", this.geometry); // Must be last
+    this._setChunk(object, 9, "stencilBuffer", this.stencilBuffer);
+    this._setChunk(object, 10, "colorBuffer", this.colorBuffer);
+    this._setChunk(object, 11, "view", this.view);
+    this._setChunk(object, 12, "lights", this.lights);
+    this._setChunk(object, 13, "material", this.material);
+    this._setChunk(object, 14, "texture", this.texture);
+    this._setChunk(object, 15, "regionMap", this.regionMap);
+    this._setChunk(object, 16, "fresnel", this.fresnel);
+    this._setChunk(object, 17, "cubemap", this.cubemap);
+    this._setChunk(object, 18, "clips", this.clips);
+    this._setChunk(object, 19, "renderer", this.renderer);
+    this._setChunk(object, 20, "geometry", this.morphGeometry, this.geometry);
+    this._setChunk(object, 21, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 22, "draw", this.geometry); // Must be last
 
     // At the very least, the object sort order
     // will need be recomputed
@@ -1504,6 +1511,10 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.depthbufEnabled = null;
     frameCtx.clearDepth = null;
     frameCtx.depthFunc = gl.LESS;
+    frameCtx.stencilbufEnabled = null;
+    frameCtx.clearStencil = null;
+    frameCtx.stencilFunc = {func: gl.ALWAYS, ref: 1, mask: 0xff};
+    frameCtx.stencilOp = {sfail: gl.KEEP, dpfail: gl.KEEP, dppass: gl.KEEP};
     frameCtx.scissorTestEnabled = false;
     frameCtx.blendEnabled = false;
     frameCtx.backfaces = true;
