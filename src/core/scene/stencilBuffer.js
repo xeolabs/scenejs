@@ -27,7 +27,7 @@
         type: "stencilBuffer",
         stateId: SceneJS._baseStateId++,
         enabled: false,
-        clearStencil: 1,
+        clearStencil: 0,
         stencilFunc: {func: null, ref: 1, mask: 0xff}, // Lazy init stencilFunc when we can get a context
         stencilOp: {sfail: null, dpfail: null, dppass: null}, 
         _stencilFuncState: {func: "always", ref: 1, mask: 0xff},
@@ -177,7 +177,8 @@
         stencilFunc.ref = stencilFunc.ref || 1;
         stencilFunc.mask = stencilFunc.mask || 0xff;
 
-        if (this._core._stencilFuncState.func != stencilFunc.func || 
+        if (this._core._stencilFuncState === undefined || 
+            this._core._stencilFuncState.func != stencilFunc.func || 
             this._core._stencilFuncState.ref != stencilFunc.ref ||
             this._core._stencilFuncState.mask != stencilFunc.mask 
             ) {
@@ -187,9 +188,12 @@
                 throw "unsupported value for 'clearFunc' attribute on stencilBuffer node: '" + stencilFunc.func
                     + "' - supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
             }
-            this._core.stencilFunc.func = this._engine.canvas.gl[funcEnumName];
-            this._core.stencilFunc.ref = stencilFunc.ref;
-            this._core.stencilFunc.mask = stencilFunc.mask;
+
+            this._core.stencilFunc = {
+                func: this._engine.canvas.gl[funcEnumName],
+                ref: stencilFunc.ref,
+                mask: stencilFunc.mask
+            };
             this._core._stencilFuncState = stencilFunc;  // state map
             this._engine.display.imageDirty = true;
         }
@@ -203,7 +207,7 @@
      * @return {*}
      */
     SceneJS.StencilBuf.prototype.setStencilOp = function (stencilOp) {
-        if (
+        if (this._core._stencilOpState === undefined ||
             this._core._stencilOpState.sfail != stencilOp.sfail ||
             this._core._stencilOpState.dpfail != stencilOp.dpfail ||
             this._core._stencilOpState.dppass != stencilOp.dppass
@@ -215,9 +219,11 @@
                 throw "unsupported value for 'clearFunc' attribute on stencilBuffer node: '" + stencilFunc
                     + "' - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
             }
-            this._core.stencilOp.sfail = this._engine.canvas.gl[sfail];
-            this._core.stencilOp.dpfail = this._engine.canvas.gl[dpfail];
-            this._core.stencilOp.dppass = this._engine.canvas.gl[dppass];
+            this._core.stencilOp = {
+                sfail: this._engine.canvas.gl[sfail],
+                dpfail: this._engine.canvas.gl[dpfail],
+                dppass: this._engine.canvas.gl[dppass]
+            };
             this._core._stencilOpState = stencilOp;
             this._engine.display.imageDirty = true;
         }
