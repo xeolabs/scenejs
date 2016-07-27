@@ -37,6 +37,8 @@ SceneJS_ChunkFactory.createChunkType({
             frameCtx.stencilFunc = stencilFunc;
         }
 
+        var stencilOp = this.core.stencilOp;
+
         if (frameCtx.stencilOp != stencilOp) {
             gl.stencilOp(stencilOp.sfail, stencilOp.dpfail, stencilOp.dppass);
             frameCtx.stencilOp = stencilOp;

@@ -26,7 +26,7 @@
     var defaultCore = {
         type: "stencilBuffer",
         stateId: SceneJS._baseStateId++,
-        enabled: true,
+        enabled: false,
         clearStencil: 1,
         stencilFunc: {func: null, ref: 1, mask: 0xff}, // Lazy init stencilFunc when we can get a context
         stencilOp: {sfail: null, dpfail: null, dppass: null}, 
@@ -40,12 +40,12 @@
     SceneJS_events.addListener(
         SceneJS_events.SCENE_COMPILING,
         function (params) {
-            if (defaultCore.stencilFunc === null) { // Lazy-init stencilFunc now we can get a context
+            if (defaultCore.stencilFunc.func === null) { // Lazy-init stencilFunc now we can get a context
                 defaultCore.stencilFunc.func = params.engine.canvas.gl.ALWAYS;
                 
-                defaultCore.stencilFunc.sfail = params.engine.canvas.gl.KEEP;
-                defaultCore.stencilFunc.dpfail = params.engine.canvas.gl.KEEP;
-                defaultCore.stencilFunc.dppass = params.engine.canvas.gl.KEEP;
+                defaultCore.stencilOp.sfail = params.engine.canvas.gl.KEEP;
+                defaultCore.stencilOp.dpfail = params.engine.canvas.gl.KEEP;
+                defaultCore.stencilOp.dppass = params.engine.canvas.gl.KEEP;
             }
             params.engine.display.stencilBuffer = defaultCore;
             stackLen = 0;
