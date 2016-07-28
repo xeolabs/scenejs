@@ -15,18 +15,18 @@
         }
     </style>
 
-    <!--<script src="../api/latest/scenejs.min.js"></script>-->
-    <script src="../api/latest/scenejs.js"></script>
+    <script src="../api/latest/scenejs.min.js"></script>
     <link href="css/styles.css" rel="stylesheet"/>
 
 <body>
 
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - Stencil Buffer
+    <a href="http://scenejs.org">SceneJS</a> - setting the stencil buffer comparison function
     <br><br>In this demo we use stencil Buffer<br><br>The first stage we draw the box and write 
     the stencil value to 9 if there's a fragment. We then draw the teapot in the second stage and 
-    only let the fragments where stencil value is changed pass the stencil test.
+    preserve the fragments based on the stencil value. 
+    <br/> We intervally swtich stencil func of the second stage (teapot) between 'less', 'greater', 'never' and 'always'
 </div>
 
 <script>
@@ -37,7 +37,7 @@
     });
 
     // Create scene
-    SceneJS.createScene({
+    var scene = SceneJS.createScene({
         nodes: [
 
             // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
@@ -57,6 +57,7 @@
 
                             {
                                 type: "stencilBuffer",
+                                id: "myStencilBuffer1",
 
                                 enabled: true,
                                 clearStencil: 0,
@@ -67,7 +68,6 @@
                                     mask: 0xff
                                 },
                                 stencilOp: {
-                                    //face: "front",
                                     sfail: "keep",
                                     dpfail: "keep",
                                     dppass: "replace"
@@ -116,13 +116,13 @@
 
                             {
                                 type: "stencilBuffer",
+                                id: "myStencilBuffer2",
 
                                 enabled: true,
                                 clear: false,
                                 stencilFunc: {
                                     func: "less",
-                                    ref: 0,
-                                    mask: 0xff
+                                    ref: 5
                                 },
                                 stencilOp: {
                                     sfail: "keep",
@@ -176,6 +176,26 @@
             }
         ]
     });
+
+    // Get the stencilBuffer node and periodically switch its stencilFunc
+
+    // full list:
+    // never, less, equal, lequal, greater, notequal, gequal, always
+
+    var stencilFuncs = ['less', 'greater', 'always', 'never'];
+    var i = 0;
+
+    scene.getNode("myStencilBuffer2", function (myStencilbuf) {
+        setInterval(
+                function () {
+                    myStencilbuf.setStencilFunc({
+                        func: stencilFuncs[i++ % stencilFuncs.length], 
+                        ref: 5
+                    });
+                },
+                1000);
+    });
+
 
 </script>
 </body>

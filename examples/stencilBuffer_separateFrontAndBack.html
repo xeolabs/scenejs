@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <!--<script src="../api/latest/scenejs.min.js"></script>-->
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - setting the stencil function of front and back face separately
+    <br><br>In this demo we use stencil Buffer<br><br>The first stage we draw the box and write 
+    the stencil value to 9 if there's a fragment. We then draw the teapot in the second stage and 
+    preserve the fragments based on the stencil value. 
+    <br/> Note: WebGL only allow the same reference value for front and back face! More details <br/>
+    http://stackoverflow.com/questions/38249716/why-i-got-this-error-webgl-invalid-operation-drawarrays-front-and-back-stenc
+    
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 10.0,
+
+                nodes: [
+
+                    {
+                        type: "depthBuffer",
+                        id: "myDepthBuf",
+                        enable: false,                  
+
+                        nodes: [
+
+                            {
+                                type: "stencilBuffer",
+
+                                enabled: true,
+                                clear: false,
+                                stencilFunc: {
+                                    //face: "front",
+                                    func: "never",
+                                    ref: 1
+                                },
+
+                                nodes: [
+                                    {
+                                        type: "stencilBuffer",
+
+                                        enabled: true,
+                                        clear: false,
+                                        stencilFunc: {
+                                            //face: "back",
+                                            func: "always",
+                                            ref: 1
+                                        },
+
+                                        nodes: [
+                                            {
+                                                type: "flags",
+                                                flags: {
+                                                    solid: false
+                                                },
+
+                                                nodes: [
+                                                    {
+                                                        type: "material",
+                                                        color: {r: 0.7, g: 0.0, b: 0.0},
+
+                                                        nodes: [
+                                                            {
+                                                                type:"scale",
+                                                                id:"myScale",
+                                                                x:0.4,
+                                                                y:0.4,
+                                                                z:0.4,
+
+                                                                nodes: [
+                                                                    {
+                                                                        type: "translate",
+                                                                        y: -1,
+
+                                                                        nodes: [
+                                                                            {
+                                                                                type:"geometry/teapot"
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                    
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]  
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+
+</script>
+</body>
+</html>
