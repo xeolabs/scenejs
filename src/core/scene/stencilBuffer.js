@@ -210,6 +210,7 @@
      */
     SceneJS.StencilBuf.prototype.setStencilFunc = function (stencilFunc) {
         stencilFunc.face = stencilFunc.face || 'front_and_back';
+        stencilFunc.func = stencilFunc.func || 'always';
         stencilFunc.ref = stencilFunc.ref || 1;
         stencilFunc.mask = stencilFunc.mask || 0xff;
 
