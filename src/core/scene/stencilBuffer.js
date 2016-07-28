@@ -273,9 +273,9 @@
      */
     SceneJS.StencilBuf.prototype.setStencilOp = function (stencilOp) {
         stencilOp.face = stencilOp.face || 'front_and_back';
-        stencilOp.sfail = stencilOp.sfail;
-        stencilOp.dpfail = stencilOp.dpfail;
-        stencilOp.dppass = stencilOp.dppass;
+        stencilOp.sfail = stencilOp.sfail || 'keep';
+        stencilOp.dpfail = stencilOp.dpfail || 'keep';
+        stencilOp.dppass = stencilOp.dppass || 'keep';
 
         if (stencilOp.face === 'front' || stencilOp.face === 'front_and_back') {
             // front
