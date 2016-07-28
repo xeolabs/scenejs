@@ -131,9 +131,6 @@
         if (params.clear != undefined) {
             this.setClear(params.clear);
         }
-        // } else if (this._core.useCount == 1) {
-        //     this.setClear(true);
-        // }
     };
 
     /**

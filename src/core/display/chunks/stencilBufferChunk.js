@@ -17,7 +17,6 @@ SceneJS_ChunkFactory.createChunkType({
         if (frameCtx.stencilbufEnabled != enabled) {
             if (enabled) {
                 gl.enable(gl.STENCIL_TEST);
-                //gl.stencilMask(0xff);
             } else {
                 gl.disable(gl.STENCIL_TEST);
             }

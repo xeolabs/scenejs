@@ -23,9 +23,10 @@
 
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - clipping caps
-    <br><br>In this demo we're creating multiple cross-sections.<br><br>The maximum number of clipping planes allowed will
-    depend on how many<br><span style="font-style:italic;">varying</span> types your WebGL supports, where each plane requires one <span style="font-style:italic;">varying</span>.
+    <a href="http://scenejs.org">SceneJS</a> - Stencil Buffer
+    <br><br>In this demo we use stencil Buffer<br><br>The first stage we draw the box and write 
+    the stencil value to 9 if there's a fragment. We then draw the teapot in the second stage and 
+    only let the fragments where stencil value is changed pass the stencil test.
 </div>
 
 <script>
@@ -48,8 +49,6 @@
                 zoomSensitivity: 10.0,
 
                 nodes: [
-
-                    // Four arbitrarily-aligned clip planes
                     {
                         type: "stage",
                         priority: 1,                        
@@ -90,69 +89,38 @@
                                                     {
                                                         type: "translate",
                                                         x: -2,
+                                                        y: -1,
                                                         z: -2,
 
 
                                                         nodes: [
-                                                            // // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/torus.js
-                                                            // {
-                                                            //     type: "geometry/torus",
-                                                            //     radius: 1.0,
-                                                            //     tube: 0.30,
-                                                            //     segmentsR: 60,
-                                                            //     segmentsT: 40,
-                                                            //     arc: Math.PI * 2
-                                                            // }
                                                             {
                                                                 type:"geometry/box"
                                                             }
                                                         ]
-                                                    }
-
-                                                    // ,
-                                                    // {
-                                                        
-                                                    //     type: "scale",
-                                                    //     x: 0.4,
-                                                    //     y: 0.4,
-                                                    //     z: 0.4,
-
-                                                    //     nodes: [
-                                                    //         {
-                                                    //             type: "geometry/teapot"
-                                                    //         }
-                                                    //     ]
-                                                    // }
-                                                    
+                                                    }                                                 
                                                 ]
                                             }
                                         ]
                                     }
                                 ]
-                                
                             }
-                            
                         ]
-                    }
+                    },
 
-                    ,
                     {
                         type: "stage",
                         priority: 2,                        
 
                         nodes: [
 
-
-                            //
                             {
                                 type: "stencilBuffer",
 
                                 enabled: true,
                                 clear: false,
                                 stencilFunc: {
-                                    //face: "front",
                                     func: "less",
-                                    //func: "always",
                                     ref: 0,
                                     mask: 0xff
                                 },
@@ -175,18 +143,7 @@
                                                 color: {r: 0.7, g: 0.0, b: 0.0},
 
                                                 nodes: [
-
-                                                    // // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/torus.js
-                                                    // {
-                                                    //     type: "geometry/torus",
-                                                    //     radius: 1.0,
-                                                    //     tube: 0.30,
-                                                    //     segmentsR: 60,
-                                                    //     segmentsT: 40,
-                                                    //     arc: Math.PI * 2
-                                                    // }
                                                     {
-                                                        
                                                         type:"scale",
                                                         id:"myScale",
                                                         x:0.4,
@@ -195,8 +152,16 @@
 
                                                         nodes: [
                                                             {
-                                                                type:"geometry/teapot"
+                                                                type: "translate",
+                                                                y: -1,
+
+                                                                nodes: [
+                                                                    {
+                                                                        type:"geometry/teapot"
+                                                                    }
+                                                                ]
                                                             }
+                                                            
                                                         ]
                                                     }
                                                 ]
@@ -204,16 +169,11 @@
                                         ]
                                     }
                                 ]
-                                
                             }
-                            
                         ]
                     }
-
                 ]
             }
-
-
         ]
     });
 
