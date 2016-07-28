@@ -35,7 +35,7 @@
 
     var UINT_INDEX_ENABLED = (function() {
         var canvas = document.createElement("canvas");
-        var gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+        var gl = canvas.getContext("webgl", {stencil: true}) || canvas.getContext("experimental-webgl");
         return !!(gl && gl.getExtension("OES_element_index_uint"));
     })();
 

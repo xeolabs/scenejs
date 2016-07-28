@@ -205,39 +205,6 @@
         return this._core.clearStencil;
     };
 
-    // /**
-    //  * Sets the stencil comparison function for both front face and back face
-    //  * Supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'
-    //  * @param {String} stencilFunc The stencil comparison function
-    //  * @return {*}
-    //  */
-    // SceneJS.StencilBuf.prototype.setStencilFunc = function (stencilFunc) {
-    //     stencilFunc.ref = stencilFunc.ref || 1;
-    //     stencilFunc.mask = stencilFunc.mask || 0xff;
-
-    //     if (this._core._stencilFuncState === undefined || 
-    //         this._core._stencilFuncState.func != stencilFunc.func || 
-    //         this._core._stencilFuncState.ref != stencilFunc.ref ||
-    //         this._core._stencilFuncState.mask != stencilFunc.mask 
-    //         ) {
-
-    //         var funcEnumName = lookup[stencilFunc.func];
-    //         if (funcEnumName == undefined) {
-    //             throw "unsupported value for 'clearFunc' attribute on stencilBuffer node: '" + stencilFunc.func
-    //                 + "' - supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
-    //         }
-
-    //         this._core.stencilFunc = {
-    //             func: this._engine.canvas.gl[funcEnumName],
-    //             ref: stencilFunc.ref,
-    //             mask: stencilFunc.mask
-    //         };
-    //         this._core._stencilFuncState = stencilFunc;  // state map
-    //         this._engine.display.imageDirty = true;
-    //     }
-    //     return this;
-    // };
-
     /**
      * Sets the stencil comparison function
      * Supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'
@@ -249,107 +216,56 @@
         stencilFunc.ref = stencilFunc.ref || 1;
         stencilFunc.mask = stencilFunc.mask || 0xff;
 
-        var targetStencilFunc = null;
-        var targetStencilFuncOther = null;
-
-        var targetStencilFuncState = null;
-        var targetStencilFuncStateOther = null;
-
-        if (stencilFunc.face == 'front') {
+        if (stencilFunc.face === 'front' || stencilFunc.face === 'front_and_back') {
             // front
-            targetStencilFunc = this._core.stencilFuncFront = this._core.stencilFuncFront || defaultCore.stencilFuncFront;
-            targetStencilFuncState = this._core._stencilFuncStateFront;
-        } else if (stencilFunc.face == 'back') {
-            // back
-            targetStencilFunc = this._core.stencilFuncBack;
-            targetStencilFuncState = this._core._stencilFuncStateBack;
-        } else {
-            // front and back
-            targetStencilFunc = this._core.stencilFuncFront = this._core.stencilFuncFront || defaultCore.stencilFuncFront;
-            targetStencilFuncState = this._core._stencilFuncStateFront;
-
-            targetStencilFuncOther = this._core.stencilFuncBack = this._core.stencilFuncBack || defaultCore.stencilFuncBack;
-            targetStencilFuncStateOther = this._core._stencilFuncStateBack;
-        }
-
-
-        if (targetStencilFuncState === undefined || 
-            targetStencilFuncState.func != stencilFunc.func || 
-            targetStencilFuncState.ref != stencilFunc.ref ||
-            targetStencilFuncState.mask != stencilFunc.mask 
-            ) {
-
-            var funcEnumName = lookup[stencilFunc.func];
-            if (funcEnumName == undefined) {
-                throw "unsupported value for 'clearFunc' attribute on stencilBuffer node: '" + stencilFunc.func
-                    + "' - supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
-            }
-
-            targetStencilFunc = {
-                func: this._engine.canvas.gl[funcEnumName],
-                ref: stencilFunc.ref,
-                mask: stencilFunc.mask
-            };
-            targetStencilFuncState = stencilFunc;  // state map
-            this._engine.display.imageDirty = true;
-        }
-
-        if (targetStencilFuncOther) {
-            if (targetStencilFuncStateOther === undefined || 
-                targetStencilFuncStateOther.func != stencilFunc.func || 
-                targetStencilFuncStateOther.ref != stencilFunc.ref ||
-                targetStencilFuncStateOther.mask != stencilFunc.mask 
+            if (this._core._stencilFuncStateFront === undefined || 
+                this._core._stencilFuncStateFront.func != stencilFunc.func || 
+                this._core._stencilFuncStateFront.ref != stencilFunc.ref ||
+                this._core._stencilFuncStateFront.mask != stencilFunc.mask 
                 ) {
 
                 var funcEnumName = lookup[stencilFunc.func];
                 if (funcEnumName == undefined) {
-                    throw "unsupported value for 'clearFunc' attribute on stencilBuffer node: '" + stencilFunc.func
+                    throw "unsupported value for 'stencilFunc' attribute on stencilBuffer node: '" + stencilFunc.func
                         + "' - supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
                 }
 
-                targetStencilFuncOther = {
+                this._core.stencilFuncFront = {
                     func: this._engine.canvas.gl[funcEnumName],
                     ref: stencilFunc.ref,
                     mask: stencilFunc.mask
                 };
-                targetStencilFuncStateOther = stencilFunc;  // state map
+                this._core._stencilFuncStateFront = stencilFunc;  // state map
+                this._engine.display.imageDirty = true;
+            }
+        } 
+        
+        if (stencilFunc.face === 'back'  || stencilFunc.face === 'front_and_back') {
+            // back
+            if (this._core._stencilFuncStateBack === undefined || 
+                this._core._stencilFuncStateBack.func != stencilFunc.func || 
+                this._core._stencilFuncStateBack.ref != stencilFunc.ref ||
+                this._core._stencilFuncStateBack.mask != stencilFunc.mask 
+                ) {
+
+                var funcEnumName = lookup[stencilFunc.func];
+                if (funcEnumName == undefined) {
+                    throw "unsupported value for 'stencilFunc' attribute on stencilBuffer node: '" + stencilFunc.func
+                        + "' - supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
+                }
+
+                this._core.stencilFuncBack = {
+                    func: this._engine.canvas.gl[funcEnumName],
+                    ref: stencilFunc.ref,
+                    mask: stencilFunc.mask
+                };
+                this._core._stencilFuncStateBack = stencilFunc;  // state map
                 this._engine.display.imageDirty = true;
             }
         }
 
-
         return this;
     };
-
-    // /**
-    //  * Sets the stencil comparison function.
-    //  * Supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'
-    //  * @param {String} stencilFunc The stencil comparison function
-    //  * @return {*}
-    //  */
-    // SceneJS.StencilBuf.prototype.setStencilOp = function (stencilOp) {
-    //     if (this._core._stencilOpState === undefined ||
-    //         this._core._stencilOpState.sfail != stencilOp.sfail ||
-    //         this._core._stencilOpState.dpfail != stencilOp.dpfail ||
-    //         this._core._stencilOpState.dppass != stencilOp.dppass
-    //         ) {
-    //         var sfail = lookup[stencilOp.sfail];
-    //         var dpfail = lookup[stencilOp.dpfail];
-    //         var dppass = lookup[stencilOp.dppass];
-    //         if (sfail == undefined || dpfail == undefined || dppass == undefined) {
-    //             throw "unsupported value for 'clearFunc' attribute on stencilBuffer node: '" + stencilFunc
-    //                 + "' - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
-    //         }
-    //         this._core.stencilOp = {
-    //             sfail: this._engine.canvas.gl[sfail],
-    //             dpfail: this._engine.canvas.gl[dpfail],
-    //             dppass: this._engine.canvas.gl[dppass]
-    //         };
-    //         this._core._stencilOpState = stencilOp;
-    //         this._engine.display.imageDirty = true;
-    //     }
-    //     return this;
-    // };
 
     /**
      * Sets the stencil comparison function.
@@ -363,77 +279,58 @@
         stencilOp.dpfail = stencilOp.dpfail;
         stencilOp.dppass = stencilOp.dppass;
 
-        var targetStencilOp = null;
-        var targetStencilOpOther = null;
-
-        var targetStencilOpState = null;
-        var targetStencilOpStateOther = null;
-
-        if (stencilOp.face == 'front') {
+        if (stencilOp.face === 'front' || stencilOp.face === 'front_and_back') {
             // front
-            targetStencilOp = this._core.stencilOpFront;
-            targetStencilOpState = this._core._stencilFuncOpStateFront;
-        } else if (stencilOp.face == 'back') {
-            // back
-            targetStencilOp = this._core.stencilOpBack;
-            targetStencilOpState = this._core._stencilOpStateBack;
-        } else {
-            // front and back
-            targetStencilOp = this._core.stencilOpFront;
-            targetStencilOpState = this._core._stencilOpStateFront;
-
-            targetStencilOpOther = this._core.stencilOpBack;
-            targetStencilOpStateOther = this._core._stencilOpStateBack;
-        }
-
-        if (targetStencilOpState === undefined ||
-            targetStencilOpState.sfail != stencilOp.sfail ||
-            targetStencilOpState.dpfail != stencilOp.dpfail ||
-            targetStencilOpState.dppass != stencilOp.dppass
-            ) {
-            var sfail = lookup[stencilOp.sfail];
-            var dpfail = lookup[stencilOp.dpfail];
-            var dppass = lookup[stencilOp.dppass];
-            if (sfail == undefined || dpfail == undefined || dppass == undefined) {
-                throw "unsupported value for 'clearFunc' attribute on stencilBuffer node: '" + stencilFunc
-                    + "' - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
-            }
-            targetStencilOp = {
-                sfail: this._engine.canvas.gl[sfail],
-                dpfail: this._engine.canvas.gl[dpfail],
-                dppass: this._engine.canvas.gl[dppass]
-            };
-            targetStencilOpState = stencilOp;
-            this._engine.display.imageDirty = true;
-        }
-
-        if (targetStencilOpOther) {
-            if (targetStencilOpStateOther === undefined || 
-                targetStencilOpStateOther.func != stencilOp.func || 
-                targetStencilOpStateOther.ref != stencilOp.ref ||
-                targetStencilOpStateOther.mask != stencilOp.mask 
+            if (this._core._stencilOpStateFront === undefined || 
+                this._core._stencilOpStateFront.sfail != stencilOp.sfail || 
+                this._core._stencilOpStateFront.dpfail != stencilOp.dpfail ||
+                this._core._stencilOpStateFront.dppass != stencilOp.dppass 
                 ) {
-                        var sfail = lookup[stencilOp.sfail];
-                        var dpfail = lookup[stencilOp.dpfail];
-                        var dppass = lookup[stencilOp.dppass];
-                        if (sfail == undefined || dpfail == undefined || dppass == undefined) {
-                            throw "unsupported value for 'clearFunc' attribute on stencilBuffer node: '" + stencilFunc
-                                + "' - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
-                        }
-                        targetStencilOpOther = {
-                            sfail: this._engine.canvas.gl[sfail],
-                            dpfail: this._engine.canvas.gl[dpfail],
-                            dppass: this._engine.canvas.gl[dppass]
-                        };
-                        targetStencilOpStateOther = stencilOp;
-                        this._engine.display.imageDirty = true;
+
+                var sfail = lookup[stencilOp.sfail];
+                var dpfail = lookup[stencilOp.dpfail];
+                var dppass = lookup[stencilOp.dppass];
+                if (sfail == undefined || dpfail == undefined || dppass == undefined) {
+                    throw "unsupported value for 'StencilOp' attribute on stencilBuffer node: '" + JSON.stringify(stencilOp)
+                        + "' - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
                 }
+                this._core.stencilOpFront = {
+                    sfail: this._engine.canvas.gl[sfail],
+                    dpfail: this._engine.canvas.gl[dpfail],
+                    dppass: this._engine.canvas.gl[dppass]
+                };
+                this._core._stencilOpStateFront = stencilOp;  // state map
+                this._engine.display.imageDirty = true;
+            }
+        } 
+        
+        if (stencilOp.face === 'back'  || stencilOp.face === 'front_and_back') {
+            // back
+            if (this._core._stencilOpStateBack === undefined || 
+                this._core._stencilOpStateBack.sfail != stencilOp.sfail || 
+                this._core._stencilOpStateBack.dpfail != stencilOp.dpfail ||
+                this._core._stencilOpStateBack.dppass != stencilOp.dppass 
+                ) {
+
+                var sfail = lookup[stencilOp.sfail];
+                var dpfail = lookup[stencilOp.dpfail];
+                var dppass = lookup[stencilOp.dppass];
+                if (sfail == undefined || dpfail == undefined || dppass == undefined) {
+                    throw "unsupported value for 'StencilOp' attribute on stencilBuffer node: '" + JSON.stringify(stencilOp)
+                        + "' - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
+                }
+                this._core.stencilOpBack = {
+                    sfail: this._engine.canvas.gl[sfail],
+                    dpfail: this._engine.canvas.gl[dpfail],
+                    dppass: this._engine.canvas.gl[dppass]
+                };
+                this._core._stencilOpStateBack = stencilOp;  // state map
+                this._engine.display.imageDirty = true;
+            }
         }
 
         return this;
     };
-
-
 
 
     // /**
