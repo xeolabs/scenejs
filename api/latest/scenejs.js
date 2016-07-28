@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-05-17
+ * Built on 2016-07-28
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -999,7 +999,7 @@ var SceneJS = new (function () {
             return info;
         }
 
-        var gl = canvas.getContext("webgl", { antialias: true }) || canvas.getContext("experimental-webgl", { antialias: true });
+        var gl = canvas.getContext("webgl", { stencil:true, antialias: true }) || canvas.getContext("experimental-webgl", { antialias: true });
 
         info.WEBGL = !!gl;
 
@@ -1862,6 +1862,8 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
      */
     this.contextAttr = contextAttr || {};
     this.contextAttr.alpha = true;
+    
+    this.contextAttr["stencil"] = true;
 
     /**
      * The WebGL context
@@ -1988,6 +1990,11 @@ var SceneJS_Engine = function (json, options) {
      * Flag set when at least one branch of the scene graph needs recompilation
      */
     this._sceneBranchesDirty = false;
+
+    /**
+     * Flag to prevent engine from re-compiling the scene graph
+     */
+    this._compilationPaused = false;
 
     /**
      * List of nodes scheduled for destruction by #destroyNode
@@ -2508,9 +2515,27 @@ SceneJS_Engine.prototype._needCompile = function () {
 };
 
 /**
+ * Prevent engine from compiling the scene graph
+ */
+SceneJS_Engine.prototype.pauseCompilation = function () {
+    this._compilationPaused = true;
+};
+
+/**
+ * Resume compilation of scene graph
+ */
+SceneJS_Engine.prototype.resumeCompilation = function () {
+    this._compilationPaused = false;
+};
+
+/**
  * Performs any pending scene compilations or display rebuilds
  */
 SceneJS_Engine.prototype.compile = function () {
+    if (this._compilationPaused) {
+        return;
+    }
+
     if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
         this._sceneBranchesDirty = false;
         SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
@@ -12539,6 +12564,380 @@ new (function () {
 
 })();;(function () {
 
+    var lookup = {
+        // stencilFunc.func
+        never: "NEVER", 
+        less: "LESS",
+        equal: "EQUAL",
+        lequal: "LEQUAL",
+        greater: "GREATER",
+        notequal: "NOTEQUAL",
+        gequal: "GEQUAL",
+        always: "ALWAYS",
+
+        // stencilOp
+        keep: "KEEP",
+        zero: "ZERO",
+        replace: "REPLACE",
+        incr: "INCR",
+        incr_wrap: "INCR_WRAP",
+        decr: "DECR",
+        decr_wrap: "DECR_WRAP",
+        invert: "INVERT",
+
+        // face
+        front: "FRONT",
+        back: "BACK",
+        front_and_back: "FRONT_AND_BACK"
+    };
+
+    // The default state core singleton for {@link SceneJS.StencilBuf} nodes
+    var defaultCore = {
+        type: "stencilBuffer",
+        stateId: SceneJS._baseStateId++,
+        enabled: false,
+        clearStencil: 0,
+        
+        //stencilFunc: {func: null, ref: 1, mask: 0xff}, // Lazy init stencilFunc when we can get a context
+        
+        stencilFuncFront: {func: null, ref: 1, mask: 0xff},
+        stencilFuncBack: {func: null, ref: 1, mask: 0xff},
+
+        //stencilOp: {sfail: null, dpfail: null, dppass: null}, 
+
+        stencilOpFront: {sfail: null, dpfail: null, dppass: null}, 
+        stencilOpBack: {sfail: null, dpfail: null, dppass: null}, 
+
+        //_stencilFuncState: {func: "always", ref: 1, mask: 0xff},
+
+        _stencilFuncStateFront: {func: "always", ref: 1, mask: 0xff},
+        _stencilFuncStateBack: {func: "always", ref: 1, mask: 0xff},
+
+        //_stencilOpState: {sfail: "keep", dpfail: "keep", dppass: "keep"},
+
+        _stencilOpFrontState: {sfail: "keep", dpfail: "keep", dppass: "keep"}, 
+        _stencilOpBackState: {sfail: "keep", dpfail: "keep", dppass: "keep"}
+    };
+
+    var coreStack = [];
+    var stackLen = 0;
+
+    SceneJS_events.addListener(
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            // Lazy-init stencilFunc now we can get a context
+            if (defaultCore.stencilFuncFront.func === null) { 
+                defaultCore.stencilFuncFront.func = params.engine.canvas.gl.ALWAYS;
+            }
+
+            if (defaultCore.stencilFuncBack.func === null) {
+                defaultCore.stencilFuncBack.func = params.engine.canvas.gl.ALWAYS;
+            }
+
+            if (defaultCore.stencilOpFront.func === null) {
+                defaultCore.stencilOpFront.sfail = params.engine.canvas.gl.KEEP;
+                defaultCore.stencilOpFront.dpfail = params.engine.canvas.gl.KEEP;
+                defaultCore.stencilOpFront.dppass = params.engine.canvas.gl.KEEP;
+            }
+
+            if (defaultCore.stencilOpBack.func === null) {
+                defaultCore.stencilOpBack.sfail = params.engine.canvas.gl.KEEP;
+                defaultCore.stencilOpBack.dpfail = params.engine.canvas.gl.KEEP;
+                defaultCore.stencilOpBack.dppass = params.engine.canvas.gl.KEEP;
+            }
+
+            params.engine.display.stencilBuffer = defaultCore;
+            stackLen = 0;
+        });
+
+    /**
+     * @class Scene graph node which configures the stencil buffer for its subgraph
+     * @extends SceneJS.Node
+     */
+    SceneJS.StencilBuf = SceneJS_NodeFactory.createNodeType("stencilBuffer");
+
+    SceneJS.StencilBuf.prototype._init = function (params) {
+
+        if (params.enabled != undefined) {
+            this.setEnabled(params.enabled);
+        } else if (this._core.useCount == 1) { // This node defines the core
+            this.setEnabled(true);
+        }
+
+        if (params.clearStencil != undefined) {
+            this.setClearStencil(params.clearStencil);
+        } else if (this._core.useCount == 1) {
+            this.setClearStencil(0);
+        }
+
+        if (params.stencilFunc != undefined) {
+            this.setStencilFunc(params.stencilFunc);
+        } else if (this._core.useCount == 1) {
+            this.setStencilFunc({
+                face: "front_back",
+                func: "always", 
+                ref: 1, 
+                mask: 0xff
+            });
+        }
+
+        if (params.stencilOp != undefined) {
+            this.setStencilOp(params.stencilOp);
+        } else if (this._core.useCount == 1) {
+            this.setStencilOp({
+                face: "front_back",
+                sfail: "keep", 
+                dpfail: "keep", 
+                dppass: "keep"
+            });
+        }
+
+        if (params.clear != undefined) {
+            this.setClear(params.clear);
+        }
+    };
+
+    /**
+     * Enable or disable the stencil buffer
+     *
+     * @param enabled Specifies whether stencil buffer is enabled or not
+     * @return {*}
+     */
+    SceneJS.StencilBuf.prototype.setEnabled = function (enabled) {
+        if (this._core.enabled != enabled) {
+            this._core.enabled = enabled;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Get whether or not the stencil buffer is enabled
+     *
+     * @return Boolean
+     */
+    SceneJS.StencilBuf.prototype.getEnabled = function () {
+        return this._core.enabled;
+    };
+
+    /**
+     * Sets whether or not to clear the stencil buffer before each render
+     *
+     * @param clear
+     * @return {*}
+     */
+    SceneJS.StencilBuf.prototype.setClear = function (clear) {
+        if (this._core.clear != clear) {
+            this._core.clear = clear;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Get whether or not the stencil buffer is cleared before each render
+     *
+     * @return Boolean
+     */
+    SceneJS.StencilBuf.prototype.getClear = function () {
+        return this._core.clear;
+    };
+    
+    /**
+     * Specify the clear value for the stencil buffer.
+     * Initial value is 1, and the given value will be clamped to [0..1].
+     * @param clearStencil
+     * @return {*}
+     */
+    SceneJS.StencilBuf.prototype.setClearStencil = function (clearStencil) {
+        if (this._core.clearStencil != clearStencil) {
+            this._core.clearStencil = clearStencil;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Get the clear value for the stencil buffer
+     *
+     * @return Number
+     */
+    SceneJS.StencilBuf.prototype.getClearStencil = function () {
+        return this._core.clearStencil;
+    };
+
+    /**
+     * Sets the stencil comparison function
+     * Supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'
+     * @param {String} stencilFunc The stencil comparison function
+     * @return {*}
+     */
+    SceneJS.StencilBuf.prototype.setStencilFunc = function (stencilFunc) {
+        stencilFunc.face = stencilFunc.face || 'front_and_back';
+        stencilFunc.func = stencilFunc.func || 'always';
+        stencilFunc.ref = stencilFunc.ref || 1;
+        stencilFunc.mask = stencilFunc.mask || 0xff;
+
+        if (stencilFunc.face === 'front' || stencilFunc.face === 'front_and_back') {
+            // front
+            if (this._core._stencilFuncStateFront === undefined || 
+                this._core._stencilFuncStateFront.func != stencilFunc.func || 
+                this._core._stencilFuncStateFront.ref != stencilFunc.ref ||
+                this._core._stencilFuncStateFront.mask != stencilFunc.mask 
+                ) {
+
+                var funcEnumName = lookup[stencilFunc.func];
+                if (funcEnumName == undefined) {
+                    throw "unsupported value for 'stencilFunc' attribute on stencilBuffer node: '" + stencilFunc.func
+                        + "' - supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
+                }
+
+                this._core.stencilFuncFront = {
+                    func: this._engine.canvas.gl[funcEnumName],
+                    ref: stencilFunc.ref,
+                    mask: stencilFunc.mask
+                };
+                this._core._stencilFuncStateFront = stencilFunc;  // state map
+                this._engine.display.imageDirty = true;
+            }
+        } 
+        
+        if (stencilFunc.face === 'back'  || stencilFunc.face === 'front_and_back') {
+            // back
+            if (this._core._stencilFuncStateBack === undefined || 
+                this._core._stencilFuncStateBack.func != stencilFunc.func || 
+                this._core._stencilFuncStateBack.ref != stencilFunc.ref ||
+                this._core._stencilFuncStateBack.mask != stencilFunc.mask 
+                ) {
+
+                var funcEnumName = lookup[stencilFunc.func];
+                if (funcEnumName == undefined) {
+                    throw "unsupported value for 'stencilFunc' attribute on stencilBuffer node: '" + stencilFunc.func
+                        + "' - supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
+                }
+
+                this._core.stencilFuncBack = {
+                    func: this._engine.canvas.gl[funcEnumName],
+                    ref: stencilFunc.ref,
+                    mask: stencilFunc.mask
+                };
+                this._core._stencilFuncStateBack = stencilFunc;  // state map
+                this._engine.display.imageDirty = true;
+            }
+        }
+
+        return this;
+    };
+
+    /**
+     * Sets the stencil comparison function.
+     * Supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'
+     * @param {String} stencilFunc The stencil comparison function
+     * @return {*}
+     */
+    SceneJS.StencilBuf.prototype.setStencilOp = function (stencilOp) {
+        stencilOp.face = stencilOp.face || 'front_and_back';
+        stencilOp.sfail = stencilOp.sfail || 'keep';
+        stencilOp.dpfail = stencilOp.dpfail || 'keep';
+        stencilOp.dppass = stencilOp.dppass || 'keep';
+
+        if (stencilOp.face === 'front' || stencilOp.face === 'front_and_back') {
+            // front
+            if (this._core._stencilOpStateFront === undefined || 
+                this._core._stencilOpStateFront.sfail != stencilOp.sfail || 
+                this._core._stencilOpStateFront.dpfail != stencilOp.dpfail ||
+                this._core._stencilOpStateFront.dppass != stencilOp.dppass 
+                ) {
+
+                var sfail = lookup[stencilOp.sfail];
+                var dpfail = lookup[stencilOp.dpfail];
+                var dppass = lookup[stencilOp.dppass];
+                if (sfail == undefined || dpfail == undefined || dppass == undefined) {
+                    throw "unsupported value for 'StencilOp' attribute on stencilBuffer node: '" + JSON.stringify(stencilOp)
+                        + "' - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
+                }
+                this._core.stencilOpFront = {
+                    sfail: this._engine.canvas.gl[sfail],
+                    dpfail: this._engine.canvas.gl[dpfail],
+                    dppass: this._engine.canvas.gl[dppass]
+                };
+                this._core._stencilOpStateFront = stencilOp;  // state map
+                this._engine.display.imageDirty = true;
+            }
+        } 
+        
+        if (stencilOp.face === 'back'  || stencilOp.face === 'front_and_back') {
+            // back
+            if (this._core._stencilOpStateBack === undefined || 
+                this._core._stencilOpStateBack.sfail != stencilOp.sfail || 
+                this._core._stencilOpStateBack.dpfail != stencilOp.dpfail ||
+                this._core._stencilOpStateBack.dppass != stencilOp.dppass 
+                ) {
+
+                var sfail = lookup[stencilOp.sfail];
+                var dpfail = lookup[stencilOp.dpfail];
+                var dppass = lookup[stencilOp.dppass];
+                if (sfail == undefined || dpfail == undefined || dppass == undefined) {
+                    throw "unsupported value for 'StencilOp' attribute on stencilBuffer node: '" + JSON.stringify(stencilOp)
+                        + "' - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
+                }
+                this._core.stencilOpBack = {
+                    sfail: this._engine.canvas.gl[sfail],
+                    dpfail: this._engine.canvas.gl[dpfail],
+                    dppass: this._engine.canvas.gl[dppass]
+                };
+                this._core._stencilOpStateBack = stencilOp;  // state map
+                this._engine.display.imageDirty = true;
+            }
+        }
+
+        return this;
+    };
+
+
+    // /**
+    //  * Returns the stencilFunc State
+    //  * @return {*}
+    //  */
+    // SceneJS.StencilBuf.prototype.getStencilFunc = function () {
+    //     return this._core._stencilFuncState;
+    // };
+
+    SceneJS.StencilBuf.prototype.getStencilFuncFront = function () {
+        return this._core._stencilFuncStateFront;
+    };
+
+    SceneJS.StencilBuf.prototype.getStencilFuncBack = function () {
+        return this._core._stencilFuncStateBack;
+    };
+
+
+    // /**
+    //  * Returns the stencilOp State
+    //  * @return {*}
+    //  */
+    // SceneJS.StencilBuf.prototype.getStencilState = function () {
+    //     return this._core._stencilOpState;
+    // };
+
+    SceneJS.StencilBuf.prototype.getStencilStateFront = function () {
+        return this._core._stencilOpStateFront;
+    };
+
+    SceneJS.StencilBuf.prototype.getStencilStateBack = function () {
+        return this._core._stencilOpStateBack;
+    };
+
+
+    SceneJS.StencilBuf.prototype._compile = function (ctx) {
+        this._engine.display.stencilBuffer = coreStack[stackLen++] = this._core;
+        this._compileNodes(ctx);
+        this._engine.display.stencilBuffer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
+    };
+
+})();;(function () {
+
     // The default state core singleton for {@link SceneJS.ColorBuffer} nodes
     var defaultCore = {
         type: "colorBuffer",
@@ -12806,9 +13205,23 @@ SceneJS.Scene.prototype.renderFrame = function (params) {
 };
 
 /**
+ * Prevent re-compilation of scene graph.
+ */
+SceneJS.Scene.prototype.pauseCompilation = function () {
+    return this._engine.pauseCompilation();
+};
+
+/**
+ * Resume re-compilation of scene graph.
+ */
+SceneJS.Scene.prototype.resumeCompilation = function () {
+    return this._engine.resumeCompilation();
+};
+
+/**
  * Force compilation of the scene graph.
  */
-SceneJS.Scene.prototype.compile = function (params) {
+SceneJS.Scene.prototype.compile = function () {
     return this._engine.compile();
 };
 
@@ -16360,6 +16773,12 @@ var SceneJS_Display = function (cfg) {
     this.depthBuffer = null;
 
     /**
+     * Node state core for the last {@link SceneJS.StencilBuf} visited during scene graph compilation traversal
+     * @type Object 
+     */
+    this.stencilBuffer = null;
+
+    /**
      * Node state core for the last {@link SceneJS.ColorBuf} visited during scene graph compilation traversal
      * @type Object
      */
@@ -16678,19 +17097,20 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 6, "shaderParams", this.shaderParams);
     this._setChunk(object, 7, "style", this.style);
     this._setChunk(object, 8, "depthBuffer", this.depthBuffer);
-    this._setChunk(object, 9, "colorBuffer", this.colorBuffer);
-    this._setChunk(object, 10, "view", this.view);
-    this._setChunk(object, 11, "lights", this.lights);
-    this._setChunk(object, 12, "material", this.material);
-    this._setChunk(object, 13, "texture", this.texture);
-    this._setChunk(object, 14, "regionMap", this.regionMap);
-    this._setChunk(object, 15, "fresnel", this.fresnel);
-    this._setChunk(object, 16, "cubemap", this.cubemap);
-    this._setChunk(object, 17, "clips", this.clips);
-    this._setChunk(object, 18, "renderer", this.renderer);
-    this._setChunk(object, 19, "geometry", this.morphGeometry, this.geometry);
-    this._setChunk(object, 20, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 21, "draw", this.geometry); // Must be last
+    this._setChunk(object, 9, "stencilBuffer", this.stencilBuffer);
+    this._setChunk(object, 10, "colorBuffer", this.colorBuffer);
+    this._setChunk(object, 11, "view", this.view);
+    this._setChunk(object, 12, "lights", this.lights);
+    this._setChunk(object, 13, "material", this.material);
+    this._setChunk(object, 14, "texture", this.texture);
+    this._setChunk(object, 15, "regionMap", this.regionMap);
+    this._setChunk(object, 16, "fresnel", this.fresnel);
+    this._setChunk(object, 17, "cubemap", this.cubemap);
+    this._setChunk(object, 18, "clips", this.clips);
+    this._setChunk(object, 19, "renderer", this.renderer);
+    this._setChunk(object, 20, "geometry", this.morphGeometry, this.geometry);
+    this._setChunk(object, 21, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 22, "draw", this.geometry); // Must be last
 
     // At the very least, the object sort order
     // will need be recomputed
@@ -17738,6 +18158,12 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.depthbufEnabled = null;
     frameCtx.clearDepth = null;
     frameCtx.depthFunc = gl.LESS;
+    frameCtx.stencilbufEnabled = null;
+    frameCtx.clearStencil = null;
+    frameCtx.stencilFuncFront = {func: gl.ALWAYS, ref: 1, mask: 0xff};
+    frameCtx.stencilFuncBack = {func: gl.ALWAYS, ref: 1, mask: 0xff};
+    frameCtx.stencilOpFront = {sfail: gl.KEEP, dpfail: gl.KEEP, dppass: gl.KEEP};
+    frameCtx.stencilOpBack = {sfail: gl.KEEP, dpfail: gl.KEEP, dppass: gl.KEEP};
     frameCtx.scissorTestEnabled = false;
     frameCtx.blendEnabled = false;
     frameCtx.backfaces = true;
@@ -20995,6 +21421,75 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this.core.clear) {
             gl.clear(gl.DEPTH_BUFFER_BIT);
+        }
+    }
+});
+;/**
+ *
+ */
+SceneJS_ChunkFactory.createChunkType({
+
+    type: "stencilBuffer",
+
+    // Avoid reapplication of a chunk after a program switch.
+    programGlobal: true,
+
+    drawAndPick: function (frameCtx) {
+
+        var gl = this.program.gl;
+
+        var enabled = this.core.enabled;
+
+        if (frameCtx.stencilbufEnabled != enabled) {
+            if (enabled) {
+                gl.enable(gl.STENCIL_TEST);
+            } else {
+                gl.disable(gl.STENCIL_TEST);
+            }
+            frameCtx.stencilbufEnabled = enabled;
+        }
+
+        var clearStencil = this.core.clearStencil;
+
+        if (clearStencil !== undefined) {
+            if (frameCtx.clearStencil != clearStencil) {
+                gl.clearStencil(clearStencil);
+                frameCtx.clearStencil = clearStencil;
+            }
+        }
+        
+
+        var stencilFuncFront = this.core.stencilFuncFront;
+
+        if (frameCtx.stencilFuncFront != stencilFuncFront && stencilFuncFront) {
+            gl.stencilFuncSeparate(gl.FRONT, stencilFuncFront.func, stencilFuncFront.ref, stencilFuncFront.mask);
+            frameCtx.stencilFuncFront = stencilFuncFront;
+        }
+
+        var stencilFuncBack = this.core.stencilFuncBack;
+        if (frameCtx.stencilFuncBack != stencilFuncBack && stencilFuncBack) {
+            gl.stencilFuncSeparate(gl.BACK, stencilFuncBack.func, stencilFuncBack.ref, stencilFuncBack.mask);
+            frameCtx.stencilFuncBack = stencilFuncBack;
+        }
+
+
+        var stencilOpFront = this.core.stencilOpFront;
+
+        if (frameCtx.stencilOpFront != stencilOpFront && stencilOpFront) {
+            gl.stencilOpSeparate(gl.FRONT, stencilOpFront.sfail, stencilOpFront.dpfail, stencilOpFront.dppass);
+            frameCtx.stencilOpFront = stencilOpFront;
+        }
+
+        var stencilOpBack = this.core.stencilOpBack;
+
+        if (frameCtx.stencilOpBack != stencilOpBack && stencilOpBack) {
+            gl.stencilOpSeparate(gl.BACK, stencilOpBack.sfail, stencilOpBack.dpfail, stencilOpBack.dppass);
+            frameCtx.stencilOpBack = stencilOpBack;
+        }
+
+
+        if (this.core.clear) {
+            gl.clear(gl.STENCIL_BUFFER_BIT);
         }
     }
 });
