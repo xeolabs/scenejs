@@ -18060,6 +18060,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
         this.stats.frame.useProgram = frameCtx.useProgram;
         this.stats.frame.bindTexture = frameCtx.bindTexture;
         this.stats.frame.bindArray = frameCtx.bindArray;
+        this.stats.frame.drawChunks = this._drawListLen;
     }
 
     if (frameCtx.renderBuf) {
