@@ -75,7 +75,6 @@ var SceneJS = new (function () {
         return info;
     })();
 
-
     /**
      * Publishes to a topic.
      *

@@ -142,6 +142,8 @@ new (function () {
                 }
             };
         }
+
+        this._engine.stats.memory.textures++;
     };
 
     function buildMatrix() {
@@ -426,6 +428,7 @@ new (function () {
                 this._core.texture.destroy();
                 this._core.texture = null;
             }
+            this._engine.stats.memory.textures--;
         }
         if (this._core) {
             this._engine._coreFactory.putCore(this._core);

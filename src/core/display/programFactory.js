@@ -2,7 +2,9 @@
  * @class Manages creation, sharing and recycle of {@link SceneJS_Program} instances
  * @private
  */
-var SceneJS_ProgramFactory = function(cfg) {
+var SceneJS_ProgramFactory = function(stats, cfg) {
+
+    this.stats = stats;
 
     this._canvas = cfg.canvas;
 
@@ -22,9 +24,11 @@ SceneJS_ProgramFactory.prototype.getProgram = function(hash, states) {
 
         var source = SceneJS_ProgramSourceFactory.getSource(hash, states);
 
-        program = new SceneJS_Program(this._nextProgramId++, hash, source, this._canvas.gl);
+        program = new SceneJS_Program(this.stats, this._nextProgramId++, hash, source, this._canvas.gl);
 
         this._programs[hash] = program;
+
+        this.stats.memory.programs++;
     }
 
     program.useCount++;
@@ -44,7 +48,9 @@ SceneJS_ProgramFactory.prototype.putProgram = function(program) {
 
         SceneJS_ProgramSourceFactory.putSource(program.hash);
 
-       delete this._programs[program.hash];
+        delete this._programs[program.hash];
+
+        this.stats.memory.programs--;
     }
 };
 
