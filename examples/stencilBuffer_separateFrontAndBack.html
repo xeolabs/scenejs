@@ -27,8 +27,8 @@
     <br><br>In this demo we use stencil Buffer<br><br>The first stage we draw the box and write 
     the stencil value to 9 if there's a fragment. We then draw the teapot in the second stage and 
     preserve the fragments based on the stencil value. 
-    <br/> Note: WebGL only allow the same reference value for front and back face! More details <br/>
-    http://stackoverflow.com/questions/38249716/why-i-got-this-error-webgl-invalid-operation-drawarrays-front-and-back-stenc
+    <br/> Note: WebGL only allow the same reference value for front and back face! You can only have separate stencilFunc func and Op for front and back faces.
+    More details on WebGL Spec 
     
 </div>
 
@@ -56,7 +56,7 @@
                     {
                         type: "depthBuffer",
                         id: "myDepthBuf",
-                        enable: false,                  
+                        enabled: false,
 
                         nodes: [
 
@@ -66,64 +66,59 @@
                                 enabled: true,
                                 clear: false,
                                 stencilFunc: {
-                                    //face: "front",
-                                    func: "never",
-                                    ref: 1
+                                    front: {
+                                        func: "never",
+                                        ref: 0,
+                                        mask: 0xff
+                                    }
+                                    ,
+                                    back: {
+                                        func: "always",
+                                        ref: 0,
+                                        mask: 0xff
+                                    }
                                 },
+
 
                                 nodes: [
                                     {
-                                        type: "stencilBuffer",
-
-                                        enabled: true,
-                                        clear: false,
-                                        stencilFunc: {
-                                            //face: "back",
-                                            func: "always",
-                                            ref: 1
+                                        type: "flags",
+                                        flags: {
+                                            solid: false
                                         },
 
                                         nodes: [
                                             {
-                                                type: "flags",
-                                                flags: {
-                                                    solid: false
-                                                },
+                                                type: "material",
+                                                color: {r: 0.7, g: 0.0, b: 0.0},
 
                                                 nodes: [
                                                     {
-                                                        type: "material",
-                                                        color: {r: 0.7, g: 0.0, b: 0.0},
+                                                        type:"scale",
+                                                        id:"myScale",
+                                                        x:0.4,
+                                                        y:0.4,
+                                                        z:0.4,
 
                                                         nodes: [
                                                             {
-                                                                type:"scale",
-                                                                id:"myScale",
-                                                                x:0.4,
-                                                                y:0.4,
-                                                                z:0.4,
+                                                                type: "translate",
+                                                                y: -1,
 
                                                                 nodes: [
                                                                     {
-                                                                        type: "translate",
-                                                                        y: -1,
-
-                                                                        nodes: [
-                                                                            {
-                                                                                type:"geometry/teapot"
-                                                                            }
-                                                                        ]
+                                                                        type:"geometry/teapot"
                                                                     }
-                                                                    
                                                                 ]
                                                             }
+                                                            
                                                         ]
                                                     }
                                                 ]
                                             }
                                         ]
                                     }
-                                ]  
+                                ]
                             }
                         ]
                     }

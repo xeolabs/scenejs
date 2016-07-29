@@ -1513,10 +1513,28 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.depthFunc = gl.LESS;
     frameCtx.stencilbufEnabled = null;
     frameCtx.clearStencil = null;
-    frameCtx.stencilFuncFront = {func: gl.ALWAYS, ref: 1, mask: 0xff};
-    frameCtx.stencilFuncBack = {func: gl.ALWAYS, ref: 1, mask: 0xff};
-    frameCtx.stencilOpFront = {sfail: gl.KEEP, dpfail: gl.KEEP, dppass: gl.KEEP};
-    frameCtx.stencilOpBack = {sfail: gl.KEEP, dpfail: gl.KEEP, dppass: gl.KEEP};
+
+    // frameCtx.stencilFuncFront = {func: gl.ALWAYS, ref: 1, mask: 0xff};
+    // frameCtx.stencilFuncBack = {func: gl.ALWAYS, ref: 1, mask: 0xff};
+    // frameCtx.stencilOpFront = {sfail: gl.KEEP, dpfail: gl.KEEP, dppass: gl.KEEP};
+    // frameCtx.stencilOpBack = {sfail: gl.KEEP, dpfail: gl.KEEP, dppass: gl.KEEP};
+    
+    frameCtx.stencilFuncFuncFront = gl.ALWAYS;
+    frameCtx.stencilFuncRefFront = 0;
+    frameCtx.stencilFuncMaskFront = 0xff;
+
+    frameCtx.stencilFuncFuncBack = gl.ALWAYS;
+    frameCtx.stencilFuncRefBack = 0;
+    frameCtx.stencilFuncMaskBack = 0xff;
+
+    frameCtx.stencilOpSfailFront = gl.KEEP;
+    frameCtx.stencilOpDpfailFront = gl.KEEP;
+    frameCtx.stencilOpDppassFront = gl.KEEP;
+
+    frameCtx.stencilOpSfailBack = gl.KEEP;
+    frameCtx.stencilOpDpfailBack = gl.KEEP;
+    frameCtx.stencilOpDppassBack = gl.KEEP;
+
     frameCtx.scissorTestEnabled = false;
     frameCtx.blendEnabled = false;
     frameCtx.backfaces = true;

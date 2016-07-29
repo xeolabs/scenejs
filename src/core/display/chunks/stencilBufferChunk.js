@@ -32,35 +32,69 @@ SceneJS_ChunkFactory.createChunkType({
             }
         }
         
+        var stencilFuncFuncFront = this.core.stencilFuncFuncFront;
+        var stencilFuncRefFront = this.core.stencilFuncRefFront;
+        var stencilFuncMaskFront = this.core.stencilFuncMaskFront;
 
-        var stencilFuncFront = this.core.stencilFuncFront;
-
-        if (frameCtx.stencilFuncFront != stencilFuncFront && stencilFuncFront) {
-            gl.stencilFuncSeparate(gl.FRONT, stencilFuncFront.func, stencilFuncFront.ref, stencilFuncFront.mask);
-            frameCtx.stencilFuncFront = stencilFuncFront;
+        if (stencilFuncFuncFront) {
+            if (frameCtx.stencilFuncFuncFront != stencilFuncFuncFront ||
+                frameCtx.stencilFuncRefFront != stencilFuncRefFront ||
+                frameCtx.stencilFuncMaskFront != stencilFuncMaskFront
+                ) {
+                gl.stencilFuncSeparate(gl.FRONT, stencilFuncFuncFront, stencilFuncRefFront, stencilFuncMaskFront);
+                frameCtx.stencilFuncFuncFront = stencilFuncFuncFront;
+                frameCtx.stencilFuncRefFront = stencilFuncRefFront;
+                frameCtx.stencilFuncMaskFront = stencilFuncMaskFront;
+            }
         }
 
-        var stencilFuncBack = this.core.stencilFuncBack;
-        if (frameCtx.stencilFuncBack != stencilFuncBack && stencilFuncBack) {
-            gl.stencilFuncSeparate(gl.BACK, stencilFuncBack.func, stencilFuncBack.ref, stencilFuncBack.mask);
-            frameCtx.stencilFuncBack = stencilFuncBack;
+        var stencilFuncFuncBack = this.core.stencilFuncFuncBack;
+        var stencilFuncRefBack = this.core.stencilFuncRefBack;
+        var stencilFuncMaskBack = this.core.stencilFuncMaskBack;
+
+        if (stencilFuncFuncBack) {
+            if (frameCtx.stencilFuncFuncBack != stencilFuncFuncBack ||
+                frameCtx.stencilFuncRefBack != stencilFuncRefBack ||
+                frameCtx.stencilFuncMaskBack != stencilFuncMaskBack
+                ) {
+                gl.stencilFuncSeparate(gl.BACK, stencilFuncFuncBack, stencilFuncRefBack, stencilFuncMaskBack);
+                frameCtx.stencilFuncFuncBack = stencilFuncFuncBack;
+                frameCtx.stencilFuncRefBack = stencilFuncRefBack;
+                frameCtx.stencilFuncMaskBack = stencilFuncMaskBack;
+            }
         }
 
+        var stencilOpSfailFront = this.core.stencilOpSfailFront;
+        var stencilOpDpfailFront = this.core.stencilOpDpfailFront;
+        var stencilOpDppassFront = this.core.stencilOpDppassFront;
 
-        var stencilOpFront = this.core.stencilOpFront;
-
-        if (frameCtx.stencilOpFront != stencilOpFront && stencilOpFront) {
-            gl.stencilOpSeparate(gl.FRONT, stencilOpFront.sfail, stencilOpFront.dpfail, stencilOpFront.dppass);
-            frameCtx.stencilOpFront = stencilOpFront;
+        if (stencilOpSfailFront) {
+            if (frameCtx.stencilOpSfailFront != stencilOpSfailFront ||
+                frameCtx.stencilOpDpfailFront != stencilOpDpfailFront ||
+                frameCtx.stencilOpDppassFront != stencilOpDppassFront
+                ) {
+                gl.stencilOpSeparate(gl.FRONT, stencilOpSfailFront, stencilOpDpfailFront, stencilOpDppassFront);
+                frameCtx.stencilOpSfailFront = stencilOpSfailFront;
+                frameCtx.stencilOpDpfailFront = stencilOpDpfailFront;
+                frameCtx.stencilOpDppassFront = stencilOpDppassFront;
+            }
         }
 
-        var stencilOpBack = this.core.stencilOpBack;
+        var stencilOpSfailBack = this.core.stencilOpSfailBack;
+        var stencilOpDpfailBack = this.core.stencilOpDpfailBack;
+        var stencilOpDppassBack = this.core.stencilOpDppassBack;
 
-        if (frameCtx.stencilOpBack != stencilOpBack && stencilOpBack) {
-            gl.stencilOpSeparate(gl.BACK, stencilOpBack.sfail, stencilOpBack.dpfail, stencilOpBack.dppass);
-            frameCtx.stencilOpBack = stencilOpBack;
+        if (stencilOpSfailBack) {
+            if (frameCtx.stencilOpSfailBack != stencilOpSfailBack ||
+                frameCtx.stencilOpDpfailBack != stencilOpDpfailBack ||
+                frameCtx.stencilOpDppassBack != stencilOpDppassBack
+                ) {
+                gl.stencilOpSeparate(gl.BACK, stencilOpSfailBack, stencilOpDpfailBack, stencilOpDppassBack);
+                frameCtx.stencilOpSfailBack = stencilOpSfailBack;
+                frameCtx.stencilOpDpfailBack = stencilOpDpfailBack;
+                frameCtx.stencilOpDppassBack = stencilOpDppassBack;
+            }
         }
-
 
         if (this.core.clear) {
             gl.clear(gl.STENCIL_BUFFER_BIT);
