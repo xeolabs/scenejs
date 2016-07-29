@@ -24,6 +24,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         frameCtx.drawProgram = this.program.draw;
+        frameCtx.useProgram++;
     },
 
     pick: function (frameCtx) {

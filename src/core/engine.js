@@ -44,10 +44,54 @@ var SceneJS_Engine = function (json, options) {
     this._nodeFactory = new SceneJS_NodeFactory();
 
     /**
+     * Tracks statistics within this engine, such as numbers of
+     * scenes, textures, geometries etc.
+     *
+     * @property stats
+     * @type {*}
+     * @final
+     */
+    this.stats = {
+        build: {
+            version: SceneJS.VERSION
+        },
+        client: {
+            browser: (navigator && navigator.userAgent) ? navigator.userAgent : "n/a"
+        },
+        components: {
+        },
+        memory: {
+            // Note that these counts will include any positions, colors,
+            // normals and indices that SceneJS internally creates on-demand
+            // to support color-index triangle picking.
+            meshes: 0,
+            positions: 0,
+            colors: 0,
+            normals: 0,
+            uvs: 0,
+            indices: 0,
+            textures: 0,
+            programs: 0
+        },
+        frame: {
+            frameCount: 0,
+            fps: 0,
+            useProgram: 0,
+            setUniform: 0,
+            setUniformCacheHits: 0,
+            bindTexture: 0,
+            bindArray: 0,
+            drawElements: 0,
+            drawArrays: 0,
+            drawChunks: 0
+        }
+    };
+
+    /**
      * The engine's scene renderer
      * @type SceneJS_Display
      */
-    this.display = new SceneJS_Display({
+    this.display = new SceneJS_Display(this.stats, {
         canvas: this.canvas,
         transparent: json.transparent,
         dof: json.dof,
@@ -392,6 +436,13 @@ SceneJS_Engine.prototype.start = function () {
         var height;
         var lastWidth = null;
         var lastHeight = null;
+        var frameTime;
+        var lastFrameTime = 0;
+        var elapsedFrameTime;
+        var newFPS;
+        var fpsSamples = [];
+        var numFPSSamples = 30;
+        var totalFPS = 0;
 
         // Notify started
         this.events.fireEvent("started", {
@@ -431,6 +482,21 @@ SceneJS_Engine.prototype.start = function () {
         function draw() {
             rendered = false;
 
+            frameTime = Date.now();
+
+            // Moving average of FPS
+
+            if (lastFrameTime > 0) {
+                elapsedFrameTime = frameTime - lastFrameTime;
+                newFPS = 1000 / elapsedFrameTime;
+                totalFPS += newFPS;
+                fpsSamples.push(newFPS);
+                if (fpsSamples.length >= numFPSSamples) {
+                    totalFPS -= fpsSamples.shift();
+                }
+                self.stats.frame.fps = Math.round(totalFPS / fpsSamples.length);
+            }
+
             // Render the scene once for each pass
             for (var i = 0; i < self._numPasses; i++) {
 
@@ -459,6 +525,10 @@ SceneJS_Engine.prototype.start = function () {
                     rendered = true;
                 }
             }
+
+            lastFrameTime = frameTime;
+
+            self.stats.frame.frameCount++;
 
             // If any of the passes did not render anything, then put the render loop to sleep again
             if (!rendered) {

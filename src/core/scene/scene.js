@@ -19,6 +19,16 @@ SceneJS.Scene.prototype._init = function (params) {
      * @type {boolean}
      */
     this.transparent = (params.transparent === true);
+
+    /**
+     * Tracks statistics within this engine, such as numbers of
+     * scenes, textures, geometries etc.
+     *
+     * @property stats
+     * @type {*}
+     * @final
+     */
+    this.stats = this._engine.stats;
 };
 
 

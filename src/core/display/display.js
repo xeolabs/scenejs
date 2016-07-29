@@ -65,13 +65,16 @@
  * <p>After a scene update, we set a flag on the display to indicate the stage we will need to redo from. The pipeline is
  * then lazy-redone on the next call to #render or #pick.</p>
  */
-var SceneJS_Display = function (cfg) {
+var SceneJS_Display = function (stats, cfg) {
+
+    // Collects runtime statistics
+    this.stats = stats || {};
 
     // Display is bound to the lifetime of an HTML5 canvas
     this._canvas = cfg.canvas;
 
     // Factory which creates and recycles {@link SceneJS_Program} instances
-    this._programFactory = new SceneJS_ProgramFactory({
+    this._programFactory = new SceneJS_ProgramFactory(this.stats, {
         canvas: cfg.canvas
     });
 
@@ -1519,6 +1522,11 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.texture = null;
     frameCtx.normalMapUVLayerIdx = -1;
     frameCtx.regionMapUVLayerIdx = -1;
+    frameCtx.drawElements = 0;
+    frameCtx.drawArrays = 0;
+    frameCtx.useProgram = 0;
+    frameCtx.bindTexture = 0;
+    frameCtx.bindArray = 0;
 
     // The extensions needs to be re-queried in case the context was lost and has been recreated.
     if (SceneJS.WEBGL_INFO.SUPPORTED_EXTENSIONS["OES_element_index_uint"]) {
@@ -1527,6 +1535,9 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     var VAO = gl.getExtension("OES_vertex_array_object");
     frameCtx.VAO = (VAO) ? VAO : null;
+
+    this.stats.frame.setUniform = 0;
+    this.stats.frame.setUniformCacheHits = 0;
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -1552,6 +1563,8 @@ SceneJS_Display.prototype._doDrawList = function (params) {
         for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
             this._pickDrawList[i].pick(frameCtx);
         }
+
+        gl.flush();
 
     } else if (params.pickRegion || params.pickTriangle) {
 
@@ -1585,10 +1598,14 @@ SceneJS_Display.prototype._doDrawList = function (params) {
             }
         }
 
+        gl.flush();
+
     } else {
 
         // Render scene
         // Render whole draw list
+
+        var startTime = Date.now();
 
         // Option to only render opaque objects
         var len = (params.opaqueOnly && this._drawListTransparentIndex >= 0 ? this._drawListTransparentIndex : this._drawListLen);
@@ -1597,9 +1614,18 @@ SceneJS_Display.prototype._doDrawList = function (params) {
         for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
             this._drawList[i].draw(frameCtx);
         }
-    }
 
-    gl.flush();
+        gl.flush();
+
+        var endTime = Date.now();
+
+        this.stats.frame.renderTime = (endTime - startTime) / 1000.0;
+        this.stats.frame.drawElements = frameCtx.drawElements;
+        this.stats.frame.drawArrays = frameCtx.drawArrays;
+        this.stats.frame.useProgram = frameCtx.useProgram;
+        this.stats.frame.bindTexture = frameCtx.bindTexture;
+        this.stats.frame.bindArray = frameCtx.bindArray;
+    }
 
     if (frameCtx.renderBuf) {
         frameCtx.renderBuf.unbind();

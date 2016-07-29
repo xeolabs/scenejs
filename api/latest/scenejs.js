@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-05-17
+ * Built on 2016-07-29
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -1040,7 +1040,6 @@ var SceneJS = new (function () {
         return info;
     })();
 
-
     /**
      * Publishes to a topic.
      *
@@ -1969,10 +1968,54 @@ var SceneJS_Engine = function (json, options) {
     this._nodeFactory = new SceneJS_NodeFactory();
 
     /**
+     * Tracks statistics within this engine, such as numbers of
+     * scenes, textures, geometries etc.
+     *
+     * @property stats
+     * @type {*}
+     * @final
+     */
+    this.stats = {
+        build: {
+            version: SceneJS.VERSION
+        },
+        client: {
+            browser: (navigator && navigator.userAgent) ? navigator.userAgent : "n/a"
+        },
+        components: {
+        },
+        memory: {
+            // Note that these counts will include any positions, colors,
+            // normals and indices that SceneJS internally creates on-demand
+            // to support color-index triangle picking.
+            meshes: 0,
+            positions: 0,
+            colors: 0,
+            normals: 0,
+            uvs: 0,
+            indices: 0,
+            textures: 0,
+            programs: 0
+        },
+        frame: {
+            frameCount: 0,
+            fps: 0,
+            useProgram: 0,
+            setUniform: 0,
+            setUniformCacheHits: 0,
+            bindTexture: 0,
+            bindArray: 0,
+            drawElements: 0,
+            drawArrays: 0,
+            drawChunks: 0
+        }
+    };
+
+    /**
      * The engine's scene renderer
      * @type SceneJS_Display
      */
-    this.display = new SceneJS_Display({
+    this.display = new SceneJS_Display(this.stats, {
         canvas: this.canvas,
         transparent: json.transparent,
         dof: json.dof,
@@ -1988,6 +2031,11 @@ var SceneJS_Engine = function (json, options) {
      * Flag set when at least one branch of the scene graph needs recompilation
      */
     this._sceneBranchesDirty = false;
+
+    /**
+     * Flag to prevent engine from re-compiling the scene graph
+     */
+    this._compilationPaused = false;
 
     /**
      * List of nodes scheduled for destruction by #destroyNode
@@ -2312,6 +2360,13 @@ SceneJS_Engine.prototype.start = function () {
         var height;
         var lastWidth = null;
         var lastHeight = null;
+        var frameTime;
+        var lastFrameTime = 0;
+        var elapsedFrameTime;
+        var newFPS;
+        var fpsSamples = [];
+        var numFPSSamples = 30;
+        var totalFPS = 0;
 
         // Notify started
         this.events.fireEvent("started", {
@@ -2351,6 +2406,21 @@ SceneJS_Engine.prototype.start = function () {
         function draw() {
             rendered = false;
 
+            frameTime = Date.now();
+
+            // Moving average of FPS
+
+            if (lastFrameTime > 0) {
+                elapsedFrameTime = frameTime - lastFrameTime;
+                newFPS = 1000 / elapsedFrameTime;
+                totalFPS += newFPS;
+                fpsSamples.push(newFPS);
+                if (fpsSamples.length >= numFPSSamples) {
+                    totalFPS -= fpsSamples.shift();
+                }
+                self.stats.frame.fps = Math.round(totalFPS / fpsSamples.length);
+            }
+
             // Render the scene once for each pass
             for (var i = 0; i < self._numPasses; i++) {
 
@@ -2379,6 +2449,10 @@ SceneJS_Engine.prototype.start = function () {
                     rendered = true;
                 }
             }
+
+            lastFrameTime = frameTime;
+
+            self.stats.frame.frameCount++;
 
             // If any of the passes did not render anything, then put the render loop to sleep again
             if (!rendered) {
@@ -2508,9 +2582,27 @@ SceneJS_Engine.prototype._needCompile = function () {
 };
 
 /**
+ * Prevent engine from compiling the scene graph
+ */
+SceneJS_Engine.prototype.pauseCompilation = function () {
+    this._compilationPaused = true;
+};
+
+/**
+ * Resume compilation of scene graph
+ */
+SceneJS_Engine.prototype.resumeCompilation = function () {
+    this._compilationPaused = false;
+};
+
+/**
  * Performs any pending scene compilations or display rebuilds
  */
 SceneJS_Engine.prototype.compile = function () {
+    if (this._compilationPaused) {
+        return;
+    }
+
     if (this._sceneBranchesDirty || this.sceneDirty) { // Need scene graph compilation
         this._sceneBranchesDirty = false;
         SceneJS_events.fireEvent(SceneJS_events.SCENE_COMPILING, {  // Notify compilation support start
@@ -3178,6 +3270,24 @@ SceneJS.log = new (function() {
 
         dest[0] = u[0] - v[0];
         dest[1] = u[1] - v[1];
+
+        return dest;
+    };
+
+    /**
+     * @param u vec2
+     * @param v vec2
+     * @param dest vec2 - optional destination
+     * @return {vec2} dest if specified, u otherwise
+     * @private
+     */
+    window.SceneJS_math_addVec2 = function (u, v, dest) {
+        if (!dest) {
+            dest = u;
+        }
+
+        dest[0] = u[0] + v[0];
+        dest[1] = u[1] + v[1];
 
         return dest;
     };
@@ -6091,12 +6201,15 @@ SceneJS._webgl.RenderBuffer.prototype.destroy = function () {
  * @class Wrapper for a WebGL program
  *
  * @param hash SceneJS-managed ID for program
+ * @param {*} stats Collects scene statistics
  * @param gl WebGL gl
  * @param vertexSources Source codes for vertex shaders
  * @param fragmentSources Source codes for fragment shaders
  * @param logging Program and shaders will write to logging's debug channel as they compile and link
  */
-SceneJS._webgl.Program = function (gl, vertexSources, fragmentSources) {
+SceneJS._webgl.Program = function (stats, gl, vertexSources, fragmentSources) {
+
+    this.stats = stats;
 
     /**
      * True as soon as this program is allocated and ready to go
@@ -6162,7 +6275,7 @@ SceneJS._webgl.Program = function (gl, vertexSources, fragmentSources) {
                 if ((u.type == gl.SAMPLER_2D) || (u.type == gl.SAMPLER_CUBE) || (u.type == 35682)) {
                     this._samplers[u_name] = new SceneJS._webgl.Sampler(gl, this.handle, u_name, u.type, u.size, location);
                 } else {
-                    this._uniforms[u_name] = new SceneJS._webgl.Uniform(gl, this.handle, u_name, u.type, u.size, location, valueIndex);
+                    this._uniforms[u_name] = new SceneJS._webgl.Uniform(stats.frame, gl, this.handle, u_name, u.type, u.size, location, valueIndex);
                     ++valueIndex;
                 }
             }
@@ -6469,7 +6582,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
     }
     return x + 1;
 };
-;SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, index, logging) {
+;SceneJS._webgl.Uniform = function (renderStats, gl, program, name, type, size, location, index, logging) {
 
     var func = null;
 
@@ -6479,10 +6592,12 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value === v) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value = v;
             gl.uniform1i(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.BOOL_VEC2) {
@@ -6490,11 +6605,13 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1]) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value[0] = v[0];
             value[1] = v[1];
             gl.uniform2iv(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.BOOL_VEC3) {
@@ -6502,12 +6619,14 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value[0] = v[0];
             value[1] = v[1];
             value[2] = v[2];
             gl.uniform3iv(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.BOOL_VEC4) {
@@ -6515,6 +6634,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value[0] = v[0];
@@ -6522,16 +6642,19 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
             value[2] = v[2];
             value[3] = v[3];
             gl.uniform4iv(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.INT) {
 
         func = function (v) {
             if (value === v) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value = v;
             gl.uniform1iv(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.INT_VEC2) {
@@ -6539,10 +6662,12 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1]) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform2iv(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.INT_VEC3) {
@@ -6550,10 +6675,12 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform3iv(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.INT_VEC4) {
@@ -6561,20 +6688,24 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform4iv(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT) {
 
         func = function (v) {
             if (value === v) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value = v;
             gl.uniform1f(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_VEC2) {
@@ -6582,10 +6713,12 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1]) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform2fv(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_VEC3) {
@@ -6593,10 +6726,12 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform3fv(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_VEC4) {
@@ -6604,22 +6739,26 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
+                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform4fv(location, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_MAT2) {
 
         func = function (v) {
             gl.uniformMatrix2fv(location, gl.FALSE, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_MAT3) {
 
         func = function (v) {
             gl.uniformMatrix3fv(location, gl.FALSE, v);
+            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_MAT4) {
@@ -6629,6 +6768,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
             // Caching this matrix is actually slower than not caching
 
             gl.uniformMatrix4fv(location, gl.FALSE, v);
+            renderStats.setUniform++;
         };
 
     } else {
@@ -9291,6 +9431,7 @@ new (function () {
                 self._buildNodeCore(self._engine.canvas.gl, self._core);
             };
 
+            this._engine.stats.memory.meshes++;
         }
     };
 
@@ -9336,6 +9477,7 @@ new (function () {
             }
 
             core.arrays.positions = data.positions;
+            this._engine.stats.memory.positions += data.positions.length / 3;
         }
 
         if (data.normals) {
@@ -9344,6 +9486,7 @@ new (function () {
             }
 
             core.arrays.normals = data.normals;
+            this._engine.stats.memory.normals += data.normals.length / 3;
         }
 
         if (data.uvs) {
@@ -9354,6 +9497,7 @@ new (function () {
                 if (uv.constructor != Float32Array) {
                     uvs[i] = new Float32Array(uvs[i]);
                 }
+                this._engine.stats.memory.uvs += uv.length / 2;
             }
             core.arrays.uvs = uvs;
         }
@@ -9368,6 +9512,7 @@ new (function () {
                 core.arrays.uvs = [];
             }
             core.arrays.uvs[0] = data.uv;
+            this._engine.stats.memory.uvs += data.uv.length / 2;
         }
 
         if (data.uv1) {
@@ -9377,7 +9522,8 @@ new (function () {
             if (!core.arrays.uvs) {
                 core.arrays.uvs = [];
             }
-            core.arrays.uvs[1] = data.uv2;
+            core.arrays.uvs[1] = data.uv1;
+            this._engine.stats.memory.uvs += data.uv1.length / 2;
         }
 
         if (data.uv2) {
@@ -9388,6 +9534,7 @@ new (function () {
                 core.arrays.uvs = [];
             }
             core.arrays.uvs[2] = data.uv2;
+            this._engine.stats.memory.uvs += data.uv2.length / 2;
         }
 
         if (data.uv3) {
@@ -9398,6 +9545,7 @@ new (function () {
                 core.arrays.uvs = [];
             }
             core.arrays.uvs[3] = data.uv3;
+            this._engine.stats.memory.uvs += data.uv3.length / 2;
         }
 
         // ----------------------------------------------------------
@@ -9412,6 +9560,7 @@ new (function () {
             }
 
             core.arrays.colors = data.colors;
+            this._engine.stats.memory.colors += data.colors.length / 4;
         }
 
         if (data.indices) {
@@ -9420,6 +9569,7 @@ new (function () {
             }
 
             core.arrays.indices = data.indices;
+            this._engine.stats.memory.indices += data.indices.length;
         }
 
         // Lazy-build tangents, only when needed as rendering
@@ -9716,6 +9866,7 @@ new (function () {
         }
 
         data.normals = normals;
+        this._engine.stats.memory.normals += normals.length / 3;
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
@@ -10009,6 +10160,8 @@ new (function () {
             if (this._source && this._source.destroy) {
                 this._source.destroy();
             }
+
+            this._engine.stats.memory.meshes--;
         }
     };
 
@@ -10016,6 +10169,24 @@ new (function () {
 
         if (document.getElementById(this._engine.canvas.canvasId)) { // Context won't exist if canvas has disappeared
             destroyBuffers(this._core);
+        }
+
+        var arrays = this._core.arrays;
+
+        if (arrays.positions) {
+            this._engine.stats.memory.positions -= arrays.positions.length / 3;
+        }
+        if (arrays.normals) {
+            this._engine.stats.memory.normals -= arrays.normals.length / 3;
+        }
+        if (arrays.colors) {
+            this._engine.stats.memory.colors -= arrays.colors.length / 3;
+        }
+        if (arrays.uvs && arrays.uvs.length > 0) {
+            this._engine.stats.memory.uvs -= arrays.uvs.length * (arrays.uvs[0].length / 2);
+        }
+        if (arrays.indices) {
+            this._engine.stats.memory.indices -= arrays.indices.length;
         }
     };
 
@@ -12719,6 +12890,16 @@ SceneJS.Scene.prototype._init = function (params) {
      * @type {boolean}
      */
     this.transparent = (params.transparent === true);
+
+    /**
+     * Tracks statistics within this engine, such as numbers of
+     * scenes, textures, geometries etc.
+     *
+     * @property stats
+     * @type {*}
+     * @final
+     */
+    this.stats = this._engine.stats;
 };
 
 
@@ -12806,9 +12987,23 @@ SceneJS.Scene.prototype.renderFrame = function (params) {
 };
 
 /**
+ * Prevent re-compilation of scene graph.
+ */
+SceneJS.Scene.prototype.pauseCompilation = function () {
+    return this._engine.pauseCompilation();
+};
+
+/**
+ * Resume re-compilation of scene graph.
+ */
+SceneJS.Scene.prototype.resumeCompilation = function () {
+    return this._engine.resumeCompilation();
+};
+
+/**
  * Force compilation of the scene graph.
  */
-SceneJS.Scene.prototype.compile = function (params) {
+SceneJS.Scene.prototype.compile = function () {
     return this._engine.compile();
 };
 
@@ -13556,6 +13751,8 @@ new (function () {
                     this.publish("image", layer.image);
                     this._imagePublished = true;
                 }
+
+                this._engine.stats.memory.textures++;
             }
 
             var self = this;
@@ -13958,6 +14155,7 @@ new (function () {
                 layer = layers[i];
                 if (layer.texture) {
                     layer.texture.destroy();
+                    this._engine.stats.memory.textures++;
                 }
                 source = layer._source;
                 if (source && source.destroy) {
@@ -14111,6 +14309,8 @@ new (function () {
 //                        });
                 }
             };
+
+            this._engine.stats.memory.textures++;
         }
     };
 
@@ -14396,6 +14596,7 @@ new (function () {
                 this._core.texture.destroy();
                 this._core.texture = null;
             }
+            this._engine.stats.memory.textures--;
         }
         if (this._core) {
             this._engine._coreFactory.putCore(this._core);
@@ -16299,13 +16500,16 @@ SceneJS.Types = new (function () {
  * <p>After a scene update, we set a flag on the display to indicate the stage we will need to redo from. The pipeline is
  * then lazy-redone on the next call to #render or #pick.</p>
  */
-var SceneJS_Display = function (cfg) {
+var SceneJS_Display = function (stats, cfg) {
+
+    // Collects runtime statistics
+    this.stats = stats || {};
 
     // Display is bound to the lifetime of an HTML5 canvas
     this._canvas = cfg.canvas;
 
     // Factory which creates and recycles {@link SceneJS_Program} instances
-    this._programFactory = new SceneJS_ProgramFactory({
+    this._programFactory = new SceneJS_ProgramFactory(this.stats, {
         canvas: cfg.canvas
     });
 
@@ -17194,7 +17398,7 @@ SceneJS_Display.prototype._logPickList = function () {
 
 (function () {
 
-// Cached vectors to avoid garbage collection
+    // Cached vectors to avoid garbage collection
 
     var origin = SceneJS_math_vec3();
     var dir = SceneJS_math_vec3();
@@ -17216,21 +17420,19 @@ SceneJS_Display.prototype._logPickList = function () {
 
     var tempVec4 = SceneJS_math_vec4();
     var tempVec4b = SceneJS_math_vec4();
-    var tempVec4c = SceneJS_math_vec4();
 
     var tempVec3 = SceneJS_math_vec3();
     var tempVec3b = SceneJS_math_vec3();
     var tempVec3c = SceneJS_math_vec3();
     var tempVec3d = SceneJS_math_vec3();
-    var tempVec3e = SceneJS_math_vec3();
-    var tempVec3f = SceneJS_math_vec3();
-    var tempVec3g = SceneJS_math_vec3();
-    var tempVec3h = SceneJS_math_vec3();
-    var tempVec3i = SceneJS_math_vec3();
-    var tempVec3j = SceneJS_math_vec3();
+
+    var tempVec2 = SceneJS_math_vec2();
+    var tempVec2b = SceneJS_math_vec2();
+    var tempVec2c = SceneJS_math_vec2();
+    var tempVec2d = SceneJS_math_vec2();
 
 
-    // Given a GameObject and camvas coordinates, gets a ray
+    // Given an Object and canvas coordinates, gets a ray
     // originating at the World-space eye position that passes
     // through the perspective projection plane. The ray is
     // returned via the origin and dir arguments.
@@ -17588,11 +17790,11 @@ SceneJS_Display.prototype._logPickList = function () {
                             uvc[0] = uvs[ic2];
                             uvc[1] = uvs[ic2 + 1];
 
-                            uv = SceneJS_math_addVec3(
-                                SceneJS_math_addVec3(
-                                    SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
-                                    SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
-                                SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), SceneJS_math_vec3());
+                            uv = SceneJS_math_addVec2(
+                                SceneJS_math_addVec2(
+                                    SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec2),
+                                    SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec2b), tempVec2c),
+                                SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec2d), SceneJS_math_vec2());
 
                             hit.uvs.push(uv);
                         }
@@ -17755,6 +17957,11 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.texture = null;
     frameCtx.normalMapUVLayerIdx = -1;
     frameCtx.regionMapUVLayerIdx = -1;
+    frameCtx.drawElements = 0;
+    frameCtx.drawArrays = 0;
+    frameCtx.useProgram = 0;
+    frameCtx.bindTexture = 0;
+    frameCtx.bindArray = 0;
 
     // The extensions needs to be re-queried in case the context was lost and has been recreated.
     if (SceneJS.WEBGL_INFO.SUPPORTED_EXTENSIONS["OES_element_index_uint"]) {
@@ -17763,6 +17970,9 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     var VAO = gl.getExtension("OES_vertex_array_object");
     frameCtx.VAO = (VAO) ? VAO : null;
+
+    this.stats.frame.setUniform = 0;
+    this.stats.frame.setUniformCacheHits = 0;
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -17788,6 +17998,8 @@ SceneJS_Display.prototype._doDrawList = function (params) {
         for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
             this._pickDrawList[i].pick(frameCtx);
         }
+
+        gl.flush();
 
     } else if (params.pickRegion || params.pickTriangle) {
 
@@ -17821,10 +18033,14 @@ SceneJS_Display.prototype._doDrawList = function (params) {
             }
         }
 
+        gl.flush();
+
     } else {
 
         // Render scene
         // Render whole draw list
+
+        var startTime = Date.now();
 
         // Option to only render opaque objects
         var len = (params.opaqueOnly && this._drawListTransparentIndex >= 0 ? this._drawListTransparentIndex : this._drawListLen);
@@ -17833,9 +18049,18 @@ SceneJS_Display.prototype._doDrawList = function (params) {
         for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
             this._drawList[i].draw(frameCtx);
         }
-    }
 
-    gl.flush();
+        gl.flush();
+
+        var endTime = Date.now();
+
+        this.stats.frame.renderTime = (endTime - startTime) / 1000.0;
+        this.stats.frame.drawElements = frameCtx.drawElements;
+        this.stats.frame.drawArrays = frameCtx.drawArrays;
+        this.stats.frame.useProgram = frameCtx.useProgram;
+        this.stats.frame.bindTexture = frameCtx.bindTexture;
+        this.stats.frame.bindArray = frameCtx.bindArray;
+    }
 
     if (frameCtx.renderBuf) {
         frameCtx.renderBuf.unbind();
@@ -19303,7 +19528,9 @@ var SceneJS_ProgramSource = function(hash, pickVertexSrc, pickFragmentSrc, drawV
  * @class Manages creation, sharing and recycle of {@link SceneJS_Program} instances
  * @private
  */
-var SceneJS_ProgramFactory = function(cfg) {
+var SceneJS_ProgramFactory = function(stats, cfg) {
+
+    this.stats = stats;
 
     this._canvas = cfg.canvas;
 
@@ -19323,9 +19550,11 @@ SceneJS_ProgramFactory.prototype.getProgram = function(hash, states) {
 
         var source = SceneJS_ProgramSourceFactory.getSource(hash, states);
 
-        program = new SceneJS_Program(this._nextProgramId++, hash, source, this._canvas.gl);
+        program = new SceneJS_Program(this.stats, this._nextProgramId++, hash, source, this._canvas.gl);
 
         this._programs[hash] = program;
+
+        this.stats.memory.programs++;
     }
 
     program.useCount++;
@@ -19345,7 +19574,9 @@ SceneJS_ProgramFactory.prototype.putProgram = function(program) {
 
         SceneJS_ProgramSourceFactory.putSource(program.hash);
 
-       delete this._programs[program.hash];
+        delete this._programs[program.hash];
+
+        this.stats.memory.programs--;
     }
 };
 
@@ -19376,12 +19607,15 @@ SceneJS_ProgramFactory.prototype.destroy = function() {
  * @class Vertex and fragment shaders for pick and draw
  * @private
  *
+ * @param {*} stats Collects runtime statistics
  * @param {Number} id ID unique among all programs in the owner {@link SceneJS_ProgramFactory}
  * @param {String} hash Hash code which uniquely identifies the capabilities of the program, computed from hashes on the {@link Scene_Core}s that the {@link SceneJS_ProgramSource} composed to render
  * @param {SceneJS_ProgramSource} source Sourcecode from which the the program is compiled in {@link #build}
  * @param {WebGLRenderingContext} gl WebGL context 
  */
-var SceneJS_Program = function(id, hash, source, gl) {
+var SceneJS_Program = function(stats, id, hash, source, gl) {
+
+    this.stats = stats;
 
     /**
      * ID for this program, unique among all programs in the display
@@ -19435,8 +19669,8 @@ var SceneJS_Program = function(id, hash, source, gl) {
 SceneJS_Program.prototype.build = function(gl) {
 
     this.gl = gl;
-    this.draw = new SceneJS._webgl.Program(gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
-    this.pick = new SceneJS._webgl.Program(gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
+    this.draw = new SceneJS._webgl.Program(this.stats, gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
+    this.pick = new SceneJS._webgl.Program(this.stats, gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
 };
 ;/**
  * @class Manages creation and recycle of {@link SceneJS_Object} instances
@@ -20050,9 +20284,11 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (core.indexBuf) {
-            gl.drawElements(core.primitive, core.indexBuf.numItems, core.indexBuf.itemType, 0);            
+            gl.drawElements(core.primitive, core.indexBuf.numItems, core.indexBuf.itemType, 0);
+            frameCtx.drawElements++;
         } else {
             gl.drawArrays(core.primitive, 0, core.vertexBuf.numItems / 3);
+            frameCtx.drawArrays++;
         }
 
         //frameCtx.textureUnit = 0;
@@ -20312,15 +20548,21 @@ SceneJS_ChunkFactory.createChunkType({
         if (this._aMorphVertexDraw) {
             this._aVertexDraw.bindFloatArrayBuffer(target1.vertexBuf);
             this._aMorphVertexDraw.bindFloatArrayBuffer(target2.vertexBuf);
+            frameCtx.bindArray += 2;
+
         } else if (this._aVertexDraw) {
             this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
+            frameCtx.bindArray++;
         }
 
         if (this._aMorphNormalDraw) {
             this._aNormalDraw.bindFloatArrayBuffer(target1.normalBuf);
             this._aMorphNormalDraw.bindFloatArrayBuffer(target2.normalBuf);
+            frameCtx.bindArray += 2;
+
         } else if (this._aNormalDraw) {
             this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
+            frameCtx.bindArray++;
         }
 
         if (this._aMorphTangentDraw || this._aTangentDraw) {
@@ -20339,6 +20581,8 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aMorphTangentDraw) {
                     this._aTangentDraw.bindFloatArrayBuffer(this.core.getTangents(key1, this.core2.arrays.indices, this.core2.arrays.uvs[normalMapUVLayerIdx]));
                     this._aMorphTangentDraw.bindFloatArrayBuffer(this.core.getTangents(key2, this.core2.arrays.indices, this.core2.arrays.uvs[normalMapUVLayerIdx]));
+                    frameCtx.bindArray += 2;
+
                 } else if (this._aTangentDraw) {
 
                     // TODO: What's this for?
@@ -20354,22 +20598,22 @@ SceneJS_ChunkFactory.createChunkType({
             uvBuf = this.core2.uvBufs[i];
             if (uvBuf) {
                 this._aUVDraw[i].bindFloatArrayBuffer(uvBuf);
+                frameCtx.bindArray++;
             }
         }
 
         if (this._aColorDraw) {
             this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
+            frameCtx.bindArray++;
         }
 
         this.setDrawMorphFactor();
     },
 
     setDrawMorphFactor: function () {
-
         if (this._uMorphFactorDraw) {
             this._uMorphFactorDraw.setValue(this.core.factor); // Bind LERP factor
         }
-
     },
 
     draw: function (frameCtx) {
@@ -20405,33 +20649,41 @@ SceneJS_ChunkFactory.createChunkType({
                 this.core2.interleavedBuf.bind();
                 if (this._aVertexDraw) {
                     this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedPositionOffset);
+                    frameCtx.bindArray++;
                 }
                 if (this._aNormalDraw) {
                     this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedNormalOffset);
+                    frameCtx.bindArray++;
                 }
                 for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
                     this._aUVDraw[i].bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUVOffsets[i]);
+                    frameCtx.bindArray++;
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
+                    frameCtx.bindArray++;
                 }
             } else {
                 this.VAOHasInterleavedBuf = false;
                 if (this._aVertexDraw) {
                     this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
+                    frameCtx.bindArray++;
                 }
                 if (this._aNormalDraw) {
                     this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
+                    frameCtx.bindArray++;
                 }
                 var uvBuf;
                 for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
                     uvBuf = this.core2.uvBufs[i];
                     if (uvBuf) {
                         this._aUVDraw[i].bindFloatArrayBuffer(uvBuf);
+                        frameCtx.bindArray++;
                     }
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
+                    frameCtx.bindArray++;
                 }
             }
 
@@ -20447,6 +20699,7 @@ SceneJS_ChunkFactory.createChunkType({
                 var normalMapUVLayerIdx = frameCtx.normalMapUVLayerIdx;
                 if (normalMapUVLayerIdx >= 0) {
                     this._aTangentDraw.bindFloatArrayBuffer(this.core2.getTangents(normalMapUVLayerIdx));
+                    frameCtx.bindArray++;
                 }
             }
         }
@@ -20457,6 +20710,7 @@ SceneJS_ChunkFactory.createChunkType({
                 var uvBufs = this.core2.uvBufs;
                 if (regionMapUVLayerIdx < uvBufs.length) {
                     this._aRegionMapUVDraw.bindFloatArrayBuffer(uvBufs[regionMapUVLayerIdx]);
+                    frameCtx.bindArray++;
                 }
             }
         }
@@ -20540,7 +20794,7 @@ SceneJS_ChunkFactory.createChunkType({
                 }
 
                 if (core2.indexBuf) {
-                    core2.indexBuf.bind();                    
+                    core2.indexBuf.bind();
                 }
 
             } else if (frameCtx.pickTriangle) {
@@ -20814,6 +21068,7 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         frameCtx.drawProgram = this.program.draw;
+        frameCtx.useProgram++;
     },
 
     pick: function (frameCtx) {
@@ -21192,6 +21447,8 @@ SceneJS_ChunkFactory.createChunkType({
 
                     draw.bindTexture(this._uTexSampler[i], layer.texture, frameCtx.textureUnit);
                     frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
+
+                    frameCtx.bindTexture++;
 
                     if (layer._matrixDirty && layer.buildMatrix) {
                         layer.buildMatrix.call(layer);

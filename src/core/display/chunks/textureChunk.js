@@ -49,6 +49,8 @@ SceneJS_ChunkFactory.createChunkType({
                     draw.bindTexture(this._uTexSampler[i], layer.texture, frameCtx.textureUnit);
                     frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
 
+                    frameCtx.bindTexture++;
+
                     if (layer._matrixDirty && layer.buildMatrix) {
                         layer.buildMatrix.call(layer);
                     }
