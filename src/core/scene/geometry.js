@@ -477,7 +477,7 @@ new (function () {
         }
 
         data.normals = normals;
-        self._engine.stats.memory.normals += normals.length / 3;
+        this._engine.stats.memory.normals += normals.length / 3;
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {

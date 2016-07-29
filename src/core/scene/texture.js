@@ -141,9 +141,9 @@ new (function () {
 //                        });
                 }
             };
-        }
 
-        this._engine.stats.memory.textures++;
+            this._engine.stats.memory.textures++;
+        }
     };
 
     function buildMatrix() {
