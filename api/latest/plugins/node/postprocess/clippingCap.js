@@ -84,8 +84,8 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                 type: "stage",
                 priority: 2,
 
-                clearColor: true,
-                clearDepth: true,
+                // clearColor: true,
+                // clearDepth: true,
 
                 nodes: [
                     {
