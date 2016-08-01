@@ -15,8 +15,7 @@
         }
     </style>
 
-    <!--<script src="../api/latest/scenejs.min.js"></script>-->
-    <script src="../api/latest/scenejs.js"></script>
+    <script src="../api/latest/scenejs.min.js"></script>
     <link href="css/styles.css" rel="stylesheet"/>
 
 <body>
@@ -64,17 +63,18 @@
                                 type: "stencilBuffer",
 
                                 enabled: true,
-                                clear: false,
+                                clear: true,
+                                clearStencil: 0,
                                 stencilFunc: {
                                     front: {
-                                        func: "never",
-                                        ref: 0,
+                                        func: "less",
+                                        ref: 5,
                                         mask: 0xff
                                     }
                                     ,
                                     back: {
-                                        func: "always",
-                                        ref: 0,
+                                        func: "greater",
+                                        ref: 5,
                                         mask: 0xff
                                     }
                                 },
