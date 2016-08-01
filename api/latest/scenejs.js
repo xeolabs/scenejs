@@ -12919,8 +12919,8 @@ new (function () {
                 faceBack = true;
 
                 funcBack = params.back.sfail || 'keep';
-                refBack = params.front.dpfail || 'keep';
-                maskBack = params.front.dppass || 'keep';
+                refBack = params.back.dpfail || 'keep';
+                maskBack = params.back.dppass || 'keep';
             }
 
         } else {
