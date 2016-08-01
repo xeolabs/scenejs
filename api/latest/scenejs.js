@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-07-29
+ * Built on 2016-08-01
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -12600,9 +12600,6 @@ new (function () {
         
         // Lazy init stencilFunc when we can get a context
 
-        // stencilFuncFront: {func: null, ref: 1, mask: 0xff},
-        // stencilFuncBack: {func: null, ref: 1, mask: 0xff},
-
         stencilFuncFuncFront: null,
         stencilFuncRefFront: 0,
         stencilFuncMaskFront: 0xff,
@@ -12610,9 +12607,6 @@ new (function () {
         stencilFuncFuncBack: null,
         stencilFuncRefBack: 0,
         stencilFuncMaskBack: 0xff,
-
-        // stencilOpFront: {sfail: null, dpfail: null, dppass: null}, 
-        // stencilOpBack: {sfail: null, dpfail: null, dppass: null},
 
         stencilOpSfailFront: null,
         stencilOpDpfailFront: null,
@@ -12622,9 +12616,6 @@ new (function () {
         stencilOpDpfailBack: null,
         stencilOpDppassBack: null,
 
-        // _stencilFuncStateFront: {func: "always", ref: 1, mask: 0xff},
-        // _stencilFuncStateBack: {func: "always", ref: 1, mask: 0xff},
-
         _stencilFuncFuncStateFront: "always",
         _stencilFuncRefStateFront: 0,
         _stencilFuncMaskStateFront: 0xff,
@@ -12632,9 +12623,6 @@ new (function () {
         _stencilFuncFuncStateBack: "always",
         _stencilFuncRefStateBack: 0,
         _stencilFuncMaskStateBack: 0xff,
-
-        // _stencilOpFrontState: {sfail: "keep", dpfail: "keep", dppass: "keep"}, 
-        // _stencilOpBackState: {sfail: "keep", dpfail: "keep", dppass: "keep"}
 
         _stencilOpSfailStateFront: "keep",
         _stencilOpDpfailStateFront: "keep",
@@ -12855,12 +12843,6 @@ new (function () {
                         + "' - supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
                 }
 
-                // this._core.stencilFuncFront = {
-                //     func: this._engine.canvas.gl[funcEnumName],
-                //     ref: stencilFunc.ref,
-                //     mask: stencilFunc.mask
-                // };
-
                 this._core.stencilFuncFuncFront = this._engine.canvas.gl[funcEnumName];
                 this._core.stencilFuncRefFront = refFront;
                 this._core.stencilFuncMaskFront = maskFront;
@@ -12886,12 +12868,6 @@ new (function () {
                         + "' - supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
                 }
 
-                // this._core.stencilFuncBack = {
-                //     func: this._engine.canvas.gl[funcEnumName],
-                //     ref: stencilFunc.ref,
-                //     mask: stencilFunc.mask
-                // };
-
                 this._core.stencilFuncFuncBack = this._engine.canvas.gl[funcEnumName];
                 this._core.stencilFuncRefBack = refBack;
                 this._core.stencilFuncMaskBack = maskBack;
@@ -12910,7 +12886,8 @@ new (function () {
     /**
      * Sets the stencil comparison function.
      * Supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'
-     * @param {String} stencilFunc The stencil comparison function
+     * @param {Object} params - stencilOp parameters
+     * @param {String} params.
      * @return {*}
      */
     SceneJS.StencilBuf.prototype.setStencilOp = function (params) {
@@ -12967,12 +12944,6 @@ new (function () {
                     throw "unsupported value for 'StencilOp' attribute on stencilBuffer node - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
                 }
 
-                // this._core.stencilOpFront = {
-                //     sfail: this._engine.canvas.gl[sfail],
-                //     dpfail: this._engine.canvas.gl[dpfail],
-                //     dppass: this._engine.canvas.gl[dppass]
-                // };
-
                 this._core.stencilOpSfailFront = this._engine.canvas.gl[sfail];
                 this._core.stencilOpDpfailFront = this._engine.canvas.gl[dpfail];
                 this._core.stencilOpDppassFront = this._engine.canvas.gl[dppass];
@@ -12999,12 +12970,6 @@ new (function () {
                     throw "unsupported value for 'StencilOp' attribute on stencilBuffer node - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
                 }
 
-                // this._core.stencilOpBack = {
-                //     sfail: this._engine.canvas.gl[sfail],
-                //     dpfail: this._engine.canvas.gl[dpfail],
-                //     dppass: this._engine.canvas.gl[dppass]
-                // };
-
                 this._core.stencilOpSfailBack = this._engine.canvas.gl[sfail];
                 this._core.stencilOpDpfailBack = this._engine.canvas.gl[dpfail];
                 this._core.stencilOpDppassBack = this._engine.canvas.gl[dppass];
@@ -13020,17 +12985,7 @@ new (function () {
         return this;
     };
 
-
-    // /**
-    //  * Returns the stencilFunc State
-    //  * @return {*}
-    //  */
-    // SceneJS.StencilBuf.prototype.getStencilFunc = function () {
-    //     return this._core._stencilFuncState;
-    // };
-
     SceneJS.StencilBuf.prototype.getStencilFuncFront = function () {
-        // return this._core._stencilFuncStateFront;
         return {
             func: this._core._stencilFuncFuncStateFront,
             ref: this._core._stencilFuncRefStateFront,
@@ -13039,7 +12994,6 @@ new (function () {
     };
 
     SceneJS.StencilBuf.prototype.getStencilFuncBack = function () {
-        //return this._core._stencilFuncStateBack;
         return {
             func: this._core._stencilFuncFuncStateBack,
             ref: this._core._stencilFuncRefStateBack,
@@ -13047,23 +13001,21 @@ new (function () {
         };
     };
 
-
-    // /**
-    //  * Returns the stencilOp State
-    //  * @return {*}
-    //  */
-    // SceneJS.StencilBuf.prototype.getStencilState = function () {
-    //     return this._core._stencilOpState;
-    // };
-
-    SceneJS.StencilBuf.prototype.getStencilStateFront = function () {
-        return this._core._stencilOpStateFront;
+    SceneJS.StencilBuf.prototype.getStencilOpFront = function () {
+        return {
+            sfail: this._core._stencilOpSfailStateFront, 
+            dpfail: this._core._stencilOpDpfailStateFront,
+            dppass: this._core._stencilOpDppassStateFront
+        };
     };
 
-    SceneJS.StencilBuf.prototype.getStencilStateBack = function () {
-        return this._core._stencilOpStateBack;
+    SceneJS.StencilBuf.prototype.getStencilOpBack = function () {
+        return {
+            sfail: this._core._stencilOpSfailStateBack, 
+            dpfail: this._core._stencilOpDpfailStateBack,
+            dppass: this._core._stencilOpDppassStateBack
+        };
     };
-
 
     SceneJS.StencilBuf.prototype._compile = function (ctx) {
         this._engine.display.stencilBuffer = coreStack[stackLen++] = this._core;
