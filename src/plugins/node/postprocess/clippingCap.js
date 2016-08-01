@@ -28,9 +28,10 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                         id: "myDepthBuf",
                         //enabled: false,
 
-                        clearDepth: 0.0,
+                        clearDepth: 1.0,
                         enabled: true,
-                        depthFunc: "greater",
+                        depthFunc: "less",
+                        //depthFunc: "greater",
 
                         nodes: [
                             {
@@ -38,10 +39,11 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
                                 enabled: true,
                                 clear: true,
-                                clearStencil: 128,
+                                clearStencil: 0,
                                 stencilFunc: {
+                                    //func: "lequal",
                                     func: "always",
-                                    ref: 200, 
+                                    ref: 0, 
                                     mask: 0xff
                                 },
                                 stencilOp: {
@@ -49,13 +51,13 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                         //sfail: "decr",
                                         sfail: "keep",
                                         dpfail: "keep", 
-                                        //dppass: "decr"
-                                        dppass: "zero"
+                                        dppass: "decr"
+                                        //dppass: "zero"
                                     },
                                     back: {
                                         sfail: "keep",
                                         dpfail: "keep", 
-                                        dppass: "replace"
+                                        dppass: "incr"
                                     }
                                 },
 
@@ -74,47 +76,49 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                 ]
             },
 
-            // // Stage 2
-            // // Draw Caps with stencil test
-            // // Draw the origin geometry with inner volume texture (tissue)
-            // // and depth func set to GREATER to draw closest object to the clipping plane
-            // {
-            //     type: "stage",
-            //     priority: 2,
+            // Stage 2
+            // Draw Caps with stencil test
+            // Draw the origin geometry with inner volume texture (tissue)
+            // and depth func set to GREATER to draw closest object to the clipping plane
+            {
+                type: "stage",
+                priority: 2,
 
-            //     //clearColor: true,
-            //     clearDepth: true,
+                // clearColor: true,
+                // clearDepth: true,
 
-            //     nodes: [
-            //         {
-            //             type: "depthBuffer",
-            //             enabled: true,
-            //             clear: true,
-            //             //depthFunc: "greater",
+                nodes: [
+                    {
+                        type: "depthBuffer",
+                        enabled: true,
+                        clear: true,
+                        
+                        clearDepth: 0.0,
+                        depthFunc: "greater",
 
-            //             nodes: [
-            //                 {
-            //                     type: "stencilBuffer",
+                        nodes: [
+                            {
+                                type: "stencilBuffer",
 
-            //                     enabled: true,
-            //                     clear: false,
-            //                     stencilFunc: {
-            //                         func: "less", 
-            //                         ref: 128,
-            //                         mask: 0xff
-            //                     },
-            //                     stencilOp: {
-            //                         sfail: "keep", 
-            //                         dpfail: "keep",
-            //                         dppass: "keep"
-            //                     },
+                                enabled: true,
+                                clear: false,
+                                stencilFunc: {
+                                    func: "less", 
+                                    ref: 0,
+                                    mask: 0xff
+                                },
+                                stencilOp: {
+                                    sfail: "keep", 
+                                    dpfail: "keep",
+                                    dppass: "keep"
+                                },
 
-            //                     nodes: params.capNodes
-            //                 }
-            //             ]
-            //         }
-            //     ]
-            // },
+                                nodes: params.capNodes
+                            }
+                        ]
+                    }
+                ]
+            },
 
             // // Stage 3
             // // Draw the original objects
@@ -126,6 +130,7 @@ SceneJS.Types.addType("postprocess/clippingCap", {
             //         {
             //             type: "depthBuffer",
             //             enabled: true,
+            //             clearDepth: 1.0,
             //             depthFunc: "less",
 
             //             nodes: [
