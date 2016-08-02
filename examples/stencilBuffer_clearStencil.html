@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - clearing the stencil buffer
+    <br><br>In this demo we use stencil Buffer
+    <br/> We intervally set clearStencil Value to 0 and 9
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 10.0,
+
+                nodes: [
+                    {
+                        type: "stage",
+                        priority: 1,                        
+
+                        nodes: [
+
+                            {
+                                type: "stencilBuffer",
+                                id: "myStencilBuffer",
+
+                                enabled: true,
+                                clearStencil: 0,
+                                clear: true,
+                                stencilFunc: {
+                                    func: "less",
+                                    ref: 1,
+                                    mask: 0xff
+                                },
+
+                                nodes: [
+                                    {
+                                        type: "flags",
+                                        flags: {
+                                            solid: false
+                                        },
+
+                                        nodes: [
+                                            {
+                                                type: "material",
+                                                color: {r: 0.6, g: 0.6, b: 0.9},
+
+                                                nodes: [
+                                                    {
+                                                        type: "translate",
+                                                        x: -2,
+                                                        y: -1,
+                                                        z: -2,
+
+
+                                                        nodes: [
+                                                            {
+                                                                type:"geometry/box"
+                                                            }
+                                                        ]
+                                                    }                                                 
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Get the stencilBuffer node and periodically change the clearStencil Value 
+
+    scene.getNode("myStencilBuffer", function (myStencilbuf) {
+        setInterval(
+                function () {
+                    myStencilbuf.setClearStencil(9 - myStencilbuf.getClearStencil());
+                },
+                1000);
+    });
+
+
+</script>
+</body>
+</html>
