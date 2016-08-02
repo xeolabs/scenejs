@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-07-29
+ * Built on 2016-08-01
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -999,7 +999,7 @@ var SceneJS = new (function () {
             return info;
         }
 
-        var gl = canvas.getContext("webgl", { antialias: true }) || canvas.getContext("experimental-webgl", { antialias: true });
+        var gl = canvas.getContext("webgl", { stencil:true, antialias: true }) || canvas.getContext("experimental-webgl", { antialias: true });
 
         info.WEBGL = !!gl;
 
@@ -1039,6 +1039,7 @@ var SceneJS = new (function () {
 
         return info;
     })();
+
 
     /**
      * Publishes to a topic.
@@ -1861,6 +1862,8 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
      */
     this.contextAttr = contextAttr || {};
     this.contextAttr.alpha = true;
+    
+    this.contextAttr["stencil"] = true;
 
     /**
      * The WebGL context
@@ -1968,54 +1971,10 @@ var SceneJS_Engine = function (json, options) {
     this._nodeFactory = new SceneJS_NodeFactory();
 
     /**
-     * Tracks statistics within this engine, such as numbers of
-     * scenes, textures, geometries etc.
-     *
-     * @property stats
-     * @type {*}
-     * @final
-     */
-    this.stats = {
-        build: {
-            version: SceneJS.VERSION
-        },
-        client: {
-            browser: (navigator && navigator.userAgent) ? navigator.userAgent : "n/a"
-        },
-        components: {
-        },
-        memory: {
-            // Note that these counts will include any positions, colors,
-            // normals and indices that SceneJS internally creates on-demand
-            // to support color-index triangle picking.
-            meshes: 0,
-            positions: 0,
-            colors: 0,
-            normals: 0,
-            uvs: 0,
-            indices: 0,
-            textures: 0,
-            programs: 0
-        },
-        frame: {
-            frameCount: 0,
-            fps: 0,
-            useProgram: 0,
-            setUniform: 0,
-            setUniformCacheHits: 0,
-            bindTexture: 0,
-            bindArray: 0,
-            drawElements: 0,
-            drawArrays: 0,
-            drawChunks: 0
-        }
-    };
-
-    /**
      * The engine's scene renderer
      * @type SceneJS_Display
      */
-    this.display = new SceneJS_Display(this.stats, {
+    this.display = new SceneJS_Display({
         canvas: this.canvas,
         transparent: json.transparent,
         dof: json.dof,
@@ -2360,13 +2319,6 @@ SceneJS_Engine.prototype.start = function () {
         var height;
         var lastWidth = null;
         var lastHeight = null;
-        var frameTime;
-        var lastFrameTime = 0;
-        var elapsedFrameTime;
-        var newFPS;
-        var fpsSamples = [];
-        var numFPSSamples = 30;
-        var totalFPS = 0;
 
         // Notify started
         this.events.fireEvent("started", {
@@ -2406,21 +2358,6 @@ SceneJS_Engine.prototype.start = function () {
         function draw() {
             rendered = false;
 
-            frameTime = Date.now();
-
-            // Moving average of FPS
-
-            if (lastFrameTime > 0) {
-                elapsedFrameTime = frameTime - lastFrameTime;
-                newFPS = 1000 / elapsedFrameTime;
-                totalFPS += newFPS;
-                fpsSamples.push(newFPS);
-                if (fpsSamples.length >= numFPSSamples) {
-                    totalFPS -= fpsSamples.shift();
-                }
-                self.stats.frame.fps = Math.round(totalFPS / fpsSamples.length);
-            }
-
             // Render the scene once for each pass
             for (var i = 0; i < self._numPasses; i++) {
 
@@ -2449,10 +2386,6 @@ SceneJS_Engine.prototype.start = function () {
                     rendered = true;
                 }
             }
-
-            lastFrameTime = frameTime;
-
-            self.stats.frame.frameCount++;
 
             // If any of the passes did not render anything, then put the render loop to sleep again
             if (!rendered) {
@@ -3270,24 +3203,6 @@ SceneJS.log = new (function() {
 
         dest[0] = u[0] - v[0];
         dest[1] = u[1] - v[1];
-
-        return dest;
-    };
-
-    /**
-     * @param u vec2
-     * @param v vec2
-     * @param dest vec2 - optional destination
-     * @return {vec2} dest if specified, u otherwise
-     * @private
-     */
-    window.SceneJS_math_addVec2 = function (u, v, dest) {
-        if (!dest) {
-            dest = u;
-        }
-
-        dest[0] = u[0] + v[0];
-        dest[1] = u[1] + v[1];
 
         return dest;
     };
@@ -6201,15 +6116,12 @@ SceneJS._webgl.RenderBuffer.prototype.destroy = function () {
  * @class Wrapper for a WebGL program
  *
  * @param hash SceneJS-managed ID for program
- * @param {*} stats Collects scene statistics
  * @param gl WebGL gl
  * @param vertexSources Source codes for vertex shaders
  * @param fragmentSources Source codes for fragment shaders
  * @param logging Program and shaders will write to logging's debug channel as they compile and link
  */
-SceneJS._webgl.Program = function (stats, gl, vertexSources, fragmentSources) {
-
-    this.stats = stats;
+SceneJS._webgl.Program = function (gl, vertexSources, fragmentSources) {
 
     /**
      * True as soon as this program is allocated and ready to go
@@ -6275,7 +6187,7 @@ SceneJS._webgl.Program = function (stats, gl, vertexSources, fragmentSources) {
                 if ((u.type == gl.SAMPLER_2D) || (u.type == gl.SAMPLER_CUBE) || (u.type == 35682)) {
                     this._samplers[u_name] = new SceneJS._webgl.Sampler(gl, this.handle, u_name, u.type, u.size, location);
                 } else {
-                    this._uniforms[u_name] = new SceneJS._webgl.Uniform(stats.frame, gl, this.handle, u_name, u.type, u.size, location, valueIndex);
+                    this._uniforms[u_name] = new SceneJS._webgl.Uniform(gl, this.handle, u_name, u.type, u.size, location, valueIndex);
                     ++valueIndex;
                 }
             }
@@ -6582,7 +6494,7 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
     }
     return x + 1;
 };
-;SceneJS._webgl.Uniform = function (renderStats, gl, program, name, type, size, location, index, logging) {
+;SceneJS._webgl.Uniform = function (gl, program, name, type, size, location, index, logging) {
 
     var func = null;
 
@@ -6592,12 +6504,10 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value === v) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value = v;
             gl.uniform1i(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.BOOL_VEC2) {
@@ -6605,13 +6515,11 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1]) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value[0] = v[0];
             value[1] = v[1];
             gl.uniform2iv(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.BOOL_VEC3) {
@@ -6619,14 +6527,12 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value[0] = v[0];
             value[1] = v[1];
             value[2] = v[2];
             gl.uniform3iv(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.BOOL_VEC4) {
@@ -6634,7 +6540,6 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value[0] = v[0];
@@ -6642,19 +6547,16 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
             value[2] = v[2];
             value[3] = v[3];
             gl.uniform4iv(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.INT) {
 
         func = function (v) {
             if (value === v) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value = v;
             gl.uniform1iv(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.INT_VEC2) {
@@ -6662,12 +6564,10 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1]) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform2iv(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.INT_VEC3) {
@@ -6675,12 +6575,10 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform3iv(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.INT_VEC4) {
@@ -6688,24 +6586,20 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform4iv(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT) {
 
         func = function (v) {
             if (value === v) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value = v;
             gl.uniform1f(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_VEC2) {
@@ -6713,12 +6607,10 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1]) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform2fv(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_VEC3) {
@@ -6726,12 +6618,10 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2]) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform3fv(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_VEC4) {
@@ -6739,26 +6629,22 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
 
         func = function (v) {
             if (value[0] === v[0] && value[1] === v[1] && value[2] === v[2] && value[3] === v[3]) {
-                renderStats.setUniformCacheHits++;
                 return;
             }
             value.set(v);
             gl.uniform4fv(location, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_MAT2) {
 
         func = function (v) {
             gl.uniformMatrix2fv(location, gl.FALSE, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_MAT3) {
 
         func = function (v) {
             gl.uniformMatrix3fv(location, gl.FALSE, v);
-            renderStats.setUniform++;
         };
 
     } else if (type === gl.FLOAT_MAT4) {
@@ -6768,7 +6654,6 @@ SceneJS._webgl.nextHighestPowerOfTwo = function (x) {
             // Caching this matrix is actually slower than not caching
 
             gl.uniformMatrix4fv(location, gl.FALSE, v);
-            renderStats.setUniform++;
         };
 
     } else {
@@ -9431,7 +9316,6 @@ new (function () {
                 self._buildNodeCore(self._engine.canvas.gl, self._core);
             };
 
-            this._engine.stats.memory.meshes++;
         }
     };
 
@@ -9477,7 +9361,6 @@ new (function () {
             }
 
             core.arrays.positions = data.positions;
-            this._engine.stats.memory.positions += data.positions.length / 3;
         }
 
         if (data.normals) {
@@ -9486,7 +9369,6 @@ new (function () {
             }
 
             core.arrays.normals = data.normals;
-            this._engine.stats.memory.normals += data.normals.length / 3;
         }
 
         if (data.uvs) {
@@ -9497,7 +9379,6 @@ new (function () {
                 if (uv.constructor != Float32Array) {
                     uvs[i] = new Float32Array(uvs[i]);
                 }
-                this._engine.stats.memory.uvs += uv.length / 2;
             }
             core.arrays.uvs = uvs;
         }
@@ -9512,7 +9393,6 @@ new (function () {
                 core.arrays.uvs = [];
             }
             core.arrays.uvs[0] = data.uv;
-            this._engine.stats.memory.uvs += data.uv.length / 2;
         }
 
         if (data.uv1) {
@@ -9522,8 +9402,7 @@ new (function () {
             if (!core.arrays.uvs) {
                 core.arrays.uvs = [];
             }
-            core.arrays.uvs[1] = data.uv1;
-            this._engine.stats.memory.uvs += data.uv1.length / 2;
+            core.arrays.uvs[1] = data.uv2;
         }
 
         if (data.uv2) {
@@ -9534,7 +9413,6 @@ new (function () {
                 core.arrays.uvs = [];
             }
             core.arrays.uvs[2] = data.uv2;
-            this._engine.stats.memory.uvs += data.uv2.length / 2;
         }
 
         if (data.uv3) {
@@ -9545,7 +9423,6 @@ new (function () {
                 core.arrays.uvs = [];
             }
             core.arrays.uvs[3] = data.uv3;
-            this._engine.stats.memory.uvs += data.uv3.length / 2;
         }
 
         // ----------------------------------------------------------
@@ -9560,7 +9437,6 @@ new (function () {
             }
 
             core.arrays.colors = data.colors;
-            this._engine.stats.memory.colors += data.colors.length / 4;
         }
 
         if (data.indices) {
@@ -9569,7 +9445,6 @@ new (function () {
             }
 
             core.arrays.indices = data.indices;
-            this._engine.stats.memory.indices += data.indices.length;
         }
 
         // Lazy-build tangents, only when needed as rendering
@@ -9866,7 +9741,6 @@ new (function () {
         }
 
         data.normals = normals;
-        this._engine.stats.memory.normals += normals.length / 3;
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
@@ -10160,8 +10034,6 @@ new (function () {
             if (this._source && this._source.destroy) {
                 this._source.destroy();
             }
-
-            this._engine.stats.memory.meshes--;
         }
     };
 
@@ -10169,24 +10041,6 @@ new (function () {
 
         if (document.getElementById(this._engine.canvas.canvasId)) { // Context won't exist if canvas has disappeared
             destroyBuffers(this._core);
-        }
-
-        var arrays = this._core.arrays;
-
-        if (arrays.positions) {
-            this._engine.stats.memory.positions -= arrays.positions.length / 3;
-        }
-        if (arrays.normals) {
-            this._engine.stats.memory.normals -= arrays.normals.length / 3;
-        }
-        if (arrays.colors) {
-            this._engine.stats.memory.colors -= arrays.colors.length / 3;
-        }
-        if (arrays.uvs && arrays.uvs.length > 0) {
-            this._engine.stats.memory.uvs -= arrays.uvs.length * (arrays.uvs[0].length / 2);
-        }
-        if (arrays.indices) {
-            this._engine.stats.memory.indices -= arrays.indices.length;
         }
     };
 
@@ -12710,6 +12564,468 @@ new (function () {
 
 })();;(function () {
 
+    var lookup = {
+        // stencilFunc.func
+        never: "NEVER", 
+        less: "LESS",
+        equal: "EQUAL",
+        lequal: "LEQUAL",
+        greater: "GREATER",
+        notequal: "NOTEQUAL",
+        gequal: "GEQUAL",
+        always: "ALWAYS",
+
+        // stencilOp
+        keep: "KEEP",
+        zero: "ZERO",
+        replace: "REPLACE",
+        incr: "INCR",
+        incr_wrap: "INCR_WRAP",
+        decr: "DECR",
+        decr_wrap: "DECR_WRAP",
+        invert: "INVERT",
+
+        // face
+        front: "FRONT",
+        back: "BACK",
+        front_and_back: "FRONT_AND_BACK"
+    };
+
+    // The default state core singleton for {@link SceneJS.StencilBuf} nodes
+    var defaultCore = {
+        type: "stencilBuffer",
+        stateId: SceneJS._baseStateId++,
+        enabled: false,
+        clearStencil: 0,
+        
+        // Lazy init stencilFunc when we can get a context
+
+        stencilFuncFuncFront: null,
+        stencilFuncRefFront: 0,
+        stencilFuncMaskFront: 0xff,
+
+        stencilFuncFuncBack: null,
+        stencilFuncRefBack: 0,
+        stencilFuncMaskBack: 0xff,
+
+        stencilOpSfailFront: null,
+        stencilOpDpfailFront: null,
+        stencilOpDppassFront: null,
+
+        stencilOpSfailBack: null,
+        stencilOpDpfailBack: null,
+        stencilOpDppassBack: null,
+
+        _stencilFuncFuncStateFront: "always",
+        _stencilFuncRefStateFront: 0,
+        _stencilFuncMaskStateFront: 0xff,
+
+        _stencilFuncFuncStateBack: "always",
+        _stencilFuncRefStateBack: 0,
+        _stencilFuncMaskStateBack: 0xff,
+
+        _stencilOpSfailStateFront: "keep",
+        _stencilOpDpfailStateFront: "keep",
+        _stencilOpDppassStateFront: "keep",
+
+        _stencilOpSfailStateBack: "keep",
+        _stencilOpDpfailStateBack: "keep",
+        _stencilOpDppassStateBack: "keep"
+    };
+
+    var coreStack = [];
+    var stackLen = 0;
+
+    SceneJS_events.addListener(
+        SceneJS_events.SCENE_COMPILING,
+        function (params) {
+            // Lazy-init stencilFunc now we can get a context
+            if (defaultCore.stencilFuncFuncFront === null) { 
+                defaultCore.stencilFuncFuncFront = params.engine.canvas.gl.ALWAYS;
+            }
+
+            if (defaultCore.stencilFuncFuncBack === null) {
+                defaultCore.stencilFuncFuncBack = params.engine.canvas.gl.ALWAYS;
+            }
+
+            if (defaultCore.stencilOpSfailFront === null) {
+                defaultCore.stencilOpSfailFront = params.engine.canvas.gl.KEEP;
+                defaultCore.stencilOpDpfailFront = params.engine.canvas.gl.KEEP;
+                defaultCore.stencilOpDppassFront = params.engine.canvas.gl.KEEP;
+            }
+
+            if (defaultCore.stencilOpSfailBack === null) {
+                defaultCore.stencilOpSfailBack = params.engine.canvas.gl.KEEP;
+                defaultCore.stencilOpDpfailBack = params.engine.canvas.gl.KEEP;
+                defaultCore.stencilOpDppassBack = params.engine.canvas.gl.KEEP;
+            }
+
+            params.engine.display.stencilBuffer = defaultCore;
+            stackLen = 0;
+        });
+
+    /**
+     * @class Scene graph node which configures the stencil buffer for its subgraph
+     * @extends SceneJS.Node
+     */
+    SceneJS.StencilBuf = SceneJS_NodeFactory.createNodeType("stencilBuffer");
+
+    SceneJS.StencilBuf.prototype._init = function (params) {
+
+        if (params.enabled != undefined) {
+            this.setEnabled(params.enabled);
+        } else if (this._core.useCount == 1) { // This node defines the core
+            this.setEnabled(true);
+        }
+
+        if (params.clearStencil != undefined) {
+            this.setClearStencil(params.clearStencil);
+        } else if (this._core.useCount == 1) {
+            this.setClearStencil(0);
+        }
+
+        if (params.stencilFunc != undefined) {
+            this.setStencilFunc(params.stencilFunc);
+        } else if (this._core.useCount == 1) {
+            this.setStencilFunc({
+                face: "front_back",
+                func: "always", 
+                ref: 1, 
+                mask: 0xff
+            });
+        }
+
+        if (params.stencilOp != undefined) {
+            this.setStencilOp(params.stencilOp);
+        } else if (this._core.useCount == 1) {
+            this.setStencilOp({
+                face: "front_back",
+                sfail: "keep", 
+                dpfail: "keep", 
+                dppass: "keep"
+            });
+        }
+
+        if (params.clear != undefined) {
+            this.setClear(params.clear);
+        }
+    };
+
+    /**
+     * Enable or disable the stencil buffer
+     *
+     * @param enabled Specifies whether stencil buffer is enabled or not
+     * @return {*}
+     */
+    SceneJS.StencilBuf.prototype.setEnabled = function (enabled) {
+        if (this._core.enabled != enabled) {
+            this._core.enabled = enabled;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Get whether or not the stencil buffer is enabled
+     *
+     * @return Boolean
+     */
+    SceneJS.StencilBuf.prototype.getEnabled = function () {
+        return this._core.enabled;
+    };
+
+    /**
+     * Sets whether or not to clear the stencil buffer before each render
+     *
+     * @param clear
+     * @return {*}
+     */
+    SceneJS.StencilBuf.prototype.setClear = function (clear) {
+        if (this._core.clear != clear) {
+            this._core.clear = clear;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Get whether or not the stencil buffer is cleared before each render
+     *
+     * @return Boolean
+     */
+    SceneJS.StencilBuf.prototype.getClear = function () {
+        return this._core.clear;
+    };
+    
+    /**
+     * Specify the clear value for the stencil buffer.
+     * Initial value is 1, and the given value will be clamped to [0..1].
+     * @param clearStencil
+     * @return {*}
+     */
+    SceneJS.StencilBuf.prototype.setClearStencil = function (clearStencil) {
+        if (this._core.clearStencil != clearStencil) {
+            this._core.clearStencil = clearStencil;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
+    /**
+     * Get the clear value for the stencil buffer
+     *
+     * @return Number
+     */
+    SceneJS.StencilBuf.prototype.getClearStencil = function () {
+        return this._core.clearStencil;
+    };
+
+    /**
+     * Sets the stencil comparison function
+     * 
+     * @param {String} params - The stencil comparison function
+     * @return {*}
+     */
+    SceneJS.StencilBuf.prototype.setStencilFunc = function (params) {
+
+        var faceFront = false;
+        var faceBack = false;
+
+        var funcFront = params.func || 'always';
+        var refFront = params.ref !== undefined ? params.ref : 1;
+        var maskFront = params.mask !== undefined ? params.mask : 0xff;
+
+        var funcBack = funcFront;
+        var refBack = refFront;
+        var maskBack = maskFront;
+
+        var face = params.face || 'front_and_back';
+
+        if (params.front || params.back) {
+
+            if (params.front) {
+                faceFront = true;
+
+                funcFront = params.front.func || 'always';
+                refFront = params.front.ref !== undefined ? params.front.ref : 1;
+                maskFront = params.front.mask !== undefined ? params.front.mask : 0xff;
+            }
+
+            if (params.back) {
+                faceBack = true;
+
+                funcBack = params.back.func || 'always';
+                refBack = params.back.ref !== undefined ? params.back.ref : 1;
+                maskBack = params.back.mask !== undefined ? params.back.mask : 0xff;
+            }
+
+        } else {
+
+            faceFront = face === 'front' || face === 'front_and_back';
+            faceBack = face === 'back' || face === 'front_and_back';
+
+        }
+
+        if (refFront !== refBack || maskFront !== maskBack) {
+            throw "WebGL only allow same value for stencil ref and mask of front and back faces";
+        }
+
+        if (faceFront) {
+            // Front
+            if (this._core._stencilFuncFuncStateFront != funcFront || 
+                this._core._stencilFuncRefStateFront != refFront ||
+                this._core._stencilFuncMaskStateFront != maskFront 
+                ) {
+
+                var funcEnumName = lookup[funcFront];
+                if (funcEnumName == undefined) {
+                    throw "unsupported value for 'stencilFunc' attribute on stencilBuffer node: '" + stencilFunc.func
+                        + "' - supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
+                }
+
+                this._core.stencilFuncFuncFront = this._engine.canvas.gl[funcEnumName];
+                this._core.stencilFuncRefFront = refFront;
+                this._core.stencilFuncMaskFront = maskFront;
+
+                this._core._stencilFuncFuncStateFront = funcFront;
+                this._core._stencilFuncRefStateFront = refFront;
+                this._core._stencilFuncMaskStateFront = maskFront;
+
+                this._engine.display.imageDirty = true;
+            }
+        } 
+
+        if (faceBack) {
+            // Back
+            if (this._core._stencilFuncFuncStateBack != funcBack || 
+                this._core._stencilFuncRefStateBack != refBack ||
+                this._core._stencilFuncMaskStateBack != maskBack 
+                ) {
+
+                var funcEnumName = lookup[funcBack];
+                if (funcEnumName == undefined) {
+                    throw "unsupported value for 'stencilFunc' attribute on stencilBuffer node: '" + stencilFunc.func
+                        + "' - supported values are 'keep', 'always', 'less', 'equal', 'lequal', 'greater', 'notequal' and 'gequal'";
+                }
+
+                this._core.stencilFuncFuncBack = this._engine.canvas.gl[funcEnumName];
+                this._core.stencilFuncRefBack = refBack;
+                this._core.stencilFuncMaskBack = maskBack;
+
+                this._core._stencilFuncFuncStateBack = funcBack;
+                this._core._stencilFuncRefStateBack = refBack;
+                this._core._stencilFuncMaskStateBack = maskBack;
+
+                this._engine.display.imageDirty = true;
+            }
+        } 
+
+        return this;
+    };
+
+    /**
+     * Sets the stencil comparison function.
+     * Supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'
+     * @param {Object} params - stencilOp parameters
+     * @param {String} params.
+     * @return {*}
+     */
+    SceneJS.StencilBuf.prototype.setStencilOp = function (params) {
+
+        var faceFront = false;
+        var faceBack = false;
+
+        var sfailFront = params.sfail || 'keep';
+        var dpfailFront = params.dpfail || 'keep';
+        var dppassFront = params.dppass || 'keep';
+
+        var sfailBack = sfailFront;
+        var dpfailBack = dpfailFront;
+        var dppassBack = dppassFront;
+
+        var face = params.face || 'front_and_back';
+
+        if (params.front || params.back) {
+
+            if (params.front) {
+                faceFront = true;
+
+                sfailFront = params.front.sfail || 'keep';
+                dpfailFront = params.front.dpfail || 'keep';
+                dppassFront = params.front.dppass || 'keep';
+            }
+
+            if (params.back) {
+                faceBack = true;
+
+                sfailBack = params.back.sfail || 'keep';
+                dpfailBack = params.back.dpfail || 'keep';
+                dppassBack = params.back.dppass || 'keep';
+            }
+
+        } else {
+
+            faceFront = face === 'front' || face === 'front_and_back';
+            faceBack = face === 'back' || face === 'front_and_back';
+
+        }
+
+        if (faceFront) {
+            // Front
+            if (this._core._stencilOpSfailStateFront != sfailFront || 
+                this._core._stencilOpDpfailStateFront != dpfailFront ||
+                this._core._stencilOpDppassStateFront != dppassFront 
+                ) {
+
+                var sfail = lookup[sfailFront];
+                var dpfail = lookup[dpfailFront];
+                var dppass = lookup[dppassFront];
+                if (sfail == undefined || dpfail == undefined || dppass == undefined) {
+                    throw "unsupported value for 'StencilOp' attribute on stencilBuffer node - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
+                }
+
+                this._core.stencilOpSfailFront = this._engine.canvas.gl[sfail];
+                this._core.stencilOpDpfailFront = this._engine.canvas.gl[dpfail];
+                this._core.stencilOpDppassFront = this._engine.canvas.gl[dppass];
+
+                this._core._stencilOpSfailStateFront = sfailFront;
+                this._core._stencilOpSfailStateFront = dpfailFront;
+                this._core._stencilOpSfailStateFront = dppassFront;
+
+                this._engine.display.imageDirty = true;
+            }
+        } 
+        
+        if (faceBack) {
+            // Back
+            if (this._core._stencilOpSfailStateBack != sfailBack || 
+                this._core._stencilOpDpfailStateBack != dpfailBack ||
+                this._core._stencilOpDppassStateBack != dppassBack 
+                ) {
+
+                var sfail = lookup[sfailBack];
+                var dpfail = lookup[dpfailBack];
+                var dppass = lookup[dppassBack];
+                if (sfail == undefined || dpfail == undefined || dppass == undefined) {
+                    throw "unsupported value for 'StencilOp' attribute on stencilBuffer node - supported values are 'keep', 'zero', 'replace', 'incr', 'incr_wrap', 'decr', 'decr_wrap', 'invert'";
+                }
+
+                this._core.stencilOpSfailBack = this._engine.canvas.gl[sfail];
+                this._core.stencilOpDpfailBack = this._engine.canvas.gl[dpfail];
+                this._core.stencilOpDppassBack = this._engine.canvas.gl[dppass];
+
+                this._core._stencilOpSfailStateBack = sfailBack;
+                this._core._stencilOpSfailStateBack = dpfailBack;
+                this._core._stencilOpSfailStateBack = dppassBack;
+
+                this._engine.display.imageDirty = true;
+            }
+        }
+
+        return this;
+    };
+
+    SceneJS.StencilBuf.prototype.getStencilFuncFront = function () {
+        return {
+            func: this._core._stencilFuncFuncStateFront,
+            ref: this._core._stencilFuncRefStateFront,
+            mask: this._core._stencilFuncMaskStateFront
+        };
+    };
+
+    SceneJS.StencilBuf.prototype.getStencilFuncBack = function () {
+        return {
+            func: this._core._stencilFuncFuncStateBack,
+            ref: this._core._stencilFuncRefStateBack,
+            mask: this._core._stencilFuncMaskStateBack
+        };
+    };
+
+    SceneJS.StencilBuf.prototype.getStencilOpFront = function () {
+        return {
+            sfail: this._core._stencilOpSfailStateFront, 
+            dpfail: this._core._stencilOpDpfailStateFront,
+            dppass: this._core._stencilOpDppassStateFront
+        };
+    };
+
+    SceneJS.StencilBuf.prototype.getStencilOpBack = function () {
+        return {
+            sfail: this._core._stencilOpSfailStateBack, 
+            dpfail: this._core._stencilOpDpfailStateBack,
+            dppass: this._core._stencilOpDppassStateBack
+        };
+    };
+
+    SceneJS.StencilBuf.prototype._compile = function (ctx) {
+        this._engine.display.stencilBuffer = coreStack[stackLen++] = this._core;
+        this._compileNodes(ctx);
+        this._engine.display.stencilBuffer = (--stackLen > 0) ? coreStack[stackLen - 1] : defaultCore;
+        coreStack[stackLen] = null; // Release memory
+    };
+
+})();;(function () {
+
     // The default state core singleton for {@link SceneJS.ColorBuffer} nodes
     var defaultCore = {
         type: "colorBuffer",
@@ -12890,16 +13206,6 @@ SceneJS.Scene.prototype._init = function (params) {
      * @type {boolean}
      */
     this.transparent = (params.transparent === true);
-
-    /**
-     * Tracks statistics within this engine, such as numbers of
-     * scenes, textures, geometries etc.
-     *
-     * @property stats
-     * @type {*}
-     * @final
-     */
-    this.stats = this._engine.stats;
 };
 
 
@@ -13751,8 +14057,6 @@ new (function () {
                     this.publish("image", layer.image);
                     this._imagePublished = true;
                 }
-
-                this._engine.stats.memory.textures++;
             }
 
             var self = this;
@@ -14155,7 +14459,6 @@ new (function () {
                 layer = layers[i];
                 if (layer.texture) {
                     layer.texture.destroy();
-                    this._engine.stats.memory.textures++;
                 }
                 source = layer._source;
                 if (source && source.destroy) {
@@ -14309,8 +14612,6 @@ new (function () {
 //                        });
                 }
             };
-
-            this._engine.stats.memory.textures++;
         }
     };
 
@@ -14596,7 +14897,6 @@ new (function () {
                 this._core.texture.destroy();
                 this._core.texture = null;
             }
-            this._engine.stats.memory.textures--;
         }
         if (this._core) {
             this._engine._coreFactory.putCore(this._core);
@@ -16500,16 +16800,13 @@ SceneJS.Types = new (function () {
  * <p>After a scene update, we set a flag on the display to indicate the stage we will need to redo from. The pipeline is
  * then lazy-redone on the next call to #render or #pick.</p>
  */
-var SceneJS_Display = function (stats, cfg) {
-
-    // Collects runtime statistics
-    this.stats = stats || {};
+var SceneJS_Display = function (cfg) {
 
     // Display is bound to the lifetime of an HTML5 canvas
     this._canvas = cfg.canvas;
 
     // Factory which creates and recycles {@link SceneJS_Program} instances
-    this._programFactory = new SceneJS_ProgramFactory(this.stats, {
+    this._programFactory = new SceneJS_ProgramFactory({
         canvas: cfg.canvas
     });
 
@@ -16562,6 +16859,12 @@ var SceneJS_Display = function (stats, cfg) {
      * @type Object
      */
     this.depthBuffer = null;
+
+    /**
+     * Node state core for the last {@link SceneJS.StencilBuf} visited during scene graph compilation traversal
+     * @type Object 
+     */
+    this.stencilBuffer = null;
 
     /**
      * Node state core for the last {@link SceneJS.ColorBuf} visited during scene graph compilation traversal
@@ -16882,19 +17185,20 @@ SceneJS_Display.prototype.buildObject = function (objectId) {
     this._setChunk(object, 6, "shaderParams", this.shaderParams);
     this._setChunk(object, 7, "style", this.style);
     this._setChunk(object, 8, "depthBuffer", this.depthBuffer);
-    this._setChunk(object, 9, "colorBuffer", this.colorBuffer);
-    this._setChunk(object, 10, "view", this.view);
-    this._setChunk(object, 11, "lights", this.lights);
-    this._setChunk(object, 12, "material", this.material);
-    this._setChunk(object, 13, "texture", this.texture);
-    this._setChunk(object, 14, "regionMap", this.regionMap);
-    this._setChunk(object, 15, "fresnel", this.fresnel);
-    this._setChunk(object, 16, "cubemap", this.cubemap);
-    this._setChunk(object, 17, "clips", this.clips);
-    this._setChunk(object, 18, "renderer", this.renderer);
-    this._setChunk(object, 19, "geometry", this.morphGeometry, this.geometry);
-    this._setChunk(object, 20, "listeners", this.renderListeners);      // Must be after the above chunks
-    this._setChunk(object, 21, "draw", this.geometry); // Must be last
+    this._setChunk(object, 9, "stencilBuffer", this.stencilBuffer);
+    this._setChunk(object, 10, "colorBuffer", this.colorBuffer);
+    this._setChunk(object, 11, "view", this.view);
+    this._setChunk(object, 12, "lights", this.lights);
+    this._setChunk(object, 13, "material", this.material);
+    this._setChunk(object, 14, "texture", this.texture);
+    this._setChunk(object, 15, "regionMap", this.regionMap);
+    this._setChunk(object, 16, "fresnel", this.fresnel);
+    this._setChunk(object, 17, "cubemap", this.cubemap);
+    this._setChunk(object, 18, "clips", this.clips);
+    this._setChunk(object, 19, "renderer", this.renderer);
+    this._setChunk(object, 20, "geometry", this.morphGeometry, this.geometry);
+    this._setChunk(object, 21, "listeners", this.renderListeners);      // Must be after the above chunks
+    this._setChunk(object, 22, "draw", this.geometry); // Must be last
 
     // At the very least, the object sort order
     // will need be recomputed
@@ -17398,7 +17702,7 @@ SceneJS_Display.prototype._logPickList = function () {
 
 (function () {
 
-    // Cached vectors to avoid garbage collection
+// Cached vectors to avoid garbage collection
 
     var origin = SceneJS_math_vec3();
     var dir = SceneJS_math_vec3();
@@ -17420,28 +17724,30 @@ SceneJS_Display.prototype._logPickList = function () {
 
     var tempVec4 = SceneJS_math_vec4();
     var tempVec4b = SceneJS_math_vec4();
+    var tempVec4c = SceneJS_math_vec4();
 
     var tempVec3 = SceneJS_math_vec3();
     var tempVec3b = SceneJS_math_vec3();
     var tempVec3c = SceneJS_math_vec3();
     var tempVec3d = SceneJS_math_vec3();
+    var tempVec3e = SceneJS_math_vec3();
+    var tempVec3f = SceneJS_math_vec3();
+    var tempVec3g = SceneJS_math_vec3();
+    var tempVec3h = SceneJS_math_vec3();
+    var tempVec3i = SceneJS_math_vec3();
+    var tempVec3j = SceneJS_math_vec3();
 
-    var tempVec2 = SceneJS_math_vec2();
-    var tempVec2b = SceneJS_math_vec2();
-    var tempVec2c = SceneJS_math_vec2();
-    var tempVec2d = SceneJS_math_vec2();
 
-
-    // Given an Object and canvas coordinates, gets a ray
+    // Given a GameObject and camvas coordinates, gets a ray
     // originating at the World-space eye position that passes
     // through the perspective projection plane. The ray is
     // returned via the origin and dir arguments.
 
     function getLocalRay(canvas, object, canvasCoords, origin, dir) {
 
-        var modelMat = object.modelTransform.mat;
-        var viewMat = object.viewTransform.mat;
-        var projMat = object.projTransform.mat;
+        var modelMat = object.modelTransform.matrix;
+        var viewMat = object.viewTransform.matrix;
+        var projMat = object.projTransform.matrix;
 
         var vmMat = SceneJS_math_mulMat4(viewMat, modelMat, tempMat4);
         var pvMat = SceneJS_math_mulMat4(projMat, vmMat, tempMat4b);
@@ -17696,7 +18002,7 @@ SceneJS_Display.prototype._logPickList = function () {
 
                 // Get World-space cartesian coordinates of the ray-triangle intersection
 
-                SceneJS_math_transformVector4(object.modelTransform.mat, tempVec4, tempVec4b);
+                SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
 
                 hit.worldPos = SceneJS._sliceArray(tempVec4b, 0, 3);
 
@@ -17790,11 +18096,11 @@ SceneJS_Display.prototype._logPickList = function () {
                             uvc[0] = uvs[ic2];
                             uvc[1] = uvs[ic2 + 1];
 
-                            uv = SceneJS_math_addVec2(
-                                SceneJS_math_addVec2(
-                                    SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec2),
-                                    SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec2b), tempVec2c),
-                                SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec2d), SceneJS_math_vec2());
+                            uv = SceneJS_math_addVec3(
+                                SceneJS_math_addVec3(
+                                    SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
+                                    SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
+                                SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), SceneJS_math_vec3());
 
                             hit.uvs.push(uv);
                         }
@@ -17940,6 +18246,30 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.depthbufEnabled = null;
     frameCtx.clearDepth = null;
     frameCtx.depthFunc = gl.LESS;
+    frameCtx.stencilbufEnabled = null;
+    frameCtx.clearStencil = null;
+
+    // frameCtx.stencilFuncFront = {func: gl.ALWAYS, ref: 1, mask: 0xff};
+    // frameCtx.stencilFuncBack = {func: gl.ALWAYS, ref: 1, mask: 0xff};
+    // frameCtx.stencilOpFront = {sfail: gl.KEEP, dpfail: gl.KEEP, dppass: gl.KEEP};
+    // frameCtx.stencilOpBack = {sfail: gl.KEEP, dpfail: gl.KEEP, dppass: gl.KEEP};
+    
+    frameCtx.stencilFuncFuncFront = gl.ALWAYS;
+    frameCtx.stencilFuncRefFront = 0;
+    frameCtx.stencilFuncMaskFront = 0xff;
+
+    frameCtx.stencilFuncFuncBack = gl.ALWAYS;
+    frameCtx.stencilFuncRefBack = 0;
+    frameCtx.stencilFuncMaskBack = 0xff;
+
+    frameCtx.stencilOpSfailFront = gl.KEEP;
+    frameCtx.stencilOpDpfailFront = gl.KEEP;
+    frameCtx.stencilOpDppassFront = gl.KEEP;
+
+    frameCtx.stencilOpSfailBack = gl.KEEP;
+    frameCtx.stencilOpDpfailBack = gl.KEEP;
+    frameCtx.stencilOpDppassBack = gl.KEEP;
+
     frameCtx.scissorTestEnabled = false;
     frameCtx.blendEnabled = false;
     frameCtx.backfaces = true;
@@ -17957,11 +18287,6 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.texture = null;
     frameCtx.normalMapUVLayerIdx = -1;
     frameCtx.regionMapUVLayerIdx = -1;
-    frameCtx.drawElements = 0;
-    frameCtx.drawArrays = 0;
-    frameCtx.useProgram = 0;
-    frameCtx.bindTexture = 0;
-    frameCtx.bindArray = 0;
 
     // The extensions needs to be re-queried in case the context was lost and has been recreated.
     if (SceneJS.WEBGL_INFO.SUPPORTED_EXTENSIONS["OES_element_index_uint"]) {
@@ -17970,9 +18295,6 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     var VAO = gl.getExtension("OES_vertex_array_object");
     frameCtx.VAO = (VAO) ? VAO : null;
-
-    this.stats.frame.setUniform = 0;
-    this.stats.frame.setUniformCacheHits = 0;
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -17998,8 +18320,6 @@ SceneJS_Display.prototype._doDrawList = function (params) {
         for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
             this._pickDrawList[i].pick(frameCtx);
         }
-
-        gl.flush();
 
     } else if (params.pickRegion || params.pickTriangle) {
 
@@ -18033,14 +18353,10 @@ SceneJS_Display.prototype._doDrawList = function (params) {
             }
         }
 
-        gl.flush();
-
     } else {
 
         // Render scene
         // Render whole draw list
-
-        var startTime = Date.now();
 
         // Option to only render opaque objects
         var len = (params.opaqueOnly && this._drawListTransparentIndex >= 0 ? this._drawListTransparentIndex : this._drawListLen);
@@ -18049,19 +18365,9 @@ SceneJS_Display.prototype._doDrawList = function (params) {
         for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
             this._drawList[i].draw(frameCtx);
         }
-
-        gl.flush();
-
-        var endTime = Date.now();
-
-        this.stats.frame.renderTime = (endTime - startTime) / 1000.0;
-        this.stats.frame.drawElements = frameCtx.drawElements;
-        this.stats.frame.drawArrays = frameCtx.drawArrays;
-        this.stats.frame.useProgram = frameCtx.useProgram;
-        this.stats.frame.bindTexture = frameCtx.bindTexture;
-        this.stats.frame.bindArray = frameCtx.bindArray;
-        this.stats.frame.drawChunks = this._drawListLen;
     }
+
+    gl.flush();
 
     if (frameCtx.renderBuf) {
         frameCtx.renderBuf.unbind();
@@ -19529,9 +19835,7 @@ var SceneJS_ProgramSource = function(hash, pickVertexSrc, pickFragmentSrc, drawV
  * @class Manages creation, sharing and recycle of {@link SceneJS_Program} instances
  * @private
  */
-var SceneJS_ProgramFactory = function(stats, cfg) {
-
-    this.stats = stats;
+var SceneJS_ProgramFactory = function(cfg) {
 
     this._canvas = cfg.canvas;
 
@@ -19551,11 +19855,9 @@ SceneJS_ProgramFactory.prototype.getProgram = function(hash, states) {
 
         var source = SceneJS_ProgramSourceFactory.getSource(hash, states);
 
-        program = new SceneJS_Program(this.stats, this._nextProgramId++, hash, source, this._canvas.gl);
+        program = new SceneJS_Program(this._nextProgramId++, hash, source, this._canvas.gl);
 
         this._programs[hash] = program;
-
-        this.stats.memory.programs++;
     }
 
     program.useCount++;
@@ -19575,9 +19877,7 @@ SceneJS_ProgramFactory.prototype.putProgram = function(program) {
 
         SceneJS_ProgramSourceFactory.putSource(program.hash);
 
-        delete this._programs[program.hash];
-
-        this.stats.memory.programs--;
+       delete this._programs[program.hash];
     }
 };
 
@@ -19608,15 +19908,12 @@ SceneJS_ProgramFactory.prototype.destroy = function() {
  * @class Vertex and fragment shaders for pick and draw
  * @private
  *
- * @param {*} stats Collects runtime statistics
  * @param {Number} id ID unique among all programs in the owner {@link SceneJS_ProgramFactory}
  * @param {String} hash Hash code which uniquely identifies the capabilities of the program, computed from hashes on the {@link Scene_Core}s that the {@link SceneJS_ProgramSource} composed to render
  * @param {SceneJS_ProgramSource} source Sourcecode from which the the program is compiled in {@link #build}
  * @param {WebGLRenderingContext} gl WebGL context 
  */
-var SceneJS_Program = function(stats, id, hash, source, gl) {
-
-    this.stats = stats;
+var SceneJS_Program = function(id, hash, source, gl) {
 
     /**
      * ID for this program, unique among all programs in the display
@@ -19670,8 +19967,8 @@ var SceneJS_Program = function(stats, id, hash, source, gl) {
 SceneJS_Program.prototype.build = function(gl) {
 
     this.gl = gl;
-    this.draw = new SceneJS._webgl.Program(this.stats, gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
-    this.pick = new SceneJS._webgl.Program(this.stats, gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
+    this.draw = new SceneJS._webgl.Program(gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
+    this.pick = new SceneJS._webgl.Program(gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
 };
 ;/**
  * @class Manages creation and recycle of {@link SceneJS_Object} instances
@@ -20285,11 +20582,9 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (core.indexBuf) {
-            gl.drawElements(core.primitive, core.indexBuf.numItems, core.indexBuf.itemType, 0);
-            frameCtx.drawElements++;
+            gl.drawElements(core.primitive, core.indexBuf.numItems, core.indexBuf.itemType, 0);            
         } else {
             gl.drawArrays(core.primitive, 0, core.vertexBuf.numItems / 3);
-            frameCtx.drawArrays++;
         }
 
         //frameCtx.textureUnit = 0;
@@ -20549,21 +20844,15 @@ SceneJS_ChunkFactory.createChunkType({
         if (this._aMorphVertexDraw) {
             this._aVertexDraw.bindFloatArrayBuffer(target1.vertexBuf);
             this._aMorphVertexDraw.bindFloatArrayBuffer(target2.vertexBuf);
-            frameCtx.bindArray += 2;
-
         } else if (this._aVertexDraw) {
             this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
-            frameCtx.bindArray++;
         }
 
         if (this._aMorphNormalDraw) {
             this._aNormalDraw.bindFloatArrayBuffer(target1.normalBuf);
             this._aMorphNormalDraw.bindFloatArrayBuffer(target2.normalBuf);
-            frameCtx.bindArray += 2;
-
         } else if (this._aNormalDraw) {
             this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
-            frameCtx.bindArray++;
         }
 
         if (this._aMorphTangentDraw || this._aTangentDraw) {
@@ -20582,8 +20871,6 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aMorphTangentDraw) {
                     this._aTangentDraw.bindFloatArrayBuffer(this.core.getTangents(key1, this.core2.arrays.indices, this.core2.arrays.uvs[normalMapUVLayerIdx]));
                     this._aMorphTangentDraw.bindFloatArrayBuffer(this.core.getTangents(key2, this.core2.arrays.indices, this.core2.arrays.uvs[normalMapUVLayerIdx]));
-                    frameCtx.bindArray += 2;
-
                 } else if (this._aTangentDraw) {
 
                     // TODO: What's this for?
@@ -20599,22 +20886,22 @@ SceneJS_ChunkFactory.createChunkType({
             uvBuf = this.core2.uvBufs[i];
             if (uvBuf) {
                 this._aUVDraw[i].bindFloatArrayBuffer(uvBuf);
-                frameCtx.bindArray++;
             }
         }
 
         if (this._aColorDraw) {
             this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
-            frameCtx.bindArray++;
         }
 
         this.setDrawMorphFactor();
     },
 
     setDrawMorphFactor: function () {
+
         if (this._uMorphFactorDraw) {
             this._uMorphFactorDraw.setValue(this.core.factor); // Bind LERP factor
         }
+
     },
 
     draw: function (frameCtx) {
@@ -20650,41 +20937,33 @@ SceneJS_ChunkFactory.createChunkType({
                 this.core2.interleavedBuf.bind();
                 if (this._aVertexDraw) {
                     this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedPositionOffset);
-                    frameCtx.bindArray++;
                 }
                 if (this._aNormalDraw) {
                     this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedNormalOffset);
-                    frameCtx.bindArray++;
                 }
                 for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
                     this._aUVDraw[i].bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUVOffsets[i]);
-                    frameCtx.bindArray++;
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
-                    frameCtx.bindArray++;
                 }
             } else {
                 this.VAOHasInterleavedBuf = false;
                 if (this._aVertexDraw) {
                     this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
-                    frameCtx.bindArray++;
                 }
                 if (this._aNormalDraw) {
                     this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
-                    frameCtx.bindArray++;
                 }
                 var uvBuf;
                 for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
                     uvBuf = this.core2.uvBufs[i];
                     if (uvBuf) {
                         this._aUVDraw[i].bindFloatArrayBuffer(uvBuf);
-                        frameCtx.bindArray++;
                     }
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
-                    frameCtx.bindArray++;
                 }
             }
 
@@ -20700,7 +20979,6 @@ SceneJS_ChunkFactory.createChunkType({
                 var normalMapUVLayerIdx = frameCtx.normalMapUVLayerIdx;
                 if (normalMapUVLayerIdx >= 0) {
                     this._aTangentDraw.bindFloatArrayBuffer(this.core2.getTangents(normalMapUVLayerIdx));
-                    frameCtx.bindArray++;
                 }
             }
         }
@@ -20711,7 +20989,6 @@ SceneJS_ChunkFactory.createChunkType({
                 var uvBufs = this.core2.uvBufs;
                 if (regionMapUVLayerIdx < uvBufs.length) {
                     this._aRegionMapUVDraw.bindFloatArrayBuffer(uvBufs[regionMapUVLayerIdx]);
-                    frameCtx.bindArray++;
                 }
             }
         }
@@ -20795,7 +21072,7 @@ SceneJS_ChunkFactory.createChunkType({
                 }
 
                 if (core2.indexBuf) {
-                    core2.indexBuf.bind();
+                    core2.indexBuf.bind();                    
                 }
 
             } else if (frameCtx.pickTriangle) {
@@ -21069,7 +21346,6 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         frameCtx.drawProgram = this.program.draw;
-        frameCtx.useProgram++;
     },
 
     pick: function (frameCtx) {
@@ -21251,6 +21527,109 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this.core.clear) {
             gl.clear(gl.DEPTH_BUFFER_BIT);
+        }
+    }
+});
+;/**
+ *
+ */
+SceneJS_ChunkFactory.createChunkType({
+
+    type: "stencilBuffer",
+
+    // Avoid reapplication of a chunk after a program switch.
+    programGlobal: true,
+
+    drawAndPick: function (frameCtx) {
+
+        var gl = this.program.gl;
+
+        var enabled = this.core.enabled;
+
+        if (frameCtx.stencilbufEnabled != enabled) {
+            if (enabled) {
+                gl.enable(gl.STENCIL_TEST);
+            } else {
+                gl.disable(gl.STENCIL_TEST);
+            }
+            frameCtx.stencilbufEnabled = enabled;
+        }
+
+        var clearStencil = this.core.clearStencil;
+
+        if (clearStencil !== undefined) {
+            if (frameCtx.clearStencil != clearStencil) {
+                gl.clearStencil(clearStencil);
+                frameCtx.clearStencil = clearStencil;
+            }
+        }
+        
+        var stencilFuncFuncFront = this.core.stencilFuncFuncFront;
+        var stencilFuncRefFront = this.core.stencilFuncRefFront;
+        var stencilFuncMaskFront = this.core.stencilFuncMaskFront;
+
+        if (stencilFuncFuncFront) {
+            if (frameCtx.stencilFuncFuncFront != stencilFuncFuncFront ||
+                frameCtx.stencilFuncRefFront != stencilFuncRefFront ||
+                frameCtx.stencilFuncMaskFront != stencilFuncMaskFront
+                ) {
+                gl.stencilFuncSeparate(gl.FRONT, stencilFuncFuncFront, stencilFuncRefFront, stencilFuncMaskFront);
+                frameCtx.stencilFuncFuncFront = stencilFuncFuncFront;
+                frameCtx.stencilFuncRefFront = stencilFuncRefFront;
+                frameCtx.stencilFuncMaskFront = stencilFuncMaskFront;
+            }
+        }
+
+        var stencilFuncFuncBack = this.core.stencilFuncFuncBack;
+        var stencilFuncRefBack = this.core.stencilFuncRefBack;
+        var stencilFuncMaskBack = this.core.stencilFuncMaskBack;
+
+        if (stencilFuncFuncBack) {
+            if (frameCtx.stencilFuncFuncBack != stencilFuncFuncBack ||
+                frameCtx.stencilFuncRefBack != stencilFuncRefBack ||
+                frameCtx.stencilFuncMaskBack != stencilFuncMaskBack
+                ) {
+                gl.stencilFuncSeparate(gl.BACK, stencilFuncFuncBack, stencilFuncRefBack, stencilFuncMaskBack);
+                frameCtx.stencilFuncFuncBack = stencilFuncFuncBack;
+                frameCtx.stencilFuncRefBack = stencilFuncRefBack;
+                frameCtx.stencilFuncMaskBack = stencilFuncMaskBack;
+            }
+        }
+
+        var stencilOpSfailFront = this.core.stencilOpSfailFront;
+        var stencilOpDpfailFront = this.core.stencilOpDpfailFront;
+        var stencilOpDppassFront = this.core.stencilOpDppassFront;
+
+        if (stencilOpSfailFront) {
+            if (frameCtx.stencilOpSfailFront != stencilOpSfailFront ||
+                frameCtx.stencilOpDpfailFront != stencilOpDpfailFront ||
+                frameCtx.stencilOpDppassFront != stencilOpDppassFront
+                ) {
+                gl.stencilOpSeparate(gl.FRONT, stencilOpSfailFront, stencilOpDpfailFront, stencilOpDppassFront);
+                frameCtx.stencilOpSfailFront = stencilOpSfailFront;
+                frameCtx.stencilOpDpfailFront = stencilOpDpfailFront;
+                frameCtx.stencilOpDppassFront = stencilOpDppassFront;
+            }
+        }
+
+        var stencilOpSfailBack = this.core.stencilOpSfailBack;
+        var stencilOpDpfailBack = this.core.stencilOpDpfailBack;
+        var stencilOpDppassBack = this.core.stencilOpDppassBack;
+
+        if (stencilOpSfailBack) {
+            if (frameCtx.stencilOpSfailBack != stencilOpSfailBack ||
+                frameCtx.stencilOpDpfailBack != stencilOpDpfailBack ||
+                frameCtx.stencilOpDppassBack != stencilOpDppassBack
+                ) {
+                gl.stencilOpSeparate(gl.BACK, stencilOpSfailBack, stencilOpDpfailBack, stencilOpDppassBack);
+                frameCtx.stencilOpSfailBack = stencilOpSfailBack;
+                frameCtx.stencilOpDpfailBack = stencilOpDpfailBack;
+                frameCtx.stencilOpDppassBack = stencilOpDppassBack;
+            }
+        }
+
+        if (this.core.clear) {
+            gl.clear(gl.STENCIL_BUFFER_BIT);
         }
     }
 });
@@ -21448,8 +21827,6 @@ SceneJS_ChunkFactory.createChunkType({
 
                     draw.bindTexture(this._uTexSampler[i], layer.texture, frameCtx.textureUnit);
                     frameCtx.textureUnit = (frameCtx.textureUnit + 1) % SceneJS.WEBGL_INFO.MAX_TEXTURE_UNITS;
-
-                    frameCtx.bindTexture++;
 
                     if (layer._matrixDirty && layer.buildMatrix) {
                         layer.buildMatrix.call(layer);

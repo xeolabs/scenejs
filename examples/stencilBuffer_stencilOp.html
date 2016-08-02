@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+        body {
+            background: white;
+            margin: 0;
+            -moz-user-select: -moz-none;
+            -khtml-user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+
+    <script src="../api/latest/scenejs.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+<body>
+
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - setting the stencil buffer Op function
+    <br><br>In this demo we use stencil Buffer<br><br>The first stage we draw the box and write 
+    the stencil value. We then draw the teapot in the second stage and 
+    preserve the fragments based on the stencil value. 
+    <br/> We intervally swtich stencil Op of the first stage (box)
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 30,
+                pitch: -30,
+                zoom: 5,
+                zoomSensitivity: 10.0,
+
+                nodes: [
+                    {
+                        type: "stage",
+                        priority: 1,                        
+
+                        nodes: [
+
+                            {
+                                type: "stencilBuffer",
+                                id: "myStencilBuffer1",
+
+                                enabled: true,
+                                clearStencil: 5,
+                                clear: true,
+                                stencilFunc: {
+                                    func: "always",
+                                    ref: 9,
+                                    mask: 0xff
+                                },
+                                stencilOp: {
+                                    sfail: "keep",
+                                    dpfail: "keep",
+                                    dppass: "replace"
+                                },
+
+                                nodes: [
+                                    {
+                                        type: "flags",
+                                        flags: {
+                                            solid: false
+                                        },
+
+                                        nodes: [
+                                            {
+                                                type: "material",
+                                                color: {r: 0.6, g: 0.6, b: 0.9},
+
+                                                nodes: [
+                                                    {
+                                                        type: "translate",
+                                                        x: -2,
+                                                        y: -1,
+                                                        z: -2,
+
+
+                                                        nodes: [
+                                                            {
+                                                                type:"geometry/box"
+                                                            }
+                                                        ]
+                                                    }                                                 
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    {
+                        type: "stage",
+                        priority: 2,                        
+
+                        nodes: [
+
+                            {
+                                type: "stencilBuffer",
+                                id: "myStencilBuffer2",
+
+                                enabled: true,
+                                clear: false,
+                                stencilFunc: {
+                                    func: "less",
+                                    ref: 5
+                                },
+                                stencilOp: {
+                                    sfail: "keep",
+                                    dpfail: "keep",
+                                    dppass: "keep"
+                                },
+
+                                nodes: [
+                                    {
+                                        type: "flags",
+                                        flags: {
+                                            solid: false
+                                        },
+
+                                        nodes: [
+                                            {
+                                                type: "material",
+                                                color: {r: 0.7, g: 0.0, b: 0.0},
+
+                                                nodes: [
+                                                    {
+                                                        type:"scale",
+                                                        id:"myScale",
+                                                        x:0.4,
+                                                        y:0.4,
+                                                        z:0.4,
+
+                                                        nodes: [
+                                                            {
+                                                                type: "translate",
+                                                                y: -1,
+
+                                                                nodes: [
+                                                                    {
+                                                                        type:"geometry/teapot"
+                                                                    }
+                                                                ]
+                                                            }
+                                                            
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Get the stencilBuffer node and periodically switch its stencilOp
+
+    // full list:
+    // keep, zero, replace, incr, incr_wrap, decr, decr_wrap, invert
+
+    var stencilOps = ['keep', 'zero', 'replace', 'incr', 'decr'];
+    var i = 0;
+
+    scene.getNode("myStencilBuffer1", function (myStencilbuf) {
+        setInterval(
+                function () {
+                    myStencilbuf.setStencilOp({
+                        dppass: stencilOps[i++ % (stencilOps.length)]
+                    });
+                },
+                1000);
+    });
+
+
+</script>
+</body>
+</html>
