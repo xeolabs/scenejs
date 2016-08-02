@@ -10,6 +10,7 @@
 
         picking: true,              // Picking enabled
         clipping: true,             // User-defined clipping enabled
+        frontClippingOnly: true,        // Used to assist drawing clipping caps
         enabled: true,              // Node not culled from traversal
         transparent: false,         // Node transparent - works in conjunction with matarial alpha properties
         backfaces: true,            // Show backfaces
@@ -43,6 +44,7 @@
 
             this._core.picking = true;           // Picking enabled
             this._core.clipping = true;          // User-defined clipping enabled
+            this._core.frontClippingOnly = false;
             this._core.enabled = true;           // Node not culled from traversal
             this._core.transparent = false;      // Node transparent - works in conjunction with matarial alpha properties
             this._core.backfaces = true;         // Show backfaces
@@ -68,6 +70,11 @@
 
         if (flags.clipping != undefined) {
             core.clipping = !!flags.clipping;
+            this._engine.display.imageDirty = true;
+        }
+
+        if (flags.frontClippingOnly != undefined) {
+            core.frontClippingOnly = !!flags.frontClippingOnly;
             this._engine.display.imageDirty = true;
         }
 
@@ -130,6 +137,7 @@
         return {
             picking: core.picking,
             clipping: core.clipping,
+            frontClippingOnly: core.frontClippingOnly,
             enabled: core.enabled,
             transparent: core.transparent,
             backfaces: core.backfaces,
@@ -162,8 +170,21 @@
         return this;
     };
 
+    SceneJS.Flags.prototype.setFrontClippingOnly = function (frontClippingOnly) {
+        frontClippingOnly = !!frontClippingOnly;
+        if (this._core.frontClippingOnly != frontClippingOnly) {
+            this._core.frontClippingOnly = frontClippingOnly;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
     SceneJS.Flags.prototype.getClipping = function () {
         return this._core.clipping;
+    };
+
+    SceneJS.Flags.prototype.getFrontClippingOnly = function () {
+        return this._core.frontClippingOnly;
     };
 
     SceneJS.Flags.prototype.setEnabled = function (enabled) {

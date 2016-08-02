@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-08-01
+ * Built on 2016-08-02
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -8859,6 +8859,7 @@ new (function () {
 
         picking: true,              // Picking enabled
         clipping: true,             // User-defined clipping enabled
+        frontClippingOnly: true,        // Used to assist drawing clipping caps
         enabled: true,              // Node not culled from traversal
         transparent: false,         // Node transparent - works in conjunction with matarial alpha properties
         backfaces: true,            // Show backfaces
@@ -8892,6 +8893,7 @@ new (function () {
 
             this._core.picking = true;           // Picking enabled
             this._core.clipping = true;          // User-defined clipping enabled
+            this._core.frontClippingOnly = false;
             this._core.enabled = true;           // Node not culled from traversal
             this._core.transparent = false;      // Node transparent - works in conjunction with matarial alpha properties
             this._core.backfaces = true;         // Show backfaces
@@ -8917,6 +8919,11 @@ new (function () {
 
         if (flags.clipping != undefined) {
             core.clipping = !!flags.clipping;
+            this._engine.display.imageDirty = true;
+        }
+
+        if (flags.frontClippingOnly != undefined) {
+            core.frontClippingOnly = !!flags.frontClippingOnly;
             this._engine.display.imageDirty = true;
         }
 
@@ -8979,6 +8986,7 @@ new (function () {
         return {
             picking: core.picking,
             clipping: core.clipping,
+            frontClippingOnly: core.frontClippingOnly,
             enabled: core.enabled,
             transparent: core.transparent,
             backfaces: core.backfaces,
@@ -9011,8 +9019,21 @@ new (function () {
         return this;
     };
 
+    SceneJS.Flags.prototype.setFrontClippingOnly = function (frontClippingOnly) {
+        frontClippingOnly = !!frontClippingOnly;
+        if (this._core.frontClippingOnly != frontClippingOnly) {
+            this._core.frontClippingOnly = frontClippingOnly;
+            this._engine.display.imageDirty = true;
+        }
+        return this;
+    };
+
     SceneJS.Flags.prototype.getClipping = function () {
         return this._core.clipping;
+    };
+
+    SceneJS.Flags.prototype.getFrontClippingOnly = function () {
+        return this._core.frontClippingOnly;
     };
 
     SceneJS.Flags.prototype.setEnabled = function (enabled) {
@@ -18462,6 +18483,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var billboard;
     var tangents;
     var clipping;
+    var frontClippingOnly;
     var morphing;
     var regionMapping;
     var regionInteraction;
@@ -18498,6 +18520,7 @@ var SceneJS_ProgramSourceFactory = new (function () {
         billboard = !states.billboard.empty;
         tangents = hasTangents(states);
         clipping = states.clips.clips.length > 0;
+        frontClippingOnly = states.flags.frontClippingOnly;
         morphing = !!states.morphGeometry.targets;
         regionMapping = hasRegionMap();
         regionInteraction = regionMapping && states.regionMap.mode !== "info";
@@ -19061,6 +19084,10 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("uniform vec3 SCENEJS_uWorldEye;");
 
+        if (frontClippingOnly) {
+            add("uniform vec3 SCENEJS_uWorldLook;")         // World-space look position
+        }
+
 
         /*-----------------------------------------------------------------------------------
          * Variables
@@ -19256,7 +19283,17 @@ var SceneJS_ProgramSourceFactory = new (function () {
             add("  float dist = 0.0;");
             for (var i = 0; i < states.clips.clips.length; i++) {
                 add("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
+
+                if (frontClippingOnly) {
+                    add("    if (dot(SCENEJS_uWorldLook - SCENEJS_uWorldEye, SCENEJS_uClipNormalAndDist" + i + ".xyz) < 0.0) {");
+                }
+                
                 add("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
+
+                if (frontClippingOnly) {
+                    add("    }");
+                }
+
                 add("  }");
             }
             add("  if (dist > 0.0) { discard; }");
@@ -20766,8 +20803,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
         gl.clearColor(frameCtx.ambientColor[0], frameCtx.ambientColor[1], frameCtx.ambientColor[2], 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
-      //  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         frameCtx.renderBuf = renderBuf;
     }
@@ -21233,6 +21270,9 @@ SceneJS_ChunkFactory.createChunkType({
         this._uVNMatrixDraw = this.program.draw.getUniform("SCENEJS_uVNMatrix");
         this._uWorldEyeDraw = this.program.draw.getUniform("SCENEJS_uWorldEye");
 
+        // for clipping caps
+        this._uWorldLookDraw = this.program.draw.getUniform("SCENEJS_uWorldLook");
+
         this._uvMatrixPick = this.program.pick.getUniform("SCENEJS_uVMatrix");
     },
 
@@ -21254,6 +21294,10 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this._uWorldEyeDraw) {
             this._uWorldEyeDraw.setValue(this.core.lookAt.eye);
+        }
+
+        if (this._uWorldLookDraw) {
+            this._uWorldLookDraw.setValue(this.core.lookAt.look);
         }
 
         frameCtx.viewMat = this.core.mat;
