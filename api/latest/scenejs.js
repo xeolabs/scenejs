@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-08-02
+ * Built on 2016-08-04
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -8859,7 +8859,7 @@ new (function () {
 
         picking: true,              // Picking enabled
         clipping: true,             // User-defined clipping enabled
-        frontClippingOnly: true,        // Used to assist drawing clipping caps
+        frontClippingOnly: false,        // Used to assist drawing clipping caps
         enabled: true,              // Node not culled from traversal
         transparent: false,         // Node transparent - works in conjunction with matarial alpha properties
         backfaces: true,            // Show backfaces
@@ -8868,7 +8868,9 @@ new (function () {
         solid: false,               // When true, renders backfaces without texture or shading, for a cheap solid cross-section effect
         solidColor: [1.0, 1.0, 1.0],// Solid cap color
         skybox: false,              // Treat as a skybox
-        hash: "refl;;;"
+        hash: "refl;;;",
+
+        clearColorBuffer: false
     };
 
     var coreStack = [];
@@ -8923,7 +8925,13 @@ new (function () {
         }
 
         if (flags.frontClippingOnly != undefined) {
-            core.frontClippingOnly = !!flags.frontClippingOnly;
+            core.frontClippingOnly = flags.frontClippingOnly;
+            this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
+        }
+
+        if (flags.clearColorBuffer != undefined) {
+            core.clearColorBuffer = flags.clearColorBuffer;
             this._engine.display.imageDirty = true;
         }
 
@@ -9023,6 +9031,8 @@ new (function () {
         frontClippingOnly = !!frontClippingOnly;
         if (this._core.frontClippingOnly != frontClippingOnly) {
             this._core.frontClippingOnly = frontClippingOnly;
+            this._core.hash = getHash(this._core);
+            this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
         return this;
@@ -9161,7 +9171,8 @@ new (function () {
     function getHash(core) {
         return (core.reflective ? "refl" : "") + ";" +
                 (core.solid ? "s" : "") + ";" +
-                (core.skybox ? "sky" : "") + ";";
+                (core.skybox ? "sky" : "") + ";" +
+                (core.frontClippingOnly ? "fco" : "") + ";";
     }
 
 })();
@@ -19281,18 +19292,34 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (clipping) {
             add("if (SCENEJS_uClipping) {");
             add("  float dist = 0.0;");
+
             for (var i = 0; i < states.clips.clips.length; i++) {
                 add("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
 
-                if (frontClippingOnly) {
-                    add("    if (dot(SCENEJS_uWorldLook - SCENEJS_uWorldEye, SCENEJS_uClipNormalAndDist" + i + ".xyz) < 0.0) {");
-                }
-                
-                add("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
+                // if (frontClippingOnly) {
+                //     // add("      dist += clamp(");
+                //     // add("        (dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w)");
+                //     // add("         * (dot(SCENEJS_uWorldEye.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w)");
+                //     // add("         , 0.0, 10000.0);");
+                //     add("    dist += clamp(  ( dot( SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w) * (dot(SCENEJS_uWorldEye.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w), 0.0, 1000.0);");
 
+                // } else {
+                //     add("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
+                // }
+                
+                if (frontClippingOnly) {
+                    add("    if (dot(SCENEJS_uWorldLook - SCENEJS_uWorldEye, SCENEJS_uClipNormalAndDist" + i + ".xyz) < -1.0) {");
+                }
+                add("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
                 if (frontClippingOnly) {
                     add("    }");
                 }
+
+                //add("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
+
+                // if (frontClippingOnly) {
+                //     add("    }");
+                // }
 
                 add("  }");
             }
@@ -20755,6 +20782,14 @@ SceneJS_ChunkFactory.createChunkType({
 
             if (this._uSolidColorDraw) {
                 this._uSolidColorDraw.setValue(this.core.solidColor);
+            }
+
+            // !!dirty
+            // if (frameCtx.clearColorBuffer != this.core.clearColorBuffer) {
+            //     frameCtx.clearColorBuffer = this.core.clearColorBuffer;
+            // }
+            if ( this.core.clearColorBuffer ) {
+                gl.clear(gl.COLOR_BUFFER_BIT);
             }
         }
     }

@@ -10,7 +10,7 @@
 
         picking: true,              // Picking enabled
         clipping: true,             // User-defined clipping enabled
-        frontClippingOnly: true,        // Used to assist drawing clipping caps
+        frontClippingOnly: false,        // Used to assist drawing clipping caps
         enabled: true,              // Node not culled from traversal
         transparent: false,         // Node transparent - works in conjunction with matarial alpha properties
         backfaces: true,            // Show backfaces
@@ -19,7 +19,9 @@
         solid: false,               // When true, renders backfaces without texture or shading, for a cheap solid cross-section effect
         solidColor: [1.0, 1.0, 1.0],// Solid cap color
         skybox: false,              // Treat as a skybox
-        hash: "refl;;;"
+        hash: "refl;;;",
+
+        clearColorBuffer: false
     };
 
     var coreStack = [];
@@ -74,7 +76,13 @@
         }
 
         if (flags.frontClippingOnly != undefined) {
-            core.frontClippingOnly = !!flags.frontClippingOnly;
+            core.frontClippingOnly = flags.frontClippingOnly;
+            this._engine.branchDirty(this);
+            this._engine.display.imageDirty = true;
+        }
+
+        if (flags.clearColorBuffer != undefined) {
+            core.clearColorBuffer = flags.clearColorBuffer;
             this._engine.display.imageDirty = true;
         }
 
@@ -174,6 +182,8 @@
         frontClippingOnly = !!frontClippingOnly;
         if (this._core.frontClippingOnly != frontClippingOnly) {
             this._core.frontClippingOnly = frontClippingOnly;
+            this._core.hash = getHash(this._core);
+            this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
         return this;
@@ -312,7 +322,8 @@
     function getHash(core) {
         return (core.reflective ? "refl" : "") + ";" +
                 (core.solid ? "s" : "") + ";" +
-                (core.skybox ? "sky" : "") + ";";
+                (core.skybox ? "sky" : "") + ";" +
+                (core.frontClippingOnly ? "fco" : "") + ";";
     }
 
 })();
