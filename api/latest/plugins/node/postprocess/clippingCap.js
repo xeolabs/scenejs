@@ -20,7 +20,7 @@ SceneJS.Types.addType("postprocess/clippingCap", {
             // Stage 1
             // Back face frag -> stencil buffer +1
             // Front face frag -> stencil buffer -1
-            // Front face clipping plane
+            // Use Front face clipping plane only
             {
                 type: "stage",
                 priority: 1,
@@ -34,7 +34,6 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                         enabled: true,
                         depthFunc: "lequal",
                         clear: true,
-                        //depthFunc: "greater",
 
                         nodes: [
                             {
@@ -44,18 +43,15 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                 clear: true,
                                 clearStencil: 128,
                                 stencilFunc: {
-                                    //func: "lequal",
                                     func: "always",
                                     ref: 128, 
                                     mask: 0xff
                                 },
                                 stencilOp: {
                                     front: {
-                                        //sfail: "decr",
                                         sfail: "keep",
                                         dpfail: "decr", 
                                         dppass: "decr"
-                                        //dppass: "zero"
                                     },
                                     back: {
                                         sfail: "keep",
@@ -99,83 +95,24 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                 nodes: [
                     {
                         type: "depthBuffer",
-                        //enabled: false,
 
-                        clearDepth: 1.0,
-                        enabled: true,
-                        depthFunc: "lequal",
                         clear: true,
-                        //depthFunc: "greater",
 
                         nodes: [
                             {
-                                type: "colorBuffer",
-                                clear: true
-                            },
-                            {
-                                type: "stencilBuffer",
-
-                                clear: false,
-                                enabled: true,
-                                stencilFunc: {
-                                    //func: "lequal",
-                                    func: "always",
-                                    ref: 128, 
-                                    mask: 0xff
-                                },
-                                stencilOp: {
-                                    sfail: "keep", 
-                                    dpfail: "keep",
-                                    dppass: "keep"
-                                },
-
+                                type: "clips",
+                                clips: this._clips,
 
                                 nodes: [
                                     {
-                                        type: "clips",
-                                        clips: this._clips,
+                                        type: "flags",
+                                        flags: {
+                                            backfaces: false,
+                                            clearColorBuffer: true
+                                        },
 
-
-                                        //nodes: params.originNodes
-
-                                        nodes: [
-                                            {
-                                                type: "flags",
-                                                flags: {
-                                                    frontClippingOnly: false,
-                                                    backfaces: false,
-                                                    
-                                                    clearColorBuffer: true
-                                                },
-
-                                                nodes: params.originNodes
-                                                // nodes: [
-                                                //     {
-                                                //         type: "material",
-                                                //         color: {r: 0.0, g: 0.6, b: 0.0},
-
-                                                //         nodes: [
-
-                                                //             // Torus primitive, implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/torus.js
-                                                //             {
-                                                //                 type: "geometry/torus",
-                                                //                 radius: 1.0,
-                                                //                 tube: 0.30,
-                                                //                 segmentsR: 60,
-                                                //                 segmentsT: 40,
-                                                //                 arc: Math.PI * 2
-                                                                
-                                                //             }
-                                                //         ]
-                                                //     }
-                                                // ]
-                                            }
-                                        ]
-                                        
-
-                                        
+                                        nodes: params.originNodes
                                     }
-                                    
                                 ]
                             }
                         ]
@@ -188,47 +125,12 @@ SceneJS.Types.addType("postprocess/clippingCap", {
             // Draw Caps with stencil test
             // Draw the origin geometry with inner volume texture (tissue)
             // and depth func set to GREATER to draw closest object to the clipping plane
+            // TODO: custom shader
             {
                 type: "stage",
                 priority: 3,
 
-                // clearColor: true,
-                // clearDepth: true,
-
                 nodes: [
-                    // {
-                    //     type: "shader", 
-                    //     shaders: [
-                    //         // Vertex stage just passes through the positions and UVs
-                    //         {
-                    //             stage: "vertex",
-                    //             code: [
-                    //                 "attribute vec3 SCENEJS_aVertex;",
-                    //                 "attribute vec2 SCENEJS_aUVCoord0;",
-                    //                 "varying vec2 vUv;",
-                    //                 "void main () {",
-                    //                 "    gl_Position = vec4(SCENEJS_aVertex, 1.0);",
-                    //                 "    vUv = SCENEJS_aUVCoord0;",
-                    //                 "}"
-                    //             ]
-                    //         },
-
-                    //         {
-                    //             stage: "fragment", 
-                    //             code: [
-                    //                 "precision mediump float;",
-                    //                 "uniform sampler2D SCENEJS_uSampler0;",
-                    //                 "uniform vec3 SCENEJS_uWorldEye;",
-                    //                 "uniform vec3 SCENEJS_uWorldLook",
-                    //                 "varying vec2 vUv;",
-                    //                 "void main () {",
-                    //                 "   gl_FragColor = texture2D(SCENEJS_uSampler0, vUv);",
-                    //                 "}"
-                    //             ]
-                    //         }
-                    //     ]
-                    // },
-
                     
                     {
                         type: "depthBuffer",
@@ -238,8 +140,8 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                         clear: true,
                         //clear: false,
 
-                        // clearDepth: 0.0,
-                        // depthFunc: "gequal",
+                        clearDepth: 0.0,
+                        depthFunc: "gequal",
                         
                         // depthFunc: "lequal",
 
@@ -251,7 +153,6 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                 clear: false,
                                 stencilFunc: {
                                     func: "less",
-                                    //func: "always", 
                                     ref: 128,
                                     mask: 0xff
                                 },
@@ -270,15 +171,6 @@ SceneJS.Types.addType("postprocess/clippingCap", {
             }
 
         ]);
-
-        
-        
-        
-        
-        
-
-
-
         
 
     }
