@@ -73,7 +73,7 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                                     frontClippingOnly: true
                                                 },
 
-                                                nodes: params.originNodes
+                                                nodes: params.nodes
                                             }
                                         ]
 
@@ -111,7 +111,7 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                             clearColorBuffer: true
                                         },
 
-                                        nodes: params.originNodes
+                                        nodes: params.nodes
                                     }
                                 ]
                             }
@@ -162,7 +162,25 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                     dppass: "keep"
                                 },
 
-                                nodes: params.capNodes
+                                nodes: [
+                                    {
+                                        type: "shader",
+                                        shaders: [
+                                            {
+                                                stage: "fragment",
+                                                code: [
+                                                    "precision mediump float;",
+                                                    "uniform vec3  SCENEJS_uMaterialColor;",
+                                                    "varying vec2 vUv;",
+                                                    "void main () {",
+                                                    "   gl_FragColor = vec4(SCENEJS_uMaterialColor, 1.0);",
+                                                    "}"
+                                                ]
+                                            }
+                                        ],
+                                        nodes: params.capNodes
+                                    }
+                                ]
                                     
                             }
                         ]
