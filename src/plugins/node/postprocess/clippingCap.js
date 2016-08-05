@@ -9,6 +9,49 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
         this._clips = params.clips != undefined ? params.clips : [{x: 0, y: 0, z: 1, dist: 0, mode: "inside"}];
 
+        var frontClippingFS = [
+            "precision mediump float;",
+            "uniform bool SCENEJS_uClipping;",
+            "uniform vec3 SCENEJS_uWorldEye;",
+            "uniform vec3 SCENEJS_uWorldLook;",
+            "uniform vec3 SCENEJS_uMaterialColor;"//,
+        ];
+
+        var lenClips = this._clips.length;
+        var i;
+        for (i = 0; i < lenClips; i++) {
+            frontClippingFS.push("uniform float SCENEJS_uClipMode" + i + ";");
+            frontClippingFS.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";");
+        }
+
+        frontClippingFS.push("varying vec4 SCENEJS_vWorldVertex;");
+        frontClippingFS.push("varying vec2 vUv;");
+
+        frontClippingFS.push("void main () {");
+        
+        //frontClippingFS.push("if (SCENEJS_uClipping) {");
+
+        frontClippingFS.push("  float dist = 0.0;");
+
+        //for (i = 0; i < 1; i++) {
+        for (i = 0; i < lenClips; i++) {
+            frontClippingFS.push("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
+            frontClippingFS.push("    if (dot(SCENEJS_uWorldLook - SCENEJS_uWorldEye, SCENEJS_uClipNormalAndDist" + i + ".xyz) < -SCENEJS_uClipNormalAndDist" + i + ".w) {");
+            frontClippingFS.push("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
+            frontClippingFS.push("    }");
+            frontClippingFS.push("  }");
+        }
+
+        frontClippingFS.push("  if (dist > 0.0) { discard; }");
+
+        //frontClippingFS.push("}");
+
+
+        frontClippingFS.push("  gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);");
+
+
+        frontClippingFS.push("}");
+
 
 
 
@@ -68,12 +111,20 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
                                         nodes: [
                                             {
-                                                type: "flags",
-                                                flags: {
-                                                    frontClippingOnly: true
-                                                },
+                                                // type: "flags",
+                                                // flags: {
+                                                //     frontClippingOnly: true
+                                                // },
+                                                type: "shader",
+                                                shaders: [
+                                                    {
+                                                        stage: "fragment",
+                                                        code: frontClippingFS
+                                                    }
+                                                ],
 
                                                 nodes: params.nodes
+
                                             }
                                         ]
 
@@ -108,7 +159,7 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                         type: "flags",
                                         flags: {
                                             backfaces: false,
-                                            clearColorBuffer: true
+                                            //clearColorBuffer: true
                                         },
 
                                         nodes: params.nodes
@@ -181,6 +232,26 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                         nodes: params.capNodes
                                     }
                                 ]
+
+                                //nodes: params.capNodes
+
+                                // nodes: [
+                                //     {
+                                //         type: "clips",
+                                //         clips: this._clips,
+
+                                //         nodes: [
+                                //             {
+                                //                 type: "flags",
+                                //                 flags: {
+                                //                     backClippingOnly: true
+                                //                 },
+
+                                //                 nodes: params.capNodes
+                                //             }
+                                //         ]
+                                //     }
+                                // ]
                                     
                             }
                         ]
@@ -190,6 +261,10 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
         ]);
         
+
+
+        //this._shader.setParams({SCENEJS_uWorldEye: this._core.look.eye});
+
 
     }
 });
