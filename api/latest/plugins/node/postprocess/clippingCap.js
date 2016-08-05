@@ -10,37 +10,6 @@ SceneJS.Types.addType("postprocess/clippingCap", {
         var lenClips = this._clips.length;
         var i;
 
-        
-        // var clippingPlanesNodes = [{
-        //     type: "flag",
-        //     flags: {
-        //         backfaces: false
-        //     },
-
-        //     nodes: []
-        // }];
-
-        // var clippingPlanes = clippingPlanesNodes.nodes;
-
-        // for (i = 0; i < lenClips; i++) {
-        //     clippingPlanes.push({
-        //         type: "rotate",
-
-
-
-        //         nodes: [
-        //             {
-        //                 type: "geometry/plane",
-        //                 width: 10, 
-        //                 height: 10,
-        //                 widthSegments: 1,
-        //                 heightSegments: 1
-        //             }
-        //         ]
-        //     })
-        // }
-
-
         // Build custom clipping shader
 
         var frontClippingFS = [
@@ -76,76 +45,6 @@ SceneJS.Types.addType("postprocess/clippingCap", {
         frontClippingFS.push("  gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n");
 
         frontClippingFS.push("}");
-
-
-
-        var backClippingFS = [
-            "precision highp float;\n",
-            "uniform vec3 SCENEJS_uWorldEye;\n",
-            "uniform vec3 SCENEJS_uWorldLook;\n",
-            "uniform vec3 SCENEJS_uMaterialColor;\n"//,
-        ];
-
-        for (i = 0; i < lenClips; i++) {
-            backClippingFS.push("uniform float SCENEJS_uClipMode" + i + ";\n");
-            backClippingFS.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";\n");
-        }
-
-        backClippingFS.push("varying vec4 SCENEJS_vWorldVertex;\n");
-        backClippingFS.push("varying vec2 vUv;\n");
-
-        backClippingFS.push("void main () {\n");
-
-        backClippingFS.push("  float dist = 0.0;\n");
-
-        //for (i = 0; i < 1; i++) {
-        for (i = 0; i < lenClips; i++) {
-            backClippingFS.push("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
-            backClippingFS.push("    if (dot(SCENEJS_uWorldLook - SCENEJS_uWorldEye, SCENEJS_uClipNormalAndDist" + i + ".xyz) > -SCENEJS_uClipNormalAndDist" + i + ".w) {");
-            backClippingFS.push("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
-            backClippingFS.push("    }");
-            backClippingFS.push("  }");
-        }
-
-        backClippingFS.push("  if (dist > 0.0) { discard; }\n");
-
-        backClippingFS.push("  gl_FragColor = vec4(SCENEJS_uMaterialColor, 1.0);\n");
-
-        backClippingFS.push("}");
-
-
-
-        var capClippingFS = [
-            "precision highp float;\n",
-            "uniform vec3 SCENEJS_uWorldEye;\n",
-            "uniform vec3 SCENEJS_uWorldLook;\n",
-            "uniform vec3 SCENEJS_uMaterialColor;\n"//,
-        ];
-
-        for (i = 0; i < lenClips; i++) {
-            capClippingFS.push("uniform float SCENEJS_uClipMode" + i + ";\n");
-            capClippingFS.push("uniform vec4  SCENEJS_uClipNormalAndDist" + i + ";\n");
-        }
-
-        capClippingFS.push("varying vec4 SCENEJS_vWorldVertex;\n");
-        capClippingFS.push("varying vec2 vUv;\n");
-
-        capClippingFS.push("void main () {\n");
-
-        capClippingFS.push("  float dist = 1.0;\n");
-
-        for (i = 0; i < lenClips; i++) {
-            capClippingFS.push("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
-            capClippingFS.push("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
-            capClippingFS.push("  }");
-        }
-
-        capClippingFS.push("  if (dist > 0.0) { discard; }\n");
-
-        capClippingFS.push("  gl_FragColor = vec4(SCENEJS_uMaterialColor, 1.0);\n");
-
-        capClippingFS.push("}");
-
 
 
         this.addNodes([
