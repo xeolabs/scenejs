@@ -823,31 +823,16 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
             for (var i = 0; i < states.clips.clips.length; i++) {
                 add("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
-
-                // if (frontClippingOnly) {
-                //     // add("      dist += clamp(");
-                //     // add("        (dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w)");
-                //     // add("         * (dot(SCENEJS_uWorldEye.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w)");
-                //     // add("         , 0.0, 10000.0);");
-                //     add("    dist += clamp(  ( dot( SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w) * (dot(SCENEJS_uWorldEye.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w), 0.0, 1000.0);");
-
-                // } else {
-                //     add("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
-                // }
                 
                 if (frontClippingOnly) {
                     add("    if (dot(SCENEJS_uWorldLook - SCENEJS_uWorldEye, SCENEJS_uClipNormalAndDist" + i + ".xyz) < -SCENEJS_uClipNormalAndDist" + i + ".w) {");
                 }
+                
                 add("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
+                
                 if (frontClippingOnly) {
                     add("    }");
                 }
-
-                //add("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
-
-                // if (frontClippingOnly) {
-                //     add("    }");
-                // }
 
                 add("  }");
             }
