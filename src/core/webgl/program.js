@@ -57,6 +57,9 @@ SceneJS._webgl.Program = function (gl, vertexSources, fragmentSources) {
         }
 
         gl.linkProgram(this.handle);
+        if (!gl.getProgramParameter(this.handle, gl.LINK_STATUS)) {
+            console.error(gl.getProgramInfoLog(this.handle));
+        }
 
         // Discover uniforms and samplers
 

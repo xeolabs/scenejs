@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-08-04
+ * Built on 2016-08-05
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -6171,6 +6171,9 @@ SceneJS._webgl.Program = function (gl, vertexSources, fragmentSources) {
         }
 
         gl.linkProgram(this.handle);
+        if (!gl.getProgramParameter(this.handle, gl.LINK_STATUS)) {
+            console.error(gl.getProgramInfoLog(this.handle));
+        }
 
         // Discover uniforms and samplers
 
