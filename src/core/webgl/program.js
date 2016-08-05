@@ -2,12 +2,15 @@
  * @class Wrapper for a WebGL program
  *
  * @param hash SceneJS-managed ID for program
+ * @param {*} stats Collects scene statistics
  * @param gl WebGL gl
  * @param vertexSources Source codes for vertex shaders
  * @param fragmentSources Source codes for fragment shaders
  * @param logging Program and shaders will write to logging's debug channel as they compile and link
  */
-SceneJS._webgl.Program = function (gl, vertexSources, fragmentSources) {
+SceneJS._webgl.Program = function (stats, gl, vertexSources, fragmentSources) {
+
+    this.stats = stats;
 
     /**
      * True as soon as this program is allocated and ready to go
@@ -76,7 +79,7 @@ SceneJS._webgl.Program = function (gl, vertexSources, fragmentSources) {
                 if ((u.type == gl.SAMPLER_2D) || (u.type == gl.SAMPLER_CUBE) || (u.type == 35682)) {
                     this._samplers[u_name] = new SceneJS._webgl.Sampler(gl, this.handle, u_name, u.type, u.size, location);
                 } else {
-                    this._uniforms[u_name] = new SceneJS._webgl.Uniform(gl, this.handle, u_name, u.type, u.size, location, valueIndex);
+                    this._uniforms[u_name] = new SceneJS._webgl.Uniform(stats.frame, gl, this.handle, u_name, u.type, u.size, location, valueIndex);
                     ++valueIndex;
                 }
             }

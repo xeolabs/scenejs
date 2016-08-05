@@ -32,9 +32,11 @@ SceneJS_ChunkFactory.createChunkType({
         }
 
         if (core.indexBuf) {
-            gl.drawElements(core.primitive, core.indexBuf.numItems, core.indexBuf.itemType, 0);            
+            gl.drawElements(core.primitive, core.indexBuf.numItems, core.indexBuf.itemType, 0);
+            frameCtx.drawElements++;
         } else {
             gl.drawArrays(core.primitive, 0, core.vertexBuf.numItems / 3);
+            frameCtx.drawArrays++;
         }
 
         //frameCtx.textureUnit = 0;

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <script src="../api/latest/scenejs.min.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoLight" style="background: black; opacity: 0.7; color: white;">
+    <a href="http://scenejs.org">SceneJS</a> - logging runtime statistics on a Scene
+    <pre id="infoTxt"
+         style="left: 0; text-align: left; background: black; opacity: 0.7; color: white; font-size: 14pt;">
+    </pre>
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        nodes: [
+
+            // Mouse-orbited camera,
+            // implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
+            {
+                type: "cameras/orbit",
+                yaw: 340,
+                pitch: -20,
+                zoom: 7,
+                zoomSensitivity: 1.0,
+                eye: {x: 0, y: 0, z: 10},
+                look: {x: 0, y: 0, z: 0},
+                spin: 0.1,
+
+                nodes: [
+
+                    // Planet Earth model,
+                    // implemented by plugin at http://scenejs.org/api/latest/plugins/node/models/space/planets/earth.js
+                    {
+                        type: "models/space/planets/earth"
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Periodically log scene statistics
+
+    var freq = 5; // Log every five ticks
+    var i = freq;
+
+    scene.on("tick", function () {
+        if (--i === 0) {
+            logJSON(scene.stats);
+            i = freq;
+        }
+    });
+
+    function logJSON(json) {
+        document.getElementById("infoTxt").innerHTML = JSON.stringify(json, null, 4);
+    }
+
+</script>
+</body>
+</html>

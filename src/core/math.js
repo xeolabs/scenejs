@@ -281,6 +281,24 @@
     };
 
     /**
+     * @param u vec2
+     * @param v vec2
+     * @param dest vec2 - optional destination
+     * @return {vec2} dest if specified, u otherwise
+     * @private
+     */
+    window.SceneJS_math_addVec2 = function (u, v, dest) {
+        if (!dest) {
+            dest = u;
+        }
+
+        dest[0] = u[0] + v[0];
+        dest[1] = u[1] + v[1];
+
+        return dest;
+    };
+
+    /**
      * @param v vec4
      * @param s scalar
      * @param dest vec4 - optional destination

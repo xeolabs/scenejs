@@ -42,6 +42,7 @@ new (function () {
                 self._buildNodeCore(self._engine.canvas.gl, self._core);
             };
 
+            this._engine.stats.memory.meshes++;
         }
     };
 
@@ -87,6 +88,7 @@ new (function () {
             }
 
             core.arrays.positions = data.positions;
+            this._engine.stats.memory.positions += data.positions.length / 3;
         }
 
         if (data.normals) {
@@ -95,6 +97,7 @@ new (function () {
             }
 
             core.arrays.normals = data.normals;
+            this._engine.stats.memory.normals += data.normals.length / 3;
         }
 
         if (data.uvs) {
@@ -105,6 +108,7 @@ new (function () {
                 if (uv.constructor != Float32Array) {
                     uvs[i] = new Float32Array(uvs[i]);
                 }
+                this._engine.stats.memory.uvs += uv.length / 2;
             }
             core.arrays.uvs = uvs;
         }
@@ -119,6 +123,7 @@ new (function () {
                 core.arrays.uvs = [];
             }
             core.arrays.uvs[0] = data.uv;
+            this._engine.stats.memory.uvs += data.uv.length / 2;
         }
 
         if (data.uv1) {
@@ -128,7 +133,8 @@ new (function () {
             if (!core.arrays.uvs) {
                 core.arrays.uvs = [];
             }
-            core.arrays.uvs[1] = data.uv2;
+            core.arrays.uvs[1] = data.uv1;
+            this._engine.stats.memory.uvs += data.uv1.length / 2;
         }
 
         if (data.uv2) {
@@ -139,6 +145,7 @@ new (function () {
                 core.arrays.uvs = [];
             }
             core.arrays.uvs[2] = data.uv2;
+            this._engine.stats.memory.uvs += data.uv2.length / 2;
         }
 
         if (data.uv3) {
@@ -149,6 +156,7 @@ new (function () {
                 core.arrays.uvs = [];
             }
             core.arrays.uvs[3] = data.uv3;
+            this._engine.stats.memory.uvs += data.uv3.length / 2;
         }
 
         // ----------------------------------------------------------
@@ -163,14 +171,19 @@ new (function () {
             }
 
             core.arrays.colors = data.colors;
+            this._engine.stats.memory.colors += data.colors.length / 4;
         }
 
         if (data.indices) {
-            if (data.indices.constructor != Uint16Array && data.indices.constructor != Uint32Array) {
+            if (data.indices.constructor != Uint8Array &&
+                data.indices.constructor != Uint16Array &&
+                data.indices.constructor != Uint32Array)
+            {
                 data.indices = new IndexArrayType(data.indices);
             }
 
             core.arrays.indices = data.indices;
+            this._engine.stats.memory.indices += data.indices.length;
         }
 
         // Lazy-build tangents, only when needed as rendering
@@ -467,6 +480,7 @@ new (function () {
         }
 
         data.normals = normals;
+        this._engine.stats.memory.normals += normals.length / 3;
     };
 
     SceneJS.Geometry.prototype.setSource = function (sourceConfigs) {
@@ -538,8 +552,13 @@ new (function () {
             this._boundary = null;
             var core = this._core;
             core.indexBuf.bind();
-            var IndexArrayType = this._engine.canvas.UINT_INDEX_ENABLED ? Uint32Array : Uint16Array;
-            core.indexBuf.setData(new IndexArrayType(data.indices), data.indicesOffset || 0);
+
+            // Make sure indices remain of the same type.
+            if (data.indices.constructor != core.arrays.indices.constructor) {
+                data.indices = new core.arrays.indices.constructor(data.indices);
+            }
+
+            core.indexBuf.setData(data.indices, data.indicesOffset || 0);
             core.arrays.indices.set(data.indices, data.indicesOffset || 0);
             this._engine.display.imageDirty = true;
         }
@@ -760,6 +779,8 @@ new (function () {
             if (this._source && this._source.destroy) {
                 this._source.destroy();
             }
+
+            this._engine.stats.memory.meshes--;
         }
     };
 
@@ -767,6 +788,24 @@ new (function () {
 
         if (document.getElementById(this._engine.canvas.canvasId)) { // Context won't exist if canvas has disappeared
             destroyBuffers(this._core);
+        }
+
+        var arrays = this._core.arrays;
+
+        if (arrays.positions) {
+            this._engine.stats.memory.positions -= arrays.positions.length / 3;
+        }
+        if (arrays.normals) {
+            this._engine.stats.memory.normals -= arrays.normals.length / 3;
+        }
+        if (arrays.colors) {
+            this._engine.stats.memory.colors -= arrays.colors.length / 3;
+        }
+        if (arrays.uvs && arrays.uvs.length > 0) {
+            this._engine.stats.memory.uvs -= arrays.uvs.length * (arrays.uvs[0].length / 2);
+        }
+        if (arrays.indices) {
+            this._engine.stats.memory.indices -= arrays.indices.length;
         }
     };
 

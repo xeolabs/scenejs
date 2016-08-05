@@ -65,13 +65,16 @@
  * <p>After a scene update, we set a flag on the display to indicate the stage we will need to redo from. The pipeline is
  * then lazy-redone on the next call to #render or #pick.</p>
  */
-var SceneJS_Display = function (cfg) {
+var SceneJS_Display = function (stats, cfg) {
+
+    // Collects runtime statistics
+    this.stats = stats || {};
 
     // Display is bound to the lifetime of an HTML5 canvas
     this._canvas = cfg.canvas;
 
     // Factory which creates and recycles {@link SceneJS_Program} instances
-    this._programFactory = new SceneJS_ProgramFactory({
+    this._programFactory = new SceneJS_ProgramFactory(this.stats, {
         canvas: cfg.canvas
     });
 
@@ -967,7 +970,7 @@ SceneJS_Display.prototype._logPickList = function () {
 
 (function () {
 
-// Cached vectors to avoid garbage collection
+    // Cached vectors to avoid garbage collection
 
     var origin = SceneJS_math_vec3();
     var dir = SceneJS_math_vec3();
@@ -989,30 +992,28 @@ SceneJS_Display.prototype._logPickList = function () {
 
     var tempVec4 = SceneJS_math_vec4();
     var tempVec4b = SceneJS_math_vec4();
-    var tempVec4c = SceneJS_math_vec4();
 
     var tempVec3 = SceneJS_math_vec3();
     var tempVec3b = SceneJS_math_vec3();
     var tempVec3c = SceneJS_math_vec3();
     var tempVec3d = SceneJS_math_vec3();
-    var tempVec3e = SceneJS_math_vec3();
-    var tempVec3f = SceneJS_math_vec3();
-    var tempVec3g = SceneJS_math_vec3();
-    var tempVec3h = SceneJS_math_vec3();
-    var tempVec3i = SceneJS_math_vec3();
-    var tempVec3j = SceneJS_math_vec3();
+
+    var tempVec2 = SceneJS_math_vec2();
+    var tempVec2b = SceneJS_math_vec2();
+    var tempVec2c = SceneJS_math_vec2();
+    var tempVec2d = SceneJS_math_vec2();
 
 
-    // Given a GameObject and camvas coordinates, gets a ray
+    // Given an Object and canvas coordinates, gets a ray
     // originating at the World-space eye position that passes
     // through the perspective projection plane. The ray is
     // returned via the origin and dir arguments.
 
     function getLocalRay(canvas, object, canvasCoords, origin, dir) {
 
-        var modelMat = object.modelTransform.matrix;
-        var viewMat = object.viewTransform.matrix;
-        var projMat = object.projTransform.matrix;
+        var modelMat = object.modelTransform.mat;
+        var viewMat = object.viewTransform.mat;
+        var projMat = object.projTransform.mat;
 
         var vmMat = SceneJS_math_mulMat4(viewMat, modelMat, tempMat4);
         var pvMat = SceneJS_math_mulMat4(projMat, vmMat, tempMat4b);
@@ -1267,7 +1268,7 @@ SceneJS_Display.prototype._logPickList = function () {
 
                 // Get World-space cartesian coordinates of the ray-triangle intersection
 
-                SceneJS_math_transformVector4(object.modelTransform.matrix, tempVec4, tempVec4b);
+                SceneJS_math_transformVector4(object.modelTransform.mat, tempVec4, tempVec4b);
 
                 hit.worldPos = SceneJS._sliceArray(tempVec4b, 0, 3);
 
@@ -1361,11 +1362,11 @@ SceneJS_Display.prototype._logPickList = function () {
                             uvc[0] = uvs[ic2];
                             uvc[1] = uvs[ic2 + 1];
 
-                            uv = SceneJS_math_addVec3(
-                                SceneJS_math_addVec3(
-                                    SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec3f),
-                                    SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec3g), tempVec3h),
-                                SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec3i), SceneJS_math_vec3());
+                            uv = SceneJS_math_addVec2(
+                                SceneJS_math_addVec2(
+                                    SceneJS_math_mulVec2Scalar(uva, barycentric[0], tempVec2),
+                                    SceneJS_math_mulVec2Scalar(uvb, barycentric[1], tempVec2b), tempVec2c),
+                                SceneJS_math_mulVec2Scalar(uvc, barycentric[2], tempVec2d), SceneJS_math_vec2());
 
                             hit.uvs.push(uv);
                         }
@@ -1552,6 +1553,11 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.texture = null;
     frameCtx.normalMapUVLayerIdx = -1;
     frameCtx.regionMapUVLayerIdx = -1;
+    frameCtx.drawElements = 0;
+    frameCtx.drawArrays = 0;
+    frameCtx.useProgram = 0;
+    frameCtx.bindTexture = 0;
+    frameCtx.bindArray = 0;
 
     // The extensions needs to be re-queried in case the context was lost and has been recreated.
     if (SceneJS.WEBGL_INFO.SUPPORTED_EXTENSIONS["OES_element_index_uint"]) {
@@ -1560,6 +1566,9 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     var VAO = gl.getExtension("OES_vertex_array_object");
     frameCtx.VAO = (VAO) ? VAO : null;
+
+    this.stats.frame.setUniform = 0;
+    this.stats.frame.setUniformCacheHits = 0;
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -1586,6 +1595,8 @@ SceneJS_Display.prototype._doDrawList = function (params) {
         for (var i = 0, len = this._pickDrawListLen; i < len; i++) {
             this._pickDrawList[i].pick(frameCtx);
         }
+
+        gl.flush();
 
     } else if (params.pickRegion || params.pickTriangle) {
 
@@ -1619,10 +1630,14 @@ SceneJS_Display.prototype._doDrawList = function (params) {
             }
         }
 
+        gl.flush();
+
     } else {
 
         // Render scene
         // Render whole draw list
+
+        var startTime = Date.now();
 
         // Option to only render opaque objects
         var len = (params.opaqueOnly && this._drawListTransparentIndex >= 0 ? this._drawListTransparentIndex : this._drawListLen);
@@ -1631,9 +1646,19 @@ SceneJS_Display.prototype._doDrawList = function (params) {
         for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
             this._drawList[i].draw(frameCtx);
         }
-    }
 
-    gl.flush();
+        gl.flush();
+
+        var endTime = Date.now();
+
+        this.stats.frame.renderTime = (endTime - startTime) / 1000.0;
+        this.stats.frame.drawElements = frameCtx.drawElements;
+        this.stats.frame.drawArrays = frameCtx.drawArrays;
+        this.stats.frame.useProgram = frameCtx.useProgram;
+        this.stats.frame.bindTexture = frameCtx.bindTexture;
+        this.stats.frame.bindArray = frameCtx.bindArray;
+        this.stats.frame.drawChunks = this._drawListLen;
+    }
 
     if (frameCtx.renderBuf) {
         frameCtx.renderBuf.unbind();

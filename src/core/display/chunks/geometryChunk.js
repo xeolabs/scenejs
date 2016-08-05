@@ -72,15 +72,21 @@ SceneJS_ChunkFactory.createChunkType({
         if (this._aMorphVertexDraw) {
             this._aVertexDraw.bindFloatArrayBuffer(target1.vertexBuf);
             this._aMorphVertexDraw.bindFloatArrayBuffer(target2.vertexBuf);
+            frameCtx.bindArray += 2;
+
         } else if (this._aVertexDraw) {
             this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
+            frameCtx.bindArray++;
         }
 
         if (this._aMorphNormalDraw) {
             this._aNormalDraw.bindFloatArrayBuffer(target1.normalBuf);
             this._aMorphNormalDraw.bindFloatArrayBuffer(target2.normalBuf);
+            frameCtx.bindArray += 2;
+
         } else if (this._aNormalDraw) {
             this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
+            frameCtx.bindArray++;
         }
 
         if (this._aMorphTangentDraw || this._aTangentDraw) {
@@ -99,6 +105,8 @@ SceneJS_ChunkFactory.createChunkType({
                 if (this._aMorphTangentDraw) {
                     this._aTangentDraw.bindFloatArrayBuffer(this.core.getTangents(key1, this.core2.arrays.indices, this.core2.arrays.uvs[normalMapUVLayerIdx]));
                     this._aMorphTangentDraw.bindFloatArrayBuffer(this.core.getTangents(key2, this.core2.arrays.indices, this.core2.arrays.uvs[normalMapUVLayerIdx]));
+                    frameCtx.bindArray += 2;
+
                 } else if (this._aTangentDraw) {
 
                     // TODO: What's this for?
@@ -114,22 +122,22 @@ SceneJS_ChunkFactory.createChunkType({
             uvBuf = this.core2.uvBufs[i];
             if (uvBuf) {
                 this._aUVDraw[i].bindFloatArrayBuffer(uvBuf);
+                frameCtx.bindArray++;
             }
         }
 
         if (this._aColorDraw) {
             this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
+            frameCtx.bindArray++;
         }
 
         this.setDrawMorphFactor();
     },
 
     setDrawMorphFactor: function () {
-
         if (this._uMorphFactorDraw) {
             this._uMorphFactorDraw.setValue(this.core.factor); // Bind LERP factor
         }
-
     },
 
     draw: function (frameCtx) {
@@ -165,33 +173,41 @@ SceneJS_ChunkFactory.createChunkType({
                 this.core2.interleavedBuf.bind();
                 if (this._aVertexDraw) {
                     this._aVertexDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedPositionOffset);
+                    frameCtx.bindArray++;
                 }
                 if (this._aNormalDraw) {
                     this._aNormalDraw.bindInterleavedFloatArrayBuffer(3, this.core2.interleavedStride, this.core2.interleavedNormalOffset);
+                    frameCtx.bindArray++;
                 }
                 for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
                     this._aUVDraw[i].bindInterleavedFloatArrayBuffer(2, this.core2.interleavedStride, this.core2.interleavedUVOffsets[i]);
+                    frameCtx.bindArray++;
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindInterleavedFloatArrayBuffer(4, this.core2.interleavedStride, this.core2.interleavedColorOffset);
+                    frameCtx.bindArray++;
                 }
             } else {
                 this.VAOHasInterleavedBuf = false;
                 if (this._aVertexDraw) {
                     this._aVertexDraw.bindFloatArrayBuffer(this.core2.vertexBuf);
+                    frameCtx.bindArray++;
                 }
                 if (this._aNormalDraw) {
                     this._aNormalDraw.bindFloatArrayBuffer(this.core2.normalBuf);
+                    frameCtx.bindArray++;
                 }
                 var uvBuf;
                 for (var i = 0, len = this._aUVDraw.length; i < len; i++) {
                     uvBuf = this.core2.uvBufs[i];
                     if (uvBuf) {
                         this._aUVDraw[i].bindFloatArrayBuffer(uvBuf);
+                        frameCtx.bindArray++;
                     }
                 }
                 if (this._aColorDraw) {
                     this._aColorDraw.bindFloatArrayBuffer(this.core2.colorBuf);
+                    frameCtx.bindArray++;
                 }
             }
 
@@ -207,6 +223,7 @@ SceneJS_ChunkFactory.createChunkType({
                 var normalMapUVLayerIdx = frameCtx.normalMapUVLayerIdx;
                 if (normalMapUVLayerIdx >= 0) {
                     this._aTangentDraw.bindFloatArrayBuffer(this.core2.getTangents(normalMapUVLayerIdx));
+                    frameCtx.bindArray++;
                 }
             }
         }
@@ -217,6 +234,7 @@ SceneJS_ChunkFactory.createChunkType({
                 var uvBufs = this.core2.uvBufs;
                 if (regionMapUVLayerIdx < uvBufs.length) {
                     this._aRegionMapUVDraw.bindFloatArrayBuffer(uvBufs[regionMapUVLayerIdx]);
+                    frameCtx.bindArray++;
                 }
             }
         }
@@ -300,7 +318,7 @@ SceneJS_ChunkFactory.createChunkType({
                 }
 
                 if (core2.indexBuf) {
-                    core2.indexBuf.bind();                    
+                    core2.indexBuf.bind();
                 }
 
             } else if (frameCtx.pickTriangle) {

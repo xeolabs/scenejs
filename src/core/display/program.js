@@ -2,12 +2,15 @@
  * @class Vertex and fragment shaders for pick and draw
  * @private
  *
+ * @param {*} stats Collects runtime statistics
  * @param {Number} id ID unique among all programs in the owner {@link SceneJS_ProgramFactory}
  * @param {String} hash Hash code which uniquely identifies the capabilities of the program, computed from hashes on the {@link Scene_Core}s that the {@link SceneJS_ProgramSource} composed to render
  * @param {SceneJS_ProgramSource} source Sourcecode from which the the program is compiled in {@link #build}
  * @param {WebGLRenderingContext} gl WebGL context 
  */
-var SceneJS_Program = function(id, hash, source, gl) {
+var SceneJS_Program = function(stats, id, hash, source, gl) {
+
+    this.stats = stats;
 
     /**
      * ID for this program, unique among all programs in the display
@@ -61,6 +64,6 @@ var SceneJS_Program = function(id, hash, source, gl) {
 SceneJS_Program.prototype.build = function(gl) {
 
     this.gl = gl;
-    this.draw = new SceneJS._webgl.Program(gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
-    this.pick = new SceneJS._webgl.Program(gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
+    this.draw = new SceneJS._webgl.Program(this.stats, gl, [this.source.drawVertexSrc.join("\n")], [this.source.drawFragmentSrc.join("\n")]);
+    this.pick = new SceneJS._webgl.Program(this.stats, gl, [this.source.pickVertexSrc.join("\n")], [this.source.pickFragmentSrc.join("\n")]);
 };

@@ -134,6 +134,8 @@ new (function () {
                     this.publish("image", layer.image);
                     this._imagePublished = true;
                 }
+
+                this._engine.stats.memory.textures++;
             }
 
             var self = this;
@@ -536,6 +538,7 @@ new (function () {
                 layer = layers[i];
                 if (layer.texture) {
                     layer.texture.destroy();
+                    this._engine.stats.memory.textures++;
                 }
                 source = layer._source;
                 if (source && source.destroy) {
