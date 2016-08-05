@@ -4,13 +4,44 @@
 SceneJS.Types.addType("postprocess/clippingCap", {
 
     construct: function (params) {
-        
-        //var colorTargetId = this.id + ".colorTarget";
 
         this._clips = params.clips != undefined ? params.clips : [{x: 0, y: 0, z: 1, dist: 0, mode: "inside"}];
 
         var lenClips = this._clips.length;
         var i;
+
+        
+        // var clippingPlanesNodes = [{
+        //     type: "flag",
+        //     flags: {
+        //         backfaces: false
+        //     },
+
+        //     nodes: []
+        // }];
+
+        // var clippingPlanes = clippingPlanesNodes.nodes;
+
+        // for (i = 0; i < lenClips; i++) {
+        //     clippingPlanes.push({
+        //         type: "rotate",
+
+
+
+        //         nodes: [
+        //             {
+        //                 type: "geometry/plane",
+        //                 width: 10, 
+        //                 height: 10,
+        //                 widthSegments: 1,
+        //                 heightSegments: 1
+        //             }
+        //         ]
+        //     })
+        // }
+
+
+        // Build custom clipping shader
 
         var frontClippingFS = [
             "precision highp float;\n",
@@ -105,9 +136,7 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
         for (i = 0; i < lenClips; i++) {
             capClippingFS.push("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
-            //capClippingFS.push("    if (dot(SCENEJS_uWorldLook - SCENEJS_uWorldEye, SCENEJS_uClipNormalAndDist" + i + ".xyz) > -SCENEJS_uClipNormalAndDist" + i + ".w) {");
             capClippingFS.push("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
-            //capClippingFS.push("    }");
             capClippingFS.push("  }");
         }
 
@@ -120,10 +149,6 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
 
         this.addNodes([
-
-
-            // TODO: use the simplest fragment shader (no shading needed, just need to discard and write stencil buffer)
-
             // Stage 1
             // Back face frag -> stencil buffer +1
             // Front face frag -> stencil buffer -1
@@ -135,7 +160,6 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                 nodes: [
                     {
                         type: "depthBuffer",
-                        //enabled: false,
 
                         clearDepth: 1.0,
                         enabled: true,
@@ -175,10 +199,6 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
                                         nodes: [
                                             {
-                                                // type: "flags",
-                                                // flags: {
-                                                //     frontClippingOnly: true
-                                                // },
                                                 type: "shader",
                                                 shaders: [
                                                     {
@@ -187,24 +207,9 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                                     }
                                                 ],
 
-                                                // nodes: [
-                                                //     {
-                                                //         type: "flag", 
-                                                //         flags: {
-                                                //             backfaces: false
-                                                //         },
-
-                                                //         nodes: params.nodes
-                                                //     }
-                                                // ]
-
                                                 nodes: params.nodes
-                                                
-
                                             }
                                         ]
-
-                                        
                                     }
                                 ]
                             }
@@ -215,6 +220,8 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
             
             ,
+            // Stage 2
+            // Draw the actual clipped geometry
             {
                 type: "stage",
                 priority: 2,
@@ -250,9 +257,9 @@ SceneJS.Types.addType("postprocess/clippingCap", {
             ,
             // Stage 3
             // Draw Caps with stencil test
-            // Draw the origin geometry with inner volume texture (tissue)
-            // and depth func set to GREATER to draw closest object to the clipping plane
-            // TODO: custom shader
+            // Draw the capNodes as the caps
+            // With certain knowledge of the clipping planes, we can use appropriate 
+            // capNodes geometry to get rid of the overlapping clipping planes artifacts
             {
                 type: "stage",
                 priority: 3,
@@ -262,15 +269,7 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                     {
                         type: "depthBuffer",
                         enabled: true,
-                        //enabled: false,
-                        
                         clear: true,
-                        //clear: false,
-
-                        clearDepth: 0.0,
-                        depthFunc: "gequal",
-                        
-                        // depthFunc: "lequal",
 
                         nodes: [
                             {
@@ -289,81 +288,31 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                     dppass: "keep"
                                 },
 
-                                        nodes: [
+                                nodes: [
+                                    {
+                                        type: "shader",
+
+                                        shaders: [
                                             {
-                                                type: "shader",
-                                                // shaders: [
-                                                //     {
-                                                //         stage: "fragment",
-                                                //         //code: backClippingFS
-                                                //         code : capClippingFS
-                                                //     }
-                                                // ],
-
-                                                shaders: [
-                                                    {
-                                                        stage: "fragment",
-                                                        code: [
-                                                            "precision mediump float;",
-                                                            "uniform vec3  SCENEJS_uMaterialColor;",
-                                                            "varying vec2 vUv;",
-                                                            "void main () {",
-                                                            "   gl_FragColor = vec4(SCENEJS_uMaterialColor, 1.0);",
-                                                            "}"
-                                                        ]
-                                                    }
-                                                ],
-
-
-                                                nodes: params.capNodes
+                                                stage: "fragment",
+                                                code: [
+                                                    "precision mediump float;",
+                                                    "uniform vec3  SCENEJS_uMaterialColor;",
+                                                    "void main () {",
+                                                    "   gl_FragColor = vec4(SCENEJS_uMaterialColor, 1.0);",
+                                                    "}"
+                                                ]
                                             }
-                                        ]
+                                        ],
 
-                                //         // nodes: [
-                                //         //     {
-                                //         //         type: "flag", 
-                                //         //         flags: {
-                                //         //             backfaces: false
-                                //         //         }
-
-                                //         //         ,
-                                //         //         nodes: params.capNodes
-                                //         //     }
-                                //         // ]
-                                        
-                                //     }
-                                    
-                                // ]
-
-                                //nodes: params.capNodes
-
-                                // nodes: [
-                                //     {
-                                //         type: "clips",
-                                //         clips: this._clips,
-
-                                //         nodes: [
-                                //             {
-                                //                 type: "flags",
-                                //                 flags: {
-                                //                     backClippingOnly: true
-                                //                 },
-
-                                //                 nodes: params.capNodes
-                                //             }
-                                //         ]
-                                //     }
-                                // ]
-                                    
+                                        nodes: params.capNodes
+                                    }
+                                ]
                             }
                         ]
                     }
                 ]
             }
-
         ]);
-        
-
-
     }
 });
