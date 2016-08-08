@@ -50,13 +50,11 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
         frontClippingFS.push("}");
 
-        // Cap nodes
-        var capNodes = params.capNodes;
 
         // Whether use solid color cheap frag shader or not
         var capDrawingNodes;
         if (solidColorCaps) {
-            capDrawingNodes = {
+            capDrawingNodes = [{
                 type: "shader",
 
                 shaders: [
@@ -72,10 +70,10 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                     }
                 ],
 
-                nodes: capNodes
-            };
+                nodes: params.capNodes
+            }];
         } else {
-            capDrawingNodes = capNodes;
+            capDrawingNodes = params.capNodes;
         }
 
 
