@@ -1,5 +1,5 @@
 /**
- * 
+ * Credit: algorithm learnt from: https://github.com/daign/clipping-with-caps
  */
 SceneJS.Types.addType("postprocess/clippingCap", {
 
