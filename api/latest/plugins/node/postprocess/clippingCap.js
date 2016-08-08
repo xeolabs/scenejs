@@ -5,6 +5,8 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
     construct: function (params) {
 
+        var clipsNodeId = params.clipsNodeId || "clippingCapClipsNode";
+
         this._clips = params.clips != undefined ? params.clips : [{x: 0, y: 0, z: 1, dist: 0, mode: "inside"}];
 
         var lenClips = this._clips.length;
@@ -48,53 +50,55 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
 
         this.addNodes([
-            // Stage 1
-            // Back face frag -> stencil buffer +1
-            // Front face frag -> stencil buffer -1
-            // Use Front face clipping plane only
             {
-                type: "stage",
-                priority: 1,
+                type: "clips",
+                id: clipsNodeId,
+                clips: this._clips,
 
                 nodes: [
-                    {
-                        type: "depthBuffer",
 
-                        clearDepth: 1.0,
-                        enabled: true,
-                        depthFunc: "lequal",
-                        clear: true,
+                    // Stage 1
+                    // Back face frag -> stencil buffer +1
+                    // Front face frag -> stencil buffer -1
+                    // Use Front face clipping plane only
+                    {
+                        type: "stage",
+                        priority: 1,
 
                         nodes: [
                             {
-                                type: "stencilBuffer",
+                                type: "depthBuffer",
 
+                                clearDepth: 1.0,
                                 enabled: true,
+                                depthFunc: "lequal",
                                 clear: true,
-                                clearStencil: 128,
-                                stencilFunc: {
-                                    func: "always",
-                                    ref: 128, 
-                                    mask: 0xff
-                                },
-                                stencilOp: {
-                                    front: {
-                                        sfail: "keep",
-                                        dpfail: "decr", 
-                                        dppass: "decr"
-                                    },
-                                    back: {
-                                        sfail: "keep",
-                                        dpfail: "incr", 
-                                        dppass: "incr"
-                                    }
-                                },
-
 
                                 nodes: [
                                     {
-                                        type: "clips",
-                                        clips: this._clips,
+                                        type: "stencilBuffer",
+
+                                        enabled: true,
+                                        clear: true,
+                                        clearStencil: 128,
+                                        stencilFunc: {
+                                            func: "always",
+                                            ref: 128, 
+                                            mask: 0xff
+                                        },
+                                        stencilOp: {
+                                            front: {
+                                                sfail: "keep",
+                                                dpfail: "decr", 
+                                                dppass: "decr"
+                                            },
+                                            back: {
+                                                sfail: "keep",
+                                                dpfail: "incr", 
+                                                dppass: "incr"
+                                            }
+                                        },
+
 
                                         nodes: [
                                             {
@@ -114,28 +118,19 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                             }
                         ]
                     }
-                ]
-            }
 
             
-            ,
-            // Stage 2
-            // Draw the actual clipped geometry
-            {
-                type: "stage",
-                priority: 2,
-
-                nodes: [
+                    ,
+                    // Stage 2
+                    // Draw the actual clipped geometry
                     {
-                        type: "depthBuffer",
-
-                        clear: true,
+                        type: "stage",
+                        priority: 2,
 
                         nodes: [
                             {
-                                type: "clips",
-                                clips: this._clips,
-
+                                type: "depthBuffer",
+                                clear: true,
                                 nodes: [
                                     {
                                         type: "flags",
@@ -214,4 +209,5 @@ SceneJS.Types.addType("postprocess/clippingCap", {
             }
         ]);
     }
+
 });
