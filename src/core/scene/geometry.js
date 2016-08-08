@@ -175,7 +175,10 @@ new (function () {
         }
 
         if (data.indices) {
-            if (data.indices.constructor != Uint16Array && data.indices.constructor != Uint32Array) {
+            if (data.indices.constructor != Uint8Array &&
+                data.indices.constructor != Uint16Array &&
+                data.indices.constructor != Uint32Array)
+            {
                 data.indices = new IndexArrayType(data.indices);
             }
 
@@ -549,8 +552,13 @@ new (function () {
             this._boundary = null;
             var core = this._core;
             core.indexBuf.bind();
-            var IndexArrayType = this._engine.canvas.UINT_INDEX_ENABLED ? Uint32Array : Uint16Array;
-            core.indexBuf.setData(new IndexArrayType(data.indices), data.indicesOffset || 0);
+
+            // Make sure indices remain of the same type.
+            if (data.indices.constructor != core.arrays.indices.constructor) {
+                data.indices = new core.arrays.indices.constructor(data.indices);
+            }
+
+            core.indexBuf.setData(data.indices, data.indicesOffset || 0);
             core.arrays.indices.set(data.indices, data.indicesOffset || 0);
             this._engine.display.imageDirty = true;
         }

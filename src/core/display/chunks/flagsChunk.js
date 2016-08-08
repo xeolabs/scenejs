@@ -88,6 +88,14 @@ SceneJS_ChunkFactory.createChunkType({
             if (this._uSolidColorDraw) {
                 this._uSolidColorDraw.setValue(this.core.solidColor);
             }
+
+            // !!dirty
+            // if (frameCtx.clearColorBuffer != this.core.clearColorBuffer) {
+            //     frameCtx.clearColorBuffer = this.core.clearColorBuffer;
+            // }
+            if ( this.core.clearColorBuffer ) {
+                gl.clear(gl.COLOR_BUFFER_BIT);
+            }
         }
     }
 });
