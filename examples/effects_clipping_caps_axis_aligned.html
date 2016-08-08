@@ -47,9 +47,6 @@
         z: 1
     };
 
-    var t = {x: 0, y: 0, z:0};
-    var s = {x: 1, y: 1, z:1};
-
     var clips = [
         // Left
         {
@@ -166,15 +163,15 @@
                                     {
                                         type: "translate",
                                         id: "capBoxTranslate",
-                                        x: t.x,
-                                        y: t.y,
-                                        z: t.z,
+                                        x: 0,
+                                        y: 0,
+                                        z: 0,
 
                                         nodes: [
                                             {
                                                 type: "scale",
                                                 id: "capBoxScale",
-                                                x: s.x, y: s.y, z: s.z,
+                                                x: 1, y: 1, z: 1,
 
                                                 nodes: [
                                                     {
