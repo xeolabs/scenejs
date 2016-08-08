@@ -7,6 +7,8 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
         var clipsNodeId = params.clipsNodeId || "clippingCapClipsNode";
 
+        var solidColorCaps = params.solidColorCaps !== undefined ? params.solidColorCaps : true;
+
         this._clips = params.clips != undefined ? params.clips : [{x: 0, y: 0, z: 1, dist: 0, mode: "inside"}];
 
         var lenClips = this._clips.length;
@@ -47,6 +49,35 @@ SceneJS.Types.addType("postprocess/clippingCap", {
         frontClippingFS.push("  gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n");
 
         frontClippingFS.push("}");
+
+        // Cap nodes
+        var capNodes = params.capNodes;
+
+        // Whether use solid color cheap frag shader or not
+        var capDrawingNodes;
+        if (solidColorCaps) {
+            capDrawingNodes = {
+                type: "shader",
+
+                shaders: [
+                    {
+                        stage: "fragment",
+                        code: [
+                            "precision mediump float;",
+                            "uniform vec3  SCENEJS_uMaterialColor;",
+                            "void main () {",
+                            "   gl_FragColor = vec4(SCENEJS_uMaterialColor, 1.0);",
+                            "}"
+                        ]
+                    }
+                ],
+
+                nodes: capNodes
+            };
+        } else {
+            capDrawingNodes = capNodes;
+        }
+
 
 
         this.addNodes([
@@ -182,26 +213,7 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                     dppass: "keep"
                                 },
 
-                                nodes: [
-                                    {
-                                        type: "shader",
-
-                                        shaders: [
-                                            {
-                                                stage: "fragment",
-                                                code: [
-                                                    "precision mediump float;",
-                                                    "uniform vec3  SCENEJS_uMaterialColor;",
-                                                    "void main () {",
-                                                    "   gl_FragColor = vec4(SCENEJS_uMaterialColor, 1.0);",
-                                                    "}"
-                                                ]
-                                            }
-                                        ],
-
-                                        nodes: params.capNodes
-                                    }
-                                ]
+                                nodes: capDrawingNodes
                             }
                         ]
                     }

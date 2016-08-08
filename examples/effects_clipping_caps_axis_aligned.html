@@ -36,19 +36,82 @@
     });
 
     var clippingMin = {
-        x: -0.5,
+        x: -0.8,
         y: -0.8,
         z: -1
-    }
+    };
 
     var clippingMax = {
         x: 0.9,
         y: 0.8,
         z: 1
-    }
+    };
+
+    var t = {x: 0, y: 0, z:0};
+    var s = {x: 1, y: 1, z:1};
+
+    var clips = [
+        // Left
+        {
+            // Vector from origin to clipping plane
+            x: -1.0,
+            y: 0.0,
+            z: 0.0,
+
+            // Distance to plane along the vector
+            dist: -clippingMin.x,
+            mode: "inside"
+        },
+
+        // Right
+        {
+            x: 1.0,
+            y: 0.0,
+            z: 0.0,
+            dist: clippingMax.x,
+            mode: "inside"
+        },
+
+        // Bottom
+        {
+            x: 0.0,
+            y: -1.0,
+            z: 0.0,
+            dist: -clippingMin.y,
+            mode: "inside"
+        },
+
+        // Top
+        {
+            x: 0.0,
+            y: 1.0,
+            z: 0.0,
+            dist: clippingMax.y,
+            //dist: 0.8,
+            mode: "inside"
+        },
+
+        // Front
+        {
+            x: 0.0,
+            y: 0.0,
+            z: -1.0,
+            dist: -clippingMin.z,
+            mode: "inside"
+        },
+
+        // Back
+        {
+            x: 0.0,
+            y: 0.0,
+            z: 1.0,
+            dist: clippingMax.z,
+            mode: "inside"
+        }
+    ];
 
     // Create scene
-    SceneJS.createScene({
+    var scene = SceneJS.createScene({
         nodes: [
 
             // Mouse-orbited camera, implemented by plugin at http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
@@ -63,67 +126,10 @@
                 nodes: [
                     {
                         type: "postprocess/clippingCap",
+                        id: "myClippingCap",
 
                         // Four arbitrarily-aligned clip planes
-                        clips: [
-                            // Left
-                            {
-                                // Vector from origin to clipping plane
-                                x: -1.0,
-                                y: 0.0,
-                                z: 0.0,
-
-                                // Distance to plane along the vector
-                                dist: -clippingMin.x,
-                                mode: "inside"
-                            },
-
-                            // Right
-                            {
-                                x: 1.0,
-                                y: 0.0,
-                                z: 0.0,
-                                dist: clippingMax.x,
-                                mode: "inside"
-                            },
-
-                            // Bottom
-                            {
-                                x: 0.0,
-                                y: -1.0,
-                                z: 0.0,
-                                dist: -clippingMin.y,
-                                mode: "inside"
-                            },
-
-                            // Top
-                            {
-                                x: 0.0,
-                                y: 1.0,
-                                z: 0.0,
-                                dist: clippingMax.y,
-                                //dist: 0.8,
-                                mode: "inside"
-                            },
-
-                            // Front
-                            {
-                                x: 0.0,
-                                y: 0.0,
-                                z: -1.0,
-                                dist: -clippingMin.z,
-                                mode: "inside"
-                            },
-
-                            // Back
-                            {
-                                x: 0.0,
-                                y: 0.0,
-                                z: 1.0,
-                                dist: clippingMax.z,
-                                mode: "inside"
-                            }
-                        ]
+                        clips: clips
                         ,
 
                         nodes: [
@@ -157,11 +163,27 @@
                                 specular: 0,
 
                                 nodes: [
-
                                     {
-                                        type: "geometry/boxBoundary",
-                                        min: [clippingMin.x, clippingMin.y, clippingMin.z],
-                                        max: [clippingMax.x, clippingMax.y, clippingMax.z]
+                                        type: "translate",
+                                        id: "capBoxTranslate",
+                                        x: t.x,
+                                        y: t.y,
+                                        z: t.z,
+
+                                        nodes: [
+                                            {
+                                                type: "scale",
+                                                id: "capBoxScale",
+                                                x: s.x, y: s.y, z: s.z,
+
+                                                nodes: [
+                                                    {
+                                                        type: "geometry/box",
+                                                        size: [0.5, 0.5, 0.5]
+                                                    }
+                                                ]
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -171,6 +193,60 @@
             }
         ]
     });
+
+
+    scene.getNode("clippingCapClipsNode", function (clipsNode) {
+        scene.getNode("capBoxTranslate", function (translateNode) {
+            scene.getNode("capBoxScale", function (scaleNode) {
+
+
+                var xInc = 0.01;
+                var yInc = 0.004;
+                scene.on("tick", function() {
+
+                    if (clippingMax.x > 1.4 || clippingMax.x < 0) {
+                        xInc *= -1;
+                    }
+                    if (clippingMax.y > 1.5 || clippingMax.y < 0.65) {
+                        yInc *= -1;
+                    }
+
+                    clippingMax.x += xInc;
+                    clippingMax.y += yInc;
+                    clippingMin.y -= yInc;
+
+                    updateClips(clipsNode);
+                    updateCapBox(translateNode, scaleNode);
+
+                });
+            });
+        });
+    });
+
+
+    function updateClips(C) {
+        clips[0].dist = -clippingMin.x;     //left
+        clips[1].dist = clippingMax.x;     //right
+
+        clips[2].dist = -clippingMin.y;     //bottom
+        clips[3].dist = clippingMax.y;     //top
+
+        clips[4].dist = -clippingMin.z;     //front
+        clips[5].dist = clippingMax.z;     //back
+
+        C.setClips(clips);
+    }
+
+
+    function updateCapBox(T, S) {
+        S.setX(clippingMax.x - clippingMin.x);
+        S.setY(clippingMax.y - clippingMin.y);
+        S.setZ(clippingMax.z - clippingMin.z);
+
+        T.setX((clippingMax.x + clippingMin.x) / 2);
+        T.setY((clippingMax.y + clippingMin.y) / 2);
+        T.setZ((clippingMax.z + clippingMin.z) / 2);
+    }
 
 </script>
 </body>
