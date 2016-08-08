@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-08-05
+ * Built on 2016-08-08
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -8979,7 +8979,6 @@ new (function () {
 
         picking: true,              // Picking enabled
         clipping: true,             // User-defined clipping enabled
-        frontClippingOnly: false,        // Used to assist drawing clipping caps
         enabled: true,              // Node not culled from traversal
         transparent: false,         // Node transparent - works in conjunction with matarial alpha properties
         backfaces: true,            // Show backfaces
@@ -9015,7 +9014,6 @@ new (function () {
 
             this._core.picking = true;           // Picking enabled
             this._core.clipping = true;          // User-defined clipping enabled
-            this._core.frontClippingOnly = false;
             this._core.enabled = true;           // Node not culled from traversal
             this._core.transparent = false;      // Node transparent - works in conjunction with matarial alpha properties
             this._core.backfaces = true;         // Show backfaces
@@ -9041,12 +9039,6 @@ new (function () {
 
         if (flags.clipping != undefined) {
             core.clipping = !!flags.clipping;
-            this._engine.display.imageDirty = true;
-        }
-
-        if (flags.frontClippingOnly != undefined) {
-            core.frontClippingOnly = flags.frontClippingOnly;
-            this._engine.branchDirty(this);
             this._engine.display.imageDirty = true;
         }
 
@@ -9114,7 +9106,6 @@ new (function () {
         return {
             picking: core.picking,
             clipping: core.clipping,
-            frontClippingOnly: core.frontClippingOnly,
             enabled: core.enabled,
             transparent: core.transparent,
             backfaces: core.backfaces,
@@ -9147,23 +9138,8 @@ new (function () {
         return this;
     };
 
-    SceneJS.Flags.prototype.setFrontClippingOnly = function (frontClippingOnly) {
-        frontClippingOnly = !!frontClippingOnly;
-        if (this._core.frontClippingOnly != frontClippingOnly) {
-            this._core.frontClippingOnly = frontClippingOnly;
-            this._core.hash = getHash(this._core);
-            this._engine.branchDirty(this);
-            this._engine.display.imageDirty = true;
-        }
-        return this;
-    };
-
     SceneJS.Flags.prototype.getClipping = function () {
         return this._core.clipping;
-    };
-
-    SceneJS.Flags.prototype.getFrontClippingOnly = function () {
-        return this._core.frontClippingOnly;
     };
 
     SceneJS.Flags.prototype.setEnabled = function (enabled) {
@@ -9291,8 +9267,7 @@ new (function () {
     function getHash(core) {
         return (core.reflective ? "refl" : "") + ";" +
                 (core.solid ? "s" : "") + ";" +
-                (core.skybox ? "sky" : "") + ";" +
-                (core.frontClippingOnly ? "fco" : "") + ";";
+                (core.skybox ? "sky" : "") + ";"
     }
 
 })();
@@ -18694,7 +18669,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var billboard;
     var tangents;
     var clipping;
-    var frontClippingOnly;
     var morphing;
     var regionMapping;
     var regionInteraction;
@@ -18731,7 +18705,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         billboard = !states.billboard.empty;
         tangents = hasTangents(states);
         clipping = states.clips.clips.length > 0;
-        frontClippingOnly = states.flags.frontClippingOnly;
         morphing = !!states.morphGeometry.targets;
         regionMapping = hasRegionMap();
         regionInteraction = regionMapping && states.regionMap.mode !== "info";
@@ -19295,10 +19268,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("uniform vec3 SCENEJS_uWorldEye;");
 
-        if (frontClippingOnly) {
-            add("uniform vec3 SCENEJS_uWorldLook;")         // World-space look position
-        }
-
 
         /*-----------------------------------------------------------------------------------
          * Variables
@@ -19492,20 +19461,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (clipping) {
             add("if (SCENEJS_uClipping) {");
             add("  float dist = 0.0;");
-
             for (var i = 0; i < states.clips.clips.length; i++) {
                 add("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
-                
-                if (frontClippingOnly) {
-                    add("    if (dot(SCENEJS_uWorldLook - SCENEJS_uWorldEye, SCENEJS_uClipNormalAndDist" + i + ".xyz) < -SCENEJS_uClipNormalAndDist" + i + ".w) {");
-                }
-                
                 add("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
-                
-                if (frontClippingOnly) {
-                    add("    }");
-                }
-
                 add("  }");
             }
             add("  if (dist > 0.0) { discard; }");

@@ -22,7 +22,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
     var billboard;
     var tangents;
     var clipping;
-    var frontClippingOnly;
     var morphing;
     var regionMapping;
     var regionInteraction;
@@ -59,7 +58,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
         billboard = !states.billboard.empty;
         tangents = hasTangents(states);
         clipping = states.clips.clips.length > 0;
-        frontClippingOnly = states.flags.frontClippingOnly;
         morphing = !!states.morphGeometry.targets;
         regionMapping = hasRegionMap();
         regionInteraction = regionMapping && states.regionMap.mode !== "info";
@@ -623,10 +621,6 @@ var SceneJS_ProgramSourceFactory = new (function () {
 
         add("uniform vec3 SCENEJS_uWorldEye;");
 
-        if (frontClippingOnly) {
-            add("uniform vec3 SCENEJS_uWorldLook;")         // World-space look position
-        }
-
 
         /*-----------------------------------------------------------------------------------
          * Variables
@@ -820,20 +814,9 @@ var SceneJS_ProgramSourceFactory = new (function () {
         if (clipping) {
             add("if (SCENEJS_uClipping) {");
             add("  float dist = 0.0;");
-
             for (var i = 0; i < states.clips.clips.length; i++) {
                 add("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
-                
-                if (frontClippingOnly) {
-                    add("    if (dot(SCENEJS_uWorldLook - SCENEJS_uWorldEye, SCENEJS_uClipNormalAndDist" + i + ".xyz) < -SCENEJS_uClipNormalAndDist" + i + ".w) {");
-                }
-                
                 add("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
-                
-                if (frontClippingOnly) {
-                    add("    }");
-                }
-
                 add("  }");
             }
             add("  if (dist > 0.0) { discard; }");
