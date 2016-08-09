@@ -6,6 +6,9 @@ SceneJS.Types.addType("postprocess/clippingCap", {
     construct: function (params) {
 
         var clipsNodeId = params.clipsNodeId || "clippingCapClipsNode";
+        var stage1ContentNodeId = params.stage1ContentNodeId || "clippingCapStage1ContentNode";
+        var stage2ContentNodeId = params.stage2ContentNodeId || "clippingCapStage2ContentNode";
+        var stage3ContentNodeId = params.stage3ContentNodeId || "clippingCapStage3ContentNode";
 
         var solidColorCaps = params.solidColorCaps !== undefined ? params.solidColorCaps : true;
 
@@ -19,8 +22,7 @@ SceneJS.Types.addType("postprocess/clippingCap", {
         var frontClippingFS = [
             "precision highp float;\n",
             "uniform vec3 SCENEJS_uWorldEye;\n",
-            "uniform vec3 SCENEJS_uWorldLook;\n",
-            "uniform vec3 SCENEJS_uMaterialColor;\n"//,
+            "uniform vec3 SCENEJS_uWorldLook;\n"
         ];
 
         
@@ -75,8 +77,6 @@ SceneJS.Types.addType("postprocess/clippingCap", {
         } else {
             capDrawingNodes = params.capNodes;
         }
-
-
 
         this.addNodes([
             {
@@ -139,7 +139,13 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                                     }
                                                 ],
 
-                                                nodes: params.nodes
+                                                nodes: [
+                                                    {
+                                                        id: stage1ContentNodeId,
+
+                                                        nodes: params.nodes
+                                                    }
+                                                ]
                                             }
                                         ]
                                     }
@@ -168,7 +174,13 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                             clearColorBuffer: true
                                         },
 
-                                        nodes: params.nodes
+                                        nodes: [
+                                            {
+                                                id: stage2ContentNodeId,
+
+                                                nodes: params.nodes
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -211,7 +223,13 @@ SceneJS.Types.addType("postprocess/clippingCap", {
                                     dppass: "keep"
                                 },
 
-                                nodes: capDrawingNodes
+                                nodes: [
+                                    {
+                                        id: stage3ContentNodeId,
+
+                                        nodes: capDrawingNodes
+                                    }
+                                ]
                             }
                         ]
                     }
