@@ -81,6 +81,7 @@ SceneJS.XForm.prototype._compile = function (ctx) {
     var i, len;
 
     core.numCores = 0;
+    if (!this.xformChildren) {this.xformChildren = [];}
     for (i = 0, len = this.xformChildren.length; i < len; i++) {
         var child = this.xformChildren[i];
         if (!this.branchDirty && !child.dirty) {
