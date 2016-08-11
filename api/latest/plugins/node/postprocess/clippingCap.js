@@ -40,7 +40,7 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
         for (i = 0; i < lenClips; i++) {
             frontClippingFS.push("  if (SCENEJS_uClipMode" + i + " != 0.0) {");
-            frontClippingFS.push("    if (dot(SCENEJS_uWorldLook - SCENEJS_uWorldEye, SCENEJS_uClipNormalAndDist" + i + ".xyz) < -SCENEJS_uClipNormalAndDist" + i + ".w) {");
+            frontClippingFS.push("    if (dot(SCENEJS_uWorldEye, SCENEJS_uClipNormalAndDist" + i + ".xyz) > SCENEJS_uClipNormalAndDist" + i + ".w) {");
             frontClippingFS.push("      dist += clamp(dot(SCENEJS_vWorldVertex.xyz, SCENEJS_uClipNormalAndDist" + i + ".xyz) - SCENEJS_uClipNormalAndDist" + i + ".w, 0.0, 1000.0);");
             frontClippingFS.push("    }");
             frontClippingFS.push("  }");
