@@ -21,8 +21,7 @@ SceneJS.Types.addType("postprocess/clippingCap", {
 
         var frontClippingFS = [
             "precision highp float;\n",
-            "uniform vec3 SCENEJS_uWorldEye;\n",
-            "uniform vec3 SCENEJS_uWorldLook;\n"
+            "uniform vec3 SCENEJS_uWorldEye;\n"
         ];
 
         
