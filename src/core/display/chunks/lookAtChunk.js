@@ -11,6 +11,9 @@ SceneJS_ChunkFactory.createChunkType({
         this._uVNMatrixDraw = this.program.draw.getUniform("SCENEJS_uVNMatrix");
         this._uWorldEyeDraw = this.program.draw.getUniform("SCENEJS_uWorldEye");
 
+        // for clipping caps
+        this._uWorldLookDraw = this.program.draw.getUniform("SCENEJS_uWorldLook");
+
         this._uvMatrixPick = this.program.pick.getUniform("SCENEJS_uVMatrix");
     },
 
@@ -32,6 +35,10 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this._uWorldEyeDraw) {
             this._uWorldEyeDraw.setValue(this.core.lookAt.eye);
+        }
+
+        if (this._uWorldLookDraw) {
+            this._uWorldLookDraw.setValue(this.core.lookAt.look);
         }
 
         frameCtx.viewMat = this.core.mat;

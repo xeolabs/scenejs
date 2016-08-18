@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-08-02
+ * Built on 2016-08-08
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -6261,6 +6261,9 @@ SceneJS._webgl.Program = function (stats, gl, vertexSources, fragmentSources) {
         }
 
         gl.linkProgram(this.handle);
+        if (!gl.getProgramParameter(this.handle, gl.LINK_STATUS)) {
+            console.error(gl.getProgramInfoLog(this.handle));
+        }
 
         // Discover uniforms and samplers
 
@@ -8984,7 +8987,9 @@ new (function () {
         solid: false,               // When true, renders backfaces without texture or shading, for a cheap solid cross-section effect
         solidColor: [1.0, 1.0, 1.0],// Solid cap color
         skybox: false,              // Treat as a skybox
-        hash: "refl;;;"
+        hash: "refl;;;",
+
+        clearColorBuffer: false
     };
 
     var coreStack = [];
@@ -9034,6 +9039,11 @@ new (function () {
 
         if (flags.clipping != undefined) {
             core.clipping = !!flags.clipping;
+            this._engine.display.imageDirty = true;
+        }
+
+        if (flags.clearColorBuffer != undefined) {
+            core.clearColorBuffer = flags.clearColorBuffer;
             this._engine.display.imageDirty = true;
         }
 
@@ -9257,7 +9267,7 @@ new (function () {
     function getHash(core) {
         return (core.reflective ? "refl" : "") + ";" +
                 (core.solid ? "s" : "") + ";" +
-                (core.skybox ? "sky" : "") + ";";
+                (core.skybox ? "sky" : "") + ";"
     }
 
 })();
@@ -18486,7 +18496,8 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     }
 
     if (params.clear) {
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+        //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
     gl.frontFace(gl.CCW);
@@ -20926,6 +20937,14 @@ SceneJS_ChunkFactory.createChunkType({
             if (this._uSolidColorDraw) {
                 this._uSolidColorDraw.setValue(this.core.solidColor);
             }
+
+            // !!dirty
+            // if (frameCtx.clearColorBuffer != this.core.clearColorBuffer) {
+            //     frameCtx.clearColorBuffer = this.core.clearColorBuffer;
+            // }
+            if ( this.core.clearColorBuffer ) {
+                gl.clear(gl.COLOR_BUFFER_BIT);
+            }
         }
     }
 });
@@ -20973,8 +20992,8 @@ SceneJS_ChunkFactory.createChunkType({
 
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
         gl.clearColor(frameCtx.ambientColor[0], frameCtx.ambientColor[1], frameCtx.ambientColor[2], 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
-      //  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         frameCtx.renderBuf = renderBuf;
     }
@@ -21458,6 +21477,9 @@ SceneJS_ChunkFactory.createChunkType({
         this._uVNMatrixDraw = this.program.draw.getUniform("SCENEJS_uVNMatrix");
         this._uWorldEyeDraw = this.program.draw.getUniform("SCENEJS_uWorldEye");
 
+        // for clipping caps
+        this._uWorldLookDraw = this.program.draw.getUniform("SCENEJS_uWorldLook");
+
         this._uvMatrixPick = this.program.pick.getUniform("SCENEJS_uVMatrix");
     },
 
@@ -21479,6 +21501,10 @@ SceneJS_ChunkFactory.createChunkType({
 
         if (this._uWorldEyeDraw) {
             this._uWorldEyeDraw.setValue(this.core.lookAt.eye);
+        }
+
+        if (this._uWorldLookDraw) {
+            this._uWorldLookDraw.setValue(this.core.lookAt.look);
         }
 
         frameCtx.viewMat = this.core.mat;

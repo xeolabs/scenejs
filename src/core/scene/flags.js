@@ -18,7 +18,9 @@
         solid: false,               // When true, renders backfaces without texture or shading, for a cheap solid cross-section effect
         solidColor: [1.0, 1.0, 1.0],// Solid cap color
         skybox: false,              // Treat as a skybox
-        hash: "refl;;;"
+        hash: "refl;;;",
+
+        clearColorBuffer: false
     };
 
     var coreStack = [];
@@ -68,6 +70,11 @@
 
         if (flags.clipping != undefined) {
             core.clipping = !!flags.clipping;
+            this._engine.display.imageDirty = true;
+        }
+
+        if (flags.clearColorBuffer != undefined) {
+            core.clearColorBuffer = flags.clearColorBuffer;
             this._engine.display.imageDirty = true;
         }
 
@@ -291,7 +298,7 @@
     function getHash(core) {
         return (core.reflective ? "refl" : "") + ";" +
                 (core.solid ? "s" : "") + ";" +
-                (core.skybox ? "sky" : "") + ";";
+                (core.skybox ? "sky" : "") + ";"
     }
 
 })();

@@ -10,7 +10,7 @@
  *      type: "geometry/boundary",
  *      min: [-9, -3, -2],
  *      max: [2,3,12],
- *      wire: false // Default
+ *      wire: true // Default
  *  });
  *  </pre>
  */
@@ -24,6 +24,8 @@
     });
 
     function build(params) {
+
+        var wire = params.wire !== undefined ? params.wire : true;
 
         var min = params.min || [0, 0, 0];
         var max = params.max || [0, 0, 0];
@@ -50,7 +52,7 @@
         // Otherwise, create a new geometry
         return {
             type:"geometry",
-            primitive:params.wire ? "lines" : "triangles",
+            primitive:wire ? "lines" : "triangles",
             coreId:coreId,
             positions:[
                 xmax, ymax, zmax,
