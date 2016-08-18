@@ -23,8 +23,7 @@
 
 
 <div id="infoDark">
-    <a href="http://scenejs.org">SceneJS</a> - Axis Aligned clipping planes with caps
-    <br><br>In this demo we're creating multiple axis-aligned cross-sections with caps. We used a box as the capNodes. <br><br>The maximum number of clipping planes allowed will
+    <a href="http://scenejs.org">SceneJS</a> - Axis Aligned clipping planes with caps, using the <a href="../api/latest/plugins/node/postprocess/clippingCap.js">postprocess/clippingCap</a> plugin. <br><br>The maximum number of clipping planes allowed will
     depend on how many<br><span style="font-style:italic;">varying</span> types your WebGL supports, where each plane requires one <span style="font-style:italic;">varying</span>.
 </div>
 
@@ -121,6 +120,8 @@
                 spin: 0.1, // Slowly spin about X axis
 
                 nodes: [
+
+                    // Capped cross-sections, implemented by plugin at http://scenejs.org/api/latest/plugins/postprocess/clippingCap.js
                     {
                         type: "postprocess/clippingCap",
                         id: "myClippingCap",
