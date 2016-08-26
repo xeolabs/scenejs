@@ -18,10 +18,17 @@ var SceneJS_Engine = function (json, options) {
 
     /**
      * Number of times the scene is drawn each time it's rendered.
-     * <p>This is useful for when we need to do things like render for left and right eyes.
+     * <p>This is useful for when we need to do things like render for left and right eyes.</p>
      * @type {*|number}
      */
     this._numPasses = json.numPasses || 1;
+
+    /**
+     * When doing multiple passes per frame, specifies whether to clear the
+     * canvas before each pass (true) or just before the first pass (false, default).
+     * @type Boolean
+     */
+    this._clearEachPass = !!json.clearEachPass;
 
     /**
      * Canvas and GL context for this engine
@@ -193,13 +200,27 @@ var SceneJS_Engine = function (json, options) {
 
 /**
  * Sets the number of times the scene is drawn on each render.
- * <p>This is useful for when we need to do things like render for left and right eyes.
+ * <p>This is useful for when we need to do things like render for left and right eyes.</p>
  * @param {Number} numPasses The number of times the scene is drawn on each frame.
  * @see #getTagMask
  * @see SceneJS.Tag
  */
 SceneJS_Engine.prototype.setNumPasses = function (numPasses) {
     this._numPasses = numPasses;
+};
+
+/**
+ *  When doing multiple passes per frame, specifies whether to clear the
+ * canvas before each pass (true) or just before the first pass (false).
+ *
+ * <p>This is useful for when we need to do things like render a separate pass to a stereo framebuffer for left and right eyes,
+ * where we want to clear the buffer before each pass.</p>
+ *
+ * @param {Boolean} clearEachPass True to clear before each pass (default is false).
+ * @see SceneJS.Tag
+ */
+SceneJS_Engine.prototype.setClearEachPass = function (clearEachPass) {
+    this._clearEachPass = clearEachPass;
 };
 
 /**
@@ -393,7 +414,7 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
             // Render display graph
             // Clear buffers only on first frame
             this.display.render({
-                clear: i == 0,
+                clear: this._clearEachPass || i == 0,
                 force: force,
                 opaqueOnly: params && params.opaqueOnly
             });

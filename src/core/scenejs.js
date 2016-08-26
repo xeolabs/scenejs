@@ -190,6 +190,9 @@ var SceneJS = new (function () {
      * @param {String} json JSON scene description
      * @param {*} options Optional options
      * @param {Boolean} options.simulateWebGLContextLost Set true to enable simulation of lost WebGL context (has performance impact)
+     * @param {Number} options.passes The number of times this Scene renders per frame.
+     * @param {Boolean} options.clearEachPass When doing multiple passes per frame, specifies whether to clear the
+     * canvas before each pass (true) or just before the first pass (false).
      * @returns {SceneJS.Scene} New scene
      */
     this.createScene = function (json, options) {

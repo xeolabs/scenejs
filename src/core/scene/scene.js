@@ -98,14 +98,30 @@ SceneJS.Scene.prototype.getTagMask = function () {
 
 /**
  * Sets the number of times this scene is drawn on each render.
- * <p>This is useful for when we need to do things like render for left and right eyes.
+ *
+ * <p>This is useful for when we need to do things like render for left and right eyes.</p>
+ *
  * @param {Number} numPasses The number of times the scene is drawn on each frame.
- * @see #getTagMask
  * @see SceneJS.Tag
  */
 SceneJS.Scene.prototype.setNumPasses = function (numPasses) {
     this._engine.setNumPasses(numPasses);
 };
+
+/**
+ *  When doing multiple passes per frame, specifies whether to clear the
+ * canvas before each pass (true) or just before the first pass (false).
+ *
+ * <p>This is useful for when we need to do things like render a separate pass to a stereo framebuffer for left and right eyes,
+ * where we want to clear the buffer before each pass.</p>
+ *
+ * @param {Boolean} clearEachPass Tryu to clear before each pass (default is false).
+ * @see SceneJS.Tag
+ */
+SceneJS.Scene.prototype.setClearEachPass = function (clearEachPass) {
+    this._engine.setClearEachPass(clearEachPass);
+};
+
 
 /**
  * Render a single frame if new frame pending, or force a new frame
