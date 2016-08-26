@@ -370,6 +370,32 @@ var SceneJS_Display = function (stats, cfg) {
      * @type Boolean
      */
     this.imageDirty = true;
+
+    /**
+     * Optional callback to fire when renderer wants to
+     * bind an output framebuffer. This is useful when we need to bind a stereo output buffer for WebVR.
+     *
+     * When this is missing, the renderer will implicitly bind
+     * WebGL's default framebuffer.
+     *
+     * The callback takes two parameters, which is the WebGL context and the index of the current
+     * rendering pass in which the buffer is to be bound.
+     *
+     * Use like this: myRenderer.bindOutputFramebuffer = function(gl, pass) { .. });
+     */
+    this.bindOutputFramebuffer = null;
+
+    /**
+     * Optional callback to fire when renderer wants to
+     * unbind any output drawing framebuffer that was
+     * previously bound with #bindOutputFramebuffer.
+     *
+     * The callback takes two parameters, which is the WebGL context and the index of the current
+     * rendering pass in which the buffer is to be unbound.
+     *
+     * Use like this: myRenderer.unbindOutputFramebuffer = function(gl, pass) { .. });
+     */
+    this.unbindOutputFramebuffer = null;
 };
 
 /**
@@ -1499,6 +1525,12 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     var gl = this._canvas.gl;
 
+    var outputFramebuffer = this.bindOutputFramebuffer && this.unbindOutputFramebuffer && !params.pickObject && !params.rayPick;
+
+    if (outputFramebuffer) {
+        this.bindOutputFramebuffer(g, params.pass);
+    }
+
     // Reset frame context
     var frameCtx = this._frameCtx;
 
@@ -1677,6 +1709,10 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 //        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
 //        gl.bindTexture(gl.TEXTURE_2D, null);
 //    }
+
+    if (outputFramebuffer) {
+        this.unbindOutputFramebuffer(params.pass);
+    }
 };
 
 SceneJS_Display.prototype.readPixels = function (entries, size, opaqueOnly) {
