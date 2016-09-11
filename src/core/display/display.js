@@ -1199,7 +1199,7 @@ SceneJS_Display.prototype._logPickList = function () {
         // Read pixel color in pick buffer at given coordinates,
         // convert to an index into the pick name list
 
-        var pix = pickBuf.read(canvasPos[0], canvasPos[1]);
+        var pix = pickBuf.read(pickBufX, pickBufY);
 
         var pickedColorIndex = pix[0] + (pix[1] * 256) + (pix[2] * 256 * 256) + (pix[3] * 256 * 256 * 256);
 
