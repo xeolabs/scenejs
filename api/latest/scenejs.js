@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-08-08
+ * Built on 2016-09-11
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -1155,6 +1155,9 @@ var SceneJS = new (function () {
      * @param {String} json JSON scene description
      * @param {*} options Optional options
      * @param {Boolean} options.simulateWebGLContextLost Set true to enable simulation of lost WebGL context (has performance impact)
+     * @param {Number} options.passes The number of times this Scene renders per frame.
+     * @param {Boolean} options.clearEachPass When doing multiple passes per frame, specifies whether to clear the
+     * canvas before each pass (true) or just before the first pass (false).
      * @returns {SceneJS.Scene} New scene
      */
     this.createScene = function (json, options) {
@@ -1862,12 +1865,21 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
     this.contextAttr = contextAttr || {};
     this.contextAttr.alpha = true;
     
-    this.contextAttr["stencil"] = true;
+  //  this.contextAttr["stencil"] = true;
 
     /**
      * The WebGL context
      */
     this.gl = null;
+
+    /**
+     * True when WebGL 2 support is enabled.
+     *
+     * @property webgl2
+     * @type {Boolean}
+     * @final
+     */
+    this.webgl2 = false; // Will set true in _initWebGL if WebGL is requested and we succeed in getting it.
 
     this.initWebGL();
 };
@@ -1889,10 +1901,24 @@ SceneJS_Canvas.prototype._WEBGL_CONTEXT_NAMES = [
  */
 SceneJS_Canvas.prototype.initWebGL = function () {
 
-    for (var i = 0; !this.gl && i < this._WEBGL_CONTEXT_NAMES.length; i++) {
+    if (this.options.webgl2 !== false) {
         try {
-            this.gl = this.canvas.getContext(this._WEBGL_CONTEXT_NAMES[i], this.contextAttr);
+            this.gl = this.canvas.getContext("webgl2", this.contextAttr);
         } catch (e) { // Try with next context name
+        }
+        if (!this.gl) {
+            console.log('Failed to get a WebGL 2 context - defaulting to WebGL 1.');
+        } else {
+            this.webgl2 = true;
+        }
+    }
+
+    if (!this.gl) {
+        for (var i = 0; !this.gl && i < this._WEBGL_CONTEXT_NAMES.length; i++) {
+            try {
+                this.gl = this.canvas.getContext(this._WEBGL_CONTEXT_NAMES[i], this.contextAttr);
+            } catch (e) { // Try with next context name
+            }
         }
     }
 
@@ -1944,10 +1970,17 @@ var SceneJS_Engine = function (json, options) {
 
     /**
      * Number of times the scene is drawn each time it's rendered.
-     * <p>This is useful for when we need to do things like render for left and right eyes.
+     * <p>This is useful for when we need to do things like render for left and right eyes.</p>
      * @type {*|number}
      */
     this._numPasses = json.numPasses || 1;
+
+    /**
+     * When doing multiple passes per frame, specifies whether to clear the
+     * canvas before each pass (true) or just before the first pass (false, default).
+     * @type Boolean
+     */
+    this._clearEachPass = !!json.clearEachPass;
 
     /**
      * Canvas and GL context for this engine
@@ -2119,13 +2152,27 @@ var SceneJS_Engine = function (json, options) {
 
 /**
  * Sets the number of times the scene is drawn on each render.
- * <p>This is useful for when we need to do things like render for left and right eyes.
+ * <p>This is useful for when we need to do things like render for left and right eyes.</p>
  * @param {Number} numPasses The number of times the scene is drawn on each frame.
  * @see #getTagMask
  * @see SceneJS.Tag
  */
 SceneJS_Engine.prototype.setNumPasses = function (numPasses) {
     this._numPasses = numPasses;
+};
+
+/**
+ *  When doing multiple passes per frame, specifies whether to clear the
+ * canvas before each pass (true) or just before the first pass (false).
+ *
+ * <p>This is useful for when we need to do things like render a separate pass to a stereo framebuffer for left and right eyes,
+ * where we want to clear the buffer before each pass.</p>
+ *
+ * @param {Boolean} clearEachPass True to clear before each pass (default is false).
+ * @see SceneJS.Tag
+ */
+SceneJS_Engine.prototype.setClearEachPass = function (clearEachPass) {
+    this._clearEachPass = clearEachPass;
 };
 
 /**
@@ -2319,7 +2366,7 @@ SceneJS_Engine.prototype.renderFrame = function (params) {
             // Render display graph
             // Clear buffers only on first frame
             this.display.render({
-                clear: i == 0,
+                clear: this._clearEachPass || i == 0,
                 force: force,
                 opaqueOnly: params && params.opaqueOnly
             });
@@ -2426,7 +2473,7 @@ SceneJS_Engine.prototype.start = function () {
             // Render the scene once for each pass
             for (var i = 0; i < self._numPasses; i++) {
 
-                if (self._needCompile() || rendered) {
+                if (rendered || self._needCompile()) {
 
                     sleeping = false;
 
@@ -2438,8 +2485,8 @@ SceneJS_Engine.prototype.start = function () {
                     self.compile();
 
                     // Render display graph
-                    // Clear buffers only on first frame
-                    renderOptions.clear = i == 0;
+                    renderOptions.clear = self._clearEachPass || (i == 0);
+//                    renderOptions.force = true;
                     self.display.render(renderOptions);
 
                     // Notify that we've just done a render
@@ -2531,14 +2578,13 @@ SceneJS_Engine.prototype.start = function () {
  * also find the intersection point on the picked object's near surface with a ray cast from the eye that passes
  * through the mouse position on the projection plane.
  *
- * @param {Number} canvasX X-axis canvas pick coordinate
- * @param {Number} canvasY Y-axis canvas pick coordinate
- * @param options Pick options
- * @param options.rayPick Performs additional ray-intersect pick when true
- * @param options.regionPick Performs additional region-intersect pick when true
+ * @param params Pick options
+ * @param params.canvasPos Canvas coordinates
+ * @param params.rayPick Performs additional ray-intersect pick when true
+ * @param params.regionPick Performs additional region-intersect pick when true
  * @returns The pick record
  */
-SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
+SceneJS_Engine.prototype.pick = function (params) {
 
     // Do any pending scene compilations
     if (this._needCompile()) {
@@ -2546,10 +2592,11 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
     }
 
     var hit = this.display.pick({
-        canvasX: canvasX,
-        canvasY: canvasY,
-        pickTriangle: options ? options.rayPick : false,
-        pickRegion: options ? options.regionPick : false
+        pickTriangle: params ? params.rayPick : false,
+        pickRegion: params ? params.regionPick : false,
+        canvasPos: params.canvasPos,
+        origin: params.origin,
+        direction: params.direction
     });
 
     return hit;
@@ -4263,6 +4310,56 @@ SceneJS.log = new (function() {
     };
 
     /**
+     * Creates a matrix from a quaternion rotation and vector translation
+     *
+     * @param {Float32Array} q Rotation quaternion
+     * @param {Float32Array} v Translation vector
+     * @param {Float32Array} dest Destination matrix
+     * @returns {Float32Array} dest
+     */
+    window.SceneJS_math_rotationTranslationMat4 = function (q, v, dest) {
+
+        dest = dest || SceneJS_math_mat4();
+
+        var x = q[0];
+        var y = q[1];
+        var z = q[2];
+        var w = q[3];
+
+        var x2 = x + x;
+        var y2 = y + y;
+        var z2 = z + z;
+        var xx = x * x2;
+        var xy = x * y2;
+        var xz = x * z2;
+        var yy = y * y2;
+        var yz = y * z2;
+        var zz = z * z2;
+        var wx = w * x2;
+        var wy = w * y2;
+        var wz = w * z2;
+
+        dest[0] = 1 - (yy + zz);
+        dest[1] = xy + wz;
+        dest[2] = xz - wy;
+        dest[3] = 0;
+        dest[4] = xy - wz;
+        dest[5] = 1 - (xx + zz);
+        dest[6] = yz + wx;
+        dest[7] = 0;
+        dest[8] = xz + wy;
+        dest[9] = yz - wx;
+        dest[10] = 1 - (xx + yy);
+        dest[11] = 0;
+        dest[12] = v[0];
+        dest[13] = v[1];
+        dest[14] = v[2];
+        dest[15] = 1;
+
+        return dest;
+    };
+
+    /**
      * Default lookat properties - eye at 0,0,1, looking at 0,0,0, up vector pointing up Y-axis
      */
     window.SceneJS_math_LOOKAT_OBJ = {
@@ -4458,7 +4555,10 @@ SceneJS.log = new (function() {
         return m;
     };
 
-    /** @private */
+    /**
+     * Creates projection matrix from frustum boundary.
+     * @private
+     */
     window.SceneJS_math_frustumMatrix4 = function (left, right, bottom, top, near, far, dest) {
         if (!dest) {
             dest = SceneJS_math_mat4();
@@ -4481,6 +4581,38 @@ SceneJS.log = new (function() {
         dest[12] = 0;
         dest[13] = 0;
         dest[14] = -(far * near * 2) / fn;
+        dest[15] = 0;
+        return dest;
+    };
+
+    /**
+     * Creates projection matrix from frustum angles.
+     * @private
+     **/
+    window.SceneJS_math_frustumMatrix4FromAngles = function( left, right, down, up,  near, far, dest) {
+        if (!dest) {
+            dest = SceneJS_math_mat4();
+        }
+        var o = Math.tan(up);
+        var u = Math.tan(down);
+        var l = Math.tan(left);
+        var e = Math.tan(right);
+        var M = 2 / (l + e), s = 2 / (o + u);
+        dest[0] = M;
+        dest[1] = 0;
+        dest[2] = 0;
+        dest[3] = 0;
+        dest[4] = 0;
+        dest[5] = s;
+        dest[6] = 0;
+        dest[7] = 0;
+        dest[8] = -((l - e) * M * .5);
+        dest[9] = (o - u) * s * .5;
+        dest[10] = far / (near - far);
+        dest[11] = -1;
+        dest[12] = 0;
+        dest[13] = 0;
+        dest[14] = far * near / (near - far);
         dest[15] = 0;
         return dest;
     };
@@ -8712,6 +8844,16 @@ new (function () {
                     top: optics.top || 1.0,
                     far: optics.far || 10000.0
                 };
+            } else if (type == "frustumAngles") {
+                core.optics = {
+                    type: type,
+                    left: optics.left || 22,
+                    down: optics.down || 22,
+                    near: optics.near || 0.1,
+                    right: optics.right || 22,
+                    up: optics.up || 22,
+                    far: optics.far || 10000.0
+                };
             } else if (type == "perspective") {
                 core.optics = {
                     type: type,
@@ -8724,12 +8866,12 @@ new (function () {
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "SceneJS.Camera configuration invalid: optics type not specified - " +
-                    "supported types are 'perspective', 'frustum' and 'ortho'");
+                    "supported types are 'perspective', 'frustum', 'frustumAngles' and 'ortho'");
             } else {
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "SceneJS.Camera configuration invalid: optics type not supported - " +
-                    "supported types are 'perspective', 'frustum' and 'ortho'");
+                    "supported types are 'perspective', 'frustum', 'frustumAngles' and 'ortho'");
             }
         }
         this._core.optics.pan = optics.pan;
@@ -8765,6 +8907,15 @@ new (function () {
                 optics.near,
                 optics.far);
 
+        } else if (optics.type == "frustumAngles") {
+            core.matrix = SceneJS_math_frustumMatrix4FromAngles(
+                optics.left,
+                optics.right,
+                optics.down,
+                optics.up,
+                optics.near,
+                optics.far);
+
         } else if (optics.type == "perspective") {
             core.matrix = SceneJS_math_perspectiveMatrix4(
                 optics.fovy * Math.PI / 180.0,
@@ -8795,6 +8946,13 @@ new (function () {
             }
         }
         return optics;
+    };
+
+    SceneJS.Camera.prototype.setMatrix = function (matrix) { // TODO: Extract clip planes from matrix
+        this._core.matrix = matrix;
+        this._core.mat = matrix;
+        this.publish("matrix", this._core.matrix);
+        this._engine.display.imageDirty = true;
     };
 
     SceneJS.Camera.prototype.getMatrix = function () {
@@ -11112,6 +11270,23 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
         };
     };
 
+    SceneJS.Lookat.prototype.setMatrix = function (matrix) { // TODO: Extract clip planes from matrix
+        var core = this._core;
+        core.matrix = matrix;
+        core.mat = matrix;
+        if (!core.mat) { // Lazy-create arrays
+            core.mat = new Float32Array(core.matrix);
+            core.normalMat = new Float32Array(
+                SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
+
+        } else { // Insert into arrays
+            core.mat.set(core.matrix);
+            core.normalMat.set(SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
+        }
+        this.publish("matrix", core.matrix);
+        this._engine.display.imageDirty = true;
+    };
+
     /**
      * Returns a copy of the matrix as a 1D array of 16 elements
      * @returns {Number[16]}
@@ -13409,6 +13584,13 @@ SceneJS.Scene.prototype.getGL = function () {
     return this._engine.canvas.gl;
 };
 
+/**
+ * True if WebGL 2 is supported
+ */
+SceneJS.Scene.prototype.getWebGL2Supported = function () {
+    return this._engine.canvas.webgl2;
+};
+
 /** Returns the Z-buffer depth in bits of the webgl context that this scene is to bound to.
  */
 SceneJS.Scene.prototype.getZBufferDepth = function () {
@@ -13451,13 +13633,40 @@ SceneJS.Scene.prototype.getTagMask = function () {
 
 /**
  * Sets the number of times this scene is drawn on each render.
- * <p>This is useful for when we need to do things like render for left and right eyes.
+ *
+ * <p>This is useful for when we need to do things like render for left and right eyes.</p>
+ *
  * @param {Number} numPasses The number of times the scene is drawn on each frame.
- * @see #getTagMask
  * @see SceneJS.Tag
  */
 SceneJS.Scene.prototype.setNumPasses = function (numPasses) {
     this._engine.setNumPasses(numPasses);
+};
+
+/**
+ *  When doing multiple passes per frame, specifies whether to clear the
+ * canvas before each pass (true) or just before the first pass (false).
+ *
+ * <p>This is useful for when we need to do things like render a separate pass to a stereo framebuffer for left and right eyes,
+ * where we want to clear the buffer before each pass.</p>
+ *
+ * @param {Boolean} clearEachPass Tryu to clear before each pass (default is false).
+ * @see SceneJS.Tag
+ */
+SceneJS.Scene.prototype.setClearEachPass = function (clearEachPass) {
+    this._engine.setClearEachPass(clearEachPass);
+};
+
+/**
+ * Sets a custom framebuffer to bind for render passes.
+ *
+ * @param {Function} bindOutputFrameBuffer Callback to bind framebuffer
+ * @param {Function} unbindOutputFrameBuffer Callback to unbind framebuffer
+ * @see SceneJS.Tag
+ */
+SceneJS.Scene.prototype.setBindOutputFrameBuffer = function (bindOutputFrameBuffer, unbindOutputFrameBuffer) {
+    this._engine.display.bindOutputFramebuffer = bindOutputFrameBuffer;
+    this._engine.display.unbindOutputFramebuffer = unbindOutputFrameBuffer;
 };
 
 /**
@@ -13528,10 +13737,10 @@ SceneJS.Scene.prototype.isRunning = function () {
 };
 
 /**
- * Picks whatever geometry will be rendered at the given canvas coordinates.
+ *
  */
-SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
-    var result = this._engine.pick(canvasX, canvasY, options);
+SceneJS.Scene.prototype.pick = function (params) {
+    var result = this._engine.pick(params);
     this.renderFrame({force: true }); // HACK: canvas blanks after picking
     if (result) {
         this.publish("pick", result);
@@ -17287,6 +17496,32 @@ var SceneJS_Display = function (stats, cfg) {
      * @type Boolean
      */
     this.imageDirty = true;
+
+    /**
+     * Optional callback to fire when renderer wants to
+     * bind an output framebuffer. This is useful when we need to bind a stereo output buffer for WebVR.
+     *
+     * When this is missing, the renderer will implicitly bind
+     * WebGL's default framebuffer.
+     *
+     * The callback takes one parameter, which is the index of the current
+     * rendering pass in which the buffer is to be bound.
+     *
+     * Use like this: myRenderer.bindOutputFrameBuffer = function(pass) { .. });
+     */
+    this.bindOutputFrameBuffer = null;
+
+    /**
+     * Optional callback to fire when renderer wants to
+     * unbind any output drawing framebuffer that was
+     * previously bound with #bindOutputFrameBuffer.
+     *
+     * The callback takes one parameter, which is the index of the current
+     * rendering pass in which the buffer is to be bound.
+     *
+     * Use like this: myRenderer.unbindOutputFrameBuffer = function(pass) { .. });
+     */
+    this.unbindOutputFrameBuffer = null;
 };
 
 /**
@@ -17542,10 +17777,14 @@ SceneJS_Display.prototype.render = function (params) {
         //this._logPickList();
     }
 
-    if (this.imageDirty || params.force) {
+    if (true || this.imageDirty || params.force) {
         SceneJS_events.fireEvent(SceneJS_events.RENDER, {
             forced: !!params.force
         });
+        //if (!this._helloWebGL) {
+        //    this._helloWebGL = new HelloWebGL(this._canvas.canvas, this._canvas.gl);
+        //}
+//        this._helloWebGL.draw();
         this._doDrawList({ // Render, no pick
             clear: (params.clear !== false), // Clear buffers by default
             opaqueOnly: params.opaqueOnly
@@ -17889,8 +18128,9 @@ SceneJS_Display.prototype._logPickList = function () {
 
     // Cached vectors to avoid garbage collection
 
-    var origin = SceneJS_math_vec3();
-    var dir = SceneJS_math_vec3();
+    var localRayOrigin = SceneJS_math_vec3();
+    var localRayDir = SceneJS_math_vec3();
+    var pickMatrix = SceneJS_math_mat4();
 
     var a = SceneJS_math_vec3();
     var b = SceneJS_math_vec3();
@@ -17926,7 +18166,7 @@ SceneJS_Display.prototype._logPickList = function () {
     // through the perspective projection plane. The ray is
     // returned via the origin and dir arguments.
 
-    function getLocalRay(canvas, object, canvasCoords, origin, dir) {
+    function canvasPosToLocalRay(canvas, object, canvasPos, localRayOrigin, localRayDir) {
 
         var modelMat = object.modelTransform.mat;
         var viewMat = object.viewTransform.mat;
@@ -17944,8 +18184,8 @@ SceneJS_Display.prototype._logPickList = function () {
         var canvasWidth = canvas.width;
         var canvasHeight = canvas.height;
 
-        var clipX = (canvasCoords[0] - canvasWidth / 2) / (canvasWidth / 2);  // Calculate clip space coordinates
-        var clipY = -(canvasCoords[1] - canvasHeight / 2) / (canvasHeight / 2);
+        var clipX = (canvasPos[0] - canvasWidth / 2) / (canvasWidth / 2);  // Calculate clip space coordinates
+        var clipY = -(canvasPos[1] - canvasHeight / 2) / (canvasHeight / 2);
 
         var local1 = SceneJS_math_transformVector4(pvMatInverse, [clipX, clipY, -1, 1], tempVec4);
         local1 = SceneJS_math_mulVec4Scalar(local1, 1 / local1[3]);
@@ -17953,14 +18193,42 @@ SceneJS_Display.prototype._logPickList = function () {
         var local2 = SceneJS_math_transformVector4(pvMatInverse, [clipX, clipY, 1, 1], tempVec4b);
         local2 = SceneJS_math_mulVec4Scalar(local2, 1 / local2[3]);
 
-        origin[0] = local1[0];
-        origin[1] = local1[1];
-        origin[2] = local1[2];
+        localRayOrigin[0] = local1[0];
+        localRayOrigin[1] = local1[1];
+        localRayOrigin[2] = local1[2];
 
-        SceneJS_math_subVec3(local2, local1, dir);
+        SceneJS_math_subVec3(local2, local1, localRayDir);
 
-        SceneJS_math_normalizeVec3(dir);
+        SceneJS_math_normalizeVec3(localRayDir);
     }
+
+    // Transforms a ray from World-space to Local-space
+    var worldRayToLocalRay = (function () {
+
+        var invModelMat = SceneJS_math_mat4();
+        var tempVec4a = SceneJS_math_vec4();
+        var tempVec4b = SceneJS_math_vec4();
+
+        return function (object, worldRayOrigin, worldRayDir, localRayOrigin, localRayDir) {
+
+            var modelMat = object.modelTransform.mat;
+
+            SceneJS_math_inverseMat4(modelMat, invModelMat);
+
+            tempVec4a[0] = worldRayOrigin[0];
+            tempVec4a[1] = worldRayOrigin[1];
+            tempVec4a[2] = worldRayOrigin[2];
+            tempVec4a[3] = 1;
+
+            SceneJS_math_transformVector4(invModelMat, tempVec4a, tempVec4b);
+
+            localRayOrigin[0] = tempVec4b[0];
+            localRayOrigin[1] = tempVec4b[1];
+            localRayOrigin[2] = tempVec4b[2];
+
+            SceneJS_math_transformVector3(invModelMat, worldRayDir, localRayDir);
+        };
+    })();
 
     /**
      * Performs a pick on the display graph and returns info on the result.
@@ -17969,11 +18237,17 @@ SceneJS_Display.prototype._logPickList = function () {
      */
     SceneJS_Display.prototype.pick = function (params) {
 
+        if (!params.canvasPos && (params.rayPick && (!params.origin || !params.direction))) {
+            console.warn("Incomplete pick parameters");
+            return;
+        }
+
         var canvas = this._canvas.canvas;
         var resolutionScaling = this._canvas.resolutionScaling;
-        var canvasX = params.canvasX * resolutionScaling;
-        var canvasY = params.canvasY * resolutionScaling;
-        var canvasPos = [canvasX, canvasY];
+        var canvasPos = params.canvasPos;
+        if (canvasPos) {
+            canvasPos = new Float32Array([canvasPos[0] * resolutionScaling, canvasPos[1] * resolutionScaling]);
+        }
         var pickBuf = this.pickBuf;
         var hit = null;
         var object;
@@ -17988,6 +18262,48 @@ SceneJS_Display.prototype._logPickList = function () {
             });
         }
 
+        var canvasRayPicking =  params.pickTriangle && params.canvasPos;
+        var worldRayPicking = !canvasRayPicking && params.pickTriangle;
+
+        var worldRayOrigin;
+        var worldRayDir;
+
+        var pickBufX;
+        var pickBufY;
+
+        if (worldRayPicking) {
+
+            // 3D picking with arbitrary World-space ray
+            // Will sample center of pickbuffer
+
+            worldRayOrigin = params.origin || SceneJS_math_vec3([0, 0, 0]);
+            worldRayDir = params.direction || SceneJS_math_vec3([0, 0, 1]);
+
+            var look = SceneJS_math_addVec3(worldRayOrigin, worldRayDir, tempVec3);
+            var up = new Float32Array([0, 1, 0]); // TODO: derive from ray
+
+            SceneJS_math_lookAtMat4v(worldRayOrigin, look, up, pickMatrix);
+
+            pickBufX = canvas.clientWidth * 0.5;
+            pickBufY = canvas.clientHeight * 0.5;
+
+        } else if (canvasRayPicking) {
+
+            // 3D picking with a 3D ray fired through the canvas
+            // Will sample center of pickbuffer
+
+            pickBufX = canvas.clientWidth * 0.5;
+            pickBufY = canvas.clientHeight * 0.5;
+
+        } else {
+
+            // 2D picking of object at canvas position
+            // Will sample pick buffer at that position
+
+            pickBufX = canvasPos[0];
+            pickBufY = canvasPos[1];
+        }
+
         this.render(); // Do any pending visible render
 
         //------------------------------------------------------------------
@@ -18000,7 +18316,8 @@ SceneJS_Display.prototype._logPickList = function () {
 
         this._doDrawList({
             pickObject: true,
-            clear: true
+            clear: true,
+            pickMatrix: worldRayPicking ? pickMatrix: null
         });
 
         this._canvas.gl.finish();
@@ -18008,7 +18325,7 @@ SceneJS_Display.prototype._logPickList = function () {
         // Read pixel color in pick buffer at given coordinates,
         // convert to an index into the pick name list
 
-        var pix = pickBuf.read(canvasX, canvasY);
+        var pix = pickBuf.read(canvasPos[0], canvasPos[1]);
 
         var pickedColorIndex = pix[0] + (pix[1] * 256) + (pix[2] * 256 * 256) + (pix[3] * 256 * 256 * 256);
 
@@ -18027,6 +18344,11 @@ SceneJS_Display.prototype._logPickList = function () {
                 hit.path = name.path;
                 hit.nodeId = name.nodeId;
             }
+
+            if (worldRayPicking) {
+                hit.origin = worldRayOrigin;
+                hit.direction = worldRayDir;
+            }
         }
 
         if (params.pickRegion) {
@@ -18041,10 +18363,11 @@ SceneJS_Display.prototype._logPickList = function () {
             this._doDrawList({
                 pickRegion: true,
                 object: object,
+                pickMatrix: worldRayPicking ? pickMatrix: null,
                 clear: true
             });
 
-            pix = pickBuf.read(canvasX, canvasY);
+            pix = pickBuf.read(pickBufX, pickBufY);
 
             if (pix[0] !== 0 || pix[1] !== 0 || pix[2] !== 0 || pix[3] !== 0) {
 
@@ -18091,10 +18414,11 @@ SceneJS_Display.prototype._logPickList = function () {
             this._doDrawList({
                 pickTriangle: true,
                 object: object,
+                pickMatrix: worldRayPicking ? pickMatrix: null,
                 clear: true
             });
 
-            pix = pickBuf.read(canvasX, canvasY);
+            pix = pickBuf.read(pickBufX, pickBufY);
             var primitiveIndex = pix[0] + (pix[1] * 256) + (pix[2] * 256 * 256) + (pix[3] * 256 * 256 * 256);
             primitiveIndex *= 3; // Convert from triangle number to first vertex in indices
 
@@ -18109,11 +18433,14 @@ SceneJS_Display.prototype._logPickList = function () {
 
                 hit.primitive = "triangle";
 
-                // Attempt to ray-pick the triangle; in World-space, fire a ray
-                // from the eye position through the mouse position
-                // on the perspective projection plane
+                // Find the local-space ray to test for intersection with the triangle
 
-                getLocalRay(canvas, object, canvasPos, origin, dir);
+                if (worldRayPicking) { // Convert world-space picking ray to local-space ray
+                    worldRayToLocalRay(object, worldRayOrigin, worldRayDir, localRayOrigin, localRayDir);
+
+                } else  { // Convert canvas pos to local-space ray
+                    canvasPosToLocalRay(canvas, object, canvasPos, localRayOrigin, localRayDir);
+                }
 
                 // Get triangle indices
 
@@ -18174,7 +18501,7 @@ SceneJS_Display.prototype._logPickList = function () {
 
                 // Get Local-space cartesian coordinates of the ray-triangle intersection
 
-                var position = hit.position = SceneJS_math_rayPlaneIntersect(origin, dir, a, b, c, SceneJS_math_vec3());
+                var position = hit.position = SceneJS_math_rayPlaneIntersect(localRayOrigin, localRayDir, a, b, c, SceneJS_math_vec3());
 
                 // Get interpolated World-space coordinates
 
@@ -18416,6 +18743,12 @@ SceneJS_Display.prototype._doDrawList = function (params) {
 
     var gl = this._canvas.gl;
 
+    var outputFramebuffer = this.bindOutputFrameBuffer && this.unbindOutputFrameBuffer && !params.pickObject && !params.rayPick;
+
+    if (outputFramebuffer) {
+        this.bindOutputFrameBuffer(g, params.pass);
+    }
+
     // Reset frame context
     var frameCtx = this._frameCtx;
 
@@ -18476,6 +18809,8 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.bindTexture = 0;
     frameCtx.bindArray = 0;
 
+    frameCtx.pickMatrix = params.pickMatrix;
+
     // The extensions needs to be re-queried in case the context was lost and has been recreated.
     if (SceneJS.WEBGL_INFO.SUPPORTED_EXTENSIONS["OES_element_index_uint"]) {
         gl.getExtension("OES_element_index_uint");
@@ -18496,7 +18831,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     }
 
     if (params.clear) {
-        //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+      //  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     }
 
@@ -18560,7 +18895,7 @@ SceneJS_Display.prototype._doDrawList = function (params) {
         var len = (params.opaqueOnly && this._drawListTransparentIndex >= 0 ? this._drawListTransparentIndex : this._drawListLen);
 
         // Render for draw
-        for (var i = 0; i < len; i++) {      // Push opaque rendering chunks
+        for (var i = 0; i < len; i++) { // Push opaque rendering chunks
             this._drawList[i].draw(frameCtx);
         }
 
@@ -18587,13 +18922,17 @@ SceneJS_Display.prototype._doDrawList = function (params) {
             gl.disableVertexAttribArray(i);
         }
     }
-//
+
 //    var numTextureUnits = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 //    for (var ii = 0; ii < numTextureUnits; ++ii) {
 //        gl.activeTexture(gl.TEXTURE0 + ii);
 //        gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
 //        gl.bindTexture(gl.TEXTURE_2D, null);
 //    }
+
+    if (outputFramebuffer) {
+        this.unbindOutputFrameBuffer(params.pass);
+    }
 };
 
 SceneJS_Display.prototype.readPixels = function (entries, size, opaqueOnly) {
@@ -21511,11 +21850,9 @@ SceneJS_ChunkFactory.createChunkType({
     },
 
     pick : function(frameCtx) {
-
-        var gl = this.program.gl;
-
+        
         if (this._uvMatrixPick) {
-            this._uvMatrixPick.setValue(this.core.mat);
+            this._uvMatrixPick.setValue(frameCtx.pickMatrix || this.core.mat);
         }
 
         frameCtx.viewMat = this.core.mat;

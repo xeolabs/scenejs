@@ -64,6 +64,15 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
      */
     this.gl = null;
 
+    /**
+     * True when WebGL 2 support is enabled.
+     *
+     * @property webgl2
+     * @type {Boolean}
+     * @final
+     */
+    this.webgl2 = false; // Will set true in _initWebGL if WebGL is requested and we succeed in getting it.
+
     this.initWebGL();
 };
 
@@ -84,10 +93,24 @@ SceneJS_Canvas.prototype._WEBGL_CONTEXT_NAMES = [
  */
 SceneJS_Canvas.prototype.initWebGL = function () {
 
-    for (var i = 0; !this.gl && i < this._WEBGL_CONTEXT_NAMES.length; i++) {
+    if (this.options.webgl2 !== false) {
         try {
-            this.gl = this.canvas.getContext(this._WEBGL_CONTEXT_NAMES[i], this.contextAttr);
+            this.gl = this.canvas.getContext("webgl2", this.contextAttr);
         } catch (e) { // Try with next context name
+        }
+        if (!this.gl) {
+            console.log('Failed to get a WebGL 2 context - defaulting to WebGL 1.');
+        } else {
+            this.webgl2 = true;
+        }
+    }
+
+    if (!this.gl) {
+        for (var i = 0; !this.gl && i < this._WEBGL_CONTEXT_NAMES.length; i++) {
+            try {
+                this.gl = this.canvas.getContext(this._WEBGL_CONTEXT_NAMES[i], this.contextAttr);
+            } catch (e) { // Try with next context name
+            }
         }
     }
 

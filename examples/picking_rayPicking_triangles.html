@@ -60,10 +60,10 @@
     <a href="http://scenejs.org" target="_other">SceneJS</a> - ray picking
     <br>
     SceneJS ray picking retrieves the following useful information about the picked point: <BR>
-    index of the picked triangle; world position the picked point; barycentric coordinates of <BR> 
-    the picked point on the picked triangle; interpolated uvs and normal at the picked point. 
+    index of the picked triangle; world position the picked point; barycentric coordinates of <BR>
+    the picked point on the picked triangle; interpolated uvs and normal at the picked point.
     <br>
-    
+
 
     <div id="infoTxt"></div>
     <div id="map">
@@ -121,7 +121,7 @@
                     },
 
                     // Red sphere to indicate last picked position
-             
+
                     {
                         type: "flags",
                         id: "indicatorFlags",
@@ -144,7 +144,7 @@
                                         z: 0,
 
                                         nodes: [
-                           
+
                                             // Sphere primitive implemented by plugin at
                                             // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
                                             {
@@ -187,8 +187,11 @@
     scene.getNode("worldPosIndicator", function (worldPosIndicator) {
         scene.getNode("indicatorFlags", function (indicatorFlags) {
 
-            scene.on("tick", function() {
-                var hit = scene.pick(pickX, pickY, {rayPick: true});
+            scene.on("tick", function () {
+                var hit = scene.pick({
+                    canvasPos: [pickX, pickY],
+                    rayPick: true
+                });
 
                 markerContext.clearRect(0, 0, markerCanvas.width, markerCanvas.height);
                 pickInfo.innerHTML = "";

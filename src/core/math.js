@@ -1512,7 +1512,10 @@
         return m;
     };
 
-    /** @private */
+    /**
+     * Creates projection matrix from frustum boundary.
+     * @private
+     */
     window.SceneJS_math_frustumMatrix4 = function (left, right, bottom, top, near, far, dest) {
         if (!dest) {
             dest = SceneJS_math_mat4();
@@ -1535,6 +1538,38 @@
         dest[12] = 0;
         dest[13] = 0;
         dest[14] = -(far * near * 2) / fn;
+        dest[15] = 0;
+        return dest;
+    };
+
+    /**
+     * Creates projection matrix from frustum angles.
+     * @private
+     **/
+    window.SceneJS_math_frustumMatrix4FromAngles = function( left, right, down, up,  near, far, dest) {
+        if (!dest) {
+            dest = SceneJS_math_mat4();
+        }
+        var o = Math.tan(up);
+        var u = Math.tan(down);
+        var l = Math.tan(left);
+        var e = Math.tan(right);
+        var M = 2 / (l + e), s = 2 / (o + u);
+        dest[0] = M;
+        dest[1] = 0;
+        dest[2] = 0;
+        dest[3] = 0;
+        dest[4] = 0;
+        dest[5] = s;
+        dest[6] = 0;
+        dest[7] = 0;
+        dest[8] = -((l - e) * M * .5);
+        dest[9] = (o - u) * s * .5;
+        dest[10] = far / (near - far);
+        dest[11] = -1;
+        dest[12] = 0;
+        dest[13] = 0;
+        dest[14] = far * near / (near - far);
         dest[15] = 0;
         return dest;
     };

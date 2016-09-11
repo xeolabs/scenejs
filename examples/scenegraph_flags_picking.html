@@ -78,7 +78,7 @@
                                 nodes: [
                                     {
                                         type: "material",
-                                        color: { r: 0.5, g: 0.5, b: 0.7 },
+                                        color: {r: 0.5, g: 0.5, b: 0.7},
 
                                         nodes: [
 
@@ -125,14 +125,16 @@
 
     function mouseUp(event) {
         if (dragging) {
-            scene.pick(event.clientX, event.clientY);
+            scene.pick({canvasPos: [event.clientX, event.clientY]});
         }
         dragging = false;
     }
 
     function touchEnd() {
         if (dragging) {
-            scene.pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
+            scene.pick({
+                canvasPos: [event.targetTouches[0].clientX, event.targetTouches[0].clientY]
+            });
         }
         dragging = false;
     }

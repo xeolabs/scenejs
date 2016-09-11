@@ -61,7 +61,7 @@
     <br>
     This torus contains <span id="polycount"></span> triangles.
     <br>
-    
+
 
     <div id="infoTxt"></div>
     <div id="map">
@@ -123,7 +123,7 @@
                     },
 
                     // Red sphere to indicate last picked position
-             
+
                     {
                         type: "flags",
                         id: "indicatorFlags",
@@ -146,7 +146,7 @@
                                         z: 0,
 
                                         nodes: [
-                           
+
                                             // Sphere primitive implemented by plugin at
                                             // http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
                                             {
@@ -189,8 +189,11 @@
     scene.getNode("worldPosIndicator", function (worldPosIndicator) {
         scene.getNode("indicatorFlags", function (indicatorFlags) {
 
-            scene.on("tick", function() {
-                var hit = scene.pick(pickX, pickY, {rayPick: true});
+            scene.on("tick", function () {
+                var hit = scene.pick({
+                    canvasPos: [pickX, pickY],
+                    rayPick: true
+                });
 
                 markerContext.clearRect(0, 0, markerCanvas.width, markerCanvas.height);
                 pickInfo.innerHTML = "";
@@ -226,7 +229,7 @@
         });
     });
 
-    scene.getNode("torus", function(torus) {
+    scene.getNode("torus", function (torus) {
         document.getElementById("polycount").innerText = torus.nodes[0]._core.arrays.indices.length / 3;
     })
 

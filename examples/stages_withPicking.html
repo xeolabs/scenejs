@@ -224,7 +224,7 @@ canvas.addEventListener('mouseup',
             if (dragging && Math.abs(event.clientX - lastX) < 3 && Math.abs(event.clientY - lastY) < 3) {
 
                 // Do pick
-                scene.pick(event.clientX, event.clientY);
+                scene.pick({ canvasPos: [event.clientX, event.clientY] });
                 scene.renderFrame({ force: true });
             }
             dragging = false;
@@ -242,7 +242,7 @@ canvas.addEventListener('touchend',
             if (dragging && event.targetTouches[0].clientX == lastX && event.targetTouches[0].clientY == lastY) {
 
                 // Do pick
-                scene.pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
+                scene.pick({ canvasPos: [event.targetTouches[0].clientX, event.targetTouches[0].clientY] });
             }
             dragging = false;
         }, true);

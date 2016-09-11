@@ -79,7 +79,7 @@
                         nodes: [
                             {
                                 type: "material",
-                                color: { r: 1.0, g: 0.3, b: 0.3 },
+                                color: {r: 1.0, g: 0.3, b: 0.3},
 
                                 nodes: [
 
@@ -113,7 +113,7 @@
                                     // Transparent material - note the 'alpha'
                                     {
                                         type: "material",
-                                        color: { r: 0.3, g: 0.3, b: 1.0 },
+                                        color: {r: 0.3, g: 0.3, b: 1.0},
                                         alpha: 0.4,
 
                                         nodes: [
@@ -191,7 +191,8 @@
                 if (dragging && Math.abs(event.clientX - lastX) < 3 && Math.abs(event.clientY - lastY) < 3) {
 
                     // Do pick
-                    scene.pick(event.clientX, event.clientY, {
+                    scene.pick({
+                        canvasPos: [event.clientX, event.clientY],
                         rayPick: true
                     });
                 }
@@ -210,7 +211,8 @@
                 if (dragging && event.targetTouches[0].clientX == lastX && event.targetTouches[0].clientY == lastY) {
 
                     // Do pick
-                    scene.pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY, {
+                    scene.pick({
+                        canvasPos: [event.targetTouches[0].clientX, event.targetTouches[0].clientY],
                         rayPick: true
                     });
                 }

@@ -54,8 +54,8 @@
                 yaw: -40,
                 pitch: -20,
                 zoom: 10,
-                eye: { x: 0, y: 150, z: -1000 },
-                look: { x: 0, y: 0, z: 0 },
+                eye: {x: 0, y: 150, z: -1000},
+                look: {x: 0, y: 0, z: 0},
                 zoomSensitivity: 10.0,
 
                 nodes: [
@@ -77,7 +77,7 @@
                                         name: "redTeapot",
                                         nodes: [
                                             {
-                                                type: "material", color: { r: 1.0, g: 0.3, b: 0.3 },
+                                                type: "material", color: {r: 1.0, g: 0.3, b: 0.3},
                                                 nodes: [
                                                     {
                                                         type: "translate", z: 2,
@@ -101,7 +101,7 @@
                                         name: "blueTeapot",
                                         nodes: [
                                             {
-                                                type: "material", color: { r: 0.3, g: 0.3, b: 1.0 },
+                                                type: "material", color: {r: 0.3, g: 0.3, b: 1.0},
                                                 nodes: [
                                                     {
                                                         type: "translate", z: -2,
@@ -240,7 +240,7 @@
                 if (dragging && Math.abs(event.clientX - lastX) < 3 && Math.abs(event.clientY - lastY) < 3) {
 
                     // Do pick
-                    myScene.pick(event.clientX, event.clientY);
+                    myScene.pick({canvasPos: [event.clientX, event.clientY]});
                 }
                 dragging = false;
             }, true);
@@ -257,7 +257,9 @@
                 if (dragging && event.targetTouches[0].clientX == lastX && event.targetTouches[0].clientY == lastY) {
 
                     // Do pick
-                    myScene.pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
+                    myScene.pick({
+                        canvasPos: [event.targetTouches[0].clientX, event.targetTouches[0].clientY]
+                    });
                 }
                 dragging = false;
             }, true);

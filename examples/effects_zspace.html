@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <script src="libs/gl-matrix-min.js"></script> <!-- Include this BEFORE SceneJS to avoid requireJS confusion -->
+    <script src="../api/latest/scenejs.js"></script>
+    <script src="js/zspace/zSpace.js"></script>
+    <script src="js/zspace/zSpaceEffect.js"></script>
+
+    <link href="css/styles.css" rel="stylesheet"/>
+
+</head>
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org">SceneJS</a> - zSpace integration example
+</div>
+
+<script>
+
+    //-----------------------------------------------------------------------------------------------------------------
+    // Rendering a scene with zSpace
+    //-----------------------------------------------------------------------------------------------------------------
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Create scene
+    var scene = SceneJS.createScene({
+        webgl2: true,
+        nodes: [
+            {
+                type: "lookAt",
+                id: "theLookat",
+                eye: {x: 0, y: 0, z: 10},
+                look: {x: 0, y: 0, z: 0},
+                up: {x: 0, y: 1, z: 0},
+
+                nodes: [
+                    {
+                        type: "camera",
+                        id: "theCamera",
+                        optics: {
+                            type: "frustumAngles",
+                            left:20,
+                            down:20,
+                            near:0.1,
+                            right:20,
+                            up:20,
+                            far:10000
+                        },
+
+                        nodes: [
+                            {
+                                type: "rotate",
+                                id: "theRotate",
+                                x: 0, y: -1, z: 0, // Axis of rotation
+                                angle: 90.0,
+
+                                nodes: [
+
+                                    // Randomly scattered boxes, implemented by plugin at
+                                    // http://scenejs.org/api/latest/plugins/node/geometry/randomObjects.js
+                                    {
+                                        type: "geometry/randomObjects",
+                                        numObjects: 500
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    // Spin the cubes
+
+    scene.getNode("theRotate", function (rotate) {
+        scene.on("tick", function () {
+            rotate.setAngle(rotate.getAngle() + 0.2);
+        });
+    });
+
+    // Get view and projection transforms
+
+    scene.getNode("theLookat", function (lookat) {
+
+        scene.getNode("theCamera", function (camera) {
+
+            // Create zSpace effect, which controls the transforms
+
+            var zspace = new SceneJS.ZSpaceEffect({
+                scene: scene,
+                lookat: lookat,
+                camera: camera,
+                farClip: 10000,
+                viewerScale: .01
+            });
+        });
+    });
+
+</script>
+</body>
+</html>

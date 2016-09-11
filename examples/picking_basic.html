@@ -27,7 +27,7 @@
             z-index: 100000;
         }
     </style>
-    <script src="../api/latest/scenejs.min.js"></script>
+    <script src="../api/latest/scenejs.js"></script>
     <link href="css/styles.css" rel="stylesheet"/>
 </head>
 
@@ -41,6 +41,7 @@
     learn more in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
     <br>
     <br>
+
     <div id="infoTxt">
     </div>
 </div>
@@ -63,7 +64,7 @@
     var myScene = SceneJS.createScene({
         nodes: [
             {
-                type: "lookAt", eye: { x: 7, y: 5, z: 10 }, look: { x: 0, y: 1, z: 0 },
+                type: "lookAt", eye: {x: 7, y: 5, z: 10}, look: {x: 0, y: 1, z: 0},
                 nodes: [
 
                     // Pickable red teapot with name "redTeapot"
@@ -72,7 +73,7 @@
                         name: "redTeapot",
                         nodes: [
                             {
-                                type: "material", color: { r: 1.0, g: 0.3, b: 0.3 },
+                                type: "material", color: {r: 1.0, g: 0.3, b: 0.3},
                                 nodes: [
                                     {
                                         type: "translate", z: 2,
@@ -96,7 +97,7 @@
                         name: "blueTeapot",
                         nodes: [
                             {
-                                type: "material", color: { r: 0.3, g: 0.3, b: 1.0 },
+                                type: "material", color: {r: 0.3, g: 0.3, b: 1.0},
                                 nodes: [
                                     {
                                         type: "translate", z: -2,
@@ -163,7 +164,9 @@
                 if (dragging && Math.abs(event.clientX - lastX) < 3 && Math.abs(event.clientY - lastY) < 3) {
 
                     // Do pick
-                    myScene.pick(event.clientX, event.clientY);
+                    myScene.pick({
+                        canvasPos: [event.clientX, event.clientY]
+                    });
                 }
                 dragging = false;
             }, true);
@@ -180,7 +183,9 @@
                 if (dragging && event.targetTouches[0].clientX == lastX && event.targetTouches[0].clientY == lastY) {
 
                     // Do pick
-                    myScene.pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
+                    myScene.pick({
+                        canvasPos: [event.targetTouches[0].clientX, event.targetTouches[0].clientY]
+                    });
                 }
                 dragging = false;
             }, true);

@@ -94,7 +94,7 @@
 
     document.addEventListener("mousedown", function(e) {
 
-        var hit = scene.pick(e.clientX, e.clientY, {rayPick: true});
+        var hit = scene.pick({ canvasPos: [e.clientX, e.clientY], rayPick: true});
 
         if (!hit) {
             return;
@@ -162,7 +162,7 @@
                 ctx.fillStyle = "white";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                var hit = scene.pick(pickX, pickY, {rayPick: true});
+                var hit = scene.pick({ canvasPos: [pickX, pickY], rayPick: true});
 
                 if (hit) {
                     var uv = hit.uv;

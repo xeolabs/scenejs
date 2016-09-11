@@ -45,11 +45,9 @@ SceneJS_ChunkFactory.createChunkType({
     },
 
     pick : function(frameCtx) {
-
-        var gl = this.program.gl;
-
+        
         if (this._uvMatrixPick) {
-            this._uvMatrixPick.setValue(this.core.mat);
+            this._uvMatrixPick.setValue(frameCtx.pickMatrix || this.core.mat);
         }
 
         frameCtx.viewMat = this.core.mat;

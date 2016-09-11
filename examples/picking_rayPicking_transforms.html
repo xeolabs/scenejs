@@ -371,7 +371,10 @@
         scene.getNode("indicatorFlags", function (indicatorFlags) {
 
             scene.on("tick", function () {
-                var hit = scene.pick(pickX, pickY, {rayPick: true});
+                var hit = scene.pick({
+                    canvasPos: [pickX, pickY],
+                    rayPick: true
+                });
 
                 markerContext.clearRect(0, 0, markerCanvas.width, markerCanvas.height);
                 pickInfo.innerHTML = "";

@@ -145,7 +145,10 @@
                 ctx.fillStyle = "white";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                var hit = scene.pick(pickX, pickY, {rayPick: true});
+                var hit = scene.pick({
+                    canvasPos: [pickX, pickY],
+                    rayPick: true
+                });
 
                 if (hit) {
                     var uv = hit.uv;

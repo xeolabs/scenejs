@@ -521,7 +521,7 @@ SceneJS_Engine.prototype.start = function () {
             // Render the scene once for each pass
             for (var i = 0; i < self._numPasses; i++) {
 
-                if (self._needCompile() || rendered) {
+                if (rendered || self._needCompile()) {
 
                     sleeping = false;
 
@@ -533,8 +533,8 @@ SceneJS_Engine.prototype.start = function () {
                     self.compile();
 
                     // Render display graph
-                    // Clear buffers only on first frame
-                    renderOptions.clear = i == 0;
+                    renderOptions.clear = self._clearEachPass || (i == 0);
+
                     self.display.render(renderOptions);
 
                     // Notify that we've just done a render
@@ -626,14 +626,13 @@ SceneJS_Engine.prototype.start = function () {
  * also find the intersection point on the picked object's near surface with a ray cast from the eye that passes
  * through the mouse position on the projection plane.
  *
- * @param {Number} canvasX X-axis canvas pick coordinate
- * @param {Number} canvasY Y-axis canvas pick coordinate
- * @param options Pick options
- * @param options.rayPick Performs additional ray-intersect pick when true
- * @param options.regionPick Performs additional region-intersect pick when true
+ * @param params Pick options
+ * @param params.canvasPos Canvas coordinates
+ * @param params.rayPick Performs additional ray-intersect pick when true
+ * @param params.regionPick Performs additional region-intersect pick when true
  * @returns The pick record
  */
-SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
+SceneJS_Engine.prototype.pick = function (params) {
 
     // Do any pending scene compilations
     if (this._needCompile()) {
@@ -641,10 +640,11 @@ SceneJS_Engine.prototype.pick = function (canvasX, canvasY, options) {
     }
 
     var hit = this.display.pick({
-        canvasX: canvasX,
-        canvasY: canvasY,
-        pickTriangle: options ? options.rayPick : false,
-        pickRegion: options ? options.regionPick : false
+        pickTriangle: params ? params.rayPick : false,
+        pickRegion: params ? params.regionPick : false,
+        canvasPos: params.canvasPos,
+        origin: params.origin,
+        direction: params.direction
     });
 
     return hit;

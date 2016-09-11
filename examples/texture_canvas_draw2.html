@@ -231,7 +231,7 @@
                                 return;
                             }
 
-                            var hit = scene.pick(coords[0], coords[1], {rayPick: true});
+                            var hit = scene.pick({ canvasPos: coords, rayPick: true});
 
                             if (hit && hit.worldPos && hit.normal) {
 
