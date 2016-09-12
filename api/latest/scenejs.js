@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-09-11
+ * Built on 2016-09-12
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -1863,9 +1863,10 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
      * Attributes given when initialising the WebGL context
      */
     this.contextAttr = contextAttr || {};
+    this.contextAttr.depth = true;
     this.contextAttr.alpha = true;
-    
-    this.contextAttr["stencil"] = true;
+    this.contextAttr.preserveDrawingbuffer = false;
+    this.contextAttr.stencil = true;
 
     /**
      * The WebGL context
@@ -18166,41 +18167,50 @@ SceneJS_Display.prototype._logPickList = function () {
     // through the perspective projection plane. The ray is
     // returned via the origin and dir arguments.
 
-    function canvasPosToLocalRay(canvas, object, canvasPos, localRayOrigin, localRayDir) {
+    var canvasPosToLocalRay = (function () {
 
-        var modelMat = object.modelTransform.mat;
-        var viewMat = object.viewTransform.mat;
-        var projMat = object.projTransform.mat;
+        var vmMat = SceneJS_math_mat4();
+        var pvMat = SceneJS_math_mat4();
+        var pvMatInv = SceneJS_math_mat4();
+        var local1  = SceneJS_math_vec4();
+        var local2 = SceneJS_math_vec4();
 
-        var vmMat = SceneJS_math_mulMat4(viewMat, modelMat, tempMat4);
-        var pvMat = SceneJS_math_mulMat4(projMat, vmMat, tempMat4b);
-        var pvMatInverse = SceneJS_math_inverseMat4(pvMat, tempMat4b);
+        return function (canvas, object, canvasPos, localRayOrigin, localRayDir) {
 
-        //var modelMatInverse = math.inverseMat4(modelMat, tempMat4c);
+            var modelMat = object.modelTransform.mat;
+            var viewMat = object.viewTransform.mat;
+            var projMat = object.projTransform.mat;
 
-        // Calculate clip space coordinates, which will be in range
-        // of x=[-1..1] and y=[-1..1], with y=(+1) at top
+            SceneJS_math_mulMat4(viewMat, modelMat, vmMat);
+            SceneJS_math_mulMat4(projMat, vmMat, pvMat);
+            SceneJS_math_inverseMat4(pvMat, pvMatInv);
 
-        var canvasWidth = canvas.width;
-        var canvasHeight = canvas.height;
+            //var modelMatInverse = math.inverseMat4(modelMat, tempMat4c);
 
-        var clipX = (canvasPos[0] - canvasWidth / 2) / (canvasWidth / 2);  // Calculate clip space coordinates
-        var clipY = -(canvasPos[1] - canvasHeight / 2) / (canvasHeight / 2);
+            // Calculate clip space coordinates, which will be in range
+            // of x=[-1..1] and y=[-1..1], with y=(+1) at top
 
-        var local1 = SceneJS_math_transformVector4(pvMatInverse, [clipX, clipY, -1, 1], tempVec4);
-        local1 = SceneJS_math_mulVec4Scalar(local1, 1 / local1[3]);
+            var canvasWidth = canvas.width;
+            var canvasHeight = canvas.height;
 
-        var local2 = SceneJS_math_transformVector4(pvMatInverse, [clipX, clipY, 1, 1], tempVec4b);
-        local2 = SceneJS_math_mulVec4Scalar(local2, 1 / local2[3]);
+            var clipX = (canvasPos[0] - canvasWidth / 2) / (canvasWidth / 2);  // Calculate clip space coordinates
+            var clipY = -(canvasPos[1] - canvasHeight / 2) / (canvasHeight / 2);
 
-        localRayOrigin[0] = local1[0];
-        localRayOrigin[1] = local1[1];
-        localRayOrigin[2] = local1[2];
+            SceneJS_math_transformVector4(pvMatInv, [clipX, clipY, -1, 1], local1);
+            local1 = SceneJS_math_mulVec4Scalar(local1, 1 / local1[3]);
 
-        SceneJS_math_subVec3(local2, local1, localRayDir);
+            SceneJS_math_transformVector4(pvMatInv, [clipX, clipY, 1, 1], local2);
+            local2 = SceneJS_math_mulVec4Scalar(local2, 1 / local2[3]);
 
-        SceneJS_math_normalizeVec3(localRayDir);
-    }
+            localRayOrigin[0] = local1[0];
+            localRayOrigin[1] = local1[1];
+            localRayOrigin[2] = local1[2];
+
+            SceneJS_math_subVec3(local2, local1, localRayDir);
+
+            SceneJS_math_normalizeVec3(localRayDir);
+        };
+    })();
 
     // Transforms a ray from World-space to Local-space
     var worldRayToLocalRay = (function () {
@@ -18287,18 +18297,7 @@ SceneJS_Display.prototype._logPickList = function () {
             pickBufX = canvas.clientWidth * 0.5;
             pickBufY = canvas.clientHeight * 0.5;
 
-        } else if (canvasRayPicking) {
-
-            // 3D picking with a 3D ray fired through the canvas
-            // Will sample center of pickbuffer
-
-            pickBufX = canvas.clientWidth * 0.5;
-            pickBufY = canvas.clientHeight * 0.5;
-
         } else {
-
-            // 2D picking of object at canvas position
-            // Will sample pick buffer at that position
 
             pickBufX = canvasPos[0];
             pickBufY = canvasPos[1];
