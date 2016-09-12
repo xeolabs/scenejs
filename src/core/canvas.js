@@ -55,9 +55,10 @@ var SceneJS_Canvas = function (id, canvasId, contextAttr, options) {
      * Attributes given when initialising the WebGL context
      */
     this.contextAttr = contextAttr || {};
+    this.contextAttr.depth = true;
     this.contextAttr.alpha = true;
-    
-    this.contextAttr["stencil"] = true;
+    this.contextAttr.preserveDrawingbuffer = false;
+    this.contextAttr.stencil = true;
 
     /**
      * The WebGL context
