@@ -238,9 +238,9 @@
     }
 
     var viewMatrixToLookat = (function () {
-        var invMat = SceneJS_math_mat4();
+        var invMat = mat4.create();
         return function (mat, lookat) {
-            SceneJS_math_inverseMat4(mat, invMat);
+            mat4.invert(invMat, mat);
 
             lookat.eye[0] = invMat[12];
             lookat.eye[1] = invMat[13];

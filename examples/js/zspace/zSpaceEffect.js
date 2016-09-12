@@ -127,4 +127,8 @@ SceneJS.ZSpaceEffect = function (cfg) {
     this.setFarClip = function (clip) {
         zspace.setFarClip(clip);
     };
+
+    this.setViewMat = function(mat) {
+        baseViewMat.set(mat);
+    }
 };
