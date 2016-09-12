@@ -361,6 +361,23 @@
         };
     };
 
+    SceneJS.Lookat.prototype.setMatrix = function (matrix) { // TODO: Extract clip planes from matrix
+        var core = this._core;
+        core.matrix = matrix;
+        core.mat = matrix;
+        if (!core.mat) { // Lazy-create arrays
+            core.mat = new Float32Array(core.matrix);
+            core.normalMat = new Float32Array(
+                SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
+
+        } else { // Insert into arrays
+            core.mat.set(core.matrix);
+            core.normalMat.set(SceneJS_math_transposeMat4(SceneJS_math_inverseMat4(core.matrix, SceneJS_math_mat4())));
+        }
+        this.publish("matrix", core.matrix);
+        this._engine.display.imageDirty = true;
+    };
+
     /**
      * Returns a copy of the matrix as a 1D array of 16 elements
      * @returns {Number[16]}

@@ -419,7 +419,10 @@
 
     canvas.addEventListener('mousemove',
             function (event) {
-                scene.pick(event.clientX, event.clientY, {regionPick: true});
+                scene.pick({
+                    canvasPos: [event.clientX, event.clientY],
+                    regionPick: true
+                });
             }, true);
 
 

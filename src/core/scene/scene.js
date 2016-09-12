@@ -56,6 +56,13 @@ SceneJS.Scene.prototype.getGL = function () {
     return this._engine.canvas.gl;
 };
 
+/**
+ * True if WebGL 2 is supported
+ */
+SceneJS.Scene.prototype.getWebGL2Supported = function () {
+    return this._engine.canvas.webgl2;
+};
+
 /** Returns the Z-buffer depth in bits of the webgl context that this scene is to bound to.
  */
 SceneJS.Scene.prototype.getZBufferDepth = function () {
@@ -98,13 +105,40 @@ SceneJS.Scene.prototype.getTagMask = function () {
 
 /**
  * Sets the number of times this scene is drawn on each render.
- * <p>This is useful for when we need to do things like render for left and right eyes.
+ *
+ * <p>This is useful for when we need to do things like render for left and right eyes.</p>
+ *
  * @param {Number} numPasses The number of times the scene is drawn on each frame.
- * @see #getTagMask
  * @see SceneJS.Tag
  */
 SceneJS.Scene.prototype.setNumPasses = function (numPasses) {
     this._engine.setNumPasses(numPasses);
+};
+
+/**
+ *  When doing multiple passes per frame, specifies whether to clear the
+ * canvas before each pass (true) or just before the first pass (false).
+ *
+ * <p>This is useful for when we need to do things like render a separate pass to a stereo framebuffer for left and right eyes,
+ * where we want to clear the buffer before each pass.</p>
+ *
+ * @param {Boolean} clearEachPass Tryu to clear before each pass (default is false).
+ * @see SceneJS.Tag
+ */
+SceneJS.Scene.prototype.setClearEachPass = function (clearEachPass) {
+    this._engine.setClearEachPass(clearEachPass);
+};
+
+/**
+ * Sets a custom framebuffer to bind for render passes.
+ *
+ * @param {Function} bindOutputFrameBuffer Callback to bind framebuffer
+ * @param {Function} unbindOutputFrameBuffer Callback to unbind framebuffer
+ * @see SceneJS.Tag
+ */
+SceneJS.Scene.prototype.setBindOutputFrameBuffer = function (bindOutputFrameBuffer, unbindOutputFrameBuffer) {
+    this._engine.display.bindOutputFramebuffer = bindOutputFrameBuffer;
+    this._engine.display.unbindOutputFramebuffer = unbindOutputFrameBuffer;
 };
 
 /**
@@ -175,10 +209,10 @@ SceneJS.Scene.prototype.isRunning = function () {
 };
 
 /**
- * Picks whatever geometry will be rendered at the given canvas coordinates.
+ *
  */
-SceneJS.Scene.prototype.pick = function (canvasX, canvasY, options) {
-    var result = this._engine.pick(canvasX, canvasY, options);
+SceneJS.Scene.prototype.pick = function (params) {
+    var result = this._engine.pick(params);
     this.renderFrame({force: true }); // HACK: canvas blanks after picking
     if (result) {
         this.publish("pick", result);

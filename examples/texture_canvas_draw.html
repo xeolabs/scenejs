@@ -43,7 +43,7 @@
         nodes: [
 
             {
-                type: "lookAt", 
+                type: "lookAt",
                 eye: {
                     x: 2,
                     y: 2,
@@ -83,7 +83,7 @@
                     }
                 ]
             }
-    
+
         ]
     });
 
@@ -107,7 +107,7 @@
 
     scene.on("tick", function() {
         if (drawing) {
-            scene.pick(pickX, pickY, {rayPick: true});
+            scene.pick({ canvasPos: [pickX, pickY], rayPick: true});
         }
     });
 

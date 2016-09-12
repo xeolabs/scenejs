@@ -40,6 +40,7 @@
     learn more about picking in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
     <br>
     <br>
+
     <div id="infoTxt">Click something!
     </div>
 </div>
@@ -89,8 +90,8 @@
                                 type: "material",
                                 id: "object" + i + "-material",
                                 emit: 0,
-                                color: { r: 0.5, g: 0.5, b: 0.6 },
-                                specularColor: { r: 0.9, g: 0.9, b: 0.9 },
+                                color: {r: 0.5, g: 0.5, b: 0.6},
+                                specularColor: {r: 0.9, g: 0.9, b: 0.9},
                                 specular: 1.0,
                                 shine: 70.0,
                                 nodes: [
@@ -178,7 +179,7 @@
     }
 
     function pick(canvasX, canvasY) {
-        scene.pick(canvasX, canvasY);
+        scene.pick({canvasPos: [canvasX, canvasY]});
     }
 
 

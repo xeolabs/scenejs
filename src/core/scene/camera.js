@@ -115,6 +115,16 @@
                     top: optics.top || 1.0,
                     far: optics.far || 10000.0
                 };
+            } else if (type == "frustumAngles") {
+                core.optics = {
+                    type: type,
+                    left: optics.left || 22,
+                    down: optics.down || 22,
+                    near: optics.near || 0.1,
+                    right: optics.right || 22,
+                    up: optics.up || 22,
+                    far: optics.far || 10000.0
+                };
             } else if (type == "perspective") {
                 core.optics = {
                     type: type,
@@ -127,12 +137,12 @@
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "SceneJS.Camera configuration invalid: optics type not specified - " +
-                    "supported types are 'perspective', 'frustum' and 'ortho'");
+                    "supported types are 'perspective', 'frustum', 'frustumAngles' and 'ortho'");
             } else {
                 throw SceneJS_error.fatalError(
                     SceneJS.errors.ILLEGAL_NODE_CONFIG,
                     "SceneJS.Camera configuration invalid: optics type not supported - " +
-                    "supported types are 'perspective', 'frustum' and 'ortho'");
+                    "supported types are 'perspective', 'frustum', 'frustumAngles' and 'ortho'");
             }
         }
         this._core.optics.pan = optics.pan;
@@ -168,6 +178,15 @@
                 optics.near,
                 optics.far);
 
+        } else if (optics.type == "frustumAngles") {
+            core.matrix = SceneJS_math_frustumMatrix4FromAngles(
+                optics.left,
+                optics.right,
+                optics.down,
+                optics.up,
+                optics.near,
+                optics.far);
+
         } else if (optics.type == "perspective") {
             core.matrix = SceneJS_math_perspectiveMatrix4(
                 optics.fovy * Math.PI / 180.0,
@@ -198,6 +217,13 @@
             }
         }
         return optics;
+    };
+
+    SceneJS.Camera.prototype.setMatrix = function (matrix) { // TODO: Extract clip planes from matrix
+        this._core.matrix = matrix;
+        this._core.mat = matrix;
+        this.publish("matrix", this._core.matrix);
+        this._engine.display.imageDirty = true;
     };
 
     SceneJS.Camera.prototype.getMatrix = function () {

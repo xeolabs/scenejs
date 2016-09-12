@@ -41,9 +41,9 @@
 <div id="infoDark">
     <a href="http://scenejs.org" target="_other">SceneJS</a> - region picking - highlight
     <br>
-    SceneJS allows you to define regions on a surface using a texture. 
+    SceneJS allows you to define regions on a surface using a texture.
     <br>
-    Arbitrary data can be associated with regions, and that data will be returned on pick. 
+    Arbitrary data can be associated with regions, and that data will be returned on pick.
     <br>
     Regions can also be interacted with in three ways: highlight, hide, isolate
     <br>
@@ -88,7 +88,7 @@
                         priority: -1,
                         nodes: [
                             {
-                                type:"skybox/cloudySea"
+                                type: "skybox/cloudySea"
                             }
                         ]
                     },
@@ -285,7 +285,10 @@
 
     canvas.addEventListener('mousemove',
             function (event) {
-                scene.pick(event.clientX, event.clientY, { regionPick: true });
+                scene.pick({
+                    canvasPos: [event.clientX, event.clientY],
+                    regionPick: true
+                });
             }, true);
 
 </script>

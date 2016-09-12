@@ -42,6 +42,7 @@
     <br>
     learn more about picking in <a href="http://xeolabs.com/articles/scenejs-picking/" target="_other">this tutorial</a>
     <br><br>
+
     <div id="infoTxt">
     </div>
 </div>
@@ -53,30 +54,30 @@
 
     // Point SceneJS to the bundled plugins
     SceneJS.setConfigs({
-        pluginPath:"../api/latest/plugins"
+        pluginPath: "../api/latest/plugins"
     });
 
     // Create scene
     var scene = SceneJS.createScene({
-        nodes:[
+        nodes: [
             // Orbiting camera node, implemented by plugin at
             // http://scenejs.org/api/latest/plugins/node/cameras/orbit.js
             {
-                type:"cameras/orbit", yaw:30, pitch:-30, zoom:15, zoomSensitivity:1.0,
-                nodes:[
+                type: "cameras/orbit", yaw: 30, pitch: -30, zoom: 15, zoomSensitivity: 1.0,
+                nodes: [
 
                     // Pickable red teapot with name "redTeapot"
                     {
-                        type:"name", name:"redTeapot",
-                        nodes:[
+                        type: "name", name: "redTeapot",
+                        nodes: [
                             {
-                                type:"material", color:{ r:1.0, g:0.3, b:0.3 },
-                                nodes:[
+                                type: "material", color: {r: 1.0, g: 0.3, b: 0.3},
+                                nodes: [
 
                                     // Teapot primitive, implemented by plugin at
                                     // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
                                     {
-                                        type:"geometry/teapot"
+                                        type: "geometry/teapot"
                                     }
                                 ]
                             }
@@ -86,24 +87,24 @@
                     // Transparent blue box that you can pick through
                     // Flags make it transparent and unpickable, while material alpha sets degree of opacity
                     {
-                        type:"name", name:"blueBox",
-                        nodes:[
+                        type: "name", name: "blueBox",
+                        nodes: [
                             {
-                                type:"flags", flags:{ transparent:true, picking:false },
-                                nodes:[
+                                type: "flags", flags: {transparent: true, picking: false},
+                                nodes: [
 
                                     // Transparent material - note the 'alpha'
                                     {
-                                        type:"material", color:{ r:0.3, g:0.3, b:1.0 }, alpha:0.4,
-                                        nodes:[
+                                        type: "material", color: {r: 0.3, g: 0.3, b: 1.0}, alpha: 0.4,
+                                        nodes: [
                                             {
-                                                type:"translate", x:0.4, y:2, z:0.5,
-                                                nodes:[
+                                                type: "translate", x: 0.4, y: 2, z: 0.5,
+                                                nodes: [
 
                                                     // Box primitive, implemented by plugin at
                                                     // http://scenejs.org/api/latest/plugins/node/geometry/box.js
                                                     {
-                                                        type:"geometry/box", xSize:3.5, ySize:2, zSize:3.5
+                                                        type: "geometry/box", xSize: 3.5, ySize: 2, zSize: 3.5
                                                     }
                                                 ]
                                             }
@@ -163,7 +164,7 @@
                 if (dragging && Math.abs(event.clientX - lastX) < 3 && Math.abs(event.clientY - lastY) < 3) {
 
                     // Do pick
-                    scene.pick(event.clientX, event.clientY);
+                    scene.pick({canvasPos: [event.clientX, event.clientY]});
                 }
                 dragging = false;
             }, true);
@@ -180,7 +181,7 @@
                 if (dragging && event.targetTouches[0].clientX == lastX && event.targetTouches[0].clientY == lastY) {
 
                     // Do pick
-                    scene.pick(event.targetTouches[0].clientX, event.targetTouches[0].clientY);
+                    scene.pick({canvasPos: [event.targetTouches[0].clientX, event.targetTouches[0].clientY]});
                 }
                 dragging = false;
             }, true);
