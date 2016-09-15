@@ -27,41 +27,10 @@
         this.viewerScale = 1.0;
 
         this.leftViewMatrix = mat4.create();
-        this.leftViewLookat = {
-            eye: new Float32Array(3),
-            look: new Float32Array(3),
-            up: new Float32Array(3)
-        };
-
         this.rightViewMatrix = mat4.create();
-        this.rightViewLookat = {
-            eye: new Float32Array(3),
-            look: new Float32Array(3),
-            up: new Float32Array(3)
-        };
-
         this.leftProjectionMatrix = mat4.create();
-        this.leftFrustumAngles = {
-            left: 1.0,
-            down: 1.0,
-            near: 0.1,
-            right: 1.0,
-            up: 1.0,
-            far: 5000.0
-        };
-
         this.rightProjectionMatrix = mat4.create();
-        this.rightFrustumAngles = {
-            left: 1.0,
-            down: 1.0,
-            near: 0.1,
-            right: 1.0,
-            up: 1.0,
-            far: 5000.0
-        };
-
         this.stylusCameraMatrix = mat4.create();
-
 
         this.currentWidth = 0;
         this.currentHeight = 0;
@@ -185,7 +154,8 @@
             return;
 
         var buffer = 0;
-        if (swapStereo) {
+        if (swapStereo)
+        {
             buffer = 1;
         }
         this.gl.bindFramebuffer(this.gl.DRAW_FRAMEBUFFER, this.frameBuffer);
@@ -237,25 +207,6 @@
         projection[15] = 0;
     }
 
-    var viewMatrixToLookat = (function () {
-        var invMat = mat4.create();
-        return function (mat, lookat) {
-            mat4.invert(invMat, mat);
-
-            lookat.eye[0] = invMat[12];
-            lookat.eye[1] = invMat[13];
-            lookat.eye[2] = invMat[14];
-
-            lookat.look[0] = invMat[8];
-            lookat.look[1] = invMat[9];
-            lookat.look[2] = invMat[10];
-
-            lookat.up[0] = invMat[4];
-            lookat.up[1] = invMat[5];
-            lookat.up[2] = invMat[6];
-        };
-    })();
-
     zspace.prototype.zspaceUpdate = function zspaceUpdate() {
         if (!stereoEnable) {
             this.gl.setStereoFramebuffer(null, null);
@@ -296,22 +247,16 @@
         var viewScale = mat4.create();
         mat4.identity(viewScale);
         var scale = vec3.create();
-        scale[0] = this.viewerScale;
-        scale[1] = this.viewerScale;
-        scale[2] = this.viewerScale;
+        scale[0] = this.viewerScale; scale[1] = this.viewerScale; scale[2] = this.viewerScale;
         mat4.scale(viewScale, viewScale, scale);
 
         if (leftViewDevice) {
             var leftViewPose = leftViewDevice.getPose();
             if (leftViewPose && leftViewPose.orientation && leftViewPose.position) {
-
                 var newPosition = vec3.create();
-
                 vec3.transformMat4(newPosition, leftViewPose.position, offsetTranslation);
                 vec3.transformMat4(newPosition, newPosition, viewScale);
                 mat4.fromRotationTranslation(this.leftViewMatrix, leftViewPose.orientation, newPosition);
-
-                viewMatrixToLookat(this.leftViewMatrix, this.leftViewLookat);
             }
         }
         else {
@@ -321,14 +266,10 @@
         if (rightViewDevice) {
             var rightViewPose = rightViewDevice.getPose();
             if (rightViewPose && rightViewPose.orientation && rightViewPose.position) {
-
                 var newPosition = vec3.create();
-
                 vec3.transformMat4(newPosition, rightViewPose.position, offsetTranslation);
                 vec3.transformMat4(newPosition, newPosition, viewScale);
                 mat4.fromRotationTranslation(this.rightViewMatrix, rightViewPose.orientation, newPosition);
-
-                viewMatrixToLookat(this.rightViewMatrix, this.rightViewLookat);
             }
         }
         else {
@@ -339,24 +280,20 @@
         offsetTranslation[13] = -offsetTranslation[13];
 
 
+
         if (leftProjectionDevice) {
             var leftProjectionPose = leftProjectionDevice.getPose();
             if (leftProjectionPose && leftProjectionPose.orientation && leftProjectionPose.position) {
 
                 var leftEye = vec3.create();
-
                 vec3.transformMat4(leftEye, leftProjectionPose.position, offsetTranslation);
                 vec3.transformMat4(leftEye, leftEye, viewScale);
 
-                var leftFrustumAngles = this.leftFrustumAngles;
-                leftFrustumAngles.near = this.nearClip;
-                leftFrustumAngles.far = this.farClip;
-                leftFrustumAngles.up = Math.atan((canvasHeight * 0.5 - leftEye[1]) / leftEye[2]);
-                leftFrustumAngles.down = Math.atan((canvasHeight * 0.5 + leftEye[1]) / leftEye[2]);
-                leftFrustumAngles.left = Math.atan((canvasWidth * 0.5 + leftEye[0]) / leftEye[2]);
-                leftFrustumAngles.right = Math.atan((canvasWidth * 0.5 - leftEye[0]) / leftEye[2]);
-
-                this.makeProjection(this.leftProjectionMatrix, leftFrustumAngles.up, leftFrustumAngles.down, leftFrustumAngles.left, leftFrustumAngles.right);
+                var up = Math.atan((canvasHeight * 0.5 - leftEye[1]) / leftEye[2]);
+                var down = Math.atan((canvasHeight * 0.5 + leftEye[1]) / leftEye[2]);
+                var left = Math.atan((canvasWidth * 0.5 + leftEye[0]) / leftEye[2]);
+                var right = Math.atan((canvasWidth * 0.5 - leftEye[0]) / leftEye[2]);
+                this.makeProjection(this.leftProjectionMatrix, up, down, left, right);
             } else {
                 mat4.frustum(this.leftProjectionMatrix, -0.1, 0.1, -0.1, 0.1, 0.1, 1000.0);
             }
@@ -369,15 +306,11 @@
                 vec3.transformMat4(rightEye, rightProjectionPose.position, offsetTranslation);
                 vec3.transformMat4(rightEye, rightEye, viewScale);
 
-                var rightFrustumAngles = this.rightFrustumAngles;
-                rightFrustumAngles.near = this.nearClip;
-                rightFrustumAngles.far = this.farClip;
-                rightFrustumAngles.up = Math.atan((canvasHeight * 0.5 - rightEye[1]) / rightEye[2]);
-                rightFrustumAngles.down = Math.atan((canvasHeight * 0.5 + rightEye[1]) / rightEye[2]);
-                rightFrustumAngles.left = Math.atan((canvasWidth * 0.5 + rightEye[0]) / rightEye[2]);
-                rightFrustumAngles.right = Math.atan((canvasWidth * 0.5 - rightEye[0]) / rightEye[2]);
-
-                this.makeProjection(this.rightProjectionMatrix, rightFrustumAngles.up, rightFrustumAngles.down, rightFrustumAngles.left, rightFrustumAngles.right);
+                var up = Math.atan((canvasHeight * 0.5 - rightEye[1]) / rightEye[2]);
+                var down = Math.atan((canvasHeight * 0.5 + rightEye[1]) / rightEye[2]);
+                var left = Math.atan((canvasWidth * 0.5 + rightEye[0]) / rightEye[2]);
+                var right = Math.atan((canvasWidth * 0.5 - rightEye[0]) / rightEye[2]);
+                this.makeProjection(this.rightProjectionMatrix, up, down, left, right);
             } else {
                 mat4.frustum(this.rightProjectionMatrix, -0.1, 0.1, -0.1, 0.1, 0.1, 1000.0);
             }
