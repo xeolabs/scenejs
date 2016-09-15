@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-09-13
+ * Built on 2016-09-15
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
@@ -2462,9 +2462,13 @@ SceneJS_Engine.prototype.start = function () {
 
             if (lastFrameTime > 0) {
                 elapsedFrameTime = frameTime - lastFrameTime;
-                newFPS = 1000 / elapsedFrameTime;
-                totalFPS += newFPS;
-                fpsSamples.push(newFPS);
+                if(elapsedFrameTime == 0) {
+                    newFPS = 0;
+                } else {
+                    newFPS = 1000 / elapsedFrameTime;
+                    totalFPS += newFPS;
+                    fpsSamples.push(newFPS);
+                }
                 if (fpsSamples.length >= numFPSSamples) {
                     totalFPS -= fpsSamples.shift();
                 }
@@ -8960,6 +8964,13 @@ new (function () {
         return SceneJS._sliceArray(this._core.matrix, 0);
     };
 
+    SceneJS.Camera.prototype.setMatrix = function (matrix) { // TODO: Extract clip planes from matrix
+        this._core.matrix = matrix;
+        this._core.mat = matrix;
+        this.publish("matrix", this._core.matrix);
+        this._engine.display.imageDirty = true;
+    };
+
     /**
      * Compiles this camera node, setting this node's state core on the display, compiling sub-nodes,
      * then restoring the previous camera state core back onto the display on exit.
@@ -11299,6 +11310,13 @@ SceneJS.Library.prototype._compile = function(ctx) { // Bypass child nodes
         }
 
         return  SceneJS._sliceArray(this._core.matrix, 0);
+    };
+
+    SceneJS.Lookat.prototype.setMatrix = function (matrix) { // TODO: Extract clip planes from matrix
+        this._core.matrix = matrix;
+        this._core.mat = matrix;
+        this.publish("matrix", this._core.matrix);
+        this._engine.display.imageDirty = true;
     };
 
     SceneJS.Lookat.prototype.getAttributes = function () {
@@ -17778,14 +17796,10 @@ SceneJS_Display.prototype.render = function (params) {
         //this._logPickList();
     }
 
-    if (true || this.imageDirty || params.force) {
+    if (this.imageDirty || params.force) {
         SceneJS_events.fireEvent(SceneJS_events.RENDER, {
             forced: !!params.force
         });
-        //if (!this._helloWebGL) {
-        //    this._helloWebGL = new HelloWebGL(this._canvas.canvas, this._canvas.gl);
-        //}
-//        this._helloWebGL.draw();
         this._doDrawList({ // Render, no pick
             clear: (params.clear !== false), // Clear buffers by default
             opaqueOnly: params.opaqueOnly
@@ -18131,7 +18145,9 @@ SceneJS_Display.prototype._logPickList = function () {
 
     var localRayOrigin = SceneJS_math_vec3();
     var localRayDir = SceneJS_math_vec3();
-    var pickMatrix = SceneJS_math_mat4();
+    var pickViewMatrix = mat4.create();
+    var pickProjMatrix = mat4.create();
+    mat4.frustum(pickProjMatrix, -1, 1, -1, 1, 0.1, 10000);
 
     var a = SceneJS_math_vec3();
     var b = SceneJS_math_vec3();
@@ -18292,7 +18308,7 @@ SceneJS_Display.prototype._logPickList = function () {
             var look = SceneJS_math_addVec3(worldRayOrigin, worldRayDir, tempVec3);
             var up = new Float32Array([0, 1, 0]); // TODO: derive from ray
 
-            SceneJS_math_lookAtMat4v(worldRayOrigin, look, up, pickMatrix);
+            SceneJS_math_lookAtMat4v(worldRayOrigin, look, up, pickViewMatrix);
 
             pickBufX = canvas.clientWidth * 0.5;
             pickBufY = canvas.clientHeight * 0.5;
@@ -18316,7 +18332,8 @@ SceneJS_Display.prototype._logPickList = function () {
         this._doDrawList({
             pickObject: true,
             clear: true,
-            pickMatrix: worldRayPicking ? pickMatrix: null
+            pickViewMatrix: worldRayPicking ? pickViewMatrix: null,
+            pickProjMatrix: worldRayPicking ? pickProjMatrix: null
         });
 
         this._canvas.gl.finish();
@@ -18362,7 +18379,8 @@ SceneJS_Display.prototype._logPickList = function () {
             this._doDrawList({
                 pickRegion: true,
                 object: object,
-                pickMatrix: worldRayPicking ? pickMatrix: null,
+                pickViewMatrix: worldRayPicking ? pickViewMatrix: null,
+                pickProjMatrix: worldRayPicking ? pickProjMatrix: null,
                 clear: true
             });
 
@@ -18413,7 +18431,8 @@ SceneJS_Display.prototype._logPickList = function () {
             this._doDrawList({
                 pickTriangle: true,
                 object: object,
-                pickMatrix: worldRayPicking ? pickMatrix: null,
+                pickViewMatrix: worldRayPicking ? pickViewMatrix: null,
+                pickProjMatrix: worldRayPicking ? pickProjMatrix: null,
                 clear: true
             });
 
@@ -18808,7 +18827,8 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.bindTexture = 0;
     frameCtx.bindArray = 0;
 
-    frameCtx.pickMatrix = params.pickMatrix;
+    frameCtx.pickViewMatrix = params.pickViewMatrix;
+    frameCtx.pickProjMatrix = params.pickProjMatrix;
 
     // The extensions needs to be re-queried in case the context was lost and has been recreated.
     if (SceneJS.WEBGL_INFO.SUPPORTED_EXTENSIONS["OES_element_index_uint"]) {
@@ -21015,7 +21035,7 @@ SceneJS_ChunkFactory.prototype.webglRestored = function () {
         var gl = this.program.gl;
 
         if (this._uPMatrixPick) {
-            this._uPMatrixPick.setValue(this.core.mat);
+            this._uPMatrixPick.setValue(frameCtx.pickProjMatrix || this.core.mat);
         }
 
         if (frameCtx.rayPick) { // Z-pick pass: feed near and far clip planes into shader
@@ -21851,7 +21871,7 @@ SceneJS_ChunkFactory.createChunkType({
     pick : function(frameCtx) {
         
         if (this._uvMatrixPick) {
-            this._uvMatrixPick.setValue(frameCtx.pickMatrix || this.core.mat);
+            this._uvMatrixPick.setValue(frameCtx.pickViewMatrix || this.core.mat);
         }
 
         frameCtx.viewMat = this.core.mat;

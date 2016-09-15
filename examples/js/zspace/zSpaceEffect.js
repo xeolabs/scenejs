@@ -2,7 +2,7 @@
 
  A ZSpace effect for SceneJS.
 
- Dependencies: zSpace.js and glmatrix
+ Dependencies: zSpace.js and glmatrix.js
 
  @param {*} cfg
  @param {SceneJS.Scene} cfg.scene The SceneJS scene
@@ -40,6 +40,14 @@ SceneJS.ZSpaceEffect = function (cfg) {
     var lookat = cfg.lookat;
     var camera = cfg.camera;
 
+    if (!lookat) {
+        throw "Param missing: lookat";
+    }
+
+    if (!camera) {
+        throw "Param missing: lookat";
+    }
+
     //----------------------------------------------------------------------
     // Set up zSpace
     //----------------------------------------------------------------------
@@ -57,20 +65,19 @@ SceneJS.ZSpaceEffect = function (cfg) {
     // Gets World-space stylus position and direction from zSpace
     //----------------------------------------------------------------------
 
-    var stylusWorldPos = new Float32Array(3);
-    var stylusWorldDir = new Float32Array(3);
+    var stylusWorldPos = vec3.create();
+    var stylusWorldDir = vec3.create();
 
     var processStylus = (function () {
 
-        var invViewMat = new Float32Array(16);
-        var stylusWorldMat = new Float32Array(16);
+        var invViewMat = mat4.create();
+        var stylusWorldMat = mat4.create();
 
         return function () {
 
             var viewMat = camera.getMatrix(); // View matrix (assuming this is the inverse of the World matrix?)
 
-            //SceneJS_math_inverseMat4(viewMat, invViewMat);
-            SceneJS_math_mulMat4(viewMat, zspace.stylusCameraMatrix, stylusWorldMat);
+            mat4.multiply(stylusWorldMat, viewMat, zspace.stylusCameraMatrix);
 
             stylusWorldPos[0] = stylusWorldMat[12];
             stylusWorldPos[1] = stylusWorldMat[13];
@@ -89,10 +96,10 @@ SceneJS.ZSpaceEffect = function (cfg) {
     // the result into our SceneJS lookat node
     //----------------------------------------------------------------------
 
-    var setViewMatrix = (function () { // Sets the SceneJS Lookat to vectors extracted from the given view matrix
-        var viewMat = new Float32Array(16);
+    var setViewMatrix = (function () {
+        var viewMat = mat4.create();
         return function (mat) {
-            SceneJS_math_mulMat4(baseViewMat, mat, viewMat);
+            mat4.multiply(viewMat, baseViewMat, mat);
             lookat.setMatrix(viewMat);
         };
     })();

@@ -230,6 +230,13 @@
         return SceneJS._sliceArray(this._core.matrix, 0);
     };
 
+    SceneJS.Camera.prototype.setMatrix = function (matrix) { // TODO: Extract clip planes from matrix
+        this._core.matrix = matrix;
+        this._core.mat = matrix;
+        this.publish("matrix", this._core.matrix);
+        this._engine.display.imageDirty = true;
+    };
+
     /**
      * Compiles this camera node, setting this node's state core on the display, compiling sub-nodes,
      * then restoring the previous camera state core back onto the display on exit.
