@@ -46,7 +46,7 @@ SceneJS_ChunkFactory.createChunkType({
         var gl = this.program.gl;
 
         if (this._uPMatrixPick) {
-            this._uPMatrixPick.setValue(this.core.mat);
+            this._uPMatrixPick.setValue(frameCtx.pickProjMatrix || this.core.mat);
         }
 
         if (frameCtx.rayPick) { // Z-pick pass: feed near and far clip planes into shader

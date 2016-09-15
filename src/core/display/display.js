@@ -1000,7 +1000,9 @@ SceneJS_Display.prototype._logPickList = function () {
 
     var localRayOrigin = SceneJS_math_vec3();
     var localRayDir = SceneJS_math_vec3();
-    var pickMatrix = SceneJS_math_mat4();
+    var pickViewMatrix = mat4.create();
+    var pickProjMatrix = mat4.create();
+    mat4.frustum(pickProjMatrix, -1, 1, -1, 1, 0.1, 10000);
 
     var a = SceneJS_math_vec3();
     var b = SceneJS_math_vec3();
@@ -1161,7 +1163,7 @@ SceneJS_Display.prototype._logPickList = function () {
             var look = SceneJS_math_addVec3(worldRayOrigin, worldRayDir, tempVec3);
             var up = new Float32Array([0, 1, 0]); // TODO: derive from ray
 
-            SceneJS_math_lookAtMat4v(worldRayOrigin, look, up, pickMatrix);
+            SceneJS_math_lookAtMat4v(worldRayOrigin, look, up, pickViewMatrix);
 
             pickBufX = canvas.clientWidth * 0.5;
             pickBufY = canvas.clientHeight * 0.5;
@@ -1185,7 +1187,8 @@ SceneJS_Display.prototype._logPickList = function () {
         this._doDrawList({
             pickObject: true,
             clear: true,
-            pickMatrix: worldRayPicking ? pickMatrix: null
+            pickViewMatrix: worldRayPicking ? pickViewMatrix: null,
+            pickProjMatrix: worldRayPicking ? pickProjMatrix: null
         });
 
         this._canvas.gl.finish();
@@ -1231,7 +1234,8 @@ SceneJS_Display.prototype._logPickList = function () {
             this._doDrawList({
                 pickRegion: true,
                 object: object,
-                pickMatrix: worldRayPicking ? pickMatrix: null,
+                pickViewMatrix: worldRayPicking ? pickViewMatrix: null,
+                pickProjMatrix: worldRayPicking ? pickProjMatrix: null,
                 clear: true
             });
 
@@ -1282,7 +1286,8 @@ SceneJS_Display.prototype._logPickList = function () {
             this._doDrawList({
                 pickTriangle: true,
                 object: object,
-                pickMatrix: worldRayPicking ? pickMatrix: null,
+                pickViewMatrix: worldRayPicking ? pickViewMatrix: null,
+                pickProjMatrix: worldRayPicking ? pickProjMatrix: null,
                 clear: true
             });
 
@@ -1677,7 +1682,8 @@ SceneJS_Display.prototype._doDrawList = function (params) {
     frameCtx.bindTexture = 0;
     frameCtx.bindArray = 0;
 
-    frameCtx.pickMatrix = params.pickMatrix;
+    frameCtx.pickViewMatrix = params.pickViewMatrix;
+    frameCtx.pickProjMatrix = params.pickProjMatrix;
 
     // The extensions needs to be re-queried in case the context was lost and has been recreated.
     if (SceneJS.WEBGL_INFO.SUPPORTED_EXTENSIONS["OES_element_index_uint"]) {

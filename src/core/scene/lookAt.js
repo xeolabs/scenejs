@@ -391,6 +391,13 @@
         return  SceneJS._sliceArray(this._core.matrix, 0);
     };
 
+    SceneJS.Lookat.prototype.setMatrix = function (matrix) { // TODO: Extract clip planes from matrix
+        this._core.matrix = matrix;
+        this._core.mat = matrix;
+        this.publish("matrix", this._core.matrix);
+        this._engine.display.imageDirty = true;
+    };
+
     SceneJS.Lookat.prototype.getAttributes = function () {
         return {
             look:{
