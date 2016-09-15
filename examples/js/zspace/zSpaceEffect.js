@@ -19,7 +19,6 @@ SceneJS.ZSpaceEffect = function (cfg) {
 
     if (!scene.getWebGL2Supported()) {
         console.error("WebGL2 not supported");
-        return;
     }
 
     var gl = scene.getGL();
