@@ -509,9 +509,13 @@ SceneJS_Engine.prototype.start = function () {
 
             if (lastFrameTime > 0) {
                 elapsedFrameTime = frameTime - lastFrameTime;
-                newFPS = 1000 / elapsedFrameTime;
-                totalFPS += newFPS;
-                fpsSamples.push(newFPS);
+                if(elapsedFrameTime == 0) {
+                    newFPS = 0;
+                } else {
+                    newFPS = 1000 / elapsedFrameTime;
+                    totalFPS += newFPS;
+                    fpsSamples.push(newFPS);
+                }
                 if (fpsSamples.length >= numFPSSamples) {
                     totalFPS -= fpsSamples.shift();
                 }
