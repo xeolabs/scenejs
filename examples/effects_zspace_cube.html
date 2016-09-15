@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
-    <script src="libs/gl-matrix-min.js"></script> <!-- Include this BEFORE SceneJS to avoid requireJS confusion -->
+    <script src="libs/gl-matrix-min.js"></script>
+    <!-- Include this BEFORE SceneJS to avoid requireJS confusion -->
     <script src="../api/latest/scenejs.js"></script>
     <script src="js/zspace/zSpace.js"></script>
     <script src="js/zspace/zSpaceEffect.js"></script>
@@ -32,8 +33,12 @@
 
     // Create scene
     var scene = SceneJS.createScene({
-        webgl2: true,
+
+        webgl2: true, // Need WebGL2 for zSpace
+
         nodes: [
+
+            // Viewing transform
             {
                 type: "lookAt",
                 id: "theLookat",
@@ -42,20 +47,24 @@
                 up: {x: 0, y: 1, z: 0},
 
                 nodes: [
+
+                    // Projection transform
                     {
                         type: "camera",
                         id: "theCamera",
                         optics: {
                             type: "frustumAngles",
-                            left:20,
-                            down:20,
-                            near:0.1,
-                            right:20,
-                            up:20,
-                            far:10000
+                            left: 20,
+                            down: 20,
+                            near: 0.1,
+                            right: 20,
+                            up: 20,
+                            far: 10000
                         },
 
                         nodes: [
+
+                            // Spin the cube
                             {
                                 type: "rotate",
                                 id: "theRotate",
@@ -64,11 +73,29 @@
 
                                 nodes: [
 
-                                    // Randomly scattered boxes, implemented by plugin at
-                                    // http://scenejs.org/api/latest/plugins/node/geometry/randomObjects.js
+                                    // Texture the cube
                                     {
-                                        type: "geometry/randomObjects",
-                                        numObjects: 500
+                                        type: "texture",
+                                        src: "textures/superman.jpg",
+                                        applyTo: "color",  // Apply to material "color" property (default)
+
+                                        nodes: [
+
+                                            // Scale the cube
+                                            {
+                                                type: "scale",
+                                                x: 0.2, y: 0.2, z: 0.2,
+
+                                                nodes: [
+
+                                                    // Box primitive, implemented by plugin at
+                                                    // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                    {
+                                                        type: "geometry/box"
+                                                    }
+                                                ]
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -148,14 +175,7 @@
         console.log(stylusWorldDir);
 
         rayHelper.setRay(stylusWorldPos, stylusWorldDir);
-
-        var stylusButtons = zspace.getStylusButtons();
-
-        if (stylusButtons[0]) {
-
-        }
     });
-
 
 </script>
 </body>

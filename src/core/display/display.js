@@ -651,14 +651,10 @@ SceneJS_Display.prototype.render = function (params) {
         //this._logPickList();
     }
 
-    if (true || this.imageDirty || params.force) {
+    if (this.imageDirty || params.force) {
         SceneJS_events.fireEvent(SceneJS_events.RENDER, {
             forced: !!params.force
         });
-        //if (!this._helloWebGL) {
-        //    this._helloWebGL = new HelloWebGL(this._canvas.canvas, this._canvas.gl);
-        //}
-//        this._helloWebGL.draw();
         this._doDrawList({ // Render, no pick
             clear: (params.clear !== false), // Clear buffers by default
             opaqueOnly: params.opaqueOnly

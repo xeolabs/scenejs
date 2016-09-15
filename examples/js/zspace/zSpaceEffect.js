@@ -22,14 +22,28 @@ SceneJS.ZSpaceEffect = function (cfg) {
         return;
     }
 
-    scene.setNumPasses(2); // Configure SceneJS to perform two passes per render, for left and right eyes
-    scene.setClearEachPass(true); // Clear the output framebuffer before each pass
-
     var gl = scene.getGL();
     var canvas = scene.getCanvas();
 
+    //----------------------------------------------------------------------
+    // Configure SceneJS to do two passes (left and right) on each frame,
+    // while clearing the stereo framebuffer before each pass
+    //----------------------------------------------------------------------
+
+    scene.setNumPasses(2);
+    scene.setClearEachPass(true);
+
+    //----------------------------------------------------------------------
+    // We'll be updating SceneJS' view and projection transforms
+    // through these scene graph nodes
+    //----------------------------------------------------------------------
+
     var lookat = cfg.lookat;
     var camera = cfg.camera;
+
+    //----------------------------------------------------------------------
+    // Set up zSpace
+    //----------------------------------------------------------------------
 
     var zspace = new ZSpace(gl, canvas, window);
     zspace.zspaceInit();
@@ -37,98 +51,160 @@ SceneJS.ZSpaceEffect = function (cfg) {
     zspace.setViewerScale(cfg.viewerScale || 10);
     zspace.setFarClip(cfg.farClip || 10000.0);
 
+    // The "base" view matrix we use to position and orient the virtual camera
     var baseViewMat = SceneJS_math_lookAtMat4v([0.0, 3.45, 2.22], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0]);
 
-    var setLookatFromViewMat = (function () { // Sets the SceneJS Lookat to vectors extracted from the given view matrix
-        var viewMat = new Float32Array(16);
+    //----------------------------------------------------------------------
+    // Gets World-space stylus position and direction from zSpace
+    //----------------------------------------------------------------------
+
+    var stylusWorldPos = new Float32Array(3);
+    var stylusWorldDir = new Float32Array(3);
+
+    var processStylus = (function () {
+
         var invViewMat = new Float32Array(16);
+        var stylusWorldMat = new Float32Array(16);
+
+        return function () {
+
+            var viewMat = camera.getMatrix(); // View matrix (assuming this is the inverse of the World matrix?)
+
+            //SceneJS_math_inverseMat4(viewMat, invViewMat);
+            SceneJS_math_mulMat4(viewMat, zspace.stylusCameraMatrix, stylusWorldMat);
+
+            stylusWorldPos[0] = stylusWorldMat[12];
+            stylusWorldPos[1] = stylusWorldMat[13];
+            stylusWorldPos[2] = stylusWorldMat[14];
+
+            stylusWorldDir[0] = -stylusWorldMat[8];
+            stylusWorldDir[1] = -stylusWorldMat[9];
+            stylusWorldDir[2] = -stylusWorldMat[10];
+
+            SceneJS_math_normalizeVec3(stylusWorldDir);
+        };
+    })();
+
+    //----------------------------------------------------------------------
+    // Concatenates the given matrix to the base view matrix, then feeds
+    // the result into our SceneJS lookat node
+    //----------------------------------------------------------------------
+
+    var setViewMatrix = (function () { // Sets the SceneJS Lookat to vectors extracted from the given view matrix
+        var viewMat = new Float32Array(16);
         return function (mat) {
             SceneJS_math_mulMat4(baseViewMat, mat, viewMat);
-            SceneJS_math_inverseMat4(viewMat, invViewMat);
-            lookat.setEye({x: invViewMat[12], y: invViewMat[13], z: invViewMat[14]});
-            lookat.setLook({x: invViewMat[8], y: invViewMat[9], z: invViewMat[10]});
-            lookat.setUp({x: invViewMat[4], y: invViewMat[5], z: invViewMat[6]});
+            lookat.setMatrix(viewMat);
         };
     })();
 
-    var setLookatFromVectors = (function () { // Sets the SceneJS Lookat to the given (eye, look, up) vectors
-        return function (eyeLookUp) {
-            lookat.setEye({x: eyeLookUp.eye[0], y: eyeLookUp.eye[1], z: eyeLookUp.eye[2]});
-            lookat.setLook({x: eyeLookUp.look[0], y: eyeLookUp.look[1], z: eyeLookUp.look[2]});
-            lookat.setUp({x: eyeLookUp.up[0], y: eyeLookUp.up[1], z: eyeLookUp.up[2]});
-        };
-    })();
+    //----------------------------------------------------------------------
+    // Sets the matrix on our SceneJS camera node
+    //----------------------------------------------------------------------
 
-    function setCameraFrustumAngles(frustumAngles) { // Sets the Camera to the given perspective frustum angles
-        camera.setOptics({
-            type: "frustumAngles",
-            up: frustumAngles.up,
-            down: frustumAngles.down,
-            left: frustumAngles.left,
-            right: frustumAngles.right,
-            near: frustumAngles.near,
-            far: frustumAngles.far
-        });
+    function setProjMatrix(mat) {
+        camera.setMatrix(mat);
     }
 
-    // Force SceneJS to render a frame (containing two passes) on each tick
+    //----------------------------------------------------------------------
+    // On each SceneJS tick, update zSpace, process stylus input and
+    // force-render a frame (which contains left and right passes)
+    //----------------------------------------------------------------------
+
     scene.on("tick", function () {
-        scene.renderFrame({force: true})
+        zspace.zspaceUpdate();
+        processStylus();
+        scene.renderFrame({force: true});
     });
 
-    // Intercept render passes for left and right eye; we let SceneJS decide when it needs to render,
-    // instead of forcing it. Therefore we must inject callbacks to fire before and after each pass.
+    //----------------------------------------------------------------------
+    // Intercept each left/right render pass to bind stereo buffer
+    // and update view and projection transforms
+    //----------------------------------------------------------------------
+
     scene.on("rendering", function (e) {
 
         switch (e.pass) {
 
             case 0: // Left eye
 
-                zspace.zspaceUpdate(); // Update matrices
-
                 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-                zspace.zspaceLeftView(); // Bind stereo framebuffer for left view
+                zspace.zspaceLeftView();
 
-                setLookatFromViewMat(zspace.leftViewMatrix);
-
-                //setLookat(zspace.leftViewLookat);
-                setCameraFrustumAngles(zspace.leftFrustumAngles);
-
-                //camera.setMatrix(zspace.leftProjectionMatrix);
+                setViewMatrix(zspace.leftViewMatrix);
+                setProjMatrix(zspace.leftProjectionMatrix);
 
                 break;
 
             case 1: // Right eye
 
-                zspace.zspaceRightView(); // Bind stereo framebuffer for right view
+                zspace.zspaceRightView();
 
-                setLookatFromViewMat(zspace.rightViewMatrix);
+                setViewMatrix(zspace.rightViewMatrix);
+                setProjMatrix(zspace.rightProjectionMatrix);
 
-                //setLookat(zspace.rightViewLookat);
-
-                setCameraFrustumAngles(zspace.rightFrustumAngles);
-
-                // camera.setMatrix(zspace.rightProjectionMatrix);
                 break;
         }
     });
 
+    //----------------------------------------------------------------------
+    // Unbind stereo buffer after right pass
+    //----------------------------------------------------------------------
+
     scene.on("rendered", function (e) {
-        if (e.pass === 1) { // Both left and right views rendered
-            zspace.zspaceFrameEnd(); // Unbind stereo framebuffer
+        if (e.pass === 1) {
+            zspace.zspaceFrameEnd();
         }
     });
 
+    /**
+     * Sets the base viewing transform; the zSpace viewing transform is
+     * post-multiplied with this.
+     *
+     * @param {Float32Array} mat The base viewing transform.
+     */
+    this.setViewMat = function (mat) {
+        baseViewMat.set(mat);
+    };
+
+    /**
+     * Sets the zSpace viewer scale factor.
+     * @param {Number} scale The scale factor
+     */
     this.setViewerScale = function (scale) {
         zspace.setViewerScale(scale);
     };
 
+    /**
+     * Sets the distance to the zSpace far clipping plane.
+     * @param {Number} clip Distance to far clipping plane
+     */
     this.setFarClip = function (clip) {
         zspace.setFarClip(clip);
     };
 
-    this.setViewMat = function(mat) {
-        baseViewMat.set(mat);
-    }
+    /**
+     * Gets the World-space position of the stylus.
+     * @returns {Float32Array}
+     */
+    this.getStylusWorldPos = function() {
+        return stylusWorldPos;
+    };
+
+    /**
+     * Gets the World-space direction of the stylus.
+     * @returns {Float32Array}
+     */
+    this.getStylusWorldDir = function() {
+        return stylusWorldDir;
+    };
+
+    /**
+     * Gets the states of the three stylus buttons.
+     * @returns {Array of Number}
+     */
+    this.getStylusButtons = function() {
+        return zspace.buttonPressed;
+    };
 };
