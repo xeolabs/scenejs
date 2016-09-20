@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>SceneJS Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <script src="../api/latest/scenejs.js"></script>
+    <link href="css/styles.css" rel="stylesheet"/>
+</head>
+
+<body>
+
+<div id="infoDark">
+    <a href="http://scenejs.org" target="_other">SceneJS</a> - GPU-assisted raycasting demo
+</div>
+
+<script>
+
+    // Point SceneJS to the bundled plugins
+    SceneJS.setConfigs({
+        pluginPath: "../api/latest/plugins"
+    });
+
+    // Define scene
+    var scene = SceneJS.createScene({
+        nodes: [
+            {
+                type: "lookAt",
+                id: "myLookat",
+                eye: {x: -5, y: 5, z: 10},
+                look: {x: 0, y: 0, z: 0},
+                nodes: [
+                    {
+                        type: "rotate",
+                        id: "myRotate",
+                        y: 1,
+                        angle: 0,
+                        nodes: [
+
+                            // Blue teapot
+                            {
+                                type: "name",
+                                name: "blueTeapot",
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: {r: 0.3, g: 0.3, b: 1.0},
+                                        nodes: [
+                                            {
+                                                type: "translate",
+                                                x: -5,
+                                                nodes: [
+                                                    {
+                                                        type: "rotate",
+                                                        y: 1,
+                                                        angle: 90,
+                                                        nodes: [
+
+                                                            // Teapot primitive, implemented by plugin at
+                                                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                                            {
+                                                                type: "geometry/teapot"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+
+                            // Yellow teapot in middle
+                            {
+                                type: "name",
+                                name: "yellowTeapot",
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: {r: 1.0, g: 1.0, b: 0.3},
+                                        nodes: [
+
+                                            // Teapot primitive, implemented by plugin at
+                                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                            {
+                                                type: "geometry/teapot"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+
+                            // Pink teapot
+                            {
+                                type: "name",
+                                name: "pinkTeapot",
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: {r: 1.0, g: 0.5, b: 0.5},
+                                        nodes: [
+                                            {
+                                                type: "translate",
+                                                x: 5,
+                                                nodes: [
+                                                    {
+                                                        type: "rotate",
+                                                        y: 1,
+                                                        angle: -90,
+                                                        nodes: [
+
+                                                            // Teapot primitive, implemented by plugin at
+                                                            // http://scenejs.org/api/latest/plugins/node/geometry/teapot.js
+                                                            {
+                                                                type: "geometry/teapot"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+
+                            // Slab behind teh teapots
+                            {
+                                type: "name",
+                                name: "backdrop",
+                                nodes: [
+                                    {
+                                        type: "material",
+                                        color: {r: 0.5, g: 1.0, b: 1.0},
+                                        nodes: [
+                                            {
+                                                type: "translate",
+                                                z: -6,
+                                                nodes: [
+                                                    {
+                                                        type: "scale",
+                                                        x: 10.0,
+                                                        y: 3.0,
+                                                        z: 0.5,
+
+                                                        nodes: [
+                                                            // Teapot primitive, implemented by plugin at
+                                                            // http://scenejs.org/api/latest/plugins/node/geometry/box.js
+                                                            {
+                                                                type: "geometry/box"
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    });
+
+    var lookat = scene.getNode("myLookat");
+    var rotate = scene.getNode("myRotate");
+
+    // Creates little red sphere at each given ray pick hit
+
+    function showHit(hit) {
+
+        rotate.addNode({
+            type: "material",
+            color: {r: 1, g: 0.3, b: 0.3},
+            nodes: [
+                {
+                    type: "flags",
+                    flags: {
+                        picking: false
+                    },
+                    nodes: [
+                        {
+                            type: "translate",
+                            x: hit.worldPos[0],
+                            y: hit.worldPos[1],
+                            z: hit.worldPos[2],
+                            nodes: [
+                                {
+                                    type: "scale",
+                                    x: 0.1,
+                                    y: 0.1,
+                                    z: 0.1,
+                                    nodes: [
+
+                                        // Sphere primitive implemented by plugin at http://scenejs.org/api/latest/plugins/node/geometry/sphere.js
+                                        {
+                                            type: "geometry/sphere",
+                                            radius: 1
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        });
+    }
+
+    // Shows a ray as an object within the scene
+    var rayHelper = new (function() {
+
+        var material = rotate.addNode({
+            type: "material",
+            color: {r: 1, g: 0.3, b: 0.3}
+        });
+
+        var flags = material.addNode({
+            type: "flags",
+            flags: {
+                enabled: true,
+                picking: false
+            }
+        });
+
+        var style = flags.addNode({
+            type: "style",
+            lineWidth: 3
+        });
+
+        var geometry = style.addNode({
+            type: "geometry",
+            primitive: "lines",
+            positions: [0, 0, 0, 0, 0, 0],
+            indices: [0, 1]
+        });
+
+        this.setRay = function (origin, direction) {
+            geometry.setPositions({
+                positions: [
+                    // Origin
+                    origin[0],
+                    origin[1],
+                    origin[2],
+                    // Direction
+                    origin[0] + direction[0],
+                    origin[1] + direction[1],
+                    origin[2] + direction[2]
+                ]
+            });
+        };
+
+        this.destroy = function () {
+            material.destroy();
+        };
+    })();
+
+    // Scan a ray across the teapots while continuously picking on it
+
+    var origin = new Float32Array([-10, 1, 10]);
+    var direction = new Float32Array([0, 0, -20]);
+
+    var xinc = 0.05;
+    var i = 0;
+
+    scene.on("tick",
+            function () {
+
+                lookat.setEye({x: lookat.getEye().x + xinc});
+                origin[0] += xinc;
+                origin[1] = 1 - Math.sin(origin[0] * 0.8) * 1;
+
+                if (i++ > 450) {
+                    return;
+                }
+
+                rayHelper.setRay(origin, direction);
+
+                var hit = scene.pick({
+                    rayPick: true,
+                    origin: origin,
+                    direction: direction
+                });
+
+                if (hit) {
+                    showHit(hit);
+                }
+            });
+
+</script>
+</body>
+</html>
