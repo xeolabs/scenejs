@@ -4,7 +4,7 @@
  * A WebGL-based 3D scene graph from xeoLabs
  * http://scenejs.org/
  *
- * Built on 2016-09-15
+ * Built on 2016-09-22
  *
  * MIT License
  * Copyright 2016, Lindsay Kay
