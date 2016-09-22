@@ -18147,7 +18147,8 @@ SceneJS_Display.prototype._logPickList = function () {
     var localRayDir = SceneJS_math_vec3();
     var pickViewMatrix = SceneJS_math_mat4();
     var pickProjMatrix = SceneJS_math_mat4();
-    mat4.frustum(pickProjMatrix, -1, 1, -1, 1, 0.1, 10000);
+
+    SceneJS_math_frustumMatrix4 (-1, 1, -1, 1, 0.1, 10000, pickProjMatrix);
 
     var a = SceneJS_math_vec3();
     var b = SceneJS_math_vec3();
