@@ -285,7 +285,7 @@ require([
                 canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
                 function pick(canvasX, canvasY) {
-                    scene.pick(canvasX, canvasY, { rayPick: true });
+                    scene.pick({ canvasPos :[canvasX, canvasY], rayPick: true });
                 }
 
                 var scene = this.getScene();
