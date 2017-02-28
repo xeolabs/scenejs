@@ -23,7 +23,7 @@ SceneJS.Types.addType("cameras/orbit", {
 
     construct: function (params) {
 
-        var lookat = this.addNode({
+        this._lookat = this.addNode({
             type: "lookAt",
 
             // A plugin node type is responsible for attaching specified
@@ -31,47 +31,44 @@ SceneJS.Types.addType("cameras/orbit", {
             nodes: params.nodes
         });
 
-        var yaw = params.yaw || 0;
-        var pitch = params.pitch || 0;
-        var zoom = params.zoom || 10;
-        var minPitch = params.minPitch;
-        var maxPitch = params.maxPitch;
-        var zoomSensitivity = params.zoomSensitivity || 1.0;
+        this.yaw = params.yaw || 0;
+        this.pitch = params.pitch || 0;
+        this.zoom = params.zoom || 10;
+        this.minPitch = params.minPitch;
+        this.maxPitch = params.maxPitch;
+        this.zoomSensitivity = params.zoomSensitivity || 1.0;
 
-        var lastX;
-        var lastY;
-        var dragging = false;
-        var lookatDirty = false;
+        this.eye = params.eye || { x: 0, y: 0, z: 0 };
+        this.look = params.look || { x: 0, y: 0, z: 0};
+        this.up = params.up || { x: 0, y: 1, z: 0 };
 
-        var eye = params.eye || { x: 0, y: 0, z: 0 };
-        var look = params.look || { x: 0, y: 0, z: 0};
-
-        lookat.setEye({ x: eye.x, y: eye.y, z: -zoom });
-        lookat.setLook({ x: look.x, y: look.y, z: look.z });
-        lookat.setUp({ x: 0, y: 1, z: 0 });
-
-        var spin = params.spin;
-
+        this._lookat.setEye({ x: this.eye.x, y: this.eye.y, z: this.eye.z });
+        this._lookat.setLook({ x: this.look.x, y: this.look.y, z: this.look.z });
+        this._lookat.setUp({ x: this.up.x, y: this.up.y, z: this.up.z });
 
         if (params.spin || params.spinYaw || params.spinPitch) {
-            var spinYaw = 0;
-            var spinPitch = 0;
             if (params.spin) {
-                spinYaw = params.spin;
+                this.spinYaw = params.spin;
             } else {
-                spinYaw = params.spinYaw || 0.0;
-                spinPitch = params.spinPitch || 0.0;
+                this.spinYaw = params.spinYaw || 0.0;
+                this.spinPitch = params.spinPitch || 0.0;
             }
 
             this._tick = this.getScene().on("tick",
                 function () {
-                    yaw -= spinYaw;
-                    pitch -= spinPitch;
-                    update();
+                    this.yaw -= this.spinYaw;
+                    this.pitch -= this.spinPitch;
+                    this._update();
                 });
         }
 
         var canvas = this.getScene().getCanvas();
+
+        var self = this;
+        var lastX;
+        var lastY;
+        var dragging = false;
+        var lookatDirty = false;
 
         function mouseDown(event) {
             lastX = event.clientX;
@@ -108,10 +105,10 @@ SceneJS.Types.addType("cameras/orbit", {
         function actionMove(posX, posY) {
             if (dragging) {
 
-                yaw -= (posX - lastX) * 0.1;
-                pitch -= (posY - lastY) * 0.1;
+                self.yaw -= (posX - lastX) * 0.1;
+                self.pitch -= (posY - lastY) * 0.1;
 
-                update();
+                self._update();
 
                 lastX = posX;
                 lastY = posY;
@@ -129,17 +126,16 @@ SceneJS.Types.addType("cameras/orbit", {
             }
             if (delta) {
                 if (delta < 0) {
-                    zoom -= zoomSensitivity;
+                    self.zoom -= self.zoomSensitivity;
                 } else {
-                    zoom += zoomSensitivity;
+                    self.zoom += self.zoomSensitivity;
                 }
             }
             if (event.preventDefault) {
                 event.preventDefault();
             }
             event.returnValue = false;
-            update();
-
+            self._update();
         }
 
         canvas.addEventListener('mousedown', mouseDown, true);
@@ -151,40 +147,50 @@ SceneJS.Types.addType("cameras/orbit", {
         canvas.addEventListener('mousewheel', mouseWheel, true);
         canvas.addEventListener('DOMMouseScroll', mouseWheel, true);
 
-        function update() {
-
-            if (minPitch != undefined && pitch < minPitch) {
-                pitch = minPitch;
-            }
-
-            if (maxPitch != undefined && pitch > maxPitch) {
-                pitch = maxPitch;
-            }
-
-            var eye = [0, 0, zoom];
-            var look = [0, 0, 0];
-            var up = [0, 1, 0];
-
-            // TODO: These references are to private SceneJS math methods, which are not part of API
-
-            var eyeVec = SceneJS_math_subVec3(eye, look, []);
-            var axis = SceneJS_math_cross3Vec3(up, eyeVec, []);
-
-            var pitchMat = SceneJS_math_rotationMat4v(pitch * 0.0174532925, axis);
-            var yawMat = SceneJS_math_rotationMat4v(yaw * 0.0174532925, up);
-
-            var eye3 = SceneJS_math_transformPoint3(pitchMat, eye);
-            eye3 = SceneJS_math_transformPoint3(yawMat, eye3);
-
-            lookat.setEye({x: eye3[0], y: eye3[1], z: eye3[2] });
-        }
-
-        update();
+        this._update();
     },
 
     setLook: function (l) {
+        this.look = l;
+        this._update();
+    },
 
+    setEye: function (e) {
+        this.eye = e;
+        this._update();
+    },
 
+    setUp: function (u) {
+        this.up = u;
+        this._update();
+    },
+
+    _update: function () {
+        if (this.minPitch != undefined && this.pitch < this.minPitch) {
+            this.pitch = this.minPitch;
+        }
+
+        if (this.maxPitch != undefined && this.pitch > this.maxPitch) {
+            this.pitch = this.maxPitch;
+        }
+
+        var e = [this.eye.x, this.eye.y, this.zoom * this.eye.z];
+        var l = [this.look.x, this.look.y, this.look.z];
+        var u = [this.up.x, this.up.y, this.up.z];
+
+        // TODO: These references are to private SceneJS math methods, which are not part of API
+        var eyeVec = SceneJS_math_subVec3(e, l, []);
+        var axis = SceneJS_math_cross3Vec3(u, eyeVec, []);
+
+        var pitchMat = SceneJS_math_rotationMat4v(this.pitch * 0.0174532925, axis);
+        var yawMat = SceneJS_math_rotationMat4v(this.yaw * 0.0174532925, u);
+
+        var eye3 = SceneJS_math_transformPoint3(pitchMat, e);
+        eye3 = SceneJS_math_transformPoint3(yawMat, eye3);
+
+        this._lookat.setEye({x: eye3[0], y: eye3[1], z: eye3[2] });
+        this._lookat.setLook(this.look);
+        this._lookat.setUp(this.up);
     },
 
     destruct: function () {
